@@ -26,7 +26,7 @@ import { preventIncapacitatedMovement, preventIncapacitatedPositionUpdate } from
 import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
 
 Hooks.once("init", async () => {
-  await foundry.applications.handlebars.loadTemplates([`systems/${SYSTEM_ID}/templates/profession.hbs`]);
+  await foundry.applications.handlebars.loadTemplates(["profession", "lifepath"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Actor.documentClass = WitcherActor;
   CONFIG.ChatMessage.documentClass = WitcherChatMessage;

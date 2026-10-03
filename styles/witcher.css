@@ -346,3 +346,24 @@
 .witcher-profession-rank button,.witcher-profession-ability > button:last-child { width:30px; }
 .witcher-profession-choice { margin:12px 0; }
 .witcher-item-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:12px 0; }
+
+.witcher-lifepath-heading, .witcher-lifepath-entry header { display: flex; align-items: center; gap: .6rem; }
+.witcher-lifepath-heading h3, .witcher-lifepath-entry h3 { flex: 1; margin: .5rem 0; }
+.witcher-lifepath-heading button, .witcher-lifepath-entry header button { width: auto; flex: 0 0 auto; }
+.witcher-lifepath-entry { border: 1px solid #b8a58a; padding: .7rem; margin: .8rem 0; border-radius: 4px; }
+.witcher-lifepath-summary { display: grid; grid-template-columns: minmax(130px, 1fr) 2fr; gap: .4rem .7rem; margin: .8rem 0; }
+.witcher-lifepath-summary dt { color: #793a36; font-weight: 600; }
+.witcher-lifepath-summary dd { margin: 0; overflow-wrap: anywhere; }
+.witcher-lifepath-summary small { display: block; font-size: .85em; opacity: .8; }
+.witcher-structured-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+.witcher-structured-fields label { display: flex; flex-direction: column; gap: .3rem; }
+.witcher-record-editor fieldset { margin: .7rem 0; }
+.witcher-record-editor [hidden] { display: none !important; }
+.witcher-record-editor .window-content { max-height: 78vh; overflow-y: auto; }
+.witcher-lifepath h2, .witcher-lifepath h3 { color: #6b3030; font-family: Georgia, serif; text-shadow: none; border: 0; }
+.witcher-lifepath h2 { font-size: 22px; }
+.witcher-lifepath h3 { font-size: 17px; }
+.witcher-lifepath button { color: #6d5133; background: #fcf8ef; border: 1px solid #b9a98e; min-height: 28px; font-size: 12px; box-shadow: none; }
+.witcher-lifepath-summary dt, .witcher-lifepath-summary dd { color: #493c32; text-shadow: none; }
+.witcher-lifepath-summary dt { color: #793a36; }
+.witcher-lifepath-summary small { color: #776956; }

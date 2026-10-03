@@ -1,4 +1,5 @@
 import { PROFESSIONS } from "./professions.mjs";
+import { lifepathSchema } from "./lifepath-fields.mjs";
 import { RACE_CHOICES } from "./races.mjs";
 import { ORIGIN_CHOICES, getOriginBonus } from "./origins.mjs";
 import { FAMILY_STATUS_CHOICES, getFamilyReward } from "./family-statuses.mjs";
@@ -19,6 +20,7 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
     });
 
     return {
+      lifepath: lifepathSchema(),
       // Null distinguishes an unfilled statistic from an explicitly entered zero on old actors.
       attributes: new SchemaField(Object.fromEntries(ATTRIBUTE_KEYS.map(key => [key,
         new NumberField({ required: true, nullable: true, integer: true, min: 0, max: 100, initial: null })

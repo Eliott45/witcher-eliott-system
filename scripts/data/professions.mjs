@@ -1,3 +1,4 @@
+import { cappedSkillModifiers } from "./background-modifiers.mjs";
 // Core book (Russian edition), pp. 37–46, 61–70. Stable IDs are independent of display names.
 // Ordinary skill ranks remain in actor.system.skills; only profession abilities are embedded Items.
 const rows = [
@@ -150,6 +151,8 @@ export function professionAbilityState(actor, definition) {
   const prerequisite = definition.tier === 0 ? null : definition.tier === 1 ? profession.abilities[0]
     : profession.abilities.find(entry => entry.branch === definition.branch && entry.tier === definition.tier - 1);
   const predecessor = prerequisite && items.find(item => item.type === "ability" && item.system.ruleId === prerequisite.id);
-  return { owned, level: owned?.system.level ?? 0, unlocked: !prerequisite || (predecessor?.system.level ?? 0) >= 5,
+  const level = owned?.system.level ?? 0;
+  const bonus = cappedSkillModifiers(level, (actor.system.statistics.modifiers ?? []).filter(modifier => modifier.target === definition.id)).reduce((sum, entry) => sum + entry.value, 0);
+  return { owned, level, bonus, unlocked: !prerequisite || (predecessor?.system.level ?? 0) >= 5,
     prerequisite: prerequisite?.name ?? "", attribute: definition.attribute ? actor.system.statistics.effective[definition.attribute] : null };
 }

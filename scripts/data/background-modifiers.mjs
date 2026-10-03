@@ -33,7 +33,7 @@ const ORIGIN_SKILLS = {
 export function backgroundModifiers(details = {}, additionalAbilities = []) {
   const modifiers = [];
   const add = (source, [target, value, condition]) => modifiers.push({
-    source: source.id, label: source.label, target, value, ...(condition ? { condition } : {})
+    source: source.id, label: source.label, target, value, category: source.group ? "lifepath" : "race", ...(condition ? { condition } : {})
   });
   const abilityIds = new Set([...(getRace(details.race)?.abilities ?? []).map(ability => ability.id), ...additionalAbilities]);
   for (const ability of RACES.flatMap(race => race.abilities).filter(ability => abilityIds.has(ability.id))) {
@@ -46,6 +46,17 @@ export function backgroundModifiers(details = {}, additionalAbilities = []) {
     if (origin) add(origin, [`skills.${ORIGIN_SKILLS[origin.id]}`, 1]);
   }
   return modifiers;
+}
+
+/** Lifepath ranks share the ordinary cap; racial perks can exceed it (core errata p. 32). */
+export function cappedSkillModifiers(level, modifiers, cap = 10) {
+  let room = Math.max(0, cap - level);
+  return modifiers.map(modifier => {
+    if (modifier.category !== "lifepath" || modifier.value <= 0) return modifier;
+    const value = Math.min(room, modifier.value);
+    room -= value;
+    return { ...modifier, value };
+  });
 }
 
 export function modifierTotal(modifiers, target, conditions = []) {

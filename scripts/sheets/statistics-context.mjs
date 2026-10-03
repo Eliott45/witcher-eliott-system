@@ -13,7 +13,7 @@ export function statisticsContext(system, { localize, format }) {
   const base = {
     body: value(statistics.adjusted.body), will: value(statistics.adjusted.will),
     speed: value(statistics.effective.speed), reflex: value(statistics.initiative),
-    physical: value(statistics.recovery), health: statistics.healthMax ?? system.health.max, maximum: value(statistics.healthMax),
+    physical: value(statistics.recovery), health: statistics.healthMax ?? system.health.max, maximum: statistics.recovery === null ? "—" : statistics.recovery * 5,
     stun: value(statistics.stun), threshold: statistics.woundThreshold,
     run: value(statistics.run), leap: value(statistics.leap), carry: value(statistics.carryMax),
     carryBase: statistics.effective.body === null ? "—" : statistics.effective.body * 10
@@ -36,6 +36,7 @@ export function statisticsContext(system, { localize, format }) {
   death.active = statistics.dying;
   death.dead = statistics.dead;
   return {
+    vigorTotal: statistics.vigor,
     death,
     luck: { points, available: points.filter(point => !point.spent).length, maximum: value(statistics.effective.luck),
       pending: points.filter(point => point.selected).length,
@@ -49,8 +50,8 @@ export function statisticsContext(system, { localize, format }) {
       effective: value(statistics.effective[key]), rollHint: rollHint(key), unset: system.attributes[key] === null
     })),
     physicalReady,
-    healthTooltip: tooltip("Health", "Resource") + resourceHint,
-    staminaTooltip: tooltip("Stamina", "Resource") + resourceHint,
+    healthTooltip: [tooltip("Health", "Resource") + resourceHint, ...modifierLines(statistics, "healthMax", localize), format("WITCHER.Statistics.TotalValue", { value: statistics.healthMax ?? system.health.max })].join("<br>"),
+    staminaTooltip: [tooltip("Stamina", "Resource") + resourceHint, ...modifierLines(statistics, "staminaMax", localize), format("WITCHER.Statistics.TotalValue", { value: statistics.staminaMax ?? system.stamina.max })].join("<br>"),
     stunTooltip: stunTooltip(system, { localize, format }), stunValue: value(statistics.stun),
     stunUnavailable: statistics.stun === null,
     recovery: row("Recovery", statistics.recovery, "Recovery"),
@@ -63,7 +64,7 @@ export function statisticsContext(system, { localize, format }) {
       format("WITCHER.Statistics.CarryFormula", { ...base, body: value(statistics.effective.body) }),
       ...modifierLines(statistics, "carryMax", localize), format("WITCHER.Statistics.TotalValue", { value: base.carry })].join("<br>"),
     carriedWeight: 0,
-    vigorTooltip: description("Vigor"),
+    vigorTooltip: [description("Vigor"), ...modifierLines(statistics, "vigor", localize)].join("<br>"),
     wounded: statistics.wounded && !statistics.dying && !statistics.dead,
     woundNotice: "WITCHER.Statistics.Wounded"
   };

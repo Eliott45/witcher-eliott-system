@@ -93,6 +93,12 @@ assert.deepEqual(legacyActorData.toObject().biography, {
 legacyActorData.updateSource({ biography });
 legacyActorData.updateSource({ "details.age": 230, "details.race": "witcher", "details.gender": "Любой свой текст" });
 const restored = new WitcherActorData(JSON.parse(JSON.stringify(legacyActorData.toObject())));
+restored.updateSource({ lifepath: { witcher: { school: "griffin", training: "best", trial: "normal", decades: [{ id: "testdecade000001", age: 30, risk: "normal", outcome: "hunt", hunt: { monster: "Грифон", category: "Гибриды" }, danger: { kind: "wound", wound: "breath" } }] } } });
+const reopenedWitcher = new WitcherActorData(JSON.parse(JSON.stringify(restored.toObject())));
+assert.equal(reopenedWitcher.lifepath.witcher.decades[0].hunt.monster, "Грифон");
+assert.equal(reopenedWitcher.lifepath.witcher.decades[0].danger.wound, "breath");
+assert.equal(reopenedWitcher.lifepath.witcher.school, "griffin");
+restored.updateSource({ "lifepath.witcher.school": "", "lifepath.witcher.training": "", "lifepath.witcher.trial": "", "lifepath.witcher.decades": [] });
 assert.deepEqual(restored.toObject().biography, biography, "Every biography section must survive saving and loading, including line breaks");
 restored.updateSource({ "biography.appearance": "" });
 assert.equal(restored.biography.appearance, "");
@@ -385,7 +391,7 @@ for (const statusId of ["dying", "dead"]) {
 handlebars.registerHelper("localize", key => foundry.utils.getProperty(translations, key) ?? key);
 handlebars.registerHelper("not", value => !value);
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-handlebars.registerPartial("systems/witcher-eliott-system/templates/profession.hbs", await readFile(new URL("../templates/profession.hbs", import.meta.url), "utf8"));
+for (const name of ["profession", "lifepath"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -428,7 +434,7 @@ assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
 assert.ok(!html.includes("witcher-footnote"));
-assert.equal([...html.matchAll(/data-action="tab"/g)].length, 7);
+assert.equal([...html.matchAll(/data-action="tab"/g)].length, 8);
 assert.equal([...html.matchAll(/name="system.attributes\./g)].length, 0, "Base attributes are locked by default");
 sheet.submit = async () => {};
 sheet.render = async () => {};
@@ -480,7 +486,7 @@ sheet.tabGroups.character = "main";
 await updateSheetPreferences(sheet.actor.uuid, { hiddenTabs: ["main"], collapsed: { parents: true, appearance: true } });
 const customized = await sheet._prepareContext({});
 assert.equal(sheet.tabGroups.character, "skills", "Hiding the active tab must select a visible one");
-assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "inventory", "actions", "biography", "family", "effects"]);
+assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "inventory", "actions", "biography", "family", "lifepath", "effects"]);
 assert.equal(customized.familySections.find(section => section.id === "parents").open, false);
 assert.equal(customized.biographySections.find(section => section.id === "appearance").open, false);
 assert.ok(!template(customized).includes('data-action="tab" data-group="character" data-tab="main"'));
@@ -660,7 +666,7 @@ for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   assert.ok(!rendered.includes("undefined"));
 }
 const tabsTemplate = handlebars.compile(await readFile(new URL("../templates/sheet-tabs.hbs", import.meta.url), "utf8"), { strict: true });
-assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 7);
+assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 8);
 // Exercise Luck against the installed parser, real evaluated dice, and chat schema.
 const aliasHook = registerHooks({ resolve(specifier, context, next) {
   return next(specifier.startsWith("@common/") ? new URL(specifier.slice(8), core).href : specifier, context);

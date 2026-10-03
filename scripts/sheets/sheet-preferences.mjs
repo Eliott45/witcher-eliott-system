@@ -7,6 +7,7 @@ export const SHEET_TABS = [
   { id: "actions", label: "WITCHER.Actions.Title", icon: "fa-solid fa-swords" },
   { id: "biography", label: "WITCHER.Sheet.Biography", icon: "fa-solid fa-book-open" },
   { id: "family", label: "WITCHER.Sheet.Family", icon: "fa-solid fa-people-roof" },
+  { id: "lifepath", label: "WITCHER.Lifepath.Title", icon: "fa-solid fa-route" },
   { id: "effects", label: "WITCHER.Sheet.Effects", icon: "fa-solid fa-person-rays" }
 ];
 

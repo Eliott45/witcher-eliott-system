@@ -1,0 +1,14 @@
+<div class="witcher-structured-fields">
+{{#each fields as |field|}}
+  <label data-record-field="{{field.name}}"><span>{{field.label}}</span>
+  {{#if field.isChoice}}
+    <select name="{{field.name}}" aria-label="{{field.label}}"><option value="">—</option>{{#each field.choices as |option|}}<option value="{{option.id}}" {{#if option.selected}}selected{{/if}}>{{localize option.name}}</option>{{/each}}</select>
+  {{else}}{{#if field.isNumber}}
+    <input type="number" name="{{field.name}}" value="{{field.value}}" min="{{field.min}}" step="1" aria-label="{{field.label}}">
+  {{else}}
+    <input type="text" name="{{field.name}}" value="{{field.value}}" aria-label="{{field.label}}">
+  {{/if}}{{/if}}
+  <small data-field-description="{{field.name}}">{{field.description}}</small>
+  </label>
+{{/each}}
+</div>

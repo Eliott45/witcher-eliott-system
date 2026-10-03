@@ -1,3 +1,4 @@
+import { cappedSkillModifiers } from "./background-modifiers.mjs";
 // Stable IDs match background-modifiers.mjs; language is a template for named entries.
 const groups = {
   intelligence: ["awareness", "wildernessSurvival", "deduction", "monsterLore", "education", "streetwise", "teaching", "tactics", "business", "socialEtiquette", "language"],
@@ -23,8 +24,8 @@ export function skillValue(system, key, languageId = "") {
   const level = language ? language.level : system.skills[key];
   const statistics = system.statistics;
   const attribute = statistics.effective[skill.attribute];
-  const modifiers = statistics.modifiers.filter(modifier => modifier.target === `skills.${key}`
-    && (!modifier.condition || (modifier.condition === "humanTarget" && system.abilityState.trustEnabled)));
+  const modifiers = cappedSkillModifiers(level, statistics.modifiers.filter(modifier => modifier.target === `skills.${key}`
+    && (!modifier.condition || (modifier.condition === "humanTarget" && system.abilityState.trustEnabled))));
   const bonus = modifiers.reduce((sum, modifier) => sum + modifier.value, 0);
   return { ...skill, language, level, attributeValue: attribute, bonus, modifiers,
     total: attribute === null ? null : attribute + level + bonus };

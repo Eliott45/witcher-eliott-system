@@ -3,11 +3,11 @@ import { test } from "node:test";
 import { registerSheetPreferences, sheetPreferences, visibleSheetTabs, updateSheetPreferences } from "../scripts/sheets/sheet-preferences.mjs";
 
 test("tab visibility always leaves a way back into the sheet", () => {
-  const all = ["main", "skills", "inventory", "actions", "biography", "family", "effects"];
+  const all = ["main", "skills", "inventory", "actions", "biography", "family", "lifepath", "effects"];
   assert.deepEqual(visibleSheetTabs().map(tab => tab.id), all);
   assert.deepEqual(visibleSheetTabs(all.filter(id => id !== "family")).map(tab => tab.id), ["family"]);
   assert.deepEqual(visibleSheetTabs(all).map(tab => tab.id), ["main"]);
-  assert.deepEqual(visibleSheetTabs(["main", "biography", "family", "effects"]).map(tab => tab.id), ["skills", "inventory", "actions"], "Old preferences reveal new tabs");
+  assert.deepEqual(visibleSheetTabs(["main", "biography", "family", "lifepath", "effects"]).map(tab => tab.id), ["skills", "inventory", "actions"], "Old preferences reveal new tabs");
   assert.deepEqual(visibleSheetTabs(["parameters"]).map(tab => tab.id), all);
 });
 

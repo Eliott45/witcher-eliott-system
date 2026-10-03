@@ -10,7 +10,7 @@ export function professionContext(actor) {
   const entries = definition.abilities.map(ability => {
     const state = professionAbilityState(actor, ability);
     return { ...ability, level: state.level, unlocked: state.unlocked, prerequisite: state.prerequisite, itemId: state.owned?.id ?? "", uuid: `Compendium.${SYSTEM_ID}.abilities.Item.${ability.documentId}`,
-      total: state.attribute === null ? "—" : state.attribute + state.level,
+      total: state.attribute === null ? "—" : state.attribute + state.level + state.bonus,
       rollUnavailable: !ability.attribute || state.attribute === null || !conditionRules(actor).canAct,
       attributeLabel: ability.attribute ? localize(`WITCHER.Attributes.${ability.attribute}.Short`) : localize("WITCHER.Professions.Passive") };
   });
@@ -47,13 +47,13 @@ export async function rollProfessionAbility(_event, target) {
   await (writes.get(this.actor) ?? Promise.resolve());
   const definition = getProfessionAbility(target.dataset.abilityId);
   if (!definition || definition.profession !== this.actor.system.details.profession || !definition.attribute || !conditionRules(this.actor).canAct) return;
-  const { level, attribute } = professionAbilityState(this.actor, definition);
+  const { level, attribute, bonus } = professionAbilityState(this.actor, definition);
   if (attribute === null) return;
   const messageMode = game.settings.get("core", "messageMode");
-  const roll = await new foundry.dice.Roll(`1d10wc + ${attribute + level}`).evaluate({ allowInteractive: messageMode !== "blind" });
+  const roll = await new foundry.dice.Roll(`1d10wc + ${attribute + level + bonus}`).evaluate({ allowInteractive: messageMode !== "blind" });
   return roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: this.actor }),
-    flavor: `<span data-tooltip="${escapeTooltip(`${definition.name}: ${attribute} + ${level}`)}">${escapeTooltip(definition.name)}</span>`,
-    flags: { [SYSTEM_ID]: { professionCheck: { id: definition.id, level, attribute, base: attribute + level } } }
+    flavor: `<span data-tooltip="${escapeTooltip(`${definition.name}: ${attribute} + ${level} + ${bonus}`)}">${escapeTooltip(definition.name)}</span>`,
+    flags: { [SYSTEM_ID]: { professionCheck: { id: definition.id, level, attribute, bonus, base: attribute + level + bonus } } }
   }, { messageMode });
 }
 

@@ -107,6 +107,7 @@
         <label for="{{rootId}}-vigor"><span data-tooltip="{{stats.vigorTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Statistics.Vigor"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></label>
         <input id="{{rootId}}-vigor" name="system.vigor" type="number" min="0" step="1"
                value="{{system.vigor}}" {{disabled (not editable)}}>
+        <output data-tooltip="{{localize 'WITCHER.Lifepath.VigorHint'}}">{{stats.vigorTotal}}</output>
       </div>
     </section>
   </aside>
@@ -418,6 +419,9 @@
                   aria-labelledby="{{../rootId}}-{{section.id}}-title" {{disabled (not ../editable)}}>{{section.value}}</textarea>
       </details>
       {{/each}}
+    </section>
+    <section id="{{rootId}}-lifepath" class="witcher-character-content witcher-lifepath tab {{tabs.lifepath.cssClass}}" data-group="character" data-tab="lifepath" aria-label="{{localize 'WITCHER.Lifepath.Title'}}">
+      {{> "systems/witcher-eliott-system/templates/lifepath.hbs"}}
     </section>
     <section id="{{rootId}}-effects" class="witcher-character-content witcher-effects tab {{tabs.effects.cssClass}}"
              data-group="character" data-tab="effects" aria-label="{{localize 'WITCHER.Sheet.Effects'}}">

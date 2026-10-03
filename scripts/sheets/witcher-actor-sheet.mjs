@@ -1,4 +1,5 @@
 import { getProfession as selectionProfession } from "../data/professions.mjs";
+import { lifepathContext, editWitcherPath, editDecade, removeDecade, rollDecade } from "./lifepath-context.mjs";
 import { professionContext, setProfessionLevel, rollProfessionAbility, professionSelectionUpdate } from "./profession-context.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { getRace } from "../data/races.mjs";
@@ -32,6 +33,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
+      editWitcherPath, editDecade, removeDecade, rollDecade,
       rollProfessionAbility,
       viewRace: WitcherActorSheet.#onViewReference,
       viewOrigin: WitcherActorSheet.#onViewReference,
@@ -94,6 +96,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     });
     return Object.assign(context, {
       conditions,
+      lifepath: lifepathContext(this.actor),
       profession: professionContext(this.actor),
       skills: skillsContext(this.actor, {
         localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
