@@ -141,9 +141,9 @@
     <nav class="witcher-character-tabs tabs" aria-label="{{localize 'WITCHER.Sheet.Title'}}">
       {{#each visibleTabs as |tab|}}
       <button type="button" class="{{tab.cssClass}}" data-action="tab" data-group="{{tab.group}}" data-tab="{{tab.id}}"
-              aria-pressed="{{tab.active}}" aria-controls="{{../rootId}}-{{tab.id}}">
+              aria-pressed="{{tab.active}}" aria-controls="{{../rootId}}-{{tab.id}}" title="{{localize tab.label}}" aria-label="{{localize tab.label}}">
         <i class="{{tab.icon}}" aria-hidden="true"></i>
-        <span>{{localize tab.label}}</span>
+        <span class="witcher-tab-label">{{localize tab.label}}</span>
       </button>
       {{/each}}
       <button type="button" class="witcher-manage-tabs" data-action="configureTabs"
@@ -271,6 +271,112 @@
         {{/each}}
       </div>
       </section>
+    </section>
+    <section id="{{rootId}}-skills" class="witcher-character-content witcher-skills tab {{tabs.skills.cssClass}}"
+             data-group="character" data-tab="skills" aria-label="{{localize 'WITCHER.Skills.Title'}}">
+      <div class="witcher-skills-heading">
+        <h2>{{localize "WITCHER.Skills.Title"}}</h2>
+        <button type="button" data-action="toggleSkills" role="switch" aria-checked="{{skills.editing}}" {{disabled (not editable)}}>
+          <i class="fa-solid {{#if skills.editing}}fa-toggle-on{{else}}fa-toggle-off{{/if}}" aria-hidden="true"></i> {{localize "WITCHER.Skills.Edit"}}
+        </button>
+      </div>
+      <div class="witcher-skill-rules">{{localize "WITCHER.Skills.Rules"}}</div>
+      <div class="witcher-ability-controls">
+        {{#if abilities.hasTrust}}
+        <button type="button" class="witcher-trust {{#if abilities.trustEnabled}}enabled{{/if}}" data-action="toggleTrust" role="switch"
+                aria-checked="{{abilities.trustEnabled}}" data-tooltip="{{localize 'WITCHER.Abilities.TrustHint'}}" {{disabled (not editable)}}>
+          <i class="fa-regular {{#if abilities.trustEnabled}}fa-square-check{{else}}fa-square{{/if}}" aria-hidden="true"></i> {{localize "WITCHER.Abilities.TrustToggle"}}
+        </button>
+        {{/if}}
+        {{#if abilities.hasStubbornness}}
+        <div class="witcher-stubbornness">
+          <span data-tooltip="{{localize 'WITCHER.Abilities.CounterHint'}}" tabindex="0">{{localize "WITCHER.Abilities.Stubbornness"}}</span>
+          <strong>{{abilities.remaining}}</strong>
+          <button type="button" data-action="stubbornness" data-change="1" title="{{localize 'WITCHER.Abilities.Use'}}" aria-label="{{localize 'WITCHER.Abilities.Use'}}" {{#if abilities.exhausted}}disabled{{else}}{{disabled (not editable)}}{{/if}}><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+          <button type="button" data-action="stubbornness" data-change="-1" title="{{localize 'WITCHER.Abilities.Restore'}}" aria-label="{{localize 'WITCHER.Abilities.Restore'}}" {{#if abilities.full}}disabled{{else}}{{disabled (not editable)}}{{/if}}><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+          <button type="button" data-action="stubbornness" data-change="0" title="{{localize 'WITCHER.Abilities.Reset'}}" aria-label="{{localize 'WITCHER.Abilities.Reset'}}" {{#if abilities.full}}disabled{{else}}{{disabled (not editable)}}{{/if}}><i class="fa-solid fa-rotate-left" aria-hidden="true"></i></button>
+        </div>
+        {{/if}}
+      </div>
+      <details class="witcher-sheet-abilities" data-biography-section="abilities" {{#if abilitiesOpen}}open{{/if}}>
+        <summary>{{localize "WITCHER.Abilities.Title"}} <small>{{abilities.entries.length}}</small></summary>
+        <div class="witcher-abilities-toolbar">
+          <button type="button" data-action="browseAbilities"><i class="fa-solid fa-book-atlas" aria-hidden="true"></i> {{localize "WITCHER.Abilities.Browse"}}</button>
+          <button type="button" data-action="createAbility" {{disabled (not editable)}}><i class="fa-solid fa-plus" aria-hidden="true"></i> {{localize "WITCHER.Abilities.Create"}}</button>
+        </div>
+        <p class="witcher-drop-hint">{{localize "WITCHER.Abilities.Hint"}}</p>
+        {{#each abilities.entries as |ability|}}
+        <details class="witcher-owned-ability {{#if ability.id}}draggable{{/if}}" data-item-id="{{ability.id}}">
+          <summary>
+            <img src="{{ability.img}}" alt=""><span>{{ability.name}}</span>
+            {{#if ability.fromRace}}<small>{{localize "WITCHER.Abilities.Race"}}</small>{{/if}}
+          </summary>
+          <div class="witcher-owned-description">{{{ability.description}}}</div>
+          <div class="witcher-owned-buttons">
+            <button type="button" data-action="viewSheetItem" data-item-id="{{ability.id}}" data-uuid="{{ability.uuid}}"><i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i> {{localize "WITCHER.Abilities.View"}}</button>
+            {{#if ability.id}}{{#if ../editable}}<button type="button" data-action="removeSheetItem" data-item-id="{{ability.id}}"><i class="fa-solid fa-trash" aria-hidden="true"></i> {{localize "WITCHER.Abilities.Remove"}}</button>{{/if}}{{/if}}
+          </div>
+        </details>
+        {{else}}<p class="witcher-drop-hint">{{localize "WITCHER.Abilities.Empty"}}</p>{{/each}}
+      </details>
+      <label class="witcher-skills-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input type="search" data-skill-search value="{{skills.query}}" placeholder="{{localize 'WITCHER.Skills.Search'}}" aria-label="{{localize 'WITCHER.Skills.Search'}}">
+      </label>
+      {{#each skills.groups as |group|}}
+      <section class="witcher-skill-group" data-skill-group {{#unless group.visible}}hidden{{/unless}}>
+        <h3>{{localize group.label}}</h3>
+        <table class="witcher-skills-table">
+          <thead><tr><th>{{localize "WITCHER.Skills.Name"}}</th><th>{{localize "WITCHER.Skills.Level"}}</th><th>{{localize "WITCHER.Skills.Attribute"}}</th><th>{{localize "WITCHER.Skills.Bonus"}}</th><th>{{localize "WITCHER.Skills.Base"}}</th><th></th></tr></thead>
+          <tbody>
+            {{#each group.rows as |skill|}}
+            <tr data-skill-name="{{skill.searchName}}" {{#unless skill.visible}}hidden{{/unless}}>
+              <td><span class="witcher-skill-label" data-tooltip="{{skill.tooltip}}" tabindex="0">{{skill.label}}{{#if skill.complex}} <small>(2)</small>{{/if}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></td>
+              <td>{{#if ../../skills.editing}}<input name="system.skills.{{skill.key}}" type="number" min="0" step="1" value="{{skill.level}}" aria-label="{{skill.label}} — {{localize 'WITCHER.Skills.Level'}}">{{else}}<output>{{skill.level}}</output>{{/if}}</td>
+              <td><span title="{{localize skill.attributeShort}}">{{skill.attributeText}}</span></td>
+              <td><output class="{{#if skill.bonus}}has-bonus{{/if}}" data-tooltip="{{skill.calculation}}" tabindex="0">{{skill.bonusText}}</output></td>
+              <td><output class="witcher-skill-total" data-tooltip="{{skill.calculation}}" tabindex="0">{{skill.total}}</output></td>
+              <td><button type="button" data-action="rollSkill" data-skill="{{skill.key}}" title="{{skill.rollHint}}" aria-label="{{skill.rollHint}}" {{#if skill.rollUnavailable}}disabled{{else}}{{disabled (not ../../editable)}}{{/if}}><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button></td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </section>
+      {{/each}}
+      <div class="witcher-languages-heading">
+        <h3><span data-tooltip="{{skills.languageTooltip}}" tabindex="0">{{localize "WITCHER.Skills.Languages"}} (2) <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></h3>
+        <button type="button" data-action="browseLanguages" title="{{localize 'WITCHER.Languages.Browse'}}" aria-label="{{localize 'WITCHER.Languages.Browse'}}"><i class="fa-solid fa-book-atlas" aria-hidden="true"></i> {{localize "WITCHER.Languages.Compendium"}}</button>
+        <button type="button" data-action="addLanguage" title="{{localize 'WITCHER.Skills.AddLanguage'}}" {{disabled (not editable)}}><i class="fa-solid fa-plus" aria-hidden="true"></i> {{localize "WITCHER.Skills.AddLanguage"}}</button>
+      </div>
+      <div data-skill-group>
+        {{#each skills.languages as |skill|}}
+        <div class="witcher-language-row" data-skill-name="{{skill.searchName}}" {{#unless skill.visible}}hidden{{/unless}}>
+          {{#if ../skills.editing}}
+          <input type="text" data-language-field="name" data-language-id="{{skill.languageId}}" value="{{skill.label}}" aria-label="{{localize 'WITCHER.Skills.LanguageName'}}" required>
+          <input type="number" data-language-field="level" data-language-id="{{skill.languageId}}" value="{{skill.level}}" min="0" step="1" aria-label="{{skill.label}} — {{localize 'WITCHER.Skills.Level'}}">
+          {{else}}<span>{{skill.label}}</span><span>{{localize "WITCHER.Skills.Level"}} {{skill.level}}</span>{{/if}}
+          <output class="witcher-skill-total" data-tooltip="{{skill.calculation}}" tabindex="0">{{skill.total}}</output>
+          <button type="button" data-action="rollSkill" data-skill="language" data-language-id="{{skill.languageId}}" title="{{skill.rollHint}}" aria-label="{{skill.rollHint}}" {{#if skill.rollUnavailable}}disabled{{else}}{{disabled (not ../editable)}}{{/if}}><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button>
+          {{#if ../skills.editing}}<button type="button" data-action="removeLanguage" data-language-id="{{skill.languageId}}" title="{{localize 'WITCHER.Skills.RemoveLanguage'}}" aria-label="{{localize 'WITCHER.Skills.RemoveLanguage'}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>{{/if}}
+        </div>
+        {{else}}<p class="witcher-drop-hint">{{localize "WITCHER.Skills.LanguageEmpty"}}</p>{{/each}}
+      </div>
+      <p class="witcher-drop-hint" data-no-skills {{#unless skills.empty}}hidden{{/unless}}>{{localize "WITCHER.Skills.NoResults"}}</p>
+    </section>
+    <section id="{{rootId}}-inventory" class="witcher-character-content witcher-inventory tab {{tabs.inventory.cssClass}}"
+             data-group="character" data-tab="inventory" aria-label="{{localize 'WITCHER.Inventory.Title'}}">
+      <h2>{{localize "WITCHER.Inventory.Title"}}</h2>
+      <p class="witcher-drop-hint">{{localize "WITCHER.Inventory.Hint"}}</p>
+      {{#each equipment as |item|}}
+      <article class="witcher-inventory-item draggable" data-item-id="{{item.id}}">
+        <img src="{{item.img}}" alt=""><button type="button" data-action="viewSheetItem" data-item-id="{{item.id}}">{{item.name}}</button>
+        {{#if ../editable}}<button type="button" data-action="removeSheetItem" data-item-id="{{item.id}}" title="{{localize 'WITCHER.Inventory.Remove'}}" aria-label="{{localize 'WITCHER.Inventory.Remove'}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>{{/if}}
+      </article>
+      {{else}}<p class="witcher-empty-panel"><i class="fa-solid fa-sack" aria-hidden="true"></i>{{localize "WITCHER.Inventory.Empty"}}</p>{{/each}}
+    </section>
+    <section id="{{rootId}}-actions" class="witcher-character-content tab {{tabs.actions.cssClass}}"
+             data-group="character" data-tab="actions" aria-label="{{localize 'WITCHER.Actions.Title'}}">
+      <h2>{{localize "WITCHER.Actions.Title"}}</h2>
+      <p class="witcher-empty-panel"><i class="fa-solid fa-swords" aria-hidden="true"></i>{{localize "WITCHER.Actions.Empty"}}</p>
     </section>
     <section id="{{rootId}}-biography" class="witcher-character-content witcher-biography tab {{tabs.biography.cssClass}}"
              data-group="character" data-tab="biography" aria-label="{{localize 'WITCHER.Sheet.Biography'}}">

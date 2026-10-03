@@ -6,11 +6,11 @@ export const ATTRIBUTE_KEYS = ["intelligence", "reflex", "dexterity", "body", "s
 const WOUNDED_ATTRIBUTES = new Set(["intelligence", "reflex", "dexterity", "will"]);
 
 /** Use base BODY/WILL for resource limits: wound penalties must not lower their own threshold. */
-export function deriveStatistics({ attributes, health, details = {} }, { dying = false, dead = false } = {}) {
-  const modifiers = backgroundModifiers(details);
+export function deriveStatistics({ attributes, health, details = {}, abilityState = {} }, { dying = false, dead = false, abilityIds = [] } = {}) {
+  const modifiers = backgroundModifiers(details, abilityIds);
   const adjusted = Object.fromEntries(ATTRIBUTE_KEYS.map(key => [key, attributes[key] === null ? null
     : attributes[key] + modifierTotal(modifiers, `attributes.${key}`)]));
-  if (details.race === "witcher" && adjusted.empathy !== null) adjusted.empathy = Math.min(6, Math.max(1, adjusted.empathy));
+  if (modifiers.some(modifier => modifier.source === "witcher.dulled-emotions") && adjusted.empathy !== null) adjusted.empathy = Math.min(6, Math.max(1, adjusted.empathy));
   const { body, will } = adjusted;
   const physical = body !== null && will !== null ? Math.floor((body + will) / 2) : null;
   const healthMax = physical === null ? null : physical * 5;
@@ -31,7 +31,7 @@ export function deriveStatistics({ attributes, health, details = {} }, { dying =
     recovery: physical, woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
     reputationBonus: modifierTotal(modifiers, "reputation"), naturalArmor: modifierTotal(modifiers, "naturalArmor"),
     skillBonuses: Object.fromEntries([...new Set(modifiers.filter(modifier => modifier.target.startsWith("skills.")).map(modifier => modifier.target))]
-      .map(target => [target.slice(7), modifierTotal(modifiers, target)])),
+      .map(target => [target.slice(7), modifierTotal(modifiers, target, abilityState.trustEnabled ? ["humanTarget"] : [])])),
     initiative: effective.reflex,
     run, leap: run === null ? null : Math.floor(run / 5),
     carryMax: effective.body === null ? null : effective.body * 10 + modifierTotal(modifiers, "carryMax")

@@ -11,7 +11,7 @@ export function attributeTooltip(system, key, { localize, format }) {
   if (attributes[key] === null) return localize("WITCHER.Statistics.UnfilledAttribute");
   const lines = [format("WITCHER.Statistics.BaseValue", { value: attributes[key] }),
     ...modifierLines(statistics, `attributes.${key}`, localize)];
-  if (key === "empathy" && system.details?.race === "witcher") lines.push(localize("WITCHER.Statistics.EmpathyLimit"));
+  if (key === "empathy" && statistics.modifiers.some(modifier => modifier.source === "witcher.dulled-emotions")) lines.push(localize("WITCHER.Statistics.EmpathyLimit"));
   if (statistics.effective[key] !== statistics.adjusted[key]) {
     lines.push(format(statistics.dying || statistics.dead ? "WITCHER.Death.Calculation" : "WITCHER.Statistics.WoundCalculation",
       { value: statistics.adjusted[key], result: statistics.effective[key] }));

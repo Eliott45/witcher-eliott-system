@@ -4,6 +4,7 @@ import { RACE_DOCUMENT_IDS, ABILITY_DOCUMENT_IDS, abilityUuid, equipmentUuid } f
 import { FAMILY_STATUSES, FAMILY_GROUPS } from "../scripts/data/family-statuses.mjs";
 import { EQUIPMENT, EQUIPMENT_FOLDERS, getEquipment } from "../scripts/data/equipment.mjs";
 import { INFLUENTIAL_FRIENDS } from "../scripts/data/influential-friends.mjs";
+import { LANGUAGES } from "../scripts/data/languages.mjs";
 
 const escapeHTML = text => text.replace(/[&<>"']/g, character => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -16,7 +17,7 @@ export function compendiumData(translations) {
     _id: id,
     name: ["familyStatus", "influence"].includes(type) ? `${localize(entry.label)} — ${localize(FAMILY_GROUPS[entry.group])}` : localize(entry.label),
     type,
-    img: ({ race: "icons/svg/mystery-man.svg", origin: "icons/svg/village.svg", familyStatus: "icons/svg/house.svg", equipment: "icons/svg/item-bag.svg", influence: "icons/svg/upgrade.svg" })[type] ?? "icons/svg/aura.svg",
+    img: ({ race: "icons/svg/mystery-man.svg", origin: "icons/svg/village.svg", familyStatus: "icons/svg/house.svg", equipment: "icons/svg/item-bag.svg", influence: "icons/svg/upgrade.svg", language: "icons/svg/book.svg" })[type] ?? "icons/svg/aura.svg",
     system: { ruleId: entry.id, ...system },
     effects: [],
     folder: type === "equipment" ? EQUIPMENT_FOLDERS[entry.source].id : null,
@@ -25,6 +26,9 @@ export function compendiumData(translations) {
     flags: {}
   });
   return {
+    languages: LANGUAGES.map(language => item(language.documentId, "language", language, {
+      description: paragraph(language.description) + paragraph("WITCHER.Languages.Rules")
+    })),
     races: RACES.map(race => item(RACE_DOCUMENT_IDS[race.id], "race", race, {
       description: paragraph(race.note),
       abilities: race.abilities.map(ability => abilityUuid(ability.id))

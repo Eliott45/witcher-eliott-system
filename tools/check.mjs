@@ -8,6 +8,7 @@ import { ORIGINS, ORIGIN_GROUPS } from "../scripts/data/origins.mjs";
 import { FAMILY_STATUSES, FAMILY_GROUPS } from "../scripts/data/family-statuses.mjs";
 import { EQUIPMENT } from "../scripts/data/equipment.mjs";
 import { INFLUENTIAL_FRIENDS } from "../scripts/data/influential-friends.mjs";
+import { LANGUAGES } from "../scripts/data/languages.mjs";
 import { compendiumData, compendiumFolders } from "./compendium-data.mjs";
 
 process.chdir(fileURLToPath(new URL("..", import.meta.url)));
@@ -53,7 +54,7 @@ for (const pack of manifest.packs) {
   assert.equal(pack.ownership.PLAYER, "OBSERVER", "Players must be able to read racial bonuses");
 }
 const ids = new Set();
-for (const entry of [...FAMILY_STATUSES, ...EQUIPMENT, ...INFLUENTIAL_FRIENDS]) {
+for (const entry of [...FAMILY_STATUSES, ...EQUIPMENT, ...INFLUENTIAL_FRIENDS, ...LANGUAGES]) {
   for (const key of [entry.label, entry.description, entry.reward, FAMILY_GROUPS[entry.group]].filter(Boolean)) {
     assert.ok(keys.has(key), `Missing family/equipment translation: ${key}`);
   }

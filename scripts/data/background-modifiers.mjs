@@ -1,4 +1,4 @@
-import { getRace } from "./races.mjs";
+import { getRace, RACES } from "./races.mjs";
 import { getOrigin } from "./origins.mjs";
 import { getFamilyStatus } from "./family-statuses.mjs";
 
@@ -30,12 +30,13 @@ const ORIGIN_SKILLS = {
   "dol-blathanna": "socialEtiquette", mahakam: "crafting"
 };
 
-export function backgroundModifiers(details = {}) {
+export function backgroundModifiers(details = {}, additionalAbilities = []) {
   const modifiers = [];
   const add = (source, [target, value, condition]) => modifiers.push({
     source: source.id, label: source.label, target, value, ...(condition ? { condition } : {})
   });
-  for (const ability of getRace(details.race)?.abilities ?? []) {
+  const abilityIds = new Set([...(getRace(details.race)?.abilities ?? []).map(ability => ability.id), ...additionalAbilities]);
+  for (const ability of RACES.flatMap(race => race.abilities).filter(ability => abilityIds.has(ability.id))) {
     for (const rule of RACE_RULES[ability.id] ?? []) add(ability, rule);
   }
   if (details.race !== "witcher") {

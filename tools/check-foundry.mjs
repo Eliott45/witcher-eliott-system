@@ -38,7 +38,7 @@ assert.equal(game.system.grid.distance, 2);
 assert.equal(game.system.grid.units, "m");
 const [packFolder] = game.system.packFolders;
 assert.equal(packFolder.name, "Witcher");
-assert.deepEqual(Array.from(packFolder.packs), ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends"]);
+assert.deepEqual(Array.from(packFolder.packs), ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages"]);
 game.model = { ...game.system.documentTypes, Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type, folders: new Map() }]));
 game.user = { id: "testuser00000001", isGM: true };
@@ -253,7 +253,7 @@ const { WitcherOriginData } = await import("../scripts/data/witcher-origin-data.
 const { WitcherFamilyStatusData } = await import("../scripts/data/witcher-family-status-data.mjs");
 const { WitcherInfluenceData } = await import("../scripts/data/witcher-influence-data.mjs");
 const { raceUuid, abilityUuid, originUuid, familyStatusUuid, equipmentUuid, influentialFriendUuid } = await import("../scripts/data/compendiums.mjs");
-CONFIG.Item.dataModels = { race: WitcherRaceData, ability: WitcherReferenceData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherReferenceData, influence: WitcherInfluenceData };
+CONFIG.Item.dataModels = { race: WitcherRaceData, ability: WitcherReferenceData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherReferenceData, influence: WitcherInfluenceData, language: WitcherReferenceData };
 const equipmentPack = `${game.system.id}.equipment`;
 for (const source of await readJSON("../pack-sources/equipment.folders.json")) {
   const folder = new foundry.documents.BaseFolder(source, { pack: equipmentPack });
@@ -273,7 +273,17 @@ for (const pack of game.system.packs) {
     documents.set(uuid, document);
   }
 }
-assert.equal(documents.size, 129);
+assert.equal(documents.size, 132);
+const { addLanguageFromItem, LANGUAGES } = await import("../scripts/data/languages.mjs");
+const { languageUuid } = await import("../scripts/data/compendiums.mjs");
+const languageActor = { uuid: "Actor.languageImport", isOwner: true, system: new WitcherActorData(),
+  async update(changes) { this.system.updateSource(foundry.utils.expandObject(changes).system); }
+};
+await Promise.all(LANGUAGES.map(language => addLanguageFromItem(languageActor, documents.get(languageUuid(language.id)))));
+assert.equal(languageActor.system.languages.length, 3);
+assert.ok(languageActor.system.languages.every(entry => entry.level === 0));
+const savedLanguages = new WitcherActorData(JSON.parse(JSON.stringify(languageActor.system.toObject())));
+assert.deepEqual(savedLanguages.toObject().languages, languageActor.system.toObject().languages);
 for (const entry of INFLUENTIAL_FRIENDS) {
   const document = documents.get(influentialFriendUuid(entry.id));
   assert.equal(document.type, "influence");
@@ -335,6 +345,28 @@ assert.equal(coreEffect.showIcon, CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS);
 assert.ok(new foundry.documents.BaseActiveEffect(coreEffect.toObject()).statuses.has("stunned"));
 CONFIG.Actor.dataModels.character = WitcherActorData;
 foundry.data.PrototypeTokenOverrides.overrides = { base: {} };
+// Real embedded Items feed ability rules; only the base skill level is persisted.
+const skillsActor = new foundry.documents.BaseActor({ name: "Skill check", type: "character",
+  system: { attributes: { intelligence: 8, dexterity: 8, empathy: 8 }, details: { race: "elf", origin: "redania", familyStatus: "elder.scribes" },
+    skills: { education: 4, archery: 3 }, languages: [{ id: "common0000000001", name: "Всеобщий", level: 8 }],
+    abilityState: { trustEnabled: true, stubbornnessUsed: 2 } },
+  items: ["human.ingenuity", "human.trust", "witcher.lightning-reflexes", "elf.marksman"].map(id => documents.get(abilityUuid(id)).toObject())
+});
+const { skillValue } = await import("../scripts/data/skills.mjs");
+assert.equal(skillValue(skillsActor.system, "education").total, 14);
+assert.equal(skillValue(skillsActor.system, "archery").total, 14, "9 DEX + 3 level + 2 Marksman, even if the racial ability is also embedded");
+assert.equal(skillValue(skillsActor.system, "deduction").total, 9);
+assert.equal(skillValue(skillsActor.system, "charisma").total, 9);
+const savedSkills = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(skillsActor.toObject())));
+assert.equal(skillValue(savedSkills.system, "archery").total, 14);
+assert.equal(savedSkills.system.abilityState.stubbornnessUsed, 2);
+assert.equal(savedSkills.system.abilityState.trustEnabled, true);
+assert.equal(skillValue(savedSkills.system, "language", "common0000000001").total, 16);
+assert.equal(savedSkills.system.skills.archery, 3);
+assert.equal(Object.keys(actorData.skills).length, 49, "Legacy characters receive zeroed skills");
+assert.ok(Object.values(actorData.skills).every(value => value === 0));
+assert.deepEqual(actorData.languages, []);
+assert.equal(actorData.abilityState.trustEnabled, false);
 for (const statusId of ["dying", "dead"]) {
   const definition = CONFIG.statusEffects[statusId];
   const actor = new foundry.documents.BaseActor({ name: "Condition check", type: "character",
@@ -376,6 +408,7 @@ foundry.applications = {
   ux: { TextEditor: { implementation: { enrichHTML: async html => html } } }
 };
 const { WitcherActorSheet } = await import("../scripts/sheets/witcher-actor-sheet.mjs");
+foundry.utils.fromUuid = async () => null;
 const sheet = new WitcherActorSheet();
 sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/svg/mystery-man.svg", type: "character", system: actorData, prototypeToken: prototype, effects: [], isOwner: true };
 sheet.token = null;
@@ -393,7 +426,7 @@ assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
 assert.ok(!html.includes("witcher-footnote"));
-assert.equal([...html.matchAll(/data-action="tab"/g)].length, 4);
+assert.equal([...html.matchAll(/data-action="tab"/g)].length, 7);
 assert.equal([...html.matchAll(/name="system.attributes\./g)].length, 0, "Base attributes are locked by default");
 sheet.submit = async () => {};
 sheet.render = async () => {};
@@ -403,6 +436,11 @@ assert.equal([...editableStatisticsHTML.matchAll(/name="system.attributes\./g)].
 assert.match(editableStatisticsHTML, /role="switch" aria-checked="true"/);
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleAttributes.call(sheet);
 assert.equal((await sheet._prepareContext({})).editingAttributes, false);
+assert.equal([...html.matchAll(/data-action="rollSkill"/g)].length, 49);
+assert.equal([...html.matchAll(/name="system.skills\./g)].length, 0, "Skills are locked until editing is enabled");
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleSkills.call(sheet);
+assert.equal([...template(await sheet._prepareContext({})).matchAll(/name="system.skills\./g)].length, 49);
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleSkills.call(sheet);
 assert.ok(html.includes('data-action="rollStun"'));
 assert.ok(!html.includes('name="system.carriedWeight"'));
 assert.ok(!html.includes('data-tab="parameters"'));
@@ -416,7 +454,7 @@ assert.ok(html.indexOf("Отдых") < html.indexOf('class="witcher-derived"'));
 assert.ok(html.includes('name="system.vigor"'));
 assert.ok(!html.includes("undefined"));
 assert.ok(html.includes('data-action="configureTabs"'));
-assert.equal([...html.matchAll(/data-biography-section=/g)].length, 10);
+assert.equal([...html.matchAll(/data-biography-section=/g)].length, 11);
 assert.ok(html.includes('data-kind="influentialFriend"'));
 assert.ok(!html.includes('data-action="viewFriend"'), "An unset friend must not have a broken description button");
 assert.match(html, /id="test-actor-main" class="witcher-character-content tab active"/);
@@ -439,8 +477,8 @@ assert.ok(!biographyHTML.includes("<script>test</script>"), "Biography text must
 sheet.tabGroups.character = "main";
 await updateSheetPreferences(sheet.actor.uuid, { hiddenTabs: ["main"], collapsed: { parents: true, appearance: true } });
 const customized = await sheet._prepareContext({});
-assert.equal(sheet.tabGroups.character, "biography", "Hiding the active tab must select a visible one");
-assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["biography", "family", "effects"]);
+assert.equal(sheet.tabGroups.character, "skills", "Hiding the active tab must select a visible one");
+assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "inventory", "actions", "biography", "family", "effects"]);
 assert.equal(customized.familySections.find(section => section.id === "parents").open, false);
 assert.equal(customized.biographySections.find(section => section.id === "appearance").open, false);
 assert.ok(!template(customized).includes('data-action="tab" data-group="character" data-tab="main"'));
@@ -457,8 +495,8 @@ for (const race of RACES) {
   assert.ok(rendered.includes('data-action="viewRace"'));
   assert.match(rendered, /data-action="viewRace"[^>]*>\s*<span>[^<]+<\/span>\s*<i class="fa-solid fa-ellipsis-vertical"/);
   for (const ability of race.abilities) {
-    assert.ok(!rendered.includes(handlebars.escapeExpression(foundry.utils.getProperty(translations, ability.description))),
-      "Racial bonuses must appear in the reference document, not on the actor sheet");
+    assert.ok(rendered.includes(foundry.utils.getProperty(translations, ability.description)),
+      "The skills tab includes descriptions of the current racial abilities");
   }
 }
 assert.deepEqual(actorData.toObject().health, before.health, "Race bonuses must not overwrite saved base resources");
@@ -558,6 +596,28 @@ const { WitcherItemSheet } = await import("../scripts/sheets/witcher-item-sheet.
 const referenceSheet = new WitcherItemSheet();
 referenceSheet.isEditable = false;
 const itemTemplate = handlebars.compile(await readFile(new URL("../templates/item-sheet.hbs", import.meta.url), "utf8"), { strict: true });
+const originalSheetActor = sheet.actor;
+const originalEditable = sheet.isEditable;
+sheet.actor = { ...originalSheetActor, system: savedSkills.system, items: savedSkills.items, effects: [] };
+sheet.isEditable = true;
+sheet.tabGroups.character = "skills";
+let skillsContext = await sheet._prepareContext({});
+assert.equal(skillsContext.abilities.entries.length, 6, "Own-race duplicate is one card; three foreign abilities remain editable");
+assert.equal(skillsContext.abilities.hasTrust, true);
+assert.ok(skillsContext.abilities.entries.some(ability => ability.id && !ability.fromRace && ability.description.includes("Дедукции")));
+assert.match(template(skillsContext), /data-action="toggleTrust"[^>]*aria-checked="true"/);
+assert.match(template(skillsContext), /data-skill="language" data-language-id="common0000000001"/);
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleSkills.call(sheet);
+assert.match(template(await sheet._prepareContext({})), /data-language-field="level"[^>]*value="8"/);
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleSkills.call(sheet);
+sheet.isEditable = false;
+const observerSkills = template(await sheet._prepareContext({}));
+assert.match(observerSkills, /data-action="toggleTrust"[^>]*disabled/);
+assert.match(observerSkills, /data-action="createAbility"[^>]*disabled/);
+assert.ok(!observerSkills.includes('data-action="removeSheetItem"'));
+sheet.actor = originalSheetActor;
+sheet.isEditable = originalEditable;
+sheet.tabGroups.character = "main";
 for (const uuid of documents.keys()) {
   referenceSheet.item = await foundry.utils.fromUuid(uuid);
   const context = await referenceSheet._prepareContext({});
@@ -579,7 +639,7 @@ for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   assert.ok(!rendered.includes("undefined"));
 }
 const tabsTemplate = handlebars.compile(await readFile(new URL("../templates/sheet-tabs.hbs", import.meta.url), "utf8"), { strict: true });
-assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 4);
+assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 7);
 // Exercise Luck against the installed parser, real evaluated dice, and chat schema.
 const aliasHook = registerHooks({ resolve(specifier, context, next) {
   return next(specifier.startsWith("@common/") ? new URL(specifier.slice(8), core).href : specifier, context);
@@ -724,4 +784,4 @@ if (process.argv[3]) {
   }
   console.log("Installed Dice So Nice: all nine critical chains produce the correct successive d10 throws");
 }
-console.log("Installed Foundry core: data, 129 Items, templates, native Luck, death saves and all nine critical chains OK");
+console.log("Installed Foundry core: data, 132 Items, templates, native Luck, death saves and all nine critical chains OK");

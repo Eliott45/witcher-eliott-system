@@ -45,6 +45,7 @@ Hooks.once("init", () => {
   CONFIG.Item.dataModels.familyStatus = WitcherFamilyStatusData;
   CONFIG.Item.dataModels.equipment = WitcherReferenceData;
   CONFIG.Item.dataModels.influence = WitcherInfluenceData;
+  CONFIG.Item.dataModels.language = WitcherReferenceData;
 
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
     foundry.documents.Actor,

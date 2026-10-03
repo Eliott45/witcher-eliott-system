@@ -97,6 +97,10 @@
 .witcher-character-tabs button.active { color: #fff3d9; background: #ffffff0d; box-shadow: inset 0 -3px #d4b477; text-shadow: none; }
 .witcher-character-tabs i { font-size: 13px; }
 .witcher-character-tabs .witcher-manage-tabs { margin-left: auto; flex: 0 0 30px; justify-content: center; padding: 7px; }
+.witcher-character-tabs button:not(.active) .witcher-tab-label { display: none; }
+.witcher-character-tabs button { flex: 0 0 auto; }
+.witcher-character-tabs.tabs { gap: 2px; padding: 0 8px; }
+.witcher-character-tabs button:not(.active):not(.witcher-manage-tabs) { width: 34px; justify-content: center; padding: 7px; }
 .witcher-character-content { flex: 1; min-height: 0; overflow-y: auto; padding: 24px; }
 .witcher-character-content.tab { display: none; }
 .witcher-character-content.tab.active { display: block; }
@@ -143,6 +147,70 @@
 .witcher-effect header button { flex: 0 0 26px; width: 26px; height: 26px; padding: 0; background: transparent; color: #8f6752; border: 0; }
 .witcher-effect-description { margin-top: 12px; font-size: 13px; line-height: 1.6; color: #514538; }
 .witcher-effects-empty { color: #89765b; font-size: 14px; }
+.witcher-skills { padding: 18px; }
+.witcher-skills [hidden] { display: none !important; }
+.witcher-skills-heading, .witcher-languages-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.witcher-skills h2, .witcher-inventory h2 { color: #6b3030; font-family: Georgia, serif; margin: 0; border: 0; font-size: 22px; }
+.witcher-skills h3 { color: #6b3030; font-family: Georgia, serif; border: 0; margin: 0; font-size: 16px; }
+.witcher-skills button, .witcher-inventory button { height: 28px; min-height: 0; padding: 4px 7px; color: #6d5133; border: 1px solid #b9a98e; background: #fcf8ef; font-size: 11px; box-shadow: none; }
+.witcher-skills button:hover, .witcher-inventory button:hover { background: #e5d9c2; color: #502e25; }
+.witcher-skills button:disabled { opacity: 0.4; }
+.witcher-skills-heading button { width: auto; border: 0; background: transparent; }
+.witcher-skills-heading [aria-checked=true] { color: #32623d; }
+.witcher-skill-rules, .witcher-drop-hint { color: #776956; font-size: 11px; line-height: 1.5; margin: 6px 0 12px; }
+.witcher-ability-controls { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
+.witcher-ability-controls:empty { display: none; }
+.witcher-ability-controls .witcher-trust { text-align: left; justify-content: flex-start; width: 100%; height: auto; min-height: 32px; }
+.witcher-ability-controls .witcher-trust.enabled { color: #255232; background: #dce8d3; border-color: #8ea581; }
+.witcher-stubbornness { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 4px 7px; border: 1px solid #c7bba6; color: #6b3030; font-size: 12px; background: #f7f0e2; }
+.witcher-stubbornness > span { cursor: help; }
+.witcher-stubbornness strong { font-size: 11px; margin-right: auto; color: #6d5133; }
+.witcher-stubbornness button { width: 25px; padding: 2px; height: 25px; }
+.witcher-sheet-abilities { margin: 10px 0 16px; padding: 10px; background: #faf6ed; border: 1px solid #c7bba6; border-radius: 3px; }
+.witcher-sheet-abilities > summary { cursor: pointer; color: #6b3030; font-family: Georgia, serif; font-size: 17px; }
+.witcher-sheet-abilities > summary > small { color: #968067; font-family: var(--font-body, sans-serif); margin-left: 5px; font-size: 11px; }
+.witcher-abilities-toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.witcher-abilities-toolbar button { width: auto; }
+.witcher-owned-ability { border-top: 1px solid #dbd0bd; padding: 7px 0; }
+.witcher-owned-ability > summary { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #553931; }
+.witcher-owned-ability > summary::before { content: "▸"; color: #a1814f; }
+.witcher-owned-ability[open] > summary::before { content: "▾"; }
+.witcher-owned-ability img, .witcher-inventory-item img { width: 26px; height: 26px; object-fit: cover; border: 0; background: #59443b; border-radius: 3px; }
+.witcher-owned-ability summary small { font-size: 10px; color: #8e7c63; margin-left: auto; }
+.witcher-owned-description { color: #514538; font-size: 12px; line-height: 1.6; padding: 0 8px; overflow-wrap: anywhere; }
+.witcher-owned-buttons { display: flex; gap: 6px; margin-top: 8px; }
+.witcher-owned-buttons button { width: auto; height: auto; }
+.witcher-skills-search { display: flex; align-items: center; gap: 9px; background: #faf6ed; border: 1px solid #b9a98e; border-radius: 3px; padding: 0 10px; margin: 12px 0 16px; color: #9c815a; }
+.witcher-skills-search input { width: 100%; height: 32px; border: 0; background: transparent; color: #302b26; }
+.witcher-skill-group { margin-bottom: 18px; }
+.witcher-skill-group h3 { padding: 0 0 6px; border-bottom: 2px solid #aa8b59; }
+.witcher-skills-table { width: 100%; table-layout: fixed; margin: 0; border: 0; background: transparent; color: #45392d; }
+.witcher-skills-table thead { background: transparent; color: #88765e; border: 0; text-shadow: none; font-size: 9px; }
+.witcher-skills-table th { font-weight: normal; }
+.witcher-skills-table td, .witcher-skills-table th { padding: 5px 3px; text-align: center; width: 42px; }
+.witcher-skills-table td:first-child, .witcher-skills-table th:first-child { text-align: left; width: auto; }
+.witcher-skills-table td:last-child, .witcher-skills-table th:last-child { width: 29px; padding-right: 0; }
+.witcher-skills-table tbody tr { border-bottom: 1px solid #d4c8b655; font-size: 12px; }
+.witcher-skills-table tbody tr:nth-child(even) { background: #b5a38212; }
+.witcher-skills-table input, .witcher-language-row input { height: 27px; width: 100%; color: #302b26; background: #faf6ed; border: 1px solid #b9a98e; padding: 2px; border-radius: 2px; }
+.witcher-skills-table input[type=number] { text-align: center; }
+.witcher-skills-table button, .witcher-language-row button { width: 27px; padding: 0; background: transparent; border: 0; font-size: 18px; }
+.witcher-skill-label { cursor: help; line-height: 1.45; }
+.witcher-skill-label i { font-size: 9px; color: #9b876b; }
+.witcher-skill-label small { color: #8b7150; }
+.witcher-skill-total { color: #6b3030; font-weight: bold; font-size: 16px; cursor: help; font-variant-numeric: tabular-nums; }
+.witcher-skills-table .has-bonus { color: #32623d; font-weight: bold; }
+.witcher-languages-heading { margin-top: 20px; flex-wrap: wrap; }
+.witcher-languages-heading h3 { font-size: 16px; }
+.witcher-languages-heading h3 i { font-size: 10px; }
+.witcher-languages-heading button { width: auto; }
+.witcher-language-row { display: grid; grid-template-columns: minmax(80px, 1fr) 68px 36px 28px auto; gap: 6px; align-items: center; padding: 6px 0; font-size: 12px; }
+.witcher-language-row input[type=number] { text-align: center; }
+.witcher-language-row button[data-action=removeLanguage] { font-size: 12px; }
+.witcher-inventory-item { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #c7bba6; }
+.witcher-inventory-item > button[data-action=viewSheetItem] { flex: 1; text-align: left; justify-content: flex-start; height: auto; background: transparent; border: 0; font-size: 14px; }
+.witcher-empty-panel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 200px; color: #8f806c; font-size: 14px; text-align: center; }
+.witcher-empty-panel > i { font-size: 38px; color: #b8a786; }
 .witcher-biography-section { margin-bottom: 16px; border-bottom: 1px solid #c7bba6; padding-bottom: 12px; }
 .witcher-biography-section:last-child { margin-bottom: 0; }
 .witcher-biography-section > summary { cursor: pointer; color: #6b3030; font-family: Georgia, serif; font-size: 18px; line-height: 1.5; }

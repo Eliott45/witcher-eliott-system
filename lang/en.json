@@ -10,7 +10,8 @@
       "origin": "Origin",
       "familyStatus": "Family status",
       "equipment": "Equipment",
-      "influence": "Influential friend"
+      "influence": "Influential friend",
+      "language": "Language (2)"
     }
   },
   "WITCHER": {
@@ -732,6 +733,484 @@
       "CannotMove": "The character cannot move in this condition.",
       "CannotAct": "The character cannot act or defend in this condition.",
       "RecoveryError": "Could not restore Stamina."
+    },
+    "Skills": {
+      "Title": "Skills",
+      "Level": "Level",
+      "Attribute": "Stat",
+      "Bonus": "Bonus",
+      "Base": "Base",
+      "Name": "Skill",
+      "Search": "Search skills…",
+      "Edit": "Edit levels",
+      "Rules": "Base = attribute + skill level + bonuses. The 10 / 13 / 16 / 20 benchmarks describe mastery, not check difficulties.",
+      "Complex": "Difficult skill: costs twice as many points to learn and improve.",
+      "Roll": "{skill}: 1d10 + {base}",
+      "Formula": "{attribute}: {value} + level {level} + bonuses {bonus} = {total}",
+      "NoResults": "No skills found",
+      "Languages": "Languages",
+      "AddLanguage": "Add language",
+      "LanguageName": "Language name",
+      "RemoveLanguage": "Remove language",
+      "LanguageEmpty": "Each language is learned separately. Add the languages you need.",
+      "Entries": {
+        "awareness": {
+          "Label": "Awareness",
+          "Description": "Notice details, changes, hidden creatures, ambushes, and visual or auditory clues.",
+          "Ten": "Obvious events and major changes.",
+          "Thirteen": "Small changes and poorly hidden people.",
+          "Sixteen": "Very observant and difficult to surprise.",
+          "Twenty": "Almost nothing nearby escapes notice."
+        },
+        "wildernessSurvival": {
+          "Label": "Wilderness Survival",
+          "Description": "Navigation, tracking, hunting, finding food, and surviving away from civilization.",
+          "Ten": "Basic camps, tracks, plants, and hazards.",
+          "Thirteen": "Can survive and find food independently.",
+          "Sixteen": "Experienced tracker or hunter.",
+          "Twenty": "Adapts to almost any wilderness."
+        },
+        "deduction": {
+          "Label": "Deduction",
+          "Description": "Draw logical conclusions from facts, traces, and evidence.",
+          "Ten": "Often finds the answer intuitively.",
+          "Thirteen": "Can explain deductions logically.",
+          "Sixteen": "Reconstructs events from a few clues.",
+          "Twenty": "Almost always reaches the right conclusion."
+        },
+        "monsterLore": {
+          "Label": "Monster Lore",
+          "Description": "Knowledge of monsters, their behavior, strengths, and weaknesses.",
+          "Ten": "Recognizes common monsters.",
+          "Thirteen": "Knows the main kinds of monsters.",
+          "Sixteen": "Knows most monsters' strengths and weaknesses.",
+          "Twenty": "Identifies even rare monsters almost instantly."
+        },
+        "education": {
+          "Label": "Education",
+          "Description": "General knowledge of history, science, politics, and culture.",
+          "Ten": "Ordinary everyday knowledge.",
+          "Thirteen": "Significant education or training.",
+          "Sixteen": "Serious academic education.",
+          "Twenty": "University professor's knowledge."
+        },
+        "streetwise": {
+          "Label": "Streetwise",
+          "Description": "Knowledge of urban life, neighborhoods, crime, authorities, and institutions.",
+          "Ten": "Knows dangerous and respectable areas.",
+          "Thirteen": "Understands local factions and influence.",
+          "Sixteen": "Quickly understands an unfamiliar city.",
+          "Twenty": "Navigates almost like a local."
+        },
+        "teaching": {
+          "Label": "Teaching",
+          "Description": "Explain complex ideas and teach skills clearly.",
+          "Ten": "Can explain simple basics.",
+          "Thirteen": "Can teach a diligent student.",
+          "Sixteen": "Good with difficult or uninterested students.",
+          "Twenty": "Explains almost anything on the first attempt."
+        },
+        "tactics": {
+          "Label": "Tactics",
+          "Description": "Battle planning, assessing enemies, and commanding troops.",
+          "Ten": "Predicts a disorganized group's actions.",
+          "Thirteen": "Can command a small military unit.",
+          "Sixteen": "Experienced mercenary commander.",
+          "Twenty": "Can lead an army through difficult battles."
+        },
+        "business": {
+          "Label": "Business",
+          "Description": "Trade, valuation, deals, and running a business.",
+          "Ten": "Simple trading.",
+          "Thirteen": "Can run a small business.",
+          "Sixteen": "Experienced successful merchant.",
+          "Twenty": "Can run a trading empire."
+        },
+        "socialEtiquette": {
+          "Label": "Social Etiquette",
+          "Description": "Rules of behavior among nobles, wealthy people, and influential society.",
+          "Ten": "Basic manners.",
+          "Thirteen": "Comfortable at social events.",
+          "Sixteen": "Knows high society's conventions.",
+          "Twenty": "Knows obscure court rules and impresses royalty."
+        },
+        "language": {
+          "Label": "Language",
+          "Description": "Proficiency in one particular language. Each language is learned separately.",
+          "Ten": "Basics, slow reading, and a strong accent.",
+          "Thirteen": "Everyday conversation and writing.",
+          "Sixteen": "Fluent, including dialects.",
+          "Twenty": "Near-complete knowledge, including archaic forms."
+        },
+        "melee": {
+          "Label": "Melee",
+          "Description": "Use ordinary melee weapons such as clubs, maces, and axes.",
+          "Ten": "Confident weapon use.",
+          "Thirteen": "Professional fighter.",
+          "Sixteen": "Experienced melee veteran.",
+          "Twenty": "Master who can fight several enemies."
+        },
+        "brawling": {
+          "Label": "Brawling",
+          "Description": "Unarmed strikes, grappling, and fighting.",
+          "Ten": "Confident in an ordinary brawl.",
+          "Thirteen": "Good fist fighter.",
+          "Sixteen": "Trained martial artist.",
+          "Twenty": "Can beat almost anyone unarmed, including armed foes."
+        },
+        "riding": {
+          "Label": "Riding",
+          "Description": "Control horses and other mounts.",
+          "Ten": "Rides a trained horse confidently.",
+          "Thirteen": "Races and clears obstacles.",
+          "Sixteen": "Controls a wild horse without a saddle.",
+          "Twenty": "Handles exceptionally difficult mounts."
+        },
+        "staffSpear": {
+          "Label": "Staff/Spear",
+          "Description": "Use spears, halberds, staves, and other polearms.",
+          "Ten": "Confident user.",
+          "Thirteen": "Professional soldier.",
+          "Sixteen": "Can effectively oppose cavalry.",
+          "Twenty": "Extremely dangerous polearm master."
+        },
+        "smallBlades": {
+          "Label": "Small Blades",
+          "Description": "Use daggers, knives, and other small blades.",
+          "Ten": "Confident user.",
+          "Thirteen": "Professional fighter or assassin.",
+          "Sixteen": "Veteran knife fighter.",
+          "Twenty": "Can fight several opponents."
+        },
+        "swordsmanship": {
+          "Label": "Swordsmanship",
+          "Description": "Use swords of various kinds.",
+          "Ten": "Can fight effectively with a sword.",
+          "Thirteen": "Professional swordsman.",
+          "Sixteen": "Experienced duelist who wins most ordinary duels.",
+          "Twenty": "Outstanding sword master."
+        },
+        "sailing": {
+          "Label": "Sailing",
+          "Description": "Operate vessels, navigate, and act on water.",
+          "Ten": "Sails in calm conditions.",
+          "Thirteen": "Handles bad weather and obstacles.",
+          "Sixteen": "Experienced open-sea sailor.",
+          "Twenty": "Can bring a ship through extreme storms."
+        },
+        "dodgeEscape": {
+          "Label": "Dodge/Escape",
+          "Description": "Evade attacks and projectiles and escape grapples.",
+          "Ten": "Evades an obvious attack or simple grapple.",
+          "Thirteen": "Avoids quick attacks and ordinary holds.",
+          "Sixteen": "Dodges arrows and knows many escapes.",
+          "Twenty": "Avoids almost impossible attacks and holds."
+        },
+        "athletics": {
+          "Label": "Athletics",
+          "Description": "Climbing, jumping, balance, and throwing.",
+          "Ten": "Ordinary climbing and throwing.",
+          "Thirteen": "Climbs buildings and handles difficult ground.",
+          "Sixteen": "Tightrope walking and difficult throwing tricks.",
+          "Twenty": "Outstanding acrobat."
+        },
+        "sleightOfHand": {
+          "Label": "Sleight of Hand",
+          "Description": "Tricks, pickpocketing, and discreetly moving small objects.",
+          "Ten": "Simple tricks and stealing from inattentive targets.",
+          "Thirteen": "Confident theft and manipulation.",
+          "Sixteen": "Plants or steals objects right beside someone.",
+          "Twenty": "Conceals and manipulates even large objects."
+        },
+        "stealth": {
+          "Label": "Stealth",
+          "Description": "Move, hide, and act unnoticed.",
+          "Ten": "Passes sleeping or inattentive guards.",
+          "Thirteen": "Acts discreetly near guards.",
+          "Sixteen": "Professional assassin or scout.",
+          "Twenty": "Enters heavily guarded places almost unnoticed."
+        },
+        "crossbow": {
+          "Label": "Crossbow",
+          "Description": "Accuracy and proficiency with crossbows.",
+          "Ten": "Ordinary accuracy.",
+          "Thirteen": "Trained soldier.",
+          "Sixteen": "Quickly hits difficult targets.",
+          "Twenty": "Master who can hit almost any target."
+        },
+        "archery": {
+          "Label": "Archery",
+          "Description": "Accuracy and proficiency with bows.",
+          "Ten": "Ordinary targets.",
+          "Thirteen": "Experienced archer.",
+          "Sixteen": "Quickly hits most difficult targets.",
+          "Twenty": "Outstanding archer."
+        },
+        "physique": {
+          "Label": "Physique",
+          "Description": "Physical strength for lifting, breaking, and forceful actions.",
+          "Ten": "Lifts heavy loads.",
+          "Thirteen": "Breaks wood and bends thin metal.",
+          "Sixteen": "Breaks shackles and deforms strong metal.",
+          "Twenty": "Bends metal bars with almost superhuman strength."
+        },
+        "endurance": {
+          "Label": "Endurance",
+          "Description": "Resist fatigue, illness, poison, drugs, and deprivation.",
+          "Ten": "Endures hard marching and ordinary exertion.",
+          "Thirteen": "Professional endurance.",
+          "Sixteen": "Survives long periods with little rest or food.",
+          "Twenty": "Exceptional resilience in extreme conditions."
+        },
+        "gambling": {
+          "Label": "Gambling",
+          "Description": "Assess odds, read opponents, and play for money.",
+          "Ten": "Understands the basics and beats novices.",
+          "Thirteen": "Confident gambler.",
+          "Sixteen": "Regularly beats experienced players.",
+          "Twenty": "Renowned professional gambler."
+        },
+        "groomingStyle": {
+          "Label": "Grooming and Style",
+          "Description": "Personal care, clothes, and making an impression through appearance.",
+          "Ten": "Neat and presentable.",
+          "Thirteen": "Understands clothes and style.",
+          "Sixteen": "Looks at home among the rich and influential.",
+          "Twenty": "Master of exceptional personal style."
+        },
+        "performance": {
+          "Label": "Performance",
+          "Description": "Music, singing, acting, and stage performance.",
+          "Ten": "Performs for a small audience.",
+          "Thirteen": "Impresses audiences.",
+          "Sixteen": "Professional performer.",
+          "Twenty": "Worthy of performing for kings and emperors."
+        },
+        "fineArts": {
+          "Label": "Fine Arts",
+          "Description": "Create paintings, songs, sculptures, and other art.",
+          "Ten": "Basic artistic training.",
+          "Thirteen": "Good enough to sell work.",
+          "Sixteen": "Professional artist.",
+          "Twenty": "Rare talent worthy of royal commissions."
+        },
+        "leadership": {
+          "Label": "Leadership",
+          "Description": "Lead people, give orders, and manage groups.",
+          "Ten": "Confident leadership in ordinary situations.",
+          "Thirteen": "Experienced leader of a small group.",
+          "Sixteen": "Commands a large unit effectively.",
+          "Twenty": "Army commander."
+        },
+        "deceit": {
+          "Label": "Deceit",
+          "Description": "Lie, mislead, and conceal the truth.",
+          "Ten": "Convincing simple lies.",
+          "Thirteen": "Experienced liar.",
+          "Sixteen": "Can deceive professional guards and investigators.",
+          "Twenty": "Outstanding manipulator."
+        },
+        "humanPerception": {
+          "Label": "Human Perception",
+          "Description": "Read emotions, intentions, and behavior.",
+          "Ten": "Senses another person's mood.",
+          "Thirteen": "Easily understands most intelligent beings' emotions.",
+          "Sixteen": "Notices subtle discomfort and recognizes lies.",
+          "Twenty": "Reads a person almost at a glance."
+        },
+        "seduction": {
+          "Label": "Seduction",
+          "Description": "Flirting, sexual charm, and attraction.",
+          "Ten": "Some experience with flirting.",
+          "Thirteen": "Confident seducer.",
+          "Sixteen": "Highly skilled lover and seducer.",
+          "Twenty": "Exceptionally difficult to resist."
+        },
+        "persuasion": {
+          "Label": "Persuasion",
+          "Description": "Convince someone to agree voluntarily.",
+          "Ten": "Reasonable arguments with ordinary people.",
+          "Thirteen": "Good negotiator in difficult situations.",
+          "Sixteen": "Experienced orator and negotiator.",
+          "Twenty": "Can change even a stubborn or influential person's mind."
+        },
+        "charisma": {
+          "Label": "Charisma",
+          "Description": "Charm, likability, and winning people over.",
+          "Ten": "Makes acquaintances easily.",
+          "Thirteen": "Quickly puts people at ease.",
+          "Sixteen": "Life of the party.",
+          "Twenty": "Can calm even highly hostile people."
+        },
+        "alchemy": {
+          "Label": "Alchemy",
+          "Description": "Create potions, oils, substances, and other alchemical mixtures.",
+          "Ten": "Basic recipes.",
+          "Thirteen": "Full alchemist, including witcher oils and potions.",
+          "Sixteen": "Works even in poor conditions.",
+          "Twenty": "Creates original recipes."
+        },
+        "pickLock": {
+          "Label": "Pick Lock",
+          "Description": "Open locks without a key.",
+          "Ten": "Simple cheap locks.",
+          "Thirteen": "Most ordinary locks.",
+          "Sixteen": "Complex locks and safes with tools.",
+          "Twenty": "Almost any lock quickly."
+        },
+        "trapCrafting": {
+          "Label": "Trap Crafting",
+          "Description": "Build, set, conceal, and disarm mechanical traps.",
+          "Ten": "Simple traps.",
+          "Thirteen": "Complex dangerous traps.",
+          "Sixteen": "Well-hidden traps and several devices together.",
+          "Twenty": "Extremely complex traps against groups."
+        },
+        "crafting": {
+          "Label": "Crafting",
+          "Description": "Make and repair weapons, armor, and other items.",
+          "Ten": "Simple items such as shields and daggers.",
+          "Thirteen": "Quality weapons and ordinary military armor.",
+          "Sixteen": "Recognized master whose work is valuable.",
+          "Twenty": "Famous artisan producing the finest work."
+        },
+        "disguise": {
+          "Label": "Disguise",
+          "Description": "Change your own or another person's appearance.",
+          "Ten": "Simple makeup concealing identity.",
+          "Thirteen": "Convincingly imitates another profession or culture.",
+          "Sixteen": "Imitates a particular person or nonhuman.",
+          "Twenty": "Extremely convincing impersonation despite major differences."
+        },
+        "firstAid": {
+          "Label": "First Aid",
+          "Description": "Stop bleeding, stabilize wounds, and provide emergency care.",
+          "Ten": "Understands basic emergency care.",
+          "Thirteen": "Treats minor injuries confidently.",
+          "Sixteen": "Prepares several serious casualties for treatment.",
+          "Twenty": "Can pull someone back from the brink of death."
+        },
+        "forgery": {
+          "Label": "Forgery",
+          "Description": "Make counterfeit documents, coins, seals, and official items.",
+          "Ten": "Passes a cursory inspection.",
+          "Thirteen": "Accepted by most people.",
+          "Sixteen": "Professional work, including complex documents and seals.",
+          "Twenty": "Master forger."
+        },
+        "intimidation": {
+          "Label": "Intimidation",
+          "Description": "Threats, psychological pressure, and frightening others.",
+          "Ten": "Convincingly threatens an ordinary person.",
+          "Thirteen": "Threats affect even tough people.",
+          "Sixteen": "Can frighten a professional warrior.",
+          "Twenty": "A glance can sometimes force obedience."
+        },
+        "hexWeaving": {
+          "Label": "Hex Weaving",
+          "Description": "Create curses and use dark magic.",
+          "Ten": "Simplest hexes.",
+          "Thirteen": "Confident dark-magic user.",
+          "Sixteen": "Very experienced with deadly curses.",
+          "Twenty": "Envy of the most experienced witches."
+        },
+        "ritualCrafting": {
+          "Label": "Ritual Crafting",
+          "Description": "Know and perform magical rituals.",
+          "Ten": "Simple known rituals.",
+          "Thirteen": "Experienced ritualist.",
+          "Sixteen": "Works under stress.",
+          "Twenty": "Master of ritual magic."
+        },
+        "resistMagic": {
+          "Label": "Resist Magic",
+          "Description": "Resist magical influence through willpower.",
+          "Ten": "Understands magic and sometimes resists it.",
+          "Thirteen": "Good defense against mental magic.",
+          "Sixteen": "Resists even experienced mages.",
+          "Twenty": "Almost impervious to ordinary magical influence."
+        },
+        "resistCoercion": {
+          "Label": "Resist Coercion",
+          "Description": "Resist persuasion, seduction, and social pressure.",
+          "Ten": "Can refuse an unpleasant offer.",
+          "Thirteen": "Resists seduction and arguments.",
+          "Sixteen": "Extremely difficult to sway.",
+          "Twenty": "Almost impossible to convince after deciding."
+        },
+        "spellCasting": {
+          "Label": "Spell Casting",
+          "Description": "Use spells and Signs.",
+          "Ten": "Simple spells and Signs.",
+          "Thirteen": "Confident practitioner.",
+          "Sixteen": "Experienced mage who handles complex spells easily.",
+          "Twenty": "Even difficult spells feel natural."
+        },
+        "courage": {
+          "Label": "Courage",
+          "Description": "Keep composure in the face of fear, threats, and monsters.",
+          "Ten": "Keeps calm before serious threats.",
+          "Thirteen": "Stands against a killer or ordinary monster.",
+          "Sixteen": "Brave even against overwhelming enemies.",
+          "Twenty": "Almost impossible to frighten into flight."
+        }
+      }
+    },
+    "Abilities": {
+      "Title": "Abilities",
+      "Browse": "Ability compendium",
+      "Create": "Custom ability",
+      "New": "New ability",
+      "Hint": "Drop an ability from any compendium or item directory here, or create your own.",
+      "Empty": "No abilities yet",
+      "Race": "From ancestry",
+      "Added": "Added",
+      "View": "Open description",
+      "Remove": "Remove ability",
+      "Duplicate": "This character already has this ability.",
+      "TrustToggle": "Trust — interacting with humans",
+      "TrustHint": "+1 to Charisma, Seduction, and Persuasion against humans while enabled.",
+      "Stubbornness": "Stubbornness",
+      "Remaining": "{remaining} of 3 remaining",
+      "Use": "Spend a use",
+      "Restore": "Restore a use",
+      "Reset": "Restore all uses",
+      "CounterHint": "Tracks uses of Stubbornness. Perform rerolls manually according to the ability description.",
+      "RemoveConfirm": "Remove “{name}” from this character?",
+      "Edit": "Edit ability",
+      "Error": "Could not update abilities."
+    },
+    "Inventory": {
+      "Title": "Inventory",
+      "Empty": "Inventory is empty",
+      "Hint": "Drop items here. Weight and equipment mechanics will be added later.",
+      "View": "Open item",
+      "Remove": "Remove item"
+    },
+    "Languages": {
+      "Browse": "Open the language compendium",
+      "Compendium": "Compendium",
+      "Duplicate": "This character already has this language. Its level was preserved.",
+      "Rules": "Each language is a separate difficult Language (2) skill linked to Intelligence. The (2) marker means it costs twice as much to learn and improve. Base = INT + that language's level. Drop the entry on a character sheet to add the language at level 0; edit its level on the Skills tab.",
+      "Common": {
+        "Name": "Common Speech",
+        "Label": "Language: Common Speech (2)",
+        "Description": "Common Speech is the language of the Northern Kingdoms, including Temeria, Redania, Kaedwen, and other northern states. It is learned separately from Elder Speech and Dwarven."
+      },
+      "Elder": {
+        "Name": "Elder Speech",
+        "Label": "Language: Elder Speech (2)",
+        "Description": "In the base The Witcher TRPG rules, Elder Speech groups together the language of Nilfgaardians, the people of Skellige, and most nonhumans except dwarves. It is learned as one separate language skill."
+      },
+      "Dwarven": {
+        "Name": "Dwarven",
+        "Label": "Language: Dwarven (2)",
+        "Description": "Dwarven is the distinct language of dwarves. It is not grouped with Elder Speech in the rules and has its own skill level."
+      }
+    },
+    "Actions": {
+      "Title": "Actions",
+      "Empty": "Character actions will appear here"
     }
   }
 }

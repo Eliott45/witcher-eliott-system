@@ -3,6 +3,7 @@ import { getOrigin } from "./origins.mjs";
 import { getFamilyStatus } from "./family-statuses.mjs";
 import { getEquipment } from "./equipment.mjs";
 import { getInfluentialFriend } from "./influential-friends.mjs";
+import { getLanguage } from "./languages.mjs";
 
 // Never renumber these IDs: actor links and compendium references must survive updates.
 export const RACE_DOCUMENT_IDS = {
@@ -56,4 +57,9 @@ export function equipmentUuid(id) {
 export function influentialFriendUuid(id) {
   const documentId = getInfluentialFriend(id)?.documentId;
   return documentId ? `Compendium.${SYSTEM_ID}.influential-friends.Item.${documentId}` : null;
+}
+
+export function languageUuid(id) {
+  const documentId = getLanguage(id)?.documentId;
+  return documentId ? `Compendium.${SYSTEM_ID}.languages.Item.${documentId}` : null;
 }

@@ -4,11 +4,14 @@ import { FAMILY_STATUS_CHOICES, getFamilyReward } from "./family-statuses.mjs";
 import { INFLUENTIAL_FRIEND_CHOICES } from "./influential-friends.mjs";
 import { ATTRIBUTE_KEYS, deriveStatistics } from "./statistics.mjs";
 import { hasStatus, DYING, DEAD } from "../combat/status-effects.mjs";
+import { SKILL_KEYS } from "./skills.mjs";
+import { additionalAbilityIds } from "./abilities.mjs";
 
 /** Store base values; source bonuses and wound penalties are derived without stacking. */
 export class WitcherActorData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
-    const { ArrayField, NumberField, SchemaField, StringField } = foundry.data.fields;
+    const { ArrayField, BooleanField, NumberField, SchemaField, StringField } = foundry.data.fields;
+    const skillLevel = () => new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 });
     const resource = (allowNegative = false) => new SchemaField({
       value: new NumberField({ required: true, nullable: false, integer: true, ...(allowNegative ? {} : { min: 0 }), initial: 0 }),
       max: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 })
@@ -19,6 +22,16 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
       attributes: new SchemaField(Object.fromEntries(ATTRIBUTE_KEYS.map(key => [key,
         new NumberField({ required: true, nullable: true, integer: true, min: 0, max: 100, initial: null })
       ]))),
+      skills: new SchemaField(Object.fromEntries(SKILL_KEYS.map(key => [key, skillLevel()]))),
+      languages: new ArrayField(new SchemaField({
+        id: new StringField({ required: true, nullable: false, blank: false }),
+        name: new StringField({ required: true, nullable: false, blank: false }),
+        level: skillLevel()
+      })),
+      abilityState: new SchemaField({
+        trustEnabled: new BooleanField({ initial: false }),
+        stubbornnessUsed: new NumberField({ required: true, nullable: false, integer: true, min: 0, max: 3, initial: 0 })
+      }),
       carriedWeight: new NumberField({ required: true, nullable: false, min: 0, initial: 0 }),
       luckSpent: new ArrayField(new NumberField({ required: true, nullable: false, integer: true, min: 1 })),
       luckPending: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
@@ -59,7 +72,10 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
 
   get statistics() {
     const actor = this.parent;
-    return deriveStatistics(this, actor?.effects ? { dying: hasStatus(actor, DYING), dead: hasStatus(actor, DEAD) } : {});
+    return deriveStatistics(this, {
+      abilityIds: actor ? additionalAbilityIds(actor) : [],
+      ...(actor?.effects ? { dying: hasStatus(actor, DYING), dead: hasStatus(actor, DEAD) } : {})
+    });
   }
 
   prepareDerivedData() {

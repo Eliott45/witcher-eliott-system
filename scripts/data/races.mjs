@@ -1,7 +1,7 @@
 /**
  * Race and ability IDs are persistent identifiers, independent of translations.
- * These definitions are descriptive only. Future automation can target an ability
- * ID without changing saved actor data or inferring rules from its description.
+ * Descriptions and numeric rules share IDs without parsing text. Sheet counters
+ * and background-modifiers.mjs use these IDs independently of the selected race.
  */
 export const RACES = [
   {

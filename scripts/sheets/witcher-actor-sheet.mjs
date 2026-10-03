@@ -13,6 +13,12 @@ import { STATUS_DEFINITIONS, DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS } from "..
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { recoverStamina } from "../combat/exhaustion.mjs";
 import { rollDeath } from "../combat/death-state.mjs";
+import { rollSkill } from "../combat/skill-roll.mjs";
+import { skillsContext } from "./skills-context.mjs";
+import { abilitiesContext } from "./abilities-context.mjs";
+import { hasAbility, adjustStubbornness } from "../data/abilities.mjs";
+import { viewSheetItem, createAbility, browseAbilities, browseLanguages, removeSheetItem } from "./sheet-items.mjs";
+import { addLanguageFromItem, updateLanguages } from "../data/languages.mjs";
 import { SHEET_TABS, sheetPreferences, visibleSheetTabs, updateSheetPreferences, chooseVisibleTabs, reportPreferencesError } from "./sheet-preferences.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -34,6 +40,13 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       recoverStamina: WitcherActorSheet.#onRecoverStamina,
       rollDeath: WitcherActorSheet.#onRollDeath,
       rollAttribute: WitcherActorSheet.#onRollAttribute,
+      rollSkill: WitcherActorSheet.#onRollSkill,
+      toggleSkills: WitcherActorSheet.#onToggleSkills,
+      toggleTrust: WitcherActorSheet.#onTrust,
+      stubbornness: WitcherActorSheet.#onStubbornness,
+      addLanguage: WitcherActorSheet.#onAddLanguage,
+      removeLanguage: WitcherActorSheet.#onRemoveLanguage,
+      viewSheetItem, createAbility, browseAbilities, browseLanguages, removeSheetItem,
       toggleLuck: WitcherActorSheet.#onLuck,
       resetLuck: WitcherActorSheet.#onLuck,
       toggleAttributes: WitcherActorSheet.#onToggleAttributes,
@@ -45,7 +58,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static PARTS = {
     content: {
       template: `systems/${SYSTEM_ID}/templates/actor-sheet.hbs`,
-      scrollable: [".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=effects]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
+      scrollable: [".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
     }
   };
 
@@ -78,6 +91,12 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     });
     return Object.assign(context, {
       conditions,
+      skills: skillsContext(this.actor, {
+        localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
+      }, { query: this.#skillQuery, editing: this.isEditable && this.#editingSkills }),
+      abilities: await abilitiesContext(this.actor),
+      equipment: (this.actor.items ?? []).filter(item => item.type === "equipment").map(item => ({ id: item.id, name: item.name, img: item.img })),
+      abilitiesOpen: !preferences.collapsed?.abilities,
       editingAttributes: this.isEditable && this.#editingAttributes,
       effects: await Promise.all(this.actor.effects.map(async effect => {
         const definition = Object.values(STATUS_DEFINITIONS).find(status => effect.statuses.has(status.id));
@@ -122,13 +141,38 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   _toggleDisabled(disabled) {
     super._toggleDisabled(disabled);
     // Foundry disables every form button for observers, including read-only actions.
-    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=viewFriend], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs]")) {
+    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=viewFriend], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs], [data-action=viewSheetItem], [data-action=browseAbilities], [data-action=browseLanguages]")) {
       button.disabled = false;
     }
+    const search = this.element.querySelector("[data-skill-search]");
+    if (search) search.disabled = false;
   }
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this.element.querySelector("[data-skill-search]").addEventListener("input", event => {
+      this.#skillQuery = event.target.value;
+      const query = this.#skillQuery.trim().toLocaleLowerCase();
+      let matches = 0;
+      for (const group of this.element.querySelectorAll("[data-skill-group]")) {
+        let visible = 0;
+        for (const row of group.querySelectorAll("[data-skill-name]")) {
+          row.hidden = !row.dataset.skillName.toLocaleLowerCase().includes(query);
+          if (!row.hidden) visible++;
+        }
+        group.hidden = !visible;
+        matches += visible;
+      }
+      this.element.querySelector("[data-no-skills]").hidden = matches > 0;
+    });
+    for (const input of this.element.querySelectorAll("[data-language-field]")) input.addEventListener("change", () => {
+      if (!this.isEditable || !this.#editingSkills) return;
+      const { languageId, languageField } = input.dataset;
+      const value = languageField === "level" ? Math.max(0, Math.trunc(Number(input.value) || 0)) : input.value.trim();
+      if (languageField === "name" && !value) { input.value = this.actor.system.languages.find(entry => entry.id === languageId).name; return; }
+      this.#languageWrites = updateLanguages(this.actor, entries => entries.map(entry => entry.id === languageId
+        ? { ...entry, [languageField]: value } : entry)).catch(reportPreferencesError);
+    });
     for (const details of this.element.querySelectorAll("details[data-biography-section]")) {
       let wasOpen = details.open;
       details.addEventListener("toggle", () => {
@@ -138,6 +182,83 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
           .catch(reportPreferencesError);
       });
     }
+  }
+
+  async _onDropItem(event, item) {
+    if (!this.isEditable) return null;
+    if (item.type === "language") {
+      const work = addLanguageFromItem(this.actor, item);
+      this.#languageWrites = work.catch(() => {});
+      try {
+        if (!await work) ui.notifications.info(game.i18n.localize("WITCHER.Languages.Duplicate"));
+      } catch (error) { reportPreferencesError(error); }
+      return null;
+    }
+    if (item.type === "ability" && this.actor.uuid !== item.parent?.uuid && item.system.ruleId
+      && hasAbility(this.actor, item.system.ruleId)) {
+      ui.notifications.info(game.i18n.localize("WITCHER.Abilities.Duplicate"));
+      return null;
+    }
+    return super._onDropItem(event, item);
+  }
+
+  #skillQuery = "";
+  #editingSkills = false;
+  #languageWrites = Promise.resolve();
+
+  static async #onToggleSkills() {
+    if (!this.isEditable) return;
+    await this.submit();
+    await this.#languageWrites;
+    this.#editingSkills = !this.#editingSkills;
+    await this.render({ force: true });
+  }
+
+  static async #onRollSkill(_event, target) {
+    if (!this.isEditable || target.disabled) return;
+    target.disabled = true;
+    try {
+      await this.submit();
+      await this.#languageWrites;
+      await this.#luckWrites;
+      await rollSkill(this.actor, target.dataset.skill, target.dataset.languageId);
+    } catch (error) {
+      console.error(`${SYSTEM_ID} | Skill roll failed`, error);
+      ui.notifications.error(game.i18n.localize("WITCHER.Statistics.AttributeRollError"));
+    } finally { target.disabled = !this.isEditable || !conditionRules(this.actor).canAct; }
+  }
+
+  static async #onTrust() {
+    if (!this.isEditable || !hasAbility(this.actor, "human.trust")) return;
+    await this.actor.update({ "system.abilityState.trustEnabled": !this.actor.system.abilityState.trustEnabled });
+  }
+
+  static async #onStubbornness(_event, target) {
+    if (!this.isEditable) return;
+    try { await adjustStubbornness(this.actor, Number(target.dataset.change)); }
+    catch (error) {
+      console.error(`${SYSTEM_ID} | Ability counter update failed`, error);
+      ui.notifications.error(game.i18n.localize("WITCHER.Abilities.Error"));
+    }
+  }
+
+  static async #onAddLanguage() {
+    if (!this.isEditable) return;
+    const name = await foundry.applications.api.DialogV2.prompt({
+      window: { title: "WITCHER.Skills.AddLanguage" },
+      content: `<label>${game.i18n.localize("WITCHER.Skills.LanguageName")}<input name="languageName" type="text" required autofocus></label>`,
+      ok: { label: "WITCHER.Skills.AddLanguage", callback: (_event, button) => button.form.elements.languageName.value.trim() },
+      rejectClose: false
+    });
+    if (!name || !this.isEditable) return;
+    this.#languageWrites = updateLanguages(this.actor, entries => [...entries, { id: foundry.utils.randomID(), name, level: 0 }]);
+    await this.#languageWrites;
+  }
+
+  static async #onRemoveLanguage(_event, target) {
+    if (!this.isEditable || !this.#editingSkills) return;
+    this.#languageWrites = updateLanguages(this.actor, entries => entries.filter(entry => entry.id !== target.dataset.languageId));
+    await this.#languageWrites;
   }
 
   static async #onConfigureTabs() {

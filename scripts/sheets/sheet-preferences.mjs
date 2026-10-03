@@ -2,6 +2,9 @@ import { SYSTEM_ID } from "../config.mjs";
 
 export const SHEET_TABS = [
   { id: "main", label: "WITCHER.Sheet.Main", icon: "fa-solid fa-user" },
+  { id: "skills", label: "WITCHER.Skills.Title", icon: "fa-solid fa-graduation-cap" },
+  { id: "inventory", label: "WITCHER.Inventory.Title", icon: "fa-solid fa-sack" },
+  { id: "actions", label: "WITCHER.Actions.Title", icon: "fa-solid fa-swords" },
   { id: "biography", label: "WITCHER.Sheet.Biography", icon: "fa-solid fa-book-open" },
   { id: "family", label: "WITCHER.Sheet.Family", icon: "fa-solid fa-people-roof" },
   { id: "effects", label: "WITCHER.Sheet.Effects", icon: "fa-solid fa-person-rays" }
