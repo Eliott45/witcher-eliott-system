@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 import { ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID } from "../scripts/config.mjs";
 import { RACES } from "../scripts/data/races.mjs";
 import { ORIGINS, ORIGIN_GROUPS } from "../scripts/data/origins.mjs";
+import { FAMILY_STATUSES, FAMILY_GROUPS } from "../scripts/data/family-statuses.mjs";
+import { EQUIPMENT } from "../scripts/data/equipment.mjs";
 import { compendiumData } from "./compendium-data.mjs";
 
 process.chdir(fileURLToPath(new URL("..", import.meta.url)));
@@ -28,7 +30,7 @@ const leaves = (object, prefix = "") => Object.entries(object).flatMap(([key, va
 const languages = await Promise.all(manifest.languages.map(async ({ path }) => JSON.parse(await readFile(path, "utf8"))));
 assert.deepEqual(leaves(languages[0]).sort(), leaves(languages[1]).sort(), "Translation keys must match");
 const keys = new Set(leaves(languages[0]));
-for (const name of ["actor-sheet", "item-sheet", "reference-picker"]) {
+for (const name of ["actor-sheet", "item-sheet", "reference-picker", "sheet-tabs"]) {
   const template = await readFile(`templates/${name}.hbs`, "utf8");
   for (const [, key] of template.matchAll(/localize\s+["']([^"']+)["']/g)) {
     assert.ok(keys.has(key), `Missing translation: ${key}`);
@@ -42,6 +44,14 @@ for (const pack of manifest.packs) {
   assert.equal(pack.ownership.PLAYER, "OBSERVER", "Players must be able to read racial bonuses");
 }
 const ids = new Set();
+for (const entry of [...FAMILY_STATUSES, ...EQUIPMENT]) {
+  for (const key of [entry.label, entry.description, entry.reward, FAMILY_GROUPS[entry.group]].filter(Boolean)) {
+    assert.ok(keys.has(key), `Missing family/equipment translation: ${key}`);
+  }
+  assert.match(entry.documentId, /^[a-zA-Z0-9]{16}$/);
+  assert.ok(!ids.has(entry.documentId), `Duplicate document ID: ${entry.documentId}`);
+  ids.add(entry.documentId);
+}
 for (const origin of ORIGINS) {
   for (const key of [origin.label, origin.bonus, ORIGIN_GROUPS[origin.group]]) assert.ok(keys.has(key), `Missing origin translation: ${key}`);
   assert.match(origin.documentId, /^[a-zA-Z0-9]{16}$/);

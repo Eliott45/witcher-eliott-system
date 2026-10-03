@@ -1,0 +1,401 @@
+[
+  {
+    "_id": "fami000000000001",
+    "name": "Аристократия — Северянин",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "north.aristocracy",
+      "region": "north",
+      "roll": "1",
+      "description": "<p>Северянин</p><p>Результат броска: 1</p><p>Вы выросли в богатом особняке, где слуги исполняли любую вашу прихоть. От вас ожидали хорошего поведения и умения произвести впечатление.</p><h2>Начальное снаряжение и связи</h2><p>Дворянская грамота (+2 к репутации).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000001]{Дворянская грамота}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000002",
+    "name": "Под опекой мага — Северянин",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "north.mage-ward",
+      "region": "north",
+      "roll": "2",
+      "description": "<p>Северянин</p><p>Результат броска: 2</p><p>В юном возрасте вас отдали под опеку магу. Вы жили в комфортных условиях, но опекуна своего практически не видели — он постоянно был занят.</p><h2>Начальное снаряжение и связи</h2><p>Летопись (+1 к Образованию).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000002]{Летопись}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000003",
+    "name": "Рыцарство — Северянин",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "north.knighthood",
+      "region": "north",
+      "roll": "3",
+      "description": "<p>Северянин</p><p>Результат броска: 3</p><p>Вы жили в особняке, где из вас растили настоящего лорда или леди. Ваша судьба была предрешена с рождения.</p><h2>Начальное снаряжение и связи</h2><p>Личный герб (+1 к репутации).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000003]{Личный герб}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000004",
+    "name": "Семья торговцев — Северянин",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "north.merchants",
+      "region": "north",
+      "roll": "4",
+      "description": "<p>Северянин</p><p>Результат броска: 4</p><p>Вы выросли в купеческой среде, под крики продавцов и звон монет.</p><h2>Начальное снаряжение и связи</h2><p>2 знакомых.</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000005",
+    "name": "Семья мастеров — Северянин",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "north.artisans",
+      "region": "north",
+      "roll": "5",
+      "description": "<p>Северянин</p><p>Результат броска: 5</p><p>Вы выросли в ремесленной мастерской, где каждый день стучали молотки или раздавались другие звуки творчества.</p><h2>Начальное снаряжение и связи</h2><p>3 обычных чертежа/формулы.</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000004]{Обычный чертёж}, @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000005]{Обычная формула}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000006",
+    "name": "Семья артистов — Северянин",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "north.performers",
+      "region": "north",
+      "roll": "6–7",
+      "description": "<p>Северянин</p><p>Результат броска: 6–7</p><p>Вы выросли в актёрской труппе. Возможно, вы вместе с ними странствовали или же выступали в театре.</p><h2>Начальное снаряжение и связи</h2><p>1 музыкальный инструмент и 1 друг.</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000006]{Музыкальный инструмент}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000007",
+    "name": "Крестьянская семья — Северянин",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "north.peasants",
+      "region": "north",
+      "roll": "8–10",
+      "description": "<p>Северянин</p><p>Результат броска: 8–10</p><p>Вы выросли на ферме в сельской глуши. За душой у вас почти ничего нет, а жизнь ваша была простой, но опасной.</p><h2>Начальное снаряжение и связи</h2><p>Счастливый талисман (+1 к Удаче).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000007]{Счастливый талисман}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000008",
+    "name": "Аристократия — Нильфгаардец",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "nilfgaard.aristocracy",
+      "region": "nilfgaard",
+      "roll": "1",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 1</p><p>Вы выросли в богатом особняке, где вас неплохо научили выживать в мире придворных интриг. Роскошь служила лишь стимулом к обучению.</p><h2>Начальное снаряжение и связи</h2><p>Дворянская грамота (+2 к репутации).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000001]{Дворянская грамота}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000009",
+    "name": "Высшее жречество — Нильфгаардец",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "nilfgaard.high-clergy",
+      "region": "nilfgaard",
+      "roll": "2",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 2</p><p>Вы выросли среди жрецов Великого Солнца. Вы были набожным ребёнком, уверенным, что церковь всегда укажет верный путь.</p><h2>Начальное снаряжение и связи</h2><p>Священный символ (+1 к Храбрости).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000008]{Священный символ}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000010",
+    "name": "Рыцарство — Нильфгаардец",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "nilfgaard.knighthood",
+      "region": "nilfgaard",
+      "roll": "3",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 3</p><p>Вы росли, зная, что ваш долг — служить императору и что роскошь — награда за будущую службу.</p><h2>Начальное снаряжение и связи</h2><p>Личный герб (+1 к репутации).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000003]{Личный герб}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000011",
+    "name": "Семья мастеров — Нильфгаардец",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "nilfgaard.artisans",
+      "region": "nilfgaard",
+      "roll": "4",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 4</p><p>Вы выросли в мастерской, учась создавать вещи, которые продавались бы по всему миру. Там вы и узнали цену мастерству.</p><h2>Начальное снаряжение и связи</h2><p>3 обычных чертежа/формулы.</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000004]{Обычный чертёж}, @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000005]{Обычная формула}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000012",
+    "name": "Семья торговцев — Нильфгаардец",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "nilfgaard.merchants",
+      "region": "nilfgaard",
+      "roll": "5",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 5</p><p>Вы росли, продавая товары по всей Империи, и повидали разные экзотические изделия со всего мира.</p><h2>Начальное снаряжение и связи</h2><p>2 знакомых.</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000013",
+    "name": "Рабство — Нильфгаардец",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "nilfgaard.slavery",
+      "region": "nilfgaard",
+      "roll": "6–7",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 6–7</p><p>Вы раб с рождения. Вы жили в простой комнатушке и много работали, а скарб ваш скуден.</p><h2>Начальное снаряжение и связи</h2><p>Обученная птица или змея.</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000009]{Обученная птица}, @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000010]{Обученная змея}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000014",
+    "name": "Крестьянская семья — Нильфгаардец",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "nilfgaard.peasants",
+      "region": "nilfgaard",
+      "roll": "8–10",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 8–10</p><p>Вы выросли на одной из тысяч ферм Империи. За душой у вас почти ничего нет, но жизнь ваша была простой.</p><h2>Начальное снаряжение и связи</h2><p>Счастливый талисман (+1 к Удаче).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000007]{Счастливый талисман}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000015",
+    "name": "Аристократия — Нелюдь",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "elder.aristocracy",
+      "region": "elder",
+      "roll": "1",
+      "description": "<p>Нелюдь</p><p>Результат броска: 1</p><p>Вы выросли во дворце, где вам постоянно напоминали о славном прошлом, ожидая, что вы будете достойны своих предков.</p><h2>Начальное снаряжение и связи</h2><p>Дворянская грамота (+2 к репутации).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000001]{Дворянская грамота}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000016",
+    "name": "Благородный воин — Нелюдь",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "elder.noble-warrior",
+      "region": "elder",
+      "roll": "2",
+      "description": "<p>Нелюдь</p><p>Результат броска: 2</p><p>Вы дитя благородного воина. От вас ожидают, что вы оправдаете репутацию семьи и не опозорите своих предков.</p><h2>Начальное снаряжение и связи</h2><p>Личный герб (+1 к репутации).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000003]{Личный герб}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000017",
+    "name": "Семья торговцев — Нелюдь",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "elder.merchants",
+      "region": "elder",
+      "roll": "3",
+      "description": "<p>Нелюдь</p><p>Результат броска: 3</p><p>Вы выросли в семье странствующих торговцев. Иногда жизнь была трудна, но созданные нелюдями товары всегда ценятся.</p><h2>Начальное снаряжение и связи</h2><p>2 знакомых.</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000018",
+    "name": "Семья грамотеев — Нелюдь",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "elder.scribes",
+      "region": "elder",
+      "roll": "4",
+      "description": "<p>Нелюдь</p><p>Результат броска: 4</p><p>Вы выросли в семье грамотеев. Ваши близкие вели летопись истории Старших Народов, стараясь сохранить её для потомков.</p><h2>Начальное снаряжение и связи</h2><p>Летопись (+1 к Образованию).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000002]{Летопись}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000019",
+    "name": "Артисты — Нелюдь",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "elder.performers",
+      "region": "elder",
+      "roll": "5",
+      "description": "<p>Нелюдь</p><p>Результат броска: 5</p><p>С детства вы исполняли песни и играли на сцене, а в свободное время помогали гримёрам или чинили музыкальные инструменты.</p><h2>Начальное снаряжение и связи</h2><p>1 музыкальный инструмент и 1 друг.</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000006]{Музыкальный инструмент}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000020",
+    "name": "Семья мастеров — Нелюдь",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "elder.artisans",
+      "region": "elder",
+      "roll": "6–7",
+      "description": "<p>Нелюдь</p><p>Результат броска: 6–7</p><p>Вы выросли в семье мастеров, посещали древние дворцы для вдохновения и ежедневно проводили за работой много часов.</p><h2>Начальное снаряжение и связи</h2><p>3 обычных чертежа/формулы.</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000004]{Обычный чертёж}, @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000005]{Обычная формула}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "fami000000000021",
+    "name": "Низкое происхождение — Нелюдь",
+    "type": "familyStatus",
+    "img": "icons/svg/house.svg",
+    "system": {
+      "ruleId": "elder.low-born",
+      "region": "elder",
+      "roll": "8–10",
+      "description": "<p>Нелюдь</p><p>Результат броска: 8–10</p><p>Вы из простой семьи и зарабатывали на жизнь, прибираясь в чужих особняках либо перебиваясь подачками в родном городе.</p><h2>Начальное снаряжение и связи</h2><p>Счастливый талисман (+1 к Удаче).</p><p>Предметы в компендиуме: @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000007]{Счастливый талисман}</p><p>Ведьмаки не получают награды за положение семьи.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  }
+]

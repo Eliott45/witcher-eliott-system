@@ -39,13 +39,17 @@
       <span>{{localize typeLabel}}</span>
     </header>
     <nav class="witcher-character-tabs tabs" aria-label="{{localize 'WITCHER.Sheet.Title'}}">
-      {{#each tabs as |tab|}}
+      {{#each visibleTabs as |tab|}}
       <button type="button" class="{{tab.cssClass}}" data-action="tab" data-group="{{tab.group}}" data-tab="{{tab.id}}"
               aria-pressed="{{tab.active}}" aria-controls="{{../rootId}}-{{tab.id}}">
         <i class="{{tab.icon}}" aria-hidden="true"></i>
         <span>{{localize tab.label}}</span>
       </button>
       {{/each}}
+      <button type="button" class="witcher-manage-tabs" data-action="configureTabs"
+              title="{{localize 'WITCHER.Sheet.ManageTabs'}}" aria-label="{{localize 'WITCHER.Sheet.ManageTabs'}}">
+        <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
+      </button>
     </nav>
     <section id="{{rootId}}-main" class="witcher-character-content tab {{tabs.main.cssClass}}" data-group="character" data-tab="main"
              aria-label="{{localize 'WITCHER.Sheet.Main'}}">
@@ -100,6 +104,26 @@
             </div>
             {{#if originExcluded}}<p class="witcher-origin-excluded" role="note">{{localize "WITCHER.Sheet.OriginExcluded"}}</p>{{/if}}
           </div>
+          {{#if showFamilyStatus}}
+          <div class="witcher-reference-field">
+            <span class="witcher-field-label">{{localize "WITCHER.Sheet.FamilyStatus"}}</span>
+            <div class="witcher-reference-value">
+              {{#if selectedFamilyStatus}}
+              <button type="button" class="witcher-select-reference" data-action="viewFamilyStatus"
+                      title="{{localize 'WITCHER.Sheet.ViewFamilyStatus'}}">
+                <span>{{localize selectedFamilyStatus.label}}</span>
+                <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
+              </button>
+              {{else}}
+              <span class="witcher-select-reference">{{localize "WITCHER.Sheet.FamilyStatusUnset"}}</span>
+              {{/if}}
+              <button type="button" class="witcher-reference-inspect" data-action="chooseReference" data-kind="familyStatus"
+                      aria-label="{{localize 'WITCHER.Sheet.ChooseFamilyStatus'}}" title="{{localize 'WITCHER.Sheet.ChooseFamilyStatus'}}" {{disabled (not editable)}}>
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          {{/if}}
         </div>
       </div>
       <div class="witcher-demographics">
@@ -114,21 +138,23 @@
     </section>
     <section id="{{rootId}}-biography" class="witcher-character-content witcher-biography tab {{tabs.biography.cssClass}}"
              data-group="character" data-tab="biography" aria-label="{{localize 'WITCHER.Sheet.Biography'}}">
-      <label for="{{rootId}}-appearance">{{localize "WITCHER.Sheet.Appearance"}}
-        <textarea id="{{rootId}}-appearance" name="system.biography.appearance" rows="3" {{disabled (not editable)}}>{{system.biography.appearance}}</textarea>
-      </label>
-      <label for="{{rootId}}-personality">{{localize "WITCHER.Sheet.Personality"}}
-        <textarea id="{{rootId}}-personality" name="system.biography.personality" rows="3" {{disabled (not editable)}}>{{system.biography.personality}}</textarea>
-      </label>
-      <label for="{{rootId}}-allies">{{localize "WITCHER.Sheet.Allies"}}
-        <textarea id="{{rootId}}-allies" name="system.biography.allies" rows="3" {{disabled (not editable)}}>{{system.biography.allies}}</textarea>
-      </label>
-      <label for="{{rootId}}-backstory">{{localize "WITCHER.Sheet.Backstory"}}
-        <textarea id="{{rootId}}-backstory" name="system.biography.backstory" rows="5" {{disabled (not editable)}}>{{system.biography.backstory}}</textarea>
-      </label>
-      <label for="{{rootId}}-session-notes">{{localize "WITCHER.Sheet.SessionNotes"}}
-        <textarea id="{{rootId}}-session-notes" name="system.biography.sessionNotes" rows="5" {{disabled (not editable)}}>{{system.biography.sessionNotes}}</textarea>
-      </label>
+      {{#each biographySections as |section|}}
+      <details class="witcher-biography-section" data-biography-section="{{section.id}}" {{#if section.open}}open{{/if}}>
+        <summary id="{{../rootId}}-{{section.id}}-title">{{localize section.label}}</summary>
+        <textarea id="{{../rootId}}-{{section.id}}" name="system.{{section.path}}" rows="{{section.rows}}"
+                  aria-labelledby="{{../rootId}}-{{section.id}}-title" {{disabled (not ../editable)}}>{{section.value}}</textarea>
+      </details>
+      {{/each}}
+    </section>
+    <section id="{{rootId}}-family" class="witcher-character-content witcher-biography tab {{tabs.family.cssClass}}"
+             data-group="character" data-tab="family" aria-label="{{localize 'WITCHER.Sheet.Family'}}">
+      {{#each familySections as |section|}}
+      <details class="witcher-biography-section" data-biography-section="{{section.id}}" {{#if section.open}}open{{/if}}>
+        <summary id="{{../rootId}}-{{section.id}}-title">{{localize section.label}}</summary>
+        <textarea id="{{../rootId}}-{{section.id}}" name="system.{{section.path}}" rows="{{section.rows}}"
+                  aria-labelledby="{{../rootId}}-{{section.id}}-title" {{disabled (not ../editable)}}>{{section.value}}</textarea>
+      </details>
+      {{/each}}
     </section>
   </div>
 </div>

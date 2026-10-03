@@ -1,12 +1,14 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { ORIGIN_GROUPS } from "../data/origins.mjs";
+import { FAMILY_GROUPS } from "../data/family-statuses.mjs";
 import { selectionEntries, filterEntries } from "./selection-data.mjs";
 
 /** Local browsing only; the actor is updated by its sheet after confirmation. */
-export async function chooseReference(kind, current, { isWitcher = false } = {}) {
+export async function chooseReference(kind, current, { isWitcher = false, initialGroup = "" } = {}) {
+  if (kind === "familyStatus" && isWitcher) return null;
   const localize = key => game.i18n.localize(key);
   const entries = selectionEntries(kind, localize);
-  const groups = kind === "origin" ? ORIGIN_GROUPS : {
+  const groups = kind === "familyStatus" ? FAMILY_GROUPS : kind === "origin" ? ORIGIN_GROUPS : {
     peoples: "WITCHER.Picker.Peoples", mutants: "WITCHER.Picker.Mutants"
   };
   const content = await foundry.applications.handlebars.renderTemplate(
@@ -17,12 +19,12 @@ export async function chooseReference(kind, current, { isWitcher = false } = {})
     }
   );
   let selected = current;
-  let group = "";
+  let group = kind === "familyStatus" ? entries.find(entry => entry.id === current)?.group ?? initialGroup : initialGroup;
   const result = await foundry.applications.api.DialogV2.wait({
     modal: true,
     classes: ["witcher-picker"],
     position: { width: 780 },
-    window: { title: localize(kind === "race" ? "WITCHER.Sheet.ChooseRace" : "WITCHER.Sheet.ChooseOrigin"), resizable: true },
+    window: { title: localize({ race: "WITCHER.Sheet.ChooseRace", origin: "WITCHER.Sheet.ChooseOrigin", familyStatus: "WITCHER.Sheet.ChooseFamilyStatus" }[kind]), resizable: true },
     content,
     buttons: [
       { action: "clear", label: "WITCHER.Picker.Clear", type: "button", callback: () => "" },

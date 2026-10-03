@@ -1,0 +1,172 @@
+[
+  {
+    "_id": "gear000000000001",
+    "name": "Дворянская грамота",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "noble-charter",
+      "description": ""
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000002",
+    "name": "Летопись",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "chronicle",
+      "description": ""
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000003",
+    "name": "Личный герб",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "personal-crest",
+      "description": ""
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000004",
+    "name": "Обычный чертёж",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "common-diagram",
+      "description": ""
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000005",
+    "name": "Обычная формула",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "common-formula",
+      "description": ""
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000006",
+    "name": "Музыкальный инструмент",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "musical-instrument",
+      "description": ""
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000007",
+    "name": "Счастливый талисман",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "lucky-charm",
+      "description": ""
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000008",
+    "name": "Священный символ",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "sacred-symbol",
+      "description": ""
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000009",
+    "name": "Обученная птица",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "trained-bird",
+      "description": ""
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000010",
+    "name": "Обученная змея",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "trained-snake",
+      "description": ""
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  }
+]

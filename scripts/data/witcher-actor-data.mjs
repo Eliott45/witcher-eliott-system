@@ -1,5 +1,6 @@
 import { RACE_CHOICES } from "./races.mjs";
 import { ORIGIN_CHOICES, getOriginBonus } from "./origins.mjs";
+import { FAMILY_STATUS_CHOICES, getFamilyReward } from "./family-statuses.mjs";
 
 /** Identity and manually entered resources. Racial abilities do not apply effects yet. */
 export class WitcherActorData extends foundry.abstract.TypeDataModel {
@@ -15,12 +16,19 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
         age: new NumberField({ required: true, nullable: true, integer: true, min: 0, initial: null }),
         gender: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
         race: new StringField({ required: true, nullable: false, blank: true, choices: RACE_CHOICES, initial: "" }),
-        origin: new StringField({ required: true, nullable: false, blank: true, choices: ORIGIN_CHOICES, initial: "" })
+        origin: new StringField({ required: true, nullable: false, blank: true, choices: ORIGIN_CHOICES, initial: "" }),
+        familyStatus: new StringField({ required: true, nullable: false, blank: true, choices: FAMILY_STATUS_CHOICES, initial: "" })
       }),
       biography: new SchemaField({
         appearance: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
         personality: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
         allies: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
+        enemies: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
+        family: new SchemaField({
+          history: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
+          parents: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
+          siblings: new StringField({ required: true, nullable: false, blank: true, initial: "" })
+        }),
         backstory: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
         sessionNotes: new StringField({ required: true, nullable: false, blank: true, initial: "" })
       }),
@@ -32,5 +40,9 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
 
   get originBonusEligible() {
     return getOriginBonus(this.details.race, this.details.origin) !== null;
+  }
+
+  get familyRewardEligible() {
+    return getFamilyReward(this.details.race, this.details.familyStatus) !== null;
   }
 }

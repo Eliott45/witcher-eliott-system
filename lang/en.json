@@ -7,7 +7,9 @@
     "Item": {
       "ability": "Ability",
       "race": "Race",
-      "origin": "Origin"
+      "origin": "Origin",
+      "familyStatus": "Family status",
+      "equipment": "Equipment"
     }
   },
   "WITCHER": {
@@ -47,6 +49,19 @@
       "Allies": "Connections and allies",
       "Backstory": "Backstory",
       "SessionNotes": "Session notes",
+      "Family": "Family",
+      "FamilyHistory": "About the family",
+      "Parents": "Parents",
+      "Siblings": "Brothers and sisters",
+      "Enemies": "Enemies",
+      "FamilyStatus": "Family status",
+      "FamilyStatusUnset": "Choose family status",
+      "ChooseFamilyStatus": "Choose family status",
+      "ViewFamilyStatus": "Read family status and rewards",
+      "ManageTabs": "Visible tabs",
+      "TabsHint": "Personal settings for this sheet. Hiding a tab keeps its contents. At least one tab must remain visible.",
+      "Apply": "Apply",
+      "PreferencesError": "Could not save sheet display preferences.",
       "OriginExcluded": "Witchers do not receive an origin bonus.",
       "ReferenceUnavailable": "Could not open the entry. Restart the world after adding the compendium."
     },
@@ -63,6 +78,39 @@
       "Rolling": "…",
       "Error": "Could not post the roll. Your selected dice are saved — you can try again.",
       "Quantity": "Dice quantities"
+    },
+    "Equipment": {
+      "NobleCharter": "Noble charter", "Chronicle": "Chronicle", "PersonalCrest": "Personal crest",
+      "CommonDiagram": "Common diagram", "CommonFormula": "Common formula", "MusicalInstrument": "Musical instrument",
+      "LuckyCharm": "Lucky charm", "SacredSymbol": "Sacred symbol", "TrainedBird": "Trained bird", "TrainedSnake": "Trained snake"
+    },
+    "Family": {
+      "Groups": { "North": "Northerner", "Nilfgaard": "Nilfgaardian", "Elder": "Non-human" },
+      "Roll": "Roll result",
+      "Rewards": "Starting equipment and contacts",
+      "EquipmentLinks": "Equipment in the compendium",
+      "WitcherRule": "Witchers do not receive family status rewards.",
+      "NorthAristocracy": { "Name": "Aristocracy", "Description": "You grew up in a wealthy manor where servants fulfilled your every wish. You were expected to behave well and make a good impression.", "Reward": "Noble charter (+2 Reputation)." },
+      "MageWard": { "Name": "Mage's ward", "Description": "You were placed in a mage's care at a young age. You lived comfortably but rarely saw your guardian, who was always busy.", "Reward": "Chronicle (+1 Education)." },
+      "NorthKnighthood": { "Name": "Knighthood", "Description": "You lived in a manor and were raised to become a proper lord or lady. Your future was decided at birth.", "Reward": "Personal crest (+1 Reputation)." },
+      "NorthMerchants": { "Name": "Merchant family", "Description": "You grew up among merchants, surrounded by vendors' cries and clinking coins.", "Reward": "2 acquaintances." },
+      "NorthArtisans": { "Name": "Artisan family", "Description": "You grew up in a workshop, hearing hammers and other sounds of craft every day.", "Reward": "3 common diagrams/formulae." },
+      "NorthPerformers": { "Name": "Family of performers", "Description": "You grew up with an acting troupe, perhaps travelling with them or performing in a theatre.", "Reward": "1 musical instrument and 1 friend." },
+      "NorthPeasants": { "Name": "Peasant family", "Description": "You grew up on a remote farm. You owned very little and lived a simple but dangerous life.", "Reward": "Lucky charm (+1 Luck)." },
+      "NilfgaardAristocracy": { "Name": "Aristocracy", "Description": "You grew up in a wealthy manor and learned to survive court intrigue. Luxury was an incentive to learn.", "Reward": "Noble charter (+2 Reputation)." },
+      "HighClergy": { "Name": "High clergy", "Description": "You grew up among the priests of the Great Sun. You were a devout child, certain that the church would guide you.", "Reward": "Sacred symbol (+1 Courage)." },
+      "NilfgaardKnighthood": { "Name": "Knighthood", "Description": "You grew up knowing that serving the emperor was your duty and luxury was a reward for your future service.", "Reward": "Personal crest (+1 Reputation)." },
+      "NilfgaardArtisans": { "Name": "Artisan family", "Description": "You grew up in a workshop, learning to make goods that could be sold around the world and discovering the value of skill.", "Reward": "3 common diagrams/formulae." },
+      "NilfgaardMerchants": { "Name": "Merchant family", "Description": "You grew up selling goods across the Empire and saw exotic wares from around the world.", "Reward": "2 acquaintances." },
+      "Slavery": { "Name": "Slavery", "Description": "You were enslaved from birth. You lived in a simple room, worked hard and owned little.", "Reward": "Trained bird or snake." },
+      "NilfgaardPeasants": { "Name": "Peasant family", "Description": "You grew up on one of the Empire's thousands of farms. You owned very little, but life was simple.", "Reward": "Lucky charm (+1 Luck)." },
+      "ElderAristocracy": { "Name": "Aristocracy", "Description": "You grew up in a palace, constantly reminded of a glorious past and expected to live up to your ancestors.", "Reward": "Noble charter (+2 Reputation)." },
+      "NobleWarrior": { "Name": "Noble warrior", "Description": "You are the child of a noble warrior, expected to uphold your family's reputation and honour your ancestors.", "Reward": "Personal crest (+1 Reputation)." },
+      "ElderMerchants": { "Name": "Merchant family", "Description": "You grew up with travelling merchants. Life could be hard, but goods made by non-humans were always valued.", "Reward": "2 acquaintances." },
+      "Scribes": { "Name": "Family of scribes", "Description": "Your family chronicled the history of the Elder Races, trying to preserve it for future generations.", "Reward": "Chronicle (+1 Education)." },
+      "ElderPerformers": { "Name": "Performers", "Description": "You sang and performed on stage from childhood, helping with makeup or repairing musical instruments in your free time.", "Reward": "1 musical instrument and 1 friend." },
+      "ElderArtisans": { "Name": "Artisan family", "Description": "You grew up among artisans, visited ancient palaces for inspiration and spent many hours at work every day.", "Reward": "3 common diagrams/formulae." },
+      "LowBorn": { "Name": "Low birth", "Description": "You came from an ordinary family and earned your living cleaning other people's mansions or surviving on handouts in your home city.", "Reward": "Lucky charm (+1 Luck)." }
     },
     "Races": {
       "Human": {

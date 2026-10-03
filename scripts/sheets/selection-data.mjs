@@ -1,9 +1,16 @@
 import { RACES } from "../data/races.mjs";
 import { ORIGINS, ORIGIN_GROUPS } from "../data/origins.mjs";
+import { FAMILY_STATUSES, FAMILY_GROUPS } from "../data/family-statuses.mjs";
 
 export const normalizeSearch = text => text.toLocaleLowerCase().replaceAll("ё", "е").trim();
 
 export function selectionEntries(kind, localize) {
+  if (kind === "familyStatus") return FAMILY_STATUSES.map(entry => ({
+    id: entry.id, label: localize(entry.label), group: entry.group,
+    groupLabel: `${localize(FAMILY_GROUPS[entry.group])} · ${localize("WITCHER.Family.Roll")}: ${entry.roll}`,
+    summary: localize(entry.reward),
+    details: [{ name: localize(entry.label), description: localize(entry.description) }]
+  }));
   if (kind === "origin") return ORIGINS.map(origin => ({
     id: origin.id, label: localize(origin.label), group: origin.group,
     groupLabel: localize(ORIGIN_GROUPS[origin.group]), summary: localize(origin.bonus), details: []

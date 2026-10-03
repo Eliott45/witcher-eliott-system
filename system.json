@@ -23,7 +23,9 @@
     "Item": {
       "race": { "htmlFields": ["description"] },
       "ability": { "htmlFields": ["description"] },
-      "origin": { "htmlFields": ["description"] }
+      "origin": { "htmlFields": ["description"] },
+      "familyStatus": { "htmlFields": ["description"] },
+      "equipment": { "htmlFields": ["description"] }
     }
   },
   "packs": [
@@ -50,10 +52,26 @@
       "type": "Item",
       "system": "witcher-eliott-system",
       "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "family-statuses",
+      "label": "Положение семьи",
+      "path": "packs/family-statuses",
+      "type": "Item",
+      "system": "witcher-eliott-system",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "equipment",
+      "label": "Предметы",
+      "path": "packs/equipment",
+      "type": "Item",
+      "system": "witcher-eliott-system",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
     }
   ],
   "packFolders": [
-    { "name": "Witcher", "sorting": "a", "color": "#947641", "packs": ["races", "abilities", "origins"] }
+    { "name": "Witcher", "sorting": "a", "color": "#947641", "packs": ["races", "abilities", "origins", "family-statuses", "equipment"] }
   ],
   "grid": {
     "type": 1,
