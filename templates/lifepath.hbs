@@ -10,4 +10,11 @@
 <article class="witcher-lifepath-entry"><header><h3>{{entry.title}}</h3><button type="button" data-action="editDecade" data-entry-id="{{entry.id}}" {{disabled (not ../editable)}}><i class="fa-solid fa-pen"></i></button><button type="button" data-action="removeDecade" data-entry-id="{{entry.id}}" {{disabled (not ../editable)}}><i class="fa-solid fa-trash"></i></button></header>
 <dl class="witcher-lifepath-summary">{{#each entry.summary as |field|}}<dt>{{field.label}}</dt><dd>{{field.value}}{{#if field.description}}<small>{{field.description}}</small>{{/if}}</dd>{{/each}}</dl></article>
 {{else}}<p class="witcher-drop-hint">{{localize "WITCHER.Lifepath.NoDecades"}}</p>{{/each}}
-{{else}}<p>{{localize "WITCHER.Lifepath.OrdinaryHint"}}</p>{{/if}}
+{{else}}
+<p class="witcher-drop-hint">Одно событие за каждые полные 10 лет жизни. Записано: {{lifepath.eventCount}} / {{lifepath.expectedEvents}}. Награды и обстоятельства можно уточнить перед сохранением.</p>
+<div class="witcher-lifepath-heading"><h3>Жизненные события</h3><button type="button" data-action="editLifeEvent" {{disabled (not editable)}}><i class="fa-solid fa-plus"></i> Добавить событие</button><button type="button" data-action="rollLifeEvent" {{disabled (not editable)}}><i class="fa-solid fa-dice-d10"></i> Случайное событие</button></div>
+{{#each lifepath.events as |entry|}}
+<article class="witcher-lifepath-entry"><header><h3>{{entry.title}}</h3><button type="button" data-action="editLifeEvent" data-entry-id="{{entry.id}}" aria-label="Изменить событие" {{disabled (not ../editable)}}><i class="fa-solid fa-pen"></i></button><button type="button" data-action="removeLifeEvent" data-entry-id="{{entry.id}}" aria-label="Удалить событие" {{disabled (not ../editable)}}><i class="fa-solid fa-trash"></i></button></header>
+<dl class="witcher-lifepath-summary">{{#each entry.summary as |field|}}<dt>{{field.label}}</dt><dd>{{field.value}}{{#if field.description}}<small>{{field.description}}</small>{{/if}}</dd>{{/each}}</dl></article>
+{{else}}<p class="witcher-drop-hint">Жизненных событий пока нет.</p>{{/each}}
+{{/if}}

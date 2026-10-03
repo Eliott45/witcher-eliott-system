@@ -98,6 +98,13 @@ const reopenedWitcher = new WitcherActorData(JSON.parse(JSON.stringify(restored.
 assert.equal(reopenedWitcher.lifepath.witcher.decades[0].hunt.monster, "Грифон");
 assert.equal(reopenedWitcher.lifepath.witcher.decades[0].danger.wound, "breath");
 assert.equal(reopenedWitcher.lifepath.witcher.school, "griffin");
+const oldPath = reopenedWitcher.toObject().lifepath.witcher;
+reopenedWitcher.updateSource({ "lifepath.events": [{ id: "enemytest0000001", age: 20, kind: "enemy", enemy: { name: "Тестовый враг", strength: 7, power: "Магия", cause: "Шантаж" } }] });
+const reopenedEvents = new WitcherActorData(JSON.parse(JSON.stringify(reopenedWitcher.toObject())));
+assert.deepEqual(reopenedEvents.toObject().lifepath.witcher, oldPath);
+assert.equal(reopenedEvents.lifepath.events[0].enemy.strength, 7);
+assert.equal(reopenedEvents.lifepath.events[0].enemy.power, "Магия");
+assert.deepEqual(legacyActorData.lifepath.events, [], "Old actors receive an empty event list");
 restored.updateSource({ "lifepath.witcher.school": "", "lifepath.witcher.training": "", "lifepath.witcher.trial": "", "lifepath.witcher.decades": [] });
 assert.deepEqual(restored.toObject().biography, biography, "Every biography section must survive saving and loading, including line breaks");
 restored.updateSource({ "biography.appearance": "" });

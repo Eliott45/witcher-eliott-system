@@ -1,6 +1,7 @@
 import { backgroundModifiers, modifierTotal } from "./background-modifiers.mjs";
 import { dyingHealth } from "./death.mjs";
 import { witcherModifiers } from "./witcher-lifepath.mjs";
+import { lifeEventModifiers } from "./life-events.mjs";
 
 export const ATTRIBUTE_KEYS = ["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"];
 
@@ -8,7 +9,7 @@ const WOUNDED_ATTRIBUTES = new Set(["intelligence", "reflex", "dexterity", "will
 
 /** Use base BODY/WILL for resource limits: wound penalties must not lower their own threshold. */
 export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, vigor = 0 }, { dying = false, dead = false, abilityIds = [] } = {}) {
-  const modifiers = [...backgroundModifiers(details, abilityIds), ...witcherModifiers({ details, lifepath })];
+  const modifiers = [...backgroundModifiers(details, abilityIds), ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath })];
   const adjusted = Object.fromEntries(ATTRIBUTE_KEYS.map(key => [key, attributes[key] === null ? null
     : attributes[key] + modifierTotal(modifiers, `attributes.${key}`)]));
   if (modifiers.some(modifier => modifier.source === "witcher.dulled-emotions") && adjusted.empathy !== null) adjusted.empathy = Math.min(6, Math.max(1, adjusted.empathy));

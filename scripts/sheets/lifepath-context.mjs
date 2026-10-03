@@ -3,14 +3,23 @@ import { WITCHER_CREATION_FIELDS, DECADE_FIELDS, DECADE_GROUPS, formFields } fro
 import { WITCHER_RISKS, witcherTrialModifier } from "../data/witcher-lifepath.mjs";
 import { escapeTooltip } from "./statistics-tooltips.mjs";
 import { generateDecade } from "../data/witcher-decades.mjs";
+import { LIFE_EVENT_FIELDS, LIFE_EVENT_GROUPS, validateLifeEvent } from "../data/life-event-fields.mjs";
+import { LIFE_KINDS } from "../data/life-events.mjs";
+import { generateLifeEvent } from "../data/life-event-generator.mjs";
+import { addLanguageFromItem, getLanguage } from "../data/languages.mjs";
 
 const valueAt = (data, key) => key.split(".").reduce((value, part) => value?.[part], data);
-const visible = (group, data) => !group.when || valueAt(data, group.when[0]) === group.when[1];
+const visible = (group, data) => !group.when || [group.when[1]].flat().includes(valueAt(data, group.when[0]));
 export const summarizeFields = (fields, data) => formFields(fields, data).filter(field => visible(field, data) && field.value !== "" && field.value !== 0)
   .map(field => ({ label: field.label, value: field.isChoice ? game.i18n.localize(field.choices.find(option => option.selected)?.name ?? "—") : field.value, description: field.description }));
 export function lifepathContext(actor) {
   const path = actor.system.lifepath.witcher;
-  return { isWitcher: actor.system.details.race === "witcher", creation: summarizeFields(WITCHER_CREATION_FIELDS, path),
+  return { isWitcher: actor.system.details.race === "witcher", eventCount: actor.system.lifepath.events.length,
+    expectedEvents: Math.floor((Number(actor.system.details.age) || 0) / 10),
+    events: actor.system.lifepath.events.map(entry => ({ id: entry.id, title: `${entry.age} лет · ${LIFE_KINDS.find(kind => kind.id === entry.kind)?.name ?? "—"}`,
+      summary: [...summarizeFields(LIFE_EVENT_FIELDS.filter(field => !["age", "kind"].includes(field.key)), entry),
+        ...LIFE_EVENT_GROUPS.filter(group => visible(group, entry)).flatMap(group => summarizeFields(group.fields, entry[group.key]))] })),
+    creation: summarizeFields(WITCHER_CREATION_FIELDS, path),
     trialModifier: witcherTrialModifier(path), decades: path.decades.map(entry => ({ id: entry.id,
       title: `${entry.age}–${entry.age + 9} · ${WITCHER_RISKS.find(risk => risk.id === entry.risk)?.name ?? "—"}`,
       summary: [...summarizeFields(DECADE_FIELDS.filter(field => field.key !== "age"), entry),
@@ -93,4 +102,42 @@ export async function rollDecade() {
     flavor: "Жизненный путь: десятилетие ведьмака", rolls, flags: { [SYSTEM_ID]: { skipLuck: true } } }, { messageMode: game.settings.get("core", "messageMode") });
   const result = await editStructuredRecord("Результат десятилетия", DECADE_FIELDS, DECADE_GROUPS, entry);
   if (result && this.isEditable) await updatePathRecords(this.actor, "lifepath.witcher.decades", entries => [...entries, { ...result, id: foundry.utils.randomID() }]);
+}
+
+async function saveLifeEvent(sheet, previous, initial) {
+  let data = initial;
+  while (sheet.isEditable) {
+    data = await editStructuredRecord("Жизненное событие", LIFE_EVENT_FIELDS, LIFE_EVENT_GROUPS, data);
+    if (!data) return;
+    const error = validateLifeEvent(data);
+    if (error) { ui.notifications.warn(error); continue; }
+    const id = previous?.id ?? foundry.utils.randomID();
+    await updatePathRecords(sheet.actor, "lifepath.events", entries => previous
+      ? entries.map(entry => entry.id === id ? { ...data, id } : entry) : [...entries, { ...data, id }]);
+    const language = data.kind === "fortune" && data.fortune.result === "teacher" && getLanguage(data.fortune.skill);
+    if (language) await addLanguageFromItem(sheet.actor, { type: "language", name: game.i18n.localize(language.name), system: { ruleId: language.id } });
+    return;
+  }
+}
+export async function editLifeEvent(_event, target) {
+  if (!this.isEditable || this.actor.system.details.race === "witcher") return;
+  const events = this.actor.system.lifepath.events;
+  const previous = events.find(entry => entry.id === target.dataset.entryId);
+  await saveLifeEvent(this, previous, previous ?? { age: (events.length + 1) * 10, kind: "fortune" });
+}
+export async function removeLifeEvent(_event, target) {
+  if (!this.isEditable) return;
+  if (await foundry.applications.api.DialogV2.confirm({ window: { title: "Удалить событие?" }, content: "<p>Будет удалена только эта запись жизненного пути.</p>" }))
+    await updatePathRecords(this.actor, "lifepath.events", entries => entries.filter(entry => entry.id !== target.dataset.entryId));
+}
+export async function rollLifeEvent() {
+  if (!this.isEditable || this.actor.system.details.race === "witcher") return;
+  const rolls = [];
+  const data = await generateLifeEvent((this.actor.system.lifepath.events.length + 1) * 10, async faces => {
+    const roll = await new foundry.dice.Roll(`1d${faces}`).evaluate({ allowInteractive: false });
+    rolls.push(roll); return roll.total;
+  });
+  await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: this.actor }),
+    flavor: "Жизненное событие", rolls, flags: { [SYSTEM_ID]: { skipLuck: true } } }, { messageMode: game.settings.get("core", "messageMode") });
+  await saveLifeEvent(this, null, data);
 }
