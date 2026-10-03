@@ -4,6 +4,7 @@ import { WitcherActorData } from "./data/witcher-actor-data.mjs";
 import { WitcherActor } from "./documents/witcher-actor.mjs";
 import { WitcherChatMessage } from "./documents/witcher-chat-message.mjs";
 import { WitcherCombat } from "./documents/witcher-combat.mjs";
+import { registerCriticalDice } from "./dice/critical-chain.mjs";
 import { WitcherActorSheet } from "./sheets/witcher-actor-sheet.mjs";
 import { WitcherReferenceData } from "./data/witcher-reference-data.mjs";
 import { WitcherRaceData } from "./data/witcher-race-data.mjs";
@@ -25,7 +26,8 @@ Hooks.once("init", () => {
   CONFIG.Actor.documentClass = WitcherActor;
   CONFIG.ChatMessage.documentClass = WitcherChatMessage;
   CONFIG.Combat.documentClass = WitcherCombat;
-  CONFIG.Combat.initiative.formula = "1d10 + @statistics.initiative";
+  registerCriticalDice();
+  CONFIG.Combat.initiative.formula = "1d10wc + @statistics.initiative";
   registerStatusEffects();
   registerVisionMigration();
   registerCompendiumFolderMigration();

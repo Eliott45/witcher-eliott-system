@@ -165,7 +165,7 @@ savedStatistics.prepareDerivedData();
 assert.equal(savedStatistics.attributes.body, null);
 assert.equal(savedStatistics.health.max, 30, "Clearing a required stat restores the saved legacy limit");
 const { default: CoreRoll } = await import(new URL("client/dice/roll.mjs", app));
-assert.equal(CoreRoll.replaceFormulaData("1d10 + @statistics.initiative", restored), "1d10 + 4");
+assert.equal(CoreRoll.replaceFormulaData("1d10wc + @statistics.initiative", restored), "1d10wc + 4");
 
 // Exercise real Foundry schema cleaning and the resource hook, including synthetic token actors.
 const { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources } = await import("../scripts/combat/resource-updates.mjs");
@@ -576,4 +576,73 @@ for (const formula of ["1d10 + 10", "2d6 + 1d4", "(1d6 + 2) * 3", "{2d6, 1d10}kh
   assert.deepEqual(Array.from(luckActor.system.luckSpent), [1, 2, 3, 4]);
   assert.equal(luckActor.system.luckPending, 0);
 }
-console.log("Installed Foundry core: data, 129 Items, templates, parameter lock and Luck with native dice/chat schema OK");
+const { registerCriticalDice } = await import("../scripts/dice/critical-chain.mjs");
+const { prepareCriticalResult } = await import("../scripts/chat/critical-result.mjs");
+registerCriticalDice();
+const sequences = [
+  [[10, 4], 14], [[10, 10, 7], 27], [[10, 10, 10, 2], 32], [[10, 1], 11],
+  [[1, 4], -4], [[1, 1], -1], [[1, 10, 3], -13], [[1, 10, 10, 6], -26], [[1, 10, 1], -11]
+];
+const criticalNativeRolls = [];
+for (const [sequence, expected] of sequences) {
+  const queue = [...sequence];
+  CONFIG.Dice.randomUniform = () => {
+    assert.ok(queue.length, "An ending 1–9 must not roll again");
+    return 1 - (queue.shift() - 0.5) / 10;
+  };
+  luckActor.system.updateSource({ luckSpent: [], luckPending: 4 });
+  const roll = await new CoreRoll("1d10wc + 10").evaluate({ allowInteractive: false });
+  assert.equal(queue.length, 0);
+  assert.equal(roll.total, 10 + expected);
+  const serialized = CoreRoll.fromData(JSON.parse(JSON.stringify(roll)));
+  assert.equal(serialized.total, roll.total);
+  assert.deepEqual(serialized.dice[0].results.map(result => result.result), sequence);
+  const source = new foundry.documents.BaseChatMessage({ author: game.user.id, content: String(roll.total), rolls: [serialized.toJSON()] });
+  const message = { speakerActor: luckActor, flags: source.flags, rolls: [serialized], content: source.content, flavor: source.flavor,
+    updateSource(changes) {
+      source.updateSource(changes);
+      Object.assign(this, { flags: source.flags, content: source.content, flavor: source.flavor, rolls: source.rolls.map(data => CoreRoll.fromData(data)) });
+    }
+  };
+  await prepareMessageLuck(message, "critical-check");
+  prepareCriticalResult(message);
+  assert.equal(message.rolls[0].total, 14 + expected, "Luck is added after the signed chain");
+  assert.deepEqual(message.rolls[0].dice[0].results.map(result => result.result), sequence);
+  assert.match(message.flavor, sequence[0] === 1 ? /Критический провал/ : /Критический успех/);
+  assert.match(message.flavor, /\+4 от Удачи/);
+  const sign = expected < 0 ? "−" : "+";
+  assert.ok(message.flavor.includes(`10 ${sign} ${Math.abs(expected)} + 4 = ${14 + expected}`));
+  criticalNativeRolls.push({ data: message.rolls[0].toJSON(), sequence });
+  await settleMessageLuck([message], "critical-check");
+  releaseMessageLuck("critical-check");
+  assert.deepEqual(Array.from(luckActor.system.luckSpent), [1, 2, 3, 4]);
+}
+// STUN and the ordinary dice tray retain their plain-d10 formulas.
+for (const face of [1, 10]) {
+  let draws = 0;
+  CONFIG.Dice.randomUniform = () => { draws++; return 1 - (face - 0.5) / 10; };
+  const plain = await new CoreRoll("1d10").evaluate({ allowInteractive: false });
+  assert.equal(plain.total, face);
+  assert.equal(draws, 1);
+  assert.equal(plain.dice[0].options[game.system.id], undefined);
+}
+if (process.argv[3]) {
+  // Read the installed module's notation adapter without copying its source into
+  // the repository. Physics/rendering are not started by this check.
+  const { runInThisContext } = await import("node:vm");
+  const map = JSON.parse(await readFile(resolve(process.argv[3], "main.js.map"), "utf8"));
+  const notationSource = map.sourcesContent[map.sources.findIndex(name => name.endsWith("/DiceNotation.js"))];
+  assert.ok(notationSource, "Installed DSN source map must contain DiceNotation");
+  const loadNotation = runInThisContext(`(function(foundry, game, SFXFormulaMatcher, DiceSFXManager, DiceLibrary) {
+    ${notationSource.replace(/^import .+;$/gm, "").replace(/^export /gm, "")}\nreturn DiceNotation; })`);
+  const DiceNotation = loadNotation(foundry, { ...game, settings: { get: () => 10000 } },
+    { isRealReroll: result => Boolean(result.rerolled) }, {}, {});
+  for (const { data, sequence } of criticalNativeRolls) {
+    const notation = new DiceNotation(CoreRoll.fromData(data));
+    assert.deepEqual(Array.from(notation.throws, entry => Array.from(entry.dice, die => die.result)), sequence.map(result => [result]),
+      "DSN must receive the complete chain as successive throws of the original natural faces");
+    assert.ok(notation.throws.every(entry => entry.dice.every(die => die.type === "d10")));
+  }
+  console.log("Installed Dice So Nice: all nine critical chains produce the correct successive d10 throws");
+}
+console.log("Installed Foundry core: data, 129 Items, templates, native Luck and all nine critical chains OK");

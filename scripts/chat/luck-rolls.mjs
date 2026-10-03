@@ -29,7 +29,7 @@ export async function prepareMessageLuck(message, operationId) {
     rolls: rolls.map(entry => entry.toJSON()),
     ...(message.content === String(roll.total) ? { content: String(adjusted.total) } : {}),
     flavor: `${message.flavor ?? ""}<span class="witcher-luck-bonus">${escapeTooltip(game.i18n.format("WITCHER.Luck.RollBonus", { value: points.length }))}</span>`,
-    [`flags.${SYSTEM_ID}.luck`]: { claim: claim.id, actor: actor.uuid, points, bonus: points.length }
+    [`flags.${SYSTEM_ID}.luck`]: { claim: claim.id, actor: actor.uuid, points, bonus: points.length, rollIndex: index }
   });
 }
 

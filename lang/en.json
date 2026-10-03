@@ -685,6 +685,12 @@
         "Name": "Mahakam (dwarves)",
         "Bonus": "+1 to Crafting."
       }
+    },
+    "Critical": {
+      "Success": "Critical success",
+      "Fumble": "Critical failure",
+      "FirstOne": "The first 1 starts the chain and does not count toward the total.",
+      "Total": "Check total"
     }
   }
 }

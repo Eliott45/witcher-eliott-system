@@ -8,7 +8,7 @@ export async function rollAttribute(actor, key) {
     return;
   }
   const messageMode = game.settings.get("core", "messageMode");
-  const roll = await new foundry.dice.Roll(`1d10 + ${value}`).evaluate({ allowInteractive: messageMode !== "blind" });
+  const roll = await new foundry.dice.Roll(`1d10wc + ${value}`).evaluate({ allowInteractive: messageMode !== "blind" });
   return roll.toMessage({
     speaker: foundry.documents.ChatMessage.getSpeaker({ actor }),
     flavor: game.i18n.format("WITCHER.Statistics.AttributeRoll", {
