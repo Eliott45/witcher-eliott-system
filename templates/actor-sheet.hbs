@@ -25,6 +25,31 @@
       <strong>{{stats.woundThreshold.value}}</strong>
     </div>
     {{#if stats.wounded}}<p class="witcher-wound-notice" role="status">{{localize stats.woundNotice}}</p>{{/if}}
+    {{#if stats.death.dead}}
+    <section class="witcher-death-state dead" role="status">
+      <h3><i class="fa-solid fa-skull" aria-hidden="true"></i> {{localize "WITCHER.Effects.Dead"}}</h3>
+      <p>{{localize "WITCHER.Death.DeadNotice"}}</p>
+    </section>
+    {{else if stats.death.active}}
+    <section class="witcher-death-state" aria-label="{{localize 'WITCHER.Effects.Dying'}}">
+      <h3><i class="fa-solid fa-skull" aria-hidden="true"></i> {{localize "WITCHER.Effects.Dying"}}</h3>
+      <p>{{localize "WITCHER.Death.Penalties"}}</p>
+      <div class="witcher-stat-row">
+        <label for="{{rootId}}-death-penalty">{{localize "WITCHER.Death.Penalty"}}</label>
+        {{#if canEditDeathPenalty}}
+        <input id="{{rootId}}-death-penalty" type="number" name="system.death.penalty" min="0" step="1" value="{{stats.death.penalty}}">
+        {{else}}<output id="{{rootId}}-death-penalty">{{stats.death.penalty}}</output>{{/if}}
+      </div>
+      <div class="witcher-stat-row">
+        <span data-tooltip="{{stats.death.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Death.Target"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
+        <strong>&lt; {{stats.death.target}}</strong>
+      </div>
+      <button type="button" class="witcher-stun-roll" data-action="rollDeath"
+              {{#if stats.stunUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}>
+        <i class="fa-solid fa-dice-d10" aria-hidden="true"></i> {{localize "WITCHER.Death.Roll"}}
+      </button>
+    </section>
+    {{/if}}
     <fieldset class="witcher-resource stamina">
       <legend><span data-tooltip="{{stats.staminaTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Sheet.Stamina"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></legend>
       <div class="witcher-resource-values">
@@ -289,7 +314,7 @@
           <img src="{{effect.img}}" alt="">
           <h3>{{effect.name}} {{#if effect.inactive}}<small>{{localize "WITCHER.Effects.Inactive"}}</small>{{/if}}</h3>
           <button type="button" data-action="removeEffect" data-effect-id="{{effect.id}}" title="{{localize 'WITCHER.Effects.Remove'}}"
-                  aria-label="{{localize 'WITCHER.Effects.Remove'}}" {{disabled (not ../editable)}}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                  aria-label="{{localize 'WITCHER.Effects.Remove'}}" {{disabled (not effect.canRemove)}}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </header>
         <div class="witcher-effect-description">{{{effect.description}}}</div>
       </article>

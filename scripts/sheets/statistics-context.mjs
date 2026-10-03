@@ -1,6 +1,9 @@
 import { ATTRIBUTE_KEYS } from "../data/statistics.mjs";
 import { luckPoints } from "../data/luck.mjs";
 import { attributeTooltip, modifierLines, stunTooltip } from "./statistics-tooltips.mjs";
+import { selectedLuck } from "../data/luck.mjs";
+import { deathTarget } from "../data/death.mjs";
+import { deathTooltip } from "../chat/death-result.mjs";
 
 /** Keep the displayed arithmetic alongside the same derived values used by tokens and rolls. */
 export function statisticsContext(system, { localize, format }) {
@@ -9,11 +12,11 @@ export function statisticsContext(system, { localize, format }) {
   const description = key => localize(`WITCHER.Statistics.${key}Description`);
   const base = {
     body: value(statistics.adjusted.body), will: value(statistics.adjusted.will),
-    speed: value(statistics.adjusted.speed), reflex: value(statistics.initiative),
+    speed: value(statistics.effective.speed), reflex: value(statistics.initiative),
     physical: value(statistics.recovery), health: statistics.healthMax ?? system.health.max, maximum: value(statistics.healthMax),
     stun: value(statistics.stun), threshold: statistics.woundThreshold,
     run: value(statistics.run), leap: value(statistics.leap), carry: value(statistics.carryMax),
-    carryBase: statistics.adjusted.body === null ? "—" : statistics.adjusted.body * 10
+    carryBase: statistics.effective.body === null ? "—" : statistics.effective.body * 10
   };
   const tooltip = (key, formula) => [description(key), format(`WITCHER.Statistics.${formula}Formula`, base)].join("<br><br>");
   const row = (key, number, formula, unit = "") => ({
@@ -26,7 +29,14 @@ export function statisticsContext(system, { localize, format }) {
   const rollHint = key => format("WITCHER.Statistics.AttributeRoll", {
     attribute: localize(`WITCHER.Attributes.${key}.Label`), value: value(statistics.effective[key])
   });
+  const death = { base: value(statistics.stun), penalty: system.death?.penalty ?? 0, luck: selectedLuck(system).length,
+    body: base.body, will: base.will, physical: base.physical };
+  death.target = statistics.stun === null ? "—" : deathTarget(statistics.stun, death.penalty, death.luck);
+  death.tooltip = deathTooltip(death, { localize, format });
+  death.active = statistics.dying;
+  death.dead = statistics.dead;
   return {
+    death,
     luck: { points, available: points.filter(point => !point.spent).length, maximum: value(statistics.effective.luck),
       pending: points.filter(point => point.selected).length,
       valueTooltip: attributeTooltip(system, "luck", { localize, format }),
@@ -49,11 +59,12 @@ export function statisticsContext(system, { localize, format }) {
       row("Initiative", statistics.initiative === null ? null : `+${statistics.initiative}`, "Initiative"),
       row("Run", statistics.run, "Run", "Meters"), row("Leap", statistics.leap, "Leap", "Meters")
     ],
-    carryMax: value(statistics.carryMax), carryTooltip: [tooltip("Carry", "Carry"),
+    carryMax: value(statistics.carryMax), carryTooltip: [description("Carry"),
+      format("WITCHER.Statistics.CarryFormula", { ...base, body: value(statistics.effective.body) }),
       ...modifierLines(statistics, "carryMax", localize), format("WITCHER.Statistics.TotalValue", { value: base.carry })].join("<br>"),
     carriedWeight: 0,
     vigorTooltip: description("Vigor"),
-    wounded: statistics.wounded,
-    woundNotice: system.health.value <= 0 ? "WITCHER.Statistics.Dying" : "WITCHER.Statistics.Wounded"
+    wounded: statistics.wounded && !statistics.dying && !statistics.dead,
+    woundNotice: "WITCHER.Statistics.Wounded"
   };
 }

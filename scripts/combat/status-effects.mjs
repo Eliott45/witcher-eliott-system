@@ -2,39 +2,48 @@ import { SYSTEM_ID } from "../config.mjs";
 
 export const STUNNED = "stunned";
 export const STUNNED_ICON = "icons/svg/daze.svg";
+export const DYING = "dying";
+export const DEAD = "dead";
+export const STATUS_DEFINITIONS = {
+  [STUNNED]: { id: STUNNED, name: "WITCHER.Effects.Stunned", img: STUNNED_ICON },
+  [DYING]: { id: DYING, name: "WITCHER.Effects.Dying", img: "icons/svg/blood.svg" },
+  [DEAD]: { id: DEAD, name: "WITCHER.Effects.Dead", img: "icons/svg/skull.svg" }
+};
 
 export function registerStatusEffects() {
-  CONFIG.statusEffects = {
-    [STUNNED]: { id: STUNNED, name: "WITCHER.Effects.Stunned", img: STUNNED_ICON }
-  };
+  CONFIG.statusEffects = structuredClone(STATUS_DEFINITIONS);
   // The removed core states must no longer change vision, movement or combatant status.
   for (const key of Object.keys(CONFIG.specialStatusEffects)) CONFIG.specialStatusEffects[key] = "";
 }
 
 export function localizeStatusEffects() {
-  CONFIG.statusEffects[STUNNED].description = game.i18n.localize("WITCHER.Effects.StunnedDescription");
+  for (const definition of Object.values(CONFIG.statusEffects)) {
+    definition.description = game.i18n.localize(`${definition.name}Description`);
+  }
 }
 
-export function hasStunned(actor) {
-  return actor.effects.some(effect => effect.statuses.has(STUNNED) && !effect.disabled && !effect.isSuppressed);
+export function hasStatus(actor, status) {
+  return actor.effects.some(effect => effect.statuses.has(status) && !effect.disabled && !effect.isSuppressed);
 }
+export const hasStunned = actor => hasStatus(actor, STUNNED);
+export const setStunned = (actor, active) => setStatus(actor, STUNNED, active);
 
 // A single originating client handles an update. Queue its effect writes per actor, including synthetic actors.
 const pending = new Map();
-export function setStunned(actor, active) {
+export function setStatus(actor, status, active) {
   if (!actor.isOwner) return Promise.resolve();
   const previous = pending.get(actor.uuid) ?? Promise.resolve();
   const work = previous.catch(() => {}).then(async () => {
-    const effects = actor.effects.filter(effect => effect.statuses.has(STUNNED));
+    const effects = actor.effects.filter(effect => effect.statuses.has(status));
     if (!active) {
       if (effects.length) await actor.deleteEmbeddedDocuments("ActiveEffect", effects.map(effect => effect.id));
       return;
     }
-    if (hasStunned(actor)) return;
+    if (hasStatus(actor, status)) return;
     const inactive = effects[0];
     if (inactive) await inactive.update({ disabled: false, start: null,
       duration: { value: null, units: "seconds", expiry: null, expired: false } });
-    else await actor.toggleStatusEffect(STUNNED, { active: true });
+    else await actor.toggleStatusEffect(status, { active: true });
   });
   pending.set(actor.uuid, work);
   const clear = () => { if (pending.get(actor.uuid) === work) pending.delete(actor.uuid); };

@@ -165,7 +165,7 @@ savedStatistics.prepareDerivedData();
 assert.equal(savedStatistics.attributes.body, null);
 assert.equal(savedStatistics.health.max, 30, "Clearing a required stat restores the saved legacy limit");
 const { default: CoreRoll } = await import(new URL("client/dice/roll.mjs", app));
-assert.equal(CoreRoll.replaceFormulaData("1d10wc + @statistics.initiative", restored), "1d10wc + 4");
+assert.equal(CoreRoll.replaceFormulaData("1d10wc + @statistics.initiative", restored), "1d10wc + 3");
 
 // Exercise real Foundry schema cleaning and the resource hook, including synthetic token actors.
 const { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources } = await import("../scripts/combat/resource-updates.mjs");
@@ -190,6 +190,9 @@ await updateResources({ system: { health: { value: 90 }, stamina: { value: 90 } 
 assert.equal(resourceActor.system.health.value, 50);
 assert.equal(resourceActor.system.stamina.value, 50);
 assert.equal(resourceActor.system.toObject().health.value, 50, "Clamp persists to source, not just display");
+await updateResources({ "system.health.value": 80, "system.stamina.value": 80 });
+assert.equal(resourceActor.system.toObject().health.value, 50, "Flat updates retain both HP and injected fields");
+assert.equal(resourceActor.system.toObject().stamina.value, 50);
 await updateResources({ system: { attributes: { body: 6, will: 6 } } });
 assert.equal(resourceActor.system.health.value, 30);
 assert.equal(resourceActor.system.stamina.value, 30);
@@ -209,7 +212,8 @@ assert.equal(hasStunned(resourceActor), false, "Remote clients must not duplicat
 await updateResources({ system: { stamina: { value: 10 } } });
 await updateResources({ system: { stamina: { value: 0 }, health: { value: 18 } } });
 assert.equal(hasStunned(resourceActor), true, "New exhaustion applies even when a hit occurs in the same update");
-await updateResources({ system: { health: { value: -5 }, luckSpent: [1, 5], attributes: { luck: 5 } } });
+// Here validate remote receipt of a negative HP update; death rolls use the native parser below.
+await updateResources({ system: { health: { value: -5 }, luckSpent: [1, 5], attributes: { luck: 5 } } }, "another-user");
 assert.equal(resourceActor.system.health.value, -5);
 assert.deepEqual(new WitcherActorData(resourceActor.system.toObject()).luckSpent, [1, 5]);
 resourceActor.system = new WitcherActorData({ health: { value: 60, max: 20 }, stamina: { value: 40, max: 15 } });
@@ -319,6 +323,22 @@ assert.ok(coreEffect.statuses.has("stunned"));
 assert.ok(coreEffect.description.includes("СЛ 10"));
 assert.equal(coreEffect.showIcon, CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS);
 assert.ok(new foundry.documents.BaseActiveEffect(coreEffect.toObject()).statuses.has("stunned"));
+CONFIG.Actor.dataModels.character = WitcherActorData;
+foundry.data.PrototypeTokenOverrides.overrides = { base: {} };
+for (const statusId of ["dying", "dead"]) {
+  const definition = CONFIG.statusEffects[statusId];
+  const actor = new foundry.documents.BaseActor({ name: "Condition check", type: "character",
+    system: { attributes: { body: 10, will: 10, luck: 10 }, health: { value: 50, max: 50 } },
+    effects: [{ _id: "testcondition001", name: game.i18n.localize(definition.name), img: definition.img,
+      statuses: [statusId], description: definition.description }] });
+  actor.system.prepareDerivedData();
+  assert.equal(actor.system.statistics.effective.body, 3, "An actual embedded status drives the TypeDataModel penalty");
+  assert.equal(actor.system.statistics.effective.luck, 10);
+  assert.equal(actor.system.statistics.stun, 10);
+  assert.equal(actor.system.statistics.dead, statusId === "dead");
+  assert.equal(actor.system.statistics.dying, statusId === "dying");
+  assert.equal(actor.system.health.max, 50);
+}
 handlebars.registerHelper("localize", key => foundry.utils.getProperty(translations, key) ?? key);
 handlebars.registerHelper("not", value => !value);
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
@@ -450,9 +470,11 @@ const statisticsHTML = template(await sheet._prepareContext({}));
 assert.match(statisticsHTML, /id="test-actor-main" class="witcher-character-content tab active"/);
 assert.ok(statisticsHTML.includes('<output id="test-actor-health-max">50</output>'));
 assert.ok(!statisticsHTML.includes('name="system.health.max"'), "Calculated maxima must not be resubmitted as manual values");
-assert.match(statisticsHTML, /<output id="test-actor-attribute-reflex"[^>]*>4<\/output>/);
+assert.match(statisticsHTML, /<output id="test-actor-attribute-reflex"[^>]*>3<\/output>/);
 assert.match(statisticsHTML, /<button[^>]*data-action="rollStun"[^>]*disabled/);
-assert.ok(statisticsHTML.includes('id="test-actor-weight">0 / 100 кг</output>'));
+assert.ok(statisticsHTML.includes('id="test-actor-weight">0 / 30 кг</output>'));
+assert.ok(statisticsHTML.includes('data-action="rollDeath"'));
+assert.ok(statisticsHTML.includes('id="test-actor-death-penalty">0</output>'));
 assert.equal([...statisticsHTML.matchAll(/data-action="toggleLuck"/g)].length, 100);
 sheet.actor.system = originalData;
 sheet.tabGroups.character = "main";
@@ -626,6 +648,38 @@ for (const face of [1, 10]) {
   assert.equal(draws, 1);
   assert.equal(plain.dice[0].options[game.system.id], undefined);
 }
+// Death saves persist a plain d10 and a Luck-adjusted threshold using Foundry's actual chat schema.
+const { prepareDeathResult } = await import("../scripts/chat/death-result.mjs");
+for (const [face, penalty, luck, target, succeeded] of [
+  [10, 0, 4, 14, true], [10, 0, 0, 10, false], [9, 1, 0, 9, false], [1, 10, 0, 0, false]
+]) {
+  CONFIG.Dice.randomUniform = () => 1 - (face - 0.5) / 10;
+  luckActor.system.updateSource({ luckSpent: [], luckPending: luck });
+  const roll = await new CoreRoll("1d10").evaluate({ allowInteractive: false });
+  const source = new foundry.documents.BaseChatMessage({ author: game.user.id, content: String(roll.total), rolls: [roll.toJSON()],
+    flags: { [game.system.id]: { deathSave: { base: 10, penalty, body: 10, will: 10, physical: 10, cause: "manual" } } } });
+  const message = { speakerActor: luckActor, flags: source.flags, rolls: [roll], content: source.content, flavor: source.flavor,
+    updateSource(changes) {
+      source.updateSource(changes);
+      Object.assign(this, { flags: source.flags, flavor: source.flavor, content: source.content,
+        rolls: source.rolls.map(data => CoreRoll.fromData(data)) });
+    }
+  };
+  await prepareMessageLuck(message, "death-check");
+  prepareDeathResult(message);
+  const result = message.flags[game.system.id].deathSave;
+  assert.equal(result.target, target);
+  assert.equal(result.succeeded, succeeded);
+  assert.equal(message.rolls[0].total, face);
+  assert.equal(message.rolls[0].dice[0].results.length, 1);
+  assert.ok(message.flavor.includes(`10 − ${penalty} + ${luck} = ${target}`));
+  const restoredMessage = new foundry.documents.BaseChatMessage(JSON.parse(JSON.stringify(source.toObject())));
+  assert.equal(restoredMessage.flags[game.system.id].deathSave.target, target);
+  await settleMessageLuck([message], "death-check");
+  releaseMessageLuck("death-check");
+  assert.equal(luckActor.system.luckSpent.length, luck);
+}
+for (const icon of ["blood", "skull"]) await access(new URL(`public/icons/svg/${icon}.svg`, app));
 if (process.argv[3]) {
   // Read the installed module's notation adapter without copying its source into
   // the repository. Physics/rendering are not started by this check.
@@ -645,4 +699,4 @@ if (process.argv[3]) {
   }
   console.log("Installed Dice So Nice: all nine critical chains produce the correct successive d10 throws");
 }
-console.log("Installed Foundry core: data, 129 Items, templates, native Luck and all nine critical chains OK");
+console.log("Installed Foundry core: data, 129 Items, templates, native Luck, death saves and all nine critical chains OK");

@@ -78,7 +78,11 @@
       "Remove": "Remove effect",
       "Empty": "No effects applied.",
       "Recover": "Stun save — recover",
-      "UpdateError": "Could not update the character's effect."
+      "UpdateError": "Could not update the character's effect.",
+      "Dying": "Dying",
+      "DyingDescription": "At HP ≤ 0, the character is dying. Divide all primary attributes except Luck by 3, rounding down. Maximum HP and Stamina and base STUN are unchanged. Entering this state immediately triggers a death save with penalty 0. Further damage and each new round increase the penalty by 1 and trigger another save. Success does not stabilize the character; failure means death.",
+      "Dead": "Dead",
+      "DeadDescription": "The character died after failing a death save. No further saves are made. Healing HP does not automatically remove death; the GM may remove this state."
     },
     "Statistics": {
       "Primary": "Primary statistics",
@@ -117,7 +121,6 @@
       "AttributeRoll": "{attribute}: 1d10 + {value}",
       "AttributeRollError": "Could not send the statistic roll to chat.",
       "Wounded": "Seriously wounded: INT, REF, DEX and WILL are halved.",
-      "Dying": "HP ≤ 0: fight for your life. Serious wound penalties apply.",
       "WoundedValue": "While wounded",
       "RollStun": "Stun save",
       "Success": "success",
@@ -132,7 +135,7 @@
       "TotalValue": "Total: {value}",
       "EmpathyLimit": "Dulled emotions: final EMP is at least 1 and at most 6.",
       "WoundCalculation": "Serious wound: ⌊{value} / 2⌋ = {result}",
-      "StunNoLuck": "This save does not spend Luck. STUN ignores the serious-wound penalty to WILL."
+      "StunNoLuck": "This save does not spend Luck. STUN ignores serious-wound and dying penalties."
     },
     "Token": {
       "PreviewVision": "Preview 180° vision (only for you)",
@@ -691,6 +694,28 @@
       "Fumble": "Critical failure",
       "FirstOne": "The first 1 starts the chain and does not count toward the total.",
       "Total": "Check total"
+    },
+    "Death": {
+      "Roll": "Death save",
+      "Penalty": "Death penalty",
+      "Target": "Save threshold",
+      "Penalties": "Attributes ×⅓. Luck is unchanged.",
+      "Formula": "Threshold = base STUN − death penalty + selected Luck.<br>{base} − {penalty} + {luck} = {target}.",
+      "Rule": "Plain 1d10, without critical chains. Roll strictly under the threshold; a tie fails. STUN ignores wound and dying penalties. Success does not stabilize; failure means death.",
+      "Calculation": "Dying: ⌊{value} / 3⌋ = {result}",
+      "Success": "The character survives and remains dying.",
+      "Failure": "Failed — the character dies.",
+      "Result": "1d10: {result} {comparison} {target}",
+      "LuckBonus": "+{value} Luck to the save threshold",
+      "DeadNotice": "The character is dead. No further saves are made.",
+      "GMRemoval": "Only the GM may manually remove this state.",
+      "RollError": "Could not complete the death save. Retry with the save button; the penalty was retained.",
+      "Causes": {
+        "entry": "HP dropped to 0 or below · penalty 0",
+        "damage": "Damage while dying · penalty +1",
+        "round": "Next round · penalty +1",
+        "manual": "Manual save · penalty unchanged"
+      }
     }
   }
 }

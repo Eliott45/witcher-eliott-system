@@ -40,6 +40,14 @@
 .witcher-stat-entry-value > span { flex: none; white-space: nowrap; }
 .witcher-stat-entry.overloaded input { border-color: #ef9a85; color: #ffbca4; }
 .witcher-wound-notice { margin: 5px 0 0; padding: 6px 8px; background: #ab3c3425; border-left: 2px solid #d57661; color: #ffd0b6; font-size: 11px; line-height: 1.4; }
+.witcher-death-state { margin: 10px 0; padding: 10px; background: #240e11; border: 1px solid #a65950; border-radius: 4px; color: #ffe5ce; }
+.witcher-death-state h3 { margin: 0 0 6px; border: 0; color: #ffc6b6; font-size: 15px; }
+.witcher-death-state p { margin: 5px 0 8px; font-size: 11px; line-height: 1.4; }
+.witcher-death-state .witcher-stat-row { gap: 5px; font-size: 11px; }
+.witcher-death-state input { flex: 0 0 40px; width: 40px; height: 26px; text-align: center; color: #ffe5ce; background: #ffffff12; border: 1px solid #a65950; }
+.witcher-death-state.dead { background: #171315; border-color: #857271; }
+.witcher-death-result small { display: block; margin-top: 4px; font-size: 11px; }
+.witcher-death-result p { margin: 6px 0; }
 .witcher-character-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; color: #2f2a26; }
 .witcher-character-name { flex: none; background: linear-gradient(100deg, #482021, #66292a); min-height: 86px; padding: 17px 22px 13px; }
 .witcher-character-name > input { width: 100%; height: 36px; color: #f8eddb; background: transparent; border: 0; border-radius: 0; padding: 0; font-family: Georgia, serif; font-size: 27px; font-weight: 700; }

@@ -3,6 +3,7 @@ import { ORIGIN_CHOICES, getOriginBonus } from "./origins.mjs";
 import { FAMILY_STATUS_CHOICES, getFamilyReward } from "./family-statuses.mjs";
 import { INFLUENTIAL_FRIEND_CHOICES } from "./influential-friends.mjs";
 import { ATTRIBUTE_KEYS, deriveStatistics } from "./statistics.mjs";
+import { hasStatus, DYING, DEAD } from "../combat/status-effects.mjs";
 
 /** Store base values; source bonuses and wound penalties are derived without stacking. */
 export class WitcherActorData extends foundry.abstract.TypeDataModel {
@@ -21,6 +22,12 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
       carriedWeight: new NumberField({ required: true, nullable: false, min: 0, initial: 0 }),
       luckSpent: new ArrayField(new NumberField({ required: true, nullable: false, integer: true, min: 1 })),
       luckPending: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
+      death: new SchemaField({
+        penalty: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
+        episode: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
+        lastCombat: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
+        lastRound: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 })
+      }),
       vigor: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
       details: new SchemaField({
         age: new NumberField({ required: true, nullable: true, integer: true, min: 0, initial: null }),
@@ -50,7 +57,8 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
   }
 
   get statistics() {
-    return deriveStatistics(this);
+    const actor = this.parent;
+    return deriveStatistics(this, actor?.effects ? { dying: hasStatus(actor, DYING), dead: hasStatus(actor, DEAD) } : {});
   }
 
   prepareDerivedData() {

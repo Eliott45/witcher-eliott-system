@@ -76,6 +76,33 @@ test("Stun saves succeed strictly below the target, including the endpoints", ()
   assert.equal(stunSucceeded(1, 0), false);
 });
 
+test("dying divides eight adjusted stats by three, preserves Luck and base STUN, and replaces wounds", () => {
+  const data = actor(Object.fromEntries(ATTRIBUTE_KEYS.map(key => [key, 10])), { value: 0, max: 50 });
+  data.details = { race: "human", familyStatus: "north.peasants" };
+  for (const hp of [0, -20]) {
+    data.health.value = hp;
+    const stats = data.statistics;
+    assert.equal(stats.dying, true);
+    for (const key of ATTRIBUTE_KEYS.filter(key => key !== "luck")) assert.equal(stats.effective[key], 3, key);
+    assert.equal(stats.effective.luck, 11);
+    assert.equal(stats.healthMax, 50);
+    assert.equal(stats.staminaMax, 50);
+    assert.equal(stats.stun, 10);
+    assert.equal(stats.recovery, 10);
+    assert.equal(stats.run, 9);
+    assert.equal(stats.leap, 1);
+    assert.equal(stats.carryMax, 30);
+  }
+  data.health.value = 1;
+  assert.equal(data.statistics.dying, false);
+  assert.equal(data.statistics.effective.reflex, 5);
+  assert.equal(data.statistics.effective.body, 10);
+  assert.equal(deriveStatistics(data, { dying: true }).effective.body, 3, "A manually applied dying effect uses the same penalty");
+  assert.equal(deriveStatistics(data, { dead: true }).dead, true);
+  assert.equal(deriveStatistics(data, { dead: true }).dying, false);
+  assert.equal(actor({}, { value: 0, max: 0 }).statistics.dying, false, "A blank sheet is not dying");
+});
+
 test("localized tooltips contain resolved formulas and distinguish resource names", async () => {
   for (const language of ["ru", "en"]) {
     const translations = JSON.parse(await readFile(new URL(`../lang/${language}.json`, import.meta.url), "utf8"));

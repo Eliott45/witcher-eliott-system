@@ -15,6 +15,12 @@ export async function prepareMessageLuck(message, operationId) {
   if (!points.length || index < 0) return;
   const claim = { id: foundry.utils.randomID(), operationId, actor, points };
   reservations.set(actor.uuid, claim);
+  const luck = { claim: claim.id, actor: actor.uuid, points, bonus: points.length, rollIndex: index };
+  // A death save rolls under a threshold. Luck increases that threshold, never the die.
+  if (message.flags[SYSTEM_ID]?.deathSave) {
+    message.updateSource({ [`flags.${SYSTEM_ID}.luck`]: { ...luck, target: "death" } });
+    return;
+  }
   const roll = message.rolls[index];
   const bonus = new foundry.dice.terms.NumericTerm({ number: points.length,
     options: { flavor: game.i18n.localize("WITCHER.Attributes.luck.Label") } });
@@ -29,7 +35,7 @@ export async function prepareMessageLuck(message, operationId) {
     rolls: rolls.map(entry => entry.toJSON()),
     ...(message.content === String(roll.total) ? { content: String(adjusted.total) } : {}),
     flavor: `${message.flavor ?? ""}<span class="witcher-luck-bonus">${escapeTooltip(game.i18n.format("WITCHER.Luck.RollBonus", { value: points.length }))}</span>`,
-    [`flags.${SYSTEM_ID}.luck`]: { claim: claim.id, actor: actor.uuid, points, bonus: points.length, rollIndex: index }
+    [`flags.${SYSTEM_ID}.luck`]: luck
   });
 }
 
