@@ -22,20 +22,20 @@ function create(type, data = {}) {
   return changes;
 }
 
-test("new characters have linked tokens and a rotatable 180-degree field of view", () => {
+test("new characters have linked tokens and a full 360-degree field of view", () => {
   const changes = create("character");
   assert.equal(changes["prototypeToken.sight.enabled"], true);
-  assert.equal(changes["prototypeToken.sight.angle"], 180);
+  assert.equal(changes["prototypeToken.sight.angle"], 360);
   assert.equal(changes["prototypeToken.actorLink"], true);
   assert.equal(changes["prototypeToken.lockRotation"], false);
   assert.ok(!Object.hasOwn(changes, "prototypeToken.sight.range"), "Do not grant darkvision");
   assert.ok(!Object.hasOwn(changes, "prototypeToken.light"), "Do not make characters emit light");
 });
 
-test("NPC resources are independent while NPCs still get directional vision", () => {
+test("NPC resources are independent and default vision is unrestricted", () => {
   const changes = create("npc");
   assert.equal(changes["prototypeToken.actorLink"], false);
-  assert.equal(changes["prototypeToken.sight.angle"], 180);
+  assert.equal(changes["prototypeToken.sight.angle"], 360);
 });
 
 test("duplicates and imports preserve explicit values, including false and zero", () => {

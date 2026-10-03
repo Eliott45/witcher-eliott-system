@@ -1,0 +1,34 @@
+<div class="witcher-sheet-body">
+  <header class="witcher-reference-header">
+    <img src="{{item.img}}" alt="{{item.name}}" data-action="editImage" data-edit="img">
+    <div>
+      <span class="witcher-eyebrow">{{localize typeLabel}}</span>
+      {{#if editable}}
+      <input name="name" type="text" value="{{item.name}}" required aria-label="{{localize 'WITCHER.Sheet.Name'}}">
+      {{else}}
+      <h1>{{item.name}}</h1>
+      {{/if}}
+    </div>
+  </header>
+  {{#if editable}}
+  <prose-mirror name="system.description" value="{{system.description}}"
+                data-document-uuid="{{item.uuid}}" collaborate toggled>
+    {{{description}}}
+  </prose-mirror>
+  {{else}}
+  {{#if description}}<div class="witcher-description">{{{description}}}</div>{{/if}}
+  {{/if}}
+  {{#if abilities}}
+  <section aria-labelledby="{{rootId}}-abilities-title">
+    <h2 id="{{rootId}}-abilities-title">{{localize "WITCHER.Sheet.RacialAbilities"}}</h2>
+    <ul class="witcher-ability-list">
+      {{#each abilities as |ability|}}
+      <li class="witcher-ability">
+        <h3>{{{ability.link}}}</h3>
+        <div class="witcher-description">{{{ability.description}}}</div>
+      </li>
+      {{/each}}
+    </ul>
+  </section>
+  {{/if}}
+</div>

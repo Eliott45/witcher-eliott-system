@@ -2,6 +2,10 @@ node_modules/
 .dev/
 coverage/
 *.log
+!packs/**/*.log
+packs/**/LOCK
+packs/**/LOG
+packs/**/LOG.old
 .DS_Store
 Thumbs.db
 

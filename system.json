@@ -2,7 +2,7 @@
   "id": "witcher-eliott-system",
   "title": "The Witcher — Eliott",
   "description": "Неофициальная система для The Witcher TRPG. Разработка начинается с удобства боя и листов персонажей.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "compatibility": {
     "minimum": "14",
     "verified": "14.368",
@@ -19,8 +19,30 @@
     "Actor": {
       "character": {},
       "npc": {}
+    },
+    "Item": {
+      "race": { "htmlFields": ["description"] },
+      "ability": { "htmlFields": ["description"] }
     }
   },
+  "packs": [
+    {
+      "name": "races",
+      "label": "Расы",
+      "path": "packs/races",
+      "type": "Item",
+      "system": "witcher-eliott-system",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "abilities",
+      "label": "Расовые способности",
+      "path": "packs/abilities",
+      "type": "Item",
+      "system": "witcher-eliott-system",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    }
+  ],
   "grid": {
     "type": 1,
     "distance": 2,

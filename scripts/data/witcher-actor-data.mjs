@@ -1,4 +1,6 @@
-/** Only the manually entered resources needed by the initial combat sheet. */
+import { RACE_CHOICES } from "./races.mjs";
+
+/** Identity and manually entered resources. Racial abilities do not apply effects yet. */
 export class WitcherActorData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     const { NumberField, SchemaField, StringField } = foundry.data.fields;
@@ -8,6 +10,10 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
     });
 
     return {
+      details: new SchemaField({
+        age: new NumberField({ required: true, nullable: true, integer: true, min: 0, initial: null }),
+        race: new StringField({ required: true, nullable: false, blank: true, choices: RACE_CHOICES, initial: "" })
+      }),
       health: resource(),
       stamina: resource(),
       notes: new StringField({ required: true, nullable: false, initial: "" })

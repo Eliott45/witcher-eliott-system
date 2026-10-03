@@ -1,4 +1,4 @@
-.witcher-eliott.actor-sheet {
+.witcher-eliott.actor-sheet, .witcher-eliott.reference-sheet {
   --witcher-ink: #ece5d8;
   --witcher-muted: #b6ad9f;
   --witcher-line: #47433b;
@@ -7,12 +7,13 @@
   --color-text-secondary: var(--witcher-muted);
   color: var(--witcher-ink);
   min-width: 420px;
-  min-height: 480px;
+  min-height: 340px;
 }
 
-.witcher-eliott.actor-sheet .window-content {
+.witcher-eliott .window-content {
   background: #1d211f;
   padding: 0;
+  container: witcher-sheet / inline-size;
 }
 
 .witcher-eliott .witcher-sheet-body {
@@ -32,8 +33,9 @@
 }
 
 .witcher-eliott .witcher-portrait {
-  flex: 0 0 80px;
-  height: 90px;
+  display: block;
+  width: 104px;
+  height: 138px;
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--witcher-gold);
@@ -42,12 +44,23 @@
   cursor: pointer;
 }
 
+.witcher-eliott .witcher-portrait-frame { position: relative; flex: 0 0 auto; }
+.witcher-eliott .witcher-portrait-button { display: block; width: auto; height: auto; padding: 0; border: 0; background: transparent; }
+.witcher-eliott .witcher-portrait-button:focus-visible { outline: 2px solid var(--witcher-gold); outline-offset: 3px; }
+.witcher-eliott .witcher-edit-portrait { position: absolute; right: 5px; bottom: 5px; width: 26px; height: 26px; padding: 0; }
+.witcher-eliott .witcher-race-choice { display: flex; align-items: end; gap: 6px; }
+.witcher-eliott .witcher-race-choice select { min-width: 0; flex: 1; }
+.witcher-eliott .witcher-view-race { flex: 0 0 34px; height: 34px; padding: 0; }
+
 .witcher-eliott .witcher-identity { flex: 1; min-width: 0; }
 .witcher-eliott .witcher-eyebrow { display: block; color: var(--witcher-gold); font-size: 11px; letter-spacing: 0.1em; margin-bottom: 12px; }
 .witcher-eliott label { display: block; color: var(--witcher-muted); font-size: 12px; }
-.witcher-eliott input, .witcher-eliott textarea { background: #131715; color: var(--witcher-ink); border: 1px solid var(--witcher-line); margin-top: 5px; }
-.witcher-eliott input:focus, .witcher-eliott textarea:focus { outline: 2px solid var(--witcher-gold); outline-offset: 1px; }
-.witcher-eliott .witcher-identity input { height: 36px; font-size: 20px; }
+.witcher-eliott input, .witcher-eliott textarea, .witcher-eliott select { background: #131715; color: var(--witcher-ink); border: 1px solid var(--witcher-line); margin-top: 5px; width: 100%; }
+.witcher-eliott input:focus, .witcher-eliott textarea:focus, .witcher-eliott select:focus { outline: 2px solid var(--witcher-gold); outline-offset: 1px; }
+.witcher-eliott select option { background: #131715; color: var(--witcher-ink); }
+.witcher-eliott .witcher-identity > input { height: 38px; font-size: 22px; }
+.witcher-eliott .witcher-identity-details { display: grid; grid-template-columns: minmax(90px, 0.6fr) minmax(120px, 1.4fr); gap: 14px; margin-top: 12px; }
+.witcher-eliott .witcher-identity-details input, .witcher-eliott .witcher-identity-details select { height: 34px; font-size: 15px; }
 .witcher-eliott .witcher-resources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .witcher-eliott .witcher-resource { margin: 0; padding: 14px; border: 1px solid var(--witcher-line); border-top: 3px solid #ba685f; border-radius: 4px; min-width: 0; }
 .witcher-eliott .witcher-resource.stamina { border-top-color: #70a695; }
@@ -55,12 +68,32 @@
 .witcher-eliott .witcher-resource-values { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 8px; }
 .witcher-eliott .witcher-resource-values input { height: 38px; text-align: center; font-size: 22px; }
 .witcher-eliott .witcher-resource-values > span { line-height: 38px; color: var(--witcher-muted); }
-.witcher-eliott .witcher-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .witcher-eliott h2 { font-size: 18px; color: var(--witcher-ink); margin: 0; border: 0; }
-.witcher-eliott .witcher-angle { color: var(--witcher-gold); font-size: 24px; }
 .witcher-eliott p { color: var(--witcher-muted); line-height: 1.5; font-size: 13px; }
 .witcher-eliott button { color: var(--witcher-ink); border-color: var(--witcher-line); background: #2a302b; }
 .witcher-eliott button:hover { border-color: var(--witcher-gold); background: #343c35; }
-.witcher-eliott .witcher-vision button { width: 100%; }
-.witcher-eliott .witcher-notes textarea { width: 100%; min-height: 80px; resize: vertical; padding: 10px; }
-.witcher-eliott .witcher-footnote { margin: 0; font-size: 11px; border-top: 1px solid var(--witcher-line); padding-top: 12px; }
+.witcher-eliott .witcher-ability-list { display: flex; flex-direction: column; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.witcher-eliott .witcher-ability { padding: 14px 16px; background: #232923; border: 1px solid #3a443a; border-left: 3px solid #947641; border-radius: 4px; }
+.witcher-eliott .witcher-ability h3 { margin: 0 0 6px; border: 0; color: var(--witcher-gold); font-size: 16px; }
+.witcher-eliott .witcher-ability p { color: var(--witcher-ink); margin: 0; overflow-wrap: anywhere; }
+.witcher-eliott .witcher-reference-header { display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--witcher-line); padding-bottom: 16px; }
+.witcher-eliott .witcher-reference-header img { width: 64px; height: 64px; object-fit: contain; border: 0; }
+.witcher-eliott .witcher-reference-header > div { flex: 1; min-width: 0; }
+.witcher-eliott .witcher-reference-header h1 { font-size: 26px; margin: 0; border: 0; color: var(--witcher-gold); }
+.witcher-eliott .witcher-description { color: var(--witcher-ink); line-height: 1.5; overflow-wrap: anywhere; }
+.witcher-eliott .witcher-description p { color: inherit; }
+.witcher-eliott.reference-sheet h2 { margin-bottom: 14px; }
+.witcher-eliott.reference-sheet prose-mirror { min-height: 160px; }
+.witcher-eliott .witcher-ability .content-link { background: transparent; border: 0; color: var(--witcher-gold); }
+
+@container witcher-sheet (max-width: 620px) {
+  .witcher-eliott .witcher-sheet-body { padding: 18px; }
+  .witcher-eliott .witcher-portrait { width: 76px; height: 104px; }
+  .witcher-eliott .witcher-sheet-header { gap: 12px; }
+}
+
+#token-hud .witcher-vision-toggle.active {
+  color: #f0cc83;
+  border-color: #d4b477;
+  box-shadow: 0 0 8px #d4b47766;
+}

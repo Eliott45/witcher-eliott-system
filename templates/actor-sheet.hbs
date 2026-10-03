@@ -1,14 +1,46 @@
 <div class="witcher-sheet-body">
   <header class="witcher-sheet-header">
-    <img class="witcher-portrait" src="{{actor.img}}" alt="{{actor.name}}" data-action="editImage"
-         data-edit="img" title="{{localize 'WITCHER.Sheet.Portrait'}}">
+    <div class="witcher-portrait-frame">
+      <button type="button" class="witcher-portrait-button" data-action="showPortraitArtwork"
+              aria-label="{{localize 'WITCHER.Sheet.ViewPortrait'}}" title="{{localize 'WITCHER.Sheet.ViewPortrait'}}">
+        <img class="witcher-portrait" src="{{actor.img}}" alt="{{actor.name}}">
+      </button>
+      {{#if editable}}
+      <button type="button" class="witcher-edit-portrait" data-action="editPortrait"
+              aria-label="{{localize 'WITCHER.Sheet.Portrait'}}" title="{{localize 'WITCHER.Sheet.Portrait'}}">
+        <i class="fa-solid fa-pen" aria-hidden="true"></i>
+      </button>
+      {{/if}}
+    </div>
     <div class="witcher-identity">
       <span class="witcher-eyebrow">THE WITCHER · {{localize typeLabel}}</span>
       <label for="{{rootId}}-name">{{localize "WITCHER.Sheet.Name"}}</label>
-      <input id="{{rootId}}-name" name="name" type="text" value="{{actor.name}}" required>
+      <input id="{{rootId}}-name" name="name" type="text" value="{{actor.name}}" required {{disabled (not editable)}}>
+      <div class="witcher-identity-details">
+        <label for="{{rootId}}-age">{{localize "WITCHER.Sheet.Age"}}
+          <input id="{{rootId}}-age" name="system.details.age" type="number" min="0" step="1"
+                 value="{{system.details.age}}" placeholder="—" {{disabled (not editable)}}>
+        </label>
+        <div>
+          <label for="{{rootId}}-race">{{localize "WITCHER.Sheet.Race"}}</label>
+          <div class="witcher-race-choice">
+            <select id="{{rootId}}-race" name="system.details.race" {{disabled (not editable)}}>
+              <option value="" {{#unless selectedRace}}selected{{/unless}}>{{localize "WITCHER.Sheet.RaceUnset"}}</option>
+              {{#each raceChoices as |race|}}
+              <option value="{{race.id}}" {{#if race.selected}}selected{{/if}}>{{localize race.label}}</option>
+              {{/each}}
+            </select>
+            {{#if selectedRace}}
+            <button type="button" data-action="viewRace" class="witcher-view-race"
+                    aria-label="{{localize 'WITCHER.Sheet.ViewRace'}}" title="{{localize 'WITCHER.Sheet.ViewRace'}}">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            </button>
+            {{/if}}
+          </div>
+        </div>
+      </div>
     </div>
   </header>
-
   <section class="witcher-resources" aria-label="{{localize 'WITCHER.Sheet.Resources'}}">
     <fieldset class="witcher-resource health">
       <legend>{{localize "WITCHER.Sheet.Health"}}</legend>
@@ -39,22 +71,4 @@
       </div>
     </fieldset>
   </section>
-
-  <section class="witcher-vision">
-    <div class="witcher-section-heading">
-      <h2>{{localize "WITCHER.Sheet.Vision"}}</h2>
-      <span class="witcher-angle">{{#if vision.enabled}}{{vision.angle}}°{{else}}{{localize "WITCHER.Sheet.Disabled"}}{{/if}}</span>
-    </div>
-    <p>{{localize "WITCHER.Sheet.VisionHint"}}</p>
-    <button type="button" data-action="{{tokenAction}}" {{disabled (not editable)}}>
-      <i class="fa-solid fa-eye" aria-hidden="true"></i> {{localize tokenLabel}}
-    </button>
-  </section>
-
-  <section class="witcher-notes">
-    <label for="{{rootId}}-notes">{{localize "WITCHER.Sheet.Notes"}}</label>
-    <textarea id="{{rootId}}-notes" name="system.notes" rows="4"
-              placeholder="{{localize 'WITCHER.Sheet.NotesPlaceholder'}}">{{system.notes}}</textarea>
-  </section>
-  <p class="witcher-footnote">{{localize "WITCHER.Sheet.FoundationHint"}}</p>
 </div>

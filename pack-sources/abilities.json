@@ -1,0 +1,223 @@
+[
+  {
+    "_id": "abil000000000001",
+    "name": "Доверие",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "human.trust",
+      "description": "<p>+1 к Харизме, Соблазнению и Убеждению против других людей.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000002",
+    "name": "Изобретательность",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "human.ingenuity",
+      "description": "<p>+1 к Дедукции.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000003",
+    "name": "Упрямство",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "human.stubbornness",
+      "description": "<p>Переброс неудачной проверки Сопротивления убеждению или Храбрости (не более 3 раз за партию; берётся наивысший результат; при повторном провале нельзя использовать снова).</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000004",
+    "name": "Чувство прекрасного",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "elf.artistic-talent",
+      "description": "<p>+1 к Искусству.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000005",
+    "name": "Стрелок",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "elf.marksman",
+      "description": "<p>+2 к Стрельбе из лука; выхватывает и натягивает лук, не тратя действие.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000006",
+    "name": "Единение с природой",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "elf.one-with-nature",
+      "description": "<p>Животные дружелюбны и не нападают без провокации; автоматически находит обычные/повсеместные растительные субстанции, если они есть в природе на этой территории.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000007",
+    "name": "Закалённый",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "dwarf.tough",
+      "description": "<p>Кожа имеет врождённую прочность 2 (прибавляется к прочности любой брони и не понижается разрушающим уроном).</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000008",
+    "name": "Сила",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "dwarf.strong",
+      "description": "<p>+1 к Силе; +25 к Переносимому весу.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000009",
+    "name": "Намётанный глаз",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "dwarf.shrewd",
+      "description": "<p>+1 к Торговле.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000010",
+    "name": "Обострённые чувства",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "witcher.enhanced-senses",
+      "description": "<p>Нет штрафов при слабом свете; +1 к Вниманию; возможность выслеживания по запаху.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000011",
+    "name": "Стойкость мутанта",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "witcher.mutant-resilience",
+      "description": "<p>Невосприимчивы к болезням; способны использовать мутагены.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000012",
+    "name": "Притупление эмоций",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "witcher.dulled-emotions",
+      "description": "<p>Не совершают проверки Храбрости против Запугивания; −4 к Эмпатии (Эмп не ниже 1); Эмп не может быть выше 6.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "abil000000000013",
+    "name": "Молниеносная реакция",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "witcher.lightning-reflexes",
+      "description": "<p>+1 к Реакции и Ловкости (можно сделать эти значения больше 10).</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  }
+]

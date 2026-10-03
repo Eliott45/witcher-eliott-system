@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readdir, readFile, access } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { ACTOR_TYPES, SYSTEM_ID } from "../scripts/config.mjs";
+import { ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID } from "../scripts/config.mjs";
+import { RACES } from "../scripts/data/races.mjs";
+import { compendiumData } from "./compendium-data.mjs";
 
 process.chdir(fileURLToPath(new URL("..", import.meta.url)));
 const manifest = JSON.parse(await readFile("system.json", "utf8"));
@@ -10,6 +12,7 @@ const pkg = JSON.parse(await readFile("package.json", "utf8"));
 assert.equal(manifest.id, SYSTEM_ID);
 assert.equal(manifest.version, pkg.version);
 assert.deepEqual(Object.keys(manifest.documentTypes.Actor), ACTOR_TYPES);
+assert.deepEqual(Object.keys(manifest.documentTypes.Item), ITEM_TYPES);
 assert.equal(manifest.grid.distance, 2);
 assert.equal(manifest.grid.units, "m");
 
@@ -24,9 +27,32 @@ const leaves = (object, prefix = "") => Object.entries(object).flatMap(([key, va
 const languages = await Promise.all(manifest.languages.map(async ({ path }) => JSON.parse(await readFile(path, "utf8"))));
 assert.deepEqual(leaves(languages[0]).sort(), leaves(languages[1]).sort(), "Translation keys must match");
 const keys = new Set(leaves(languages[0]));
-const template = await readFile("templates/actor-sheet.hbs", "utf8");
-for (const [, key] of template.matchAll(/localize\s+["']([^"']+)["']/g)) {
-  assert.ok(keys.has(key), `Missing translation: ${key}`);
+for (const name of ["actor-sheet", "item-sheet"]) {
+  const template = await readFile(`templates/${name}.hbs`, "utf8");
+  for (const [, key] of template.matchAll(/localize\s+["']([^"']+)["']/g)) {
+    assert.ok(keys.has(key), `Missing translation: ${key}`);
+  }
+}
+const expectedPacks = compendiumData(languages[0]);
+for (const pack of manifest.packs) {
+  await access(`${pack.path}/CURRENT`);
+  const documents = JSON.parse(await readFile(`pack-sources/${pack.name}.json`, "utf8"));
+  assert.deepEqual(documents, expectedPacks[pack.name], `Rebuild stale ${pack.name} compendium`);
+  assert.equal(pack.ownership.PLAYER, "OBSERVER", "Players must be able to read racial bonuses");
+}
+const ids = new Set();
+for (const race of RACES) {
+  assert.ok(!ids.has(race.id), `Duplicate race ID: ${race.id}`);
+  ids.add(race.id);
+  for (const entry of [race, ...race.abilities]) {
+    for (const key of [entry.label, entry.description, entry.note].filter(Boolean)) {
+      assert.ok(keys.has(key), `Missing race translation: ${key}`);
+    }
+  }
+  for (const ability of race.abilities) {
+    assert.ok(!ids.has(ability.id), `Duplicate ability ID: ${ability.id}`);
+    ids.add(ability.id);
+  }
 }
 
 async function checkScripts(directory) {

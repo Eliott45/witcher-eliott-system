@@ -1,0 +1,91 @@
+[
+  {
+    "_id": "race000000000001",
+    "name": "Человек",
+    "type": "race",
+    "img": "icons/svg/mystery-man.svg",
+    "system": {
+      "ruleId": "human",
+      "description": "",
+      "abilities": [
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000001",
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000002",
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000003"
+      ]
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "race000000000002",
+    "name": "Эльф",
+    "type": "race",
+    "img": "icons/svg/mystery-man.svg",
+    "system": {
+      "ruleId": "elf",
+      "description": "",
+      "abilities": [
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000004",
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000005",
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000006"
+      ]
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "race000000000003",
+    "name": "Краснолюд",
+    "type": "race",
+    "img": "icons/svg/mystery-man.svg",
+    "system": {
+      "ruleId": "dwarf",
+      "description": "",
+      "abilities": [
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000007",
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000008",
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000009"
+      ]
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "race000000000004",
+    "name": "Ведьмак",
+    "type": "race",
+    "img": "icons/svg/mystery-man.svg",
+    "system": {
+      "ruleId": "witcher",
+      "description": "<p>Изначально люди, изменённые мутациями (Испытание травами).</p>",
+      "abilities": [
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000010",
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000011",
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000012",
+        "Compendium.witcher-eliott-system.abilities.Item.abil000000000013"
+      ]
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  }
+]

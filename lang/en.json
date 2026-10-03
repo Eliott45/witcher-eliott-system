@@ -3,26 +3,102 @@
     "Actor": {
       "character": "Character",
       "npc": "NPC / opponent"
+    },
+    "Item": {
+      "ability": "Ability",
+      "race": "Race"
     }
   },
   "WITCHER": {
+    "Token": {
+      "PreviewVision": "Preview 180° vision (only for you)",
+      "RestoreVision": "Restore normal vision",
+      "MigrationFailed": "Could not update old vision settings. Reload the world as GM; see the console for details."
+    },
     "Sheet": {
       "Title": "Witcher Combat Sheet",
       "Portrait": "Change portrait",
       "Name": "Name",
+      "Age": "Age, years",
+      "Race": "Race",
+      "RaceUnset": "Choose a race…",
+      "RacialAbilities": "Racial abilities",
       "Resources": "Combat resources",
       "Health": "Health",
       "Stamina": "Stamina",
       "Current": "Current",
       "Maximum": "Maximum",
-      "Vision": "Field of view",
-      "Disabled": "Disabled",
-      "VisionHint": "The sector rotates with the token. Walls and scene lighting determine visibility. Rotate a selected token with Shift + mouse wheel.",
-      "PrototypeToken": "Configure prototype token",
-      "SceneToken": "Configure scene token",
-      "Notes": "Combat notes",
-      "NotesPlaceholder": "Tactics, conditions and reminders…",
-      "FoundationHint": "Starter sheet: enter resources manually. Rolls, damage and effects will be added separately."
+      "ReferenceTitle": "Witcher Reference",
+      "ViewRace": "View racial bonuses",
+      "ViewPortrait": "Open portrait",
+      "RaceUnavailable": "Could not open the race. Restart the Foundry world after adding the compendiums."
+    },
+    "Races": {
+      "Human": {
+        "Name": "Human",
+        "Trust": {
+          "Name": "Trust",
+          "Description": "+1 to Charisma, Seduction and Persuasion against other humans."
+        },
+        "Ingenuity": {
+          "Name": "Ingenuity",
+          "Description": "+1 to Deduction."
+        },
+        "Stubbornness": {
+          "Name": "Stubbornness",
+          "Description": "Reroll a failed Resist Coercion or Courage check (up to 3 times per session; take the highest result; if the reroll fails, this ability cannot be used again)."
+        }
+      },
+      "Elf": {
+        "Name": "Elf",
+        "ArtisticTalent": {
+          "Name": "Artistic Talent",
+          "Description": "+1 to Fine Arts."
+        },
+        "Marksman": {
+          "Name": "Marksman",
+          "Description": "+2 to Archery; draw and string a bow without spending an action."
+        },
+        "OneWithNature": {
+          "Name": "One with Nature",
+          "Description": "Animals are friendly and do not attack unless provoked; automatically find common or plentiful plant substances if they naturally occur in the area."
+        }
+      },
+      "Dwarf": {
+        "Name": "Dwarf",
+        "Tough": {
+          "Name": "Tough",
+          "Description": "Skin has a natural stopping power of 2, added to any armor's stopping power and unaffected by ablation damage."
+        },
+        "Strong": {
+          "Name": "Strong",
+          "Description": "+1 to Physique; +25 to carrying capacity."
+        },
+        "Shrewd": {
+          "Name": "Shrewd",
+          "Description": "+1 to Business."
+        }
+      },
+      "Witcher": {
+        "Name": "Witcher",
+        "Note": "Originally humans, transformed by mutations during the Trial of the Grasses.",
+        "EnhancedSenses": {
+          "Name": "Enhanced Senses",
+          "Description": "No penalties in dim light; +1 to Awareness; can track by scent."
+        },
+        "MutantResilience": {
+          "Name": "Mutant Resilience",
+          "Description": "Immune to diseases; can use mutagens."
+        },
+        "DulledEmotions": {
+          "Name": "Dulled Emotions",
+          "Description": "No Courage checks against Intimidation; −4 to Empathy (minimum 1); Empathy cannot exceed 6."
+        },
+        "LightningReflexes": {
+          "Name": "Lightning Reflexes",
+          "Description": "+1 to Reflex and Dexterity (these values may exceed 10)."
+        }
+      }
     }
   }
 }
