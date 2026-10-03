@@ -1,0 +1,24 @@
+[
+  {
+    "_id": "gearFolderFamily",
+    "name": "Семья",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "gearFolderFriend",
+    "name": "Друг",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  }
+]

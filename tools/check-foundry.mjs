@@ -38,9 +38,9 @@ assert.equal(game.system.grid.distance, 2);
 assert.equal(game.system.grid.units, "m");
 const [packFolder] = game.system.packFolders;
 assert.equal(packFolder.name, "Witcher");
-assert.deepEqual(Array.from(packFolder.packs), ["races", "abilities", "origins", "family-statuses", "equipment"]);
-game.model = game.system.documentTypes;
-game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type }]));
+assert.deepEqual(Array.from(packFolder.packs), ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends"]);
+game.model = { ...game.system.documentTypes, Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
+game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type, folders: new Map() }]));
 game.user = { id: "testuser00000001", isGM: true };
 let preferences = {};
 const player = { id: "player0000000001", isGM: false, hasPermission: () => false };
@@ -52,7 +52,8 @@ const { WitcherActorData } = await import("../scripts/data/witcher-actor-data.mj
 const { RACES } = await import("../scripts/data/races.mjs");
 const { ORIGINS } = await import("../scripts/data/origins.mjs");
 const { FAMILY_STATUSES } = await import("../scripts/data/family-statuses.mjs");
-const { EQUIPMENT } = await import("../scripts/data/equipment.mjs");
+const { EQUIPMENT, EQUIPMENT_FOLDERS } = await import("../scripts/data/equipment.mjs");
+const { INFLUENTIAL_FRIENDS } = await import("../scripts/data/influential-friends.mjs");
 const { updateSheetPreferences } = await import("../scripts/sheets/sheet-preferences.mjs");
 const actorData = new WitcherActorData();
 assert.equal(actorData.health.value, 0);
@@ -70,6 +71,13 @@ assert.equal(legacyActorData.details.race, "");
 assert.equal(legacyActorData.details.gender, "");
 assert.equal(legacyActorData.details.origin, "");
 assert.equal(legacyActorData.details.familyStatus, "");
+assert.equal(legacyActorData.details.influentialFriend, "");
+legacyActorData.updateSource({ "details.influentialFriend": "north.mage" });
+const savedFriend = new WitcherActorData(JSON.parse(JSON.stringify(legacyActorData.toObject())));
+assert.equal(savedFriend.details.influentialFriend, "north.mage");
+savedFriend.updateSource({ "details.influentialFriend": "" });
+assert.equal(savedFriend.details.influentialFriend, "", "The optional influence can be cleared");
+assert.throws(() => new WitcherActorData({ details: { influentialFriend: "missing-friend" } }));
 const biography = {
   appearance: "Шрам на лице.\nСедые волосы.",
   personality: "Упрямый, но верный слову.",
@@ -138,12 +146,20 @@ const { WitcherReferenceData } = await import("../scripts/data/witcher-reference
 const { WitcherRaceData } = await import("../scripts/data/witcher-race-data.mjs");
 const { WitcherOriginData } = await import("../scripts/data/witcher-origin-data.mjs");
 const { WitcherFamilyStatusData } = await import("../scripts/data/witcher-family-status-data.mjs");
-const { raceUuid, abilityUuid, originUuid, familyStatusUuid, equipmentUuid } = await import("../scripts/data/compendiums.mjs");
-CONFIG.Item.dataModels = { race: WitcherRaceData, ability: WitcherReferenceData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherReferenceData };
+const { WitcherInfluenceData } = await import("../scripts/data/witcher-influence-data.mjs");
+const { raceUuid, abilityUuid, originUuid, familyStatusUuid, equipmentUuid, influentialFriendUuid } = await import("../scripts/data/compendiums.mjs");
+CONFIG.Item.dataModels = { race: WitcherRaceData, ability: WitcherReferenceData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherReferenceData, influence: WitcherInfluenceData };
+const equipmentPack = `${game.system.id}.equipment`;
+for (const source of await readJSON("../pack-sources/equipment.folders.json")) {
+  const folder = new foundry.documents.BaseFolder(source, { pack: equipmentPack });
+  assert.equal(folder.type, "Item");
+  assert.equal(folder.name, source.name);
+  game.packs.get(equipmentPack).folders.set(folder.id, folder);
+}
 const documents = new Map();
 for (const pack of game.system.packs) {
   for (const source of await readJSON(`../pack-sources/${pack.name}.json`)) {
-    const document = new foundry.documents.BaseItem(source);
+    const document = new foundry.documents.BaseItem(source, { pack: `${game.system.id}.${pack.name}` });
     await access(new URL(`public/${source.img}`, app));
     assert.equal(document.type, source.type);
     assert.deepEqual(document.system.toObject(), source.system);
@@ -152,7 +168,14 @@ for (const pack of game.system.packs) {
     documents.set(uuid, document);
   }
 }
-assert.equal(documents.size, 71);
+assert.equal(documents.size, 129);
+for (const entry of INFLUENTIAL_FRIENDS) {
+  const document = documents.get(influentialFriendUuid(entry.id));
+  assert.equal(document.type, "influence");
+  assert.equal(document.system.region, entry.group);
+  assert.equal(document.system.roll, entry.roll);
+  for (const id of entry.equipment) assert.ok(document.system.description.includes(equipmentUuid(id)));
+}
 for (const entry of FAMILY_STATUSES) {
   const document = documents.get(familyStatusUuid(entry.id));
   assert.equal(document.type, "familyStatus");
@@ -163,7 +186,13 @@ for (const entry of FAMILY_STATUSES) {
     assert.ok(document.system.description.includes(equipmentUuid(id)));
   }
 }
-for (const entry of EQUIPMENT) assert.equal(documents.get(equipmentUuid(entry.id)).system.description, "");
+for (const entry of EQUIPMENT) {
+  const document = documents.get(equipmentUuid(entry.id));
+  // Common models retain foreign IDs in this server-side harness.
+  assert.equal(document.folder, EQUIPMENT_FOLDERS[entry.source].id);
+  assert.ok(game.packs.get(equipmentPack).folders.has(document.folder));
+  assert.equal(Boolean(document.system.description), entry.source === "family");
+}
 for (const origin of ORIGINS) {
   const document = documents.get(originUuid(origin.id));
   assert.equal(document.type, "origin");
@@ -229,7 +258,9 @@ assert.ok(!html.includes("witcher-vision"));
 assert.ok(!html.includes("witcher-footnote"));
 assert.equal([...html.matchAll(/data-action="tab"/g)].length, 3);
 assert.ok(html.includes('data-action="configureTabs"'));
-assert.equal([...html.matchAll(/data-biography-section=/g)].length, 9);
+assert.equal([...html.matchAll(/data-biography-section=/g)].length, 10);
+assert.ok(html.includes('data-kind="influentialFriend"'));
+assert.ok(!html.includes('data-action="viewFriend"'), "An unset friend must not have a broken description button");
 assert.match(html, /id="test-actor-main" class="witcher-character-content tab active"/);
 assert.match(html, /data-action="chooseReference" data-kind="race"[^>]*>\s*<i class="fa-solid fa-magnifying-glass"/);
 assert.match(html, /data-action="chooseReference" data-kind="origin"[^>]*>\s*<i class="fa-solid fa-magnifying-glass"/);
@@ -291,10 +322,14 @@ actorData.updateSource({ "details.familyStatus": "elder.artisans" });
 assert.equal((await sheet._prepareContext({})).showFamilyStatus, true);
 assert.ok(template(await sheet._prepareContext({})).includes('data-action="viewFamilyStatus"'));
 actorData.updateSource({ "details.race": "witcher" });
+actorData.updateSource({ "details.influentialFriend": "nilfgaard.sentient-monster" });
 const witcherHTML = template(await sheet._prepareContext({}));
 assert.ok(!witcherHTML.includes('data-kind="familyStatus"'));
 assert.ok(!witcherHTML.includes('data-action="viewFamilyStatus"'));
 assert.ok(witcherHTML.includes('name="system.biography.family.parents"'), "Witchers can still describe their families");
+assert.ok(witcherHTML.includes('data-kind="influentialFriend"'), "Unlike family status, a descriptive friend remains available to witchers");
+assert.ok(witcherHTML.includes('data-action="viewFriend"'));
+assert.equal((await sheet._prepareContext({})).selectedFriend.id, "nilfgaard.sentient-monster");
 actorData.updateSource({ "details.race": "dwarf" });
 
 // Exercise the actual race action and item sheet context without a browser host.
@@ -315,6 +350,8 @@ await WitcherActorSheet.DEFAULT_OPTIONS.actions.viewOrigin.call(sheet, null, { d
 assert.equal(openedUuid, originUuid(actorData.details.origin));
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.viewFamilyStatus.call(sheet, null, { dataset: { action: "viewFamilyStatus" } });
 assert.equal(openedUuid, familyStatusUuid(actorData.details.familyStatus));
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.viewFriend.call(sheet, null, { dataset: { action: "viewFriend" } });
+assert.equal(openedUuid, influentialFriendUuid(actorData.details.influentialFriend));
 const { WitcherItemSheet } = await import("../scripts/sheets/witcher-item-sheet.mjs");
 const referenceSheet = new WitcherItemSheet();
 referenceSheet.isEditable = false;
@@ -332,12 +369,13 @@ for (const uuid of documents.keys()) {
 }
 const { selectionEntries } = await import("../scripts/sheets/selection-data.mjs");
 const pickerTemplate = handlebars.compile(await readFile(new URL("../templates/reference-picker.hbs", import.meta.url), "utf8"), { strict: true });
-for (const kind of ["race", "origin", "familyStatus"]) {
+for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   const entries = selectionEntries(kind, key => foundry.utils.getProperty(translations, key));
-  const rendered = pickerTemplate({ entries: entries.map(entry => ({ ...entry, selected: false })), groups: [], excluded: kind === "origin" });
+  const rendered = pickerTemplate({ entries: entries.map(entry => ({ ...entry, selected: false })), groups: [], excluded: kind === "origin",
+    hintKey: kind === "influentialFriend" ? "WITCHER.Friends.Hint" : "WITCHER.Picker.ReferenceOnly" });
   assert.equal([...rendered.matchAll(/data-entry-id=/g)].length, entries.length);
   assert.ok(!rendered.includes("undefined"));
 }
 const tabsTemplate = handlebars.compile(await readFile(new URL("../templates/sheet-tabs.hbs", import.meta.url), "utf8"), { strict: true });
 assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 3);
-console.log("Installed Foundry core: family/biography save/load, 71 typed Items, witcher exclusions, personal tabs, reference actions and templates OK");
+console.log("Installed Foundry core: optional friend save/load, 129 typed Items, equipment folders, witcher exclusions, personal tabs, reference actions and templates OK");

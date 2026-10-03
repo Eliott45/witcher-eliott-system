@@ -1,10 +1,18 @@
 import { RACES } from "../data/races.mjs";
 import { ORIGINS, ORIGIN_GROUPS } from "../data/origins.mjs";
 import { FAMILY_STATUSES, FAMILY_GROUPS } from "../data/family-statuses.mjs";
+import { INFLUENTIAL_FRIENDS } from "../data/influential-friends.mjs";
+import { getEquipment } from "../data/equipment.mjs";
 
 export const normalizeSearch = text => text.toLocaleLowerCase().replaceAll("ё", "е").trim();
 
 export function selectionEntries(kind, localize) {
+  if (kind === "influentialFriend") return INFLUENTIAL_FRIENDS.map(entry => ({
+    id: entry.id, label: localize(entry.label), group: entry.group,
+    groupLabel: `${localize(FAMILY_GROUPS[entry.group])} · ${localize("WITCHER.Family.Roll")}: ${entry.roll}`,
+    summary: `${localize("WITCHER.Friends.Equipment")}: ${entry.equipment.map(id => localize(getEquipment(id).label)).join(` ${localize("WITCHER.Friends.Or")} `)}`,
+    details: [{ name: localize(entry.label), description: localize(entry.description) }]
+  }));
   if (kind === "familyStatus") return FAMILY_STATUSES.map(entry => ({
     id: entry.id, label: localize(entry.label), group: entry.group,
     groupLabel: `${localize(FAMILY_GROUPS[entry.group])} · ${localize("WITCHER.Family.Roll")}: ${entry.roll}`,

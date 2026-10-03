@@ -2,6 +2,7 @@ import { SYSTEM_ID } from "../config.mjs";
 import { getOrigin } from "./origins.mjs";
 import { getFamilyStatus } from "./family-statuses.mjs";
 import { getEquipment } from "./equipment.mjs";
+import { getInfluentialFriend } from "./influential-friends.mjs";
 
 // Never renumber these IDs: actor links and compendium references must survive updates.
 export const RACE_DOCUMENT_IDS = {
@@ -50,4 +51,9 @@ export function familyStatusUuid(id) {
 export function equipmentUuid(id) {
   const documentId = getEquipment(id)?.documentId;
   return documentId ? `Compendium.${SYSTEM_ID}.equipment.Item.${documentId}` : null;
+}
+
+export function influentialFriendUuid(id) {
+  const documentId = getInfluentialFriend(id)?.documentId;
+  return documentId ? `Compendium.${SYSTEM_ID}.influential-friends.Item.${documentId}` : null;
 }

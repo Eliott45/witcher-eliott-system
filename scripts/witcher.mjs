@@ -6,6 +6,7 @@ import { WitcherReferenceData } from "./data/witcher-reference-data.mjs";
 import { WitcherRaceData } from "./data/witcher-race-data.mjs";
 import { WitcherOriginData } from "./data/witcher-origin-data.mjs";
 import { WitcherFamilyStatusData } from "./data/witcher-family-status-data.mjs";
+import { WitcherInfluenceData } from "./data/witcher-influence-data.mjs";
 import { registerSheetPreferences } from "./sheets/sheet-preferences.mjs";
 import { WitcherItemSheet } from "./sheets/witcher-item-sheet.mjs";
 import { WitcherToken } from "./canvas/witcher-token.mjs";
@@ -28,6 +29,7 @@ Hooks.once("init", () => {
   CONFIG.Item.dataModels.origin = WitcherOriginData;
   CONFIG.Item.dataModels.familyStatus = WitcherFamilyStatusData;
   CONFIG.Item.dataModels.equipment = WitcherReferenceData;
+  CONFIG.Item.dataModels.influence = WitcherInfluenceData;
 
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
     foundry.documents.Actor,

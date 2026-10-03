@@ -6,10 +6,10 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "noble-charter",
-      "description": ""
+      "description": "<p>Документ, удостоверяющий благородное происхождение и положение семьи владельца.</p>"
     },
     "effects": [],
-    "folder": null,
+    "folder": "gearFolderFamily",
     "sort": 0,
     "ownership": {
       "default": 2
@@ -23,10 +23,10 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "chronicle",
-      "description": ""
+      "description": "<p>Семейная, историческая или научная хроника, с которой персонаж вырос и которую хорошо знает.</p>"
     },
     "effects": [],
-    "folder": null,
+    "folder": "gearFolderFamily",
     "sort": 0,
     "ownership": {
       "default": 2
@@ -40,10 +40,10 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "personal-crest",
-      "description": ""
+      "description": "<p>Герб, цвета или иной знак, подтверждающий принадлежность к известной семье или роду.</p>"
     },
     "effects": [],
-    "folder": null,
+    "folder": "gearFolderFamily",
     "sort": 0,
     "ownership": {
       "default": 2
@@ -57,10 +57,10 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "common-diagram",
-      "description": ""
+      "description": "<p>Подробная схема изготовления конкретного предмета обычной редкости.</p>"
     },
     "effects": [],
-    "folder": null,
+    "folder": "gearFolderFamily",
     "sort": 0,
     "ownership": {
       "default": 2
@@ -74,10 +74,10 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "common-formula",
-      "description": ""
+      "description": "<p>Письменный рецепт конкретного алхимического состава обычной редкости.</p>"
     },
     "effects": [],
-    "folder": null,
+    "folder": "gearFolderFamily",
     "sort": 0,
     "ownership": {
       "default": 2
@@ -91,10 +91,10 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "musical-instrument",
-      "description": ""
+      "description": "<p>Инструмент, доставшийся персонажу благодаря жизни среди артистов. Конкретный вид выбирает игрок.</p>"
     },
     "effects": [],
-    "folder": null,
+    "folder": "gearFolderFamily",
     "sort": 0,
     "ownership": {
       "default": 2
@@ -108,10 +108,10 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "lucky-charm",
-      "description": ""
+      "description": "<p>Небольшая памятная вещь, которой персонаж приписывает особую удачу.</p>"
     },
     "effects": [],
-    "folder": null,
+    "folder": "gearFolderFamily",
     "sort": 0,
     "ownership": {
       "default": 2
@@ -125,10 +125,10 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "sacred-symbol",
-      "description": ""
+      "description": "<p>Символ веры Великого Солнца, полученный благодаря воспитанию среди высшего духовенства.</p>"
     },
     "effects": [],
-    "folder": null,
+    "folder": "gearFolderFamily",
     "sort": 0,
     "ownership": {
       "default": 2
@@ -142,10 +142,10 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "trained-bird",
-      "description": ""
+      "description": "<p>Прирученная и обученная птица. Вид можно выбрать совместно с мастером.</p>"
     },
     "effects": [],
-    "folder": null,
+    "folder": "gearFolderFamily",
     "sort": 0,
     "ownership": {
       "default": 2
@@ -159,10 +159,486 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "trained-snake",
+      "description": "<p>Прирученная и обученная змея, оставшаяся у персонажа со времён жизни в услужении.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderFamily",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000011",
+    "name": "Священный текст",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "sacred-text",
       "description": ""
     },
     "effects": [],
-    "folder": null,
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000012",
+    "name": "Изготовленный вами сувенир",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "handmade-souvenir",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000013",
+    "name": "Серебряное кольцо",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "silver-ring",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000014",
+    "name": "Подвеска",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "pendant",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000015",
+    "name": "Кукла для чёрной магии",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "black-magic-doll",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000016",
+    "name": "Резной тотем",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "carved-totem",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000017",
+    "name": "Афиша",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "poster",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000018",
+    "name": "Билет",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "ticket",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000019",
+    "name": "Заработанная вами монетка",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "earned-coin",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000020",
+    "name": "Маска",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "mask",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000021",
+    "name": "Боевой трофей",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "battle-trophy",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000022",
+    "name": "Церемониальная маска",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "ceremonial-mask",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000023",
+    "name": "Яркий разноцветный значок",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "colorful-badge",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000024",
+    "name": "Серебряное ожерелье",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "silver-necklace",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000025",
+    "name": "Эмблема",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "emblem",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000026",
+    "name": "Лупа",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "magnifying-glass",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000027",
+    "name": "Кольцо с двимеритом",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "dimeritium-ring",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000028",
+    "name": "Изготовленная вами безделушка",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "handmade-trinket",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000029",
+    "name": "Странный тотем",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "strange-totem",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000030",
+    "name": "Подарок от поклонника",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "admirer-gift",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000031",
+    "name": "Соломенная кукла",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "straw-doll",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000032",
+    "name": "Изготовленный вами небольшой сувенир",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "small-handmade-souvenir",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000033",
+    "name": "Подарок в память о битве",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "battle-keepsake",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000034",
+    "name": "Кольцо-печатка",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "signet-ring",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000035",
+    "name": "Наплечная сумка",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "shoulder-bag",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000036",
+    "name": "Книга сказок",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "storybook",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000037",
+    "name": "Охотничий трофей",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "hunting-trophy",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "gear000000000038",
+    "name": "Крестьянская лопата",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "peasant-shovel",
+      "description": ""
+    },
+    "effects": [],
+    "folder": "gearFolderFriend",
     "sort": 0,
     "ownership": {
       "default": 2

@@ -1,6 +1,7 @@
 import { RACE_CHOICES } from "./races.mjs";
 import { ORIGIN_CHOICES, getOriginBonus } from "./origins.mjs";
 import { FAMILY_STATUS_CHOICES, getFamilyReward } from "./family-statuses.mjs";
+import { INFLUENTIAL_FRIEND_CHOICES } from "./influential-friends.mjs";
 
 /** Identity and manually entered resources. Racial abilities do not apply effects yet. */
 export class WitcherActorData extends foundry.abstract.TypeDataModel {
@@ -17,7 +18,8 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
         gender: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
         race: new StringField({ required: true, nullable: false, blank: true, choices: RACE_CHOICES, initial: "" }),
         origin: new StringField({ required: true, nullable: false, blank: true, choices: ORIGIN_CHOICES, initial: "" }),
-        familyStatus: new StringField({ required: true, nullable: false, blank: true, choices: FAMILY_STATUS_CHOICES, initial: "" })
+        familyStatus: new StringField({ required: true, nullable: false, blank: true, choices: FAMILY_STATUS_CHOICES, initial: "" }),
+        influentialFriend: new StringField({ required: true, nullable: false, blank: true, choices: INFLUENTIAL_FRIEND_CHOICES, initial: "" })
       }),
       biography: new SchemaField({
         appearance: new StringField({ required: true, nullable: false, blank: true, initial: "" }),

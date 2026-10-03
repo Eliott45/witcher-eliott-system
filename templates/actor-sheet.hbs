@@ -138,6 +138,23 @@
     </section>
     <section id="{{rootId}}-biography" class="witcher-character-content witcher-biography tab {{tabs.biography.cssClass}}"
              data-group="character" data-tab="biography" aria-label="{{localize 'WITCHER.Sheet.Biography'}}">
+      <details class="witcher-biography-section" data-biography-section="influential-friend" {{#if friendSectionOpen}}open{{/if}}>
+        <summary>{{localize "WITCHER.Sheet.InfluentialFriend"}} <small class="witcher-optional">{{localize "WITCHER.Sheet.Optional"}}</small></summary>
+        <div class="witcher-reference-value">
+          {{#if selectedFriend}}
+          <button type="button" class="witcher-select-reference" data-action="viewFriend" title="{{localize 'WITCHER.Sheet.ViewFriend'}}">
+            <span>{{localize selectedFriend.label}}</span>
+            <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
+          </button>
+          {{else}}
+          <span class="witcher-select-reference">{{localize "WITCHER.Sheet.FriendUnset"}}</span>
+          {{/if}}
+          <button type="button" class="witcher-reference-inspect" data-action="chooseReference" data-kind="influentialFriend"
+                  aria-label="{{localize 'WITCHER.Sheet.ChooseFriend'}}" title="{{localize 'WITCHER.Sheet.ChooseFriend'}}" {{disabled (not editable)}}>
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          </button>
+        </div>
+      </details>
       {{#each biographySections as |section|}}
       <details class="witcher-biography-section" data-biography-section="{{section.id}}" {{#if section.open}}open{{/if}}>
         <summary id="{{../rootId}}-{{section.id}}-title">{{localize section.label}}</summary>

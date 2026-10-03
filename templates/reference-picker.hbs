@@ -12,7 +12,7 @@
       {{#each groups as |group|}}
       <button type="button" data-filter="{{group.id}}" aria-pressed="false">{{localize group.label}}</button>
       {{/each}}
-      <p>{{localize "WITCHER.Picker.ReferenceOnly"}}</p>
+      <p>{{localize hintKey}}</p>
     </aside>
     <section class="witcher-picker-results">
       <p class="witcher-picker-count" aria-live="polite"></p>

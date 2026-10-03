@@ -1,0 +1,572 @@
+[
+  {
+    "_id": "infl000000000001",
+    "name": "Церковь — Северянин",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "north.church",
+      "region": "north",
+      "roll": "1",
+      "description": "<p>Северянин</p><p>Результат броска: 1</p><p>На вас сильно повлияла местная религия. Вы ежедневно проводили много часов в церкви.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000011]{Священный текст}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000002",
+    "name": "Ремесленник — Северянин",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "north.artisan",
+      "region": "north",
+      "roll": "2",
+      "description": "<p>Северянин</p><p>Результат броска: 2</p><p>Вдохновением вам служил ремесленник, научивший ценить искусство и мастерство.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000012]{Изготовленный вами сувенир}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000003",
+    "name": "Граф — Северянин",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "north.count",
+      "region": "north",
+      "roll": "3",
+      "description": "<p>Северянин</p><p>Результат броска: 3</p><p>Наибольшее влияние на вас оказал граф (графиня), научивший брать себя в руки.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000013]{Серебряное кольцо}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000004",
+    "name": "Маг — Северянин",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "north.mage",
+      "region": "north",
+      "roll": "4",
+      "description": "<p>Северянин</p><p>Результат броска: 4</p><p>Наибольшее влияние оказал маг, научивший не бояться магии и всё подвергать сомнению.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000014]{Подвеска}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000005",
+    "name": "Ведьма — Северянин",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "north.witch",
+      "region": "north",
+      "roll": "5",
+      "description": "<p>Северянин</p><p>Результат броска: 5</p><p>Наибольшее влияние на вас оказала деревенская ведьма, показавшая ценность знаний.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000015]{Кукла для чёрной магии}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000006",
+    "name": "Проклятый — Северянин",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "north.cursed",
+      "region": "north",
+      "roll": "6",
+      "description": "<p>Северянин</p><p>Результат броска: 6</p><p>Наибольшее влияние на вас оказал человек, страдавший от проклятия. Он научил вас никогда никого не судить слишком строго.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000016]{Резной тотем}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000007",
+    "name": "Артист — Северянин",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "north.performer",
+      "region": "north",
+      "roll": "7",
+      "description": "<p>Северянин</p><p>Результат броска: 7</p><p>Наибольшее влияние на вас оказал артист, что научил вас множеству способов привлечь к себе внимание.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000017]{Афиша} или @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000018]{Билет}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000008",
+    "name": "Торговец — Северянин",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "north.merchant",
+      "region": "north",
+      "roll": "8",
+      "description": "<p>Северянин</p><p>Результат броска: 8</p><p>Наибольшее влияние оказал торговец, научивший изворотливости и сообразительности.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000019]{Заработанная вами монетка}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000009",
+    "name": "Преступник — Северянин",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "north.criminal",
+      "region": "north",
+      "roll": "9",
+      "description": "<p>Северянин</p><p>Результат броска: 9</p><p>Наибольшее влияние на вас оказал преступник, научивший вас, как о себе позаботиться.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000020]{Маска}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000010",
+    "name": "Воин — Северянин",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "north.warrior",
+      "region": "north",
+      "roll": "10",
+      "description": "<p>Северянин</p><p>Результат броска: 10</p><p>Наибольшее влияние на вас оказал солдат, научивший защищаться.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000021]{Боевой трофей}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000011",
+    "name": "Культ Великого Солнца — Нильфгаардец",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "nilfgaard.great-sun",
+      "region": "nilfgaard",
+      "roll": "1",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 1</p><p>На вас сильно повлияла церковь. Вы посвятили годы изучению ритуалов и песнопений.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000022]{Церемониальная маска}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000012",
+    "name": "Изгнанник — Нильфгаардец",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "nilfgaard.exile",
+      "region": "nilfgaard",
+      "roll": "2",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 2</p><p>Наибольшее влияние на вас оказал изгнанник, научивший сомневаться в устоях общества.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000023]{Яркий разноцветный значок}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000013",
+    "name": "Граф — Нильфгаардец",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "nilfgaard.count",
+      "region": "nilfgaard",
+      "roll": "3",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 3</p><p>Наибольшее влияние на вас оказал граф, научивший вести других за собой и управлять людьми.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000024]{Серебряное ожерелье}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000014",
+    "name": "Маг — Нильфгаардец",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "nilfgaard.mage",
+      "region": "nilfgaard",
+      "roll": "4",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 4</p><p>Наибольшее влияние оказал маг, научивший вас важности порядка и осторожности.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000025]{Эмблема}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000015",
+    "name": "Следователь — Нильфгаардец",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "nilfgaard.investigator",
+      "region": "nilfgaard",
+      "roll": "5",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 5</p><p>Наибольшее влияние на вас оказал имперский детектив. Вы провели много времени за разгадыванием тайн.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000026]{Лупа}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000016",
+    "name": "Охотник на магов — Нильфгаардец",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "nilfgaard.mage-hunter",
+      "region": "nilfgaard",
+      "roll": "6",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 6</p><p>Наибольшее влияние на вас оказал охотник на магов, научивший опасаться магии и магов.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000027]{Кольцо с двимеритом}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000017",
+    "name": "Воин — Нильфгаардец",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "nilfgaard.warrior",
+      "region": "nilfgaard",
+      "roll": "7",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 7</p><p>Наибольшее влияние на вас оказал солдат, травивший байки об опасностях и приключениях.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000021]{Боевой трофей}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000018",
+    "name": "Ремесленник — Нильфгаардец",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "nilfgaard.artisan",
+      "region": "nilfgaard",
+      "roll": "8",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 8</p><p>Вдохновением вам служил ремесленник, научивший ценить навык и точность.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000028]{Изготовленная вами безделушка}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000019",
+    "name": "Разумное чудовище — Нильфгаардец",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "nilfgaard.sentient-monster",
+      "region": "nilfgaard",
+      "roll": "9",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 9</p><p>Наибольшее влияние оказало разумное чудовище, научившее вас, что не все чудовища — зло.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000029]{Странный тотем}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000020",
+    "name": "Артист — Нильфгаардец",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "nilfgaard.performer",
+      "region": "nilfgaard",
+      "roll": "10",
+      "description": "<p>Нильфгаардец</p><p>Результат броска: 10</p><p>Наибольшее влияние на вас оказал артист, у которого вы научились самовыражению.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000030]{Подарок от поклонника}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000021",
+    "name": "Человек — Нелюдь",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "elder.human",
+      "region": "elder",
+      "roll": "1",
+      "description": "<p>Нелюдь</p><p>Результат броска: 1</p><p>Наибольшее влияние на вас оказал человек, благодаря которому вы узнали, что расизм не всегда имеет основания.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000031]{Соломенная кукла}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000022",
+    "name": "Ремесленник — Нелюдь",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "elder.artisan",
+      "region": "elder",
+      "roll": "2",
+      "description": "<p>Нелюдь</p><p>Результат броска: 2</p><p>Вдохновением вам служил ремесленник, научивший ценить искусство Старших Народов.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000032]{Изготовленный вами небольшой сувенир}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000023",
+    "name": "Благородный воин — Нелюдь",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "elder.noble-warrior",
+      "region": "elder",
+      "roll": "3",
+      "description": "<p>Нелюдь</p><p>Результат броска: 3</p><p>Наибольшее влияние на вас оказал боевой танцор или защитник Махакама, научивший вас понятию чести.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000033]{Подарок в память о битве}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000024",
+    "name": "Высокорождённый — Нелюдь",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "elder.high-born",
+      "region": "elder",
+      "roll": "4",
+      "description": "<p>Нелюдь</p><p>Результат броска: 4</p><p>Наибольшее влияние оказал высокорождённый, научивший вас гордости и правилам этикета.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000034]{Кольцо-печатка}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000025",
+    "name": "Артист — Нелюдь",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "elder.performer",
+      "region": "elder",
+      "roll": "5",
+      "description": "<p>Нелюдь</p><p>Результат броска: 5</p><p>Наибольшее влияние на вас оказал артист, благодаря которому вы поняли важность счастья и красоты.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000017]{Афиша} или @UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000018]{Билет}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000026",
+    "name": "Налётчик — Нелюдь",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "elder.raider",
+      "region": "elder",
+      "roll": "6",
+      "description": "<p>Нелюдь</p><p>Результат броска: 6</p><p>Наибольшее влияние на вас оказал налётчик, благодаря которому вы поняли, что у вас есть право брать то, что нужно.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000035]{Наплечная сумка}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000027",
+    "name": "Мудрец — Нелюдь",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "elder.sage",
+      "region": "elder",
+      "roll": "7",
+      "description": "<p>Нелюдь</p><p>Результат броска: 7</p><p>Наибольшее влияние на вас оказал мудрец, благодаря которому вы познали важность истории Старших Народов.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000036]{Книга сказок}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000028",
+    "name": "Преступник — Нелюдь",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "elder.criminal",
+      "region": "elder",
+      "roll": "8",
+      "description": "<p>Нелюдь</p><p>Результат броска: 8</p><p>Наибольшее влияние на вас оказал преступник, научивший следовать собственным правилам.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000020]{Маска}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000029",
+    "name": "Охотник — Нелюдь",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "elder.hunter",
+      "region": "elder",
+      "roll": "9",
+      "description": "<p>Нелюдь</p><p>Результат броска: 9</p><p>Наибольшее влияние на вас оказал охотник, научивший вас выживать в дикой природе.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000037]{Охотничий трофей}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "infl000000000030",
+    "name": "Крестьянин из низин — Нелюдь",
+    "type": "influence",
+    "img": "icons/svg/upgrade.svg",
+    "system": {
+      "ruleId": "elder.peasant",
+      "region": "elder",
+      "roll": "10",
+      "description": "<p>Нелюдь</p><p>Результат броска: 10</p><p>Наибольшее влияние на вас оказал крестьянин из низин, научивший, как жить счастливо.</p><h2>Памятная вещь</h2><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.gear000000000038]{Крестьянская лопата}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  }
+]

@@ -1,8 +1,9 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { getRace } from "../data/races.mjs";
 import { getOrigin } from "../data/origins.mjs";
-import { raceUuid, originUuid, familyStatusUuid } from "../data/compendiums.mjs";
+import { raceUuid, originUuid, familyStatusUuid, influentialFriendUuid } from "../data/compendiums.mjs";
 import { getFamilyStatus, suggestedFamilyGroup } from "../data/family-statuses.mjs";
+import { getInfluentialFriend } from "../data/influential-friends.mjs";
 import { chooseReference } from "./reference-picker.mjs";
 import { SHEET_TABS, sheetPreferences, visibleSheetTabs, updateSheetPreferences, chooseVisibleTabs, reportPreferencesError } from "./sheet-preferences.mjs";
 
@@ -18,6 +19,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       viewRace: WitcherActorSheet.#onViewReference,
       viewOrigin: WitcherActorSheet.#onViewReference,
       viewFamilyStatus: WitcherActorSheet.#onViewReference,
+      viewFriend: WitcherActorSheet.#onViewReference,
       chooseReference: WitcherActorSheet.#onChooseReference,
       configureTabs: WitcherActorSheet.#onConfigureTabs,
       editPortrait: WitcherActorSheet.#onEditPortrait
@@ -55,6 +57,8 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       selectedOrigin: getOrigin(this.actor.system.details.origin),
       showFamilyStatus: this.actor.system.details.race !== "witcher",
       selectedFamilyStatus: getFamilyStatus(this.actor.system.details.familyStatus),
+      selectedFriend: getInfluentialFriend(this.actor.system.details.influentialFriend),
+      friendSectionOpen: !preferences.collapsed?.["influential-friend"],
       biographySections: [
         section("appearance", "biography.appearance", "Appearance"),
         section("personality", "biography.personality", "Personality"),
@@ -76,7 +80,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   _toggleDisabled(disabled) {
     super._toggleDisabled(disabled);
     // Foundry disables every form button for observers, including read-only actions.
-    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs]")) {
+    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=viewFriend], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs]")) {
       button.disabled = false;
     }
   }
@@ -104,10 +108,13 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   }
 
   static async #onViewReference(_event, target) {
-    const action = target?.dataset.action;
+    const action = target?.dataset.action ?? "viewRace";
     if (action === "viewFamilyStatus" && this.actor.system.details.race === "witcher") return;
-    const uuid = action === "viewFamilyStatus" ? familyStatusUuid(this.actor.system.details.familyStatus)
-      : action === "viewOrigin" ? originUuid(this.actor.system.details.origin) : raceUuid(this.actor.system.details.race);
+    const details = this.actor.system.details;
+    const uuid = {
+      viewRace: raceUuid(details.race), viewOrigin: originUuid(details.origin),
+      viewFamilyStatus: familyStatusUuid(details.familyStatus), viewFriend: influentialFriendUuid(details.influentialFriend)
+    }[action];
     if (!uuid) return;
     try {
       const reference = await foundry.utils.fromUuid(uuid);
@@ -122,11 +129,11 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static async #onChooseReference(_event, target) {
     if (!this.isEditable) return;
     const kind = target.dataset.kind;
-    if (!["race", "origin", "familyStatus"].includes(kind)) return;
+    if (!["race", "origin", "familyStatus", "influentialFriend"].includes(kind)) return;
     if (kind === "familyStatus" && this.actor.system.details.race === "witcher") return;
     const value = await chooseReference(kind, this.actor.system.details[kind], {
       isWitcher: this.actor.system.details.race === "witcher",
-      initialGroup: kind === "familyStatus" ? suggestedFamilyGroup(this.actor.system.details.race, this.actor.system.details.origin) : ""
+      initialGroup: ["familyStatus", "influentialFriend"].includes(kind) ? suggestedFamilyGroup(this.actor.system.details.race, this.actor.system.details.origin) : ""
     });
     if (kind === "familyStatus" && this.actor.system.details.race === "witcher") return;
     if (value !== null && this.isEditable) await this.actor.update({ [`system.details.${kind}`]: value });

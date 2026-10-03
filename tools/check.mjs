@@ -7,7 +7,8 @@ import { RACES } from "../scripts/data/races.mjs";
 import { ORIGINS, ORIGIN_GROUPS } from "../scripts/data/origins.mjs";
 import { FAMILY_STATUSES, FAMILY_GROUPS } from "../scripts/data/family-statuses.mjs";
 import { EQUIPMENT } from "../scripts/data/equipment.mjs";
-import { compendiumData } from "./compendium-data.mjs";
+import { INFLUENTIAL_FRIENDS } from "../scripts/data/influential-friends.mjs";
+import { compendiumData, compendiumFolders } from "./compendium-data.mjs";
 
 process.chdir(fileURLToPath(new URL("..", import.meta.url)));
 const manifest = JSON.parse(await readFile("system.json", "utf8"));
@@ -37,14 +38,22 @@ for (const name of ["actor-sheet", "item-sheet", "reference-picker", "sheet-tabs
   }
 }
 const expectedPacks = compendiumData(languages[0]);
+const expectedFolders = compendiumFolders(languages[0]);
 for (const pack of manifest.packs) {
   await access(`${pack.path}/CURRENT`);
   const documents = JSON.parse(await readFile(`pack-sources/${pack.name}.json`, "utf8"));
   assert.deepEqual(documents, expectedPacks[pack.name], `Rebuild stale ${pack.name} compendium`);
+  const folders = expectedFolders[pack.name] ?? [];
+  if (folders.length) {
+    assert.deepEqual(JSON.parse(await readFile(`pack-sources/${pack.name}.folders.json`, "utf8")), folders);
+  }
+  for (const document of documents) {
+    if (document.folder) assert.ok(folders.some(folder => folder._id === document.folder), `Missing folder for ${document.name}`);
+  }
   assert.equal(pack.ownership.PLAYER, "OBSERVER", "Players must be able to read racial bonuses");
 }
 const ids = new Set();
-for (const entry of [...FAMILY_STATUSES, ...EQUIPMENT]) {
+for (const entry of [...FAMILY_STATUSES, ...EQUIPMENT, ...INFLUENTIAL_FRIENDS]) {
   for (const key of [entry.label, entry.description, entry.reward, FAMILY_GROUPS[entry.group]].filter(Boolean)) {
     assert.ok(keys.has(key), `Missing family/equipment translation: ${key}`);
   }

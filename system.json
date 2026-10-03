@@ -25,7 +25,8 @@
       "ability": { "htmlFields": ["description"] },
       "origin": { "htmlFields": ["description"] },
       "familyStatus": { "htmlFields": ["description"] },
-      "equipment": { "htmlFields": ["description"] }
+      "equipment": { "htmlFields": ["description"] },
+      "influence": { "htmlFields": ["description"] }
     }
   },
   "packs": [
@@ -68,10 +69,18 @@
       "type": "Item",
       "system": "witcher-eliott-system",
       "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "influential-friends",
+      "label": "Друзья, оказавшие влияние",
+      "path": "packs/influential-friends",
+      "type": "Item",
+      "system": "witcher-eliott-system",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
     }
   ],
   "packFolders": [
-    { "name": "Witcher", "sorting": "a", "color": "#947641", "packs": ["races", "abilities", "origins", "family-statuses", "equipment"] }
+    { "name": "Witcher", "sorting": "a", "color": "#947641", "packs": ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends"] }
   ],
   "grid": {
     "type": 1,
