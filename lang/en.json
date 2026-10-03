@@ -40,6 +40,13 @@
       "ChooseRace": "Choose a race",
       "ChooseOrigin": "Choose a region of origin",
       "Identity": "Character",
+      "Main": "Main",
+      "Biography": "Biography",
+      "Appearance": "Appearance",
+      "Personality": "Personality traits",
+      "Allies": "Connections and allies",
+      "Backstory": "Backstory",
+      "SessionNotes": "Session notes",
       "OriginExcluded": "Witchers do not receive an origin bonus.",
       "ReferenceUnavailable": "Could not open the entry. Restart the world after adding the compendium."
     },

@@ -9,11 +9,11 @@
 .witcher-eliott.reference-sheet { min-width: 420px; min-height: 340px; }
 .witcher-eliott .window-content { padding: 0; background: #1d211f; container: witcher-sheet / inline-size; }
 .witcher-eliott .witcher-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.witcher-eliott button:focus-visible, .witcher-eliott input:focus-visible { outline: 2px solid #bc974f; outline-offset: 2px; }
+.witcher-eliott button:focus-visible, .witcher-eliott input:focus-visible, .witcher-eliott textarea:focus-visible { outline: 2px solid #bc974f; outline-offset: 2px; }
 
 /* Character sheet: permanent resource column and a portrait-led identity page. */
-.witcher-character-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); height: 100%; min-height: 0; overflow-y: auto; background: #eee9df; }
-.witcher-character-sidebar { background: linear-gradient(155deg, #482021, #241718); border-right: 2px solid #b39a67; padding: 22px 16px; }
+.witcher-character-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); height: 100%; min-height: 0; overflow: hidden; background: #eee9df; }
+.witcher-character-sidebar { min-height: 0; overflow-y: auto; background: linear-gradient(155deg, #482021, #241718); border-right: 2px solid #b39a67; padding: 22px 16px; }
 .witcher-brand { font-family: Georgia, serif; font-size: 20px; letter-spacing: 0.08em; color: #e0cc9e; padding-bottom: 22px; text-align: center; }
 .witcher-character-sidebar .witcher-resources { display: flex; flex-direction: column; gap: 25px; }
 .witcher-character-sidebar .witcher-resource { border: 0; margin: 0; padding: 12px 0 0; min-width: 0; border-top: 1px solid #b39a6770; }
@@ -22,12 +22,22 @@
 .witcher-character-sidebar label { font-size: 10px; text-transform: uppercase; color: #cebc9a; text-align: center; }
 .witcher-character-sidebar input { width: 100%; height: 46px; padding: 2px; margin-top: 6px; background: #100e0e35; border: 1px solid #b39a6740; border-radius: 2px; color: #fff3d9; font-family: Georgia, serif; font-size: 27px; text-align: center; }
 .witcher-character-sidebar .witcher-resource-values > span { line-height: 46px; color: #a78d65; }
-.witcher-character-main { min-width: 0; color: #2f2a26; }
-.witcher-character-name { background: linear-gradient(100deg, #482021, #66292a); min-height: 86px; padding: 17px 22px 13px; }
+.witcher-character-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; color: #2f2a26; }
+.witcher-character-name { flex: none; background: linear-gradient(100deg, #482021, #66292a); min-height: 86px; padding: 17px 22px 13px; }
 .witcher-character-name input { width: 100%; height: 36px; color: #f8eddb; background: transparent; border: 0; border-radius: 0; padding: 0; font-family: Georgia, serif; font-size: 27px; font-weight: 700; }
 .witcher-character-name > span { display: block; margin-top: 5px; color: #d9bf8a; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
-.witcher-character-tab { background: #303e43; border-bottom: 2px solid #b39a67; color: #f2eadc; padding: 7px 22px; font-family: Georgia, serif; font-size: 15px; }
-.witcher-character-content { padding: 24px; }
+.witcher-character-tabs.tabs { display: flex; flex: none; justify-content: flex-start; gap: 4px; background: #303e43; border: 0; border-bottom: 2px solid #b39a67; padding: 0 14px; margin: 0; }
+.witcher-character-tabs button { display: flex; align-items: center; gap: 8px; height: 38px; padding: 7px 10px; border: 0; border-radius: 0; background: transparent; color: #d2d2c9; font-family: Georgia, serif; font-size: 15px; box-shadow: none; }
+.witcher-character-tabs button:hover { background: #ffffff0d; color: #fff3d9; }
+.witcher-character-tabs button.active { color: #fff3d9; background: #ffffff0d; box-shadow: inset 0 -3px #d4b477; text-shadow: none; }
+.witcher-character-tabs i { font-size: 13px; }
+.witcher-character-content { flex: 1; min-height: 0; overflow-y: auto; padding: 24px; }
+.witcher-character-content.tab { display: none; }
+.witcher-character-content.tab.active { display: block; }
+.witcher-biography > label { display: block; margin-bottom: 20px; color: #6b3030; font-family: Georgia, serif; font-size: 18px; }
+.witcher-biography > label:last-child { margin-bottom: 0; }
+.witcher-biography textarea { display: block; width: 100%; min-height: 82px; margin-top: 8px; padding: 10px 12px; resize: vertical; border: 1px solid #c7bba6; border-radius: 3px; background: #faf6ed; color: #302b26; font-family: var(--font-body, sans-serif); font-size: 14px; line-height: 1.5; }
+.witcher-biography textarea:disabled { opacity: 1; }
 .witcher-character-hero { display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 22px; align-items: start; }
 .witcher-portrait-frame { position: relative; }
 .witcher-eliott .witcher-portrait-button { display: block; width: 100%; height: auto; padding: 0; background: #d9d2c5; border: 1px solid #a38a53; border-radius: 1px; box-shadow: 0 2px 8px #30211722; }
@@ -39,7 +49,7 @@
 .witcher-eliott .witcher-select-reference { display: flex; flex: 1; min-width: 0; height: auto; min-height: 38px; padding: 8px 10px; gap: 10px; justify-content: space-between; align-items: center; border: 0; border-radius: 0; background: transparent; color: #302b26; text-align: left; font-family: Georgia, serif; font-size: 18px; line-height: 1.2; box-shadow: none; }
 .witcher-select-reference span { overflow-wrap: anywhere; }
 .witcher-select-reference i { font-size: 13px; color: #826e52; flex: none; }
-.witcher-eliott .witcher-select-reference:hover:not(:disabled) { background: #b99a4d22; }
+.witcher-eliott button.witcher-select-reference:hover:not(:disabled) { background: #b99a4d22; }
 .witcher-eliott .witcher-select-reference:disabled { opacity: 1; }
 .witcher-eliott .witcher-reference-inspect { flex: 0 0 31px; height: auto; padding: 0; border: 0; border-radius: 0; color: #78603b; background: transparent; box-shadow: none; }
 .witcher-eliott .witcher-reference-inspect:hover { background: #b99a4d22; }
@@ -110,7 +120,7 @@
 #token-hud .witcher-vision-toggle.active { color: #f0cc83; border-color: #d4b477; box-shadow: 0 0 8px #d4b47766; }
 
 /* Compact dice toolbar below the chat editor. */
-.witcher-dice-tray { flex: none; min-width: 0; width: 100%; margin: 0; padding: 7px 0 2px; border: 0; border-top: 1px solid #9d8b7040; background: transparent; }
+.witcher-dice-tray { --color-text-primary: #eee4d5; --color-text-secondary: #c1b39d; flex: none; min-width: 0; width: 100%; margin: 0; padding: 8px; border: 1px solid #5b4e45; border-radius: 5px; background: #29242b; color: #eee4d5; }
 .witcher-dice-tray .witcher-dice-types { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 3px; }
 .witcher-dice-tray .witcher-die { min-width: 0; }
 .witcher-dice-tray button { color: var(--color-text-primary, #eee4d5); background: #80756812; border: 1px solid #9d8b7038; box-shadow: none; }
@@ -127,6 +137,6 @@
 .witcher-dice-tray .witcher-dice-roll { flex: 0 0 auto; border-color: #9d8b7070; }
 .witcher-dice-tray .witcher-dice-quantities { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; margin-top: 7px; }
 .witcher-dice-quantities label { font-size: 9px; text-align: center; color: var(--color-text-secondary, #c1b39d); }
-.witcher-dice-tray input { width: 100%; height: 25px; padding: 1px; border: 1px solid #9d8b7070; border-radius: 3px; text-align: center; font-size: 12px; }
+.witcher-dice-tray input { width: 100%; height: 25px; padding: 1px; border: 1px solid #9d8b7070; border-radius: 3px; background: #1e1a20; color: #eee4d5; text-align: center; font-size: 12px; }
 .witcher-dice-tray [hidden] { display: none !important; }
 .witcher-dice-tray button:disabled { opacity: 0.4; cursor: default; }

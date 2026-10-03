@@ -23,7 +23,17 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static PARTS = {
     content: {
       template: `systems/${SYSTEM_ID}/templates/actor-sheet.hbs`,
-      scrollable: [""]
+      scrollable: [".witcher-character-content[data-tab=main]", ".witcher-biography", ".witcher-character-sidebar"]
+    }
+  };
+
+  static TABS = {
+    character: {
+      initial: "main",
+      tabs: [
+        { id: "main", label: "WITCHER.Sheet.Main", icon: "fa-solid fa-user" },
+        { id: "biography", label: "WITCHER.Sheet.Biography", icon: "fa-solid fa-book-open" }
+      ]
     }
   };
 
@@ -42,7 +52,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   _toggleDisabled(disabled) {
     super._toggleDisabled(disabled);
     // Foundry disables every form button for observers, including read-only actions.
-    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=showPortraitArtwork]")) {
+    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=showPortraitArtwork], [data-action=tab]")) {
       button.disabled = false;
     }
   }

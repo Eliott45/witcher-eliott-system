@@ -17,6 +17,13 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
         race: new StringField({ required: true, nullable: false, blank: true, choices: RACE_CHOICES, initial: "" }),
         origin: new StringField({ required: true, nullable: false, blank: true, choices: ORIGIN_CHOICES, initial: "" })
       }),
+      biography: new SchemaField({
+        appearance: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
+        personality: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
+        allies: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
+        backstory: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
+        sessionNotes: new StringField({ required: true, nullable: false, blank: true, initial: "" })
+      }),
       health: resource(),
       stamina: resource(),
       notes: new StringField({ required: true, nullable: false, initial: "" })

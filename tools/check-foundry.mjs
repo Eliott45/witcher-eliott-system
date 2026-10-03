@@ -61,8 +61,21 @@ assert.equal(legacyActorData.details.age, null);
 assert.equal(legacyActorData.details.race, "");
 assert.equal(legacyActorData.details.gender, "");
 assert.equal(legacyActorData.details.origin, "");
+const biography = {
+  appearance: "Шрам на лице.\nСедые волосы.",
+  personality: "Упрямый, но верный слову.",
+  allies: "Трактирщик и старая подруга.",
+  backstory: "</textarea><script>test</script>\nИстория персонажа.",
+  sessionNotes: "Сессия 1: нашли контракт.\nСессия 2: вернулись в город."
+};
+assert.deepEqual(legacyActorData.toObject().biography, Object.fromEntries(Object.keys(biography).map(key => [key, ""])));
+legacyActorData.updateSource({ biography });
 legacyActorData.updateSource({ "details.age": 230, "details.race": "witcher", "details.gender": "Любой свой текст" });
 const restored = new WitcherActorData(JSON.parse(JSON.stringify(legacyActorData.toObject())));
+assert.deepEqual(restored.toObject().biography, biography, "Every biography section must survive saving and loading, including line breaks");
+restored.updateSource({ "biography.appearance": "" });
+assert.equal(restored.biography.appearance, "");
+assert.equal(restored.biography.sessionNotes, biography.sessionNotes);
 assert.equal(restored.details.age, 230);
 assert.equal(restored.details.race, "witcher");
 assert.equal(restored.details.gender, "Любой свой текст");
@@ -143,7 +156,19 @@ const template = handlebars.compile(await readFile(new URL("../templates/actor-s
 foundry.applications = {
   api: { HandlebarsApplicationMixin: Base => Base },
   sheets: { ActorSheetV2: class {
-    async _prepareContext() { return { editable: this.isEditable, rootId: "test-actor" }; }
+    tabGroups = {};
+    async _prepareContext() {
+      // Supply ApplicationV2's tab context while keeping its DOM host out of this check.
+      const [group, { initial, tabs }] = Object.entries(this.constructor.TABS)[0];
+      this.tabGroups[group] ??= initial;
+      return {
+        editable: this.isEditable, rootId: "test-actor",
+        tabs: Object.fromEntries(tabs.map(tab => {
+          const active = this.tabGroups[group] === tab.id;
+          return [tab.id, { ...tab, group, active, cssClass: active ? "active" : "" }];
+        }))
+      };
+    }
   }, ItemSheetV2: class {
     async _prepareContext() { return { editable: this.isEditable, rootId: "test-item" }; }
   } },
@@ -167,6 +192,20 @@ assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
 assert.ok(!html.includes("witcher-footnote"));
+assert.equal([...html.matchAll(/data-action="tab"/g)].length, 2);
+assert.match(html, /id="test-actor-main" class="witcher-character-content tab active"/);
+assert.match(html, /data-action="chooseReference" data-kind="race"[^>]*>\s*<i class="fa-solid fa-magnifying-glass"/);
+assert.match(html, /data-action="chooseReference" data-kind="origin"[^>]*>\s*<i class="fa-solid fa-magnifying-glass"/);
+actorData.updateSource({ biography });
+sheet.tabGroups.character = "biography";
+const biographyHTML = template(await sheet._prepareContext({}));
+assert.match(biographyHTML, /id="test-actor-biography" class="witcher-character-content witcher-biography tab active"/);
+for (const [key, value] of Object.entries(biography)) {
+  assert.ok(biographyHTML.includes(`name="system.biography.${key}"`));
+  assert.ok(biographyHTML.includes(handlebars.escapeExpression(value)));
+}
+assert.ok(!biographyHTML.includes("<script>test</script>"), "Biography text must not escape its textarea");
+sheet.tabGroups.character = "main";
 
 const before = actorData.toObject();
 for (const race of RACES) {
@@ -175,6 +214,7 @@ for (const race of RACES) {
   assert.equal(context.selectedRace.id, race.id);
   const rendered = template(context);
   assert.ok(rendered.includes('data-action="viewRace"'));
+  assert.match(rendered, /data-action="viewRace"[^>]*>\s*<span>[^<]+<\/span>\s*<i class="fa-solid fa-ellipsis-vertical"/);
   for (const ability of race.abilities) {
     assert.ok(!rendered.includes(handlebars.escapeExpression(foundry.utils.getProperty(translations, ability.description))),
       "Racial bonuses must appear in the reference document, not on the actor sheet");
@@ -188,11 +228,13 @@ const readOnlyHTML = template(await sheet._prepareContext({}));
 assert.match(readOnlyHTML, /<button[^>]*data-kind="race"[^>]*disabled/);
 assert.ok(!readOnlyHTML.includes('data-action="editPortrait"'));
 assert.ok(readOnlyHTML.includes('data-action="showPortraitArtwork"'));
+assert.match(readOnlyHTML, /<textarea[^>]*name="system.biography.sessionNotes"[^>]*disabled/);
 actorData.updateSource({ "details.origin": "mahakam", "details.race": "witcher" });
 assert.equal((await sheet._prepareContext({})).originExcluded, true);
 assert.ok(template(await sheet._prepareContext({})).includes("witcher-origin-excluded"));
 actorData.updateSource({ "details.race": "dwarf" });
 assert.equal((await sheet._prepareContext({})).originExcluded, false);
+assert.match(template(await sheet._prepareContext({})), /data-action="viewOrigin"[^>]*>\s*<span>[^<]+<\/span>\s*<i class="fa-solid fa-ellipsis-vertical"/);
 
 // Exercise the actual race action and item sheet context without a browser host.
 let openedUuid;
@@ -233,4 +275,4 @@ for (const kind of ["race", "origin"]) {
   assert.equal([...rendered.matchAll(/data-entry-id=/g)].length, entries.length);
   assert.ok(!rendered.includes("undefined"));
 }
-console.log("Installed Foundry core: identity save/load, 40 typed Items, origin eligibility, reference actions and three templates OK");
+console.log("Installed Foundry core: identity/biography save/load, 40 typed Items, origin eligibility, reference actions and tab templates OK");

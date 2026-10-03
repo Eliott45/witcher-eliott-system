@@ -2,19 +2,25 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { DicePool } from "../scripts/chat/dice-pool.mjs";
 
-test("different dice combine into one native roll command and can be rolled again", async () => {
+test("different dice combine into one native roll command and reset after it is posted", async () => {
   const pool = new DicePool();
   pool.set(6, 2);
   pool.set(10, 1);
   pool.set(100, 3);
   assert.equal(pool.formula, "2d6 + 1d10 + 3d100");
   const commands = [];
-  await pool.roll(async command => commands.push(command));
-  await pool.roll(async command => commands.push(command));
-  assert.deepEqual(commands, ["/r 2d6 + 1d10 + 3d100", "/r 2d6 + 1d10 + 3d100"]);
+  const message = { id: "roll-message" };
+  assert.equal(await pool.roll(async command => {
+    commands.push(command);
+    return message;
+  }), message);
+  assert.equal(pool.busy, false);
+  assert.equal(pool.formula, "");
+  for (const faces of [4, 6, 10, 12, 20, 100]) assert.equal(pool.count(faces), 0);
+  await pool.roll(async () => assert.fail("A completed roll must not leave dice selected"));
+  assert.deepEqual(commands, ["/r 2d6 + 1d10 + 3d100"]);
   pool.set(6, 1);
-  pool.set(100, 0);
-  assert.equal(pool.formula, "1d6 + 1d10");
+  assert.equal(pool.formula, "1d6");
   pool.clear();
   await pool.roll(async () => assert.fail("Empty selections must not send chat messages"));
 });
@@ -46,5 +52,17 @@ test("a pending roll cannot be submitted twice or lose its selection on failure"
   await assert.rejects(pending, /Connection lost/);
   assert.equal(pool.busy, false);
   assert.equal(pool.formula, "2d20");
-  await pool.roll(async command => assert.equal(command, "/r 2d20"));
+  await pool.roll(async command => {
+    assert.equal(command, "/r 2d20");
+    return { id: "retry-message" };
+  });
+  assert.equal(pool.formula, "");
+});
+
+test("a roll cancelled by a chat hook keeps the selection", async () => {
+  const pool = new DicePool();
+  pool.set(10, 3);
+  await pool.roll(async () => undefined);
+  assert.equal(pool.busy, false);
+  assert.equal(pool.formula, "3d10");
 });

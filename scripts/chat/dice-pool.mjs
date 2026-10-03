@@ -29,11 +29,15 @@ export class DicePool {
   async roll(sendMessage) {
     if (this.busy || !this.formula) return;
     this.busy = true;
+    let message;
     try {
       // The native /r command preserves the speaker, message mode and module hooks.
-      return await sendMessage(`/r ${this.formula}`);
+      message = await sendMessage(`/r ${this.formula}`);
+      return message;
     } finally {
       this.busy = false;
+      // A cancelled chat hook returns no message; retain the selection for a retry.
+      if (message) this.clear();
     }
   }
 }
