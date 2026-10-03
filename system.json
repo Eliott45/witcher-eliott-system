@@ -1,0 +1,32 @@
+{
+  "id": "witcher-eliott-system",
+  "title": "The Witcher — Eliott",
+  "description": "Неофициальная система для The Witcher TRPG. Разработка начинается с удобства боя и листов персонажей.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14.368",
+    "maximum": "14"
+  },
+  "authors": [{ "name": "Eliott45" }],
+  "esmodules": ["scripts/witcher.mjs"],
+  "styles": ["styles/witcher.css"],
+  "languages": [
+    { "lang": "ru", "name": "Русский", "path": "lang/ru.json" },
+    { "lang": "en", "name": "English", "path": "lang/en.json" }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "character": {},
+      "npc": {}
+    }
+  },
+  "grid": {
+    "type": 1,
+    "distance": 2,
+    "units": "m"
+  },
+  "primaryTokenAttribute": "health",
+  "secondaryTokenAttribute": "stamina",
+  "url": "https://github.com/Eliott45/witcher-eliott-system"
+}

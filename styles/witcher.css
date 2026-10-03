@@ -1,0 +1,66 @@
+.witcher-eliott.actor-sheet {
+  --witcher-ink: #ece5d8;
+  --witcher-muted: #b6ad9f;
+  --witcher-line: #47433b;
+  --witcher-gold: #d4b477;
+  --color-text-primary: var(--witcher-ink);
+  --color-text-secondary: var(--witcher-muted);
+  color: var(--witcher-ink);
+  min-width: 420px;
+  min-height: 480px;
+}
+
+.witcher-eliott.actor-sheet .window-content {
+  background: #1d211f;
+  padding: 0;
+}
+
+.witcher-eliott .witcher-sheet-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.witcher-eliott .witcher-sheet-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--witcher-line);
+}
+
+.witcher-eliott .witcher-portrait {
+  flex: 0 0 80px;
+  height: 90px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--witcher-gold);
+  border-radius: 4px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.witcher-eliott .witcher-identity { flex: 1; min-width: 0; }
+.witcher-eliott .witcher-eyebrow { display: block; color: var(--witcher-gold); font-size: 11px; letter-spacing: 0.1em; margin-bottom: 12px; }
+.witcher-eliott label { display: block; color: var(--witcher-muted); font-size: 12px; }
+.witcher-eliott input, .witcher-eliott textarea { background: #131715; color: var(--witcher-ink); border: 1px solid var(--witcher-line); margin-top: 5px; }
+.witcher-eliott input:focus, .witcher-eliott textarea:focus { outline: 2px solid var(--witcher-gold); outline-offset: 1px; }
+.witcher-eliott .witcher-identity input { height: 36px; font-size: 20px; }
+.witcher-eliott .witcher-resources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.witcher-eliott .witcher-resource { margin: 0; padding: 14px; border: 1px solid var(--witcher-line); border-top: 3px solid #ba685f; border-radius: 4px; min-width: 0; }
+.witcher-eliott .witcher-resource.stamina { border-top-color: #70a695; }
+.witcher-eliott legend { color: var(--witcher-ink); font-size: 15px; padding: 0 6px; }
+.witcher-eliott .witcher-resource-values { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 8px; }
+.witcher-eliott .witcher-resource-values input { height: 38px; text-align: center; font-size: 22px; }
+.witcher-eliott .witcher-resource-values > span { line-height: 38px; color: var(--witcher-muted); }
+.witcher-eliott .witcher-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.witcher-eliott h2 { font-size: 18px; color: var(--witcher-ink); margin: 0; border: 0; }
+.witcher-eliott .witcher-angle { color: var(--witcher-gold); font-size: 24px; }
+.witcher-eliott p { color: var(--witcher-muted); line-height: 1.5; font-size: 13px; }
+.witcher-eliott button { color: var(--witcher-ink); border-color: var(--witcher-line); background: #2a302b; }
+.witcher-eliott button:hover { border-color: var(--witcher-gold); background: #343c35; }
+.witcher-eliott .witcher-vision button { width: 100%; }
+.witcher-eliott .witcher-notes textarea { width: 100%; min-height: 80px; resize: vertical; padding: 10px; }
+.witcher-eliott .witcher-footnote { margin: 0; font-size: 11px; border-top: 1px solid var(--witcher-line); padding-top: 12px; }

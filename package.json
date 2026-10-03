@@ -1,0 +1,15 @@
+{
+  "name": "witcher-eliott-system",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A combat-first Witcher system for Foundry VTT.",
+  "scripts": {
+    "check": "node tools/check.mjs",
+    "check:foundry": "node tools/check-foundry.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

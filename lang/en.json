@@ -1,0 +1,28 @@
+{
+  "TYPES": {
+    "Actor": {
+      "character": "Character",
+      "npc": "NPC / opponent"
+    }
+  },
+  "WITCHER": {
+    "Sheet": {
+      "Title": "Witcher Combat Sheet",
+      "Portrait": "Change portrait",
+      "Name": "Name",
+      "Resources": "Combat resources",
+      "Health": "Health",
+      "Stamina": "Stamina",
+      "Current": "Current",
+      "Maximum": "Maximum",
+      "Vision": "Field of view",
+      "Disabled": "Disabled",
+      "VisionHint": "The sector rotates with the token. Walls and scene lighting determine visibility. Rotate a selected token with Shift + mouse wheel.",
+      "PrototypeToken": "Configure prototype token",
+      "SceneToken": "Configure scene token",
+      "Notes": "Combat notes",
+      "NotesPlaceholder": "Tactics, conditions and reminders…",
+      "FoundationHint": "Starter sheet: enter resources manually. Rolls, damage and effects will be added separately."
+    }
+  }
+}

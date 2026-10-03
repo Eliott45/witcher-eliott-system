@@ -1,0 +1,60 @@
+<div class="witcher-sheet-body">
+  <header class="witcher-sheet-header">
+    <img class="witcher-portrait" src="{{actor.img}}" alt="{{actor.name}}" data-action="editImage"
+         data-edit="img" title="{{localize 'WITCHER.Sheet.Portrait'}}">
+    <div class="witcher-identity">
+      <span class="witcher-eyebrow">THE WITCHER · {{localize typeLabel}}</span>
+      <label for="{{rootId}}-name">{{localize "WITCHER.Sheet.Name"}}</label>
+      <input id="{{rootId}}-name" name="name" type="text" value="{{actor.name}}" required>
+    </div>
+  </header>
+
+  <section class="witcher-resources" aria-label="{{localize 'WITCHER.Sheet.Resources'}}">
+    <fieldset class="witcher-resource health">
+      <legend>{{localize "WITCHER.Sheet.Health"}}</legend>
+      <div class="witcher-resource-values">
+        <label for="{{rootId}}-health-value">{{localize "WITCHER.Sheet.Current"}}
+          <input id="{{rootId}}-health-value" type="number" name="system.health.value"
+                 value="{{system.health.value}}" min="0" step="1">
+        </label>
+        <span aria-hidden="true">/</span>
+        <label for="{{rootId}}-health-max">{{localize "WITCHER.Sheet.Maximum"}}
+          <input id="{{rootId}}-health-max" type="number" name="system.health.max"
+                 value="{{system.health.max}}" min="0" step="1">
+        </label>
+      </div>
+    </fieldset>
+    <fieldset class="witcher-resource stamina">
+      <legend>{{localize "WITCHER.Sheet.Stamina"}}</legend>
+      <div class="witcher-resource-values">
+        <label for="{{rootId}}-stamina-value">{{localize "WITCHER.Sheet.Current"}}
+          <input id="{{rootId}}-stamina-value" type="number" name="system.stamina.value"
+                 value="{{system.stamina.value}}" min="0" step="1">
+        </label>
+        <span aria-hidden="true">/</span>
+        <label for="{{rootId}}-stamina-max">{{localize "WITCHER.Sheet.Maximum"}}
+          <input id="{{rootId}}-stamina-max" type="number" name="system.stamina.max"
+                 value="{{system.stamina.max}}" min="0" step="1">
+        </label>
+      </div>
+    </fieldset>
+  </section>
+
+  <section class="witcher-vision">
+    <div class="witcher-section-heading">
+      <h2>{{localize "WITCHER.Sheet.Vision"}}</h2>
+      <span class="witcher-angle">{{#if vision.enabled}}{{vision.angle}}°{{else}}{{localize "WITCHER.Sheet.Disabled"}}{{/if}}</span>
+    </div>
+    <p>{{localize "WITCHER.Sheet.VisionHint"}}</p>
+    <button type="button" data-action="{{tokenAction}}" {{disabled (not editable)}}>
+      <i class="fa-solid fa-eye" aria-hidden="true"></i> {{localize tokenLabel}}
+    </button>
+  </section>
+
+  <section class="witcher-notes">
+    <label for="{{rootId}}-notes">{{localize "WITCHER.Sheet.Notes"}}</label>
+    <textarea id="{{rootId}}-notes" name="system.notes" rows="4"
+              placeholder="{{localize 'WITCHER.Sheet.NotesPlaceholder'}}">{{system.notes}}</textarea>
+  </section>
+  <p class="witcher-footnote">{{localize "WITCHER.Sheet.FoundationHint"}}</p>
+</div>
