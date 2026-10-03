@@ -26,7 +26,7 @@ test("influential friend selection contains every table result and searches keep
 test("items are sorted by lifepath source and family descriptions do not contain their mechanics", () => {
   const packs = compendiumData(translations);
   const folders = compendiumFolders(translations).equipment;
-  assert.deepEqual(folders.map(folder => folder.name), ["Семья", "Друг"]);
+  assert.deepEqual(folders.slice(0, 2).map(folder => folder.name), ["Семья", "Друг"]);
   assert.equal(packs.equipment.filter(item => item.folder === EQUIPMENT_FOLDERS.family.id).length, 10);
   assert.equal(packs.equipment.filter(item => item.folder === EQUIPMENT_FOLDERS.friend.id).length, 28);
   for (const entry of EQUIPMENT) {

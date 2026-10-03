@@ -12,7 +12,9 @@
       "equipment": "Предмет",
       "influence": "Друг, оказавший влияние",
       "language": "Язык (2)",
-      "profession": "Профессия"
+      "profession": "Профессия",
+      "weapon": "Оружие / щит",
+      "armor": "Броня"
     }
   },
   "WITCHER": {

@@ -76,6 +76,16 @@
         "htmlFields": [
           "description"
         ]
+      },
+      "weapon": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "armor": {
+        "htmlFields": [
+          "description"
+        ]
       }
     }
   },

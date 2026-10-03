@@ -119,7 +119,7 @@ test("localized tooltips contain resolved formulas and distinguish resource name
     }
     assert.match(context.healthTooltip, /10.*10.*50/);
     assert.match(context.movementRows[2].tooltip, /27.*5/);
-    assert.equal(context.carriedWeight, 0, "Inventory weight is a read-only placeholder even for old manual values");
+    assert.equal(context.carriedWeight, 100.5, "Sheet displays the derived inventory weight");
     assert.ok(!JSON.stringify(context).includes("undefined"));
     assert.ok(!JSON.stringify(context).match(/\{(?:body|will|reflex|maximum|physical|threshold|run|leap)\}/));
     data.attributes.luck = 10;

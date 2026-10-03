@@ -8,6 +8,7 @@ import { ATTRIBUTE_KEYS, deriveStatistics } from "./statistics.mjs";
 import { hasStatus, DYING, DEAD } from "../combat/status-effects.mjs";
 import { SKILL_KEYS } from "./skills.mjs";
 import { additionalAbilityIds } from "./abilities.mjs";
+import { carriedWeight } from "./physical-items.mjs";
 
 /** Store base values; source bonuses and wound penalties are derived without stacking. */
 export class WitcherActorData extends foundry.abstract.TypeDataModel {
@@ -36,6 +37,7 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
         stubbornnessUsed: new NumberField({ required: true, nullable: false, integer: true, min: 0, max: 3, initial: 0 })
       }),
       carriedWeight: new NumberField({ required: true, nullable: false, min: 0, initial: 0 }),
+      crowns: new NumberField({ required: true, nullable: false, min: 0, initial: 0 }),
       luckSpent: new ArrayField(new NumberField({ required: true, nullable: false, integer: true, min: 1 })),
       luckPending: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
       exhaustionEpisode: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
@@ -77,6 +79,7 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
   get statistics() {
     const actor = this.parent;
     return deriveStatistics(this, {
+      items: actor?.items ?? [],
       abilityIds: actor ? additionalAbilityIds(actor) : [],
       ...(actor?.effects ? { dying: hasStatus(actor, DYING), dead: hasStatus(actor, DEAD) } : {})
     });
@@ -89,8 +92,7 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
     if (statistics.staminaMax !== null) this.stamina.max = statistics.staminaMax;
     this.health.value = Math.min(this.health.value, this.health.max);
     this.stamina.value = Math.min(this.stamina.value, this.stamina.max);
-    // Inventory will supply this derived value when item weights are implemented.
-    this.carriedWeight = 0;
+    this.carriedWeight = carriedWeight(this.parent?.items);
   }
 
   get originBonusEligible() {

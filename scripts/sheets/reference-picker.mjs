@@ -4,20 +4,20 @@ import { FAMILY_GROUPS } from "../data/family-statuses.mjs";
 import { selectionEntries, filterEntries } from "./selection-data.mjs";
 
 /** Local browsing only; the actor is updated by its sheet after confirmation. */
-export async function chooseReference(kind, current, { isWitcher = false, initialGroup = "" } = {}) {
+export async function chooseReference(kind, current, { isWitcher = false, initialGroup = "", entries: suppliedEntries, groups: suppliedGroups, title, hint } = {}) {
   if (kind === "familyStatus" && isWitcher) return null;
   const localize = key => game.i18n.localize(key);
-  const entries = selectionEntries(kind, localize);
+  const entries = suppliedEntries ?? selectionEntries(kind, localize);
   const isLifepath = ["familyStatus", "influentialFriend"].includes(kind);
-  const groups = kind === "profession" ? { magic: "WITCHER.Professions.Magic", mundane: "WITCHER.Professions.Mundane" } : isLifepath ? FAMILY_GROUPS : kind === "origin" ? ORIGIN_GROUPS : {
+  const groups = suppliedGroups ?? (kind === "profession" ? { magic: "WITCHER.Professions.Magic", mundane: "WITCHER.Professions.Mundane" } : isLifepath ? FAMILY_GROUPS : kind === "origin" ? ORIGIN_GROUPS : {
     peoples: "WITCHER.Picker.Peoples", mutants: "WITCHER.Picker.Mutants"
-  };
+  });
   const content = await foundry.applications.handlebars.renderTemplate(
     `systems/${SYSTEM_ID}/templates/reference-picker.hbs`, {
       entries: entries.map(entry => ({ ...entry, selected: entry.id === current })),
       groups: Object.entries(groups).map(([id, label]) => ({ id, label })),
       excluded: kind === "origin" && isWitcher,
-      hintKey: kind === "profession" ? "WITCHER.Professions.Advancement" : kind === "influentialFriend" ? "WITCHER.Friends.Hint" : "WITCHER.Picker.ReferenceOnly"
+      hintKey: hint ?? (kind === "profession" ? "WITCHER.Professions.Advancement" : kind === "influentialFriend" ? "WITCHER.Friends.Hint" : "WITCHER.Picker.ReferenceOnly")
     }
   );
   let selected = current;
@@ -26,7 +26,7 @@ export async function chooseReference(kind, current, { isWitcher = false, initia
     modal: true,
     classes: ["witcher-picker"],
     position: { width: 780 },
-    window: { title: localize({ profession: "WITCHER.Professions.Choose", race: "WITCHER.Sheet.ChooseRace", origin: "WITCHER.Sheet.ChooseOrigin", familyStatus: "WITCHER.Sheet.ChooseFamilyStatus", influentialFriend: "WITCHER.Sheet.ChooseFriend" }[kind]), resizable: true },
+    window: { title: title ?? localize({ profession: "WITCHER.Professions.Choose", race: "WITCHER.Sheet.ChooseRace", origin: "WITCHER.Sheet.ChooseOrigin", familyStatus: "WITCHER.Sheet.ChooseFamilyStatus", influentialFriend: "WITCHER.Sheet.ChooseFriend" }[kind]), resizable: true },
     content,
     buttons: [
       { action: "clear", label: "WITCHER.Picker.Clear", type: "button", callback: () => "" },

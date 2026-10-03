@@ -369,14 +369,7 @@
     </section>
     <section id="{{rootId}}-inventory" class="witcher-character-content witcher-inventory tab {{tabs.inventory.cssClass}}"
              data-group="character" data-tab="inventory" aria-label="{{localize 'WITCHER.Inventory.Title'}}">
-      <h2>{{localize "WITCHER.Inventory.Title"}}</h2>
-      <p class="witcher-drop-hint">{{localize "WITCHER.Inventory.Hint"}}</p>
-      {{#each equipment as |item|}}
-      <article class="witcher-inventory-item draggable" data-item-id="{{item.id}}">
-        <img src="{{item.img}}" alt=""><button type="button" data-action="viewSheetItem" data-item-id="{{item.id}}">{{item.name}}</button>
-        {{#if ../editable}}<button type="button" data-action="removeSheetItem" data-item-id="{{item.id}}" title="{{localize 'WITCHER.Inventory.Remove'}}" aria-label="{{localize 'WITCHER.Inventory.Remove'}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>{{/if}}
-      </article>
-      {{else}}<p class="witcher-empty-panel"><i class="fa-solid fa-sack" aria-hidden="true"></i>{{localize "WITCHER.Inventory.Empty"}}</p>{{/each}}
+      {{> "systems/witcher-eliott-system/templates/inventory.hbs"}}
     </section>
     <section id="{{rootId}}-actions" class="witcher-character-content tab {{tabs.actions.cssClass}}"
              data-group="character" data-tab="actions" aria-label="{{localize 'WITCHER.Actions.Title'}}">

@@ -1,4 +1,5 @@
 import { getProfession as selectionProfession } from "../data/professions.mjs";
+import { inventoryContext, bindInventory, equipItem, createInventoryItem, browseEquipment, addCatalogItem } from "./inventory-context.mjs";
 import { lifepathContext, editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent } from "./lifepath-context.mjs";
 import { professionContext, setProfessionLevel, rollProfessionAbility, professionSelectionUpdate } from "./profession-context.mjs";
 import { SYSTEM_ID } from "../config.mjs";
@@ -33,6 +34,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
+      equipItem, createInventoryItem, browseEquipment, addCatalogItem,
       editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent,
       rollProfessionAbility,
       viewRace: WitcherActorSheet.#onViewReference,
@@ -102,7 +104,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
         localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
       }, { query: this.#skillQuery, editing: this.isEditable && this.#editingSkills }),
       abilities: await abilitiesContext(this.actor),
-      equipment: (this.actor.items ?? []).filter(item => item.type === "equipment").map(item => ({ id: item.id, name: item.name, img: item.img })),
+      inventory: inventoryContext(this.actor),
       abilitiesOpen: !preferences.collapsed?.abilities,
       editingAttributes: this.isEditable && this.#editingAttributes,
       effects: await Promise.all(this.actor.effects.map(async effect => {
@@ -151,12 +153,12 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=viewFriend], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs], [data-action=viewSheetItem], [data-action=browseAbilities], [data-action=browseLanguages]")) {
       button.disabled = false;
     }
-    const search = this.element.querySelector("[data-skill-search]");
-    if (search) search.disabled = false;
+    for (const search of this.element.querySelectorAll("[data-skill-search], [data-inventory-search], [data-inventory-filter], [data-action=browseEquipment]")) search.disabled = false;
   }
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    bindInventory(this);
     for (const input of this.element.querySelectorAll("[data-profession-level]")) input.addEventListener("change", () => {
       if (this.isEditable && this.#editingSkills) setProfessionLevel(this.actor, input.dataset.professionLevel, input.value).catch(reportPreferencesError);
     });

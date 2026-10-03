@@ -1,0 +1,15 @@
+<div class="witcher-lifepath-heading"><h2>Инвентарь</h2><button type="button" data-action="browseEquipment"><i class="fa-solid fa-books"></i> Каталог</button><button type="button" data-action="createInventoryItem" {{disabled (not editable)}}><i class="fa-solid fa-plus"></i> Предмет</button></div>
+<button type="button" data-action="addCatalogItem" {{disabled (not editable)}}><i class="fa-solid fa-magnifying-glass"></i> Добавить из каталога</button>
+<div class="witcher-armor-zones">
+{{#each inventory.zones as |zone|}}<section class="witcher-armor-zone"><i class="fa-solid {{zone.icon}}" aria-hidden="true"></i><h3>{{zone.name}}</h3>
+{{#each zone.items as |item|}}<button type="button" data-action="viewSheetItem" data-item-id="{{item.id}}">{{item.name}}</button><strong>ПБ {{item.condition.value}} / {{item.condition.max}}</strong>{{else}}<span>Броня не надета</span>{{/each}}</section>{{/each}}
+</div>
+<div class="witcher-inventory-tools"><input type="search" data-inventory-search placeholder="Найти предмет" aria-label="Поиск в инвентаре"><select data-inventory-filter aria-label="Фильтр инвентаря"><option value="">Все предметы</option>{{#each inventory.categories}}<option value="{{id}}">{{name}}</option>{{/each}}</select></div>
+<div class="witcher-inventory-totals"><span>Вес: <strong>{{inventory.weight}} кг</strong></span><label>Кроны <input type="number" name="system.crowns" value="{{system.crowns}}" min="0" step="0.01" {{disabled (not editable)}}></label></div>
+{{#each inventory.items as |item|}}
+<article class="witcher-inventory-row draggable" draggable="true" data-item-id="{{item.id}}" data-inventory-name="{{item.name}}" data-category="{{item.category}}">
+<img src="{{item.img}}" alt=""><div class="witcher-inventory-name"><button type="button" data-action="viewSheetItem" data-item-id="{{item.id}}">{{item.name}}</button><small>{{item.totalWeight}} кг {{#if item.condition}}· {{item.conditionLabel}} {{item.condition.value}} / {{item.condition.max}}{{/if}}{{#unless item.carried}} · Не при себе{{/unless}}</small></div>
+<input type="number" data-inventory-quantity data-item-id="{{item.id}}" value="{{item.quantity}}" min="0" step="1" aria-label="Количество: {{item.name}}" {{disabled (not ../editable)}}>
+{{#if item.canEquip}}<button type="button" data-action="equipItem" data-item-id="{{item.id}}" aria-label="Экипировать: {{item.name}}" aria-pressed="{{item.equipped}}" {{disabled (not ../editable)}}><i class="fa-solid fa-hand"></i></button>{{/if}}
+<button type="button" data-action="removeSheetItem" data-item-id="{{item.id}}" aria-label="Удалить: {{item.name}}" {{disabled (not ../editable)}}><i class="fa-solid fa-trash"></i></button>
+</article>{{else}}<p class="witcher-drop-hint">Перетащите предмет из каталога или создайте свой.</p>{{/each}}

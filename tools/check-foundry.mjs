@@ -267,7 +267,12 @@ const { WitcherFamilyStatusData } = await import("../scripts/data/witcher-family
 const { WitcherInfluenceData } = await import("../scripts/data/witcher-influence-data.mjs");
 const { raceUuid, abilityUuid, originUuid, familyStatusUuid, equipmentUuid, influentialFriendUuid } = await import("../scripts/data/compendiums.mjs");
 const { WitcherAbilityData } = await import("../scripts/data/witcher-ability-data.mjs");
-CONFIG.Item.dataModels = { profession: WitcherReferenceData, race: WitcherRaceData, ability: WitcherAbilityData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherReferenceData, influence: WitcherInfluenceData, language: WitcherReferenceData };
+const { WitcherEquipmentData } = await import("../scripts/data/witcher-equipment-data.mjs");
+const { WitcherWeaponData } = await import("../scripts/data/witcher-weapon-data.mjs");
+const { WitcherArmorData } = await import("../scripts/data/witcher-armor-data.mjs");
+const oldGear = new WitcherEquipmentData({ ruleId: "old-custom", description: "<p>Старый предмет</p>" });
+assert.equal(oldGear.quantity, 1); assert.equal(oldGear.weight, 0); assert.equal(oldGear.description, "<p>Старый предмет</p>");
+CONFIG.Item.dataModels = { profession: WitcherReferenceData, race: WitcherRaceData, ability: WitcherAbilityData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherEquipmentData, weapon: WitcherWeaponData, armor: WitcherArmorData, influence: WitcherInfluenceData, language: WitcherReferenceData };
 const equipmentPack = `${game.system.id}.equipment`;
 for (const source of await readJSON("../pack-sources/equipment.folders.json")) {
   const folder = new foundry.documents.BaseFolder(source, { pack: equipmentPack });
@@ -281,13 +286,27 @@ for (const pack of game.system.packs) {
     const document = new foundry.documents.BaseItem(source, { pack: `${game.system.id}.${pack.name}` });
     await access(new URL(`public/${source.img}`, app));
     assert.equal(document.type, source.type);
-    assert.deepEqual(document.system.toObject(), source.system);
+    const modeled = document.system.toObject();
+    assert.deepEqual(Object.fromEntries(Object.keys(source.system).map(key => [key, modeled[key]])), source.system);
     assert.equal(document.effects.size, 0, "Reference items must not contain automated effects");
     const uuid = `Compendium.${game.system.id}.${pack.name}.Item.${document.id}`;
     documents.set(uuid, document);
   }
 }
-assert.equal(documents.size, 231);
+assert.equal(documents.size, 231 + (await import("../scripts/data/core-equipment.mjs")).CORE_EQUIPMENT.length);
+CONFIG.Actor.dataModels.character = WitcherActorData;
+const armored = new foundry.documents.BaseActor({ name: "Inventory round trip", type: "character", system: { attributes: { reflex: 5, dexterity: 4 }, health: { value: 20, max: 20 } }, items: [
+  { name: "Бригантина", type: "armor", system: { weight: 7, equipped: true, zone: "torso", encumbrance: 1, stoppingPower: { value: 8, max: 12 } } },
+  { name: "Кинжал", type: "weapon", system: { weight: 0.5, quantity: 2, reliability: { value: 7, max: 10 } } }
+] });
+armored.system.prepareDerivedData();
+assert.equal(armored.system.carriedWeight, 8);
+assert.equal(armored.system.statistics.effective.reflex, 4);
+assert.equal(armored.system.statistics.effective.dexterity, 3);
+const restoredInventory = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(armored.toObject())));
+restoredInventory.system.prepareDerivedData();
+assert.equal(restoredInventory.system.carriedWeight, 8);
+assert.equal(restoredInventory.items.find(item => item.type === "armor").system.stoppingPower.value, 8);
 const { addLanguageFromItem, LANGUAGES } = await import("../scripts/data/languages.mjs");
 const { languageUuid } = await import("../scripts/data/compendiums.mjs");
 const languageActor = { uuid: "Actor.languageImport", isOwner: true, system: new WitcherActorData(),
@@ -397,8 +416,9 @@ for (const statusId of ["dying", "dead"]) {
 }
 handlebars.registerHelper("localize", key => foundry.utils.getProperty(translations, key) ?? key);
 handlebars.registerHelper("not", value => !value);
+handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["profession", "lifepath"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["profession", "lifepath", "inventory", "structured-fields"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -436,7 +456,7 @@ assert.ok(html.includes('name="system.details.age"'));
 assert.ok(html.includes('name="system.details.gender"'));
 assert.ok(html.includes('data-kind="race"'));
 assert.ok(html.includes('data-kind="origin"'));
-assert.ok(!html.includes("<select"), "Race and origin must use the browser, not dropdowns");
+assert.ok(!html.includes('<select name="system.details.'), "Race and origin must use the browser, not dropdowns");
 assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken preview button");
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
@@ -818,4 +838,4 @@ if (process.argv[3]) {
   }
   console.log("Installed Dice So Nice: all nine critical chains produce the correct successive d10 throws");
 }
-console.log("Installed Foundry core: data, 231 Items, templates, native Luck, death saves and all nine critical chains OK");
+console.log(`Installed Foundry core: data, ${documents.size} Items, templates, native Luck, death saves and all nine critical chains OK`);

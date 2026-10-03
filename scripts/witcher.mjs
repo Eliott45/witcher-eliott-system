@@ -7,6 +7,10 @@ import { WitcherCombat } from "./documents/witcher-combat.mjs";
 import { registerCriticalDice } from "./dice/critical-chain.mjs";
 import { WitcherActorSheet } from "./sheets/witcher-actor-sheet.mjs";
 import { WitcherAbilityData } from "./data/witcher-ability-data.mjs";
+import { WitcherEquipmentData } from "./data/witcher-equipment-data.mjs";
+import { WitcherWeaponData } from "./data/witcher-weapon-data.mjs";
+import { WitcherArmorData } from "./data/witcher-armor-data.mjs";
+import { WitcherItem } from "./documents/witcher-item.mjs";
 import { WitcherReferenceData } from "./data/witcher-reference-data.mjs";
 import { WitcherRaceData } from "./data/witcher-race-data.mjs";
 import { WitcherOriginData } from "./data/witcher-origin-data.mjs";
@@ -26,9 +30,10 @@ import { preventIncapacitatedMovement, preventIncapacitatedPositionUpdate } from
 import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
 
 Hooks.once("init", async () => {
-  await foundry.applications.handlebars.loadTemplates(["profession", "lifepath"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
+  await foundry.applications.handlebars.loadTemplates(["profession", "lifepath", "inventory", "structured-fields"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Actor.documentClass = WitcherActor;
+  CONFIG.Item.documentClass = WitcherItem;
   CONFIG.ChatMessage.documentClass = WitcherChatMessage;
   CONFIG.Combat.documentClass = WitcherCombat;
   registerCriticalDice();
@@ -46,7 +51,9 @@ Hooks.once("init", async () => {
   CONFIG.Item.dataModels.profession = WitcherReferenceData;
   CONFIG.Item.dataModels.origin = WitcherOriginData;
   CONFIG.Item.dataModels.familyStatus = WitcherFamilyStatusData;
-  CONFIG.Item.dataModels.equipment = WitcherReferenceData;
+  CONFIG.Item.dataModels.equipment = WitcherEquipmentData;
+  CONFIG.Item.dataModels.weapon = WitcherWeaponData;
+  CONFIG.Item.dataModels.armor = WitcherArmorData;
   CONFIG.Item.dataModels.influence = WitcherInfluenceData;
   CONFIG.Item.dataModels.language = WitcherReferenceData;
 

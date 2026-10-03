@@ -20,5 +20,49 @@
     "sort": 0,
     "color": "#947641",
     "flags": {}
+  },
+  {
+    "_id": "gearFolderWeapon",
+    "name": "Оружие и щиты",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "gearFolderArmors",
+    "name": "Броня",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "gearFolderTools1",
+    "name": "Инструменты",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "gearFolderCore01",
+    "name": "Снаряжение",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
   }
 ]

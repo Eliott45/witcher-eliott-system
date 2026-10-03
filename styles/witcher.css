@@ -367,3 +367,24 @@
 .witcher-lifepath-summary dt, .witcher-lifepath-summary dd { color: #493c32; text-shadow: none; }
 .witcher-lifepath-summary dt { color: #793a36; }
 .witcher-lifepath-summary small { color: #776956; }
+.witcher-armor-zones { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0; }
+.witcher-armor-zone { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-height:140px; border:1px solid #b4a17b; border-radius:8px; background:#dcd6c9; padding:12px 6px; text-align:center; color:#332b26; }
+.witcher-armor-zone > i { color:#733c35; font-size:28px; }
+.witcher-armor-zone h3 { color:#733c35; font-size:16px; margin:0; }
+.witcher-armor-zone button { height:auto; white-space:normal; line-height:1.25; padding:4px; }
+.witcher-inventory-tools { display:grid; grid-template-columns:1fr 190px; gap:8px; margin:12px 0; }
+.witcher-inventory-totals { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; color:#332b26; }
+.witcher-inventory-totals label { display:flex; gap:8px; align-items:center; }
+.witcher-inventory-totals input { width:90px; }
+.witcher-inventory-row { display:flex; gap:6px; align-items:center; border-bottom:1px solid #c3b9a6; padding:7px 0; color:#332b26; }
+.witcher-inventory-row[hidden] { display:none; }
+.witcher-inventory-row img { height:32px; width:32px; border:none; }
+.witcher-inventory-name { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.witcher-inventory-name button { height:auto; text-align:left; white-space:normal; justify-content:flex-start; line-height:1.25; }
+.witcher-inventory-name small { color:#625547; padding-left:8px; }
+.witcher-inventory-row > input { width:48px; text-align:center; }
+.witcher-inventory-row > button { width:30px; flex:none; padding:0; }
+.witcher-inventory-row > button[aria-pressed=true] { background:#733c35; color:#fff4dc; border-color:#b39450; }
+.witcher-physical-fields { border:1px solid #b4a17b; margin:10px 0; padding:12px; }
+.witcher-physical-fields legend { color:#733c35; font-weight:bold; }
+.witcher-physical-fields label { color:#332b26; }

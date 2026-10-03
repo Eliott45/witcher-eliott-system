@@ -91,7 +91,9 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "musical-instrument",
-      "description": "<p>Инструмент, доставшийся персонажу благодаря жизни среди артистов. Конкретный вид выбирает игрок.</p>"
+      "description": "<p>Инструмент, доставшийся персонажу благодаря жизни среди артистов. Конкретный вид выбирает игрок.</p>",
+      "weight": 1,
+      "price": 38
     },
     "effects": [],
     "folder": "gearFolderFamily",
@@ -125,7 +127,9 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "sacred-symbol",
-      "description": "<p>Символ веры Великого Солнца, полученный благодаря воспитанию среди высшего духовенства.</p>"
+      "description": "<p>Символ веры Великого Солнца, полученный благодаря воспитанию среди высшего духовенства.</p>",
+      "weight": 0.1,
+      "price": 14
     },
     "effects": [],
     "folder": "gearFolderFamily",
@@ -142,7 +146,8 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "trained-bird",
-      "description": "<p>Прирученная и обученная птица. Вид можно выбрать совместно с мастером.</p>"
+      "description": "<p>Прирученная и обученная птица. Вид можно выбрать совместно с мастером.</p>",
+      "kind": "companion"
     },
     "effects": [],
     "folder": "gearFolderFamily",
@@ -159,7 +164,8 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "trained-snake",
-      "description": "<p>Прирученная и обученная змея, оставшаяся у персонажа со времён жизни в услужении.</p>"
+      "description": "<p>Прирученная и обученная змея, оставшаяся у персонажа со времён жизни в услужении.</p>",
+      "kind": "companion"
     },
     "effects": [],
     "folder": "gearFolderFamily",
@@ -584,7 +590,9 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "shoulder-bag",
-      "description": ""
+      "description": "",
+      "weight": 1,
+      "price": 14
     },
     "effects": [],
     "folder": "gearFolderFriend",
@@ -639,6 +647,3488 @@
     },
     "effects": [],
     "folder": "gearFolderFriend",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000001",
+    "name": "Железный полуторный меч",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.iron-longsword",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 1.5,
+      "price": 160,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000002",
+    "name": "Рыцарский меч",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.arming-sword",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "2d6+4",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 2.5,
+      "price": 270,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000003",
+    "name": "Гледдиф",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.gleddyf",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "3d6+2",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 3,
+      "price": 285,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000004",
+    "name": "Охотничий фальшион",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.falchion",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "3d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 2,
+      "price": 325,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000005",
+    "name": "Кригсверд",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.krigsverd",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 2,
+      "rarity": "common",
+      "damage": "4d6+4",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 2,
+      "price": 570,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000006",
+    "name": "Эсбода",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.esboda",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 1,
+      "rarity": "rare",
+      "damage": "5d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 1.5,
+      "price": 650,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000007",
+    "name": "Корд",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.kord",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "5d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 1.5,
+      "price": 725,
+      "properties": "Кровопускающее (25%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000008",
+    "name": "Клинок из Виковаро",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.vicovaro",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "5d6+4",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 1.5,
+      "price": 955,
+      "properties": "Сбалансированное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000009",
+    "name": "Торрур",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.torrwr",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "6d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 3,
+      "price": 1075,
+      "properties": "Кровопускающее (50%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000010",
+    "name": "Кинжал",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.dagger",
+      "skill": "smallBlades",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "1d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "small",
+      "enhancementSlots": 0,
+      "weight": 0.5,
+      "price": 50,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000011",
+    "name": "Стилет",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.stiletto",
+      "skill": "smallBlades",
+      "damageType": "Р/К",
+      "accuracy": 2,
+      "rarity": "common",
+      "damage": "1d6",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "tiny",
+      "enhancementSlots": 1,
+      "weight": 0.5,
+      "price": 275,
+      "properties": "Незаметное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000012",
+    "name": "Короткий кинжал",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.short-dagger",
+      "skill": "smallBlades",
+      "damageType": "Р/К",
+      "accuracy": 1,
+      "rarity": "rare",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "small",
+      "enhancementSlots": 1,
+      "weight": 1,
+      "price": 350,
+      "properties": "Кровопускающее (25%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000013",
+    "name": "Джамбия",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.jambiya",
+      "skill": "smallBlades",
+      "damageType": "Р/К",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "2d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "small",
+      "enhancementSlots": 1,
+      "weight": 0.5,
+      "price": 440,
+      "properties": "Кровопускающее (25%); Пробивающее броню",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000014",
+    "name": "Топор",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.axe",
+      "skill": "melee",
+      "damageType": "Р",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "2d6+1",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "small",
+      "enhancementSlots": 0,
+      "weight": 1,
+      "price": 205,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000015",
+    "name": "Боевой топор",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.battle-axe",
+      "skill": "melee",
+      "damageType": "Р",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "5d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 2,
+      "price": 525,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000016",
+    "name": "Топор берсерка",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.berserker-axe",
+      "skill": "melee",
+      "damageType": "Р",
+      "accuracy": 0,
+      "rarity": "rare",
+      "damage": "6d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 3,
+      "price": 960,
+      "properties": "Разрушающее; Кровопускающее (25%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000017",
+    "name": "Кастет",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.brass-knuckles",
+      "skill": "brawling",
+      "damageType": "Д",
+      "accuracy": 1,
+      "rarity": "everywhere",
+      "damage": "1d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "tiny",
+      "enhancementSlots": 1,
+      "weight": 0.5,
+      "price": 50,
+      "properties": "Рукопашное: прибавляется к урону без оружия",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000018",
+    "name": "Булава",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.mace",
+      "skill": "melee",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "5d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 2,
+      "price": 525,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000019",
+    "name": "Молот горца",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.hammer",
+      "skill": "melee",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "6d6+2",
+      "reliability": {
+        "value": 20,
+        "max": 20
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 3,
+      "price": 1100,
+      "properties": "Дезориентирующее (−2); Метеоритное (бонус надёжности уже включён)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000020",
+    "name": "Копьё",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.spear",
+      "skill": "staffSpear",
+      "damageType": "К/Д",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "3d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 2,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 3.5,
+      "price": 375,
+      "properties": "Длинное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000021",
+    "name": "Секира",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.poleaxe",
+      "skill": "staffSpear",
+      "damageType": "Р/К/Д",
+      "accuracy": 0,
+      "rarity": "rare",
+      "damage": "4d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 3,
+      "price": 460,
+      "properties": "Длинное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000022",
+    "name": "Красная алебарда",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.halberd",
+      "skill": "staffSpear",
+      "damageType": "Р/К/Д",
+      "accuracy": 0,
+      "rarity": "rare",
+      "damage": "6d6+3",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 4,
+      "price": 865,
+      "properties": "Длинное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000023",
+    "name": "Посох",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.staff",
+      "skill": "staffSpear",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "1d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 3,
+      "price": 335,
+      "properties": "Длинное; Фокусирующее (1)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000024",
+    "name": "Посох с крюком",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.hooked-staff",
+      "skill": "staffSpear",
+      "damageType": "К/Д",
+      "accuracy": 0,
+      "rarity": "rare",
+      "damage": "2d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 3.5,
+      "price": 550,
+      "properties": "Длинное; Фокусирующее (1); Захватное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000025",
+    "name": "Железный посох",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.iron-staff",
+      "skill": "staffSpear",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "rare",
+      "damage": "3d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 4,
+      "price": 675,
+      "properties": "Длинное; Фокусирующее (2)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000026",
+    "name": "Посох с кристаллом",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.crystal-staff",
+      "skill": "staffSpear",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 835,
+      "properties": "Длинное; Фокусирующее (3); Улучшенное фокусирующее",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000027",
+    "name": "Метательный нож",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.throwing-knife",
+      "skill": "athletics",
+      "damageType": "К",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "1d6",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 4,
+      "concealment": "tiny",
+      "enhancementSlots": 0,
+      "weight": 0.5,
+      "price": 50,
+      "properties": "",
+      "category": "thrown",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000028",
+    "name": "Метательный топор",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.throwing-axe",
+      "skill": "athletics",
+      "damageType": "Р",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "2d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 2,
+      "concealment": "small",
+      "enhancementSlots": 0,
+      "weight": 1,
+      "price": 75,
+      "properties": "",
+      "category": "thrown",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000029",
+    "name": "Орион",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.orion",
+      "skill": "athletics",
+      "damageType": "Р",
+      "accuracy": 1,
+      "rarity": "rare",
+      "damage": "1d6",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 4,
+      "concealment": "tiny",
+      "enhancementSlots": 0,
+      "weight": 0.1,
+      "price": 100,
+      "properties": "",
+      "category": "thrown",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000030",
+    "name": "Короткий лук",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.short-bow",
+      "skill": "archery",
+      "damageType": "К",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "3d6+3",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 100,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 1,
+      "price": 290,
+      "properties": "",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000031",
+    "name": "Длинный лук",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.long-bow",
+      "skill": "archery",
+      "damageType": "К",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "4d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 200,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 2,
+      "price": 475,
+      "properties": "",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000032",
+    "name": "Армейский лук",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.war-bow",
+      "skill": "archery",
+      "damageType": "К",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "6d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 300,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 3,
+      "price": 835,
+      "properties": "",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000033",
+    "name": "Ручной арбалет",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.hand-crossbow",
+      "skill": "crossbow",
+      "damageType": "К",
+      "accuracy": 1,
+      "rarity": "everywhere",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 1,
+      "range": 50,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 1,
+      "weight": 0.5,
+      "price": 285,
+      "properties": "Медленно перезаряжающееся",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000034",
+    "name": "Арбалет",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.crossbow",
+      "skill": "crossbow",
+      "damageType": "К",
+      "accuracy": 1,
+      "rarity": "everywhere",
+      "damage": "4d6+2",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 2,
+      "range": 100,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 3,
+      "price": 455,
+      "properties": "Медленно перезаряжающееся",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000035",
+    "name": "Арбалет охотника на чудовищ",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.monster-crossbow",
+      "skill": "crossbow",
+      "damageType": "К",
+      "accuracy": 1,
+      "rarity": "unique",
+      "damage": "6d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 200,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 4,
+      "price": 1125,
+      "properties": "Медленно перезаряжающееся; Пробивающее броню",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000101",
+    "name": "Кожаный щит",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.leather-shield",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "0",
+      "reliability": {
+        "value": 4,
+        "max": 4
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 0.5,
+      "price": 50,
+      "properties": "",
+      "category": "shield",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000102",
+    "name": "Стальной баклер",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.buckler",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "0",
+      "reliability": {
+        "value": 6,
+        "max": 6
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 1,
+      "price": 150,
+      "properties": "",
+      "category": "shield",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000103",
+    "name": "Темерский щит",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.temerian-shield",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "0",
+      "reliability": {
+        "value": 8,
+        "max": 8
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 1.5,
+      "price": 225,
+      "properties": "",
+      "category": "shield",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000104",
+    "name": "Щит налётчика со Скеллиге",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.skellige-shield",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "rare",
+      "damage": "0",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 2,
+      "price": 325,
+      "properties": "",
+      "category": "shield",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000105",
+    "name": "Каэдвенский щит",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.kaedwen-shield",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "rare",
+      "damage": "0",
+      "reliability": {
+        "value": 14,
+        "max": 14
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 2.5,
+      "price": 400,
+      "properties": "",
+      "category": "shield",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000106",
+    "name": "Стальной каплевидный щит",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.kite-shield",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "0",
+      "reliability": {
+        "value": 16,
+        "max": 16
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 3,
+      "price": 400,
+      "properties": "",
+      "category": "shield",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000107",
+    "name": "Павеза",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.pavise",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "rare",
+      "damage": "0",
+      "reliability": {
+        "value": 20,
+        "max": 20
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 4,
+      "price": 500,
+      "properties": "Полное укрытие (стр. 80)",
+      "category": "shield",
+      "encumbrance": 1,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "weap000000000108",
+    "name": "Нильфгаардская павеза",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.nilfgaard-pavise",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "0",
+      "reliability": {
+        "value": 25,
+        "max": 25
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 5,
+      "price": 600,
+      "properties": "Полное укрытие (стр. 80)",
+      "category": "shield",
+      "encumbrance": 1,
+      "source": "Базовая книга, стр. 73–74 / 80",
+      "description": "<p>Базовая книга, стр. 73–74 / 80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000001",
+    "name": "Капюшон вердэнского лучника",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.head.1",
+      "zone": "head",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 3,
+        "max": 3
+      },
+      "rarity": "common",
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 0.5,
+      "price": 100,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000002",
+    "name": "Двуслойный капюшон",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.head.2",
+      "zone": "head",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 5,
+        "max": 5
+      },
+      "rarity": "rare",
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 1,
+      "price": 175,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000003",
+    "name": "Каркасный шлем с полумаской",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.head.3",
+      "zone": "head",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 8,
+        "max": 8
+      },
+      "rarity": "common",
+      "enhancementSlots": 0,
+      "encumbrance": 0,
+      "weight": 1,
+      "price": 200,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000004",
+    "name": "Кольчужный капюшон",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.head.4",
+      "zone": "head",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 12,
+        "max": 12
+      },
+      "rarity": "everywhere",
+      "enhancementSlots": 0,
+      "encumbrance": 0,
+      "weight": 1.5,
+      "price": 250,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000005",
+    "name": "Усиленный капюшон",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.head.5",
+      "zone": "head",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 14,
+        "max": 14
+      },
+      "rarity": "common",
+      "enhancementSlots": 0,
+      "encumbrance": 0,
+      "weight": 2,
+      "price": 250,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000006",
+    "name": "Темерский армет",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.head.6",
+      "zone": "head",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 16,
+        "max": 16
+      },
+      "rarity": "rare",
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 1.5,
+      "price": 475,
+      "properties": "Ограничение зрения при опущенном забрале",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000007",
+    "name": "Топфхельм",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.head.7",
+      "zone": "head",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 20,
+        "max": 20
+      },
+      "rarity": "unique",
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 3.5,
+      "price": 575,
+      "properties": "Ограничение зрения при опущенном забрале",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000008",
+    "name": "Скеллигский шлем",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.head.8",
+      "zone": "head",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 25,
+        "max": 25
+      },
+      "rarity": "rare",
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 3.5,
+      "price": 700,
+      "properties": "Ограничение зрения при опущенном забрале",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000009",
+    "name": "Нильфгаардский шлем",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.head.9",
+      "zone": "head",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 30,
+        "max": 30
+      },
+      "rarity": "unique",
+      "enhancementSlots": 2,
+      "encumbrance": 0,
+      "weight": 3,
+      "price": 800,
+      "properties": "Ограничение зрения при опущенном забрале",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000010",
+    "name": "Гамбезон",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.torso.1",
+      "zone": "torso",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 3,
+        "max": 3
+      },
+      "rarity": "everywhere",
+      "enhancementSlots": 0,
+      "encumbrance": 0,
+      "weight": 1,
+      "price": 100,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000011",
+    "name": "Аэдирнский гамбезон",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.torso.2",
+      "zone": "torso",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 5,
+        "max": 5
+      },
+      "rarity": "rare",
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 1.5,
+      "price": 175,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000012",
+    "name": "Двуслойный гамбезон",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.torso.3",
+      "zone": "torso",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 8,
+        "max": 8
+      },
+      "rarity": "rare",
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 2.5,
+      "price": 250,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000013",
+    "name": "Бригантина",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.torso.4",
+      "zone": "torso",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 12,
+        "max": 12
+      },
+      "rarity": "common",
+      "enhancementSlots": 0,
+      "encumbrance": 1,
+      "weight": 7,
+      "price": 300,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000014",
+    "name": "Броня реданского алебардщика",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.torso.5",
+      "zone": "torso",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 14,
+        "max": 14
+      },
+      "rarity": "rare",
+      "enhancementSlots": 1,
+      "encumbrance": 1,
+      "weight": 8.5,
+      "price": 400,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000015",
+    "name": "Кожаная куртка из Лирии",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.torso.6",
+      "zone": "torso",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 16,
+        "max": 16
+      },
+      "rarity": "unique",
+      "enhancementSlots": 1,
+      "encumbrance": 1,
+      "weight": 6.5,
+      "price": 525,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000016",
+    "name": "Латный доспех",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.torso.7",
+      "zone": "torso",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 20,
+        "max": 20
+      },
+      "rarity": "unique",
+      "enhancementSlots": 1,
+      "encumbrance": 2,
+      "weight": 14,
+      "price": 625,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000017",
+    "name": "Хиндарсфьяльский тяжёлый доспех",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.torso.8",
+      "zone": "torso",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 25,
+        "max": 25
+      },
+      "rarity": "unique",
+      "enhancementSlots": 3,
+      "encumbrance": 2,
+      "weight": 15,
+      "price": 750,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000018",
+    "name": "Нильфгаардский латный доспех",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.torso.9",
+      "zone": "torso",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 30,
+        "max": 30
+      },
+      "rarity": "unique",
+      "enhancementSlots": 2,
+      "encumbrance": 2,
+      "weight": 12,
+      "price": 850,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000019",
+    "name": "Кавалерийские штаны",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.legs.1",
+      "zone": "legs",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 3,
+        "max": 3
+      },
+      "rarity": "common",
+      "enhancementSlots": 0,
+      "encumbrance": 0,
+      "weight": 0.5,
+      "price": 75,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000020",
+    "name": "Стёганые штаны",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.legs.2",
+      "zone": "legs",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 5,
+        "max": 5
+      },
+      "rarity": "common",
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 1,
+      "price": 125,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000021",
+    "name": "Двуслойные штаны",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.legs.3",
+      "zone": "legs",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 8,
+        "max": 8
+      },
+      "rarity": "rare",
+      "enhancementSlots": 0,
+      "encumbrance": 0,
+      "weight": 1.5,
+      "price": 225,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000022",
+    "name": "Усиленные штаны",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.legs.4",
+      "zone": "legs",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 12,
+        "max": 12
+      },
+      "rarity": "everywhere",
+      "enhancementSlots": 0,
+      "encumbrance": 0,
+      "weight": 3.5,
+      "price": 250,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000023",
+    "name": "Реданские поножи",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.legs.5",
+      "zone": "legs",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 14,
+        "max": 14
+      },
+      "rarity": "rare",
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 4,
+      "price": 400,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000024",
+    "name": "Кожаные штаны из Лирии",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.legs.6",
+      "zone": "legs",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 16,
+        "max": 16
+      },
+      "rarity": "unique",
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 3.5,
+      "price": 525,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000025",
+    "name": "Латные поножи",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.legs.7",
+      "zone": "legs",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 20,
+        "max": 20
+      },
+      "rarity": "unique",
+      "enhancementSlots": 1,
+      "encumbrance": 1,
+      "weight": 7.5,
+      "price": 625,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000026",
+    "name": "Хиндарсфьяльские тяжёлые шоссы",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.legs.8",
+      "zone": "legs",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 25,
+        "max": 25
+      },
+      "rarity": "unique",
+      "enhancementSlots": 1,
+      "encumbrance": 1,
+      "weight": 5,
+      "price": 650,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "armo000000000027",
+    "name": "Нильфгаардские поножи",
+    "type": "armor",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "armor.legs.9",
+      "zone": "legs",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 30,
+        "max": 30
+      },
+      "rarity": "unique",
+      "enhancementSlots": 2,
+      "encumbrance": 1,
+      "weight": 6,
+      "price": 850,
+      "properties": "",
+      "source": "Базовая книга, стр. 79–80",
+      "description": "<p>Базовая книга, стр. 79–80</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000001",
+    "name": "Инструменты алхимика",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.alchemy-tools",
+      "weight": 3,
+      "price": 80,
+      "rarity": "rare",
+      "kind": "tool",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000002",
+    "name": "Амулет с самоцветом",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.gem-amulet",
+      "weight": 0.1,
+      "price": 500,
+      "rarity": "unique",
+      "kind": "tool",
+      "properties": "Фокусирующее (3)",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000003",
+    "name": "Простой амулет",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.simple-amulet",
+      "weight": 0.1,
+      "price": 250,
+      "rarity": "unique",
+      "kind": "tool",
+      "properties": "Фокусирующее (1)",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000004",
+    "name": "Принадлежности для готовки",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.cooking-tools",
+      "weight": 3,
+      "price": 15,
+      "rarity": "everywhere",
+      "kind": "tool",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000005",
+    "name": "Инструменты ремесленника",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.crafting-tools",
+      "weight": 5,
+      "price": 83,
+      "rarity": "common",
+      "kind": "tool",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000006",
+    "name": "Набор для маскировки",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.disguise-kit",
+      "weight": 1,
+      "price": 58,
+      "rarity": "rare",
+      "kind": "tool",
+      "properties": "+2 к Маскировке",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000007",
+    "name": "Инструменты для творчества",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.art-tools",
+      "weight": 2,
+      "price": 55,
+      "rarity": "common",
+      "kind": "tool",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000008",
+    "name": "Рыболовные снасти",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.fishing-tools",
+      "weight": 0.5,
+      "price": 27,
+      "rarity": "everywhere",
+      "kind": "tool",
+      "properties": "+2 к Выживанию при рыбной ловле",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000009",
+    "name": "Инструменты для подделки",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.forgery-tools",
+      "weight": 0.5,
+      "price": 58,
+      "rarity": "rare",
+      "kind": "tool",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000010",
+    "name": "Набор для макияжа",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.makeup-kit",
+      "weight": 0.5,
+      "price": 35,
+      "rarity": "everywhere",
+      "kind": "tool",
+      "properties": "+2 к Соблазнению и Харизме",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000011",
+    "name": "Инструменты торговца",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.merchant-tools",
+      "weight": 1.5,
+      "price": 60,
+      "rarity": "common",
+      "kind": "tool",
+      "properties": "+2 к Торговле при оценке товара",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000012",
+    "name": "Хирургические инструменты",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.surgical-tools",
+      "weight": 1,
+      "price": 83,
+      "rarity": "common",
+      "kind": "tool",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000013",
+    "name": "Телекоммуникатор",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.telecommunicator",
+      "weight": 4,
+      "price": 1000,
+      "rarity": "unique",
+      "kind": "tool",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000014",
+    "name": "Воровские инструменты",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.thieves-tools",
+      "weight": 1,
+      "price": 80,
+      "rarity": "rare",
+      "kind": "tool",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000015",
+    "name": "Походная кузница",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.forge",
+      "weight": 5,
+      "price": 111,
+      "rarity": "rare",
+      "kind": "tool",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000016",
+    "name": "Письменные принадлежности",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.writing-kit",
+      "weight": 1,
+      "price": 25,
+      "rarity": "everywhere",
+      "kind": "tool",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderTools1",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000017",
+    "name": "Верёвка (20 метров)",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.rope",
+      "weight": 1.5,
+      "price": 20,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000018",
+    "name": "Походная постель",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.bedroll",
+      "weight": 1.5,
+      "price": 16,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000019",
+    "name": "Свечи (5)",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.candles",
+      "weight": 0.5,
+      "price": 5,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000020",
+    "name": "Мелок",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.chalk",
+      "weight": 0.1,
+      "price": 2,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000021",
+    "name": "Огниво",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.flint",
+      "weight": 0.1,
+      "price": 6,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000022",
+    "name": "Крюк-кошка",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.grapple",
+      "weight": 0.5,
+      "price": 13,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000023",
+    "name": "Ручное зеркальце",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.mirror",
+      "weight": 0.5,
+      "price": 27,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000024",
+    "name": "Дневник / гроссбух",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.ledger",
+      "weight": 0.5,
+      "price": 8,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000025",
+    "name": "Фонарь",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.lantern",
+      "weight": 1,
+      "price": 33,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000026",
+    "name": "Замок",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.lock",
+      "weight": 0.1,
+      "price": 34,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000027",
+    "name": "Надёжный замок",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.strong-lock",
+      "weight": 0.1,
+      "price": 68,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000028",
+    "name": "Наручники",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.handcuffs",
+      "weight": 0.5,
+      "price": 30,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000029",
+    "name": "Карта Континента",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.map",
+      "weight": 0.1,
+      "price": 18,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000030",
+    "name": "Трубка",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.pipe",
+      "weight": 0.1,
+      "price": 19,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000031",
+    "name": "Колышки (5)",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.stakes",
+      "weight": 0.5,
+      "price": 10,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000032",
+    "name": "Мыло",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.soap",
+      "weight": 0.1,
+      "price": 4,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000033",
+    "name": "Брезент",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.tarpaulin",
+      "weight": 1.5,
+      "price": 10,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000034",
+    "name": "Палатка",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.tent",
+      "weight": 4,
+      "price": 19,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000035",
+    "name": "Большая палатка",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.large-tent",
+      "weight": 8,
+      "price": 36,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000036",
+    "name": "Факел",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.torch",
+      "weight": 0.1,
+      "price": 1,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000037",
+    "name": "Бурдюк",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.waterskin",
+      "weight": 1,
+      "price": 8,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000038",
+    "name": "Сухой паёк (1 день)",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.rations",
+      "weight": 1,
+      "price": 5,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000039",
+    "name": "Алкагест",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.alcahest",
+      "weight": 1,
+      "price": 8,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000040",
+    "name": "Пиво",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.beer",
+      "weight": 1,
+      "price": 5,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000041",
+    "name": "Крепкий алкоголь",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.spirits",
+      "weight": 1,
+      "price": 10,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000042",
+    "name": "Вино",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.wine",
+      "weight": 1,
+      "price": 8,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000043",
+    "name": "Мешок",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.bag",
+      "weight": 0.1,
+      "price": 3,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000044",
+    "name": "Поясная сумка",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.belt-pouch",
+      "weight": 0.1,
+      "price": 7,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000045",
+    "name": "Бандольера",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.bandolier",
+      "weight": 1,
+      "price": 19,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000046",
+    "name": "Простая одежда",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.clothing",
+      "weight": 2,
+      "price": 10,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eqip000000000047",
+    "name": "Тёплая одежда",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.warm-clothing",
+      "weight": 3,
+      "price": 45,
+      "rarity": "",
+      "kind": "gear",
+      "properties": "",
+      "source": "Базовая книга, стр. 92–93",
+      "description": "<p>Базовая книга, стр. 92–93</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
     "sort": 0,
     "ownership": {
       "default": 2
