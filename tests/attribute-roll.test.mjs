@@ -6,7 +6,7 @@ import { rollAttribute } from "../scripts/combat/attribute-roll.mjs";
 test("every attribute rolls a critical-chain d10 plus its effective value, with actor and chat privacy", async () => {
   const system = { attributes: Object.fromEntries(ATTRIBUTE_KEYS.map(key => [key, 10])), health: { value: 9, max: 50 } };
   system.statistics = deriveStatistics(system);
-  const actor = { isOwner: true, system };
+  const actor = { isOwner: true, system, effects: [] };
   let mode, sent, evaluated = 0, formula;
   globalThis.game = {
     settings: { get: () => mode },

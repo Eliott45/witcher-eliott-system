@@ -73,7 +73,7 @@
     },
     "Effects": {
       "Stunned": "Stunned",
-      "StunnedDescription": "The character is disoriented, with a spinning head and blurred vision. They cannot take any actions; hitting them requires a DC 10 check. To end the effect, they must pass a Stun save, which takes a full turn. Being hit immediately brings them back to their senses.",
+      "StunnedDescription": "The character cannot move, act, or defend. Hitting them requires a DC 10 check. They may spend their entire turn on a Stun save; success removes ordinary stun. Being hit also immediately ends it. Stun caused by exhaustion has separate recovery rules.",
       "Inactive": "inactive",
       "Remove": "Remove effect",
       "Empty": "No effects applied.",
@@ -82,7 +82,11 @@
       "Dying": "Dying",
       "DyingDescription": "At HP ≤ 0, the character is dying. Divide all primary attributes except Luck by 3, rounding down. Maximum HP and Stamina and base STUN are unchanged. Entering this state immediately triggers a death save with penalty 0. Further damage and each new round increase the penalty by 1 and trigger another save. Success does not stabilize the character; failure means death.",
       "Dead": "Dead",
-      "DeadDescription": "The character died after failing a death save. No further saves are made. Healing HP does not automatically remove death; the GM may remove this state."
+      "DeadDescription": "The character died after failing a death save. No further saves are made. Healing HP does not automatically remove death; the GM may remove this state.",
+      "ExhaustedStun": "Stunned from exhaustion",
+      "ExhaustedStunDescription": "Caused by Stamina reaching 0 or below. The character cannot move, attack, cast, or defend; only Recovery is allowed. To remove this state themselves, first restore at least 20 STA, or maximum STA if lower than 20, then spend an entire turn on a successful Stun save. Taking damage does not remove this stun.",
+      "Unconscious": "Unconscious",
+      "UnconsciousDescription": "The character cannot move, act, or defend. Exhaustion also causes exhaustion stun; only Recovery is allowed. Consciousness returns as soon as STA is above 0, but the exhaustion stun remains until its recovery conditions are met."
     },
     "Statistics": {
       "Primary": "Primary statistics",
@@ -716,6 +720,18 @@
         "round": "Next round · penalty +1",
         "manual": "Save from the sheet · penalty +1"
       }
+    },
+    "Conditions": {
+      "Recover": "Recover",
+      "RecoverAmount": "Restore {value} STA, up to maximum.",
+      "StaminaProgress": "Before a Stun save: {current} / {required} STA. Restore {remaining} more.",
+      "StaminaReady": "{current} STA restored. A Stun save is now available.",
+      "StaminaRequired": "Restore {value} STA before making a Stun save after exhaustion.",
+      "CannotStunSave": "The character cannot make a Stun save themselves in this condition.",
+      "CannotRecover": "This condition prevents a Recovery action.",
+      "CannotMove": "The character cannot move in this condition.",
+      "CannotAct": "The character cannot act or defend in this condition.",
+      "RecoveryError": "Could not restore Stamina."
     }
   }
 }

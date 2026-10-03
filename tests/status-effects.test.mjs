@@ -16,12 +16,12 @@ const actorWithEffects = () => ({
   }
 });
 
-test("only Witcher Stunned, Dying and Dead remain in the status picker", () => {
+test("only Witcher conditions remain in the status picker", () => {
   globalThis.CONFIG = { statusEffects: { deaf: {}, sick: {} }, specialStatusEffects: { BLIND: "blind", DEFEATED: "dead" } };
   globalThis.game = { i18n: { localize: key => `translated:${key}` } };
   registerStatusEffects();
   localizeStatusEffects();
-  assert.deepEqual(Object.keys(CONFIG.statusEffects), ["stunned", "dying", "dead"]);
+  assert.deepEqual(Object.keys(CONFIG.statusEffects), ["stunned", "exhausted-stun", "unconscious", "dying", "dead"]);
   assert.ok(CONFIG.statusEffects.dying.description.includes("translated:"));
   assert.ok(CONFIG.statusEffects.dead.description.includes("translated:"));
   assert.ok(CONFIG.statusEffects.stunned.description.includes("translated:"));

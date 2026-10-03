@@ -169,11 +169,12 @@ assert.equal(CoreRoll.replaceFormulaData("1d10wc + @statistics.initiative", rest
 
 // Exercise real Foundry schema cleaning and the resource hook, including synthetic token actors.
 const { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources } = await import("../scripts/combat/resource-updates.mjs");
-const { hasStunned } = await import("../scripts/combat/status-effects.mjs");
+const { hasStunned, hasStatus, STUNNED, EXHAUSTED_STUN, UNCONSCIOUS } = await import("../scripts/combat/status-effects.mjs");
+const { conditionRules } = await import("../scripts/combat/condition-rules.mjs");
 const resourceActor = {
   uuid: "Scene.test.Token.test.Actor.test", type: "npc", isOwner: true, effects: [],
   system: new WitcherActorData({ attributes: { body: 10, will: 10 }, health: { value: 50, max: 0 }, stamina: { value: 50, max: 0 } }),
-  async toggleStatusEffect(id) { this.effects.push({ id: "test-stun", statuses: new Set([id]), disabled: false }); },
+  async toggleStatusEffect(id) { this.effects.push({ id: `test-${id}`, statuses: new Set([id]), disabled: false }); },
   async deleteEmbeddedDocuments(_type, ids) { this.effects = this.effects.filter(effect => !ids.includes(effect.id)); },
   updateSource(changes) { this.system.updateSource(foundry.utils.expandObject(changes).system); }
 };
@@ -200,15 +201,24 @@ assert.equal(resourceActor.system.toObject().stamina.value, 30);
 await updateResources({ system: { stamina: { value: -2 } } });
 assert.equal(resourceActor.system.stamina.value, 0);
 assert.equal(hasStunned(resourceActor), true);
+assert.equal(hasStatus(resourceActor, EXHAUSTED_STUN), true);
+assert.equal(hasStatus(resourceActor, UNCONSCIOUS), true);
+assert.equal(hasStatus(resourceActor, STUNNED), false);
+assert.ok(resourceActor.system.exhaustionEpisode);
+assert.equal(conditionRules(resourceActor).canStunSave, false);
 await updateResources({ system: { stamina: { value: 10 } } });
 assert.equal(hasStunned(resourceActor), true, "Restoring Stamina alone does not recover from stun");
+assert.equal(hasStatus(resourceActor, UNCONSCIOUS), false, "Any positive STA restores consciousness after exhaustion");
 await updateResources({ system: { attributes: { body: 4, will: 4 } } });
 assert.equal(resourceActor.system.health.value, 20);
 assert.equal(hasStunned(resourceActor), true, "Clamping after a maximum change is not an incoming hit");
 await updateResources({ system: { health: { value: 19 } } });
-assert.equal(hasStunned(resourceActor), false, "Taking damage ends stun");
+assert.equal(hasStunned(resourceActor), true, "Taking damage must not end exhaustion stun");
+await resourceActor.toggleStatusEffect(STUNNED);
+await updateResources({ system: { health: { value: 18 } } });
+assert.equal(hasStatus(resourceActor, STUNNED), false, "Taking damage still ends ordinary stun");
 await updateResources({ system: { stamina: { value: 0 } } }, "another-user");
-assert.equal(hasStunned(resourceActor), false, "Remote clients must not duplicate originating-client effect writes");
+assert.equal(hasStatus(resourceActor, UNCONSCIOUS), false, "Remote clients must not duplicate originating-client effect writes");
 await updateResources({ system: { stamina: { value: 10 } } });
 await updateResources({ system: { stamina: { value: 0 }, health: { value: 18 } } });
 assert.equal(hasStunned(resourceActor), true, "New exhaustion applies even when a hit occurs in the same update");
@@ -476,6 +486,21 @@ assert.ok(statisticsHTML.includes('id="test-actor-weight">0 / 30 кг</output>')
 assert.ok(statisticsHTML.includes('data-action="rollDeath"'));
 assert.match(statisticsHTML, /id="test-actor-death-penalty"[^>]*value="0"[^>]*disabled/);
 assert.equal([...statisticsHTML.matchAll(/data-action="toggleLuck"/g)].length, 100);
+sheet.isEditable = true;
+sheet.actor.effects = [{ id: "exhaustion", statuses: new Set(["exhausted-stun"]) }];
+restored.stamina.value = 19;
+const exhaustedHTML = template(await sheet._prepareContext({}));
+assert.match(exhaustedHTML, /data-action="rollStun"[^>]*disabled/);
+assert.ok(exhaustedHTML.includes("19 / 20 STA"));
+assert.equal([...exhaustedHTML.matchAll(/data-action="rollAttribute"[^>]*disabled/g)].length, 9);
+assert.match(exhaustedHTML, /data-action="rollDeath"[^>]*>/);
+assert.ok(!exhaustedHTML.match(/data-action="rollDeath"[^>]*disabled/), "Incapacitation does not block mandatory death saves");
+restored.stamina.value = 20;
+const recoveredHTML = template(await sheet._prepareContext({}));
+assert.ok(!recoveredHTML.match(/data-action="rollStun"[^>]*disabled/));
+assert.ok(recoveredHTML.includes("Можно пройти испытание УСТ"));
+sheet.actor.effects = [];
+sheet.isEditable = false;
 sheet.actor.system = originalData;
 sheet.tabGroups.character = "main";
 

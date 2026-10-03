@@ -63,6 +63,7 @@
 .witcher-stat-entry-value > span { flex: none; white-space: nowrap; }
 .witcher-stat-entry.overloaded input { border-color: #ef9a85; color: #ffbca4; }
 .witcher-wound-notice { margin: 5px 0 0; padding: 6px 8px; background: #ab3c3425; border-left: 2px solid #d57661; color: #ffd0b6; font-size: 11px; line-height: 1.4; }
+.witcher-exhaustion-notice { margin: 0; padding: 6px 8px; background: #15141e88; border-left: 2px solid #c0a571; color: #eddbbd; font-size: 11px; line-height: 1.5; }
 .witcher-death-state { margin: 10px 0; padding: 10px; background: #240e11; border: 1px solid #a65950; border-radius: 4px; color: #ffe5ce; }
 .witcher-death-state h3 { margin: 0 0 6px; border: 0; color: #ffc6b6; font-size: 15px; }
 .witcher-death-state p { margin: 5px 0 8px; font-size: 11px; line-height: 1.4; }

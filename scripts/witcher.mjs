@@ -21,6 +21,8 @@ import { renderDiceTray } from "./chat/dice-tray.mjs";
 import { registerStatusEffects, localizeStatusEffects, reportEffectError } from "./combat/status-effects.mjs";
 import { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources, applyInitialConditions } from "./combat/resource-updates.mjs";
 import { prepareDeathRound, applyDeathRound, syncExistingDeathStates } from "./combat/death-state.mjs";
+import { preventIncapacitatedMovement, preventIncapacitatedPositionUpdate } from "./combat/condition-rules.mjs";
+import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
 
 Hooks.once("init", () => {
   CONFIG.Token.objectClass = WitcherToken;
@@ -65,11 +67,14 @@ Hooks.on("preUpdateActor", prepareResourceUpdate);
 Hooks.on("updateActor", applyResourceUpdate);
 Hooks.on("preUpdateCombat", prepareDeathRound);
 Hooks.on("updateCombat", applyDeathRound);
+Hooks.on("preMoveToken", preventIncapacitatedMovement);
+Hooks.on("preUpdateToken", preventIncapacitatedPositionUpdate);
 Hooks.once("i18nInit", localizeStatusEffects);
 Hooks.on("renderTokenHUD", renderTokenVisionToggle);
 Hooks.on("renderChatInput", renderDiceTray);
 Hooks.once("ready", () => {
   syncExistingDeathStates().catch(reportEffectError);
+  syncExistingExhaustion().catch(reportEffectError);
   migrateVisionDefaults().catch(error => {
     console.error(`${SYSTEM_ID} | Could not update vision defaults`, error);
     ui.notifications.error(game.i18n.localize("WITCHER.Token.MigrationFailed"));

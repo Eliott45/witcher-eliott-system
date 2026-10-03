@@ -22,6 +22,7 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
       carriedWeight: new NumberField({ required: true, nullable: false, min: 0, initial: 0 }),
       luckSpent: new ArrayField(new NumberField({ required: true, nullable: false, integer: true, min: 1 })),
       luckPending: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
+      exhaustionEpisode: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
       death: new SchemaField({
         penalty: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
         episode: new StringField({ required: true, nullable: false, blank: true, initial: "" }),

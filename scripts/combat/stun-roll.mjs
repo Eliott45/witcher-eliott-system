@@ -1,11 +1,21 @@
 import { stunSucceeded } from "../data/statistics.mjs";
-import { hasStunned, setStunned, reportEffectError } from "./status-effects.mjs";
+import { hasStunned, setStunned, setStatus, EXHAUSTED_STUN, reportEffectError } from "./status-effects.mjs";
+import { conditionRules } from "./condition-rules.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { stunTooltip, escapeTooltip } from "../sheets/statistics-tooltips.mjs";
 
 export async function rollStun(actor) {
   if (!actor.isOwner) return;
+  const conditions = conditionRules(actor);
+  if (!conditions.canStunSave) {
+    ui.notifications.warn(conditions.exhausted && !conditions.ready
+      ? game.i18n.format("WITCHER.Conditions.StaminaRequired", { value: conditions.required })
+      : game.i18n.localize("WITCHER.Conditions.CannotStunSave"));
+    return;
+  }
+  const exhaustionEpisode = actor.system.exhaustionEpisode;
+  const exhaustedEffectIds = new Set(actor.effects.filter(effect => effect.statuses.has(EXHAUSTED_STUN)).map(effect => effect.id));
   const target = actor.system.statistics.stun;
   if (target === null) {
     ui.notifications.warn(game.i18n.localize("WITCHER.Statistics.UnfilledPhysical"));
@@ -28,7 +38,16 @@ export async function rollStun(actor) {
       })
     }, { messageMode });
     await display.wait(message);
-    if (message && stunSucceeded(roll.total, target) && hasStunned(actor)) await setStunned(actor, false).catch(reportEffectError);
+    if (message && stunSucceeded(roll.total, target) && hasStunned(actor)) {
+      const current = conditionRules(actor);
+      if (current.canStunSave && actor.system.exhaustionEpisode === exhaustionEpisode) {
+        await setStunned(actor, false).catch(reportEffectError);
+        if (conditions.exhausted && current.exhausted && actor.effects.some(effect => exhaustedEffectIds.has(effect.id)
+          && effect.statuses.has(EXHAUSTED_STUN) && !effect.disabled && !effect.isSuppressed)) {
+          await setStatus(actor, EXHAUSTED_STUN, false).catch(reportEffectError);
+        }
+      }
+    }
     return message;
   } finally { display.close(); }
 }

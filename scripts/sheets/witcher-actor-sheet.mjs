@@ -9,7 +9,9 @@ import { statisticsContext } from "./statistics-context.mjs";
 import { rollStun } from "../combat/stun-roll.mjs";
 import { rollAttribute } from "../combat/attribute-roll.mjs";
 import { selectLuckPoints } from "../data/luck.mjs";
-import { STATUS_DEFINITIONS, DYING, DEAD } from "../combat/status-effects.mjs";
+import { STATUS_DEFINITIONS, DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS } from "../combat/status-effects.mjs";
+import { conditionRules } from "../combat/condition-rules.mjs";
+import { recoverStamina } from "../combat/exhaustion.mjs";
 import { rollDeath } from "../combat/death-state.mjs";
 import { SHEET_TABS, sheetPreferences, visibleSheetTabs, updateSheetPreferences, chooseVisibleTabs, reportPreferencesError } from "./sheet-preferences.mjs";
 
@@ -29,6 +31,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       chooseReference: WitcherActorSheet.#onChooseReference,
       configureTabs: WitcherActorSheet.#onConfigureTabs,
       rollStun: WitcherActorSheet.#onRollStun,
+      recoverStamina: WitcherActorSheet.#onRecoverStamina,
       rollDeath: WitcherActorSheet.#onRollDeath,
       rollAttribute: WitcherActorSheet.#onRollAttribute,
       toggleLuck: WitcherActorSheet.#onLuck,
@@ -58,27 +61,37 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     const visible = visibleSheetTabs(preferences.hiddenTabs);
     if (!visible.some(tab => tab.id === this.tabGroups.character)) this.tabGroups.character = visible[0].id;
     const context = await super._prepareContext(options);
+    const conditions = conditionRules(this.actor);
+    const stats = statisticsContext(this.actor.system, {
+      localize: key => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data)
+    });
+    for (const attribute of [...stats.attributes, stats.luck]) attribute.rollUnavailable = attribute.unset || !conditions.canAct;
+    conditions.stunUnavailable = stats.stunUnavailable || !conditions.canStunSave;
+    conditions.recoveryUnavailable = !conditions.canRecover || this.actor.system.statistics.recovery === null
+      || this.actor.system.statistics.recovery <= 0 || this.actor.system.stamina.value >= this.actor.system.stamina.max;
+    conditions.recoveryHint = game.i18n.format("WITCHER.Conditions.RecoverAmount", { value: this.actor.system.statistics.recovery ?? "—" });
+    conditions.staminaHint = game.i18n.format(conditions.ready ? "WITCHER.Conditions.StaminaReady" : "WITCHER.Conditions.StaminaProgress",
+      { current: this.actor.system.stamina.value, required: conditions.required, remaining: conditions.remaining });
     const section = (id, path, label, rows = 3) => ({
       id, path, label: `WITCHER.Sheet.${label}`, rows,
       value: foundry.utils.getProperty(this.actor.system, path), open: !preferences.collapsed?.[id]
     });
     return Object.assign(context, {
+      conditions,
       editingAttributes: this.isEditable && this.#editingAttributes,
       effects: await Promise.all(this.actor.effects.map(async effect => {
         const definition = Object.values(STATUS_DEFINITIONS).find(status => effect.statuses.has(status.id));
         return {
           id: effect.id, name: definition ? game.i18n.localize(definition.name) : effect.name,
           img: definition ? definition.img : effect.img, inactive: effect.disabled || effect.isSuppressed,
-          canRemove: this.isEditable && (game.user.isGM || ![DYING, DEAD].some(status => effect.statuses.has(status))),
+          canRemove: this.isEditable && (game.user.isGM || ![DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS].some(status => effect.statuses.has(status))),
           description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
             definition ? game.i18n.localize(`${definition.name}Description`) : effect.description,
             { secrets: this.actor.isOwner, relativeTo: effect }
           )
         };
       })),
-      stats: statisticsContext(this.actor.system, {
-        localize: key => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data)
-      }),
+      stats,
       visibleTabs: visible.map(tab => context.tabs[tab.id]),
       actor: this.actor,
       system: this.actor.system,
@@ -139,11 +152,21 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static async #onRollStun(_event, target) {
     if (!this.isEditable || target.disabled) return;
     target.disabled = true;
-    try { await rollStun(this.actor); }
+    try { await this.submit(); await rollStun(this.actor); }
     catch (error) {
       console.error(`${SYSTEM_ID} | Stun roll failed`, error);
       ui.notifications.error(game.i18n.localize("WITCHER.Statistics.RollError"));
-    } finally { target.disabled = !this.isEditable || this.actor.system.statistics.stun === null; }
+    } finally { target.disabled = !this.isEditable || this.actor.system.statistics.stun === null || !conditionRules(this.actor).canStunSave; }
+  }
+
+  static async #onRecoverStamina(_event, target) {
+    if (!this.isEditable || target.disabled) return;
+    target.disabled = true;
+    try { await this.submit(); await recoverStamina(this.actor); }
+    catch (error) {
+      console.error(`${SYSTEM_ID} | Recovery failed`, error);
+      ui.notifications.error(game.i18n.localize("WITCHER.Conditions.RecoveryError"));
+    } finally { target.disabled = !this.isEditable || !conditionRules(this.actor).canRecover; }
   }
 
   static async #onRollAttribute(_event, target) {
@@ -203,7 +226,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     target.disabled = true;
     try {
       const effect = this.actor.effects.get(target.dataset.effectId);
-      if (effect && (game.user.isGM || ![DYING, DEAD].some(status => effect.statuses.has(status)))) await effect.delete();
+      if (effect && (game.user.isGM || ![DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS].some(status => effect.statuses.has(status)))) await effect.delete();
     } catch (error) {
       console.error(`${SYSTEM_ID} | Effect action failed`, error);
       ui.notifications.error(game.i18n.localize("WITCHER.Effects.UpdateError"));

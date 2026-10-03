@@ -71,13 +71,23 @@
       <span data-tooltip="{{stats.recovery.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize stats.recovery.label}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
       <strong>{{stats.recovery.value}}</strong>
     </div>
+    <button type="button" class="witcher-stun-roll" data-action="recoverStamina" title="{{conditions.recoveryHint}}"
+            {{#if conditions.recoveryUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}>
+      <i class="fa-solid fa-bed" aria-hidden="true"></i> {{localize "WITCHER.Conditions.Recover"}}
+    </button>
+    {{#if conditions.exhausted}}
+    <p class="witcher-exhaustion-notice" role="status">{{conditions.staminaHint}}</p>
+    {{/if}}
+    {{#if conditions.unconscious}}
+    <p class="witcher-exhaustion-notice">{{localize "WITCHER.Effects.Unconscious"}}</p>
+    {{/if}}
   </section>
     <section class="witcher-derived" aria-label="{{localize 'WITCHER.Statistics.Physical'}}">
       <div class="witcher-stat-row">
         <span data-tooltip="{{stats.stunTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Statistics.Stun"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span><strong>{{stats.stunValue}}</strong>
       </div>
       <button type="button" class="witcher-stun-roll" data-action="rollStun"
-              {{#if stats.stunUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}>
+              {{#if conditions.stunUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}>
         <i class="fa-solid fa-dice-d10" aria-hidden="true"></i> {{localize "WITCHER.Statistics.RollStun"}}
       </button>
     </section>
@@ -114,7 +124,7 @@
           <output {{#unless editingAttributes}}id="{{rootId}}-luck"{{/unless}} class="witcher-luck-remaining" data-tooltip="{{stats.luck.valueTooltip}}" tabindex="0">{{stats.luck.available}} / {{stats.luck.maximum}}</output>
           {{#if stats.luck.pending}}<span class="witcher-luck-selected">+{{stats.luck.pending}} {{localize "WITCHER.Luck.NextRoll"}}</span>{{/if}}
           <button type="button" class="witcher-attribute-roll" data-action="rollAttribute" data-attribute="luck"
-                  title="{{stats.luck.rollHint}}" aria-label="{{stats.luck.rollHint}}" {{#if stats.luck.unset}}disabled{{else}}{{disabled (not editable)}}{{/if}}>
+                  title="{{stats.luck.rollHint}}" aria-label="{{stats.luck.rollHint}}" {{#if stats.luck.rollUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}>
             <i class="fa-solid fa-dice-d10" aria-hidden="true"></i>
           </button>
           <button type="button" class="witcher-reset-luck" data-action="resetLuck" title="{{localize 'WITCHER.Luck.Reset'}}"
@@ -250,7 +260,7 @@
           <output id="{{../rootId}}-attribute-{{attribute.key}}" data-tooltip="{{attribute.valueTooltip}}" tabindex="0">{{attribute.effective}}</output>
           {{/if}}
           <button type="button" class="witcher-attribute-roll" data-action="rollAttribute" data-attribute="{{attribute.key}}"
-                  title="{{attribute.rollHint}}" aria-label="{{attribute.rollHint}}" {{#if attribute.unset}}disabled{{else}}{{disabled (not ../editable)}}{{/if}}>
+                  title="{{attribute.rollHint}}" aria-label="{{attribute.rollHint}}" {{#if attribute.rollUnavailable}}disabled{{else}}{{disabled (not ../editable)}}{{/if}}>
             <i class="fa-solid fa-dice-d10" aria-hidden="true"></i>
           </button>
           </div>

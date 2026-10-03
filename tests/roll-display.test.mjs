@@ -16,15 +16,16 @@ function hookHost() {
 const tick = () => new Promise(resolve => setImmediate(resolve));
 
 test("Stun recovery waits for both visible chat and DSN completion, including immediate-chat mode", async () => {
-  for (const dice of [false, true]) for (const chatFirst of [false, true]) {
+  for (const status of ["stunned", "exhausted-stun"]) for (const dice of [false, true]) for (const chatFirst of [false, true]) {
     globalThis.Hooks = hookHost();
     globalThis.requestAnimationFrame = fn => setImmediate(fn);
     globalThis.ui = { chat: { rendered: true } };
     globalThis.game = { settings: { get: () => "public" }, dice3d: dice ? {} : null,
       i18n: { localize: key => key, format: (_key, data) => JSON.stringify(data) } };
     const actor = { uuid: "Actor.stun", isOwner: true,
-      effects: [{ id: "stun", statuses: new Set(["stunned"]) }],
-      system: { statistics: { stun: 10, adjusted: { body: 8, will: 10 }, recovery: 9 }, luckPending: 4 },
+      effects: [{ id: "stun", statuses: new Set([status]) }],
+      system: { statistics: { stun: 10, adjusted: { body: 8, will: 10 }, recovery: 9 }, luckPending: 4,
+        stamina: { value: 20, max: 50 }, exhaustionEpisode: "episode" },
       async deleteEmbeddedDocuments(_type, ids) { this.effects = this.effects.filter(effect => !ids.includes(effect.id)); }
     };
     let message;
