@@ -1,0 +1,41 @@
+<div class="witcher-picker-content">
+  <div class="witcher-picker-top">
+    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+    <input type="search" class="witcher-picker-search" placeholder="{{localize 'WITCHER.Picker.Search'}}"
+           aria-label="{{localize 'WITCHER.Picker.Search'}}" autocomplete="off">
+  </div>
+  {{#if excluded}}<p class="witcher-origin-excluded" role="note">{{localize "WITCHER.Sheet.OriginExcluded"}}</p>{{/if}}
+  <div class="witcher-picker-columns">
+    <aside class="witcher-picker-filters" aria-label="{{localize 'WITCHER.Picker.Filters'}}">
+      <h3>{{localize "WITCHER.Picker.Filters"}}</h3>
+      <button type="button" data-filter="" aria-pressed="true">{{localize "WITCHER.Picker.All"}}</button>
+      {{#each groups as |group|}}
+      <button type="button" data-filter="{{group.id}}" aria-pressed="false">{{localize group.label}}</button>
+      {{/each}}
+      <p>{{localize "WITCHER.Picker.ReferenceOnly"}}</p>
+    </aside>
+    <section class="witcher-picker-results">
+      <p class="witcher-picker-count" aria-live="polite"></p>
+      <div class="witcher-picker-list">
+        {{#each entries as |entry|}}
+        <article class="witcher-picker-entry" data-entry-id="{{entry.id}}">
+          <label class="witcher-picker-option">
+            <input type="radio" name="reference-choice" value="{{entry.id}}" {{#if entry.selected}}checked{{/if}}>
+            <span>
+              <strong>{{entry.label}}</strong><small>{{entry.groupLabel}}</small>
+              <span class="witcher-picker-summary {{#if ../excluded}}excluded{{/if}}">{{entry.summary}}</span>
+            </span>
+          </label>
+          {{#if entry.details}}
+          <details class="witcher-picker-details">
+            <summary>{{localize "WITCHER.Picker.ReadMore"}}</summary>
+            {{#each entry.details as |detail|}}<p><strong>{{detail.name}}.</strong> {{detail.description}}</p>{{/each}}
+          </details>
+          {{/if}}
+        </article>
+        {{/each}}
+        <p class="witcher-picker-empty" hidden>{{localize "WITCHER.Picker.Empty"}}</p>
+      </div>
+    </section>
+  </div>
+</div>

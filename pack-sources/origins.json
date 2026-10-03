@@ -1,0 +1,416 @@
+[
+  {
+    "_id": "orig000000000001",
+    "name": "Редания",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "redania",
+      "region": "north",
+      "description": "<p>Королевства Севера</p><p>+1 к навыку «Образование».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000002",
+    "name": "Каэдвен",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "kaedwen",
+      "region": "north",
+      "description": "<p>Королевства Севера</p><p>+1 к навыку «Стойкость».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000003",
+    "name": "Темерия",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "temeria",
+      "region": "north",
+      "description": "<p>Королевства Севера</p><p>+1 к навыку «Харизма».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000004",
+    "name": "Аэдирн",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "aedirn",
+      "region": "north",
+      "description": "<p>Королевства Севера</p><p>+1 к навыку «Изготовление».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000005",
+    "name": "Лирия и Ривия",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "lyria-rivia",
+      "region": "north",
+      "description": "<p>Королевства Севера</p><p>+1 к навыку «Сопротивление убеждению».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000006",
+    "name": "Ковир и Повисс",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "kovir-poviss",
+      "region": "north",
+      "description": "<p>Королевства Севера</p><p>+1 к навыку «Торговля».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000007",
+    "name": "Скеллиге",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "skellige",
+      "region": "north",
+      "description": "<p>Королевства Севера</p><p>+1 к навыку «Храбрость».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000008",
+    "name": "Цидарис",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "cidaris",
+      "region": "north",
+      "description": "<p>Королевства Севера</p><p>+1 к навыку «Мореходство».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000009",
+    "name": "Вердэн",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "verden",
+      "region": "north",
+      "description": "<p>Королевства Севера</p><p>+1 к навыку «Выживание в дикой природе».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000010",
+    "name": "Цинтра",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "cintra",
+      "region": "north",
+      "description": "<p>Королевства Севера</p><p>+1 к навыку «Понимание людей».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000011",
+    "name": "Сердце Нильфгаарда",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "nilfgaard-heartland",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Обман».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000012",
+    "name": "Виковаро",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "vicovaro",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Образование».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000013",
+    "name": "Ангрен",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "angren",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Выживание в дикой природе».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000014",
+    "name": "Назаир",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "nazair",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Борьба».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000015",
+    "name": "Метинна",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "metinna",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Верховая езда».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000016",
+    "name": "Маг Турга",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "mag-turga",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Стойкость».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000017",
+    "name": "Гесо",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "geso",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Скрытность».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000018",
+    "name": "Эббинг",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "ebbing",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Дедукция».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000019",
+    "name": "Мехт",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "maecht",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Харизма».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000020",
+    "name": "Геммера",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "gemmera",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Запугивание».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000021",
+    "name": "Этолия",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "etolia",
+      "region": "nilfgaard",
+      "description": "<p>Нильфгаард</p><p>+1 к навыку «Храбрость».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000022",
+    "name": "Доль Блатанна (эльфы)",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "dol-blathanna",
+      "region": "elder",
+      "description": "<p>Земли Старших Народов</p><p>+1 к навыку «Этикет».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "orig000000000023",
+    "name": "Махакам (краснолюды)",
+    "type": "origin",
+    "img": "icons/svg/village.svg",
+    "system": {
+      "ruleId": "mahakam",
+      "region": "elder",
+      "description": "<p>Земли Старших Народов</p><p>+1 к навыку «Изготовление».</p><p>Ведьмаки не получают бонус региона происхождения.</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  }
+]

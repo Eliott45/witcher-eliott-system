@@ -4,6 +4,7 @@ import { WitcherActorData } from "./data/witcher-actor-data.mjs";
 import { WitcherActorSheet } from "./sheets/witcher-actor-sheet.mjs";
 import { WitcherReferenceData } from "./data/witcher-reference-data.mjs";
 import { WitcherRaceData } from "./data/witcher-race-data.mjs";
+import { WitcherOriginData } from "./data/witcher-origin-data.mjs";
 import { WitcherItemSheet } from "./sheets/witcher-item-sheet.mjs";
 import { WitcherToken } from "./canvas/witcher-token.mjs";
 import { renderTokenVisionToggle } from "./combat/token-hud.mjs";
@@ -21,6 +22,7 @@ Hooks.once("init", () => {
   }
   CONFIG.Item.dataModels.race = WitcherRaceData;
   CONFIG.Item.dataModels.ability = WitcherReferenceData;
+  CONFIG.Item.dataModels.origin = WitcherOriginData;
 
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
     foundry.documents.Actor,

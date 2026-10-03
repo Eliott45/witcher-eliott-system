@@ -1,4 +1,5 @@
 import { RACE_CHOICES } from "./races.mjs";
+import { ORIGIN_CHOICES, getOriginBonus } from "./origins.mjs";
 
 /** Identity and manually entered resources. Racial abilities do not apply effects yet. */
 export class WitcherActorData extends foundry.abstract.TypeDataModel {
@@ -13,11 +14,16 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
       details: new SchemaField({
         age: new NumberField({ required: true, nullable: true, integer: true, min: 0, initial: null }),
         gender: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
-        race: new StringField({ required: true, nullable: false, blank: true, choices: RACE_CHOICES, initial: "" })
+        race: new StringField({ required: true, nullable: false, blank: true, choices: RACE_CHOICES, initial: "" }),
+        origin: new StringField({ required: true, nullable: false, blank: true, choices: ORIGIN_CHOICES, initial: "" })
       }),
       health: resource(),
       stamina: resource(),
       notes: new StringField({ required: true, nullable: false, initial: "" })
     };
+  }
+
+  get originBonusEligible() {
+    return getOriginBonus(this.details.race, this.details.origin) !== null;
   }
 }

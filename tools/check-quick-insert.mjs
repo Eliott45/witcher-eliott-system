@@ -21,6 +21,6 @@ vm.createContext(sandbox);
 vm.runInContext(functionSource, sandbox);
 assert.throws(() => vm.runInContext('getSubTypes("Item")', sandbox), /Cannot convert undefined or null to object/);
 sandbox.game.system.documentTypes = manifest.documentTypes;
-assert.deepEqual(Array.from(vm.runInContext('getSubTypes("Item")', sandbox)), ["Item:race", "Item:ability"]);
+assert.deepEqual(Array.from(vm.runInContext('getSubTypes("Item")', sandbox)), ["Item:race", "Item:ability", "Item:origin"]);
 assert.deepEqual(Array.from(vm.runInContext('getSubTypes("Actor")', sandbox)), ["Actor:character", "Actor:npc"]);
 console.log(`Quick Insert ${module.version}: reproduced missing-Item failure; updated system subtype initialization passes`);

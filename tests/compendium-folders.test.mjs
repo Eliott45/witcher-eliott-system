@@ -9,7 +9,7 @@ test("existing packs move into one Witcher folder once, without changing unrelat
   const writes = [];
   globalThis.game = {
     user: gm, users: { activeGM: gm }, folders,
-    packs: new Map(["races", "abilities"].map(name => [`witcher-eliott-system.${name}`, {
+    packs: new Map(["races", "abilities", "origins"].map(name => [`witcher-eliott-system.${name}`, {
       setFolder: async folder => writes.push([name, folder.id])
     }])),
     settings: { get: () => version, set: async (_system, _key, value) => { version = value; } }
@@ -24,10 +24,14 @@ test("existing packs move into one Witcher folder once, without changing unrelat
   assert.equal(folders.length, 0, "Players and secondary GMs must not change world folders");
   game.user = gm;
   await migrateCompendiumFolders();
-  assert.deepEqual(writes, [["races", "witcher-folder"], ["abilities", "witcher-folder"]]);
+  assert.deepEqual(writes, [["races", "witcher-folder"], ["abilities", "witcher-folder"], ["origins", "witcher-folder"]]);
   assert.equal(folders.length, 1);
   await migrateCompendiumFolders();
-  assert.equal(writes.length, 2, "Later manual organization must not be overwritten");
+  assert.equal(writes.length, 3, "Later manual organization must not be overwritten");
+  version = 1;
+  await migrateCompendiumFolders();
+  assert.equal(writes.length, 4, "Only the new origin pack is moved in worlds with an existing folder setup");
+  assert.deepEqual(writes.at(-1), ["origins", "witcher-folder"]);
   version = 0;
   await migrateCompendiumFolders();
   assert.equal(folders.length, 1, "Reuse the folder created by the manifest or previous attempts");

@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { getOrigin } from "./origins.mjs";
 
 // Never renumber these IDs: actor links and compendium references must survive updates.
 export const RACE_DOCUMENT_IDS = {
@@ -32,4 +33,9 @@ export function raceUuid(id) {
 export function abilityUuid(id) {
   const documentId = ABILITY_DOCUMENT_IDS[id];
   return documentId ? `Compendium.${SYSTEM_ID}.abilities.Item.${documentId}` : null;
+}
+
+export function originUuid(id) {
+  const documentId = getOrigin(id)?.documentId;
+  return documentId ? `Compendium.${SYSTEM_ID}.origins.Item.${documentId}` : null;
 }

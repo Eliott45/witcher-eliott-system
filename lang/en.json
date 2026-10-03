@@ -6,7 +6,8 @@
     },
     "Item": {
       "ability": "Ability",
-      "race": "Race"
+      "race": "Race",
+      "origin": "Origin"
     }
   },
   "WITCHER": {
@@ -22,7 +23,7 @@
       "Age": "Age, years",
       "Gender": "Gender",
       "Race": "Race",
-      "RaceUnset": "Choose a race…",
+      "RaceUnset": "Choose race",
       "RacialAbilities": "Racial abilities",
       "Resources": "Combat resources",
       "Health": "Health",
@@ -32,20 +33,29 @@
       "ReferenceTitle": "Witcher Reference",
       "ViewRace": "View racial bonuses",
       "ViewPortrait": "Open portrait",
-      "RaceUnavailable": "Could not open the race. Restart the Foundry world after adding the compendiums."
+      "RaceUnavailable": "Could not open the race. Restart the Foundry world after adding the compendiums.",
+      "Origin": "Region of origin",
+      "OriginUnset": "Choose origin",
+      "ViewOrigin": "Read about origin",
+      "ChooseRace": "Choose a race",
+      "ChooseOrigin": "Choose a region of origin",
+      "Identity": "Character",
+      "OriginExcluded": "Witchers do not receive an origin bonus.",
+      "ReferenceUnavailable": "Could not open the entry. Restart the world after adding the compendium."
     },
     "Compendiums": {
       "FolderError": "Could not move the compendiums into the Witcher folder. Reload the world as GM."
     },
     "Dice": {
       "Title": "Dice",
-      "AddHint": "Add {die} · right-click to remove one",
+      "AddHint": "Add {die} · right-click or Shift+click to remove",
       "Count": "Number of {die}",
       "Empty": "Choose dice",
-      "Clear": "Clear",
+      "Clear": "Clear selection",
       "Roll": "Roll",
-      "Rolling": "Rolling…",
-      "Error": "Could not post the roll. Your selected dice are saved — you can try again."
+      "Rolling": "…",
+      "Error": "Could not post the roll. Your selected dice are saved — you can try again.",
+      "Quantity": "Dice quantities"
     },
     "Races": {
       "Human": {
@@ -112,6 +122,121 @@
           "Name": "Lightning Reflexes",
           "Description": "+1 to Reflex and Dexterity (these values may exceed 10)."
         }
+      }
+    },
+    "Picker": {
+      "Search": "Search names and bonuses",
+      "All": "All",
+      "Peoples": "Peoples",
+      "Mutants": "Mutants",
+      "Filters": "Filters",
+      "Select": "Choose",
+      "Cancel": "Cancel",
+      "Clear": "Clear selection",
+      "Empty": "No matching entries",
+      "Found": "Found: {count}",
+      "Selected": "Selected",
+      "ReadMore": "Description",
+      "ReferenceOnly": "Bonuses are reference text and must be applied manually for now."
+    },
+    "Origins": {
+      "Groups": {
+        "North": "Northern Kingdoms",
+        "Nilfgaard": "Nilfgaard",
+        "Elder": "Elder Lands"
+      },
+      "WitcherRule": "Witchers do not receive a region of origin bonus.",
+      "Redania": {
+        "Name": "Redania",
+        "Bonus": "+1 to Education."
+      },
+      "Kaedwen": {
+        "Name": "Kaedwen",
+        "Bonus": "+1 to Endurance."
+      },
+      "Temeria": {
+        "Name": "Temeria",
+        "Bonus": "+1 to Charisma."
+      },
+      "Aedirn": {
+        "Name": "Aedirn",
+        "Bonus": "+1 to Crafting."
+      },
+      "LyriaRivia": {
+        "Name": "Lyria and Rivia",
+        "Bonus": "+1 to Resist Coercion."
+      },
+      "KovirPoviss": {
+        "Name": "Kovir and Poviss",
+        "Bonus": "+1 to Business."
+      },
+      "Skellige": {
+        "Name": "Skellige",
+        "Bonus": "+1 to Courage."
+      },
+      "Cidaris": {
+        "Name": "Cidaris",
+        "Bonus": "+1 to Sailing."
+      },
+      "Verden": {
+        "Name": "Verden",
+        "Bonus": "+1 to Wilderness Survival."
+      },
+      "Cintra": {
+        "Name": "Cintra",
+        "Bonus": "+1 to Human Perception."
+      },
+      "NilfgaardHeartland": {
+        "Name": "Nilfgaardian Heartland",
+        "Bonus": "+1 to Deceit."
+      },
+      "Vicovaro": {
+        "Name": "Vicovaro",
+        "Bonus": "+1 to Education."
+      },
+      "Angren": {
+        "Name": "Angren",
+        "Bonus": "+1 to Wilderness Survival."
+      },
+      "Nazair": {
+        "Name": "Nazair",
+        "Bonus": "+1 to Brawling."
+      },
+      "Metinna": {
+        "Name": "Metinna",
+        "Bonus": "+1 to Riding."
+      },
+      "MagTurga": {
+        "Name": "Mag Turga",
+        "Bonus": "+1 to Endurance."
+      },
+      "Geso": {
+        "Name": "Geso",
+        "Bonus": "+1 to Stealth."
+      },
+      "Ebbing": {
+        "Name": "Ebbing",
+        "Bonus": "+1 to Deduction."
+      },
+      "Maecht": {
+        "Name": "Maecht",
+        "Bonus": "+1 to Charisma."
+      },
+      "Gemmera": {
+        "Name": "Gemmera",
+        "Bonus": "+1 to Intimidation."
+      },
+      "Etolia": {
+        "Name": "Etolia",
+        "Bonus": "+1 to Courage."
+      },
+      "DolBlathanna": {
+        "Name": "Dol Blathanna (elves)",
+        "Bonus": "+1 to Etiquette."
+      },
+      "Mahakam": {
+        "Name": "Mahakam (dwarves)",
+        "Bonus": "+1 to Crafting."
       }
     }
   }

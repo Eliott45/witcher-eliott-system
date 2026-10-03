@@ -22,7 +22,8 @@
     },
     "Item": {
       "race": { "htmlFields": ["description"] },
-      "ability": { "htmlFields": ["description"] }
+      "ability": { "htmlFields": ["description"] },
+      "origin": { "htmlFields": ["description"] }
     }
   },
   "packs": [
@@ -41,10 +42,18 @@
       "type": "Item",
       "system": "witcher-eliott-system",
       "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "origins",
+      "label": "Регионы происхождения",
+      "path": "packs/origins",
+      "type": "Item",
+      "system": "witcher-eliott-system",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
     }
   ],
   "packFolders": [
-    { "name": "Witcher", "sorting": "a", "color": "#947641", "packs": ["races", "abilities"] }
+    { "name": "Witcher", "sorting": "a", "color": "#947641", "packs": ["races", "abilities", "origins"] }
   ],
   "grid": {
     "type": 1,

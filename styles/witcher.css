@@ -3,125 +3,130 @@
   --witcher-muted: #b6ad9f;
   --witcher-line: #47433b;
   --witcher-gold: #d4b477;
-  --color-text-primary: var(--witcher-ink);
-  --color-text-secondary: var(--witcher-muted);
   color: var(--witcher-ink);
-  min-width: 420px;
-  min-height: 340px;
 }
+.witcher-eliott.actor-sheet { min-width: 640px; min-height: 430px; }
+.witcher-eliott.reference-sheet { min-width: 420px; min-height: 340px; }
+.witcher-eliott .window-content { padding: 0; background: #1d211f; container: witcher-sheet / inline-size; }
+.witcher-eliott .witcher-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.witcher-eliott button:focus-visible, .witcher-eliott input:focus-visible { outline: 2px solid #bc974f; outline-offset: 2px; }
 
-.witcher-eliott .window-content {
-  background: #1d211f;
-  padding: 0;
-  container: witcher-sheet / inline-size;
-}
+/* Character sheet: permanent resource column and a portrait-led identity page. */
+.witcher-character-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); height: 100%; min-height: 0; overflow-y: auto; background: #eee9df; }
+.witcher-character-sidebar { background: linear-gradient(155deg, #482021, #241718); border-right: 2px solid #b39a67; padding: 22px 16px; }
+.witcher-brand { font-family: Georgia, serif; font-size: 20px; letter-spacing: 0.08em; color: #e0cc9e; padding-bottom: 22px; text-align: center; }
+.witcher-character-sidebar .witcher-resources { display: flex; flex-direction: column; gap: 25px; }
+.witcher-character-sidebar .witcher-resource { border: 0; margin: 0; padding: 12px 0 0; min-width: 0; border-top: 1px solid #b39a6770; }
+.witcher-character-sidebar legend { color: #e0cc9e; padding: 0 4px 0 0; font-family: Georgia, serif; font-size: 19px; }
+.witcher-character-sidebar .witcher-resource-values { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 5px; align-items: end; }
+.witcher-character-sidebar label { font-size: 10px; text-transform: uppercase; color: #cebc9a; text-align: center; }
+.witcher-character-sidebar input { width: 100%; height: 46px; padding: 2px; margin-top: 6px; background: #100e0e35; border: 1px solid #b39a6740; border-radius: 2px; color: #fff3d9; font-family: Georgia, serif; font-size: 27px; text-align: center; }
+.witcher-character-sidebar .witcher-resource-values > span { line-height: 46px; color: #a78d65; }
+.witcher-character-main { min-width: 0; color: #2f2a26; }
+.witcher-character-name { background: linear-gradient(100deg, #482021, #66292a); min-height: 86px; padding: 17px 22px 13px; }
+.witcher-character-name input { width: 100%; height: 36px; color: #f8eddb; background: transparent; border: 0; border-radius: 0; padding: 0; font-family: Georgia, serif; font-size: 27px; font-weight: 700; }
+.witcher-character-name > span { display: block; margin-top: 5px; color: #d9bf8a; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+.witcher-character-tab { background: #303e43; border-bottom: 2px solid #b39a67; color: #f2eadc; padding: 7px 22px; font-family: Georgia, serif; font-size: 15px; }
+.witcher-character-content { padding: 24px; }
+.witcher-character-hero { display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 22px; align-items: start; }
+.witcher-portrait-frame { position: relative; }
+.witcher-eliott .witcher-portrait-button { display: block; width: 100%; height: auto; padding: 0; background: #d9d2c5; border: 1px solid #a38a53; border-radius: 1px; box-shadow: 0 2px 8px #30211722; }
+.witcher-eliott .witcher-portrait { display: block; width: 100%; height: 182px; object-fit: cover; border: 3px solid #f7f1e5; border-radius: 0; }
+.witcher-eliott .witcher-edit-portrait { position: absolute; right: 7px; bottom: 7px; width: 27px; height: 27px; padding: 0; color: #f1dfb8; background: #352625; border: 1px solid #a38a53; border-radius: 3px; }
+.witcher-character-references { display: flex; flex-direction: column; gap: 21px; min-width: 0; padding-top: 2px; }
+.witcher-field-label, .witcher-demographics > label { display: block; color: #6b3030; font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.03em; }
+.witcher-reference-value { display: flex; align-items: stretch; margin-top: 6px; background: #302a2510; border-bottom: 1px solid #b8aa94; }
+.witcher-eliott .witcher-select-reference { display: flex; flex: 1; min-width: 0; height: auto; min-height: 38px; padding: 8px 10px; gap: 10px; justify-content: space-between; align-items: center; border: 0; border-radius: 0; background: transparent; color: #302b26; text-align: left; font-family: Georgia, serif; font-size: 18px; line-height: 1.2; box-shadow: none; }
+.witcher-select-reference span { overflow-wrap: anywhere; }
+.witcher-select-reference i { font-size: 13px; color: #826e52; flex: none; }
+.witcher-eliott .witcher-select-reference:hover:not(:disabled) { background: #b99a4d22; }
+.witcher-eliott .witcher-select-reference:disabled { opacity: 1; }
+.witcher-eliott .witcher-reference-inspect { flex: 0 0 31px; height: auto; padding: 0; border: 0; border-radius: 0; color: #78603b; background: transparent; box-shadow: none; }
+.witcher-eliott .witcher-reference-inspect:hover { background: #b99a4d22; }
+.witcher-origin-excluded { font-size: 12px; line-height: 1.4; color: #81483c; margin: 8px 0 0; }
+.witcher-demographics { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid #b8aa94; padding-top: 20px; margin-top: 25px; }
+.witcher-demographics input { margin-top: 6px; width: 100%; height: 34px; padding: 4px 8px; border: 0; border-bottom: 1px solid #b8aa94; border-radius: 0; background: #302a2510; color: #302b26; font-family: Georgia, serif; font-size: 19px; }
 
-.witcher-eliott .witcher-sheet-body {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 24px;
-  overflow-y: auto;
-}
-
-.witcher-eliott .witcher-sheet-header {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--witcher-line);
-}
-
-.witcher-eliott .witcher-portrait {
-  display: block;
-  width: 104px;
-  height: 138px;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--witcher-gold);
-  border-radius: 4px;
-  object-fit: cover;
-  cursor: pointer;
-}
-
-.witcher-eliott .witcher-portrait-frame { position: relative; flex: 0 0 auto; }
-.witcher-eliott .witcher-portrait-button { display: block; width: auto; height: auto; padding: 0; border: 0; background: transparent; }
-.witcher-eliott .witcher-portrait-button:focus-visible { outline: 2px solid var(--witcher-gold); outline-offset: 3px; }
-.witcher-eliott .witcher-edit-portrait { position: absolute; right: 5px; bottom: 5px; width: 26px; height: 26px; padding: 0; }
-.witcher-eliott .witcher-race-choice { display: flex; align-items: end; gap: 6px; }
-.witcher-eliott .witcher-race-choice select { min-width: 0; flex: 1; }
-.witcher-eliott .witcher-view-race { flex: 0 0 34px; height: 34px; padding: 0; }
-
-.witcher-eliott .witcher-identity { flex: 1; min-width: 0; }
-.witcher-eliott .witcher-eyebrow { display: block; color: var(--witcher-gold); font-size: 11px; letter-spacing: 0.1em; margin-bottom: 12px; }
-.witcher-eliott label { display: block; color: var(--witcher-muted); font-size: 12px; }
-.witcher-eliott input, .witcher-eliott textarea, .witcher-eliott select { background: #131715; color: var(--witcher-ink); border: 1px solid var(--witcher-line); margin-top: 5px; width: 100%; }
-.witcher-eliott input:focus, .witcher-eliott textarea:focus, .witcher-eliott select:focus { outline: 2px solid var(--witcher-gold); outline-offset: 1px; }
-.witcher-eliott select option { background: #131715; color: var(--witcher-ink); }
-.witcher-eliott .witcher-identity > input { height: 38px; font-size: 22px; }
-.witcher-eliott .witcher-identity-details { display: grid; grid-template-columns: minmax(90px, 0.6fr) minmax(120px, 1.4fr); gap: 14px; margin-top: 12px; }
-.witcher-eliott .witcher-race-field { grid-column: 1 / -1; }
-.witcher-eliott .witcher-identity-details input, .witcher-eliott .witcher-identity-details select { height: 34px; font-size: 15px; }
-.witcher-eliott .witcher-resources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.witcher-eliott .witcher-resource { margin: 0; padding: 14px; border: 1px solid var(--witcher-line); border-top: 3px solid #ba685f; border-radius: 4px; min-width: 0; }
-.witcher-eliott .witcher-resource.stamina { border-top-color: #70a695; }
-.witcher-eliott legend { color: var(--witcher-ink); font-size: 15px; padding: 0 6px; }
-.witcher-eliott .witcher-resource-values { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 8px; }
-.witcher-eliott .witcher-resource-values input { height: 38px; text-align: center; font-size: 22px; }
-.witcher-eliott .witcher-resource-values > span { line-height: 38px; color: var(--witcher-muted); }
-.witcher-eliott h2 { font-size: 18px; color: var(--witcher-ink); margin: 0; border: 0; }
-.witcher-eliott p { color: var(--witcher-muted); line-height: 1.5; font-size: 13px; }
-.witcher-eliott button { color: var(--witcher-ink); border-color: var(--witcher-line); background: #2a302b; }
-.witcher-eliott button:hover { border-color: var(--witcher-gold); background: #343c35; }
-.witcher-eliott .witcher-ability-list { display: flex; flex-direction: column; gap: 10px; list-style: none; margin: 0; padding: 0; }
-.witcher-eliott .witcher-ability { padding: 14px 16px; background: #232923; border: 1px solid #3a443a; border-left: 3px solid #947641; border-radius: 4px; }
-.witcher-eliott .witcher-ability h3 { margin: 0 0 6px; border: 0; color: var(--witcher-gold); font-size: 16px; }
-.witcher-eliott .witcher-ability p { color: var(--witcher-ink); margin: 0; overflow-wrap: anywhere; }
+/* Compendium reading sheets. */
+.witcher-eliott .witcher-sheet-body { display: flex; flex-direction: column; gap: 20px; padding: 24px; overflow-y: auto; }
 .witcher-eliott .witcher-reference-header { display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--witcher-line); padding-bottom: 16px; }
-.witcher-eliott .witcher-reference-header img { width: 64px; height: 64px; object-fit: contain; border: 0; }
-.witcher-eliott .witcher-reference-header > div { flex: 1; min-width: 0; }
-.witcher-eliott .witcher-reference-header h1 { font-size: 26px; margin: 0; border: 0; color: var(--witcher-gold); }
-.witcher-eliott .witcher-description { color: var(--witcher-ink); line-height: 1.5; overflow-wrap: anywhere; }
+.witcher-reference-header img { width: 64px; height: 64px; object-fit: contain; border: 0; }
+.witcher-reference-header > div { flex: 1; min-width: 0; }
+.witcher-reference-header h1 { font-size: 26px; margin: 0; border: 0; color: var(--witcher-gold); }
+.witcher-reference-header input { width: 100%; color: var(--witcher-ink); background: #131715; }
+.witcher-eyebrow { display: block; color: var(--witcher-gold); font-size: 11px; letter-spacing: 0.1em; margin-bottom: 12px; }
+.witcher-eliott .witcher-description { color: var(--witcher-ink); line-height: 1.5; overflow-wrap: anywhere; font-size: 14px; }
 .witcher-eliott .witcher-description p { color: inherit; }
-.witcher-eliott.reference-sheet h2 { margin-bottom: 14px; }
+.witcher-eliott.reference-sheet h2 { color: var(--witcher-ink); font-size: 18px; border: 0; margin: 0 0 14px; }
 .witcher-eliott.reference-sheet prose-mirror { min-height: 160px; }
-.witcher-eliott .witcher-ability .content-link { background: transparent; border: 0; color: var(--witcher-gold); }
+.witcher-ability-list { display: flex; flex-direction: column; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.witcher-ability { padding: 14px 16px; background: #232923; border: 1px solid #3a443a; border-left: 3px solid #947641; border-radius: 4px; }
+.witcher-ability h3 { margin: 0 0 6px; border: 0; color: var(--witcher-gold); font-size: 16px; }
+.witcher-ability p { margin: 0; }
+.witcher-ability .content-link { background: transparent; border: 0; color: var(--witcher-gold); }
 
-@container witcher-sheet (max-width: 620px) {
-  .witcher-eliott .witcher-sheet-body { padding: 18px; }
-  .witcher-eliott .witcher-portrait { width: 76px; height: 104px; }
-  .witcher-eliott .witcher-sheet-header { gap: 12px; }
+/* Searchable, modal reference browser. */
+.witcher-picker { --color-text-primary: #302b26; --color-text-secondary: #706453; color: #302b26; min-width: 550px; }
+.witcher-picker .window-content { background: #eee9df; padding: 18px; }
+.witcher-picker .dialog-content { min-height: 0; }
+.witcher-picker-top { display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid #b8aa94; background: #fffaf1; border-radius: 3px; }
+.witcher-picker-top > i { color: #83663a; }
+.witcher-picker-search { flex: 1; width: 100%; height: 38px; border: 0; color: #302b26; background: transparent; }
+.witcher-picker-columns { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 20px; margin-top: 18px; }
+.witcher-picker-filters { border-right: 1px solid #c7bba6; padding-right: 16px; }
+.witcher-picker-filters h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #795c43; border: 0; margin: 0 0 12px; }
+.witcher-picker-filters button { display: block; width: 100%; height: auto; padding: 10px; margin: 0 0 5px; color: #504432; border: 1px solid transparent; border-radius: 3px; background: transparent; text-align: left; font-size: 12px; line-height: 1.4; white-space: normal; }
+.witcher-picker-filters button[aria-pressed=true] { background: #54302a; color: #f8ead0; border-color: #886446; }
+.witcher-picker-filters p { font-size: 11px; line-height: 1.5; color: #817360; margin-top: 24px; }
+.witcher-picker-results { min-width: 0; }
+.witcher-picker-count { font-size: 11px; color: #817360; margin: 0 0 9px; }
+.witcher-picker-list { height: min(430px, 50vh); overflow-y: auto; padding-right: 5px; }
+.witcher-picker-entry { background: #faf6ed; border: 1px solid #cfc5b3; border-radius: 3px; margin-bottom: 8px; }
+.witcher-picker-entry.selected { border-color: #9b783e; background: #f1e5ca; box-shadow: inset 3px 0 #9b783e; }
+.witcher-picker-option { display: flex; align-items: start; gap: 10px; cursor: pointer; padding: 13px; }
+.witcher-picker-option > input { flex: 0 0 16px; width: 16px; height: 16px; margin: 4px 0 0; accent-color: #764333; }
+.witcher-picker-option > span { display: block; min-width: 0; }
+.witcher-picker-option strong { display: block; color: #392e26; font-family: Georgia, serif; font-size: 19px; }
+.witcher-picker-option small { display: block; color: #89765b; font-size: 10px; margin: 3px 0 7px; }
+.witcher-picker-summary { font-size: 12px; line-height: 1.4; color: #6b5334; }
+.witcher-picker-summary.excluded { text-decoration: line-through; opacity: 0.6; }
+.witcher-picker-details { border-top: 1px solid #cfc5b3; padding: 8px 13px 10px 39px; font-size: 12px; }
+.witcher-picker-details summary { color: #72522e; cursor: pointer; }
+.witcher-picker-details p { line-height: 1.5; color: #4a4034; }
+.witcher-picker .form-footer { border-top: 1px solid #c7bba6; padding-top: 12px; margin-top: 16px; gap: 8px; }
+.witcher-picker .form-footer button { background: #e0d7c6; color: #51412e; border: 1px solid #b8aa94; font-size: 13px; }
+.witcher-picker .form-footer [data-action=choose] { background: #54302a; color: #f8ead0; border-color: #886446; }
+.witcher-picker [hidden] { display: none !important; }
+
+@container witcher-sheet (max-width: 700px) {
+  .witcher-character-layout { grid-template-columns: 160px minmax(0, 1fr); }
+  .witcher-character-sidebar { padding: 20px 10px; }
+  .witcher-character-content { padding: 18px; }
+  .witcher-character-hero { grid-template-columns: 118px minmax(0, 1fr); gap: 16px; }
+  .witcher-eliott .witcher-portrait { height: 158px; }
+  .witcher-eliott .witcher-select-reference { font-size: 16px; }
 }
 
-#token-hud .witcher-vision-toggle.active {
-  color: #f0cc83;
-  border-color: #d4b477;
-  box-shadow: 0 0 8px #d4b47766;
-}
+#token-hud .witcher-vision-toggle.active { color: #f0cc83; border-color: #d4b477; box-shadow: 0 0 8px #d4b47766; }
 
-.witcher-dice-tray {
-  flex: none;
-  min-width: 0;
-  width: 100%;
-  margin: 0;
-  padding: 8px;
-  border: 1px solid #47433b;
-  border-radius: 6px;
-  background: #1d211f;
-  color: #ece5d8;
-}
-.witcher-dice-tray legend { padding: 0 5px; color: #d4b477; font-size: 12px; }
-.witcher-dice-tray .witcher-dice-types { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+/* Compact dice toolbar below the chat editor. */
+.witcher-dice-tray { flex: none; min-width: 0; width: 100%; margin: 0; padding: 7px 0 2px; border: 0; border-top: 1px solid #9d8b7040; background: transparent; }
+.witcher-dice-tray .witcher-dice-types { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 3px; }
 .witcher-dice-tray .witcher-die { min-width: 0; }
-.witcher-dice-tray button { color: #ece5d8; background: #2a302b; border: 1px solid #47433b; box-shadow: none; }
-.witcher-dice-tray button:hover { border-color: #d4b477; background: #343c35; }
-.witcher-dice-tray button:focus-visible, .witcher-dice-tray input:focus-visible { outline: 2px solid #d4b477; outline-offset: 1px; }
-.witcher-dice-tray .witcher-die-add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 100%; height: 47px; padding: 2px; font-size: 11px; line-height: 1.2; }
-.witcher-dice-tray .witcher-die-add img { height: 24px; width: 24px; border: 0; opacity: 0.8; }
-.witcher-dice-tray .selected .witcher-die-add { border-color: #d4b477; background: #453c2b; color: #f0cc83; }
-.witcher-dice-tray input { display: block; margin-top: 4px; width: 100%; height: 25px; padding: 1px; border: 1px solid #47433b; border-radius: 3px; background: #131715; color: #ece5d8; text-align: center; font-size: 12px; }
-.witcher-dice-tray .witcher-dice-formula { display: block; margin: 8px 0; min-height: 18px; color: #d4b477; font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
-.witcher-dice-tray .witcher-dice-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 6px; }
-.witcher-dice-tray .witcher-dice-actions button { height: 28px; padding: 2px 6px; font-size: 12px; }
-.witcher-dice-tray .witcher-dice-roll { border-color: #947641; }
-.witcher-dice-tray button:disabled { opacity: 0.5; cursor: default; }
+.witcher-dice-tray button { color: var(--color-text-primary, #eee4d5); background: #80756812; border: 1px solid #9d8b7038; box-shadow: none; }
+.witcher-dice-tray button:hover { border-color: #b59a62; background: #b59a6220; }
+.witcher-dice-tray button:focus-visible, .witcher-dice-tray input:focus-visible { outline: 2px solid #b59a62; outline-offset: 1px; }
+.witcher-dice-tray .witcher-die-add { position: relative; display: flex; align-items: center; justify-content: center; gap: 3px; width: 100%; height: 34px; padding: 2px; border-radius: 3px; font-size: 11px; line-height: 1.2; }
+.witcher-dice-tray .witcher-die-add img { height: 18px; width: 18px; border: 0; opacity: 0.85; }
+.witcher-dice-tray .selected .witcher-die-add { border-color: #b59a62; background: #b59a6228; }
+.witcher-dice-tray .witcher-dice-badge { position: absolute; top: -4px; right: 0; min-width: 14px; padding: 1px 3px; border-radius: 6px; background: #b89a57; color: #20190e; font: 700 9px/1.2 sans-serif; }
+.witcher-dice-tray .witcher-dice-actions { display: flex; align-items: center; gap: 4px; margin-top: 5px; }
+.witcher-dice-tray .witcher-dice-formula { display: block; flex: 1; min-width: 0; color: var(--color-text-secondary, #c1b39d); font-size: 11px; line-height: 1.3; overflow-wrap: anywhere; }
+.witcher-dice-tray .witcher-dice-actions button { height: 25px; padding: 2px 8px; font-size: 11px; border-radius: 3px; }
+.witcher-dice-tray .witcher-dice-actions .witcher-dice-icon { flex: 0 0 25px; padding: 0; border-color: transparent; background: transparent; opacity: 0.75; }
+.witcher-dice-tray .witcher-dice-roll { flex: 0 0 auto; border-color: #9d8b7070; }
+.witcher-dice-tray .witcher-dice-quantities { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; margin-top: 7px; }
+.witcher-dice-quantities label { font-size: 9px; text-align: center; color: var(--color-text-secondary, #c1b39d); }
+.witcher-dice-tray input { width: 100%; height: 25px; padding: 1px; border: 1px solid #9d8b7070; border-radius: 3px; text-align: center; font-size: 12px; }
+.witcher-dice-tray [hidden] { display: none !important; }
+.witcher-dice-tray button:disabled { opacity: 0.4; cursor: default; }

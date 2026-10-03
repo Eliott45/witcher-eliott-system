@@ -1,17 +1,21 @@
 import { SYSTEM_ID } from "../config.mjs";
-import { getRace, RACES } from "../data/races.mjs";
-import { raceUuid } from "../data/compendiums.mjs";
+import { getRace } from "../data/races.mjs";
+import { getOrigin } from "../data/origins.mjs";
+import { raceUuid, originUuid } from "../data/compendiums.mjs";
+import { chooseReference } from "./reference-picker.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
 export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
   static DEFAULT_OPTIONS = {
     classes: ["witcher-eliott", "actor-sheet"],
-    position: { width: 640, height: 450 },
+    position: { width: 800, height: 520 },
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
-      viewRace: WitcherActorSheet.#onViewRace,
+      viewRace: WitcherActorSheet.#onViewReference,
+      viewOrigin: WitcherActorSheet.#onViewReference,
+      chooseReference: WitcherActorSheet.#onChooseReference,
       editPortrait: WitcherActorSheet.#onEditPortrait
     }
   };
@@ -29,9 +33,8 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       actor: this.actor,
       system: this.actor.system,
       selectedRace: getRace(this.actor.system.details.race),
-      raceChoices: RACES.map(race => ({
-        id: race.id, label: race.label, selected: race.id === this.actor.system.details.race
-      })),
+      selectedOrigin: getOrigin(this.actor.system.details.origin),
+      originExcluded: this.actor.system.details.race === "witcher" && Boolean(this.actor.system.details.origin),
       typeLabel: `TYPES.Actor.${this.actor.type}`
     });
   }
@@ -39,22 +42,33 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   _toggleDisabled(disabled) {
     super._toggleDisabled(disabled);
     // Foundry disables every form button for observers, including read-only actions.
-    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=showPortraitArtwork]")) {
+    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=showPortraitArtwork]")) {
       button.disabled = false;
     }
   }
 
-  static async #onViewRace() {
-    const uuid = raceUuid(this.actor.system.details.race);
+  static async #onViewReference(_event, target) {
+    const uuid = target?.dataset.action === "viewOrigin"
+      ? originUuid(this.actor.system.details.origin) : raceUuid(this.actor.system.details.race);
     if (!uuid) return;
     try {
-      const race = await foundry.utils.fromUuid(uuid);
-      if (!race) throw new Error(`Missing race document: ${uuid}`);
-      await race.sheet.render({ force: true });
+      const reference = await foundry.utils.fromUuid(uuid);
+      if (!reference) throw new Error(`Missing reference document: ${uuid}`);
+      await reference.sheet.render({ force: true });
     } catch (error) {
-      console.error(`${SYSTEM_ID} | Could not open race`, error);
-      ui.notifications.error(game.i18n.localize("WITCHER.Sheet.RaceUnavailable"));
+      console.error(`${SYSTEM_ID} | Could not open reference`, error);
+      ui.notifications.error(game.i18n.localize("WITCHER.Sheet.ReferenceUnavailable"));
     }
+  }
+
+  static async #onChooseReference(_event, target) {
+    if (!this.isEditable) return;
+    const kind = target.dataset.kind;
+    if (!["race", "origin"].includes(kind)) return;
+    const value = await chooseReference(kind, this.actor.system.details[kind], {
+      isWitcher: this.actor.system.details.race === "witcher"
+    });
+    if (value !== null && this.isEditable) await this.actor.update({ [`system.details.${kind}`]: value });
   }
 
   static async #onEditPortrait() {

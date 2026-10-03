@@ -13,10 +13,13 @@ const { ClassicLevel } = require("classic-level");
 const root = fileURLToPath(new URL("../", import.meta.url));
 const translations = JSON.parse(await readFile(join(root, "lang/ru.json"), "utf8"));
 const packs = compendiumData(translations);
+const requestedPacks = process.argv.slice(3);
+for (const name of requestedPacks) assert.ok(name in packs, `Unknown compendium: ${name}`);
 await mkdir(join(root, "packs"), { recursive: true });
 await mkdir(join(root, "pack-sources"), { recursive: true });
 
 for (const [name, documents] of Object.entries(packs)) {
+  if (requestedPacks.length && !requestedPacks.includes(name)) continue;
   for (const document of documents) assert.match(document._id, /^[a-zA-Z0-9]{16}$/);
   const db = new ClassicLevel(join(root, "packs", name), { keyEncoding: "utf8", valueEncoding: "json" });
   try {

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, access } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -38,13 +38,14 @@ assert.equal(game.system.grid.distance, 2);
 assert.equal(game.system.grid.units, "m");
 const [packFolder] = game.system.packFolders;
 assert.equal(packFolder.name, "Witcher");
-assert.deepEqual(Array.from(packFolder.packs), ["races", "abilities"]);
+assert.deepEqual(Array.from(packFolder.packs), ["races", "abilities", "origins"]);
 game.model = game.system.documentTypes;
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type }]));
 game.user = { id: "testuser00000001", isGM: true };
 
 const { WitcherActorData } = await import("../scripts/data/witcher-actor-data.mjs");
 const { RACES } = await import("../scripts/data/races.mjs");
+const { ORIGINS } = await import("../scripts/data/origins.mjs");
 const actorData = new WitcherActorData();
 assert.equal(actorData.health.value, 0);
 actorData.updateSource({ "health.value": 30, "health.max": 40 });
@@ -59,6 +60,7 @@ const legacyActorData = new WitcherActorData({
 assert.equal(legacyActorData.details.age, null);
 assert.equal(legacyActorData.details.race, "");
 assert.equal(legacyActorData.details.gender, "");
+assert.equal(legacyActorData.details.origin, "");
 legacyActorData.updateSource({ "details.age": 230, "details.race": "witcher", "details.gender": "Любой свой текст" });
 const restored = new WitcherActorData(JSON.parse(JSON.stringify(legacyActorData.toObject())));
 assert.equal(restored.details.age, 230);
@@ -74,6 +76,17 @@ assert.equal(restored.details.age, 0);
 restored.updateSource({ "details.age": "", "details.race": "" });
 assert.equal(restored.details.age, null, "Clearing age must not turn an unknown age into zero");
 assert.throws(() => new WitcherActorData({ details: { race: "unknown-race" } }));
+assert.throws(() => new WitcherActorData({ details: { origin: "unknown-region" } }));
+restored.updateSource({ "details.origin": "redania", "details.race": "human" });
+assert.equal(restored.originBonusEligible, true);
+restored.updateSource({ "details.race": "witcher" });
+assert.equal(restored.originBonusEligible, false);
+assert.equal(restored.details.origin, "redania", "A witcher retains their biographical region");
+const restoredOrigin = new WitcherActorData(JSON.parse(JSON.stringify(restored.toObject())));
+assert.equal(restoredOrigin.details.origin, "redania");
+assert.equal(restoredOrigin.originBonusEligible, false);
+restored.updateSource({ "details.race": "elf" });
+assert.equal(restored.originBonusEligible, true);
 
 const { applyActorTokenDefaults } = await import("../scripts/combat/token-defaults.mjs");
 const prototype = new foundry.data.PrototypeToken();
@@ -91,12 +104,14 @@ assert.equal(prototype.light.bright, 0);
 
 const { WitcherReferenceData } = await import("../scripts/data/witcher-reference-data.mjs");
 const { WitcherRaceData } = await import("../scripts/data/witcher-race-data.mjs");
-const { raceUuid, abilityUuid } = await import("../scripts/data/compendiums.mjs");
-CONFIG.Item.dataModels = { race: WitcherRaceData, ability: WitcherReferenceData };
+const { WitcherOriginData } = await import("../scripts/data/witcher-origin-data.mjs");
+const { raceUuid, abilityUuid, originUuid } = await import("../scripts/data/compendiums.mjs");
+CONFIG.Item.dataModels = { race: WitcherRaceData, ability: WitcherReferenceData, origin: WitcherOriginData };
 const documents = new Map();
 for (const pack of game.system.packs) {
   for (const source of await readJSON(`../pack-sources/${pack.name}.json`)) {
     const document = new foundry.documents.BaseItem(source);
+    await access(new URL(`public/${source.img}`, app));
     assert.equal(document.type, source.type);
     assert.deepEqual(document.system.toObject(), source.system);
     assert.equal(document.effects.size, 0, "Reference items must not contain automated effects");
@@ -104,7 +119,13 @@ for (const pack of game.system.packs) {
     documents.set(uuid, document);
   }
 }
-assert.equal(documents.size, 17);
+assert.equal(documents.size, 40);
+for (const origin of ORIGINS) {
+  const document = documents.get(originUuid(origin.id));
+  assert.equal(document.type, "origin");
+  assert.equal(document.system.region, origin.group);
+  assert.equal(document.system.ruleId, origin.id);
+}
 for (const race of RACES) {
   const document = documents.get(raceUuid(race.id));
   assert.equal(document.system.ruleId, race.id);
@@ -139,7 +160,9 @@ assert.ok(html.includes('data-action="showPortraitArtwork"'));
 assert.ok(html.includes('data-action="editPortrait"'));
 assert.ok(html.includes('name="system.details.age"'));
 assert.ok(html.includes('name="system.details.gender"'));
-assert.ok(html.includes('name="system.details.race"'));
+assert.ok(html.includes('data-kind="race"'));
+assert.ok(html.includes('data-kind="origin"'));
+assert.ok(!html.includes("<select"), "Race and origin must use the browser, not dropdowns");
 assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken preview button");
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
@@ -150,7 +173,6 @@ for (const race of RACES) {
   actorData.updateSource({ "details.race": race.id });
   const context = await sheet._prepareContext({});
   assert.equal(context.selectedRace.id, race.id);
-  assert.equal(context.raceChoices.filter(choice => choice.selected).length, 1);
   const rendered = template(context);
   assert.ok(rendered.includes('data-action="viewRace"'));
   for (const ability of race.abilities) {
@@ -163,9 +185,14 @@ assert.deepEqual(actorData.toObject().stamina, before.stamina);
 assert.equal(actorData.toObject().notes, before.notes);
 sheet.isEditable = false;
 const readOnlyHTML = template(await sheet._prepareContext({}));
-assert.match(readOnlyHTML, /<select[^>]*name="system.details.race"[^>]*disabled/);
+assert.match(readOnlyHTML, /<button[^>]*data-kind="race"[^>]*disabled/);
 assert.ok(!readOnlyHTML.includes('data-action="editPortrait"'));
 assert.ok(readOnlyHTML.includes('data-action="showPortraitArtwork"'));
+actorData.updateSource({ "details.origin": "mahakam", "details.race": "witcher" });
+assert.equal((await sheet._prepareContext({})).originExcluded, true);
+assert.ok(template(await sheet._prepareContext({})).includes("witcher-origin-excluded"));
+actorData.updateSource({ "details.race": "dwarf" });
+assert.equal((await sheet._prepareContext({})).originExcluded, false);
 
 // Exercise the actual race action and item sheet context without a browser host.
 let openedUuid;
@@ -181,6 +208,8 @@ foundry.utils.fromUuid = async uuid => {
 };
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.viewRace.call(sheet);
 assert.equal(openedUuid, raceUuid(actorData.details.race));
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.viewOrigin.call(sheet, null, { dataset: { action: "viewOrigin" } });
+assert.equal(openedUuid, originUuid(actorData.details.origin));
 const { WitcherItemSheet } = await import("../scripts/sheets/witcher-item-sheet.mjs");
 const referenceSheet = new WitcherItemSheet();
 referenceSheet.isEditable = false;
@@ -196,4 +225,12 @@ for (const uuid of documents.keys()) {
   }
   assert.ok(!rendered.includes("prose-mirror"), "Locked references must show descriptions, not editors");
 }
-console.log("Installed Foundry core: actor save/load, 17 typed Items, ability UUIDs, race action and both sheet templates OK");
+const { selectionEntries } = await import("../scripts/sheets/selection-data.mjs");
+const pickerTemplate = handlebars.compile(await readFile(new URL("../templates/reference-picker.hbs", import.meta.url), "utf8"), { strict: true });
+for (const kind of ["race", "origin"]) {
+  const entries = selectionEntries(kind, key => foundry.utils.getProperty(translations, key));
+  const rendered = pickerTemplate({ entries: entries.map(entry => ({ ...entry, selected: false })), groups: [], excluded: kind === "origin" });
+  assert.equal([...rendered.matchAll(/data-entry-id=/g)].length, entries.length);
+  assert.ok(!rendered.includes("undefined"));
+}
+console.log("Installed Foundry core: identity save/load, 40 typed Items, origin eligibility, reference actions and three templates OK");

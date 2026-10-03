@@ -8,13 +8,15 @@ export function registerCompendiumFolderMigration() {
 
 /** packFolders handles new worlds; existing worlds can already have explicit folder:null settings. */
 export async function migrateCompendiumFolders() {
-  if (game.user !== game.users.activeGM || game.settings.get(SYSTEM_ID, "compendiumFoldersVersion") >= 1) return;
-  const packs = ["races", "abilities"].map(name => game.packs.get(`${SYSTEM_ID}.${name}`));
+  const version = game.settings.get(SYSTEM_ID, "compendiumFoldersVersion");
+  if (game.user !== game.users.activeGM || version >= 2) return;
+  const names = version < 1 ? ["races", "abilities", "origins"] : ["origins"];
+  const packs = names.map(name => game.packs.get(`${SYSTEM_ID}.${name}`));
   if (packs.some(pack => !pack)) return;
   let folder = game.folders.find(entry => entry.type === "Compendium" && entry.name === "Witcher" && !entry.folder);
   folder ??= await foundry.documents.Folder.create({
     name: "Witcher", type: "Compendium", sorting: "a", color: "#947641"
   });
   for (const pack of packs) await pack.setFolder(folder);
-  await game.settings.set(SYSTEM_ID, "compendiumFoldersVersion", 1);
+  await game.settings.set(SYSTEM_ID, "compendiumFoldersVersion", 2);
 }
