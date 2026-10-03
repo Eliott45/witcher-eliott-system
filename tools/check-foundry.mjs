@@ -36,6 +36,9 @@ const { default: BaseSystem } = await import(new URL("packages/base-system.mjs",
 game.system = new BaseSystem(await readJSON("../system.json"));
 assert.equal(game.system.grid.distance, 2);
 assert.equal(game.system.grid.units, "m");
+const [packFolder] = game.system.packFolders;
+assert.equal(packFolder.name, "Witcher");
+assert.deepEqual(Array.from(packFolder.packs), ["races", "abilities"]);
 game.model = game.system.documentTypes;
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type }]));
 game.user = { id: "testuser00000001", isGM: true };
@@ -55,10 +58,14 @@ const legacyActorData = new WitcherActorData({
 });
 assert.equal(legacyActorData.details.age, null);
 assert.equal(legacyActorData.details.race, "");
-legacyActorData.updateSource({ "details.age": 230, "details.race": "witcher" });
+assert.equal(legacyActorData.details.gender, "");
+legacyActorData.updateSource({ "details.age": 230, "details.race": "witcher", "details.gender": "Любой свой текст" });
 const restored = new WitcherActorData(JSON.parse(JSON.stringify(legacyActorData.toObject())));
 assert.equal(restored.details.age, 230);
 assert.equal(restored.details.race, "witcher");
+assert.equal(restored.details.gender, "Любой свой текст");
+restored.updateSource({ "details.gender": "" });
+assert.equal(restored.details.gender, "");
 assert.deepEqual(restored.health.toObject?.() ?? restored.health, { value: 21, max: 30 });
 assert.equal(restored.stamina.value, 14);
 assert.equal(restored.notes, "Existing combat notes");
@@ -131,6 +138,7 @@ assert.ok(!html.includes("<script>test</script>"), "Actor names must be escaped"
 assert.ok(html.includes('data-action="showPortraitArtwork"'));
 assert.ok(html.includes('data-action="editPortrait"'));
 assert.ok(html.includes('name="system.details.age"'));
+assert.ok(html.includes('name="system.details.gender"'));
 assert.ok(html.includes('name="system.details.race"'));
 assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken preview button");
 assert.ok(!html.includes('name="system.notes"'));

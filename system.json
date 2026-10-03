@@ -43,6 +43,9 @@
       "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
     }
   ],
+  "packFolders": [
+    { "name": "Witcher", "sorting": "a", "color": "#947641", "packs": ["races", "abilities"] }
+  ],
   "grid": {
     "type": 1,
     "distance": 2,

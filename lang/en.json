@@ -20,6 +20,7 @@
       "Portrait": "Change portrait",
       "Name": "Name",
       "Age": "Age, years",
+      "Gender": "Gender",
       "Race": "Race",
       "RaceUnset": "Choose a race…",
       "RacialAbilities": "Racial abilities",
@@ -32,6 +33,19 @@
       "ViewRace": "View racial bonuses",
       "ViewPortrait": "Open portrait",
       "RaceUnavailable": "Could not open the race. Restart the Foundry world after adding the compendiums."
+    },
+    "Compendiums": {
+      "FolderError": "Could not move the compendiums into the Witcher folder. Reload the world as GM."
+    },
+    "Dice": {
+      "Title": "Dice",
+      "AddHint": "Add {die} · right-click to remove one",
+      "Count": "Number of {die}",
+      "Empty": "Choose dice",
+      "Clear": "Clear",
+      "Roll": "Roll",
+      "Rolling": "Rolling…",
+      "Error": "Could not post the roll. Your selected dice are saved — you can try again."
     },
     "Races": {
       "Human": {

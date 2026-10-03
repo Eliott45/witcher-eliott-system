@@ -60,6 +60,7 @@
 .witcher-eliott select option { background: #131715; color: var(--witcher-ink); }
 .witcher-eliott .witcher-identity > input { height: 38px; font-size: 22px; }
 .witcher-eliott .witcher-identity-details { display: grid; grid-template-columns: minmax(90px, 0.6fr) minmax(120px, 1.4fr); gap: 14px; margin-top: 12px; }
+.witcher-eliott .witcher-race-field { grid-column: 1 / -1; }
 .witcher-eliott .witcher-identity-details input, .witcher-eliott .witcher-identity-details select { height: 34px; font-size: 15px; }
 .witcher-eliott .witcher-resources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .witcher-eliott .witcher-resource { margin: 0; padding: 14px; border: 1px solid var(--witcher-line); border-top: 3px solid #ba685f; border-radius: 4px; min-width: 0; }
@@ -97,3 +98,30 @@
   border-color: #d4b477;
   box-shadow: 0 0 8px #d4b47766;
 }
+
+.witcher-dice-tray {
+  flex: none;
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid #47433b;
+  border-radius: 6px;
+  background: #1d211f;
+  color: #ece5d8;
+}
+.witcher-dice-tray legend { padding: 0 5px; color: #d4b477; font-size: 12px; }
+.witcher-dice-tray .witcher-dice-types { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+.witcher-dice-tray .witcher-die { min-width: 0; }
+.witcher-dice-tray button { color: #ece5d8; background: #2a302b; border: 1px solid #47433b; box-shadow: none; }
+.witcher-dice-tray button:hover { border-color: #d4b477; background: #343c35; }
+.witcher-dice-tray button:focus-visible, .witcher-dice-tray input:focus-visible { outline: 2px solid #d4b477; outline-offset: 1px; }
+.witcher-dice-tray .witcher-die-add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 100%; height: 47px; padding: 2px; font-size: 11px; line-height: 1.2; }
+.witcher-dice-tray .witcher-die-add img { height: 24px; width: 24px; border: 0; opacity: 0.8; }
+.witcher-dice-tray .selected .witcher-die-add { border-color: #d4b477; background: #453c2b; color: #f0cc83; }
+.witcher-dice-tray input { display: block; margin-top: 4px; width: 100%; height: 25px; padding: 1px; border: 1px solid #47433b; border-radius: 3px; background: #131715; color: #ece5d8; text-align: center; font-size: 12px; }
+.witcher-dice-tray .witcher-dice-formula { display: block; margin: 8px 0; min-height: 18px; color: #d4b477; font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+.witcher-dice-tray .witcher-dice-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 6px; }
+.witcher-dice-tray .witcher-dice-actions button { height: 28px; padding: 2px 6px; font-size: 12px; }
+.witcher-dice-tray .witcher-dice-roll { border-color: #947641; }
+.witcher-dice-tray button:disabled { opacity: 0.5; cursor: default; }

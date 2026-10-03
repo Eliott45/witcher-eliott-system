@@ -7,7 +7,7 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
   static DEFAULT_OPTIONS = {
     classes: ["witcher-eliott", "actor-sheet"],
-    position: { width: 640, height: 380 },
+    position: { width: 640, height: 450 },
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {

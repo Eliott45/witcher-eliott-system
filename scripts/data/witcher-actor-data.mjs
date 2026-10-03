@@ -12,6 +12,7 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
     return {
       details: new SchemaField({
         age: new NumberField({ required: true, nullable: true, integer: true, min: 0, initial: null }),
+        gender: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
         race: new StringField({ required: true, nullable: false, blank: true, choices: RACE_CHOICES, initial: "" })
       }),
       health: resource(),

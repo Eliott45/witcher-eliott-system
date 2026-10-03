@@ -21,7 +21,11 @@
           <input id="{{rootId}}-age" name="system.details.age" type="number" min="0" step="1"
                  value="{{system.details.age}}" placeholder="—" {{disabled (not editable)}}>
         </label>
-        <div>
+        <label for="{{rootId}}-gender">{{localize "WITCHER.Sheet.Gender"}}
+          <input id="{{rootId}}-gender" name="system.details.gender" type="text"
+                 value="{{system.details.gender}}" {{disabled (not editable)}}>
+        </label>
+        <div class="witcher-race-field">
           <label for="{{rootId}}-race">{{localize "WITCHER.Sheet.Race"}}</label>
           <div class="witcher-race-choice">
             <select id="{{rootId}}-race" name="system.details.race" {{disabled (not editable)}}>
