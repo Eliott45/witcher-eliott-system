@@ -5,6 +5,11 @@ import { raceUuid, originUuid, familyStatusUuid, influentialFriendUuid } from ".
 import { getFamilyStatus, suggestedFamilyGroup } from "../data/family-statuses.mjs";
 import { getInfluentialFriend } from "../data/influential-friends.mjs";
 import { chooseReference } from "./reference-picker.mjs";
+import { statisticsContext } from "./statistics-context.mjs";
+import { rollStun } from "../combat/stun-roll.mjs";
+import { rollAttribute } from "../combat/attribute-roll.mjs";
+import { selectLuckPoints } from "../data/luck.mjs";
+import { hasStunned, setStunned, STUNNED, STUNNED_ICON } from "../combat/status-effects.mjs";
 import { SHEET_TABS, sheetPreferences, visibleSheetTabs, updateSheetPreferences, chooseVisibleTabs, reportPreferencesError } from "./sheet-preferences.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -12,7 +17,7 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
   static DEFAULT_OPTIONS = {
     classes: ["witcher-eliott", "actor-sheet"],
-    position: { width: 800, height: 520 },
+    position: { width: 800, height: 640 },
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
@@ -22,6 +27,13 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       viewFriend: WitcherActorSheet.#onViewReference,
       chooseReference: WitcherActorSheet.#onChooseReference,
       configureTabs: WitcherActorSheet.#onConfigureTabs,
+      rollStun: WitcherActorSheet.#onRollStun,
+      rollAttribute: WitcherActorSheet.#onRollAttribute,
+      toggleLuck: WitcherActorSheet.#onLuck,
+      resetLuck: WitcherActorSheet.#onLuck,
+      toggleAttributes: WitcherActorSheet.#onToggleAttributes,
+      addStunned: WitcherActorSheet.#onEffect,
+      removeEffect: WitcherActorSheet.#onEffect,
       editPortrait: WitcherActorSheet.#onEditPortrait
     }
   };
@@ -29,7 +41,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static PARTS = {
     content: {
       template: `systems/${SYSTEM_ID}/templates/actor-sheet.hbs`,
-      scrollable: [".witcher-character-content[data-tab=main]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
+      scrollable: [".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=effects]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
     }
   };
 
@@ -50,6 +62,22 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       value: foundry.utils.getProperty(this.actor.system, path), open: !preferences.collapsed?.[id]
     });
     return Object.assign(context, {
+      editingAttributes: this.isEditable && this.#editingAttributes,
+      stunned: hasStunned(this.actor),
+      effects: await Promise.all(this.actor.effects.map(async effect => {
+        const stunned = effect.statuses.has(STUNNED);
+        return {
+          id: effect.id, name: stunned ? game.i18n.localize("WITCHER.Effects.Stunned") : effect.name,
+          img: stunned ? STUNNED_ICON : effect.img, inactive: effect.disabled || effect.isSuppressed,
+          description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+            stunned ? game.i18n.localize("WITCHER.Effects.StunnedDescription") : effect.description,
+            { secrets: this.actor.isOwner, relativeTo: effect }
+          )
+        };
+      })),
+      stats: statisticsContext(this.actor.system, {
+        localize: key => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data)
+      }),
       visibleTabs: visible.map(tab => context.tabs[tab.id]),
       actor: this.actor,
       system: this.actor.system,
@@ -105,6 +133,67 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       await updateSheetPreferences(this.actor.uuid, { hiddenTabs });
       await this.render({ force: true });
     } catch (error) { reportPreferencesError(error); }
+  }
+
+  static async #onRollStun(_event, target) {
+    if (!this.isEditable || target.disabled) return;
+    target.disabled = true;
+    try { await rollStun(this.actor); }
+    catch (error) {
+      console.error(`${SYSTEM_ID} | Stun roll failed`, error);
+      ui.notifications.error(game.i18n.localize("WITCHER.Statistics.RollError"));
+    } finally { target.disabled = !this.isEditable || this.actor.system.statistics.stun === null; }
+  }
+
+  static async #onRollAttribute(_event, target) {
+    if (!this.isEditable || target.disabled) return;
+    target.disabled = true;
+    try { await rollAttribute(this.actor, target.dataset.attribute); }
+    catch (error) {
+      console.error(`${SYSTEM_ID} | Attribute roll failed`, error);
+      ui.notifications.error(game.i18n.localize("WITCHER.Statistics.AttributeRollError"));
+    } finally { target.disabled = !this.isEditable; }
+  }
+
+  #editingAttributes = false;
+  #luckWrites = Promise.resolve();
+
+  static async #onToggleAttributes() {
+    if (!this.isEditable) return;
+    // Commit any focused base input before replacing the form with read-only totals.
+    await this.submit();
+    this.#editingAttributes = !this.#editingAttributes;
+    await this.render({ force: true });
+  }
+
+  static async #onLuck(_event, target) {
+    if (!this.isEditable) return;
+    const number = Number(target.dataset.point);
+    const reset = target.dataset.action === "resetLuck";
+    const work = this.#luckWrites.then(async () => {
+      if (!this.isEditable) return;
+      const { statistics, luckSpent, luckPending } = this.actor.system;
+      const pending = reset ? 0 : selectLuckPoints(statistics.effective.luck, luckSpent, luckPending, number);
+      if (pending !== null) await this.actor.update({ "system.luckPending": pending, ...(reset ? { "system.luckSpent": [] } : {}) });
+    });
+    this.#luckWrites = work.catch(() => {});
+    try { await work; }
+    catch (error) {
+      console.error(`${SYSTEM_ID} | Luck update failed`, error);
+      ui.notifications.error(game.i18n.localize("WITCHER.Luck.UpdateError"));
+    }
+  }
+
+  static async #onEffect(_event, target) {
+    if (!this.isEditable || target.disabled) return;
+    target.disabled = true;
+    try {
+      if (target.dataset.action === "addStunned") await setStunned(this.actor, true);
+      else await this.actor.effects.get(target.dataset.effectId)?.delete();
+    } catch (error) {
+      console.error(`${SYSTEM_ID} | Effect action failed`, error);
+      ui.notifications.error(game.i18n.localize("WITCHER.Effects.UpdateError"));
+    } finally { target.disabled = !this.isEditable; }
   }
 
   static async #onViewReference(_event, target) {

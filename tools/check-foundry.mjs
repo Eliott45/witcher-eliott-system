@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile, access } from "node:fs/promises";
-import { createRequire } from "node:module";
+import { createRequire, registerHooks } from "node:module";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -128,6 +128,97 @@ assert.equal(restoredOrigin.originBonusEligible, false);
 restored.updateSource({ "details.race": "elf" });
 assert.equal(restored.originBonusEligible, true);
 
+// Derived limits must reach token bars without rewriting the saved current resources.
+restored.prepareDerivedData();
+assert.equal(restored.health.max, 30, "Unfilled base statistics retain legacy maxima");
+assert.equal(restored.stamina.max, 20);
+restored.updateSource({ "attributes.body": 10, "attributes.will": 10, "attributes.reflex": 9, "attributes.speed": 9 });
+restored.prepareDerivedData();
+assert.equal(restored.health.max, 50);
+assert.equal(restored.stamina.max, 50);
+assert.equal(restored.health.value, 21);
+assert.equal(restored.stamina.value, 14);
+assert.equal(restored.toObject().health.max, 30, "Preparation must not persist derived values into the source");
+restored.updateSource({ "health.value": 10 });
+restored.prepareDerivedData();
+assert.equal(restored.statistics.initiative, 9);
+restored.updateSource({ "health.value": 9 });
+restored.prepareDerivedData();
+assert.equal(restored.statistics.initiative, 4);
+assert.equal(restored.health.max, 50);
+assert.equal(restored.statistics.woundThreshold, 10);
+restored.updateSource({ "health.value": -5, "attributes.luck": 100, carriedWeight: 38.5, vigor: 7 });
+restored.prepareDerivedData();
+assert.equal(restored.health.value, -5, "Health must allow death-state values");
+const savedStatistics = new WitcherActorData(JSON.parse(JSON.stringify(restored.toObject())));
+savedStatistics.prepareDerivedData();
+assert.equal(savedStatistics.health.max, 50);
+assert.equal(savedStatistics.attributes.luck, 100);
+assert.equal(savedStatistics.carriedWeight, 0);
+assert.equal(savedStatistics.vigor, 7);
+savedStatistics.updateSource({ "attributes.luck": 101 });
+assert.equal(savedStatistics.attributes.luck, 100);
+savedStatistics.updateSource({ "attributes.luck": -1 });
+assert.equal(savedStatistics.attributes.luck, 0);
+savedStatistics.updateSource({ "attributes.body": "" });
+savedStatistics.prepareDerivedData();
+assert.equal(savedStatistics.attributes.body, null);
+assert.equal(savedStatistics.health.max, 30, "Clearing a required stat restores the saved legacy limit");
+const { default: CoreRoll } = await import(new URL("client/dice/roll.mjs", app));
+assert.equal(CoreRoll.replaceFormulaData("1d10 + @statistics.initiative", restored), "1d10 + 4");
+
+// Exercise real Foundry schema cleaning and the resource hook, including synthetic token actors.
+const { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources } = await import("../scripts/combat/resource-updates.mjs");
+const { hasStunned } = await import("../scripts/combat/status-effects.mjs");
+const resourceActor = {
+  uuid: "Scene.test.Token.test.Actor.test", type: "npc", isOwner: true, effects: [],
+  system: new WitcherActorData({ attributes: { body: 10, will: 10 }, health: { value: 50, max: 0 }, stamina: { value: 50, max: 0 } }),
+  async toggleStatusEffect(id) { this.effects.push({ id: "test-stun", statuses: new Set([id]), disabled: false }); },
+  async deleteEmbeddedDocuments(_type, ids) { this.effects = this.effects.filter(effect => !ids.includes(effect.id)); },
+  updateSource(changes) { this.system.updateSource(foundry.utils.expandObject(changes).system); }
+};
+resourceActor.system.prepareDerivedData();
+const updateResources = async (changes, userId = game.user.id) => {
+  const options = {};
+  prepareResourceUpdate(resourceActor, changes, options);
+  resourceActor.system.updateSource(changes.system);
+  resourceActor.system.prepareDerivedData();
+  await applyResourceUpdate(resourceActor, changes, options, userId);
+  return changes;
+};
+await updateResources({ system: { health: { value: 90 }, stamina: { value: 90 } } });
+assert.equal(resourceActor.system.health.value, 50);
+assert.equal(resourceActor.system.stamina.value, 50);
+assert.equal(resourceActor.system.toObject().health.value, 50, "Clamp persists to source, not just display");
+await updateResources({ system: { attributes: { body: 6, will: 6 } } });
+assert.equal(resourceActor.system.health.value, 30);
+assert.equal(resourceActor.system.stamina.value, 30);
+assert.equal(resourceActor.system.toObject().stamina.value, 30);
+await updateResources({ system: { stamina: { value: -2 } } });
+assert.equal(resourceActor.system.stamina.value, 0);
+assert.equal(hasStunned(resourceActor), true);
+await updateResources({ system: { stamina: { value: 10 } } });
+assert.equal(hasStunned(resourceActor), true, "Restoring Stamina alone does not recover from stun");
+await updateResources({ system: { attributes: { body: 4, will: 4 } } });
+assert.equal(resourceActor.system.health.value, 20);
+assert.equal(hasStunned(resourceActor), true, "Clamping after a maximum change is not an incoming hit");
+await updateResources({ system: { health: { value: 19 } } });
+assert.equal(hasStunned(resourceActor), false, "Taking damage ends stun");
+await updateResources({ system: { stamina: { value: 0 } } }, "another-user");
+assert.equal(hasStunned(resourceActor), false, "Remote clients must not duplicate originating-client effect writes");
+await updateResources({ system: { stamina: { value: 10 } } });
+await updateResources({ system: { stamina: { value: 0 }, health: { value: 18 } } });
+assert.equal(hasStunned(resourceActor), true, "New exhaustion applies even when a hit occurs in the same update");
+await updateResources({ system: { health: { value: -5 }, luckSpent: [1, 5], attributes: { luck: 5 } } });
+assert.equal(resourceActor.system.health.value, -5);
+assert.deepEqual(new WitcherActorData(resourceActor.system.toObject()).luckSpent, [1, 5]);
+resourceActor.system = new WitcherActorData({ health: { value: 60, max: 20 }, stamina: { value: 40, max: 15 } });
+resourceActor.system.prepareDerivedData();
+assert.equal(resourceActor.system.health.value, 20, "Old actors with excess HP are clamped during preparation");
+prepareInitialResources(resourceActor);
+assert.equal(resourceActor.system.toObject().health.value, 20);
+assert.equal(resourceActor.system.toObject().stamina.value, 15);
+
 const { applyActorTokenDefaults } = await import("../scripts/combat/token-defaults.mjs");
 const prototype = new foundry.data.PrototypeToken();
 applyActorTokenDefaults({
@@ -212,6 +303,22 @@ game.settings = {
   set: async (_system, _key, value) => { preferences = value; }
 };
 const translations = await readJSON("../lang/ru.json");
+game.i18n.localize = key => foundry.utils.getProperty(translations, key) ?? key;
+game.i18n.format = (key, data) => game.i18n.localize(key).replace(/\{(\w+)\}/g, (_, part) => data[part]);
+const { registerStatusEffects, localizeStatusEffects } = await import("../scripts/combat/status-effects.mjs");
+CONFIG.specialStatusEffects = { DEFEATED: "dead", BLIND: "blind" };
+CONFIG.ActiveEffect = { dataModels: {} };
+game.model.ActiveEffect = { base: {} };
+registerStatusEffects();
+localizeStatusEffects();
+const status = CONFIG.statusEffects.stunned;
+await access(new URL(`public/${status.img}`, app));
+const coreEffect = new foundry.documents.BaseActiveEffect({ name: game.i18n.localize(status.name),
+  img: status.img, description: status.description, statuses: [status.id], showIcon: CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS });
+assert.ok(coreEffect.statuses.has("stunned"));
+assert.ok(coreEffect.description.includes("СЛ 10"));
+assert.equal(coreEffect.showIcon, CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS);
+assert.ok(new foundry.documents.BaseActiveEffect(coreEffect.toObject()).statuses.has("stunned"));
 handlebars.registerHelper("localize", key => foundry.utils.getProperty(translations, key) ?? key);
 handlebars.registerHelper("not", value => !value);
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
@@ -240,7 +347,7 @@ foundry.applications = {
 };
 const { WitcherActorSheet } = await import("../scripts/sheets/witcher-actor-sheet.mjs");
 const sheet = new WitcherActorSheet();
-sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/svg/mystery-man.svg", type: "character", system: actorData, prototypeToken: prototype };
+sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/svg/mystery-man.svg", type: "character", system: actorData, prototypeToken: prototype, effects: [], isOwner: true };
 sheet.token = null;
 sheet.isEditable = true;
 const html = template(await sheet._prepareContext({}));
@@ -256,7 +363,28 @@ assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
 assert.ok(!html.includes("witcher-footnote"));
-assert.equal([...html.matchAll(/data-action="tab"/g)].length, 3);
+assert.equal([...html.matchAll(/data-action="tab"/g)].length, 4);
+assert.equal([...html.matchAll(/name="system.attributes\./g)].length, 0, "Base attributes are locked by default");
+sheet.submit = async () => {};
+sheet.render = async () => {};
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleAttributes.call(sheet);
+const editableStatisticsHTML = template(await sheet._prepareContext({}));
+assert.equal([...editableStatisticsHTML.matchAll(/name="system.attributes\./g)].length, 9);
+assert.match(editableStatisticsHTML, /role="switch" aria-checked="true"/);
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleAttributes.call(sheet);
+assert.equal((await sheet._prepareContext({})).editingAttributes, false);
+assert.ok(html.includes('data-action="rollStun"'));
+assert.ok(!html.includes('name="system.carriedWeight"'));
+assert.ok(!html.includes('data-tab="parameters"'));
+assert.equal([...html.matchAll(/data-action="rollAttribute"/g)].length, 9);
+assert.ok(html.includes('data-action="addStunned"'));
+assert.ok(html.indexOf('witcher-parameters') > html.indexOf('id="test-actor-main"'));
+assert.ok(html.indexOf('witcher-parameters') < html.indexOf('id="test-actor-biography"'));
+assert.ok(!html.match(/<(?:div|fieldset)[^>]+data-tooltip=/), "Tooltips must not cover entire cards or resource rows");
+assert.ok(html.indexOf("Порог ранения") < html.indexOf('class="witcher-resource stamina"'));
+assert.ok(html.indexOf("Отдых") < html.indexOf('class="witcher-derived"'));
+assert.ok(html.includes('name="system.vigor"'));
+assert.ok(!html.includes("undefined"));
 assert.ok(html.includes('data-action="configureTabs"'));
 assert.equal([...html.matchAll(/data-biography-section=/g)].length, 10);
 assert.ok(html.includes('data-kind="influentialFriend"'));
@@ -282,7 +410,7 @@ sheet.tabGroups.character = "main";
 await updateSheetPreferences(sheet.actor.uuid, { hiddenTabs: ["main"], collapsed: { parents: true, appearance: true } });
 const customized = await sheet._prepareContext({});
 assert.equal(sheet.tabGroups.character, "biography", "Hiding the active tab must select a visible one");
-assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["biography", "family"]);
+assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["biography", "family", "effects"]);
 assert.equal(customized.familySections.find(section => section.id === "parents").open, false);
 assert.equal(customized.biographySections.find(section => section.id === "appearance").open, false);
 assert.ok(!template(customized).includes('data-action="tab" data-group="character" data-tab="main"'));
@@ -303,7 +431,7 @@ for (const race of RACES) {
       "Racial bonuses must appear in the reference document, not on the actor sheet");
   }
 }
-assert.deepEqual(actorData.toObject().health, before.health, "Race selection must not apply mechanics");
+assert.deepEqual(actorData.toObject().health, before.health, "Race bonuses must not overwrite saved base resources");
 assert.deepEqual(actorData.toObject().stamina, before.stamina);
 assert.equal(actorData.toObject().notes, before.notes);
 sheet.isEditable = false;
@@ -312,6 +440,33 @@ assert.match(readOnlyHTML, /<button[^>]*data-kind="race"[^>]*disabled/);
 assert.ok(!readOnlyHTML.includes('data-action="editPortrait"'));
 assert.ok(readOnlyHTML.includes('data-action="showPortraitArtwork"'));
 assert.match(readOnlyHTML, /<textarea[^>]*name="system.biography.sessionNotes"[^>]*disabled/);
+assert.ok(!readOnlyHTML.includes('name="system.attributes.reflex"'));
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleAttributes.call(sheet);
+assert.equal((await sheet._prepareContext({})).editingAttributes, false, "Observers cannot unlock parameters");
+const originalData = sheet.actor.system;
+sheet.actor.system = restored;
+sheet.tabGroups.character = "main";
+const statisticsHTML = template(await sheet._prepareContext({}));
+assert.match(statisticsHTML, /id="test-actor-main" class="witcher-character-content tab active"/);
+assert.ok(statisticsHTML.includes('<output id="test-actor-health-max">50</output>'));
+assert.ok(!statisticsHTML.includes('name="system.health.max"'), "Calculated maxima must not be resubmitted as manual values");
+assert.match(statisticsHTML, /<output id="test-actor-attribute-reflex"[^>]*>4<\/output>/);
+assert.match(statisticsHTML, /<button[^>]*data-action="rollStun"[^>]*disabled/);
+assert.ok(statisticsHTML.includes('id="test-actor-weight">0 / 100 кг</output>'));
+assert.equal([...statisticsHTML.matchAll(/data-action="toggleLuck"/g)].length, 100);
+sheet.actor.system = originalData;
+sheet.tabGroups.character = "main";
+
+sheet.actor.effects = [{ id: "stun", name: "Old core label", statuses: new Set(["stunned"]), disabled: false, isSuppressed: false }];
+sheet.tabGroups.character = "effects";
+const effectsHTML = template(await sheet._prepareContext({}));
+assert.match(effectsHTML, /witcher-effects tab active/);
+assert.ok(effectsHTML.includes("Дезориентация"));
+assert.ok(effectsHTML.includes("СЛ 10"));
+assert.ok(effectsHTML.includes('data-action="removeEffect" data-effect-id="stun"'));
+assert.ok(!effectsHTML.includes("Old core label"));
+sheet.actor.effects = [];
+sheet.tabGroups.character = "main";
 actorData.updateSource({ "details.origin": "mahakam", "details.race": "witcher" });
 assert.equal((await sheet._prepareContext({})).originExcluded, true);
 assert.ok(template(await sheet._prepareContext({})).includes("witcher-origin-excluded"));
@@ -377,5 +532,48 @@ for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   assert.ok(!rendered.includes("undefined"));
 }
 const tabsTemplate = handlebars.compile(await readFile(new URL("../templates/sheet-tabs.hbs", import.meta.url), "utf8"), { strict: true });
-assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 3);
-console.log("Installed Foundry core: optional friend save/load, 129 typed Items, equipment folders, witcher exclusions, personal tabs, reference actions and templates OK");
+assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 4);
+// Exercise Luck against the installed parser, real evaluated dice, and chat schema.
+const aliasHook = registerHooks({ resolve(specifier, context, next) {
+  return next(specifier.startsWith("@common/") ? new URL(specifier.slice(8), core).href : specifier, context);
+} });
+const diceTerms = await import(new URL("client/dice/terms/_module.mjs", app));
+const { default: RollParser } = await import(new URL("client/dice/parser.mjs", app));
+aliasHook.deregister();
+const peggy = createRequire(new URL("package.json", app))("peggy");
+foundry.dice = { Roll: CoreRoll, terms: diceTerms,
+  RollGrammar: peggy.generate(await readFile(new URL("client/dice/grammar.pegjs", app), "utf8")) };
+CONFIG.debug = {};
+CONFIG.Dice = { parser: RollParser, rolls: [CoreRoll], termTypes: diceTerms,
+  terms: { d: diceTerms.Die, c: diceTerms.Coin, f: diceTerms.FateDie },
+  fulfillment: { methods: {} }, randomUniform: Math.random };
+const { prepareMessageLuck, settleMessageLuck, releaseMessageLuck } = await import("../scripts/chat/luck-rolls.mjs");
+game.model.ChatMessage = { base: {} };
+CONFIG.ChatMessage = { dataModels: {} };
+foundry.packages = { BasePackage: (await import(new URL("packages/base-package.mjs", core))).default };
+const luckActor = { uuid: "Actor.realDice", isOwner: true, system: new WitcherActorData({
+  attributes: { luck: 10 }, luckPending: 4, details: { race: "human", familyStatus: "north.peasants" }
+}), async update(changes) { this.system.updateSource(Object.fromEntries(Object.entries(changes).map(([key, value]) => [key.slice(7), value]))); } };
+assert.equal(luckActor.system.statistics.effective.luck, 11);
+for (const formula of ["1d10 + 10", "2d6 + 1d4", "(1d6 + 2) * 3", "{2d6, 1d10}kh", "1d20 - 5"]) {
+  luckActor.system.updateSource({ luckSpent: [], luckPending: 4 });
+  const roll = await new CoreRoll(formula).evaluate({ maximize: true, allowInteractive: false });
+  const beforeDice = JSON.stringify(roll.dice.map(die => die.results));
+  const source = new foundry.documents.BaseChatMessage({ author: game.user.id, content: String(roll.total), rolls: [roll.toJSON()] });
+  const message = { speakerActor: luckActor, flags: source.flags, rolls: [roll], content: source.content, flavor: source.flavor,
+    updateSource(changes) {
+      source.updateSource(changes);
+      this.flags = source.flags;
+      this.rolls = source.rolls.map(data => CoreRoll.fromData(data));
+    }
+  };
+  await prepareMessageLuck(message, "native-check");
+  assert.equal(message.rolls[0].total, roll.total + 4, formula);
+  assert.equal(JSON.stringify(message.rolls[0].dice.map(die => die.results)), beforeDice, "Luck must preserve original dice, including pools and parentheses");
+  assert.match(source.flavor, /\+4 от Удачи/);
+  await settleMessageLuck([message], "native-check");
+  releaseMessageLuck("native-check");
+  assert.deepEqual(Array.from(luckActor.system.luckSpent), [1, 2, 3, 4]);
+  assert.equal(luckActor.system.luckPending, 0);
+}
+console.log("Installed Foundry core: data, 129 Items, templates, parameter lock and Luck with native dice/chat schema OK");

@@ -3,7 +3,8 @@ import { SYSTEM_ID } from "../config.mjs";
 export const SHEET_TABS = [
   { id: "main", label: "WITCHER.Sheet.Main", icon: "fa-solid fa-user" },
   { id: "biography", label: "WITCHER.Sheet.Biography", icon: "fa-solid fa-book-open" },
-  { id: "family", label: "WITCHER.Sheet.Family", icon: "fa-solid fa-people-roof" }
+  { id: "family", label: "WITCHER.Sheet.Family", icon: "fa-solid fa-people-roof" },
+  { id: "effects", label: "WITCHER.Sheet.Effects", icon: "fa-solid fa-person-rays" }
 ];
 
 export function registerSheetPreferences() {

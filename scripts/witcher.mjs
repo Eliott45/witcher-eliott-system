@@ -1,6 +1,9 @@
 import { ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID } from "./config.mjs";
 import { applyActorTokenDefaults } from "./combat/token-defaults.mjs";
 import { WitcherActorData } from "./data/witcher-actor-data.mjs";
+import { WitcherActor } from "./documents/witcher-actor.mjs";
+import { WitcherChatMessage } from "./documents/witcher-chat-message.mjs";
+import { WitcherCombat } from "./documents/witcher-combat.mjs";
 import { WitcherActorSheet } from "./sheets/witcher-actor-sheet.mjs";
 import { WitcherReferenceData } from "./data/witcher-reference-data.mjs";
 import { WitcherRaceData } from "./data/witcher-race-data.mjs";
@@ -14,9 +17,16 @@ import { renderTokenVisionToggle } from "./combat/token-hud.mjs";
 import { migrateVisionDefaults, registerVisionMigration } from "./migrations/vision-defaults.mjs";
 import { migrateCompendiumFolders, registerCompendiumFolderMigration } from "./migrations/compendium-folders.mjs";
 import { renderDiceTray } from "./chat/dice-tray.mjs";
+import { registerStatusEffects, localizeStatusEffects } from "./combat/status-effects.mjs";
+import { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources, applyInitialExhaustion } from "./combat/resource-updates.mjs";
 
 Hooks.once("init", () => {
   CONFIG.Token.objectClass = WitcherToken;
+  CONFIG.Actor.documentClass = WitcherActor;
+  CONFIG.ChatMessage.documentClass = WitcherChatMessage;
+  CONFIG.Combat.documentClass = WitcherCombat;
+  CONFIG.Combat.initiative.formula = "1d10 + @statistics.initiative";
+  registerStatusEffects();
   registerVisionMigration();
   registerCompendiumFolderMigration();
   registerSheetPreferences();
@@ -46,6 +56,11 @@ Hooks.once("init", () => {
 });
 
 Hooks.on("preCreateActor", applyActorTokenDefaults);
+Hooks.on("preCreateActor", prepareInitialResources);
+Hooks.on("createActor", applyInitialExhaustion);
+Hooks.on("preUpdateActor", prepareResourceUpdate);
+Hooks.on("updateActor", applyResourceUpdate);
+Hooks.once("i18nInit", localizeStatusEffects);
 Hooks.on("renderTokenHUD", renderTokenVisionToggle);
 Hooks.on("renderChatInput", renderDiceTray);
 Hooks.once("ready", () => {

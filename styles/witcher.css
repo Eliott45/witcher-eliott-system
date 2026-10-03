@@ -14,18 +14,51 @@
 /* Character sheet: permanent resource column and a portrait-led identity page. */
 .witcher-character-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); height: 100%; min-height: 0; overflow: hidden; background: #eee9df; }
 .witcher-character-sidebar { min-height: 0; overflow-y: auto; background: linear-gradient(155deg, #482021, #241718); border-right: 2px solid #b39a67; padding: 22px 16px; }
-.witcher-brand { font-family: Georgia, serif; font-size: 20px; letter-spacing: 0.08em; color: #e0cc9e; padding-bottom: 22px; text-align: center; }
-.witcher-character-sidebar .witcher-resources { display: flex; flex-direction: column; gap: 25px; }
-.witcher-character-sidebar .witcher-resource { border: 0; margin: 0; padding: 12px 0 0; min-width: 0; border-top: 1px solid #b39a6770; }
-.witcher-character-sidebar legend { color: #e0cc9e; padding: 0 4px 0 0; font-family: Georgia, serif; font-size: 19px; }
+.witcher-brand { font-family: Georgia, serif; font-size: 20px; letter-spacing: 0.08em; color: #e0cc9e; padding-bottom: 14px; text-align: center; }
+.witcher-character-sidebar .witcher-resources { display: flex; flex-direction: column; gap: 12px; }
+.witcher-character-sidebar .witcher-resource { border: 0; margin: 0; padding: 5px 0 0; min-width: 0; border-top: 1px solid #b39a6770; }
+.witcher-character-sidebar legend { color: #e0cc9e; padding: 0 4px 0 0; font-family: Georgia, serif; font-size: 16px; }
 .witcher-character-sidebar .witcher-resource-values { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 5px; align-items: end; }
 .witcher-character-sidebar label { font-size: 10px; text-transform: uppercase; color: #cebc9a; text-align: center; }
-.witcher-character-sidebar input { width: 100%; height: 46px; padding: 2px; margin-top: 6px; background: #100e0e35; border: 1px solid #b39a6740; border-radius: 2px; color: #fff3d9; font-family: Georgia, serif; font-size: 27px; text-align: center; }
-.witcher-character-sidebar .witcher-resource-values > span { line-height: 46px; color: #a78d65; }
+.witcher-character-sidebar input { width: 100%; height: 30px; padding: 2px; margin-top: 3px; background: #100e0e35; border: 1px solid #b39a6740; border-radius: 2px; color: #fff3d9; font-family: Georgia, serif; font-size: 20px; text-align: center; }
+.witcher-character-sidebar .witcher-resource-values > span { line-height: 30px; color: #a78d65; }
+.witcher-character-sidebar [data-tooltip] { cursor: help; }
+.witcher-character-sidebar [data-tooltip] > i { font-size: 9px; opacity: 0.65; }
+.witcher-character-sidebar .witcher-resource-detail { margin-top: -9px; }
+.witcher-resource-values output { display: block; height: 30px; margin-top: 3px; font-family: Georgia, serif; font-size: 20px; line-height: 30px; color: #fff3d9; }
+.witcher-derived { margin-top: 12px; padding-top: 8px; border-top: 1px solid #b39a6770; }
+.witcher-stat-row { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; min-height: 27px; padding: 4px 0; font-size: 12px; color: #dfccb2; }
+.witcher-stat-row strong { flex: none; font-family: Georgia, serif; font-size: 16px; color: #fff3d9; font-variant-numeric: tabular-nums; }
+.witcher-character-sidebar .witcher-stun-roll { width: 100%; height: 26px; margin: 2px 0 5px; padding: 3px 5px; border: 1px solid #b39a6760; background: #b39a6715; color: #eddcba; font-size: 11px; line-height: 1.2; }
+.witcher-stun-roll:disabled { opacity: 0.45; }
+.witcher-stat-entry { margin-top: 8px; }
+.witcher-stat-entry > label, .witcher-stat-entry > span { text-align: left; text-transform: none; font-size: 12px; color: #cebc9a; }
+.witcher-stat-entry > label { display: block; }
+.witcher-stat-entry-value output { padding: 5px 0; font-family: Georgia, serif; font-size: 18px; }
+.witcher-stat-entry-value { display: flex; align-items: center; gap: 5px; color: #fff3d9; font-size: 14px; }
+.witcher-stat-entry-value input { flex: 1; min-width: 0; }
+.witcher-stat-entry-value > span { flex: none; white-space: nowrap; }
+.witcher-stat-entry.overloaded input { border-color: #ef9a85; color: #ffbca4; }
+.witcher-wound-notice { margin: 5px 0 0; padding: 6px 8px; background: #ab3c3425; border-left: 2px solid #d57661; color: #ffd0b6; font-size: 11px; line-height: 1.4; }
 .witcher-character-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; color: #2f2a26; }
 .witcher-character-name { flex: none; background: linear-gradient(100deg, #482021, #66292a); min-height: 86px; padding: 17px 22px 13px; }
-.witcher-character-name input { width: 100%; height: 36px; color: #f8eddb; background: transparent; border: 0; border-radius: 0; padding: 0; font-family: Georgia, serif; font-size: 27px; font-weight: 700; }
-.witcher-character-name > span { display: block; margin-top: 5px; color: #d9bf8a; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+.witcher-character-name > input { width: 100%; height: 36px; color: #f8eddb; background: transparent; border: 0; border-radius: 0; padding: 0; font-family: Georgia, serif; font-size: 27px; font-weight: 700; }
+.witcher-luck { margin-top: 7px; color: #ead8b0; }
+.witcher-luck-heading { display: flex; align-items: center; gap: 8px; }
+.witcher-luck-heading { flex-wrap: wrap; }
+.witcher-luck-selected { font-size: 11px; color: #a3edab; }
+.witcher-luck-remaining[data-tooltip] { cursor: help; }
+.witcher-luck-points .witcher-luck-point.selected { color: #edfff0; background: #28633d; border-color: #8bc79b; box-shadow: 0 0 0 1px #83bd8540; }
+.witcher-luck-heading > label { font-size: 12px; cursor: help; }
+.witcher-luck-heading > label > i { font-size: 10px; opacity: 0.7; }
+.witcher-luck-heading > input { width: 48px; height: 25px; padding: 2px 3px; background: #1a111133; border: 1px solid #ae8d6455; color: #f8eddb; text-align: center; font-size: 14px; }
+.witcher-luck-remaining { font-size: 11px; font-variant-numeric: tabular-nums; color: #d8bd8d; }
+.witcher-luck-heading > button { width: 25px; height: 25px; padding: 0; color: #ead8b0; background: transparent; border: 1px solid #ae8d6455; border-radius: 3px; }
+.witcher-luck-points { display: flex; flex-wrap: wrap; gap: 4px; max-height: 76px; overflow-y: auto; margin-top: 5px; }
+.witcher-luck-points:empty { display: none; }
+.witcher-luck-points .witcher-luck-point { position: relative; flex: 0 0 22px; width: 22px; height: 22px; padding: 0; color: #f4dfb5; background: #ae8d6428; border: 1px solid #bd9b65; border-radius: 50%; font-size: 10px; line-height: 20px; }
+.witcher-luck-point.spent { color: #af9789; background: transparent; opacity: 0.6; text-decoration: line-through; }
+.witcher-luck-point.spent::after { content: ""; position: absolute; inset: 9px -2px auto; height: 2px; background: #eed9b0; transform: rotate(-45deg); }
 .witcher-character-tabs.tabs { display: flex; flex: none; justify-content: flex-start; gap: 4px; background: #303e43; border: 0; border-bottom: 2px solid #b39a67; padding: 0 14px; margin: 0; }
 .witcher-character-tabs button { display: flex; align-items: center; gap: 8px; height: 38px; padding: 7px 10px; border: 0; border-radius: 0; background: transparent; color: #d2d2c9; font-family: Georgia, serif; font-size: 15px; box-shadow: none; }
 .witcher-character-tabs button:hover { background: #ffffff0d; color: #fff3d9; }
@@ -35,6 +68,40 @@
 .witcher-character-content { flex: 1; min-height: 0; overflow-y: auto; padding: 24px; }
 .witcher-character-content.tab { display: none; }
 .witcher-character-content.tab.active { display: block; }
+.witcher-parameters { border-top: 1px solid #b8aa94; margin-top: 24px; padding-top: 20px; }
+.witcher-parameters h2, .witcher-effects h2 { margin: 0 0 16px; border: 0; font-family: Georgia, serif; font-size: 21px; color: #6b3030; }
+.witcher-parameters-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 16px; }
+.witcher-parameters-heading h2 { margin: 0; }
+.witcher-parameters-heading .witcher-edit-attributes { flex: none; width: auto; height: 28px; padding: 2px 5px; gap: 5px; background: transparent; border: 0; color: #796953; font-size: 11px; }
+.witcher-edit-attributes i { font-size: 20px; }
+.witcher-edit-attributes[aria-checked=true] { color: #32623d; }
+.witcher-base-hint { margin: -5px 0 12px; color: #796953; font-size: 11px; }
+.witcher-attribute-value output { min-width: 48px; line-height: 36px; font-family: Georgia, serif; font-size: 26px; color: #302b26; cursor: help; }
+.witcher-luck-bonus { display: block; color: #32623d; font-weight: bold; }
+.witcher-stun-target { cursor: help; border-bottom: 1px dotted currentColor; }
+.witcher-attribute-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.witcher-attribute { padding: 12px 8px 10px; min-width: 0; text-align: center; background: #faf6ed; border: 1px solid #c7bba6; border-top: 3px solid #a78b56; border-radius: 3px; }
+.witcher-attribute label { display: inline-block; cursor: help; }
+.witcher-attribute-short { display: block; font-family: Georgia, serif; font-size: 22px; color: #6b3030; }
+.witcher-attribute-name { margin-top: 4px; font-size: 11px; color: #796953; overflow-wrap: anywhere; }
+.witcher-attribute-name i { font-size: 10px; opacity: 0.7; }
+.witcher-attribute-value { display: flex; justify-content: center; align-items: center; gap: 4px; margin-top: 8px; }
+.witcher-attribute-value input { min-width: 0; width: 58px; height: 36px; border: 1px solid #c7bba6; background: #f1eade; color: #302b26; font-family: Georgia, serif; font-size: 23px; text-align: center; }
+.witcher-attribute-value button { flex: 0 0 26px; width: 26px; height: 30px; padding: 0; background: transparent; border: 0; color: #805c36; font-size: 19px; }
+.witcher-attribute.reduced { border-color: #b15b49; }
+.witcher-effective { display: block; margin-top: 6px; color: #993b2e; font-size: 10px; }
+.witcher-effects-heading { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.witcher-effects-heading h2 { margin: 0; }
+.witcher-effects-heading button, .witcher-recover-stun { height: auto; padding: 7px 10px; background: #54302a; border: 1px solid #886446; color: #f8ead0; font-size: 12px; }
+.witcher-effect { padding: 14px; margin-bottom: 12px; background: #faf6ed; border: 1px solid #c7bba6; border-left: 3px solid #a78b56; border-radius: 3px; }
+.witcher-effect.inactive { opacity: 0.65; }
+.witcher-effect header { display: flex; align-items: center; gap: 10px; }
+.witcher-effect header img { width: 30px; height: 30px; border: 0; background: #54302a; border-radius: 4px; }
+.witcher-effect h3 { flex: 1; margin: 0; border: 0; font-size: 17px; color: #6b3030; }
+.witcher-effect h3 small { font-size: 10px; font-weight: normal; }
+.witcher-effect header button { flex: 0 0 26px; width: 26px; height: 26px; padding: 0; background: transparent; color: #8f6752; border: 0; }
+.witcher-effect-description { margin-top: 12px; font-size: 13px; line-height: 1.6; color: #514538; }
+.witcher-effects-empty { color: #89765b; font-size: 14px; }
 .witcher-biography-section { margin-bottom: 16px; border-bottom: 1px solid #c7bba6; padding-bottom: 12px; }
 .witcher-biography-section:last-child { margin-bottom: 0; }
 .witcher-biography-section > summary { cursor: pointer; color: #6b3030; font-family: Georgia, serif; font-size: 18px; line-height: 1.5; }
@@ -125,6 +192,10 @@
   .witcher-character-hero { grid-template-columns: 118px minmax(0, 1fr); gap: 16px; }
   .witcher-eliott .witcher-portrait { height: 158px; }
   .witcher-eliott .witcher-select-reference { font-size: 16px; }
+  .witcher-character-tabs.tabs { gap: 1px; padding: 0 5px; }
+  .witcher-character-tabs button { gap: 4px; padding: 7px 6px; font-size: 13px; }
+  .witcher-attribute-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .witcher-attribute { padding: 10px 5px; }
 }
 
 #token-hud .witcher-vision-toggle.active { color: #f0cc83; border-color: #d4b477; box-shadow: 0 0 8px #d4b47766; }

@@ -1,0 +1,37 @@
+import { SYSTEM_ID } from "../config.mjs";
+
+const nextPaint = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+/** Subscribe before creation so fast chat renders/DSN completions cannot be missed. */
+export function trackRollDisplay() {
+  // Headless consumers have no chat or animation to wait for.
+  if (!globalThis.Hooks) return { flags: {}, wait: async () => {}, close: () => {} };
+  const id = foundry.utils.randomID();
+  let rendered, animated, messageId;
+  const renderReady = new Promise(resolve => { rendered = resolve; });
+  const animationReady = new Promise(resolve => { animated = resolve; });
+  const completed = new Set();
+  const renderHook = Hooks.on("renderChatMessageHTML", message => {
+    if (message.flags[SYSTEM_ID]?.displayId === id) rendered();
+  });
+  const diceHook = Hooks.on("diceSoNiceRollComplete", (finishedId, companions = []) => {
+    for (const finished of [finishedId, ...companions]) completed.add(finished);
+    if (completed.has(messageId)) animated();
+  });
+  return {
+    flags: { [SYSTEM_ID]: { displayId: id } },
+    async wait(message) {
+      if (!message) return;
+      messageId = message.id;
+      if (ui.chat?.rendered && message.visible) await renderReady;
+      // DSN's public wait method skips animations when "immediately display chat"
+      // is enabled. Its completion hook handles that mode and interactive throws too.
+      if (game.dice3d && message._dice3danimating && !completed.has(message.id)) await animationReady;
+      await nextPaint();
+    },
+    close() {
+      Hooks.off("renderChatMessageHTML", renderHook);
+      Hooks.off("diceSoNiceRollComplete", diceHook);
+    }
+  };
+}

@@ -14,6 +14,126 @@
     }
   },
   "WITCHER": {
+    "Attributes": {
+      "intelligence": {
+        "Label": "Intelligence",
+        "Short": "INT",
+        "Description": "Intellect, knowledge, memory and analysis. Used for Awareness, Deduction, Education, Tactics, Monster Lore, Wilderness Survival and other intellectual skills."
+      },
+      "reflex": {
+        "Label": "Reflex",
+        "Short": "REF",
+        "Description": "Reaction speed and precision in close combat. Used for melee attacks, dodging, brawling, riding and related skills."
+      },
+      "dexterity": {
+        "Label": "Dexterity",
+        "Short": "DEX",
+        "Description": "Coordination, steady hands and movement control. Used for ranged weapons, Athletics, Stealth, Sleight of Hand and other precise actions."
+      },
+      "body": {
+        "Label": "Body",
+        "Short": "BODY",
+        "Description": "Physical strength and endurance. Determines HP, Stamina, carrying capacity and melee damage bonuses. Used for Physique and Endurance."
+      },
+      "speed": {
+        "Label": "Speed",
+        "Short": "SPD",
+        "Description": "Movement speed. Determines ordinary movement, Run and Leap."
+      },
+      "empathy": {
+        "Label": "Empathy",
+        "Short": "EMP",
+        "Description": "Understanding others, charm and social ability. Used for Charisma, Persuasion, Deceit, Leadership, Human Perception, Social Etiquette, Seduction and other social skills."
+      },
+      "craft": {
+        "Label": "Craft",
+        "Short": "CRA",
+        "Description": "Technical knowledge, precision and manual skills. Used for Alchemy, Crafting, First Aid, Pick Lock, Forgery, Disguise and other craft skills."
+      },
+      "will": {
+        "Label": "Will",
+        "Short": "WILL",
+        "Description": "Mental resilience, self-control and magical potential. Used for Courage, Intimidation, resisting magic and coercion, and casting spells, hexes and rituals."
+      },
+      "luck": {
+        "Label": "Luck",
+        "Short": "LUCK",
+        "Description": "Points to improve an important roll. Before a check, spend any available Luck to add the same amount to the result. The pool replenishes at the beginning of a session."
+      }
+    },
+    "Luck": {
+      "Maximum": "Maximum Luck",
+      "Points": "Select Luck points for the next roll. Click again to cancel.",
+      "Point": "Luck point",
+      "Reset": "Restore Luck at the start of the session",
+      "UpdateError": "Could not update Luck.",
+      "NextRoll": "to next roll",
+      "RollBonus": "+{value} from Luck",
+      "SpendError": "The roll was posted, but Luck could not be deducted. Check the character’s pool before rolling again."
+    },
+    "Effects": {
+      "Stunned": "Stunned",
+      "StunnedDescription": "The character is disoriented, with a spinning head and blurred vision. They cannot take any actions; hitting them requires a DC 10 check. To end the effect, they must pass a Stun save, which takes a full turn. Being hit immediately brings them back to their senses.",
+      "Inactive": "inactive",
+      "Remove": "Remove effect",
+      "Empty": "No effects applied.",
+      "Recover": "Stun save — recover",
+      "UpdateError": "Could not update the character's effect."
+    },
+    "Statistics": {
+      "Primary": "Primary statistics",
+      "Physical": "Physical statistics",
+      "Combat": "Combat statistics",
+      "Stun": "Stun",
+      "Recovery": "Recovery",
+      "WoundThreshold": "Wound threshold",
+      "Initiative": "Initiative",
+      "Run": "Run",
+      "Leap": "Leap",
+      "Carry": "Carried weight",
+      "Vigor": "Magic limit (Vigor)",
+      "Meters": "m",
+      "Kilograms": "kg",
+      "HealthDescription": "Health Points (HP) measure how much physical damage a character can withstand. Falling below the wound threshold imposes severe penalties. At 0 HP or below, the character must fight for their life.",
+      "StaminaDescription": "Stamina (STA) fuels physical and magical effort: extra actions, repeated defenses, spells and some abilities. Recovery restores it. Do not confuse it with the Endurance skill.",
+      "StunDescription": "How hard it is to stun or disorient the character. Roll 1d10 strictly under Stun to succeed. A tie fails.",
+      "RecoveryDescription": "Recovery (REC) is the amount of Stamina restored by a Recover action. REC 10 restores 10 STA.",
+      "WoundThresholdDescription": "Below this threshold, INT, REF, DEX and WILL are halved, rounding down. At a threshold of 10, 10 HP has no penalty but 9 HP does. Resource limits and the threshold itself use base statistics.",
+      "InitiativeDescription": "Determines combat order. Higher results act earlier. Uses current REF, including wound penalties.",
+      "RunDescription": "Maximum running distance in meters.",
+      "LeapDescription": "Maximum running leap distance in meters, rounded down.",
+      "CarryDescription": "Maximum weight without being overloaded depends on BODY. Carried weight is currently 0 kg; it will be calculated from equipment when inventory is added.",
+      "VigorDescription": "Vigor Threshold is the maximum total magic cost a character can safely channel in one round. Exceeding it causes damage. It is not another Stamina pool. The value mostly comes from profession and abilities; enter it manually for now.",
+      "ResourceFormula": "Maximum = ⌊(BODY + WILL) / 2⌋ × 5.<br>⌊({body} + {will}) / 2⌋ × 5 = {physical} × 5 = {maximum}.<br>Round the average of BODY and WILL down first.",
+      "RecoveryFormula": "REC = ⌊(BODY + WILL) / 2⌋ = ⌊({body} + {will}) / 2⌋ = {physical}.",
+      "StunFormula": "STUN = min(10, ⌊(BODY + WILL) / 2⌋).<br>min(10, ⌊({body} + {will}) / 2⌋) = min(10, {physical}) = {stun}.",
+      "WoundThresholdFormula": "Threshold = ⌊maximum HP / 5⌋ = ⌊{health} / 5⌋ = {threshold}.",
+      "InitiativeFormula": "Initiative = 1d10 + REF = 1d10 + {reflex}.",
+      "RunFormula": "Run = SPD × 3 = {speed} × 3 = {run} m.",
+      "LeapFormula": "Leap = ⌊Run / 5⌋ = ⌊{run} / 5⌋ = {leap} m.",
+      "CarryFormula": "BODY × 10 = {body} × 10 = {carryBase} kg.",
+      "UnfilledPhysical": "Enter BODY and WILL on the Main tab to calculate derived statistics. Until then, existing HP and Stamina limits are preserved.",
+      "UnfilledAttribute": "Enter the statistic before rolling.",
+      "AttributeRoll": "{attribute}: 1d10 + {value}",
+      "AttributeRollError": "Could not send the statistic roll to chat.",
+      "Wounded": "Seriously wounded: INT, REF, DEX and WILL are halved.",
+      "Dying": "HP ≤ 0: fight for your life. Serious wound penalties apply.",
+      "WoundedValue": "While wounded",
+      "RollStun": "Stun save",
+      "Success": "success",
+      "Failure": "failure",
+      "StunResult": "Stun save — {outcome}. Roll 1d10 strictly below {target}.",
+      "RollError": "Could not send the Stun save to chat.",
+      "Edit": "Edit",
+      "Base": "Base value",
+      "EditHint": "Enter base values. Race and lifepath bonuses are added automatically.",
+      "BaseValue": "Base value: {value}",
+      "Total": "Total",
+      "TotalValue": "Total: {value}",
+      "EmpathyLimit": "Dulled emotions: final EMP is at least 1 and at most 6.",
+      "WoundCalculation": "Serious wound: ⌊{value} / 2⌋ = {result}",
+      "StunNoLuck": "This save does not spend Luck. STUN ignores the serious-wound penalty to WILL."
+    },
     "Token": {
       "PreviewVision": "Preview 180° vision (only for you)",
       "RestoreVision": "Restore normal vision",
@@ -44,6 +164,8 @@
       "ChooseOrigin": "Choose a region of origin",
       "Identity": "Character",
       "Main": "Main",
+      "Parameters": "Statistics",
+      "Effects": "Effects",
       "Biography": "Biography",
       "Appearance": "Appearance",
       "Personality": "Personality traits",
@@ -85,7 +207,10 @@
       "Error": "Could not post the roll. Your selected dice are saved — you can try again.",
       "Quantity": "Dice quantities"
     },
-    "EquipmentSources": { "Family": "Family", "Friend": "Friend" },
+    "EquipmentSources": {
+      "Family": "Family",
+      "Friend": "Friend"
+    },
     "Equipment": {
       "NobleCharterDescription": "A document certifying the owner's noble ancestry and family standing.",
       "ChronicleDescription": "A family, historical or scholarly chronicle that the character grew up with and knows well.",
@@ -97,82 +222,287 @@
       "CommonDiagramDescription": "A detailed plan for crafting a specific item of common rarity.",
       "SacredSymbolDescription": "A symbol of the Great Sun faith, received through an upbringing among the high clergy.",
       "LuckyCharmDescription": "A small keepsake to which the character attributes special luck.",
-      "NobleCharter": "Noble charter", "Chronicle": "Chronicle", "PersonalCrest": "Personal crest",
-      "CommonDiagram": "Common diagram", "CommonFormula": "Common formula", "MusicalInstrument": "Musical instrument",
-      "LuckyCharm": "Lucky charm", "SacredSymbol": "Sacred symbol", "TrainedBird": "Trained bird", "TrainedSnake": "Trained snake"
+      "NobleCharter": "Noble charter",
+      "Chronicle": "Chronicle",
+      "PersonalCrest": "Personal crest",
+      "CommonDiagram": "Common diagram",
+      "CommonFormula": "Common formula",
+      "MusicalInstrument": "Musical instrument",
+      "LuckyCharm": "Lucky charm",
+      "SacredSymbol": "Sacred symbol",
+      "TrainedBird": "Trained bird",
+      "TrainedSnake": "Trained snake"
     },
     "FriendEquipment": {
-      "SacredText": "Sacred text", "HandmadeSouvenir": "Souvenir you made", "SilverRing": "Silver ring",
-      "Pendant": "Pendant", "BlackMagicDoll": "Black magic doll", "CarvedTotem": "Carved totem",
-      "Poster": "Poster", "Ticket": "Ticket", "EarnedCoin": "Coin you earned", "Mask": "Mask",
-      "BattleTrophy": "Battle trophy", "CeremonialMask": "Ceremonial mask", "ColorfulBadge": "Bright multicoloured badge",
-      "SilverNecklace": "Silver necklace", "Emblem": "Emblem", "MagnifyingGlass": "Magnifying glass",
-      "DimeritiumRing": "Dimeritium ring", "HandmadeTrinket": "Trinket you made", "StrangeTotem": "Strange totem",
-      "AdmirerGift": "Gift from an admirer", "StrawDoll": "Straw doll", "SmallHandmadeSouvenir": "Small souvenir you made",
-      "BattleKeepsake": "Gift commemorating a battle", "SignetRing": "Signet ring", "ShoulderBag": "Shoulder bag",
-      "Storybook": "Book of tales", "HuntingTrophy": "Hunting trophy", "PeasantShovel": "Peasant's shovel"
+      "SacredText": "Sacred text",
+      "HandmadeSouvenir": "Souvenir you made",
+      "SilverRing": "Silver ring",
+      "Pendant": "Pendant",
+      "BlackMagicDoll": "Black magic doll",
+      "CarvedTotem": "Carved totem",
+      "Poster": "Poster",
+      "Ticket": "Ticket",
+      "EarnedCoin": "Coin you earned",
+      "Mask": "Mask",
+      "BattleTrophy": "Battle trophy",
+      "CeremonialMask": "Ceremonial mask",
+      "ColorfulBadge": "Bright multicoloured badge",
+      "SilverNecklace": "Silver necklace",
+      "Emblem": "Emblem",
+      "MagnifyingGlass": "Magnifying glass",
+      "DimeritiumRing": "Dimeritium ring",
+      "HandmadeTrinket": "Trinket you made",
+      "StrangeTotem": "Strange totem",
+      "AdmirerGift": "Gift from an admirer",
+      "StrawDoll": "Straw doll",
+      "SmallHandmadeSouvenir": "Small souvenir you made",
+      "BattleKeepsake": "Gift commemorating a battle",
+      "SignetRing": "Signet ring",
+      "ShoulderBag": "Shoulder bag",
+      "Storybook": "Book of tales",
+      "HuntingTrophy": "Hunting trophy",
+      "PeasantShovel": "Peasant's shovel"
     },
     "Friends": {
       "Hint": "An optional story of an acquaintance and a keepsake. You may leave it blank.",
-      "Equipment": "Keepsake", "Or": "or",
-      "Church": { "Name": "Church", "Description": "The local religion strongly influenced you. You spent many hours in church every day." },
-      "NorthArtisan": { "Name": "Artisan", "Description": "An artisan inspired you and taught you to value art and craftsmanship." },
-      "NorthCount": { "Name": "Count", "Description": "A count or countess had the greatest influence on you, teaching you self-control." },
-      "NorthMage": { "Name": "Mage", "Description": "A mage taught you not to fear magic and to question everything." },
-      "Witch": { "Name": "Witch", "Description": "A village witch had the greatest influence on you and showed you the value of knowledge." },
-      "Cursed": { "Name": "Cursed person", "Description": "A person suffering from a curse taught you never to judge anyone too harshly." },
-      "NorthPerformer": { "Name": "Performer", "Description": "A performer had the greatest influence on you and taught you many ways to attract attention." },
-      "Merchant": { "Name": "Merchant", "Description": "A merchant taught you to be resourceful and quick-witted." },
-      "NorthCriminal": { "Name": "Criminal", "Description": "A criminal had the greatest influence on you and taught you how to look after yourself." },
-      "NorthWarrior": { "Name": "Warrior", "Description": "A soldier had the greatest influence on you and taught you to defend yourself." },
-      "GreatSun": { "Name": "Cult of the Great Sun", "Description": "The church strongly influenced you. You spent years studying rituals and chants." },
-      "Exile": { "Name": "Exile", "Description": "An exile had the greatest influence on you and taught you to question society's foundations." },
-      "NilfgaardCount": { "Name": "Count", "Description": "A count had the greatest influence on you and taught you to lead and manage people." },
-      "NilfgaardMage": { "Name": "Mage", "Description": "A mage taught you the importance of order and caution." },
-      "Investigator": { "Name": "Investigator", "Description": "An imperial detective had the greatest influence on you. You spent much time solving mysteries." },
-      "MageHunter": { "Name": "Mage hunter", "Description": "A mage hunter had the greatest influence on you and taught you to fear magic and mages." },
-      "NilfgaardWarrior": { "Name": "Warrior", "Description": "A soldier had the greatest influence on you, telling stories of danger and adventure." },
-      "NilfgaardArtisan": { "Name": "Artisan", "Description": "An artisan inspired you and taught you to value skill and precision." },
-      "SentientMonster": { "Name": "Sentient monster", "Description": "A sentient monster taught you that not all monsters are evil." },
-      "NilfgaardPerformer": { "Name": "Performer", "Description": "A performer had the greatest influence on you and taught you self-expression." },
-      "Human": { "Name": "Human", "Description": "A human had the greatest influence on you and helped you question racist prejudices." },
-      "ElderArtisan": { "Name": "Artisan", "Description": "An artisan inspired you and taught you to value the art of the Elder Races." },
-      "NobleWarrior": { "Name": "Noble warrior", "Description": "A war dancer or defender of Mahakam had the greatest influence on you and taught you the meaning of honour." },
-      "HighBorn": { "Name": "High-born", "Description": "A high-born person taught you pride and the rules of etiquette." },
-      "ElderPerformer": { "Name": "Performer", "Description": "A performer had the greatest influence on you and helped you understand the importance of happiness and beauty." },
-      "Raider": { "Name": "Raider", "Description": "A raider had the greatest influence on you and taught you that you have the right to take what you need." },
-      "Sage": { "Name": "Sage", "Description": "A sage had the greatest influence on you and taught you the importance of the history of the Elder Races." },
-      "ElderCriminal": { "Name": "Criminal", "Description": "A criminal had the greatest influence on you and taught you to follow your own rules." },
-      "Hunter": { "Name": "Hunter", "Description": "A hunter had the greatest influence on you and taught you to survive in the wilderness." },
-      "Peasant": { "Name": "Lowland peasant", "Description": "A lowland peasant had the greatest influence on you and taught you how to live happily." }
+      "Equipment": "Keepsake",
+      "Or": "or",
+      "Church": {
+        "Name": "Church",
+        "Description": "The local religion strongly influenced you. You spent many hours in church every day."
+      },
+      "NorthArtisan": {
+        "Name": "Artisan",
+        "Description": "An artisan inspired you and taught you to value art and craftsmanship."
+      },
+      "NorthCount": {
+        "Name": "Count",
+        "Description": "A count or countess had the greatest influence on you, teaching you self-control."
+      },
+      "NorthMage": {
+        "Name": "Mage",
+        "Description": "A mage taught you not to fear magic and to question everything."
+      },
+      "Witch": {
+        "Name": "Witch",
+        "Description": "A village witch had the greatest influence on you and showed you the value of knowledge."
+      },
+      "Cursed": {
+        "Name": "Cursed person",
+        "Description": "A person suffering from a curse taught you never to judge anyone too harshly."
+      },
+      "NorthPerformer": {
+        "Name": "Performer",
+        "Description": "A performer had the greatest influence on you and taught you many ways to attract attention."
+      },
+      "Merchant": {
+        "Name": "Merchant",
+        "Description": "A merchant taught you to be resourceful and quick-witted."
+      },
+      "NorthCriminal": {
+        "Name": "Criminal",
+        "Description": "A criminal had the greatest influence on you and taught you how to look after yourself."
+      },
+      "NorthWarrior": {
+        "Name": "Warrior",
+        "Description": "A soldier had the greatest influence on you and taught you to defend yourself."
+      },
+      "GreatSun": {
+        "Name": "Cult of the Great Sun",
+        "Description": "The church strongly influenced you. You spent years studying rituals and chants."
+      },
+      "Exile": {
+        "Name": "Exile",
+        "Description": "An exile had the greatest influence on you and taught you to question society's foundations."
+      },
+      "NilfgaardCount": {
+        "Name": "Count",
+        "Description": "A count had the greatest influence on you and taught you to lead and manage people."
+      },
+      "NilfgaardMage": {
+        "Name": "Mage",
+        "Description": "A mage taught you the importance of order and caution."
+      },
+      "Investigator": {
+        "Name": "Investigator",
+        "Description": "An imperial detective had the greatest influence on you. You spent much time solving mysteries."
+      },
+      "MageHunter": {
+        "Name": "Mage hunter",
+        "Description": "A mage hunter had the greatest influence on you and taught you to fear magic and mages."
+      },
+      "NilfgaardWarrior": {
+        "Name": "Warrior",
+        "Description": "A soldier had the greatest influence on you, telling stories of danger and adventure."
+      },
+      "NilfgaardArtisan": {
+        "Name": "Artisan",
+        "Description": "An artisan inspired you and taught you to value skill and precision."
+      },
+      "SentientMonster": {
+        "Name": "Sentient monster",
+        "Description": "A sentient monster taught you that not all monsters are evil."
+      },
+      "NilfgaardPerformer": {
+        "Name": "Performer",
+        "Description": "A performer had the greatest influence on you and taught you self-expression."
+      },
+      "Human": {
+        "Name": "Human",
+        "Description": "A human had the greatest influence on you and helped you question racist prejudices."
+      },
+      "ElderArtisan": {
+        "Name": "Artisan",
+        "Description": "An artisan inspired you and taught you to value the art of the Elder Races."
+      },
+      "NobleWarrior": {
+        "Name": "Noble warrior",
+        "Description": "A war dancer or defender of Mahakam had the greatest influence on you and taught you the meaning of honour."
+      },
+      "HighBorn": {
+        "Name": "High-born",
+        "Description": "A high-born person taught you pride and the rules of etiquette."
+      },
+      "ElderPerformer": {
+        "Name": "Performer",
+        "Description": "A performer had the greatest influence on you and helped you understand the importance of happiness and beauty."
+      },
+      "Raider": {
+        "Name": "Raider",
+        "Description": "A raider had the greatest influence on you and taught you that you have the right to take what you need."
+      },
+      "Sage": {
+        "Name": "Sage",
+        "Description": "A sage had the greatest influence on you and taught you the importance of the history of the Elder Races."
+      },
+      "ElderCriminal": {
+        "Name": "Criminal",
+        "Description": "A criminal had the greatest influence on you and taught you to follow your own rules."
+      },
+      "Hunter": {
+        "Name": "Hunter",
+        "Description": "A hunter had the greatest influence on you and taught you to survive in the wilderness."
+      },
+      "Peasant": {
+        "Name": "Lowland peasant",
+        "Description": "A lowland peasant had the greatest influence on you and taught you how to live happily."
+      }
     },
     "Family": {
-      "Groups": { "North": "Northerner", "Nilfgaard": "Nilfgaardian", "Elder": "Non-human" },
+      "Groups": {
+        "North": "Northerner",
+        "Nilfgaard": "Nilfgaardian",
+        "Elder": "Non-human"
+      },
       "Roll": "Roll result",
       "Rewards": "Starting equipment and contacts",
       "EquipmentLinks": "Equipment in the compendium",
       "WitcherRule": "Witchers do not receive family status rewards.",
-      "NorthAristocracy": { "Name": "Aristocracy", "Description": "You grew up in a wealthy manor where servants fulfilled your every wish. You were expected to behave well and make a good impression.", "Reward": "Noble charter (+2 Reputation)." },
-      "MageWard": { "Name": "Mage's ward", "Description": "You were placed in a mage's care at a young age. You lived comfortably but rarely saw your guardian, who was always busy.", "Reward": "Chronicle (+1 Education)." },
-      "NorthKnighthood": { "Name": "Knighthood", "Description": "You lived in a manor and were raised to become a proper lord or lady. Your future was decided at birth.", "Reward": "Personal crest (+1 Reputation)." },
-      "NorthMerchants": { "Name": "Merchant family", "Description": "You grew up among merchants, surrounded by vendors' cries and clinking coins.", "Reward": "2 acquaintances." },
-      "NorthArtisans": { "Name": "Artisan family", "Description": "You grew up in a workshop, hearing hammers and other sounds of craft every day.", "Reward": "3 common diagrams/formulae." },
-      "NorthPerformers": { "Name": "Family of performers", "Description": "You grew up with an acting troupe, perhaps travelling with them or performing in a theatre.", "Reward": "1 musical instrument and 1 friend." },
-      "NorthPeasants": { "Name": "Peasant family", "Description": "You grew up on a remote farm. You owned very little and lived a simple but dangerous life.", "Reward": "Lucky charm (+1 Luck)." },
-      "NilfgaardAristocracy": { "Name": "Aristocracy", "Description": "You grew up in a wealthy manor and learned to survive court intrigue. Luxury was an incentive to learn.", "Reward": "Noble charter (+2 Reputation)." },
-      "HighClergy": { "Name": "High clergy", "Description": "You grew up among the priests of the Great Sun. You were a devout child, certain that the church would guide you.", "Reward": "Sacred symbol (+1 Courage)." },
-      "NilfgaardKnighthood": { "Name": "Knighthood", "Description": "You grew up knowing that serving the emperor was your duty and luxury was a reward for your future service.", "Reward": "Personal crest (+1 Reputation)." },
-      "NilfgaardArtisans": { "Name": "Artisan family", "Description": "You grew up in a workshop, learning to make goods that could be sold around the world and discovering the value of skill.", "Reward": "3 common diagrams/formulae." },
-      "NilfgaardMerchants": { "Name": "Merchant family", "Description": "You grew up selling goods across the Empire and saw exotic wares from around the world.", "Reward": "2 acquaintances." },
-      "Slavery": { "Name": "Slavery", "Description": "You were enslaved from birth. You lived in a simple room, worked hard and owned little.", "Reward": "Trained bird or snake." },
-      "NilfgaardPeasants": { "Name": "Peasant family", "Description": "You grew up on one of the Empire's thousands of farms. You owned very little, but life was simple.", "Reward": "Lucky charm (+1 Luck)." },
-      "ElderAristocracy": { "Name": "Aristocracy", "Description": "You grew up in a palace, constantly reminded of a glorious past and expected to live up to your ancestors.", "Reward": "Noble charter (+2 Reputation)." },
-      "NobleWarrior": { "Name": "Noble warrior", "Description": "You are the child of a noble warrior, expected to uphold your family's reputation and honour your ancestors.", "Reward": "Personal crest (+1 Reputation)." },
-      "ElderMerchants": { "Name": "Merchant family", "Description": "You grew up with travelling merchants. Life could be hard, but goods made by non-humans were always valued.", "Reward": "2 acquaintances." },
-      "Scribes": { "Name": "Family of scribes", "Description": "Your family chronicled the history of the Elder Races, trying to preserve it for future generations.", "Reward": "Chronicle (+1 Education)." },
-      "ElderPerformers": { "Name": "Performers", "Description": "You sang and performed on stage from childhood, helping with makeup or repairing musical instruments in your free time.", "Reward": "1 musical instrument and 1 friend." },
-      "ElderArtisans": { "Name": "Artisan family", "Description": "You grew up among artisans, visited ancient palaces for inspiration and spent many hours at work every day.", "Reward": "3 common diagrams/formulae." },
-      "LowBorn": { "Name": "Low birth", "Description": "You came from an ordinary family and earned your living cleaning other people's mansions or surviving on handouts in your home city.", "Reward": "Lucky charm (+1 Luck)." }
+      "NorthAristocracy": {
+        "Name": "Aristocracy",
+        "Description": "You grew up in a wealthy manor where servants fulfilled your every wish. You were expected to behave well and make a good impression.",
+        "Reward": "Noble charter (+2 Reputation)."
+      },
+      "MageWard": {
+        "Name": "Mage's ward",
+        "Description": "You were placed in a mage's care at a young age. You lived comfortably but rarely saw your guardian, who was always busy.",
+        "Reward": "Chronicle (+1 Education)."
+      },
+      "NorthKnighthood": {
+        "Name": "Knighthood",
+        "Description": "You lived in a manor and were raised to become a proper lord or lady. Your future was decided at birth.",
+        "Reward": "Personal crest (+1 Reputation)."
+      },
+      "NorthMerchants": {
+        "Name": "Merchant family",
+        "Description": "You grew up among merchants, surrounded by vendors' cries and clinking coins.",
+        "Reward": "2 acquaintances."
+      },
+      "NorthArtisans": {
+        "Name": "Artisan family",
+        "Description": "You grew up in a workshop, hearing hammers and other sounds of craft every day.",
+        "Reward": "3 common diagrams/formulae."
+      },
+      "NorthPerformers": {
+        "Name": "Family of performers",
+        "Description": "You grew up with an acting troupe, perhaps travelling with them or performing in a theatre.",
+        "Reward": "1 musical instrument and 1 friend."
+      },
+      "NorthPeasants": {
+        "Name": "Peasant family",
+        "Description": "You grew up on a remote farm. You owned very little and lived a simple but dangerous life.",
+        "Reward": "Lucky charm (+1 Luck)."
+      },
+      "NilfgaardAristocracy": {
+        "Name": "Aristocracy",
+        "Description": "You grew up in a wealthy manor and learned to survive court intrigue. Luxury was an incentive to learn.",
+        "Reward": "Noble charter (+2 Reputation)."
+      },
+      "HighClergy": {
+        "Name": "High clergy",
+        "Description": "You grew up among the priests of the Great Sun. You were a devout child, certain that the church would guide you.",
+        "Reward": "Sacred symbol (+1 Courage)."
+      },
+      "NilfgaardKnighthood": {
+        "Name": "Knighthood",
+        "Description": "You grew up knowing that serving the emperor was your duty and luxury was a reward for your future service.",
+        "Reward": "Personal crest (+1 Reputation)."
+      },
+      "NilfgaardArtisans": {
+        "Name": "Artisan family",
+        "Description": "You grew up in a workshop, learning to make goods that could be sold around the world and discovering the value of skill.",
+        "Reward": "3 common diagrams/formulae."
+      },
+      "NilfgaardMerchants": {
+        "Name": "Merchant family",
+        "Description": "You grew up selling goods across the Empire and saw exotic wares from around the world.",
+        "Reward": "2 acquaintances."
+      },
+      "Slavery": {
+        "Name": "Slavery",
+        "Description": "You were enslaved from birth. You lived in a simple room, worked hard and owned little.",
+        "Reward": "Trained bird or snake."
+      },
+      "NilfgaardPeasants": {
+        "Name": "Peasant family",
+        "Description": "You grew up on one of the Empire's thousands of farms. You owned very little, but life was simple.",
+        "Reward": "Lucky charm (+1 Luck)."
+      },
+      "ElderAristocracy": {
+        "Name": "Aristocracy",
+        "Description": "You grew up in a palace, constantly reminded of a glorious past and expected to live up to your ancestors.",
+        "Reward": "Noble charter (+2 Reputation)."
+      },
+      "NobleWarrior": {
+        "Name": "Noble warrior",
+        "Description": "You are the child of a noble warrior, expected to uphold your family's reputation and honour your ancestors.",
+        "Reward": "Personal crest (+1 Reputation)."
+      },
+      "ElderMerchants": {
+        "Name": "Merchant family",
+        "Description": "You grew up with travelling merchants. Life could be hard, but goods made by non-humans were always valued.",
+        "Reward": "2 acquaintances."
+      },
+      "Scribes": {
+        "Name": "Family of scribes",
+        "Description": "Your family chronicled the history of the Elder Races, trying to preserve it for future generations.",
+        "Reward": "Chronicle (+1 Education)."
+      },
+      "ElderPerformers": {
+        "Name": "Performers",
+        "Description": "You sang and performed on stage from childhood, helping with makeup or repairing musical instruments in your free time.",
+        "Reward": "1 musical instrument and 1 friend."
+      },
+      "ElderArtisans": {
+        "Name": "Artisan family",
+        "Description": "You grew up among artisans, visited ancient palaces for inspiration and spent many hours at work every day.",
+        "Reward": "3 common diagrams/formulae."
+      },
+      "LowBorn": {
+        "Name": "Low birth",
+        "Description": "You came from an ordinary family and earned your living cleaning other people's mansions or surviving on handouts in your home city.",
+        "Reward": "Lucky charm (+1 Luck)."
+      }
     },
     "Races": {
       "Human": {
@@ -254,7 +584,7 @@
       "Found": "Found: {count}",
       "Selected": "Selected",
       "ReadMore": "Description",
-      "ReferenceOnly": "Bonuses are reference text and must be applied manually for now."
+      "ReferenceOnly": "Numerical attribute bonuses apply automatically. Equipment and contacts are not granted yet."
     },
     "Origins": {
       "Groups": {
