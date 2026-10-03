@@ -32,8 +32,8 @@ const leaves = (object, prefix = "") => Object.entries(object).flatMap(([key, va
 const languages = await Promise.all(manifest.languages.map(async ({ path }) => JSON.parse(await readFile(path, "utf8"))));
 assert.deepEqual(leaves(languages[0]).sort(), leaves(languages[1]).sort(), "Translation keys must match");
 const keys = new Set(leaves(languages[0]));
-for (const name of ["actor-sheet", "item-sheet", "reference-picker", "sheet-tabs"]) {
-  const template = await readFile(`templates/${name}.hbs`, "utf8");
+for (const name of (await readdir("templates")).filter(name => name.endsWith(".hbs"))) {
+  const template = await readFile(`templates/${name}`, "utf8");
   for (const [, key] of template.matchAll(/localize\s+["']([^"']+)["']/g)) {
     assert.ok(keys.has(key), `Missing translation: ${key}`);
   }

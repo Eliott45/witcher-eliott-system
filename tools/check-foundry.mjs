@@ -38,7 +38,7 @@ assert.equal(game.system.grid.distance, 2);
 assert.equal(game.system.grid.units, "m");
 const [packFolder] = game.system.packFolders;
 assert.equal(packFolder.name, "Witcher");
-assert.deepEqual(Array.from(packFolder.packs), ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages"]);
+assert.deepEqual(Array.from(packFolder.packs), ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions"]);
 game.model = { ...game.system.documentTypes, Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type, folders: new Map() }]));
 game.user = { id: "testuser00000001", isGM: true };
@@ -253,7 +253,8 @@ const { WitcherOriginData } = await import("../scripts/data/witcher-origin-data.
 const { WitcherFamilyStatusData } = await import("../scripts/data/witcher-family-status-data.mjs");
 const { WitcherInfluenceData } = await import("../scripts/data/witcher-influence-data.mjs");
 const { raceUuid, abilityUuid, originUuid, familyStatusUuid, equipmentUuid, influentialFriendUuid } = await import("../scripts/data/compendiums.mjs");
-CONFIG.Item.dataModels = { race: WitcherRaceData, ability: WitcherReferenceData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherReferenceData, influence: WitcherInfluenceData, language: WitcherReferenceData };
+const { WitcherAbilityData } = await import("../scripts/data/witcher-ability-data.mjs");
+CONFIG.Item.dataModels = { profession: WitcherReferenceData, race: WitcherRaceData, ability: WitcherAbilityData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherReferenceData, influence: WitcherInfluenceData, language: WitcherReferenceData };
 const equipmentPack = `${game.system.id}.equipment`;
 for (const source of await readJSON("../pack-sources/equipment.folders.json")) {
   const folder = new foundry.documents.BaseFolder(source, { pack: equipmentPack });
@@ -273,7 +274,7 @@ for (const pack of game.system.packs) {
     documents.set(uuid, document);
   }
 }
-assert.equal(documents.size, 132);
+assert.equal(documents.size, 231);
 const { addLanguageFromItem, LANGUAGES } = await import("../scripts/data/languages.mjs");
 const { languageUuid } = await import("../scripts/data/compendiums.mjs");
 const languageActor = { uuid: "Actor.languageImport", isOwner: true, system: new WitcherActorData(),
@@ -384,6 +385,7 @@ for (const statusId of ["dying", "dead"]) {
 handlebars.registerHelper("localize", key => foundry.utils.getProperty(translations, key) ?? key);
 handlebars.registerHelper("not", value => !value);
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
+handlebars.registerPartial("systems/witcher-eliott-system/templates/profession.hbs", await readFile(new URL("../templates/profession.hbs", import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -598,6 +600,25 @@ referenceSheet.isEditable = false;
 const itemTemplate = handlebars.compile(await readFile(new URL("../templates/item-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 const originalSheetActor = sheet.actor;
 const originalEditable = sheet.isEditable;
+const { PROFESSIONS } = await import("../scripts/data/professions.mjs");
+for (const definition of PROFESSIONS) {
+  const source = { name: "Profession persistence", type: "character", system: { details: { profession: definition.id } },
+    items: [{ name: definition.abilities[0].name, type: "ability", system: { ruleId: definition.abilities[0].id, level: 5, attribute: definition.abilities[0].attribute } }] };
+  const created = new foundry.documents.BaseActor(source);
+  const reopened = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(created.toObject())));
+  reopened.system.prepareDerivedData();
+  sheet.actor = { ...originalSheetActor, system: reopened.system, items: reopened.items, effects: [] };
+  const context = await sheet._prepareContext({});
+  assert.equal(context.profession.defining.level, 5);
+  assert.equal(context.profession.branches[0].entries[0].unlocked, true);
+  assert.equal(context.abilities.entries.filter(entry => entry.ruleId?.startsWith("profession.")).length, 0);
+  assert.ok(template(context).includes(`data-profession-level="${definition.abilities[0].id}"`));
+}
+let professionDrop;
+sheet.isEditable = true;
+sheet.actor = { ...originalSheetActor, update: async data => { professionDrop = data; } };
+await sheet._onDropItem(null, { type: "profession", system: { ruleId: "mage" } });
+assert.equal(professionDrop["system.details.profession"], "mage");
 sheet.actor = { ...originalSheetActor, system: savedSkills.system, items: savedSkills.items, effects: [] };
 sheet.isEditable = true;
 sheet.tabGroups.character = "skills";
@@ -784,4 +805,4 @@ if (process.argv[3]) {
   }
   console.log("Installed Dice So Nice: all nine critical chains produce the correct successive d10 throws");
 }
-console.log("Installed Foundry core: data, 132 Items, templates, native Luck, death saves and all nine critical chains OK");
+console.log("Installed Foundry core: data, 231 Items, templates, native Luck, death saves and all nine critical chains OK");

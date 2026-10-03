@@ -11,7 +11,8 @@
       "familyStatus": "Family status",
       "equipment": "Equipment",
       "influence": "Influential friend",
-      "language": "Language (2)"
+      "language": "Language (2)",
+      "profession": "Profession"
     }
   },
   "WITCHER": {
@@ -1211,6 +1212,21 @@
     "Actions": {
       "Title": "Actions",
       "Empty": "Character actions will appear here"
+    },
+    "Professions": {
+      "Title": "Профессия",
+      "Choose": "Выбрать профессию",
+      "Unset": "Не выбрана",
+      "Magic": "Магические",
+      "Mundane": "Остальные",
+      "Tree": "Дерево навыков",
+      "Passive": "Пассивная",
+      "Roll": "Проверка способности",
+      "Requires": "Требуется",
+      "EquipmentChoices": "Снаряжение на выбор",
+      "LanguageChoices": "Выберите языков",
+      "CombatChoices": "Ещё 5 боевых навыков",
+      "Advancement": "Новая ступень открывается после 5 уровней предыдущей; определяющий навык — корень всех трёх ветвей. При создании: 44 очка на навыки профессии, максимум 6; очки дополнительных навыков не покупают навыки профессии и дерево. Требования показаны подсказкой: ведущий может исправить уровни вручную."
     }
   }
 }

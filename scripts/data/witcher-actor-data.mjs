@@ -1,3 +1,4 @@
+import { PROFESSIONS } from "./professions.mjs";
 import { RACE_CHOICES } from "./races.mjs";
 import { ORIGIN_CHOICES, getOriginBonus } from "./origins.mjs";
 import { FAMILY_STATUS_CHOICES, getFamilyReward } from "./family-statuses.mjs";
@@ -44,6 +45,7 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
       }),
       vigor: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
       details: new SchemaField({
+        profession: new StringField({ required: true, nullable: false, blank: true, choices: ["", ...PROFESSIONS.map(entry => entry.id)], initial: "" }),
         age: new NumberField({ required: true, nullable: true, integer: true, min: 0, initial: null }),
         gender: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
         race: new StringField({ required: true, nullable: false, blank: true, choices: RACE_CHOICES, initial: "" }),

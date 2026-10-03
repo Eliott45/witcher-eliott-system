@@ -8,12 +8,28 @@
     "verified": "14.368",
     "maximum": "14"
   },
-  "authors": [{ "name": "Eliott45" }],
-  "esmodules": ["scripts/witcher.mjs"],
-  "styles": ["styles/witcher.css"],
+  "authors": [
+    {
+      "name": "Eliott45"
+    }
+  ],
+  "esmodules": [
+    "scripts/witcher.mjs"
+  ],
+  "styles": [
+    "styles/witcher.css"
+  ],
   "languages": [
-    { "lang": "ru", "name": "Русский", "path": "lang/ru.json" },
-    { "lang": "en", "name": "English", "path": "lang/en.json" }
+    {
+      "lang": "ru",
+      "name": "Русский",
+      "path": "lang/ru.json"
+    },
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
   ],
   "documentTypes": {
     "Actor": {
@@ -21,13 +37,46 @@
       "npc": {}
     },
     "Item": {
-      "race": { "htmlFields": ["description"] },
-      "ability": { "htmlFields": ["description"] },
-      "origin": { "htmlFields": ["description"] },
-      "familyStatus": { "htmlFields": ["description"] },
-      "equipment": { "htmlFields": ["description"] },
-      "influence": { "htmlFields": ["description"] },
-      "language": { "htmlFields": ["description"] }
+      "race": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "ability": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "origin": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "familyStatus": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "equipment": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "influence": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "language": {
+        "htmlFields": [
+          "description"
+        ]
+      },
+      "profession": {
+        "htmlFields": [
+          "description"
+        ]
+      }
     }
   },
   "packs": [
@@ -37,15 +86,21 @@
       "path": "packs/races",
       "type": "Item",
       "system": "witcher-eliott-system",
-      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     },
     {
       "name": "abilities",
-      "label": "Расовые способности",
+      "label": "Способности",
       "path": "packs/abilities",
       "type": "Item",
       "system": "witcher-eliott-system",
-      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     },
     {
       "name": "origins",
@@ -53,7 +108,10 @@
       "path": "packs/origins",
       "type": "Item",
       "system": "witcher-eliott-system",
-      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     },
     {
       "name": "family-statuses",
@@ -61,7 +119,10 @@
       "path": "packs/family-statuses",
       "type": "Item",
       "system": "witcher-eliott-system",
-      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     },
     {
       "name": "equipment",
@@ -69,7 +130,10 @@
       "path": "packs/equipment",
       "type": "Item",
       "system": "witcher-eliott-system",
-      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     },
     {
       "name": "influential-friends",
@@ -77,7 +141,10 @@
       "path": "packs/influential-friends",
       "type": "Item",
       "system": "witcher-eliott-system",
-      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     },
     {
       "name": "languages",
@@ -85,11 +152,39 @@
       "path": "packs/languages",
       "type": "Item",
       "system": "witcher-eliott-system",
-      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "professions",
+      "label": "Профессии",
+      "path": "packs/professions",
+      "type": "Item",
+      "system": "witcher-eliott-system",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     }
   ],
   "packFolders": [
-    { "name": "Witcher", "sorting": "a", "color": "#947641", "packs": ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages"] }
+    {
+      "name": "Witcher",
+      "sorting": "a",
+      "color": "#947641",
+      "packs": [
+        "races",
+        "abilities",
+        "origins",
+        "family-statuses",
+        "equipment",
+        "influential-friends",
+        "languages",
+        "professions"
+      ]
+    }
   ],
   "grid": {
     "type": 1,

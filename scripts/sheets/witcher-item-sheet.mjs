@@ -31,6 +31,8 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     return Object.assign(context, {
       item: this.item,
       system: this.item.system,
+      isAbility: this.item.type === "ability",
+      attributeChoices: [{value: "", label: game.i18n.localize("WITCHER.Professions.Passive")}, ...["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"].map(value => ({value, label: game.i18n.localize(`WITCHER.Attributes.${value}.Label`)}))].map(entry => ({...entry, selected: entry.value === this.item.system.attribute})),
       typeLabel: `TYPES.Item.${this.item.type}`,
       description: await enrich(this.item.system.description),
       abilities: abilities.filter(Boolean)

@@ -1,3 +1,4 @@
+import { getProfessionAbility } from "../data/professions.mjs";
 import { getRace } from "../data/races.mjs";
 import { abilityUuid } from "../data/compendiums.mjs";
 import { hasAbility } from "../data/abilities.mjs";
@@ -19,7 +20,7 @@ export async function abilitiesContext(actor) {
       html: readable ? document.system.description : `<p>${escapeTooltip(game.i18n.localize(ability.description))}</p>`
     };
   }));
-  for (const item of items.filter(item => !used.has(item.id))) entries.push({
+  for (const item of items.filter(item => !used.has(item.id) && getProfessionAbility(item.system.ruleId)?.profession !== actor.system.details.profession)) entries.push({
     id: item.id, uuid: item.uuid, fromRace: false, name: item.name, img: item.img, html: item.system.description
   });
   const enriched = await Promise.all(entries.map(async entry => ({ ...entry,

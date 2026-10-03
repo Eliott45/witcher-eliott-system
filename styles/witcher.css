@@ -330,3 +330,19 @@
 .witcher-dice-tray input { width: 100%; height: 25px; padding: 1px; border: 1px solid #9d8b7070; border-radius: 3px; background: #1e1a20; color: #eee4d5; text-align: center; font-size: 12px; }
 .witcher-dice-tray [hidden] { display: none !important; }
 .witcher-dice-tray button:disabled { opacity: 0.4; cursor: default; }
+
+/* Profession ranks use existing embedded abilities, including drag/drop. */
+.witcher-profession { border:1px solid #b7a68a; padding:12px; margin:12px 0; }
+.witcher-profession > summary { font-size:20px; color:#713c36; cursor:pointer; }
+.witcher-profession p { font-size:12px; }
+.witcher-profession-tree { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.witcher-profession-tree h3 { font-size:15px; text-align:center; }
+.witcher-profession-node { min-height:115px; padding:8px; margin:8px 0; background:#e6dfd1; border:1px solid #b7a68a; display:flex; flex-direction:column; gap:4px; }
+.witcher-profession-node.locked { border-style:dashed; }
+.witcher-profession-node > button { white-space:normal; height:auto; min-height:32px; }
+.witcher-profession-ability,.witcher-profession-rank { display:flex; align-items:center; gap:6px; }
+.witcher-profession-rank input,.witcher-profession-ability input { width:50px; }
+.witcher-profession-ability > button:first-child { flex:1; }
+.witcher-profession-rank button,.witcher-profession-ability > button:last-child { width:30px; }
+.witcher-profession-choice { margin:12px 0; }
+.witcher-item-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:12px 0; }

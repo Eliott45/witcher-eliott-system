@@ -6,6 +6,7 @@ import { WitcherChatMessage } from "./documents/witcher-chat-message.mjs";
 import { WitcherCombat } from "./documents/witcher-combat.mjs";
 import { registerCriticalDice } from "./dice/critical-chain.mjs";
 import { WitcherActorSheet } from "./sheets/witcher-actor-sheet.mjs";
+import { WitcherAbilityData } from "./data/witcher-ability-data.mjs";
 import { WitcherReferenceData } from "./data/witcher-reference-data.mjs";
 import { WitcherRaceData } from "./data/witcher-race-data.mjs";
 import { WitcherOriginData } from "./data/witcher-origin-data.mjs";
@@ -24,7 +25,8 @@ import { prepareDeathRound, applyDeathRound, syncExistingDeathStates } from "./c
 import { preventIncapacitatedMovement, preventIncapacitatedPositionUpdate } from "./combat/condition-rules.mjs";
 import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
 
-Hooks.once("init", () => {
+Hooks.once("init", async () => {
+  await foundry.applications.handlebars.loadTemplates([`systems/${SYSTEM_ID}/templates/profession.hbs`]);
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Actor.documentClass = WitcherActor;
   CONFIG.ChatMessage.documentClass = WitcherChatMessage;
@@ -40,7 +42,8 @@ Hooks.once("init", () => {
     CONFIG.Actor.trackableAttributes[type] = { bar: ["health", "stamina"], value: [] };
   }
   CONFIG.Item.dataModels.race = WitcherRaceData;
-  CONFIG.Item.dataModels.ability = WitcherReferenceData;
+  CONFIG.Item.dataModels.ability = WitcherAbilityData;
+  CONFIG.Item.dataModels.profession = WitcherReferenceData;
   CONFIG.Item.dataModels.origin = WitcherOriginData;
   CONFIG.Item.dataModels.familyStatus = WitcherFamilyStatusData;
   CONFIG.Item.dataModels.equipment = WitcherReferenceData;

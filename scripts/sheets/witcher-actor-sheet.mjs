@@ -1,3 +1,5 @@
+import { getProfession as selectionProfession } from "../data/professions.mjs";
+import { professionContext, setProfessionLevel, rollProfessionAbility, professionSelectionUpdate } from "./profession-context.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { getRace } from "../data/races.mjs";
 import { getOrigin } from "../data/origins.mjs";
@@ -30,6 +32,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
+      rollProfessionAbility,
       viewRace: WitcherActorSheet.#onViewReference,
       viewOrigin: WitcherActorSheet.#onViewReference,
       viewFamilyStatus: WitcherActorSheet.#onViewReference,
@@ -91,6 +94,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     });
     return Object.assign(context, {
       conditions,
+      profession: professionContext(this.actor),
       skills: skillsContext(this.actor, {
         localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
       }, { query: this.#skillQuery, editing: this.isEditable && this.#editingSkills }),
@@ -150,6 +154,9 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    for (const input of this.element.querySelectorAll("[data-profession-level]")) input.addEventListener("change", () => {
+      if (this.isEditable && this.#editingSkills) setProfessionLevel(this.actor, input.dataset.professionLevel, input.value).catch(reportPreferencesError);
+    });
     this.element.querySelector("[data-skill-search]").addEventListener("input", event => {
       this.#skillQuery = event.target.value;
       const query = this.#skillQuery.trim().toLocaleLowerCase();
@@ -186,6 +193,11 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
 
   async _onDropItem(event, item) {
     if (!this.isEditable) return null;
+    if (item.type === "profession") {
+      if (!item.system.ruleId || !selectionProfession(item.system.ruleId)) return null;
+      await this.actor.update(professionSelectionUpdate(this.actor, item.system.ruleId));
+      return null;
+    }
     if (item.type === "language") {
       const work = addLanguageFromItem(this.actor, item);
       this.#languageWrites = work.catch(() => {});
@@ -376,14 +388,14 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static async #onChooseReference(_event, target) {
     if (!this.isEditable) return;
     const kind = target.dataset.kind;
-    if (!["race", "origin", "familyStatus", "influentialFriend"].includes(kind)) return;
+    if (!["race", "origin", "familyStatus", "influentialFriend", "profession"].includes(kind)) return;
     if (kind === "familyStatus" && this.actor.system.details.race === "witcher") return;
     const value = await chooseReference(kind, this.actor.system.details[kind], {
       isWitcher: this.actor.system.details.race === "witcher",
       initialGroup: ["familyStatus", "influentialFriend"].includes(kind) ? suggestedFamilyGroup(this.actor.system.details.race, this.actor.system.details.origin) : ""
     });
     if (kind === "familyStatus" && this.actor.system.details.race === "witcher") return;
-    if (value !== null && this.isEditable) await this.actor.update({ [`system.details.${kind}`]: value });
+    if (value !== null && this.isEditable) await this.actor.update(kind === "profession" ? professionSelectionUpdate(this.actor, value) : { [`system.details.${kind}`]: value });
   }
 
   static async #onEditPortrait() {

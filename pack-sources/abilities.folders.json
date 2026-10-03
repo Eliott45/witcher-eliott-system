@@ -1,0 +1,101 @@
+[
+  {
+    "_id": "prfd000000000001",
+    "name": "Бард",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "prfd000000000002",
+    "name": "Ведьмак",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "prfd000000000003",
+    "name": "Воин",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "prfd000000000004",
+    "name": "Жрец",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "prfd000000000005",
+    "name": "Маг",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "prfd000000000006",
+    "name": "Медик",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "prfd000000000007",
+    "name": "Преступник",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "prfd000000000008",
+    "name": "Ремесленник",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "prfd000000000009",
+    "name": "Торговец",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  }
+]

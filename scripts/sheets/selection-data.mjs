@@ -1,3 +1,4 @@
+import { PROFESSIONS } from "../data/professions.mjs";
 import { RACES } from "../data/races.mjs";
 import { ORIGINS, ORIGIN_GROUPS } from "../data/origins.mjs";
 import { FAMILY_STATUSES, FAMILY_GROUPS } from "../data/family-statuses.mjs";
@@ -7,6 +8,7 @@ import { getEquipment } from "../data/equipment.mjs";
 export const normalizeSearch = text => text.toLocaleLowerCase().replaceAll("ё", "е").trim();
 
 export function selectionEntries(kind, localize) {
+  if (kind === "profession") return PROFESSIONS.map(entry => ({ id: entry.id, label: entry.name, group: entry.vigor ? "magic" : "mundane", groupLabel: localize(entry.vigor ? "WITCHER.Professions.Magic" : "WITCHER.Professions.Mundane"), summary: entry.abilities[0].name, details: [{ name: entry.magic, description: entry.abilities[0].description }] }));
   if (kind === "influentialFriend") return INFLUENTIAL_FRIENDS.map(entry => ({
     id: entry.id, label: localize(entry.label), group: entry.group,
     groupLabel: `${localize(FAMILY_GROUPS[entry.group])} · ${localize("WITCHER.Family.Roll")}: ${entry.roll}`,

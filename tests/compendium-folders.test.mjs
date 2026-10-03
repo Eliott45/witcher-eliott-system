@@ -9,7 +9,7 @@ test("existing packs move into one Witcher folder once, without changing unrelat
   const writes = [];
   globalThis.game = {
     user: gm, users: { activeGM: gm }, folders,
-    packs: new Map(["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages"].map(name => [`witcher-eliott-system.${name}`, {
+    packs: new Map(["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions"].map(name => [`witcher-eliott-system.${name}`, {
       setFolder: async folder => writes.push([name, folder.id])
     }])),
     settings: { get: () => version, set: async (_system, _key, value) => { version = value; } }
@@ -24,22 +24,21 @@ test("existing packs move into one Witcher folder once, without changing unrelat
   assert.equal(folders.length, 0, "Players and secondary GMs must not change world folders");
   game.user = gm;
   await migrateCompendiumFolders();
-  assert.deepEqual(writes, ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages"].map(name => [name, "witcher-folder"]));
+  assert.deepEqual(writes, ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions"].map(name => [name, "witcher-folder"]));
   assert.equal(folders.length, 1);
   await migrateCompendiumFolders();
-  assert.equal(writes.length, 7, "Later manual organization must not be overwritten");
-  version = 1;
-  await migrateCompendiumFolders();
-  assert.deepEqual(writes.slice(7), ["origins", "family-statuses", "equipment", "influential-friends", "languages"].map(name => [name, "witcher-folder"]));
-  version = 2;
-  await migrateCompendiumFolders();
-  assert.deepEqual(writes.slice(12), ["family-statuses", "equipment", "influential-friends", "languages"].map(name => [name, "witcher-folder"]));
-  version = 3;
-  await migrateCompendiumFolders();
-  assert.deepEqual(writes.slice(16), [["influential-friends", "witcher-folder"], ["languages", "witcher-folder"]]);
-  version = 4;
-  await migrateCompendiumFolders();
-  assert.deepEqual(writes.slice(18), [["languages", "witcher-folder"]], "Only languages move in a previously organized world");
+  assert.equal(writes.length, 8, "Later manual organization must not be overwritten");
+  for (const [from, expected] of [
+    [1, ["origins", "family-statuses", "equipment", "influential-friends", "languages", "professions"]],
+    [2, ["family-statuses", "equipment", "influential-friends", "languages", "professions"]],
+    [3, ["influential-friends", "languages", "professions"]],
+    [4, ["languages", "professions"]], [5, ["professions"]]
+  ]) {
+    version = from;
+    const start = writes.length;
+    await migrateCompendiumFolders();
+    assert.deepEqual(writes.slice(start), expected.map(name => [name, "witcher-folder"]));
+  }
   version = 0;
   await migrateCompendiumFolders();
   assert.equal(folders.length, 1, "Reuse the folder created by the manifest or previous attempts");

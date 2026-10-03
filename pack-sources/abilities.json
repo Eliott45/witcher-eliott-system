@@ -1,12 +1,1724 @@
 [
   {
+    "_id": "prab000000000001",
+    "name": "Уличное выступление",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.bard.busking",
+      "description": "<p>За час выступления в городе зарабатывает сумму крон, равную результату проверки. Отрицательный итог: заработка нет, −2 к Харизме в этом городе до конца дня.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000002",
+    "name": "Повторное выступление",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.bard.return-act",
+      "description": "<p>Перед Уличным выступлением проверка против СЛ ведущего: если здесь уже знают барда, заработок удваивается и общение с посетившими выступление получает +2 к Харизме.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000003",
+    "name": "Заворожить публику",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.bard.captivate",
+      "description": "<p>Полный раунд выступления; Сопротивление убеждению против результата. Зрители в 20 м продолжают слушать; враги и разумные чудовища получают +10 к сопротивлению, нападение прерывает эффект.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000004",
+    "name": "Добрый друг",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.bard.good-friend",
+      "description": "<p>Раз за сессию результат распределяется между местом, профессией и влиянием знакомого (таблица на стр. 62). Друг окажет разумную услугу без риска для жизни.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000005",
+    "name": "Незаметность",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.bard.fade",
+      "description": "<p>Проверка против Внимания позволяет затеряться среди людей без физического укрытия. Не работает при броском облике.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000006",
+    "name": "Пустить слух",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.bard.rumor",
+      "description": "<p>После успешного Обмана — против Сопротивления убеждению: цель распространяет ложь; у барда +2 к Обману при повторении этого слуха другим.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000007",
+    "name": "Сойти за своего",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.bard.fit-in",
+      "description": "<p>СЛ: деревня 25, посёлок 20, город 15, столица 10. Успех: +2 к Харизме и Убеждению среди местных, отношение как к своему.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000008",
+    "name": "Коварство",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.bard.sharpen",
+      "description": "<p>Против ЭМП × 3 цели: за каждый пункт превышения цель получает −1 к Соблазнению, Убеждению, Лидерству, Запугиванию или Харизме.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000009",
+    "name": "Подколка",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.bard.needling",
+      "description": "<p>Против Сопротивления убеждению: цель получает штраф к атаке и защите, равный половине уровня способности, на число раундов, равное её уровню.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000010",
+    "name": "И ты, Брут",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.bard.et-tu",
+      "description": "<p>Против ВОЛЯ × 3: вызывает вражду цели к союзнику на число дней, равное уровню, либо до успешного Сопротивления убеждению против результата.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000011",
+    "name": "Подготовка ведьмака",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.witcher.training",
+      "description": "<p>Заменяет Монстрологию. Штрафы опасной среды и пересечённой местности уменьшаются на половину уровня навыка (минимум 1).</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000002",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000012",
+    "name": "Медитация",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.witcher.meditation",
+      "description": "<p>Транс даёт преимущества сна при сохранении сознания. Ведьмак может очнуться, чтобы заметить происходящее в радиусе, равном удвоенному уровню в метрах.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": ""
+    },
+    "effects": [],
+    "folder": "prfd000000000002",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000013",
+    "name": "Магический источник",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.witcher.source",
+      "description": "<p>Каждые 2 уровня увеличивают предел магии на 1; при уровне 10 базовый предел ведьмака достигает 7.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": ""
+    },
+    "effects": [],
+    "folder": "prfd000000000002",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000014",
+    "name": "Гелиотроп",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.witcher.heliotrope",
+      "description": "<p>Защита против заклинания, инвокации или порчи: результат не ниже броска мага отменяет эффект. Стоимость — половина STA, затраченной на магию.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000002",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000015",
+    "name": "Крепкий желудок",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.witcher.iron-stomach",
+      "description": "<p>Уровень 1 даёт +5% допустимой токсичности; затем ещё +5% каждые 2 уровня. На уровне 10 предел последний раз повышается до 150% (errata).</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": ""
+    },
+    "effects": [],
+    "folder": "prfd000000000002",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000016",
+    "name": "Ярость",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.witcher.frenzy",
+      "description": "<p>Пока ведьмак отравлен, +1 к урону в ближнем бою за уровень. Он стремится спастись или убить отравителя. Заканчивается с ядом либо проверкой Стойкости СЛ 15.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": ""
+    },
+    "effects": [],
+    "folder": "prfd000000000002",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000017",
+    "name": "Трансмутация",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.witcher.transmutation",
+      "description": "<p>При приёме отвара проверка СЛ 18 даёт дополнительную мутацию из таблицы на стр. 63, но вдвое сокращает длительность отвара.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "body"
+    },
+    "effects": [],
+    "folder": "prfd000000000002",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000018",
+    "name": "Отбивание стрел",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.witcher.deflect",
+      "description": "<p>Проверка со штрафом −3 отбивает физический снаряд. Можно направить его в цель в 10 м: она защищается от этого результата, иначе ошеломлена (Staggered, не Stunned). Бомба взрывается после отражения; при уклонении второй цели определите разброс (errata).</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "dexterity"
+    },
+    "effects": [],
+    "folder": "prfd000000000002",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000019",
+    "name": "Быстрый удар",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.witcher.quick-strike",
+      "description": "<p>После своего хода: 5 STA и проверка против РЕА × 3 противника дают дополнительную атаку по нему; допустимы специальные атаки.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "reflex"
+    },
+    "effects": [],
+    "folder": "prfd000000000002",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000020",
+    "name": "Вихрь",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.witcher.whirl",
+      "description": "<p>5 STA за раунд: одна атака против каждого в пределах меча. Проверка способности заменяет атаку; можно лишь поддерживать Вихрь, уклоняться и идти на 2 м. Иное действие или попадание прерывает Вихрь.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "reflex"
+    },
+    "effects": [],
+    "folder": "prfd000000000002",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000021",
+    "name": "Крепче стали",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.man-at-arms.tough-as-nails",
+      "description": "<p>При ПЗ ≤ 0 проверка против удвоенного количества отрицательных ПЗ позволяет продолжить бой со штрафами тяжёлого ранения. Новый урон требует новой проверки; провал — состояние при смерти.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "body"
+    },
+    "effects": [],
+    "folder": "prfd000000000003",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000022",
+    "name": "Максимальная дистанция",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.man-at-arms.extreme-range",
+      "description": "<p>Уменьшает штраф за дальность на половину уровня. СЛ 16 позволяет стрелять до тройной дальности оружия со штрафом −10; этот штраф также уменьшается данной способностью (errata).</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "dexterity"
+    },
+    "effects": [],
+    "folder": "prfd000000000003",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000023",
+    "name": "Двойной выстрел",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.man-at-arms.twin-shot",
+      "description": "<p>Заменяет навык оружия при стрельбе из лука или метании: два снаряда по двум частям тела. При прицеливании второй попадает в случайную часть. Парирование −6; одна защита от обоих снарядов.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "dexterity"
+    },
+    "effects": [],
+    "folder": "prfd000000000003",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000024",
+    "name": "Точный прицел",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.man-at-arms.pin-point",
+      "description": "<p>После критического попадания дистанционным/метательным оружием: против ЛВК × 3 цели. Успех добавляет уровень способности только к определению тяжести критического ранения.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "dexterity"
+    },
+    "effects": [],
+    "folder": "prfd000000000003",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000025",
+    "name": "Ищейка",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.man-at-arms.bloodhound",
+      "description": "<p>Добавляет уровень к Выживанию при выслеживании цели. Потерянный след можно немедленно найти проверкой способности против СЛ ведущего.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000003",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000026",
+    "name": "Ловушка воина",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.man-at-arms.booby-trap",
+      "description": "<p>Создаёт одну ловушку с растяжкой радиусом 2 м. СЛ: опутывание/подсечка 14, ослепление 16, обезоруживание/кровотечение/дезориентация 18. Внимание против результата обнаруживает ловушку.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000003",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000027",
+    "name": "Тактическое преимущество",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.man-at-arms.tactical-awareness",
+      "description": "<p>Вместо движения: против ЛВК × 3 врагов в 10 м. На раунд +3 к атаке и защите против тех, чью СЛ удалось превысить; можно понять их намерения.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000003",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000028",
+    "name": "Неистовство",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.man-at-arms.fury",
+      "description": "<p>СЛ = собственная ЭМП × 3. На удвоенный уровень раундов даёт иммунитет к ужасу, эмоциональной магии и Словесной дуэли, но поведение подчинено боевой ярости.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000003",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000029",
+    "name": "Двуручник",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.man-at-arms.zweihand",
+      "description": "<p>Только оружие ближнего боя. 10 STA; атака способностью со штрафом −3 против защиты. Двойной урон и пробивание брони; уже пробивающее оружие получает улучшенное пробивание, уже улучшенное — ещё 3d6 урона.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "body"
+    },
+    "effects": [],
+    "folder": "prfd000000000003",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000030",
+    "name": "Игнорировать удар",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.man-at-arms.shrug",
+      "description": "<p>При критическом ранении: 10 STA и результат выше атаки отменяют критическое ранение, оставляя обычную атаку. Число применений за сессию равно ТЕЛ.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "body"
+    },
+    "effects": [],
+    "folder": "prfd000000000003",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000031",
+    "name": "Посвящённый",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.priest.initiate",
+      "description": "<p>Проверка против СЛ ведущего даёт помощь, лечение или кров в храме своей веры. Единоверцы вне храма помогают скромнее; чужая вера не подходит.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000004",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000032",
+    "name": "Божественная сила",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.priest.divine-power",
+      "description": "<p>+1 к пределу магии за уровень. Складывается с Единением с природой.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": ""
+    },
+    "effects": [],
+    "folder": "prfd000000000004",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000033",
+    "name": "Божественный авторитет",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.priest.divine-authority",
+      "description": "<p>Уровень добавляется к Лидерству в области своей религии, за её пределами добавляется половина уровня.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000004",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000034",
+    "name": "Предвидение",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.priest.precognition",
+      "description": "<p>По решению ведущего видение будущего вызывает кататонию на 3 раунда. Проверка против СЛ ведущего помогает истолковать символические образы.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000004",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000035",
+    "name": "Единение с природой",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.priest.nature-attunement",
+      "description": "<p>+1 к пределу магии за уровень. Складывается с Божественной силой.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": ""
+    },
+    "effects": [],
+    "folder": "prfd000000000004",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000036",
+    "name": "Знаки природы",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.priest.read-nature",
+      "description": "<p>Против СЛ ведущего: по природным следам узнаёт, что происходило именно здесь. Не заменяет выслеживание.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000004",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000037",
+    "name": "Союзник природы",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.priest.animal-companion",
+      "description": "<p>Уровень добавляется к Выживанию для общения с животными. Полный раунд и проверка по таблицам стр. 65 позволяют подружиться с животным на число часов, равное уровню. Не действует на чудовищ.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000004",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000038",
+    "name": "Кровавые ритуалы",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.priest.blood-rituals",
+      "description": "<p>Проверка против СЛ ритуала заменяет недостающие алхимические субстанции кровью: 5 ПЗ за каждую. Чужая кровь должна пролиться во время ритуала.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000004",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000039",
+    "name": "Рвение",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.priest.fervor",
+      "description": "<p>Против ИНТ × 3 цели: 1d6 временных ПЗ за пункт превышения (до 5d6), на удвоенный уровень раундов. На одну цель — раз в день.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000004",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000040",
+    "name": "Слово божье",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.priest.word-of-god",
+      "description": "<p>Результат против Сопротивления убеждению убеждает слушателей считать жреца мессией. Максимум последователей = уровень. После трёх провалов исполнения необычных приказов они уходят; последняя натуральная 1 вызывает вражду.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000004",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000041",
+    "name": "Магические познания",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.mage.magic-training",
+      "description": "<p>Против СЛ ведущего: распознаёт магию, феномены и теорию. Может заменять Внимание для обнаружения действующей магии и духов (errata).</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000005",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000042",
+    "name": "Строить козни",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.mage.scheming",
+      "description": "<p>Против ИНТ × 3 цели: +3 к Обману, Соблазнению, Запугиванию или Убеждению против неё на число дней, равное уровню.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000005",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000043",
+    "name": "Сплетни",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.mage.gossip",
+      "description": "<p>Час работы; против ЭМП × 3 цели. В поселении репутация цели снижается на половину уровня на число дней, равное уровню.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000005",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000044",
+    "name": "Полезные связи",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.mage.political-connections",
+      "description": "<p>Раз за игру распределите результат между поселением, профессией, влиянием и отношениями по таблице стр. 66, чтобы найти знакомого агента.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000005",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000045",
+    "name": "Анализ",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.mage.reverse-engineer",
+      "description": "<p>Час изучения алхимического состава; СЛ изготовления +3. Успех восстанавливает формулу, но изготовление по ней имеет СЛ на 3 выше обычной.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000005",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000046",
+    "name": "Дистилляция",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.mage.distillation",
+      "description": "<p>Заменяет Алхимию при изготовлении: один эффект (длительность, урон или СЛ сопротивления) усиливается в 1,5 раза с округлением вниз.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000005",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000047",
+    "name": "Мутация",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.mage.mutation",
+      "description": "<p>Полный день и вся STA: СЛ 28 − (ТЕЛ + ВОЛЯ цели)/2. Успех позволяет использовать соответствующий малой мутации мутаген; провал — при смерти и крупная мутация. Максимум две мутации, новые заменяют старые.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000005",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000048",
+    "name": "Укрепление связи",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.mage.in-touch",
+      "description": "<p>+2 к пределу магии за уровень; при уровне 10 базовый предел мага 25.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": ""
+    },
+    "effects": [],
+    "folder": "prfd000000000005",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000049",
+    "name": "Устойчивость к двимериту",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.mage.dimeritium",
+      "description": "<p>СЛ 16 при воздействии двимерита: сохраняет половину предела магии и возможность колдовать, хотя испытывает боль и дискомфорт.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000005",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000050",
+    "name": "Усиление магии",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.mage.overdraw",
+      "description": "<p>СЛ 16 перед заклинанием/ритуалом: проведение силы через любые два выбранных элемента вдвое снижает затраты STA.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000005",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000051",
+    "name": "Лечащее прикосновение",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.doctor.healing-hands",
+      "description": "<p>Заменяет Первую помощь; позволяет лечить критические ранения. СЛ и число необходимых успешных проверок зависят от тяжести ранения (стр. 173).</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000006",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000052",
+    "name": "Диагноз",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.doctor.diagnose",
+      "description": "<p>Осмотр против СЛ ведущего определяет все критические ранения и потерянные ПЗ; даёт +2 к Лечащему прикосновению для этих ран.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000006",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000053",
+    "name": "Осмотр",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.doctor.analysis",
+      "description": "<p>Перед лечением один ход обследования против СЛ тяжести ранения. Каждый 2 пункта превышения (минимум 1) сокращает операцию на ход.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000006",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000054",
+    "name": "Эффективная хирургия",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.doctor.effective-surgery",
+      "description": "<p>Перед лечением проверка против необходимой СЛ Лечащего прикосновения. Успех удваивает естественную скорость заживления обычных или критических ран.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000006",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000055",
+    "name": "Палатка лекаря",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.doctor.healing-tent",
+      "description": "<p>Час подготовки и СЛ ведущего: внутри +3 к Лечащему прикосновению/Первой помощи и +2 к скорости исцеления на число дней, равное уровню.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000006",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000056",
+    "name": "Подручные средства",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.doctor.improvise",
+      "description": "<p>Раунд работы; СЛ изготовления лечебного алхимического средства. Находит замену из подручных материалов для конкретной раны; проверку можно повторить.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000006",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000057",
+    "name": "Растительное лекарство",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.doctor.herbal-remedy",
+      "description": "<p>За ход смешивает две алхимические субстанции в одно лекарство по таблице стр. 67. Срок хранения 3 дня, одна доза; её съедают или сжигают для эффекта.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000006",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000058",
+    "name": "Кровавая рана",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.doctor.bloody-wound",
+      "description": "<p>После урона клинком СЛ 15: кровотечение наносит 1 урон за каждые 2 пункта превышения СЛ за раунд. Остановка Первой помощью против результата способности.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000006",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000059",
+    "name": "Практическая резня",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.doctor.practical-butchery",
+      "description": "<p>Против ТЕЛ × 3 цели: её обычные и критические ранения заживают вдвое медленнее. Эффективная хирургия и ускоряющие исцеление предметы нейтрализуют эффект.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000006",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000060",
+    "name": "Калечащая рана",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.doctor.crippling-wound",
+      "description": "<p>Атака способностью со штрафом −6: за каждые 3 пункта превышения защиты снижает выбранную РЕА, ТЕЛ или СКОР на 1. Снимается Эффективной хирургией выше результата атаки.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000006",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000061",
+    "name": "Профессиональная паранойя",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.criminal.paranoia",
+      "description": "<p>В пределах 10 м от ловушки/засады немедленная проверка против СЛ обнаружения, Скрытности засады или СЛ ведущего. Даже без обнаружения предупреждает, что что-то не так.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000007",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000062",
+    "name": "Присмотреться",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.criminal.case",
+      "description": "<p>Час осмотра района; СЛ деревня 16, посёлок 18, город 20, столица 22. +2 к Скрытности в этом районе на число дней, равное уровню.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000007",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000063",
+    "name": "Повторный взлом",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.criminal.mental-key",
+      "description": "<p>После взлома проверка против СЛ замка запоминает его: впредь открывается без проверки. Максимум запомненных замков = ИНТ; можно забывать старые.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000007",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000064",
+    "name": "Залечь на дно",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.criminal.hideout",
+      "description": "<p>Раз за сессию результат распределяется на расположение, защиту и преимущества убежища по таблице стр. 68. Убежище существует, пока его не уничтожили.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000007",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000065",
+    "name": "Уязвимость",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.criminal.weak-spot",
+      "description": "<p>Против Обмана разумной цели: узнаёт дорогого ей человека/вещь. +1 к Запугиванию за каждые 2 пункта превышения; действует, пока уязвимость не изменится.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000007",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000066",
+    "name": "Взять на заметку",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.criminal.marked",
+      "description": "<p>Против ЭМП × 3 цели: пугающая метка заставляет её превышать результат способности Харизмой, Убеждением или Запугиванием для получения помощи в поселении.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000007",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000067",
+    "name": "Сбор",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.criminal.rally",
+      "description": "<p>Раз в день, час работы: за каждые 2 пункта сверх СЛ ведущего нанимает разбойника на число дней, равное уровню. Потеряв половину ПЗ, тот должен выбросить на d10 меньше ВОЛИ преступника или бежать.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000007",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000068",
+    "name": "Прицеливание",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.criminal.aim",
+      "description": "<p>Вне боя полный раунд и проверка против РЕА × 3 цели: бонус к следующей атаке = половина уровня. Если цель заметила преступника до атаки, бонус вдвое меньше.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "dexterity"
+    },
+    "effects": [],
+    "folder": "prfd000000000007",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000069",
+    "name": "Прямо в глаз",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.criminal.eye-gouge",
+      "description": "<p>Атака в ближнем бою способностью со штрафом −3: 2d6 урона без модификаторов и ослепление на число раундов, равное уровню.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "dexterity"
+    },
+    "effects": [],
+    "folder": "prfd000000000007",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000070",
+    "name": "Удар ассасина",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.criminal.assassin",
+      "description": "<p>Против Внимания сохраняет скрытность после атаки. Применяются ситуационные модификаторы таблицы стр. 68; каждый противник может искать атакующего.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "dexterity"
+    },
+    "effects": [],
+    "folder": "prfd000000000007",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000071",
+    "name": "Быстрый ремонт",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.craftsman.patching",
+      "description": "<p>Ход работы; СЛ изготовления −3. Восстанавливает половину ПБ брони или надёжности сломанного оружия/щита. Оружие наносит половину урона до полного ремонта. Второе латание восстанавливает лишь четверть с округлением вниз.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000008",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000072",
+    "name": "Большой каталог",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.craftsman.catalog",
+      "description": "<p>После достижения обычного лимита запоминает дополнительный чертёж при СЛ 15. За каждые 10 таких чертежей СЛ повышается на 1.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000008",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000073",
+    "name": "Подмастерье",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.craftsman.apprentice",
+      "description": "<p>Проверка против СЛ изготовления добавляет создаваемому предмету +1 урон или ПБ за каждые 2 пункта превышения, максимум +5. Удача не увеличивает этот бонус.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000008",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000074",
+    "name": "Мастерская работа",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.craftsman.master-crafting",
+      "description": "<p>Позволяет изготавливать предметы мастера. Проверка против СЛ изготовления навсегда даёт броне выбранное сопротивление или оружию дезориентацию (−2), колющему/режущему — кровотечение 50%.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000008",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000075",
+    "name": "Список лекарств",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.craftsman.mental-pharmacy",
+      "description": "<p>После обычного лимита формул СЛ 15 запоминает ещё одну. Каждые 10 дополнительных формул повышают СЛ на 1.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000008",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000076",
+    "name": "Двойная порция",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.craftsman.double-dose",
+      "description": "<p>Против СЛ формулы: две порции алхимического состава из компонентов для одной; включая ведьмачьи эликсиры, масла, отвары и бомбы.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000008",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000077",
+    "name": "Адаптация",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.craftsman.adaptation",
+      "description": "<p>Перед созданием ведьмачьего эликсира СЛ изготовления +3: за пункт превышения снижает на 1 СЛ сопротивления отравлению этим эликсиром, минимум до 12. Провал не меняет ядовитость.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000008",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000078",
+    "name": "Улучшение",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.craftsman.augment",
+      "description": "<p>3 раунда с инструментами; кузница даёт +2. Оружие: +2 надёжности (СЛ 14), +5% кровотечения (16), +1 точности (18). Броня: +2 ПБ (14), +1 Скрытности (16), шипы с 2 уроном при захвате (18). Критпровал повреждает предмет на величину провала.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000008",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000079",
+    "name": "Серебрение",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.craftsman.silver-coating",
+      "description": "<p>В кузнице СЛ 16: +1d6 серебряного урона за каждые 3 пункта превышения, максимум 5d6. Провал ломает оружие. Серебро: 2 слитка на одноручное, 4 на двуручное, 1 на ≤10 снарядов.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000008",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000080",
+    "name": "Прицельный удар",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.craftsman.pinpoint",
+      "description": "<p>Ход осмотра и проверка против СЛ изготовления предмета выявляет слабость. Прицельная атака −6 наносит оружию/броне разрушающий урон: число d6 равно уровню способности.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000008",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000081",
+    "name": "Бывалый путешественник",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.merchant.well-traveled",
+      "description": "<p>Против СЛ ведущего узнаёт один факт о предмете, культуре или регионе из своего опыта путешествий.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000009",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000082",
+    "name": "Рынок",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.merchant.market",
+      "description": "<p>Против СЛ ведущего находит продавца того же предмета за половину рыночной цены. Чем редкость выше, тем выше СЛ. Не работает для экспериментальных, ведьмачьих вещей и реликвий.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000009",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000083",
+    "name": "Нечестная сделка",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.merchant.foul-play",
+      "description": "<p>Подкуп против ВОЛЯ × 3 цели: предмет ценой минимум 5 крон становится взяткой с +3 к Убеждению. Каждая следующая взятка увеличивает СЛ на 5.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000009",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000084",
+    "name": "Обещание",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.merchant.promise",
+      "description": "<p>При покупке против ЭМП × 3 продавца позволяет заплатить позднее — в течение числа дней, равного уровню.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000009",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000085",
+    "name": "Трущобы",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.merchant.rags",
+      "description": "<p>СЛ поселения 14/18/22: 1d6 осведомителей за пункт превышения, максимум 10. Каждый даёт +1 к Ориентированию в городе и берёт 1 крону за день обращения.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000009",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000086",
+    "name": "Свой человек",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.merchant.inside-man",
+      "description": "<p>10 крон и проверка против Сопротивления убеждению нанимают шпиона на число дней, равное уровню. Продление требует новой оплаты и проверки.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000009",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000087",
+    "name": "Карта сокровищ",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.merchant.treasure-map",
+      "description": "<p>Раз за сессию против СЛ ведущего вспоминает место реликвии или ценных руин. Место далеко либо опасно; достижение требует приключения.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000009",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000088",
+    "name": "Хорошие связи",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.merchant.connections",
+      "description": "<p>Впервые в поселении потратьте час; СЛ 14/18/22. Репутация здесь на неделю увеличивается на половину превышения СЛ, минимум 1.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000009",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000089",
+    "name": "Сбытчик",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.merchant.fence",
+      "description": "<p>Проверка против СЛ ведущего позволяет продать подозрительный или краденый предмет за полную рыночную цену без лишних вопросов и доноса.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "intelligence"
+    },
+    "effects": [],
+    "folder": "prfd000000000009",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000090",
+    "name": "Воинский долг",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.merchant.warrior-debt",
+      "description": "<p>Результат распределяется между боевыми навыками, интеллектом и снаряжением воина по таблице стр. 70. Воин помогает число дней, равное уровню, в разумных пределах.</p><p>Базовая книга, дерево профессии.</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000009",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "abil000000000001",
     "name": "Доверие",
     "type": "ability",
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "human.trust",
-      "description": "<p>+1 к Харизме, Соблазнению и Убеждению против других людей.</p>"
+      "description": "<p>+1 к Харизме, Соблазнению и Убеждению против других людей.</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -23,7 +1735,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "human.ingenuity",
-      "description": "<p>+1 к Дедукции.</p>"
+      "description": "<p>+1 к Дедукции.</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -40,7 +1754,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "human.stubbornness",
-      "description": "<p>Переброс неудачной проверки Сопротивления убеждению или Храбрости (не более 3 раз за партию; берётся наивысший результат; при повторном провале нельзя использовать снова).</p>"
+      "description": "<p>Переброс неудачной проверки Сопротивления убеждению или Храбрости (не более 3 раз за партию; берётся наивысший результат; при повторном провале нельзя использовать снова).</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -57,7 +1773,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "elf.artistic-talent",
-      "description": "<p>+1 к Искусству.</p>"
+      "description": "<p>+1 к Искусству.</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -74,7 +1792,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "elf.marksman",
-      "description": "<p>+2 к Стрельбе из лука; выхватывает и натягивает лук, не тратя действие.</p>"
+      "description": "<p>+2 к Стрельбе из лука; выхватывает и натягивает лук, не тратя действие.</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -91,7 +1811,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "elf.one-with-nature",
-      "description": "<p>Животные дружелюбны и не нападают без провокации; автоматически находит обычные/повсеместные растительные субстанции, если они есть в природе на этой территории.</p>"
+      "description": "<p>Животные дружелюбны и не нападают без провокации; автоматически находит обычные/повсеместные растительные субстанции, если они есть в природе на этой территории.</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -108,7 +1830,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "dwarf.tough",
-      "description": "<p>Кожа имеет врождённую прочность 2 (прибавляется к прочности любой брони и не понижается разрушающим уроном).</p>"
+      "description": "<p>Кожа имеет врождённую прочность 2 (прибавляется к прочности любой брони и не понижается разрушающим уроном).</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -125,7 +1849,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "dwarf.strong",
-      "description": "<p>+1 к Силе; +25 к Переносимому весу.</p>"
+      "description": "<p>+1 к Силе; +25 к Переносимому весу.</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -142,7 +1868,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "dwarf.shrewd",
-      "description": "<p>+1 к Торговле.</p>"
+      "description": "<p>+1 к Торговле.</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -159,7 +1887,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "witcher.enhanced-senses",
-      "description": "<p>Нет штрафов при слабом свете; +1 к Вниманию; возможность выслеживания по запаху.</p>"
+      "description": "<p>Нет штрафов при слабом свете; +1 к Вниманию; возможность выслеживания по запаху.</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -176,7 +1906,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "witcher.mutant-resilience",
-      "description": "<p>Невосприимчивы к болезням; способны использовать мутагены.</p>"
+      "description": "<p>Невосприимчивы к болезням; способны использовать мутагены.</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -193,7 +1925,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "witcher.dulled-emotions",
-      "description": "<p>Не совершают проверки Храбрости против Запугивания; −4 к Эмпатии (Эмп не ниже 1); Эмп не может быть выше 6.</p>"
+      "description": "<p>Не совершают проверки Храбрости против Запугивания; −4 к Эмпатии (Эмп не ниже 1); Эмп не может быть выше 6.</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,
@@ -210,7 +1944,9 @@
     "img": "icons/svg/aura.svg",
     "system": {
       "ruleId": "witcher.lightning-reflexes",
-      "description": "<p>+1 к Реакции и Ловкости (можно сделать эти значения больше 10).</p>"
+      "description": "<p>+1 к Реакции и Ловкости (можно сделать эти значения больше 10).</p>",
+      "level": 0,
+      "attribute": ""
     },
     "effects": [],
     "folder": null,

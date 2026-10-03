@@ -10,6 +10,7 @@
       {{/if}}
     </div>
   </header>
+  {{#if isAbility}}<div class="witcher-item-fields"><label>{{localize "WITCHER.Skills.Level"}}<input type="number" name="system.level" min="0" max="10" step="1" value="{{system.level}}" {{disabled (not editable)}}></label><label>{{localize "WITCHER.Skills.Attribute"}}<select name="system.attribute" {{disabled (not editable)}}>{{#each attributeChoices}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label></div>{{/if}}
   {{#if editable}}
   <prose-mirror name="system.description" value="{{system.description}}"
                 data-document-uuid="{{item.uuid}}" collaborate toggled>

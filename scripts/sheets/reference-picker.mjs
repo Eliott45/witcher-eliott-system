@@ -9,7 +9,7 @@ export async function chooseReference(kind, current, { isWitcher = false, initia
   const localize = key => game.i18n.localize(key);
   const entries = selectionEntries(kind, localize);
   const isLifepath = ["familyStatus", "influentialFriend"].includes(kind);
-  const groups = isLifepath ? FAMILY_GROUPS : kind === "origin" ? ORIGIN_GROUPS : {
+  const groups = kind === "profession" ? { magic: "WITCHER.Professions.Magic", mundane: "WITCHER.Professions.Mundane" } : isLifepath ? FAMILY_GROUPS : kind === "origin" ? ORIGIN_GROUPS : {
     peoples: "WITCHER.Picker.Peoples", mutants: "WITCHER.Picker.Mutants"
   };
   const content = await foundry.applications.handlebars.renderTemplate(
@@ -17,7 +17,7 @@ export async function chooseReference(kind, current, { isWitcher = false, initia
       entries: entries.map(entry => ({ ...entry, selected: entry.id === current })),
       groups: Object.entries(groups).map(([id, label]) => ({ id, label })),
       excluded: kind === "origin" && isWitcher,
-      hintKey: kind === "influentialFriend" ? "WITCHER.Friends.Hint" : "WITCHER.Picker.ReferenceOnly"
+      hintKey: kind === "profession" ? "WITCHER.Professions.Advancement" : kind === "influentialFriend" ? "WITCHER.Friends.Hint" : "WITCHER.Picker.ReferenceOnly"
     }
   );
   let selected = current;
@@ -26,7 +26,7 @@ export async function chooseReference(kind, current, { isWitcher = false, initia
     modal: true,
     classes: ["witcher-picker"],
     position: { width: 780 },
-    window: { title: localize({ race: "WITCHER.Sheet.ChooseRace", origin: "WITCHER.Sheet.ChooseOrigin", familyStatus: "WITCHER.Sheet.ChooseFamilyStatus", influentialFriend: "WITCHER.Sheet.ChooseFriend" }[kind]), resizable: true },
+    window: { title: localize({ profession: "WITCHER.Professions.Choose", race: "WITCHER.Sheet.ChooseRace", origin: "WITCHER.Sheet.ChooseOrigin", familyStatus: "WITCHER.Sheet.ChooseFamilyStatus", influentialFriend: "WITCHER.Sheet.ChooseFriend" }[kind]), resizable: true },
     content,
     buttons: [
       { action: "clear", label: "WITCHER.Picker.Clear", type: "button", callback: () => "" },
