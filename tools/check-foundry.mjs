@@ -397,7 +397,7 @@ assert.ok(html.includes('data-action="rollStun"'));
 assert.ok(!html.includes('name="system.carriedWeight"'));
 assert.ok(!html.includes('data-tab="parameters"'));
 assert.equal([...html.matchAll(/data-action="rollAttribute"/g)].length, 9);
-assert.ok(html.includes('data-action="addStunned"'));
+assert.ok(!html.includes('data-action="addStunned"'));
 assert.ok(html.indexOf('witcher-parameters') > html.indexOf('id="test-actor-main"'));
 assert.ok(html.indexOf('witcher-parameters') < html.indexOf('id="test-actor-biography"'));
 assert.ok(!html.match(/<(?:div|fieldset)[^>]+data-tooltip=/), "Tooltips must not cover entire cards or resource rows");
@@ -474,7 +474,7 @@ assert.match(statisticsHTML, /<output id="test-actor-attribute-reflex"[^>]*>3<\/
 assert.match(statisticsHTML, /<button[^>]*data-action="rollStun"[^>]*disabled/);
 assert.ok(statisticsHTML.includes('id="test-actor-weight">0 / 30 кг</output>'));
 assert.ok(statisticsHTML.includes('data-action="rollDeath"'));
-assert.ok(statisticsHTML.includes('id="test-actor-death-penalty">0</output>'));
+assert.match(statisticsHTML, /id="test-actor-death-penalty"[^>]*value="0"[^>]*disabled/);
 assert.equal([...statisticsHTML.matchAll(/data-action="toggleLuck"/g)].length, 100);
 sheet.actor.system = originalData;
 sheet.tabGroups.character = "main";

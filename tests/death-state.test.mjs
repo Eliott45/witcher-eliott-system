@@ -101,7 +101,7 @@ test("first HP crossing rolls with zero penalty; further hits increment; saves n
   await owner.update({ "system.luckPending": 0 });
   assert.equal(messages.length, 2, "Partial healing and unrelated updates do not cause saves");
   await rollDeath(owner);
-  assert.equal(latest().penalty, 1, "The manual button does not increment the penalty");
+  assert.equal(latest().penalty, 2, "The manual button increments the penalty before rolling");
   assert.equal(hasStatus(owner, DYING), true);
   await owner.update({ "system.health.value": 1 });
   assert.equal(hasStatus(owner, DYING), false);
@@ -148,7 +148,7 @@ test("selected Luck raises the death threshold, spends on posting, and cannot al
   owner.system.death.penalty = 10;
   faces = [1];
   await rollDeath(owner);
-  assert.equal(latest().target, 0);
+  assert.equal(latest().target, -1);
   assert.equal(latest().succeeded, false, "Natural 1 is not an automatic success against a nonpositive threshold");
 });
 
@@ -169,9 +169,27 @@ test("cancelled or failed saves keep the state, penalty and selected Luck for a 
     assert.equal(owner.system.luckPending, 4);
     cancel = fail = false;
     await rollDeath(owner);
-    assert.equal(latest().target, 12);
+    assert.equal(latest().target, 11);
     assert.deepEqual(owner.system.luckSpent, [1, 2, 3, 4]);
   }
+});
+
+test("each sheet save adds one to the current manually editable penalty", async () => {
+  reset();
+  const owner = actor();
+  await owner.update({ "system.health.value": 0 });
+  assert.equal(latest().penalty, 0, "The initial automatic save still starts at zero");
+  await owner.update({ "system.death.penalty": 5 });
+  assert.equal(messages.length, 1, "Editing the counter does not roll by itself");
+  await rollDeath(owner);
+  assert.equal(latest().penalty, 6);
+  assert.equal(latest().target, 4);
+  assert.equal(owner.system.death.penalty, 6);
+  await owner.update({ "system.death.penalty": 2 });
+  await rollDeath(owner);
+  assert.equal(latest().penalty, 3);
+  assert.equal(latest().target, 7);
+  assert.match(messages.at(-1).flavor, /Испытание с листа · штраф \+1/);
 });
 
 test("new rounds affect each actor once, not each linked token, remote client, turn, or repeated update", async () => {

@@ -12,7 +12,30 @@
 .witcher-eliott button:focus-visible, .witcher-eliott input:focus-visible, .witcher-eliott textarea:focus-visible { outline: 2px solid #bc974f; outline-offset: 2px; }
 
 /* Character sheet: permanent resource column and a portrait-led identity page. */
-.witcher-character-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); height: 100%; min-height: 0; overflow: hidden; background: #eee9df; }
+.witcher-character-layout { position: relative; isolation: isolate; display: grid; grid-template-columns: 190px minmax(0, 1fr); height: 100%; min-height: 0; overflow: hidden; background: #eee9df; }
+/* The vignette stays at the sheet's edges and never intercepts input or scrolling. */
+.witcher-character-layout:is(.is-dying, .is-dead)::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.witcher-character-layout.is-dying::after { box-shadow: inset 0 0 42px 8px #851c2b, inset 0 0 3px 1px #b24b4b; opacity: 0.28; animation: witcher-dying-pulse 3.6s ease-in-out infinite; }
+.is-dying .witcher-portrait-frame::after { content: ""; position: absolute; inset: 0; border: 1px solid #a34243; box-shadow: inset 0 0 20px #76162460, 0 0 18px #7c16294d; pointer-events: none; opacity: 0.65; animation: witcher-dying-pulse 3.6s ease-in-out infinite; }
+.is-dying .witcher-death-state h3 > i { display: inline-block; transform-origin: center; animation: witcher-dying-heartbeat 3.6s ease-in-out infinite; }
+.witcher-character-layout.is-dead::after { box-shadow: inset 0 0 65px 14px #0c0910; opacity: 0.58; animation: witcher-death-fade 1.2s ease-out both; }
+.is-dead .witcher-portrait { filter: grayscale(1) brightness(0.65); }
+@keyframes witcher-dying-pulse {
+  0%, 44%, 100% { opacity: 0.28; }
+  12%, 30% { opacity: 0.62; }
+  21% { opacity: 0.38; }
+}
+@keyframes witcher-dying-heartbeat {
+  0%, 44%, 100% { transform: scale(1); }
+  12%, 30% { transform: scale(1.13); }
+  21% { transform: scale(1.03); }
+}
+@keyframes witcher-death-fade { from { opacity: 0; } to { opacity: 0.58; } }
+@media (prefers-reduced-motion: reduce) {
+  .witcher-character-layout:is(.is-dying, .is-dead)::after,
+  .is-dying .witcher-portrait-frame::after,
+  .is-dying .witcher-death-state h3 > i { animation: none; }
+}
 .witcher-character-sidebar { min-height: 0; overflow-y: auto; background: linear-gradient(155deg, #482021, #241718); border-right: 2px solid #b39a67; padding: 22px 16px; }
 .witcher-brand { font-family: Georgia, serif; font-size: 20px; letter-spacing: 0.08em; color: #e0cc9e; padding-bottom: 14px; text-align: center; }
 .witcher-character-sidebar .witcher-resources { display: flex; flex-direction: column; gap: 12px; }
@@ -110,7 +133,6 @@
 .witcher-effective { display: block; margin-top: 6px; color: #993b2e; font-size: 10px; }
 .witcher-effects-heading { display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .witcher-effects-heading h2 { margin: 0; }
-.witcher-effects-heading button, .witcher-recover-stun { height: auto; padding: 7px 10px; background: #54302a; border: 1px solid #886446; color: #f8ead0; font-size: 12px; }
 .witcher-effect { padding: 14px; margin-bottom: 12px; background: #faf6ed; border: 1px solid #c7bba6; border-left: 3px solid #a78b56; border-radius: 3px; }
 .witcher-effect.inactive { opacity: 0.65; }
 .witcher-effect header { display: flex; align-items: center; gap: 10px; }

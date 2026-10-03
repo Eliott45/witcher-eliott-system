@@ -9,7 +9,7 @@ import { statisticsContext } from "./statistics-context.mjs";
 import { rollStun } from "../combat/stun-roll.mjs";
 import { rollAttribute } from "../combat/attribute-roll.mjs";
 import { selectLuckPoints } from "../data/luck.mjs";
-import { hasStunned, setStunned, STATUS_DEFINITIONS, DYING, DEAD } from "../combat/status-effects.mjs";
+import { STATUS_DEFINITIONS, DYING, DEAD } from "../combat/status-effects.mjs";
 import { rollDeath } from "../combat/death-state.mjs";
 import { SHEET_TABS, sheetPreferences, visibleSheetTabs, updateSheetPreferences, chooseVisibleTabs, reportPreferencesError } from "./sheet-preferences.mjs";
 
@@ -34,8 +34,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       toggleLuck: WitcherActorSheet.#onLuck,
       resetLuck: WitcherActorSheet.#onLuck,
       toggleAttributes: WitcherActorSheet.#onToggleAttributes,
-      addStunned: WitcherActorSheet.#onEffect,
-      removeEffect: WitcherActorSheet.#onEffect,
+      removeEffect: WitcherActorSheet.#onRemoveEffect,
       editPortrait: WitcherActorSheet.#onEditPortrait
     }
   };
@@ -65,8 +64,6 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     });
     return Object.assign(context, {
       editingAttributes: this.isEditable && this.#editingAttributes,
-      canEditDeathPenalty: this.isEditable && game.user.isGM,
-      stunned: hasStunned(this.actor),
       effects: await Promise.all(this.actor.effects.map(async effect => {
         const definition = Object.values(STATUS_DEFINITIONS).find(status => effect.statuses.has(status.id));
         return {
@@ -163,6 +160,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     if (!this.isEditable || target.disabled) return;
     target.disabled = true;
     try {
+      await this.submit();
       await this.#luckWrites;
       await rollDeath(this.actor);
     } catch (error) {
@@ -200,15 +198,12 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     }
   }
 
-  static async #onEffect(_event, target) {
+  static async #onRemoveEffect(_event, target) {
     if (!this.isEditable || target.disabled) return;
     target.disabled = true;
     try {
-      if (target.dataset.action === "addStunned") await setStunned(this.actor, true);
-      else {
-        const effect = this.actor.effects.get(target.dataset.effectId);
-        if (effect && (game.user.isGM || ![DYING, DEAD].some(status => effect.statuses.has(status)))) await effect.delete();
-      }
+      const effect = this.actor.effects.get(target.dataset.effectId);
+      if (effect && (game.user.isGM || ![DYING, DEAD].some(status => effect.statuses.has(status)))) await effect.delete();
     } catch (error) {
       console.error(`${SYSTEM_ID} | Effect action failed`, error);
       ui.notifications.error(game.i18n.localize("WITCHER.Effects.UpdateError"));

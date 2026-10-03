@@ -73,7 +73,20 @@ export function rollDeath(actor) {
   const work = enqueue(actor, async () => {
     if (hasStatus(actor, DEAD) || !actor.system.statistics.dying) return;
     await ensureEpisode(actor);
-    return rollDeathSave(actor);
+    // An unavailable save must not increase the counter.
+    if (actor.system.statistics.stun === null) return rollDeathSave(actor);
+    const { episode, penalty } = actor.system.death;
+    await actor.update({ "system.death.penalty": penalty + 1 });
+    let posted = false;
+    try {
+      return await rollDeathSave(actor, "manual", { onPosted: () => { posted = true; } });
+    } finally {
+      // A cancelled/rejected chat message is not an attempted save. Preserve any
+      // intervening manual correction or new episode instead of overwriting it.
+      if (!posted && actor.system.death.episode === episode && actor.system.death.penalty === penalty + 1) {
+        await actor.update({ "system.death.penalty": penalty });
+      }
+    }
   });
   manual.set(actor.uuid, work);
   const clear = () => { if (manual.get(actor.uuid) === work) manual.delete(actor.uuid); };

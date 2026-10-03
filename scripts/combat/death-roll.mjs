@@ -3,7 +3,7 @@ import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { hasStatus, setStatus, DYING, DEAD } from "./status-effects.mjs";
 
 /** Called by the per-actor death event queue, including the manual sheet button. */
-export async function rollDeathSave(actor, cause = "manual") {
+export async function rollDeathSave(actor, cause = "manual", { onPosted = () => {} } = {}) {
   if (!actor.isOwner || hasStatus(actor, DEAD) || !actor.system.statistics.dying) return;
   const statistics = actor.system.statistics;
   if (statistics.stun === null) {
@@ -21,6 +21,7 @@ export async function rollDeathSave(actor, cause = "manual") {
       speaker: foundry.documents.ChatMessage.getSpeaker({ actor }),
       flags: { [SYSTEM_ID]: { ...display.flags[SYSTEM_ID], deathSave: save } }
     }, { messageMode });
+    if (message) onPosted(message);
     await display.wait(message);
     const result = message?.flags[SYSTEM_ID]?.deathSave;
     // External healing or a GM correction while the dice were rolling invalidates this episode.

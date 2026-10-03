@@ -1,4 +1,4 @@
-<div class="witcher-character-layout">
+<div class="witcher-character-layout{{#if stats.death.dead}} is-dead{{else if stats.death.active}} is-dying{{/if}}">
   <aside class="witcher-character-sidebar">
     <div class="witcher-brand">THE WITCHER</div>
     <section class="witcher-resources" aria-label="{{localize 'WITCHER.Sheet.Resources'}}">
@@ -36,9 +36,8 @@
       <p>{{localize "WITCHER.Death.Penalties"}}</p>
       <div class="witcher-stat-row">
         <label for="{{rootId}}-death-penalty">{{localize "WITCHER.Death.Penalty"}}</label>
-        {{#if canEditDeathPenalty}}
-        <input id="{{rootId}}-death-penalty" type="number" name="system.death.penalty" min="0" step="1" value="{{stats.death.penalty}}">
-        {{else}}<output id="{{rootId}}-death-penalty">{{stats.death.penalty}}</output>{{/if}}
+        <input id="{{rootId}}-death-penalty" type="number" name="system.death.penalty" min="0" step="1"
+               value="{{stats.death.penalty}}" {{disabled (not editable)}}>
       </div>
       <div class="witcher-stat-row">
         <span data-tooltip="{{stats.death.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Death.Target"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
@@ -304,9 +303,6 @@
              data-group="character" data-tab="effects" aria-label="{{localize 'WITCHER.Sheet.Effects'}}">
       <div class="witcher-effects-heading">
         <h2>{{localize "WITCHER.Sheet.Effects"}}</h2>
-        <button type="button" data-action="addStunned" {{#if stunned}}disabled{{else}}{{disabled (not editable)}}{{/if}}>
-          <i class="fa-solid fa-plus" aria-hidden="true"></i> {{localize "WITCHER.Effects.Stunned"}}
-        </button>
       </div>
       {{#each effects as |effect|}}
       <article class="witcher-effect {{#if effect.inactive}}inactive{{/if}}">
@@ -321,11 +317,6 @@
       {{else}}
       <p class="witcher-effects-empty">{{localize "WITCHER.Effects.Empty"}}</p>
       {{/each}}
-      {{#if stunned}}
-      <button type="button" class="witcher-recover-stun" data-action="rollStun" {{#if stats.stunUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}>
-        <i class="fa-solid fa-dice-d10" aria-hidden="true"></i> {{localize "WITCHER.Effects.Recover"}}
-      </button>
-      {{/if}}
     </section>
   </div>
 </div>

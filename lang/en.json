@@ -699,7 +699,7 @@
       "Roll": "Death save",
       "Penalty": "Death penalty",
       "Target": "Save threshold",
-      "Penalties": "Attributes ×⅓. Luck is unchanged.",
+      "Penalties": "Attributes ×⅓",
       "Formula": "Threshold = base STUN − death penalty + selected Luck.<br>{base} − {penalty} + {luck} = {target}.",
       "Rule": "Plain 1d10, without critical chains. Roll strictly under the threshold; a tie fails. STUN ignores wound and dying penalties. Success does not stabilize; failure means death.",
       "Calculation": "Dying: ⌊{value} / 3⌋ = {result}",
@@ -714,7 +714,7 @@
         "entry": "HP dropped to 0 or below · penalty 0",
         "damage": "Damage while dying · penalty +1",
         "round": "Next round · penalty +1",
-        "manual": "Manual save · penalty unchanged"
+        "manual": "Save from the sheet · penalty +1"
       }
     }
   }
