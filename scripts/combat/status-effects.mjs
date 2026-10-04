@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { CONDITION_DEFINITIONS, conditionSource } from "../data/condition-definitions.mjs";
 
 export const STUNNED = "stunned";
 export const STUNNED_ICON = "icons/svg/daze.svg";
@@ -6,23 +7,21 @@ export const EXHAUSTED_STUN = "exhausted-stun";
 export const UNCONSCIOUS = "unconscious";
 export const DYING = "dying";
 export const DEAD = "dead";
-export const STATUS_DEFINITIONS = {
-  [STUNNED]: { id: STUNNED, name: "WITCHER.Effects.Stunned", img: STUNNED_ICON },
-  [EXHAUSTED_STUN]: { id: EXHAUSTED_STUN, name: "WITCHER.Effects.ExhaustedStun", img: "icons/svg/sleep.svg" },
-  [UNCONSCIOUS]: { id: UNCONSCIOUS, name: "WITCHER.Effects.Unconscious", img: "icons/svg/unconscious.svg" },
-  [DYING]: { id: DYING, name: "WITCHER.Effects.Dying", img: "icons/svg/blood.svg" },
-  [DEAD]: { id: DEAD, name: "WITCHER.Effects.Dead", img: "icons/svg/skull.svg" }
-};
+export const STATUS_DEFINITIONS = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,{id:entry.id,name:entry.name,img:entry.img,description:entry.description}]));
 
 export function registerStatusEffects() {
-  CONFIG.statusEffects = structuredClone(STATUS_DEFINITIONS);
+  CONFIG.statusEffects = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=> {
+    const { _id, statuses, ...source } = conditionSource(entry);
+    return [entry.id, { ...source, id:entry.id }];
+  }));
   // The removed core states must no longer change vision, movement or combatant status.
   for (const key of Object.keys(CONFIG.specialStatusEffects)) CONFIG.specialStatusEffects[key] = "";
 }
 
 export function localizeStatusEffects() {
   for (const definition of Object.values(CONFIG.statusEffects)) {
-    definition.description = game.i18n.localize(`${definition.name}Description`);
+    const text = STATUS_DEFINITIONS[definition.id].description;
+    definition.description = `<p>${text.startsWith("WITCHER.") ? game.i18n.localize(text) : text}</p>`;
   }
 }
 

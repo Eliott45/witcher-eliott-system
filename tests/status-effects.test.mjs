@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { registerStatusEffects, localizeStatusEffects, hasStunned, setStunned } from "../scripts/combat/status-effects.mjs";
 import { rollStun } from "../scripts/combat/stun-roll.mjs";
+import { CONDITION_DEFINITIONS } from "../scripts/data/condition-definitions.mjs";
 
 const actorWithEffects = () => ({
   uuid: "Actor.test", isOwner: true, effects: [], creations: 0,
@@ -21,7 +22,9 @@ test("only Witcher conditions remain in the status picker", () => {
   globalThis.game = { i18n: { localize: key => `translated:${key}` } };
   registerStatusEffects();
   localizeStatusEffects();
-  assert.deepEqual(Object.keys(CONFIG.statusEffects), ["stunned", "exhausted-stun", "unconscious", "dying", "dead"]);
+  assert.deepEqual(Object.keys(CONFIG.statusEffects), CONDITION_DEFINITIONS.map(entry=>entry.id));
+  assert.equal(CONFIG.statusEffects.deaf,undefined);
+  assert.equal(CONFIG.statusEffects.poisoned.flags["witcher-eliott-system"].condition.save.dc,15);
   assert.ok(CONFIG.statusEffects.dying.description.includes("translated:"));
   assert.ok(CONFIG.statusEffects.dead.description.includes("translated:"));
   assert.ok(CONFIG.statusEffects.stunned.description.includes("translated:"));

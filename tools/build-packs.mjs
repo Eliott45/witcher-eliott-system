@@ -13,6 +13,7 @@ const { ClassicLevel } = require("classic-level");
 const root = fileURLToPath(new URL("../", import.meta.url));
 const translations = JSON.parse(await readFile(join(root, "lang/ru.json"), "utf8"));
 const packs = compendiumData(translations);
+const manifest = JSON.parse(await readFile(join(root, "system.json"), "utf8"));
 const packFolders = compendiumFolders(translations);
 const sourcesOnly = process.argv.includes("--sources-only");
 const requestedPacks = process.argv.slice(3).filter(argument => argument !== "--sources-only");
@@ -37,7 +38,8 @@ for (const [name, documents] of Object.entries(packs)) {
         await collection.batch(folders.map(folder => ({ type: "put", key: folder._id, value: folder })));
         assert.deepEqual(await collection.getMany(folders.map(folder => folder._id)), folders);
       }
-      const items = db.sublevel("items", { valueEncoding: "json" });
+      const type = manifest.packs.find(pack=>pack.name===name).type;
+      const items = db.sublevel(type === "ActiveEffect" ? "effects" : "items", { valueEncoding: "json" });
       // Upsert only our stable IDs; never delete unrelated/user-added records.
       await items.batch(documents.map(document => ({ type: "put", key: document._id, value: document })));
       const stored = await items.getMany(documents.map(document => document._id));
@@ -50,5 +52,5 @@ for (const [name, documents] of Object.entries(packs)) {
   }
   await writeFile(join(root, "pack-sources", `${name}.json`), `${JSON.stringify(documents, null, 2)}\n`);
   if (folders.length) await writeFile(join(root, "pack-sources", `${name}.folders.json`), `${JSON.stringify(folders, null, 2)}\n`);
-  console.log(`${name}: ${documents.length} Item documents, ${folders.length} folders ${sourcesOnly ? "generated (JSON only; live database unchanged)" : "written and verified"}`);
+  console.log(`${name}: ${documents.length} ${manifest.packs.find(pack=>pack.name===name).type} documents, ${folders.length} folders ${sourcesOnly ? "generated (JSON only; live database unchanged)" : "written and verified"}`);
 }

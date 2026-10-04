@@ -5,6 +5,8 @@ import { ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID } from "./config.mjs";
 import { applyActorTokenDefaults } from "./combat/token-defaults.mjs";
 import { WitcherActorData } from "./data/witcher-actor-data.mjs";
 import { WitcherActor } from "./documents/witcher-actor.mjs";
+import { WitcherActiveEffect } from "./documents/witcher-active-effect.mjs";
+import { registerConditionSaves } from "./combat/condition-saves.mjs";
 import { WitcherChatMessage } from "./documents/witcher-chat-message.mjs";
 import { WitcherCombat } from "./documents/witcher-combat.mjs";
 import { registerCriticalDice } from "./dice/critical-chain.mjs";
@@ -37,12 +39,14 @@ Hooks.once("init", async () => {
   await foundry.applications.handlebars.loadTemplates(["profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "structured-fields", "workshop-item", "workshop-actor"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Actor.documentClass = WitcherActor;
+  CONFIG.ActiveEffect.documentClass = WitcherActiveEffect;
   CONFIG.Item.documentClass = WitcherItem;
   CONFIG.ChatMessage.documentClass = WitcherChatMessage;
   CONFIG.Combat.documentClass = WitcherCombat;
   registerCriticalDice();
   CONFIG.Combat.initiative.formula = "1d10wc + @statistics.initiative";
   registerStatusEffects();
+  registerConditionSaves();
   registerOilExpiry();
   registerStubbornnessChat();
   CONFIG.time.roundTime = 3;
@@ -95,7 +99,7 @@ Hooks.on("renderChatInput", renderDiceTray);
 Hooks.once("ready", () => {
   migrateEquipmentContent().catch(error => {
     console.error(`${SYSTEM_ID} | Could not update equipment content`, error);
-    ui.notifications.error("Не удалось обновить боеприпасы. Подробности в консоли.");
+    ui.notifications.error("Не удалось обновить каталог предметов. Подробности в консоли.");
   });
   syncExistingDeathStates().catch(reportEffectError);
   syncExistingExhaustion().catch(reportEffectError);

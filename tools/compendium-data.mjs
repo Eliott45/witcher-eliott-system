@@ -12,6 +12,7 @@ import { INFLUENTIAL_FRIENDS } from "../scripts/data/influential-friends.mjs";
 import { LANGUAGES } from "../scripts/data/languages.mjs";
 import { CORE_EQUIPMENT, LEGACY_GEAR_STATS } from "../scripts/data/core-equipment.mjs";
 import { defaultItemIcon } from "../scripts/data/item-icons.mjs";
+import { EFFECT_TEMPLATES, conditionSource } from "../scripts/data/condition-definitions.mjs";
 
 const coreFolders = { materials: {id:"gearMaterials001",name:"Материалы и ингредиенты"}, alchemy:{id:"gearAlchemy00001",name:"Алхимия"}, mutagens:{id:"gearMutagens0001",name:"Мутагены"}, upgrades:{id:"gearUpgrades0001",name:"Улучшения"}, recipes:{id:"gearRecipes00001",name:"Чертежи и формулы"}, weapons: { id: "gearFolderWeapon", name: "Оружие и щиты" }, ammunition: { id: "gearAmmo00000001", name: "Боеприпасы" }, armor: { id: "gearFolderArmors", name: "Броня" }, tools: { id: "gearFolderTools1", name: "Инструменты" }, core: { id: "gearFolderCore01", name: "Снаряжение" } };
 
@@ -36,6 +37,7 @@ export function compendiumData(translations) {
   });
   const professionAbility = entry => ({...item(entry.documentId, "ability", entry, { description: '<p>' + escapeHTML(entry.description) + '</p><p>Базовая книга, дерево профессии.</p>', level: 0, attribute: entry.attribute }), folder: getProfessionFolder(entry.profession)});
   return {
+    effects: EFFECT_TEMPLATES.map(entry=>conditionSource(entry,text=>text.startsWith("WITCHER.")?localize(text):text)),
     professions: PROFESSIONS.map(entry => item(entry.documentId, "profession", entry, { description: '<p>Базовая книга: стр. ' + entry.page + ', дерево: стр. ' + entry.treePage + '.</p><p>Предел магии: ' + entry.vigor + '. ' + escapeHTML(entry.magic) + '</p><p>' + entry.skills.map(key => localize('WITCHER.Skills.Entries.' + key + '.Label')).join(', ') + '</p><p>Языков на выбор: ' + entry.languageChoices + '. Снаряжение — выберите ' + entry.equipmentChoices + ': ' + escapeHTML(entry.equipment) + '</p><p>' + entry.abilities.map(ability => '@UUID[Compendium.witcher-eliott-system.abilities.Item.' + ability.documentId + ']{' + ability.name + '}').join('<br>') + '</p>' })),
     languages: LANGUAGES.map(language => item(language.documentId, "language", language, {
       description: paragraph(language.description) + paragraph("WITCHER.Languages.Rules")

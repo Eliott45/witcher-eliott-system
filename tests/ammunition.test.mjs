@@ -64,6 +64,7 @@ function migrationFixture({ fail = false, locked = true, startVersion = 0, elder
       data.forEach(folder => packFolders.set(folder._id, folder)); writes.push(["folders", data.length]); return data;
     } } },
     Item: { implementation: { updateDocuments: async (data, options) => {
+      if (options?.pack) assert.equal(options.broadcast, false, "Core v14 peers may not have these pack documents cached");
       const items = options?.pack ? index : new Map(game.items.map(item => [item._id, item]));
       for (const update of data) applyUpdate(items.get(update._id), update);
       writes.push([options?.pack ? "updates" : "world", data.length]); return data;

@@ -89,6 +89,7 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
     const actor = this.parent;
     return deriveStatistics(this, {
       items: actor?.items ?? [],
+      effects: actor?.effects ?? [],
       abilityIds: actor ? additionalAbilityIds(actor) : [],
       ...(actor?.effects ? { dying: hasStatus(actor, DYING), dead: hasStatus(actor, DEAD) } : {})
     });

@@ -6,14 +6,15 @@ import { witcherModifiers } from "./witcher-lifepath.mjs";
 import { lifeEventModifiers } from "./life-events.mjs";
 import { armorEncumbrance } from "./physical-items.mjs";
 import { reputationLevel, reputationModifiers } from "./reputation.mjs";
+import { conditionModifiers } from "./condition-definitions.mjs";
 
 export const ATTRIBUTE_KEYS = ["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"];
 
 const WOUNDED_ATTRIBUTES = new Set(["intelligence", "reflex", "dexterity", "will"]);
 
 /** Use base BODY/WILL for resource limits: wound penalties must not lower their own threshold. */
-export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, mutations = [], vigor = 0, reputation = {} }, { dying = false, dead = false, abilityIds = [], items = [] } = {}) {
-  const modifiers = [...backgroundModifiers(details, abilityIds), ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(installationBonuses)];
+export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, mutations = [], vigor = 0, reputation = {} }, { dying = false, dead = false, abilityIds = [], items = [], effects = [] } = {}) {
+  const modifiers = [...backgroundModifiers(details, abilityIds), ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(installationBonuses), ...conditionModifiers(effects)];
   const reputationBonus = modifierTotal(modifiers, "reputation");
   const reputationTotal = reputationLevel(reputation.value, reputationBonus);
   modifiers.push(...reputationModifiers(reputation, reputationTotal));
@@ -22,6 +23,7 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
     if (ev) modifiers.push({ source: "equipment.ev", label: "Скованность брони", category: "equipment", target, value: -ev });
   const adjusted = Object.fromEntries(ATTRIBUTE_KEYS.map(key => [key, attributes[key] === null ? null
     : attributes[key] + modifierTotal(modifiers, `attributes.${key}`)]));
+  for (const key of ATTRIBUTE_KEYS) if (adjusted[key] !== null && modifiers.some(modifier=>modifier.category==="effect"&&modifier.target===`attributes.${key}`)) adjusted[key]=Math.max(0,adjusted[key]);
   for (const key of ["reflex", "dexterity"]) if (ev && adjusted[key] !== null) adjusted[key] = Math.max(1, adjusted[key]);
   if (modifiers.some(modifier => modifier.source === "witcher.dulled-emotions") && adjusted.empathy !== null) adjusted.empathy = Math.min(6, Math.max(1, adjusted.empathy));
   const { body, will } = adjusted;

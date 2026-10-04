@@ -5,7 +5,7 @@ import { SYSTEM_ID } from "../config.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { stunTooltip, escapeTooltip } from "../sheets/statistics-tooltips.mjs";
 
-export async function rollStun(actor) {
+export async function rollStun(actor, { messageMode = game.settings.get("core", "messageMode"), messageData = {} } = {}) {
   if (!actor.isOwner) return;
   const conditions = conditionRules(actor);
   if (!conditions.canStunSave) {
@@ -21,7 +21,6 @@ export async function rollStun(actor) {
     ui.notifications.warn(game.i18n.localize("WITCHER.Statistics.UnfilledPhysical"));
     return;
   }
-  const messageMode = game.settings.get("core", "messageMode");
   const roll = await new foundry.dice.Roll("1d10").evaluate({ allowInteractive: messageMode !== "blind" });
   const outcome = game.i18n.localize(stunSucceeded(roll.total, target)
     ? "WITCHER.Statistics.Success" : "WITCHER.Statistics.Failure");
@@ -31,6 +30,7 @@ export async function rollStun(actor) {
   const display = trackRollDisplay();
   try {
     const message = await roll.toMessage({
+      ...messageData,
       speaker: foundry.documents.ChatMessage.getSpeaker({ actor }),
       flags: { [SYSTEM_ID]: { ...display.flags[SYSTEM_ID], skipLuck: true } },
       flavor: game.i18n.format("WITCHER.Statistics.StunResult", {

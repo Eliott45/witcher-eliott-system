@@ -1,0 +1,938 @@
+[
+  {
+    "_id": "efct000000000001",
+    "name": "Дезориентация",
+    "img": "icons/svg/daze.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Персонаж не может двигаться, действовать и защищаться. Чтобы попасть по нему, достаточно проверки со СЛ 10. Весь ход можно потратить на испытание УСТ; успех снимает обычную дезориентацию. Попадание также сразу снимает её. Для дезориентации от истощения действуют отдельные правила восстановления.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "stunned"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "stunned",
+          "save": {
+            "kind": "stun",
+            "action": "Полный ход",
+            "ends": true
+          },
+          "autoSave": true
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000002",
+    "name": "Дезориентация от истощения",
+    "img": "icons/svg/sleep.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Возникает при падении Выносливости до 0 или ниже. Нельзя двигаться, атаковать, колдовать и защищаться; можно делать только Отдых (Recovery). Чтобы самостоятельно снять это состояние, сначала восстановите минимум 20 STA или максимум STA, если он меньше 20, затем потратьте полный ход на успешное испытание УСТ. Полученный урон не снимает эту дезориентацию.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "exhausted-stun"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "exhausted-stun",
+          "save": {
+            "kind": "stun",
+            "action": "Полный ход; сначала восстановите STA",
+            "ends": true
+          },
+          "autoSave": true
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000003",
+    "name": "Без сознания",
+    "img": "icons/svg/unconscious.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Персонаж не способен двигаться, действовать и защищаться. При истощении одновременно возникает дезориентация от истощения; разрешён только Отдых (Recovery). Как только STA становится больше 0, сознание возвращается, но дезориентация остаётся до выполнения её условий восстановления.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "unconscious"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "unconscious"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000004",
+    "name": "При смерти",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>При ПЗ ≤ 0 персонаж находится при смерти. Все основные параметры, кроме Удачи, делятся на 3 с округлением вниз. Максимумы ПЗ и Выносливости и базовая УСТ сохраняются. При переходе в это состояние немедленно проводится испытание смерти со штрафом 0. Новый урон и каждый следующий раунд увеличивают штраф на 1 и вызывают новое испытание. Успех не стабилизирует персонажа; провал означает смерть.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "dying"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "dying",
+          "save": {
+            "kind": "death",
+            "action": "Испытание смерти",
+            "ends": false
+          }
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000005",
+    "name": "Смерть",
+    "img": "icons/svg/skull.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Персонаж погиб после провала испытания смерти. Новые испытания не проводятся. Лечение ПЗ не снимает смерть автоматически; отменить состояние может мастер.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "dead"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "dead"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000006",
+    "name": "Горение",
+    "img": "icons/svg/fire.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Каждый ход: 5 урона каждой части тела, который поглощается бронёй; огонь также повреждает броню и оружие на 1. Чтобы потушить пламя, потратьте ход на воду или перекатывание по земле. Урон и повреждение снаряжения учитываются вручную. Стр. 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "burning"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "burning",
+          "action": "Потушить пламя — полный ход"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000007",
+    "name": "Отравление",
+    "img": "icons/svg/poison.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Каждый ход: 3 урона, игнорирующего броню. Стойкость СЛ 15 прекращает отравление и занимает действие. Урон учитывается вручную. Стр. 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "poisoned"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "poisoned",
+          "save": {
+            "kind": "skill",
+            "skill": "endurance",
+            "dc": 15,
+            "action": "Одно действие",
+            "ends": true
+          },
+          "autoSave": true
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000008",
+    "name": "Кровотечение",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Каждый ход: 2 урона, пока рана не обработана. Первая помощь СЛ 15 за действие или исцеляющая магия останавливает кровотечение. Урон учитывается вручную. Стр. 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "bleeding"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "bleeding",
+          "save": {
+            "kind": "skill",
+            "skill": "firstAid",
+            "dc": 15,
+            "action": "Одно действие",
+            "ends": true
+          },
+          "autoSave": true
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000009",
+    "name": "Замораживание",
+    "img": "icons/svg/ice-aura.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Лёд мешает движениям: −3 СКОР, −1 РЕА. Сила СЛ 16 позволяет разбить лёд за действие. Стр. 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "frozen"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "frozen",
+          "save": {
+            "kind": "skill",
+            "skill": "physique",
+            "dc": 16,
+            "action": "Одно действие",
+            "ends": true
+          },
+          "autoSave": true,
+          "modifiers": [
+            {
+              "target": "attributes.speed",
+              "value": -3
+            },
+            {
+              "target": "attributes.reflex",
+              "value": -1
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000010",
+    "name": "Опьянение",
+    "img": "icons/svg/tankard.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>−2 к РЕА, ЛВК и ИНТ; −3 в словесной дуэли. Вероятность плохо помнить произошедшее — 25%. Обычного повторного спасброска нет. Стр. 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "intoxicated"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "intoxicated",
+          "modifiers": [
+            {
+              "target": "attributes.reflex",
+              "value": -2
+            },
+            {
+              "target": "attributes.dexterity",
+              "value": -2
+            },
+            {
+              "target": "attributes.intelligence",
+              "value": -2
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000011",
+    "name": "Галлюцинации",
+    "img": "icons/svg/eye.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Мастер описывает ложные ощущения. Дедукция СЛ 15 позволяет отличить одну иллюзию от реальности, но не снимает весь эффект. Стр. 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "hallucinating"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "hallucinating",
+          "save": {
+            "kind": "skill",
+            "skill": "deduction",
+            "dc": 15,
+            "action": "Одно действие",
+            "ends": false
+          }
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000012",
+    "name": "Алхимический клей",
+    "img": "icons/svg/net.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Через два раунда состав затвердевает. Чтобы освободить склеенные части, нужна Сила СЛ 16. Подвижность определяет мастер по месту попадания клея. Стр. 87; errata v4.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "adhesive"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "adhesive",
+          "save": {
+            "kind": "skill",
+            "skill": "physique",
+            "dc": 16,
+            "action": "Одно действие",
+            "ends": true
+          },
+          "autoSave": true,
+          "delayTurns": 2
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000013",
+    "name": "Хлороформ: без сознания",
+    "img": "icons/svg/unconscious.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Накладывается после провала первоначального испытания УСТ −2. Персонаж без сознания до успешного испытания УСТ −2. Удача не тратится. Стр. 87.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "chloroform"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "chloroform",
+          "save": {
+            "kind": "stunModified",
+            "modifier": -2,
+            "action": "Испытание УСТ −2",
+            "ends": true
+          },
+          "autoSave": true,
+          "incapacitated": true
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000014",
+    "name": "Фисштех: дезориентация",
+    "img": "icons/svg/daze.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Накладывается после провала Стойкости СЛ 16. Повторяйте проверку каждый раунд; результат ниже 10 лишает сознания на 5 раундов. Предельная длительность — полчаса. Зависимость проверяется отдельно: Стойкость СЛ 18 после каждой дозы. Стр. 87.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "fisstech"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "fisstech",
+          "save": {
+            "kind": "skill",
+            "skill": "endurance",
+            "dc": 16,
+            "action": "Раз в раунд",
+            "ends": true
+          },
+          "autoSave": true,
+          "incapacitated": true,
+          "seconds": 1800
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000015",
+    "name": "Фисштех: без сознания",
+    "img": "icons/svg/unconscious.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Персонаж без сознания в течение пяти раундов после результата ниже 10 в проверке против фисштеха. Стр. 87.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "fisstech-unconscious"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "fisstech-unconscious",
+          "rounds": 5,
+          "incapacitated": true
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000016",
+    "name": "Кровоостанавливающий порошок",
+    "img": "icons/svg/regen.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Кровотечение приостановлено на 2d10 раундов; затем оно возобновляется, если причина не устранена. Пока этот эффект активен, не учитывайте периодический урон кровотечения. Стр. 87.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "clotting"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "clotting",
+          "roundsFormula": "2d10"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000017",
+    "name": "Обезболивающие травы",
+    "img": "icons/svg/regen.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>На 2d10 раундов уменьшают на 2 штрафы от боли критических ранений и состояния при смерти. Коррекцию боли применяет мастер; базовые характеристики не меняются. Стр. 88.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "numbing"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "numbing",
+          "roundsFormula": "2d10"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000018",
+    "name": "Обеззараживающая жидкость",
+    "img": "icons/svg/regen.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Естественное заживление увеличено на 2; критические ранения заживают на два дня быстрее. Повторные применения не суммируются. Стр. 88.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "sterilizing"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "sterilizing"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000019",
+    "name": "Дыхание суккуба: на коже",
+    "img": "icons/svg/aura.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>+2 к Соблазнению, пока действует нанесённый на кожу аромат. Стр. 88.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "succubus-skin"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "succubus-skin",
+          "modifiers": [
+            {
+              "target": "skills.seduction",
+              "value": 2
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000020",
+    "name": "Дыхание суккуба: выпито",
+    "img": "icons/svg/aura.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>−5 к проверкам против Соблазнения. Обнаружить примесь можно Вниманием СЛ 16; чёрный шоколад скрывает вкус. Условный штраф учитывается только против Соблазнения. Стр. 88.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "succubus-drink"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "succubus-drink"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000021",
+    "name": "Быстрый огонь: горючее покрытие",
+    "img": "icons/svg/fire.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Контакт с пламенем воспламеняет покрытую поверхность с вероятностью 50%. Уже существующая вероятность воспламенения повышается на 50%. Сам по себе состав не поджигает цель. Стр. 88.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "quick-fire"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "quick-fire"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000022",
+    "name": "Эйфория Пантагорана",
+    "img": "icons/svg/aura.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>На 1d6 / 2 часа: −2 к Сопротивлению убеждению. Стр. 88.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "pantagran"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "pantagran",
+          "secondsFormula": "1d6 * 1800",
+          "modifiers": [
+            {
+              "target": "skills.resistCoercion",
+              "value": -2
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000101",
+    "name": "Чёрный яд",
+    "img": "icons/svg/poison.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Яд причиняет 3 урона за ход, игнорируя броню. Стойкость СЛ 16 прекращает отравление за действие. Урон учитывается вручную. Стр. 87.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "poisoned"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "black-venom",
+          "save": {
+            "kind": "skill",
+            "skill": "endurance",
+            "dc": 16,
+            "action": "Одно действие",
+            "ends": true
+          },
+          "autoSave": true
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000102",
+    "name": "Галлюциноген",
+    "img": "icons/svg/eye.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>После провала первоначальной Стойкости СЛ 15 возникают галлюцинации на 1d10 раундов. Дедукция различает одну иллюзию и не снимает эффект. Стр. 87, 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "hallucinating"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "hallucinogen",
+          "save": {
+            "kind": "skill",
+            "skill": "deduction",
+            "dc": 15,
+            "action": "Одно действие",
+            "ends": false
+          },
+          "roundsFormula": "1d10"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000103",
+    "name": "Ароматное зелье: опьянение",
+    "img": "icons/svg/tankard.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>После провала первоначальной Стойкости СЛ 16: опьянение на 1d10 часов. −2 РЕА, ЛВК и ИНТ; −3 в словесной дуэли. Снять можно магией или Слезами жён, повторного спасброска нет. Токсичность 25%. Стр. 88.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "intoxicated"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "perfume",
+          "modifiers": [
+            {
+              "target": "attributes.reflex",
+              "value": -2
+            },
+            {
+              "target": "attributes.dexterity",
+              "value": -2
+            },
+            {
+              "target": "attributes.intelligence",
+              "value": -2
+            }
+          ],
+          "secondsFormula": "1d10 * 3600"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000104",
+    "name": "Ввинчивающийся наконечник",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Кровотечение от эльфского наконечника: 2 урона за ход. Для прекращения нужно извлечь наконечник: Первая помощь СЛ 16. Урон учитывается вручную. Стр. 84.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "bleeding"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "burrowing",
+          "save": {
+            "kind": "skill",
+            "skill": "firstAid",
+            "dc": 16,
+            "action": "Одно действие",
+            "ends": true
+          },
+          "autoSave": true
+        }
+      }
+    }
+  }
+]

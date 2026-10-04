@@ -21,7 +21,7 @@ globalThis.foundry = {
   documents: await import(new URL("documents/_module.mjs", core))
 };
 globalThis.getDocumentClass = name => foundry.documents[`Base${name}`];
-globalThis.CONFIG = { Token: {}, Actor: { dataModels: {} }, Item: { dataModels: {} } };
+globalThis.CONFIG = { Token: {}, Actor: { dataModels: {} }, Item: { dataModels: {} }, ActiveEffect: {dataModels:{base:foundry.data.ActiveEffectTypeDataModel}} };
 globalThis.game = { i18n: { localize: key => key } };
 const installed = JSON.parse(await readFile(new URL("package.json", app), "utf8"));
 game.release = {
@@ -33,13 +33,14 @@ game.release = {
 
 const readJSON = async path => JSON.parse(await readFile(new URL(path, import.meta.url), "utf8"));
 const { default: BaseSystem } = await import(new URL("packages/base-system.mjs", core));
+foundry.packages = { BasePackage: (await import(new URL("packages/base-package.mjs", core))).default };
 game.system = new BaseSystem(await readJSON("../system.json"));
 assert.equal(game.system.grid.distance, 2);
 assert.equal(game.system.grid.units, "m");
 const [packFolder] = game.system.packFolders;
 assert.equal(packFolder.name, "Witcher");
-assert.deepEqual(Array.from(packFolder.packs), ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions"]);
-game.model = { ...game.system.documentTypes, Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
+assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions"]);
+game.model = { ...game.system.documentTypes, ActiveEffect:{base:{}}, Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type, folders: new Map() }]));
 game.user = { id: "testuser00000001", isGM: true };
 let preferences = {};
@@ -284,15 +285,16 @@ for (const source of await readJSON("../pack-sources/equipment.folders.json")) {
 const documents = new Map();
 for (const pack of game.system.packs) {
   for (const source of await readJSON(`../pack-sources/${pack.name}.json`)) {
-    const document = new foundry.documents.BaseItem(source, { pack: `${game.system.id}.${pack.name}` });
+    const document = new foundry.documents[`Base${pack.type}`](source, { pack: `${game.system.id}.${pack.name}` });
     await access(source.img.startsWith(`systems/${game.system.id}/`)
       ? new URL(`../${source.img.slice(`systems/${game.system.id}/`.length)}`, import.meta.url)
       : new URL(`public/${source.img}`, app));
     assert.equal(document.type, source.type);
-    const modeled = document.system.toObject();
+    const modeled = document.system.toObject?.() ?? document.system;
     assert.deepEqual(Object.fromEntries(Object.keys(source.system).map(key => [key, modeled[key]])), source.system);
-    assert.equal(document.effects.size, 0, "Reference items must not contain automated effects");
-    const uuid = `Compendium.${game.system.id}.${pack.name}.Item.${document.id}`;
+    if (pack.type === "Item") assert.equal(document.effects.size, 0, "Reference items must not contain automated effects");
+    else assert.deepEqual(document.toObject().flags,source.flags,"Effect rules survive native serialization");
+    const uuid = `Compendium.${game.system.id}.${pack.name}.${pack.type}.${document.id}`;
     documents.set(uuid, document);
   }
 }
@@ -384,7 +386,7 @@ game.i18n.localize = key => foundry.utils.getProperty(translations, key) ?? key;
 game.i18n.format = (key, data) => game.i18n.localize(key).replace(/\{(\w+)\}/g, (_, part) => data[part]);
 const { registerStatusEffects, localizeStatusEffects } = await import("../scripts/combat/status-effects.mjs");
 CONFIG.specialStatusEffects = { DEFEATED: "dead", BLIND: "blind" };
-CONFIG.ActiveEffect = { dataModels: {} };
+CONFIG.ActiveEffect = { dataModels: {base:foundry.data.ActiveEffectTypeDataModel} };
 game.model.ActiveEffect = { base: {} };
 registerStatusEffects();
 localizeStatusEffects();
@@ -397,7 +399,22 @@ assert.ok(coreEffect.description.includes("СЛ 10"));
 assert.equal(coreEffect.showIcon, CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS);
 assert.ok(new foundry.documents.BaseActiveEffect(coreEffect.toObject()).statuses.has("stunned"));
 CONFIG.Actor.dataModels.character = WitcherActorData;
+const { EFFECT_TEMPLATES, conditionSource } = await import("../scripts/data/condition-definitions.mjs");
 foundry.data.PrototypeTokenOverrides.overrides = { base: {} };
+const frozenActor = new foundry.documents.BaseActor({name:"Effects round trip",type:"character",
+  system:{attributes:{speed:8,reflex:8,body:8,will:8},health:{value:40,max:40}},
+  effects:[conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="frozen"))]});
+const reopenedFrozen = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(frozenActor.toObject())));
+for (const actor of [frozenActor,reopenedFrozen]) {
+  assert.equal(actor.system.attributes.speed,8,"Base stats remain intact");
+  assert.equal(actor.system.statistics.effective.speed,5);
+  assert.equal(actor.system.statistics.effective.reflex,7);
+  assert.equal(actor.effects.contents[0].flags[game.system.id].condition.save.dc,16);
+}
+const timedEffect = new foundry.documents.BaseActiveEffect({...conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="clotting")),
+  duration:{value:7,units:"rounds",expiry:"turnEnd",expired:false}});
+assert.deepEqual(new foundry.documents.BaseActiveEffect(timedEffect.toObject()).toObject().duration,
+  {value:7,units:"rounds",expiry:"turnEnd",expired:false});
 // Real embedded Items feed ability rules; only the base skill level is persisted.
 const skillsActor = new foundry.documents.BaseActor({ name: "Skill check", type: "character",
   system: { attributes: { intelligence: 8, dexterity: 8, empathy: 8 }, details: { race: "elf", origin: "redania", familyStatus: "elder.scribes" },
@@ -1020,4 +1037,4 @@ if (process.argv[3]) {
   }
   console.log("Installed Dice So Nice: all nine critical chains produce the correct successive d10 throws");
 }
-console.log(`Installed Foundry core: data, ${documents.size} Items, templates, native Luck, death saves and all nine critical chains OK`);
+console.log(`Installed Foundry core: data, ${documents.size} compendium documents, templates, native Luck, death saves and all nine critical chains OK`);

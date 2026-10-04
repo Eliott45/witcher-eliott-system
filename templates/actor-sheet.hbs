@@ -438,16 +438,25 @@
              data-group="character" data-tab="effects" aria-label="{{localize 'WITCHER.Sheet.Effects'}}">
       <div class="witcher-effects-heading">
         <h2>{{localize "WITCHER.Sheet.Effects"}}</h2>
+        <button type="button" data-action="browseEffects" {{disabled (not editable)}}><i class="fa-solid fa-plus" aria-hidden="true"></i> Добавить эффект</button>
       </div>
+      <p class="witcher-effects-hint">Нажмите на название для проверки. «В конце хода» выполняет одну проверку автоматически и занимает указанное действие. После ручной проверки дополнительный спас автоматически не бросается.</p>
       {{#each effects as |effect|}}
       <article class="witcher-effect {{#if effect.inactive}}inactive{{/if}}">
         <header>
           <img src="{{effect.img}}" alt="">
-          <h3>{{effect.name}} {{#if effect.inactive}}<small>{{localize "WITCHER.Effects.Inactive"}}</small>{{/if}}</h3>
+          <h3>{{#if effect.save}}<button class="witcher-effect-save" type="button" data-action="rollEffectSave" data-effect-id="{{effect.id}}" data-tooltip="{{effect.saveHint}} · {{effect.save.action}}" {{disabled (not effect.canSave)}}><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> {{effect.name}}</button>{{else}}{{effect.name}}{{/if}} {{#if effect.inactive}}<small>{{localize "WITCHER.Effects.Inactive"}}</small>{{/if}}</h3>
           <button type="button" data-action="removeEffect" data-effect-id="{{effect.id}}" title="{{localize 'WITCHER.Effects.Remove'}}"
                   aria-label="{{localize 'WITCHER.Effects.Remove'}}" {{disabled (not effect.canRemove)}}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </header>
         <div class="witcher-effect-description">{{{effect.description}}}</div>
+        <footer class="witcher-effect-controls">
+          {{#if effect.save}}<span class="witcher-effect-rule">{{effect.saveHint}}</span>{{/if}}
+          {{#if effect.durationLabel}}<span>{{effect.durationLabel}}</span>{{/if}}
+          {{#if effect.pending}}<span>Проверка…</span>{{/if}}
+          {{#if effect.autoAllowed}}<button type="button" class="witcher-effect-auto" data-action="toggleEffectSave" data-effect-id="{{effect.id}}" aria-pressed="{{effect.autoSave}}" {{disabled (not ../editable)}}><i class="fa-solid {{#if effect.autoSave}}fa-toggle-on{{else}}fa-toggle-off{{/if}}" aria-hidden="true"></i> В конце хода</button>{{/if}}
+          {{#if effect.action}}<button type="button" data-action="effectAction" data-effect-id="{{effect.id}}" {{disabled (not effect.canAct)}}>{{effect.action}}</button>{{/if}}
+        </footer>
       </article>
       {{else}}
       <p class="witcher-effects-empty">{{localize "WITCHER.Effects.Empty"}}</p>

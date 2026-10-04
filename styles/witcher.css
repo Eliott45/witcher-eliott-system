@@ -177,6 +177,15 @@
 .witcher-effect header button { flex: 0 0 26px; width: 26px; height: 26px; padding: 0; background: transparent; color: #8f6752; border: 0; }
 .witcher-effect-description { margin-top: 12px; font-size: 13px; line-height: 1.6; color: #514538; }
 .witcher-effects-empty { color: #89765b; font-size: 14px; }
+.witcher-effects-heading > button { width: auto; padding: 6px 12px; background: #e7dcc5; color: #63352e; border: 1px solid #b99c67; }
+.witcher-effects-hint { color: #796a56; font-size: 12px; line-height: 1.5; margin: -6px 0 18px; }
+.witcher-effect header .witcher-effect-save { width: auto; height: auto; text-align: left; font: inherit; color: inherit; display: inline-flex; align-items: center; gap: 8px; }
+.witcher-effect header .witcher-effect-save:hover:not(:disabled) { color: #a44b32; text-shadow: 0 0 12px #cda56a55; }
+.witcher-effect-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 10px; margin-top: 10px; border-top: 1px solid #d8cdbb; font-size: 11px; color: #796a56; }
+.witcher-effect-controls button { width: auto; height: 28px; font-size: 11px; padding: 4px 9px; color: #63352e; background: #f0e7d5; border: 1px solid #c7bba6; }
+.witcher-effect-controls .witcher-effect-auto { margin-left: auto; }
+.witcher-effect-controls .witcher-effect-auto[aria-pressed="true"] { color: #2a6757; background: #e2ece2; border-color: #8cae9b; }
+.witcher-effect-rule { font-weight: 600; }
 .witcher-skills { padding: 18px; }
 .witcher-skills [hidden] { display: none !important; }
 .witcher-skills-heading, .witcher-languages-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }

@@ -1,4 +1,5 @@
 import { equipmentUuid, MONSTER_CATEGORIES } from "./workshop.mjs";
+import { alchemyDescription } from "./alchemy-descriptions.mjs";
 // Amounts in formula strings are one unit of the named substance per letter.
 export const SUBSTANCE_CODES = { V:"vitriol", R:"rebis", A:"aether", Q:"quebrith", H:"hydragenum", M:"vermilion", S:"sol", C:"caelum", F:"fulgur" };
 const ordinary = [
@@ -17,7 +18,7 @@ const ordinary = [
  ["adhesive","Алхимический клей",15,600,52,"QHCCV",.1,28,"common","Застывает через 2 раунда. Разъединить склеенное: Сила СЛ 16. Бросок Атлетики, дальность ТЕЛ×2 м."],
  ["black-venom","Чёрный яд",15,600,67,"QQAAR",.1,45,"common","Отравляет при попадании в кровь или проглатывании; Стойкость СЛ 16 прекращает эффект. Покрыть клинок: полный раунд, действует 1d10 раундов."],
  ["chloroform","Хлороформ",16,900,54,"QQMMAV",.1,36,"common","Испытание УСТ −2; провал лишает сознания до успешного испытания. 25 применений во флаконе."],
- ["quick-fire","Быстрый огонь",16,900,67,"QRRCVM",.1,45,"rare","Делает поверхность горючей: воспламенение при контакте с огнём, +50% к шансу воспламенения."],
+ ["quick-fire","Быстрый огонь",16,900,67,"QRRCVM",.1,45,"rare","Делает поверхность горючей: 50% воспламенения при контакте с огнём; +50% к уже существующему шансу воспламенения."],
  ["bredans-fury","Ярость Бредана",22,1800,142,"SSSFFFCM",.5,95,"unique","При контакте с воздухом взрывается: 2d6 урона в радиусе 2 м. Бросок Атлетики, дальность ТЕЛ×2 м."],
  ["fisstech","Фисштех",18,1800,120,"RRRHHVVM",.1,80,"rare","Сильное привыкание: Стойкость СЛ 18 после дозы. Стойкость СЛ 16 против дезориентации на полчаса; результат ниже 10 при повторной проверке лишает сознания на 5 раундов."],
  ["pantagran","Эликсир Пантагорана",17,900,100,"MMAACSF",.5,67,"rare","Эйфория на 1d6/2 часа: −2 к Сопротивлению убеждению."],
@@ -59,3 +60,4 @@ const decoctions = [
  ["werewolf",18,"RSHHF","Длительный бег не расходует Выносливость."], ["wyvern",18,"RRVAF","Успешное попадание даёт +1 к урону следующего удара; суммируется до конца боя или получения урона."]
 ];
 ALCHEMY.push(...decoctions.map(([id,dc,substances,properties],i)=>({id:`decoction.${id}`,documentId:`alch${String(i+301).padStart(12,"0")}`,type:"equipment",name:`Отвар: ${MUTAGENS.find(m=>m.id===`mutagen.${id}`).system.mutagen.monster}`,source:"alchemy",system:{kind:"alchemy",weight:.5,properties,alchemy:{category:"decoction",duration:1800,toxicity:75},source:"Базовая книга, стр. 248 / 250; цена не указана"},formula:{dc,time:1800,substances,mutagenUuid:equipmentUuid(MUTAGENS.find(m=>m.id===`mutagen.${id}`).documentId)}})));
+for (const entry of ALCHEMY) entry.system.description = alchemyDescription(entry);

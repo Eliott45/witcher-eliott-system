@@ -1,6 +1,12 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { endTurnConditions } from "../combat/condition-saves.mjs";
 
 export class WitcherCombat extends foundry.documents.Combat {
+  async _onEndTurn(combatant, context) {
+    await super._onEndTurn(combatant,context);
+    try { await endTurnConditions(this,combatant,context); }
+    catch(error) { console.error(`${SYSTEM_ID} | End-turn conditions`,error); ui.notifications.error("Не удалось проверить эффект в конце хода. Можно повторить проверку вручную."); }
+  }
   async rollInitiative(ids, options = {}) {
     const batch = foundry.utils.randomID();
     const messageOptions = foundry.utils.mergeObject(options.messageOptions ?? {}, {

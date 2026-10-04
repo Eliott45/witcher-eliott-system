@@ -9,7 +9,7 @@ test("existing packs move into one Witcher folder once, without changing unrelat
   const writes = [];
   globalThis.game = {
     user: gm, users: { activeGM: gm }, folders,
-    packs: new Map(["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions"].map(name => [`witcher-eliott-system.${name}`, {
+    packs: new Map(["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "effects"].map(name => [`witcher-eliott-system.${name}`, {
       setFolder: async folder => writes.push([name, folder.id])
     }])),
     settings: { get: () => version, set: async (_system, _key, value) => { version = value; } }
@@ -24,15 +24,15 @@ test("existing packs move into one Witcher folder once, without changing unrelat
   assert.equal(folders.length, 0, "Players and secondary GMs must not change world folders");
   game.user = gm;
   await migrateCompendiumFolders();
-  assert.deepEqual(writes, ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions"].map(name => [name, "witcher-folder"]));
+  assert.deepEqual(writes, ["races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "effects"].map(name => [name, "witcher-folder"]));
   assert.equal(folders.length, 1);
   await migrateCompendiumFolders();
-  assert.equal(writes.length, 8, "Later manual organization must not be overwritten");
+  assert.equal(writes.length, 9, "Later manual organization must not be overwritten");
   for (const [from, expected] of [
-    [1, ["origins", "family-statuses", "equipment", "influential-friends", "languages", "professions"]],
-    [2, ["family-statuses", "equipment", "influential-friends", "languages", "professions"]],
-    [3, ["influential-friends", "languages", "professions"]],
-    [4, ["languages", "professions"]], [5, ["professions"]]
+    [1, ["origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "effects"]],
+    [2, ["family-statuses", "equipment", "influential-friends", "languages", "professions", "effects"]],
+    [3, ["influential-friends", "languages", "professions", "effects"]],
+    [4, ["languages", "professions", "effects"]], [5, ["professions", "effects"]], [6, ["effects"]]
   ]) {
     version = from;
     const start = writes.length;

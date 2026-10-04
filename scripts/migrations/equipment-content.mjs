@@ -4,10 +4,11 @@ import { ELDER_EQUIPMENT } from "../data/elder-equipment.mjs";
 import { ammunitionUpdate } from "./ammunition-data.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { equipmentIconUpdate } from "../data/item-icons.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 4;
+import { alchemyDescriptionUpdate } from "./alchemy-descriptions.mjs";
+export const EQUIPMENT_CONTENT_VERSION = 5;
 
 const updatesFor = items => Array.from(items).flatMap(item => {
-  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item) };
+  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item) };
   return Object.keys(update).length ? [{ _id: item.id ?? item._id, ...update }] : [];
 });
 
@@ -24,7 +25,7 @@ export async function migrateEquipmentContent() {
   const existing = new Set(Array.from(index.values(), entry => entry.system?.ruleId));
   const missing = [...CORE_AMMUNITION, ...ELDER_EQUIPMENT].filter(entry => !existing.has(entry.id));
   const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry =>
-    entry.system?.ruleId?.startsWith("ammunition.") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
+    /^(ammunition|alchemy|potion|oil|decoction)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
   const updates = updatesFor(oldDocuments);
   let documents = [], requiredFolders = [];
   if (missing.length) {
@@ -51,7 +52,9 @@ export async function migrateEquipmentContent() {
         const created = await foundry.documents.Item.implementation.createDocuments(documents, { pack: pack.collection, keepId: true });
         if (created.length !== documents.length) throw new Error("Добавлены не все предметы. Обновление будет повторено при следующем входе мастера.");
       }
-      if (updates.length) await foundry.documents.Item.implementation.updateDocuments(updates, { pack: pack.collection });
+      // Core v14 cleans broadcasts before loading uncached compendium documents on peers.
+      // Refresh the catalog on the GM; peers receive this one-time content update on reload.
+      if (updates.length) await foundry.documents.Item.implementation.updateDocuments(updates, { pack: pack.collection, broadcast: false });
     } finally { if (locked) await pack.configure({ locked: true }); }
   }
   const worldUpdates = updatesFor(game.items);

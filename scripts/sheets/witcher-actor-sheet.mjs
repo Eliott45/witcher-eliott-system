@@ -20,9 +20,11 @@ import { getInfluentialFriend } from "../data/influential-friends.mjs";
 import { chooseReference } from "./reference-picker.mjs";
 import { statisticsContext } from "./statistics-context.mjs";
 import { rollStun } from "../combat/stun-roll.mjs";
+import { requestEffectSave } from "../combat/condition-saves.mjs";
+import { effectsContext, effectActions } from "./effects-context.mjs";
 import { rollAttribute } from "../combat/attribute-roll.mjs";
 import { selectLuckPoints } from "../data/luck.mjs";
-import { STATUS_DEFINITIONS, DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS } from "../combat/status-effects.mjs";
+import { DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS } from "../combat/status-effects.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { recoverStamina } from "../combat/exhaustion.mjs";
 import { rollDeath } from "../combat/death-state.mjs";
@@ -43,6 +45,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
+      ...effectActions,
       ...workshopActorActions,
       openAdvancement,
       toggleExperience: WitcherActorSheet.#onToggleExperience,
@@ -139,18 +142,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       reputation: { ...reputationContext(this.actor.system, {
         localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
       }), rollUnavailable: !conditions.canAct || this.actor.system.statistics.effective.will === null || this.#rollingReputation },
-      effects: await Promise.all(this.actor.effects.map(async effect => {
-        const definition = Object.values(STATUS_DEFINITIONS).find(status => effect.statuses.has(status.id));
-        return {
-          id: effect.id, name: definition ? game.i18n.localize(definition.name) : effect.name,
-          img: definition ? definition.img : effect.img, inactive: effect.disabled || effect.isSuppressed,
-          canRemove: this.isEditable && (game.user.isGM || ![DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS].some(status => effect.statuses.has(status))),
-          description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-            definition ? game.i18n.localize(`${definition.name}Description`) : effect.description,
-            { secrets: this.actor.isOwner, relativeTo: effect }
-          )
-        };
-      })),
+      effects: await effectsContext(this),
       stats,
       visibleTabs: visible.map(tab => context.tabs[tab.id]),
       actor: this.actor,
@@ -340,7 +332,11 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static async #onRollStun(_event, target) {
     if (!this.isEditable || target.disabled) return;
     target.disabled = true;
-    try { await this.submit(); await rollStun(this.actor); }
+    try {
+      await this.submit();
+      const effect=this.actor.effects.find(effect=>!effect.disabled&&!effect.isSuppressed&&(effect.statuses.has("stunned")||effect.statuses.has(EXHAUSTED_STUN)));
+      if(effect)await requestEffectSave(this.actor,effect);else await rollStun(this.actor);
+    }
     catch (error) {
       console.error(`${SYSTEM_ID} | Stun roll failed`, error);
       ui.notifications.error(game.i18n.localize("WITCHER.Statistics.RollError"));

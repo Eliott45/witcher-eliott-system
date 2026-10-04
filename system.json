@@ -92,6 +92,14 @@
   },
   "packs": [
     {
+      "name": "effects",
+      "label": "Эффекты",
+      "path": "packs/effects",
+      "type": "ActiveEffect",
+      "system": "witcher-eliott-system",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
       "name": "races",
       "label": "Расы",
       "path": "packs/races",
@@ -186,6 +194,7 @@
       "sorting": "a",
       "color": "#947641",
       "packs": [
+        "effects",
         "races",
         "abilities",
         "origins",

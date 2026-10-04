@@ -1,4 +1,5 @@
 import { hasStatus, STUNNED, EXHAUSTED_STUN, UNCONSCIOUS, DEAD } from "./status-effects.mjs";
+import { effectRules } from "../data/condition-definitions.mjs";
 
 /** Shared action availability for the sheet and future attacks/spells/defenses. */
 export function conditionRules(actor) {
@@ -9,13 +10,14 @@ export function conditionRules(actor) {
   const { value = 0, max = 0 } = actor.system.stamina ?? {};
   const required = Math.min(20, max);
   const ready = exhausted && required > 0 && value >= required;
-  const blocked = ordinaryStun || exhausted || unconscious || dead;
+  const incapacitated = actor.effects.some(effect=>!effect.disabled&&!effect.isSuppressed&&effectRules(effect).incapacitated);
+  const blocked = ordinaryStun || exhausted || unconscious || dead || incapacitated;
   return {
     ordinaryStun, exhausted, unconscious, dead, required, ready,
     remaining: Math.max(0, required - value),
     canMove: !blocked, canAct: !blocked, canDefend: !blocked,
-    canRecover: !dead && (exhausted || (!ordinaryStun && !unconscious)),
-    canStunSave: !dead && !unconscious && (!exhausted || ready)
+    canRecover: !dead && !incapacitated && (exhausted || (!ordinaryStun && !unconscious)),
+    canStunSave: !dead && !unconscious && !incapacitated && (!exhausted || ready)
   };
 }
 
