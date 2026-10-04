@@ -2,11 +2,9 @@ import { SYSTEM_ID } from "../config.mjs";
 import { ORIGIN_GROUPS } from "../data/origins.mjs";
 import { FAMILY_GROUPS } from "../data/family-statuses.mjs";
 import { selectionEntries, filterEntries } from "./selection-data.mjs";
-import { equipmentFacets, filterEquipment } from "../data/equipment-search.mjs";
-import { bindEquipmentFilters, readEquipmentFilters } from "./equipment-filter-form.mjs";
 
 /** Local browsing only; the actor is updated by its sheet after confirmation. */
-export async function chooseReference(kind, current, { isWitcher = false, initialGroup = "", entries: suppliedEntries, groups: suppliedGroups, title, hint, advanced = false, initialEquipmentFilters = {} } = {}) {
+export async function chooseReference(kind, current, { isWitcher = false, initialGroup = "", entries: suppliedEntries, groups: suppliedGroups, title, hint } = {}) {
   if (kind === "familyStatus" && isWitcher) return null;
   const localize = key => game.i18n.localize(key);
   const entries = suppliedEntries ?? selectionEntries(kind, localize);
@@ -15,8 +13,7 @@ export async function chooseReference(kind, current, { isWitcher = false, initia
     peoples: "WITCHER.Picker.Peoples", mutants: "WITCHER.Picker.Mutants"
   });
   const content = await foundry.applications.handlebars.renderTemplate(
-    `systems/${SYSTEM_ID}/templates/${advanced ? "equipment-browser" : "reference-picker"}.hbs`, {
-      facets: advanced ? equipmentFacets(entries) : null,
+    `systems/${SYSTEM_ID}/templates/reference-picker.hbs`, {
       entries: entries.map(entry => ({ ...entry, selected: entry.id === current })),
       groups: Object.entries(groups).map(([id, label]) => ({ id, label })),
       excluded: kind === "origin" && isWitcher,
@@ -27,8 +24,8 @@ export async function chooseReference(kind, current, { isWitcher = false, initia
   let group = isLifepath ? entries.find(entry => entry.id === current)?.group ?? initialGroup : initialGroup;
   const result = await foundry.applications.api.DialogV2.wait({
     modal: true,
-    classes: ["witcher-picker", ...(advanced ? ["witcher-equipment-browser"] : [])],
-    position: { width: advanced ? 900 : 780 },
+    classes: ["witcher-picker"],
+    position: { width: 780 },
     window: { title: title ?? localize({ profession: "WITCHER.Professions.Choose", race: "WITCHER.Sheet.ChooseRace", origin: "WITCHER.Sheet.ChooseOrigin", familyStatus: "WITCHER.Sheet.ChooseFamilyStatus", influentialFriend: "WITCHER.Sheet.ChooseFriend" }[kind]), resizable: true },
     content,
     buttons: [
@@ -43,13 +40,8 @@ export async function chooseReference(kind, current, { isWitcher = false, initia
       const filters = [...root.querySelectorAll("[data-filter]")];
       const choose = root.querySelector('[data-action="choose"]');
       const refresh = () => {
-        const matched = advanced ? filterEquipment(entries, readEquipmentFilters(root)) : filterEntries(entries, search.value, group);
+        const matched = filterEntries(entries, search.value, group);
         const visible = new Set(matched.map(entry => entry.id));
-        if (advanced) {
-          const list = root.querySelector(".witcher-picker-list");
-          const indexed = new Map(rows.map(row => [row.dataset.entryId, row]));
-          for (const entry of matched) list.append(indexed.get(entry.id));
-        }
         for (const row of rows) {
           row.hidden = !visible.has(row.dataset.entryId);
           row.classList.toggle("selected", row.dataset.entryId === selected);
@@ -60,7 +52,6 @@ export async function chooseReference(kind, current, { isWitcher = false, initia
         choose.disabled = !visible.has(selected);
       };
       search.addEventListener("input", refresh);
-      if (advanced) bindEquipmentFilters(root, initialEquipmentFilters, refresh);
       for (const filter of filters) filter.addEventListener("click", () => {
         group = filter.dataset.filter;
         refresh();

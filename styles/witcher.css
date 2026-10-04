@@ -461,7 +461,6 @@
 .witcher-inventory-row:hover { background:#e4d8c4; }
 .witcher-inventory-name { min-width:0; display:flex; align-items:center; gap:6px; }
 .witcher-inventory-name img { height:26px; width:26px; object-fit:cover; border:0; border-radius:2px; flex:none; }
-.witcher-inventory-name > div { min-width:0; }
 .witcher-inventory-name button { height:auto; display:block; padding:0; background:none; border:0; text-align:left; white-space:normal; overflow-wrap:anywhere; font-size:12px; line-height:1.2; color:#332b26; }
 .witcher-inventory-name small { display:block; color:#796b58; font-size:10px; line-height:1.3; }
 .witcher-inventory-row.is-stored .witcher-inventory-name { opacity:.65; }
@@ -526,6 +525,10 @@
 .witcher-inventory-name .witcher-item-avatar { flex:0 0 27px; width:27px; height:27px; padding:0; border:0; background:#6e604f; border-radius:3px; overflow:hidden; }
 .witcher-item-avatar img { display:block; width:100%; height:100%; }
 .witcher-inventory-name [aria-expanded=true] { color:#802d2c; }
+.witcher-inventory-name .witcher-item-expand { display:flex; align-items:center; align-self:stretch; gap:8px; flex:1; width:100%; min-width:0; min-height:34px; padding:4px 6px; border-radius:3px; }
+.witcher-item-expand > i { flex:none; font-size:9px; color:#988363; transition:transform .15s ease; }
+.witcher-item-expand[aria-expanded=true] > i { transform:rotate(90deg); }
+.witcher-item-expand:hover, .witcher-item-expand:focus-visible { background:#a3834820; }
 .witcher-inventory-description { grid-column:1/-1; padding:8px 5px; line-height:1.45; font-size:12px; color:#44392e; border-top:1px solid #cbbfaa; overflow-wrap:anywhere; }
 .witcher-inventory-description p { margin:5px 0; }
 .witcher-item-traits { display:flex; flex-wrap:wrap; gap:4px; margin:3px 0; }
@@ -549,6 +552,21 @@
 .witcher-equipment-browser .witcher-picker-option small { margin:2px 0; }
 .witcher-equipment-browser .witcher-item-traits { margin-top:5px; }
 .witcher-equipment-browser .witcher-item-traits > span { font-size:9px; padding:2px 4px; }
+.witcher-catalog-wallet { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 12px; background:#ded1b9; border:1px solid #bca582; border-radius:4px; color:#4d3826; font-size:13px; }
+.witcher-catalog-wallet label { display:flex; align-items:center; gap:8px; }
+.witcher-catalog-wallet input { width:65px; height:28px; background:#faf6ed; color:#332b26; border:1px solid #bca582; text-align:center; }
+.witcher-catalog-notice { min-height:16px; margin:5px 0; color:#386442; font-size:12px; }
+.witcher-catalog-notice.error { color:#922f2b; }
+.witcher-equipment-browser .witcher-picker-entry { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:0 8px; padding:4px 8px; }
+.witcher-equipment-browser .witcher-picker-entry[hidden] { display:none; }
+.witcher-equipment-browser .witcher-catalog-view { height:auto; min-height:60px; width:100%; border:0; background:transparent; text-align:left; white-space:normal; box-shadow:none; justify-content:flex-start; }
+.witcher-equipment-browser .witcher-catalog-view:hover, .witcher-equipment-browser .witcher-catalog-view:focus-visible { background:#b2965f18; }
+.witcher-equipment-browser .witcher-picker-entry > .witcher-item-traits { grid-column:1 / -1; margin:0 0 7px 9px; }
+.witcher-catalog-actions { display:grid; align-content:center; grid-template-columns:auto auto; gap:4px; min-width:150px; padding:5px 0; }
+.witcher-catalog-actions > strong { grid-column:1 / -1; text-align:right; font-size:12px; color:#6b4930; }
+.witcher-equipment-browser .witcher-catalog-actions button { width:100%; height:29px; min-height:29px; padding:3px 7px; font-size:11px; color:#5e3529; background:#f4e9d4; border:1px solid #b69a6a; }
+.witcher-equipment-browser .witcher-catalog-actions button:disabled { opacity:.42; cursor:not-allowed; }
+.witcher-equipment-browser .witcher-catalog-actions button:not(:disabled):hover { background:#e0c89b; }
 .witcher-container-contents { grid-column:1/-1; border-left:2px solid #a18d68; padding-left:8px; min-width:0; }
 .witcher-container-empty { margin:7px; font-size:11px; font-style:italic; color:#81725c; }
 .witcher-eliott button.witcher-container-load { position:relative; grid-column:1/-1; width:100%; height:23px; min-height:0; padding:0 7px; margin:3px 0; border:1px solid #9d927b; border-radius:2px; overflow:hidden; text-align:left; background:#ddd5c6; color:#382e25; font:11px/21px sans-serif; }

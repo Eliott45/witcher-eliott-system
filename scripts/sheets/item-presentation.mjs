@@ -1,7 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { equipmentEntry } from "../data/equipment-search.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
-import { chooseEquipment } from "./equipment-browser.mjs";
+import { browseEquipmentCatalog } from "./equipment-browser.mjs";
 
 export async function itemPresentation(item, { secrets = false } = {}) {
   return { ...equipmentEntry(item), name: item.name,
@@ -25,6 +25,5 @@ export async function postItem(_event, target) {
   return Message.create(data);
 }
 export async function searchItemTrait(_event, target) {
-  const item = await chooseEquipment({ trait: target.dataset.trait, hint: "Предметы с выбранным свойством. Выбор открывает карточку." });
-  if (item) await item.sheet.render({ force: true });
+  await browseEquipmentCatalog({ actor: this.actor ?? this.item?.actor, trait: target.dataset.trait });
 }

@@ -2,8 +2,7 @@ import { available } from "../data/workshop.mjs";
 import { workshopAction, selectCatalogItem, esc } from "./workshop-item-context.mjs";
 import { craftDialog } from "../workshop/crafting.mjs";
 import { applyMutagen, harvestMaterial } from "../workshop/mutagens.mjs";
-import { copyPhysical, inventoryTransaction } from "../workshop/transaction.mjs";
-import { inventoryWrite } from "./inventory-context.mjs";
+import { acquireEquipment } from "../data/equipment-purchase.mjs";
 export async function workshopActorContext(actor) {
   const mutations=actor.system.mutations??[];
   const items=Array.from(actor.items??[]);
@@ -20,7 +19,7 @@ export const workshopActorActions={
    const item=await selectCatalogItem("Купить материалы",entry=>entry.system.kind==="material");if(!item)return;
    const quantity=await foundry.applications.api.DialogV2.prompt({window:{title:"Покупка материалов"},content:`<p>${esc(item.name)}: ${item.system.price} крон за единицу.</p><label>Количество<input name="quantity" type="number" min="1" step="1" value="1"></label>`,ok:{label:"Купить и списать кроны",callback:(_e,b)=>Number(new FormData(b.form).get("quantity"))},rejectClose:false});
    if(!Number.isInteger(quantity)||quantity<1)return;
-   await inventoryWrite(this.actor,async()=>{const cost=quantity*item.system.price;if(this.actor.system.crowns<cost)throw new Error("Недостаточно крон.");await inventoryTransaction(this.actor,{creates:[copyPhysical(item,quantity)],actorUpdate:{"system.crowns":this.actor.system.crowns-cost}});});
+   await acquireEquipment(this.actor,item,{purchase:true,quantity});
  }),
  addHarvest:workshopAction(async function(){
    if(!this.isEditable||this.actor.type!=="npc")return;

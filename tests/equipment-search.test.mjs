@@ -2,8 +2,21 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { equipmentEntry, filterEquipment } from "../scripts/data/equipment-search.mjs";
 import { postItem } from "../scripts/sheets/item-presentation.mjs";
+import { equipmentTrait } from "../scripts/data/equipment-traits.mjs";
+import { CORE_EQUIPMENT } from "../scripts/data/core-equipment.mjs";
 
 const entry = (id, type, system) => equipmentEntry({ uuid: id, name: id, type, system: { weight: 1, price: 10, properties: "", ...system } });
+test("property explanations preserve searchable labels, distinguish improved effects and cover core weapon properties", () => {
+  for (const item of CORE_EQUIPMENT.filter(item => item.type === "weapon" || item.type === "armor")) {
+    const data = equipmentEntry(item);
+    assert.deepEqual(data.traitDetails.map(trait => trait.label), data.traits);
+    assert(data.traitDetails.every(trait => trait.description && !trait.description.startsWith("Свойство предмета:")), item.name);
+  }
+  assert.match(equipmentTrait("Фокусирующее (3)").description, /STA/);
+  assert.match(equipmentTrait("Улучшенное фокусирующее").description, /на 2/);
+  assert.match(equipmentTrait("Улучшенное пробивающее броню").description, /половину/);
+  assert.match(equipmentTrait("Мой собственный эффект").description, /Мой собственный эффект/);
+});
 test("equipment search separates shields, combines property/range filters and preserves numeric sort", () => {
   const entries = [entry("Sword", "weapon", { category: "melee", hands: 1, properties: "Пробивающее броню; Сбалансированное" }),
     entry("Shield", "weapon", { category: "shield", hands: 1, price: 100 }),

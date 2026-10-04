@@ -46,7 +46,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
       item: this.item,
       system: this.item.system,
       physicalGroups: physicalItemContext(this.item, this.isEditable),
-      itemTraits: isPhysical(this.item) ? equipmentEntry(this.item).traits : [],
+      itemTraits: isPhysical(this.item) ? equipmentEntry(this.item).traitDetails : [],
       isAbility: this.item.type === "ability",
       attributeChoices: [{value: "", label: game.i18n.localize("WITCHER.Professions.Passive")}, ...["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"].map(value => ({value, label: game.i18n.localize(`WITCHER.Attributes.${value}.Label`)}))].map(entry => ({...entry, selected: entry.value === this.item.system.attribute})),
       typeLabel: `TYPES.Item.${this.item.type}`,

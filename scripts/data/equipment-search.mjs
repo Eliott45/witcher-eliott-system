@@ -1,5 +1,6 @@
 import { EQUIPMENT_KINDS, RARITIES, ARMOR_ZONES } from "./physical-items.mjs";
 import { effectiveItem } from "./workshop.mjs";
+import { equipmentTrait } from "./equipment-traits.mjs";
 
 export const EQUIPMENT_CATEGORIES = [{ id: "weapon", name: "Оружие" }, { id: "shield", name: "Щиты" }, { id: "armor", name: "Броня" }, ...EQUIPMENT_KINDS, { id: "recipe", name: "Чертежи / формулы" }];
 export const equipmentCategory = item => item.type === "weapon" && item.system.category === "shield" ? "shield" : item.type === "equipment" ? (item.system.kind || "gear") : item.type;
@@ -23,7 +24,7 @@ export function equipmentEntry(item) {
   if (item.type === "weapon") facts.push(`Урон ${data.damage}`, `Точность ${data.accuracy >= 0 ? "+" : ""}${data.accuracy}`, `Н ${data.reliability?.value ?? 0}/${data.reliability?.max ?? 0}`);
   if (item.type === "armor") facts.push(`ПБ ${data.stoppingPower?.value ?? 0}/${data.stoppingPower?.max ?? 0}`, `Скованность ${data.encumbrance}`);
   return { id: item.uuid ?? item.id, label: item.name, img: item.img, group: category, groupLabel: label(EQUIPMENT_CATEGORIES, category),
-    traits, summary: facts.join(" · "), details: [], price: data.price ?? 0, weight: data.weight ?? 0,
+    traits, traitDetails: traits.map(equipmentTrait), summary: facts.join(" · "), details: [], price: data.price ?? 0, weight: data.weight ?? 0,
     rarity: data.rarity ?? "", weaponCategory: item.type === "weapon" ? data.category : "", hands: item.type === "weapon" ? String(data.hands) : "",
     armorClass: item.type === "armor" ? data.armorClass : "", zone: item.type === "armor" ? data.zone : "", source: data.source ?? "",
     search: [item.name, ...traits, plain(data.properties), plain(data.description), data.source].join(" ").toLocaleLowerCase() };
@@ -47,6 +48,6 @@ export function filterEquipment(entries, filters = {}) {
 }
 export function equipmentFacets(entries) {
   return { types: EQUIPMENT_CATEGORIES, rarities: RARITIES, weaponCategories: WEAPON_CATEGORIES, armorClasses: ARMOR_CLASSES, zones: ARMOR_ZONES,
-    traits: [...new Set(entries.flatMap(entry => entry.traits))].sort((a, b) => a.localeCompare(b, "ru")),
+    traits: [...new Set(entries.flatMap(entry => entry.traits))].sort((a, b) => a.localeCompare(b, "ru")).map(equipmentTrait),
     sources: [...new Set(entries.map(entry => entry.source).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru")) };
 }

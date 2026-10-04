@@ -1,7 +1,9 @@
 import { effectiveItem, activeOil } from "../data/workshop.mjs";
 import { ARMOR_ZONES, isPhysical, equippedItems, conditionKey, carriedWeight, itemWeight } from "../data/physical-items.mjs";
 import { isContainer, containerParent, containerContents, isCarried } from "../data/containers.mjs";
-import { chooseEquipment } from "./equipment-browser.mjs";
+import { browseEquipmentCatalog } from "./equipment-browser.mjs";
+import { inventoryWrite } from "../data/inventory-writes.mjs";
+export { inventoryWrite } from "../data/inventory-writes.mjs";
 import { EQUIPMENT_CATEGORIES, equipmentCategory, equipmentEntry } from "../data/equipment-search.mjs";
 import { sheetPreferences, updateSheetPreferences, reportPreferencesError } from "./sheet-preferences.mjs";
 
@@ -46,11 +48,6 @@ export function inventoryContext(actor, preferences = {}) {
       items: sortRows(rows.filter(item => !item.parentId && group.categories.includes(item.category))) })),
     zones: ARMOR_ZONES.map(zone => ({ ...zone, items: equippedItems(items).filter(item => item.type === "armor" && item.system.zone === zone.id).map(item => ({ id: item.id, name: item.name, condition: effectiveItem(item).stoppingPower })) })),
     workshopOpen: !preferences.collapsed?.["inventory-workshop"] };
-}
-const queues = new WeakMap();
-export function inventoryWrite(actor, operation) {
-  const work = (queues.get(actor) ?? Promise.resolve()).then(() => actor.isOwner ? operation() : undefined);
-  queues.set(actor, work.catch(() => {})); return work;
 }
 export async function equipItem(_event, target) {
   if (!this.isEditable) return;
@@ -115,12 +112,7 @@ export async function browseEquipment() {
 export async function addCatalogItem(_event, target) {
   if (!this.isEditable) return;
   const group = GROUPS.find(entry => entry.id === target?.dataset.inventoryGroupId);
-  const selected = await chooseEquipment({ categories: group?.categories });
-  if (!selected || !this.isEditable) return;
-  const data = game.items.fromCompendium(selected, { clearFolder: true, keepId: false });
-  data.system.equipped = false;
-  data.system.containerId = "";
-  await this.actor.createEmbeddedDocuments("Item", [data]);
+  await browseEquipmentCatalog({ actor: this.actor, categories: group?.categories });
 }
 export function bindInventory(sheet) {
   const root = sheet.element;
