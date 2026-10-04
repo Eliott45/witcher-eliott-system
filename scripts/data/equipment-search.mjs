@@ -1,3 +1,4 @@
+import { isTransport } from "./transport.mjs";
 import { EQUIPMENT_KINDS, RARITIES, ARMOR_COVERAGE, armorZones, CONCEALMENT, isAmmunition } from "./physical-items.mjs";
 import { effectiveItem } from "./workshop.mjs";
 import { equipmentTrait } from "./equipment-traits.mjs";
@@ -22,7 +23,7 @@ export function equipmentEntry(item) {
     ["armor", "weapon"].includes(item.type) ? `Усиления ${data.enhancementSlots ?? 0}` : "",
     ...String(data.properties ?? "").split(/[;\n]+/).map(plain).filter(property => property.length <= 64)
   ].filter(Boolean))];
-  const facts = [`${Math.round((data.weight ?? 0) * 1000) / 1000} кг`, `${data.price ?? 0} крон`];
+  const facts = [isTransport(item) ? `Грузоподъёмность ${data.capacity} кг` : `${Math.round((data.weight ?? 0) * 1000) / 1000} кг`, `${data.price ?? 0} крон`];
   if (data.purchaseQuantity > 1) facts.push(`Пачка: ${data.purchaseQuantity} шт. за ${Math.round(data.price * data.purchaseQuantity * 100) / 100} крон`);
   if (item.type === "weapon") facts.push(`Урон ${data.damage}`, `Точность ${data.accuracy >= 0 ? "+" : ""}${data.accuracy}`, `Н ${data.reliability?.value ?? 0}/${data.reliability?.max ?? 0}`);
   if (item.type === "armor") facts.push(`ПБ ${data.stoppingPower?.value ?? 0}/${data.stoppingPower?.max ?? 0}`, `Скованность ${data.encumbrance}`);

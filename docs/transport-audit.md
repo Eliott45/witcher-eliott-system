@@ -1,0 +1,13 @@
+# Transport and manual installation — 2026-10-04
+
+The existing equipment Item and containerId tree are reused. No new Actor inventory or duplicate Compendium was introduced. New equipment kinds: transport and tack. Saddlebags keep the existing container kind. Physical capacity is independent of mass; mounts/vehicles contribute no mass. A separate transport.mountId links a wagon to one animal without placing cargo into the animal's load.
+
+Transport cargo (including nested bags) does not contribute to carried weight, equipped character armor or available crafting materials. Removing a carrier releases its contents as not carried and clears wagon links. Imported copies clear foreign hitch IDs. Two saddlebag compartments are views of the same child Items, distinguished by containerSection. Military bags also expose six exterior attachments. Overloads warn; nothing is silently deleted or prevented from being recorded.
+
+Manual upgrade installation uses the same transaction as normal installation. Both owning players and GMs can bypass tools/checks; slots, compatibility, single-item target and component consumption still apply. No duplicated upgrade storage. Display rounds enhanced mass to three decimals while calculations retain full precision.
+
+Sources: user PDF, RU pp.90–91; official Core Errata v4 (2022-01-06), pp.2–3, https://rtalsoriangames.com/wp-content/uploads/2022/03/RTG-WI-WitcherCoreErratav4.pdf. Per errata mount SPD/HP are verified against RU bestiary pp.312–313; the supplied table already matches. Carrying capacities follow p.91 and the user's explicit clarification. Manual installation is an explicit user-requested override, not a replacement RAW rule.
+
+Limits/TODO: object size has no field yet, so small/medium bag restrictions are descriptive. Driving/riding situational modifiers are shown on gear; no new mounted-combat engine. Hitching currently supports one animal per wagon; do not infer team speed/strength rules. Rider weight is not modeled. Transport does not create combat Actors automatically.
+
+Validation: 174 tests; manifest/syntax/translations check; real installed Foundry 14 schema and strict template checks (777 pack documents), existing and new Actor round trips, nested transport/saddlebag cargo, overloads, equipment/hitch selection, deletion preservation, permissions and catalog migration idempotence. Existing Victoria sheet opens in live Foundry and exposes the new tab without errors. Active player session has no Actor creation permission; live new-Actor creation and pointer drag/drop were not available, covered by native schema and action tests instead. New catalog entries append when the active GM reloads; live LevelDB files are never overwritten. Version remains 0.2.0.

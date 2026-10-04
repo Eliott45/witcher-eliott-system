@@ -1,3 +1,4 @@
+import { CORE_TRANSPORT, CORE_TACK } from "./core-transport.mjs";
 // User-provided core pp. 73–74, 79–80, 92–93. Values are per item, except explicitly named packs.
 import { CORE_CONTAINERS } from "./core-containers.mjs";
 import { CORE_AMMUNITION } from "./core-ammunition.mjs";
@@ -90,4 +91,4 @@ for (const entry of CORE_GEAR) {
   if (container) Object.assign(entry.system, container, { kind: "container", source: "Базовая книга, стр. 93, 95" });
 }
 Object.assign(LEGACY_GEAR_STATS["shoulder-bag"], CORE_CONTAINERS["shoulder-bag"], { kind: "container" });
-export const CORE_EQUIPMENT = [...CORE_WEAPONS, ...CORE_ARMOR, ...CORE_GEAR, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT];
+export const CORE_EQUIPMENT = [...CORE_WEAPONS, ...CORE_ARMOR, ...CORE_GEAR, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK];

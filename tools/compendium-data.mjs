@@ -14,7 +14,7 @@ import { CORE_EQUIPMENT, LEGACY_GEAR_STATS } from "../scripts/data/core-equipmen
 import { defaultItemIcon } from "../scripts/data/item-icons.mjs";
 import { EFFECT_TEMPLATES, conditionSource } from "../scripts/data/condition-definitions.mjs";
 
-const coreFolders = { materials: {id:"gearMaterials001",name:"Материалы и ингредиенты"}, alchemy:{id:"gearAlchemy00001",name:"Алхимия"}, mutagens:{id:"gearMutagens0001",name:"Мутагены"}, upgrades:{id:"gearUpgrades0001",name:"Улучшения"}, recipes:{id:"gearRecipes00001",name:"Чертежи и формулы"}, weapons: { id: "gearFolderWeapon", name: "Оружие и щиты" }, ammunition: { id: "gearAmmo00000001", name: "Боеприпасы" }, armor: { id: "gearFolderArmors", name: "Броня" }, tools: { id: "gearFolderTools1", name: "Инструменты" }, core: { id: "gearFolderCore01", name: "Снаряжение" } };
+const coreFolders = { transport: {id:"gearTransport001",name:"Транспорт"}, tack: {id:"gearTack00000001",name:"Упряжь и седельные сумки"}, materials: {id:"gearMaterials001",name:"Материалы и ингредиенты"}, alchemy:{id:"gearAlchemy00001",name:"Алхимия"}, mutagens:{id:"gearMutagens0001",name:"Мутагены"}, upgrades:{id:"gearUpgrades0001",name:"Улучшения"}, recipes:{id:"gearRecipes00001",name:"Чертежи и формулы"}, weapons: { id: "gearFolderWeapon", name: "Оружие и щиты" }, ammunition: { id: "gearAmmo00000001", name: "Боеприпасы" }, armor: { id: "gearFolderArmors", name: "Броня" }, tools: { id: "gearFolderTools1", name: "Инструменты" }, core: { id: "gearFolderCore01", name: "Снаряжение" } };
 
 const escapeHTML = text => text.replace(/[&<>"']/g, character => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"

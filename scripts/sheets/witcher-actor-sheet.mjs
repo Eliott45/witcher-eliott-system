@@ -1,3 +1,4 @@
+import { transportContext, transportActions, bindTransport } from "./transport-context.mjs";
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
 import { openAdvancement } from "./advancement-window.mjs";
 import { setExperience } from "../data/advancement-purchase.mjs";
@@ -45,7 +46,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
-      ...effectActions,
+      ...effectActions, ...transportActions,
       ...workshopActorActions,
       openAdvancement,
       toggleExperience: WitcherActorSheet.#onToggleExperience,
@@ -87,7 +88,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static PARTS = {
     content: {
       template: `systems/${SYSTEM_ID}/templates/actor-sheet.hbs`,
-      scrollable: [".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=profession]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
+      scrollable: [".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=profession]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=transport]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
     }
   };
 
@@ -133,7 +134,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
         localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
       }, { query: this.#skillQuery, editing: this.isEditable && this.#editingSkills }),
       abilities: await abilitiesContext(this.actor),
-      inventory,
+      inventory, transport: transportContext(this.actor,inventory,this.selectedTransportId),
       workshop: await workshopActorContext(this.actor),
       abilitiesOpen: !preferences.collapsed?.abilities,
       editingAttributes: this.isEditable && this.#editingAttributes,
@@ -178,12 +179,12 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       button.disabled = false;
     }
     for (const search of this.element.querySelectorAll("[data-skill-search], [data-inventory-search], [data-action=toggleInventoryGroup], [data-action=browseEquipment]")) search.disabled = false;
-    for (const button of this.element.querySelectorAll("[data-action=toggleItemDescription], [data-action=searchItemTrait], [data-action=toggleContainer]")) button.disabled = false;
+    for (const button of this.element.querySelectorAll("[data-action=toggleItemDescription], [data-action=searchItemTrait], [data-action=toggleContainer], [data-action=selectTransport]")) button.disabled = false;
   }
 
   async _onRender(context, options) {
     await super._onRender(context, options);
-    bindInventory(this);
+    bindInventory(this); bindTransport(this);
     for (const input of this.element.querySelectorAll("[data-header-counter]")) {
       input.addEventListener("change", event => {
         event.stopPropagation(); // Counters share the guarded actor queue with paid advancement.

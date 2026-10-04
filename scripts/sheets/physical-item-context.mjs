@@ -1,3 +1,4 @@
+import { isTransport, TRANSPORT_TYPES, TACK_SLOTS } from "../data/transport.mjs";
 import { textField as text, numberField as number, choiceField as choice, formFields } from "../data/structured-fields.mjs";
 import { isPhysical, isAmmunition, ARMOR_COVERAGE, RARITIES, EQUIPMENT_KINDS, CONCEALMENT } from "../data/physical-items.mjs";
 import { SUBSTANCES, MONSTER_CATEGORIES } from "../data/workshop.mjs";
@@ -20,9 +21,11 @@ const ARMOR = [choice("zone", "Зона брони", ARMOR_COVERAGE), choice("ar
   number("enhancementSlots", "Слоты усиления"), text("resistances", "Сопротивления")];
 export function physicalItemContext(item, editable) {
   if (!isPhysical(item)) return [];
-  const groups = [{ title: "Предмет", fields: COMMON }, { title: item.type === "weapon" ? "Оружие" : item.type === "armor" ? "Броня" : "Снаряжение",
+  const groups = [{ title: "Предмет", fields: isTransport(item) ? COMMON.filter(field=>!["weight","quantity","carried","equipped"].includes(field.key)) : COMMON }, { title: item.type === "weapon" ? "Оружие" : item.type === "armor" ? "Броня" : "Снаряжение",
     fields: item.type === "weapon" ? WEAPON : item.type === "armor" ? ARMOR : [choice("kind", "Категория", EQUIPMENT_KINDS)] },
   { title: "Особенности", fields: [text("properties", "Эффекты и условия")] }];
+  if (isTransport(item)) groups.push({title:"Транспорт",fields:[choice("transport.type","Вид транспорта",TRANSPORT_TYPES),decimal("capacity","Грузоподъёмность, кг"),number("transport.health.value","ПЗ сейчас"),number("transport.health.max","Максимум ПЗ"),number("transport.speed","Скорость"),number("transport.speedModifier","Для повозки: поправка к скорости животного",-100),number("transport.athletics","Атлетика + ЛВК (для животного)"),number("transport.handling","Модификатор управления",-100)]});
+  if(item.type==="equipment"&&["tack","container"].includes(item.system.kind)) groups.push({title:"Упряжь",fields:[choice("tack.slot","Место крепления",[{id:"",name:"Не упряжь"},...TACK_SLOTS]),number("tack.speedBonus","Бонус скорости от седла"),number("tack.stoppingPower.value","Конский доспех: ПБ сейчас"),number("tack.stoppingPower.max","Конский доспех: максимум ПБ"),choice("tack.compartments","Отделения сумок",[{id:0,name:"Один общий контейнер"},{id:2,name:"Две седельные сумки"}]),number("tack.externalSlots","Наружных креплений")]});
   if (isAmmunition(item)) groups.splice(2, 0, { title: "Боеприпасы", fields: [number("purchaseQuantity", "Штук в пачке при покупке / добавлении", 1), DAMAGE_TYPE, ...RELIABILITY, CONCEALMENT_FIELD] });
   if(item.type === "equipment" && item.system.kind === "container") groups.push({ title: "Контейнер", fields: [decimal("capacity", "Вместимость, кг (0 — не задана)")] });
   if(item.type==="recipe") groups.push({title:"Чертёж / формула",fields:[

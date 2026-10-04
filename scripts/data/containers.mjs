@@ -1,5 +1,6 @@
+import { isTransport } from "./transport.mjs";
 /** Containment is a reference between sibling Items, never a second inventory. */
-export const isContainer = item => item?.type === "equipment" && item.system.kind === "container";
+export const isContainer = item => item?.type === "equipment" && ["container", "transport"].includes(item.system.kind);
 const collection = (item, items) => Array.from(items ?? item.actor?.items ?? []);
 
 export function containerParent(item, items) {
@@ -16,7 +17,7 @@ export function containerParent(item, items) {
 }
 export function canContain(item, parent, items) {
   if (!parent) return true;
-  if (!isContainer(parent) || !item.id || parent.id === item.id) return false;
+  if (isTransport(item) || !isContainer(parent) || !item.id || parent.id === item.id) return false;
   const all = collection(item, items), seen = new Set([item.id]);
   let next = parent;
   while (next) {
@@ -30,7 +31,7 @@ export function isCarried(item, items) {
   const all = collection(item, items);
   let next = item;
   while (next) {
-    if (next.system.carried === false || next.system.quantity === 0) return false;
+    if (isTransport(next) || next.system.carried === false || next.system.quantity === 0) return false;
     next = containerParent(next, all);
   }
   return true;

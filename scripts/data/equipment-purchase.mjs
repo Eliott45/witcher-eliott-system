@@ -1,5 +1,5 @@
 import { isPhysical } from "./physical-items.mjs";
-import { isContainer } from "./containers.mjs";
+import { isContainer, canContain } from "./containers.mjs";
 import { effectiveItem } from "./workshop.mjs";
 import { inventoryWrite } from "./inventory-writes.mjs";
 import { copyPhysical, inventoryTransaction } from "../workshop/transaction.mjs";
@@ -23,14 +23,20 @@ export function equipmentQuote(actor, item, quantity = 1) {
 }
 
 /** Recheck the live balance inside the same queue used by crafting and materials. */
-export function acquireEquipment(actor, item, { purchase = false, quantity = 1 } = {}) {
+export function acquireEquipment(actor, item, { purchase = false, quantity = 1, containerId = "" } = {}) {
   if (!actor.isOwner) return Promise.reject(new Error("Нет доступа к инвентарю."));
   return inventoryWrite(actor, async () => {
     const quote = equipmentQuote(actor, item, quantity);
     const reason = purchase ? quote.buyReason : quote.addReason;
     if (reason) throw new Error(reason);
+    const data=copyPhysical(item,quote.units);
+    if(containerId) {
+      const parent=actor.items.get(containerId);
+      if(!parent||!canContain({type:item.type,system:item.system,id:item.id||"new-item"},parent,actor.items))throw new Error("Место для груза больше недоступно.");
+      data.system.containerId=containerId;
+    }
     return inventoryTransaction(actor, {
-      creates: [copyPhysical(item, quote.units)],
+      creates: [data],
       actorUpdate: purchase ? { "system.crowns": Math.round((actor.system.crowns - quote.cost) * 100) / 100 } : {}
     });
   }).then(created => {

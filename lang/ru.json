@@ -19,6 +19,7 @@
     }
   },
   "WITCHER": {
+    "Transport": { "Title": "Транспорт" },
     "Attributes": {
       "intelligence": {
         "Label": "Интеллект",

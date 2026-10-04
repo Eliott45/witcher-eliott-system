@@ -5332,6 +5332,585 @@
     "flags": {}
   },
   {
+    "_id": "trns000000000001",
+    "name": "Карета",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/wagon.svg",
+    "system": {
+      "ruleId": "transport.carriage",
+      "kind": "transport",
+      "quantity": 1,
+      "weight": 0,
+      "capacity": 600,
+      "price": 660,
+      "transport": {
+        "type": "wagon",
+        "athletics": 0,
+        "handling": -1,
+        "speed": 0,
+        "speedModifier": -3,
+        "health": {
+          "value": 60,
+          "max": 60
+        },
+        "mountId": ""
+      },
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Для движения необходимо запрячь животное. Грузоподъёмность — 600 кг.</p>"
+    },
+    "effects": [],
+    "folder": "gearTransport001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "trns000000000002",
+    "name": "Повозка",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/wagon.svg",
+    "system": {
+      "ruleId": "transport.cart",
+      "kind": "transport",
+      "quantity": 1,
+      "weight": 0,
+      "capacity": 300,
+      "price": 200,
+      "transport": {
+        "type": "wagon",
+        "athletics": 0,
+        "handling": 0,
+        "speed": 0,
+        "speedModifier": -1,
+        "health": {
+          "value": 30,
+          "max": 30
+        },
+        "mountId": ""
+      },
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Для движения необходимо запрячь животное. Грузоподъёмность — 300 кг.</p>"
+    },
+    "effects": [],
+    "folder": "gearTransport001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "trns000000000003",
+    "name": "Куттер",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/sailboat.svg",
+    "system": {
+      "ruleId": "transport.cutter",
+      "kind": "transport",
+      "quantity": 1,
+      "weight": 0,
+      "capacity": 610,
+      "price": 1670,
+      "transport": {
+        "type": "boat",
+        "athletics": 0,
+        "handling": 0,
+        "speed": 10,
+        "speedModifier": 0,
+        "health": {
+          "value": 60,
+          "max": 60
+        },
+        "mountId": ""
+      },
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Водный транспорт. Грузоподъёмность — 610 кг.</p>"
+    },
+    "effects": [],
+    "folder": "gearTransport001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "trns000000000004",
+    "name": "Лошадь",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/horse.svg",
+    "system": {
+      "ruleId": "transport.horse",
+      "kind": "transport",
+      "quantity": 1,
+      "weight": 0,
+      "capacity": 100,
+      "price": 520,
+      "transport": {
+        "type": "mount",
+        "athletics": 11,
+        "handling": 2,
+        "speed": 12,
+        "speedModifier": 0,
+        "health": {
+          "value": 40,
+          "max": 40
+        },
+        "mountId": ""
+      },
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Верховое или вьючное животное. Грузоподъёмность — 100 кг.</p>"
+    },
+    "effects": [],
+    "folder": "gearTransport001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "trns000000000005",
+    "name": "Мул",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/horse.svg",
+    "system": {
+      "ruleId": "transport.mule",
+      "kind": "transport",
+      "quantity": 1,
+      "weight": 0,
+      "capacity": 150,
+      "price": 200,
+      "transport": {
+        "type": "mount",
+        "athletics": 7,
+        "handling": 0,
+        "speed": 9,
+        "speedModifier": 0,
+        "health": {
+          "value": 45,
+          "max": 45
+        },
+        "mountId": ""
+      },
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Верховое или вьючное животное. Грузоподъёмность — 150 кг.</p>"
+    },
+    "effects": [],
+    "folder": "gearTransport001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "trns000000000006",
+    "name": "Вол",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/horse.svg",
+    "system": {
+      "ruleId": "transport.ox",
+      "kind": "transport",
+      "quantity": 1,
+      "weight": 0,
+      "capacity": 300,
+      "price": 278,
+      "transport": {
+        "type": "mount",
+        "athletics": 5,
+        "handling": -2,
+        "speed": 6,
+        "speedModifier": 0,
+        "health": {
+          "value": 50,
+          "max": 50
+        },
+        "mountId": ""
+      },
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Верховое или вьючное животное. Грузоподъёмность — 300 кг.</p>"
+    },
+    "effects": [],
+    "folder": "gearTransport001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "trns000000000007",
+    "name": "Парусная лодка",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/sailboat.svg",
+    "system": {
+      "ruleId": "transport.sailboat",
+      "kind": "transport",
+      "quantity": 1,
+      "weight": 0,
+      "capacity": 130,
+      "price": 230,
+      "transport": {
+        "type": "boat",
+        "athletics": 0,
+        "handling": 1,
+        "speed": 6,
+        "speedModifier": 0,
+        "health": {
+          "value": 30,
+          "max": 30
+        },
+        "mountId": ""
+      },
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Водный транспорт. Грузоподъёмность — 130 кг.</p>"
+    },
+    "effects": [],
+    "folder": "gearTransport001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "trns000000000008",
+    "name": "Парусный корабль",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/sailboat.svg",
+    "system": {
+      "ruleId": "transport.sailing-ship",
+      "kind": "transport",
+      "quantity": 1,
+      "weight": 0,
+      "capacity": 2040,
+      "price": 2180,
+      "transport": {
+        "type": "boat",
+        "athletics": 0,
+        "handling": -2,
+        "speed": 8,
+        "speedModifier": 0,
+        "health": {
+          "value": 80,
+          "max": 80
+        },
+        "mountId": ""
+      },
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Водный транспорт. Грузоподъёмность — 2040 кг.</p>"
+    },
+    "effects": [],
+    "folder": "gearTransport001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "trns000000000009",
+    "name": "Боевой конь",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/horse.svg",
+    "system": {
+      "ruleId": "transport.warhorse",
+      "kind": "transport",
+      "quantity": 1,
+      "weight": 0,
+      "capacity": 270,
+      "price": 1600,
+      "transport": {
+        "type": "mount",
+        "athletics": 12,
+        "handling": -2,
+        "speed": 11,
+        "speedModifier": 0,
+        "health": {
+          "value": 50,
+          "max": 50
+        },
+        "mountId": ""
+      },
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Верховое или вьючное животное. Грузоподъёмность — 270 кг.</p>"
+    },
+    "effects": [],
+    "folder": "gearTransport001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "tack000000000001",
+    "name": "Седло",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/saddle.svg",
+    "system": {
+      "ruleId": "tack.saddle",
+      "kind": "tack",
+      "quantity": 1,
+      "weight": 5,
+      "price": 100,
+      "rarity": "everywhere",
+      "capacity": 0,
+      "tack": {
+        "slot": "saddle"
+      },
+      "properties": "Нет штрафа за езду без седла.",
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Нет штрафа за езду без седла.</p>"
+    },
+    "effects": [],
+    "folder": "gearTack00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "tack000000000002",
+    "name": "Кавалерийское седло",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/saddle.svg",
+    "system": {
+      "ruleId": "tack.cavalry-saddle",
+      "kind": "tack",
+      "quantity": 1,
+      "weight": 6,
+      "price": 325,
+      "rarity": "rare",
+      "capacity": 0,
+      "tack": {
+        "slot": "saddle"
+      },
+      "properties": "+1 к проверкам управления при атаке; встроенные ножны для оружия.",
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>+1 к проверкам управления при атаке; встроенные ножны для оружия.</p>"
+    },
+    "effects": [],
+    "folder": "gearTack00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "tack000000000003",
+    "name": "Скаковое седло",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/saddle.svg",
+    "system": {
+      "ruleId": "tack.racing-saddle",
+      "kind": "tack",
+      "quantity": 1,
+      "weight": 3,
+      "price": 200,
+      "rarity": "common",
+      "capacity": 0,
+      "tack": {
+        "slot": "saddle",
+        "speedBonus": 1
+      },
+      "properties": "+1 к проверкам управления для Верховой езды; +1 СКОР.",
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>+1 к проверкам управления для Верховой езды; +1 СКОР.</p>"
+    },
+    "effects": [],
+    "folder": "gearTack00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "tack000000000004",
+    "name": "Шпоры",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/saddle.svg",
+    "system": {
+      "ruleId": "tack.spurs",
+      "kind": "tack",
+      "quantity": 1,
+      "weight": 0.1,
+      "price": 100,
+      "rarity": "everywhere",
+      "capacity": 0,
+      "tack": {
+        "slot": "spurs"
+      },
+      "properties": "+1 к успокоению скакуна.",
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>+1 к успокоению скакуна.</p>"
+    },
+    "effects": [],
+    "folder": "gearTack00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "tack000000000005",
+    "name": "Скаковые шпоры",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/saddle.svg",
+    "system": {
+      "ruleId": "tack.racing-spurs",
+      "kind": "tack",
+      "quantity": 1,
+      "weight": 0.1,
+      "price": 125,
+      "rarity": "common",
+      "capacity": 0,
+      "tack": {
+        "slot": "spurs"
+      },
+      "properties": "+2 к успокоению скакуна.",
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>+2 к успокоению скакуна.</p>"
+    },
+    "effects": [],
+    "folder": "gearTack00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "tack000000000006",
+    "name": "Перемётная сума",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/saddlebags.svg",
+    "system": {
+      "ruleId": "tack.saddlebags",
+      "kind": "container",
+      "quantity": 1,
+      "weight": 1.5,
+      "price": 100,
+      "rarity": "everywhere",
+      "capacity": 50,
+      "tack": {
+        "slot": "bags",
+        "compartments": 2
+      },
+      "properties": "Два отделения по 25 кг для небольших и средних предметов.",
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Два отделения по 25 кг для небольших и средних предметов.</p>"
+    },
+    "effects": [],
+    "folder": "gearTack00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "tack000000000007",
+    "name": "Военная перемётная сума",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/saddlebags.svg",
+    "system": {
+      "ruleId": "tack.military-saddlebags",
+      "kind": "container",
+      "quantity": 1,
+      "weight": 2,
+      "price": 150,
+      "rarity": "rare",
+      "capacity": 100,
+      "tack": {
+        "slot": "bags",
+        "compartments": 2,
+        "externalSlots": 6
+      },
+      "properties": "Два отделения по 50 кг для небольших и средних предметов; снаружи крепления для 6 крупных предметов.",
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>Два отделения по 50 кг для небольших и средних предметов; снаружи крепления для 6 крупных предметов.</p>"
+    },
+    "effects": [],
+    "folder": "gearTack00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "tack000000000008",
+    "name": "Кожаные конские доспехи",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "tack.leather-barding",
+      "kind": "tack",
+      "quantity": 1,
+      "weight": 10,
+      "price": 550,
+      "rarity": "rare",
+      "capacity": 0,
+      "tack": {
+        "slot": "barding",
+        "stoppingPower": {
+          "value": 10,
+          "max": 10
+        }
+      },
+      "properties": "ПБ 10.",
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>ПБ 10.</p>"
+    },
+    "effects": [],
+    "folder": "gearTack00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "tack000000000009",
+    "name": "Кольчужные конские доспехи",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "tack.mail-barding",
+      "kind": "tack",
+      "quantity": 1,
+      "weight": 25,
+      "price": 1050,
+      "rarity": "unique",
+      "capacity": 0,
+      "tack": {
+        "slot": "barding",
+        "stoppingPower": {
+          "value": 15,
+          "max": 15
+        }
+      },
+      "properties": "ПБ 15; −1 к проверкам управления для Верховой езды.",
+      "source": "Базовая книга, стр. 91",
+      "description": "<p>ПБ 15; −1 к проверкам управления для Верховой езды.</p>"
+    },
+    "effects": [],
+    "folder": "gearTack00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "matr000000000001",
     "name": "Пепел",
     "type": "equipment",

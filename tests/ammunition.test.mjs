@@ -1,3 +1,4 @@
+import { CORE_TRANSPORT, CORE_TACK } from "../scripts/data/core-transport.mjs";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readFile } from "node:fs/promises";
@@ -46,10 +47,11 @@ test("standard ammunition buys packs of ten but counts individual projectiles an
   assert.deepEqual(conditionUpdate(standard, { "system.reliability.value": 20 }), { "system.reliability.value": 10 });
 });
 
-function migrationFixture({ fail = false, locked = true, startVersion = 0, elder = true } = {}) {
+function migrationFixture({ fail = false, locked = true, startVersion = 0, elder = true, transport = true } = {}) {
   const gm = {}, writes = [], index = new Map(), packFolders = new Map();
   let version = startVersion;
   if (elder) for (const item of sources.filter(item=>ELDER_EQUIPMENT.some(entry=>entry.id===item.system.ruleId))) index.set(item._id,structuredClone(item));
+  if(transport) for(const item of sources.filter(item=>[...CORE_TRANSPORT,...CORE_TACK].some(entry=>entry.id===item.system.ruleId)))index.set(item._id,structuredClone(item));
   const pack = { collection: "witcher-eliott-system.equipment", locked, folders: packFolders,
     getIndex: async () => index,
     getDocument: async id => index.get(id),
@@ -85,7 +87,7 @@ test("content update appends only missing ammunition, keeps edited entries and r
   game.user = state.gm;
   await migrateEquipmentContent();
   assert.deepEqual(state.writes, [["lock", false], ["folders", 1], ["items", 3], ["lock", true]]);
-  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 34);
+  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 52);
   assert.equal(state.index.get("custom-canonical").system.price, 999);
   await migrateEquipmentContent(); assert.equal(state.writes.length, 4);
 });
@@ -130,7 +132,7 @@ test("version-one worlds repair pack, world, actor and unlinked token copies wit
     assert.equal(item.system.quantity, 10); assert.equal(item.system.weight, .05); assert.equal(item.system.price, 1);
     assert.equal(item.img, CORE_AMMUNITION[0].img); assert.equal(item.name, "Стандартные боеприпасы");
   }
-  assert.equal(state.index.size, 34); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
+  assert.equal(state.index.size, 52); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
   assert.ok(Array.from(state.index.values()).filter(item=>item.system.kind==="ammunition").every(item => item.img === CORE_AMMUNITION[0].img));
   await migrateEquipmentContent(); assert.equal(worldActor.items[0].system.quantity, 10);
 });
@@ -162,7 +164,7 @@ test("version-three worlds append all thirty Elder Folk items without recreating
   const state=migrationFixture({startVersion:3,elder:false});
   for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
   await migrateEquipmentContent();
-  assert.equal(state.index.size,34);
+  assert.equal(state.index.size,52);
   assert.equal(state.writes.find(([key])=>key==="items")[1],30);
   assert.equal(state.version,EQUIPMENT_CONTENT_VERSION);
 });
@@ -181,4 +183,13 @@ test("creating or dropping an old pack normalizes once while new individual stac
   legacy.system.purchaseQuantity = 1;
   await legacy._preCreate({}, {}, {});
   assert.equal(legacy.system.quantity, 20);
+});
+
+test("version-five worlds append transport and tack once with their own folders",async()=>{
+ const state=migrationFixture({startVersion:5,transport:false});
+ for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
+ await migrateEquipmentContent();assert.equal(state.index.size,52);
+ assert.equal(state.writes.find(([key])=>key==="items")[1],18);
+ assert.equal(state.writes.find(([key])=>key==="folders")[1],2);
+ const count=state.writes.length;await migrateEquipmentContent();assert.equal(state.writes.length,count);
 });

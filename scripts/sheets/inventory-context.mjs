@@ -1,3 +1,4 @@
+import { isTransport, cargoSections, cargoSection } from "../data/transport.mjs";
 import { effectiveItem, activeOil } from "../data/workshop.mjs";
 import { ARMOR_ZONES, armorZones, isPhysical, equippedItems, conditionKey, carriedWeight, itemWeight } from "../data/physical-items.mjs";
 import { isContainer, containerParent, containerContents, isCarried } from "../data/containers.mjs";
@@ -11,7 +12,7 @@ import { sheetPreferences, updateSheetPreferences, reportPreferencesError } from
 const GROUPS = [
   { id: "weapon", name: "Оружие и щиты", icon: "fa-swords", categories: ["weapon", "shield"] },
   { id: "armor", name: "Броня", icon: "fa-shield-halved", categories: ["armor"] },
-  { id: "gear", name: "Снаряжение и инструменты", icon: "fa-sack", categories: ["gear", "tool"] },
+  { id: "gear", name: "Снаряжение и инструменты", icon: "fa-sack", categories: ["gear", "tool", "tack"] },
   { id: "alchemy", name: "Алхимия и мутагены", icon: "fa-flask", categories: ["alchemy", "mutagen"] },
   { id: "ammunition", name: "Боеприпасы", icon: "fa-bullseye", categories: ["ammunition"] },
   { id: "material", name: "Материалы и улучшения", icon: "fa-hammer", categories: ["material", "upgrade"] },
@@ -22,13 +23,15 @@ const GROUPS = [
 export function inventoryContext(actor, preferences = {}) {
   const items = Array.from(actor.items ?? []).filter(isPhysical);
   const rows = items.map(item => ({ id: item.id, name: item.name, img: item.img, ...item.system, sort: item.sort ?? 0,
-    quantity: item.system.quantity ?? 1, carried: isCarried(item, items), expanded: false, presentation: null,
+    quantity: item.system.quantity ?? 1, carried: isCarried(item, items), expanded: false, presentation: null, cargoSections: [], onTransport: false,
     isContainer: isContainer(item), parentId: containerParent(item, items)?.id ?? "", children: [], containerOpen: true,
     isRecipe: item.type === "recipe", oil: activeOil(item, globalThis.game?.time?.worldTime ?? 0),
     category: equipmentCategory(item), search: equipmentEntry(item).search, canEquip: ["weapon", "armor"].includes(item.type),
     condition: conditionKey(item) ? effectiveItem(item)[conditionKey(item)] : null, conditionLabel: item.type === "armor" ? "ПБ" : "Н",
     totalWeight: Math.round(itemWeight(item) * 1000) / 1000 }));
   for (const row of rows) {
+    let ancestor=containerParent(items.find(item=>item.id===row.id),items);
+    while(ancestor){if(isTransport(ancestor))row.onTransport=true;ancestor=containerParent(ancestor,items);}
     if (row.parentId) rows.find(parent => parent.id === row.parentId).children.push(row);
     if (row.isContainer) {
       row.contentsWeight = Math.round(containerContents(items.find(item => item.id === row.id), items).reduce((sum, item) => sum + itemWeight(item), 0) * 1000) / 1000;
@@ -37,6 +40,16 @@ export function inventoryContext(actor, preferences = {}) {
       row.overloaded = row.capacity > 0 && row.contentsWeight > row.capacity;
       row.totalWeight = Math.round((row.totalWeight + row.contentsWeight) * 1000) / 1000;
     }
+  }
+  for(const row of rows.filter(row=>row.isContainer)) {
+    const item=items.find(item=>item.id===row.id);
+    row.cargoSections=cargoSections(item).map(section=>{
+      const children=row.children.filter(child=>cargoSection({system:child},item)===section.id);
+      const weight=Math.round(children.reduce((sum,child)=>sum+child.totalWeight,0)*1000)/1000;
+      const count=children.reduce((sum,child)=>sum+child.quantity,0);
+      return {...section,children,weight,count,overloaded:section.slots?count>section.slots:weight>section.capacity};
+    });
+    if(row.cargoSections.length)row.overloaded=row.cargoSections.some(section=>section.overloaded);
   }
   const sortRows = rows => rows.sort((a, b) => a.sort - b.sort || a.name.localeCompare(b.name, "ru"));
   for (const row of rows) sortRows(row.children);

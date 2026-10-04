@@ -456,7 +456,7 @@ handlebars.registerHelper("not", value => !value);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -599,7 +599,7 @@ assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
 assert.ok(!html.includes("witcher-footnote"));
-assert.equal([...html.matchAll(/data-action="tab"/g)].length, 9);
+assert.equal([...html.matchAll(/data-action="tab"/g)].length, 10);
 assert.equal([...html.matchAll(/name="system.attributes\./g)].length, 0, "Base attributes are locked by default");
 sheet.submit = async () => {};
 sheet.render = async () => {};
@@ -666,7 +666,7 @@ sheet.tabGroups.character = "main";
 await updateSheetPreferences(sheet.actor.uuid, { hiddenTabs: ["main"], collapsed: { parents: true, appearance: true } });
 const customized = await sheet._prepareContext({});
 assert.equal(sheet.tabGroups.character, "skills", "Hiding the active tab must select a visible one");
-assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "actions", "inventory", "biography", "family", "lifepath", "effects"]);
+assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "actions", "inventory", "transport", "biography", "family", "lifepath", "effects"]);
 assert.equal(customized.familySections.find(section => section.id === "parents").open, false);
 assert.equal(customized.biographySections.find(section => section.id === "appearance").open, false);
 assert.ok(!template(customized).includes('data-action="tab" data-group="character" data-tab="main"'));
@@ -852,7 +852,26 @@ for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   assert.ok(!rendered.includes("undefined"));
 }
 const tabsTemplate = handlebars.compile(await readFile(new URL("../templates/sheet-tabs.hbs", import.meta.url), "utf8"), { strict: true });
-assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 9);
+assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 10);
+// New transport Items survive native schema round trips without changing old Actor shapes.
+const { CORE_TRANSPORT, CORE_TACK } = await import("../scripts/data/core-transport.mjs");
+const { transportContext } = await import("../scripts/sheets/transport-context.mjs");
+const transportSource=(entry,id)=>({_id:id,type:entry.type,name:entry.name,img:entry.img,system:{...structuredClone(entry.system),ruleId:entry.id}});
+const horseSource=transportSource(CORE_TRANSPORT.find(x=>x.id==="transport.horse"),"qaHorse000000001");
+const bagSource=transportSource(CORE_TACK.find(x=>x.id==="tack.saddlebags"),"qaBag00000000001");
+bagSource.system.containerId=horseSource._id;bagSource.system.equipped=true;
+const qaCaravan=new foundry.documents.BaseActor({name:"Transport QA",type:"character",items:[horseSource,bagSource,{_id:"qaCargo000000001",name:"Сухой паёк",type:"equipment",system:{containerId:bagSource._id,containerSection:"right",quantity:8,weight:1}}]});
+const reopenedCaravan=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(qaCaravan.toObject())));
+reopenedCaravan.system.prepareDerivedData();
+assert.equal(reopenedCaravan.system.carriedWeight,0);
+assert.equal(reopenedCaravan.items.get(bagSource._id).system.tack.compartments,2);
+const caravanInventory=inventoryContext(reopenedCaravan);
+const caravanView=transportContext(reopenedCaravan,caravanInventory,horseSource._id);
+assert.equal(caravanView.selected.contentsWeight,9.5);
+assert.equal(caravanInventory.items.find(x=>x.id===bagSource._id).cargoSections[1].weight,8);
+const transportHTML=handlebars.compile(await readFile(new URL("../templates/transport.hbs",import.meta.url),"utf8"),{strict:true})({transport:caravanView,editable:true,rootId:"qa"});
+assert(transportHTML.includes("Правая сумка"));assert(transportHTML.includes("9.5 / 100"));
+assert(!transportHTML.includes("undefined"));
 // Exercise Luck against the installed parser, real evaluated dice, and chat schema.
 const aliasHook = registerHooks({ resolve(specifier, context, next) {
   return next(specifier.startsWith("@common/") ? new URL(specifier.slice(8), core).href : specifier, context);

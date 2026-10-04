@@ -4,7 +4,7 @@ import { equipmentQuote, acquireEquipment } from "../data/equipment-purchase.mjs
 import { bindEquipmentFilters, readEquipmentFilters } from "./equipment-filter-form.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 
-export async function browseEquipmentCatalog({ actor, categories = [], trait = "", documents, title = "Поиск предметов" } = {}) {
+export async function browseEquipmentCatalog({ actor, categories = [], trait = "", documents, title = "Поиск предметов", containerId = "" } = {}) {
   const items = documents ?? [...await game.packs.get("witcher-eliott-system.equipment").getDocuments(), ...game.items].filter(item => isPhysical(item) && item.testUserPermission(game.user, "OBSERVER"));
   const entries = items.map(equipmentEntry), byId = new Map(items.map(item => [item.uuid ?? item.id, item]));
   const content = await foundry.applications.handlebars.renderTemplate(`systems/${SYSTEM_ID}/templates/equipment-browser.hbs`, {
@@ -60,7 +60,7 @@ export async function browseEquipmentCatalog({ actor, categories = [], trait = "
           try {
             busy = true; refreshActions();
             const purchase = button.dataset.catalogAction === "buy", count = Number(quantity.value);
-            const created = await acquireEquipment(actor, item, { purchase, quantity: count });
+            const created = await acquireEquipment(actor, item, { purchase, quantity: count, containerId });
             notice.textContent = `${purchase ? "Куплено" : "Добавлено"}: ${item.name} × ${created.reduce((sum, entry) => sum + entry.system.quantity, 0)}`;
             notice.classList.remove("error");
           } catch (error) {

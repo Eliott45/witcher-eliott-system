@@ -57,7 +57,7 @@ test("owned moves preserve Items, packing unequips, equipping takes the item out
 test("drop handles nested owned moves and clears foreign container/equipment references when importing", async () => {
   const { actor, bag, ore } = fixture();
   const event = { target: { closest: () => ({ dataset: { itemId: bag.id } }) } };
-  const sheet = { actor, _onSortItem: () => assert.fail("Dropping on a bag must not sort") };
+  const sheet = { actor, isEditable:true, _onSortItem: () => assert.fail("Dropping on a bag must not sort") };
   await dropPhysicalItem(sheet, event, ore); assert.equal(ore.system.containerId, bag.id);
   const data = { _id: "other", type: "weapon", system: { containerId: "foreign", equipped: true } };
   globalThis.game = { items: { fromCompendium: () => structuredClone(data) } };

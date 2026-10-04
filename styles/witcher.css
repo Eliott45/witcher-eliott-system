@@ -593,3 +593,45 @@
 .witcher-attribute-grid { gap:7px; }
 .witcher-attribute label { line-height:16px; }
 .witcher-attribute-value button { height:25px; }
+/* Transport shares inventory rows, but owns its load and equipment. */
+.witcher-transport-toolbar,.witcher-cargo-toolbar,.witcher-hitch {display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;}
+.witcher-transport-toolbar {justify-content:space-between;margin-bottom:.8rem;}
+.witcher-transport-toolbar h2 {margin:0;color:#713c32;}
+.witcher-transport-toolbar p {margin:.2rem 0;color:#7e705b;font-size:.85rem;}
+.witcher-transport-toolbar>div:last-child {display:flex;gap:.4rem;}
+.witcher-transport button {width:auto;color:#624d31;border:1px solid #b6a27d;background:#f7f1e5;box-shadow:none;}
+.witcher-transport-fleet {display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.7rem;}
+.witcher-transport-fleet button {display:flex;align-items:center;gap:.6rem;min-width:150px;text-align:left;padding:.45rem .7rem;flex-shrink:0;transition:background .15s,border-color .15s;}
+.witcher-transport-fleet button[aria-pressed=true] {background:#e4d6b8;border-color:#8a6231;box-shadow:inset 0 -3px #8a6231;}
+.witcher-transport-fleet img {width:34px;height:34px;border:0;}
+.witcher-transport-fleet small {display:block;font-size:.75rem;font-weight:normal;}
+.witcher-transport-card {border:1px solid #bba887;border-radius:7px;overflow:hidden;background:#f4eee2;}
+.witcher-transport-hero {display:flex;align-items:center;gap:.8rem;background:#303f42;color:#f8ecd5;padding:.9rem 1rem;}
+.witcher-transport-hero>img {width:64px;height:64px;border:0;}
+.witcher-transport-hero>div {flex:1;}
+.witcher-transport-hero h3 {font:600 1.7rem Georgia,serif;color:#f8ecd5;margin:.2rem 0;border:0;}
+.witcher-transport-hero small {letter-spacing:.09em;text-transform:uppercase;}
+.witcher-transport-stats {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid #cdbf9f;}
+.witcher-transport-stats>div,.witcher-transport-stats>label {display:flex;flex-direction:column;align-items:center;gap:.4rem;text-align:center;padding:.8rem .3rem;font-size:.8rem;color:#7d6650;}
+.witcher-transport-stats strong,.witcher-transport-stats label>span {font:600 1.3rem Georgia,serif;color:#503827;}
+.witcher-transport-stats input {width:3.5rem;height:2rem;text-align:center;font:inherit;}
+.witcher-hitch {padding:.65rem 1rem;background:#e9e1d2;font-size:.85rem;}
+.witcher-hitch>span {flex:1;}
+.witcher-hitch small {color:#7e705b;}
+.witcher-tack-slots {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.5rem;padding:.8rem;}
+.witcher-tack-slots button {display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:.3rem;min-height:104px;padding:.65rem .35rem;white-space:normal;line-height:1.25;}
+.witcher-tack-slots button>i {font-size:1.4rem;}
+.witcher-tack-slots strong {font-size:.85rem;}
+.witcher-transport-load {position:relative;margin:.3rem .8rem .7rem;background:#ded6c5;border:1px solid #ab936e;padding:.35rem .6rem;overflow:hidden;border-radius:3px;text-align:center;}
+.witcher-transport-load>span {position:absolute;inset:0 auto 0 0;background:#80928666;transition:width .25s;}
+.witcher-transport-load strong {position:relative;font-size:.85rem;color:#403727;}
+.witcher-transport-load.overloaded>span {background:#ad574d88;}
+.witcher-cargo-toolbar {padding:.6rem .8rem;background:#70614e;color:#fff5e1;}
+.witcher-cargo-toolbar h4 {flex:1;margin:0;font-size:1rem;}
+.witcher-transport-cargo {padding:0 .45rem;}
+.witcher-transport-empty {text-align:center;padding:2rem;color:#857354;}
+.witcher-transport-empty>i {font-size:2.6rem;opacity:.65;}
+.witcher-transport-empty h3 {color:#674f31;}
+.witcher-cargo-section {padding:.3rem;border:1px solid #c7b898;margin:.35rem;}
+.witcher-cargo-section>header {display:flex;justify-content:space-between;font-size:.8rem;background:#e3d8c2;padding:.35rem;}
+.witcher-cargo-section.overloaded>header {color:#9a2828;background:#ecd1c1;}
