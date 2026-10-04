@@ -121,6 +121,14 @@ test("localized tooltips contain resolved formulas and distinguish resource name
     assert.match(context.movementRows[2].tooltip, /27.*5/);
     assert.equal(context.carriedWeight, 100.5, "Sheet displays the derived inventory weight");
     assert.ok(!JSON.stringify(context).includes("undefined"));
+    data.vigor = 2;
+    data.details = { race: "witcher" };
+    data.lifepath = { witcher: { school: "griffin" } };
+    const vigor = statisticsContext(data, { localize, format });
+    assert.equal(vigor.vigorTotal, 4);
+    assert.ok(vigor.vigorTooltip.includes(format("WITCHER.Statistics.BaseValue", { value: 2 })));
+    assert.ok(vigor.vigorTooltip.includes(format("WITCHER.Statistics.TotalValue", { value: 4 })));
+    assert.match(vigor.vigorTooltip, /\+2/);
     assert.ok(!JSON.stringify(context).match(/\{(?:body|will|reflex|maximum|physical|threshold|run|leap)\}/));
     data.attributes.luck = 10;
     data.details = { race: "human", familyStatus: "north.peasants" };

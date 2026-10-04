@@ -5,14 +5,18 @@ import { dyingHealth } from "./death.mjs";
 import { witcherModifiers } from "./witcher-lifepath.mjs";
 import { lifeEventModifiers } from "./life-events.mjs";
 import { armorEncumbrance } from "./physical-items.mjs";
+import { reputationLevel, reputationModifiers } from "./reputation.mjs";
 
 export const ATTRIBUTE_KEYS = ["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"];
 
 const WOUNDED_ATTRIBUTES = new Set(["intelligence", "reflex", "dexterity", "will"]);
 
 /** Use base BODY/WILL for resource limits: wound penalties must not lower their own threshold. */
-export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, mutations = [], vigor = 0 }, { dying = false, dead = false, abilityIds = [], items = [] } = {}) {
+export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, mutations = [], vigor = 0, reputation = {} }, { dying = false, dead = false, abilityIds = [], items = [] } = {}) {
   const modifiers = [...backgroundModifiers(details, abilityIds), ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(installationBonuses)];
+  const reputationBonus = modifierTotal(modifiers, "reputation");
+  const reputationTotal = reputationLevel(reputation.value, reputationBonus);
+  modifiers.push(...reputationModifiers(reputation, reputationTotal));
   const ev = armorEncumbrance(items, modifierTotal(modifiers, "armorEncumbrance"));
   for (const target of ["attributes.reflex", "attributes.dexterity", "skills.spellCasting", "skills.hexWeaving", "skills.ritualCrafting"])
     if (ev) modifiers.push({ source: "equipment.ev", label: "Скованность брони", category: "equipment", target, value: -ev });
@@ -39,7 +43,7 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
     healthMax, staminaMax, meleeDamageBonus: modifierTotal(modifiers, "meleeDamage"), encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),
     stun: physical === null ? null : Math.min(10, physical),
     recovery: physical, woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
-    reputationBonus: modifierTotal(modifiers, "reputation"), naturalArmor: modifierTotal(modifiers, "naturalArmor"),
+    reputationBonus, reputation: reputationTotal, naturalArmor: modifierTotal(modifiers, "naturalArmor"),
     skillBonuses: Object.fromEntries([...new Set(modifiers.filter(modifier => modifier.target.startsWith("skills.")).map(modifier => modifier.target))]
       .map(target => [target.slice(7), modifierTotal(modifiers, target, abilityState.trustEnabled ? ["humanTarget"] : [])])),
     initiative: effective.reflex,

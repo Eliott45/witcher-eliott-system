@@ -475,6 +475,16 @@ const { purchaseAdvancement } = await import("../scripts/data/advancement-purcha
 const advancementHTML = handlebars.compile(await readFile(new URL("../templates/advancement.hbs", import.meta.url), "utf8"), { strict: true });
 assert.equal(legacyActorData.experience, 0, "Old actors gain a zero IP balance without migration");
 assert.equal(new WitcherActorData().experience, 0);
+assert.deepEqual(new WitcherActorData().toObject().reputation, { value: 0, bonusEnabled: false, skills: [] });
+const reputationActor = new foundry.documents.BaseActor({ name: "Reputation round trip", type: "character", system: {
+  attributes: { body: 8, will: 8 }, health: { value: 40, max: 40 }, details: { race: "human", familyStatus: "north.aristocracy" },
+  reputation: { value: 4, bonusEnabled: true, skills: ["persuasion"] }
+} });
+const reopenedReputation = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(reputationActor.toObject())));
+assert.equal(reopenedReputation.system.reputation.value, 4);
+assert.equal(reopenedReputation.system.statistics.reputation, 6);
+assert.equal(reopenedReputation.system.statistics.skillBonuses.persuasion, 3);
+assert.deepEqual([...reopenedReputation.system.reputation.skills], ["persuasion"]);
 const advancingActor = new foundry.documents.BaseActor({ name: "Advancement round trip", type: "character", system: {
   experience: 100, attributes: { body: 5, will: 5 }, health: { value: 21, max: 25 }, stamina: { value: 12, max: 25 },
   details: { profession: "bard" }, skills: { swordsmanship: 4 }, languages: [{ id: "customLanguage1", name: "Custom language", level: 1 }]
@@ -574,6 +584,14 @@ assert.match(editableStatisticsHTML, /role="switch" aria-checked="true"/);
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleAttributes.call(sheet);
 assert.equal((await sheet._prepareContext({})).editingAttributes, false);
 assert.equal((await sheet._prepareContext({})).editingExperience, false);
+assert.equal((await sheet._prepareContext({})).editingReputation, false);
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleReputation.call(sheet);
+const reputationEditingHTML = template(await sheet._prepareContext({}));
+assert.ok(reputationEditingHTML.includes('data-header-counter="reputation"'));
+assert.ok(reputationEditingHTML.includes('data-action="rollReputation"'));
+assert.ok(reputationEditingHTML.includes('data-action="toggleReputationBonus"'));
+assert.ok(!reputationEditingHTML.includes('name="system.reputation.value"'));
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleReputation.call(sheet);
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleExperience.call(sheet);
 const experienceEditingHTML = template(await sheet._prepareContext({}));
 assert.ok(experienceEditingHTML.includes("data-sheet-experience"));
@@ -657,6 +675,8 @@ await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleAttributes.call(sheet);
 assert.equal((await sheet._prepareContext({})).editingAttributes, false, "Observers cannot unlock parameters");
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleExperience.call(sheet);
 assert.equal((await sheet._prepareContext({})).editingExperience, false, "Observers cannot unlock the XP balance");
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleReputation.call(sheet);
+assert.equal((await sheet._prepareContext({})).editingReputation, false, "Observers cannot unlock reputation");
 const originalData = sheet.actor.system;
 sheet.actor.system = restored;
 sheet.tabGroups.character = "main";

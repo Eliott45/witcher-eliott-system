@@ -64,7 +64,8 @@ export function statisticsContext(system, { localize, format }) {
       format("WITCHER.Statistics.CarryFormula", { ...base, body: value(statistics.effective.body) }),
       ...modifierLines(statistics, "carryMax", localize), format("WITCHER.Statistics.TotalValue", { value: base.carry })].join("<br>"),
     carriedWeight: system.carriedWeight ?? 0,
-    vigorTooltip: [description("Vigor"), ...modifierLines(statistics, "vigor", localize)].join("<br>"),
+    vigorTooltip: [description("Vigor"), format("WITCHER.Statistics.BaseValue", { value: system.vigor }),
+      ...modifierLines(statistics, "vigor", localize), format("WITCHER.Statistics.TotalValue", { value: statistics.vigor })].join("<br>"),
     wounded: statistics.wounded && !statistics.dying && !statistics.dead,
     woundNotice: "WITCHER.Statistics.Wounded"
   };

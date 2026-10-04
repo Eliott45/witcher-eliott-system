@@ -1,6 +1,9 @@
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
 import { openAdvancement } from "./advancement-window.mjs";
 import { setExperience } from "../data/advancement-purchase.mjs";
+import { setReputationValue } from "../data/reputation.mjs";
+import { reputationContext, configureReputationBonus } from "./reputation-context.mjs";
+import { rollReputation } from "../combat/reputation-roll.mjs";
 import { itemPresentation, toggleItemDescription, postItem, searchItemTrait } from "./item-presentation.mjs";
 import { chooseContainer, toggleContainer, dropPhysicalItem } from "./container-actions.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
@@ -43,6 +46,10 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       ...workshopActorActions,
       openAdvancement,
       toggleExperience: WitcherActorSheet.#onToggleExperience,
+      toggleReputation: WitcherActorSheet.#onToggleReputation,
+      rollReputation: WitcherActorSheet.#onRollReputation,
+      toggleReputationBonus: configureReputationBonus,
+      configureReputationBonus,
       equipItem, createInventoryItem, browseEquipment, addCatalogItem,
       changeInventoryQuantity, toggleCarried, toggleInventoryGroup,
       toggleItemDescription, postItem, searchItemTrait, chooseContainer, toggleContainer,
@@ -127,7 +134,11 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       workshop: await workshopActorContext(this.actor),
       abilitiesOpen: !preferences.collapsed?.abilities,
       editingAttributes: this.isEditable && this.#editingAttributes,
-      editingExperience: this.isEditable && this.#editingExperience,
+      editingExperience: this.isEditable && this.#editingCounters.has("experience"),
+      editingReputation: this.isEditable && this.#editingCounters.has("reputation"),
+      reputation: { ...reputationContext(this.actor.system, {
+        localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
+      }), rollUnavailable: !conditions.canAct || this.actor.system.statistics.effective.will === null || this.#rollingReputation },
       effects: await Promise.all(this.actor.effects.map(async effect => {
         const definition = Object.values(STATUS_DEFINITIONS).find(status => effect.statuses.has(status.id));
         return {
@@ -181,14 +192,15 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   async _onRender(context, options) {
     await super._onRender(context, options);
     bindInventory(this);
-    const experience = this.element.querySelector("[data-sheet-experience]");
-    experience?.addEventListener("change", event => {
-      event.stopPropagation(); // This input uses the same guarded queue as paid advancement.
-      this.#saveExperience(experience);
-    });
-    experience?.addEventListener("keydown", event => {
-      if (event.key === "Enter") { event.preventDefault(); experience.blur(); }
-    });
+    for (const input of this.element.querySelectorAll("[data-header-counter]")) {
+      input.addEventListener("change", event => {
+        event.stopPropagation(); // Counters share the guarded actor queue with paid advancement.
+        this.#saveHeaderCounter(input);
+      });
+      input.addEventListener("keydown", event => {
+        if (event.key === "Enter") { event.preventDefault(); input.blur(); }
+      });
+    }
     for (const input of this.element.querySelectorAll("[data-profession-level]")) input.addEventListener("change", () => {
       if (this.isEditable && this.#editingProfession) setProfessionLevel(this.actor, input.dataset.professionLevel, input.value).catch(reportPreferencesError);
     });
@@ -369,31 +381,48 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   }
 
   #editingAttributes = false;
-  #editingExperience = false;
-  #experienceWrite = null;
+  #editingCounters = new Set();
+  #counterWrites = new Map();
+  #rollingReputation = false;
   #luckWrites = Promise.resolve();
 
-  async #saveExperience(input) {
-    if (!this.isEditable || !this.#editingExperience) return;
-    if (this.#experienceWrite) return this.#experienceWrite;
+  async #saveHeaderCounter(input) {
+    const key = input.dataset.headerCounter;
+    const save = { experience: setExperience, reputation: setReputationValue }[key];
+    if (!save || !this.isEditable || !this.#editingCounters.has(key)) return;
+    if (this.#counterWrites.has(key)) return this.#counterWrites.get(key);
     if (!input.reportValidity() || input.value.trim() === "") return;
     const points = Number(input.value);
     const expected = Number(input.dataset.expected);
     if (points === expected) return;
     input.disabled = true;
-    this.#experienceWrite = setExperience(this.actor, points, expected, key => game.i18n.localize(key))
-      .catch(reportPreferencesError).finally(async () => {
-        this.#experienceWrite = null;
+    const work = save(this.actor, points, expected, key => game.i18n.localize(key))
+      .catch(error => ui.notifications.error(error.message)).finally(async () => {
+        this.#counterWrites.delete(key);
         if (this.rendered) await this.render({ force: true });
       });
-    return this.#experienceWrite;
+    this.#counterWrites.set(key, work);
+    return work;
   }
 
-  static async #onToggleExperience() {
+  async #toggleCounter(key) {
     if (!this.isEditable) return;
-    await this.#experienceWrite;
-    this.#editingExperience = !this.#editingExperience;
+    await this.#counterWrites.get(key);
+    if (this.#editingCounters.has(key)) this.#editingCounters.delete(key);
+    else this.#editingCounters.add(key);
     await this.render({ force: true });
+  }
+
+  static #onToggleExperience() { return this.#toggleCounter("experience"); }
+  static #onToggleReputation() { return this.#toggleCounter("reputation"); }
+
+  static async #onRollReputation(_event, target) {
+    if (!this.isEditable || target.disabled || this.#rollingReputation) return;
+    this.#rollingReputation = true;
+    target.disabled = true;
+    try { await this.#luckWrites; await rollReputation(this.actor); }
+    catch (error) { ui.notifications.error(error.message); }
+    finally { this.#rollingReputation = false; if (this.rendered) await this.render({ force: true }); }
   }
 
   static async #onToggleAttributes() {

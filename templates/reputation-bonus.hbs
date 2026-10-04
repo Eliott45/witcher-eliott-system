@@ -1,0 +1,6 @@
+<p>{{localize "WITCHER.Reputation.BonusHint"}}</p>
+<div class="witcher-reputation-choices">
+{{#each skills}}
+  <label><input type="checkbox" data-reputation-skill value="{{key}}" {{checked selected}}> {{localize label}}</label>
+{{/each}}
+</div>

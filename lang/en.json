@@ -1261,6 +1261,20 @@
       "Pending": "Выполняется переброс Упрямства…",
       "Error": "Не удалось завершить переброс Упрямства. Проверьте сообщение и счётчик зарядов."
     },
+    "Reputation": {
+      "Title": "Reputation",
+      "Edit": "Edit base reputation (0–10)",
+      "Base": "Base reputation",
+      "Roll": "Reputation check",
+      "RollShort": "Roll",
+      "Formula": "1d10 + WILL {will} + Reputation {level}",
+      "Bonus": "Reputation bonus",
+      "BonusHint": "After a successful opposed reputation check: +3 to selected conversational skills relevant to what you are known for. Enable only for a suitable conversation with GM agreement. No bonus at reputation 0.",
+      "Configure": "Skills with a reputation bonus",
+      "Invalid": "Reputation must be an integer from 0 to 10.",
+      "Stale": "Reputation has already changed. Check the new value before editing.",
+      "Cap": "Final reputation is capped at 10."
+    },
     "Advancement": {
         "Title": "Character advancement",
         "TreeHint": "Add ranks at each node · price next to +",

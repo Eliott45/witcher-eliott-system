@@ -10,6 +10,7 @@ import { hasStatus, DYING, DEAD } from "../combat/status-effects.mjs";
 import { SKILL_KEYS } from "./skills.mjs";
 import { additionalAbilityIds } from "./abilities.mjs";
 import { carriedWeight } from "./physical-items.mjs";
+import { REPUTATION_SKILLS } from "./reputation.mjs";
 
 /** Store base values; source bonuses and wound penalties are derived without stacking. */
 export class WitcherActorData extends foundry.abstract.TypeDataModel {
@@ -41,6 +42,11 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
       carriedWeight: new NumberField({ required: true, nullable: false, min: 0, initial: 0 }),
       crowns: new NumberField({ required: true, nullable: false, min: 0, initial: 0 }),
       experience: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
+      reputation: new SchemaField({
+        value: new NumberField({ required: true, nullable: false, integer: true, min: 0, max: 10, initial: 0 }),
+        bonusEnabled: new BooleanField({ initial: false }),
+        skills: new ArrayField(new StringField({ required: true, blank: false, choices: REPUTATION_SKILLS }), { initial: [] })
+      }),
       luckSpent: new ArrayField(new NumberField({ required: true, nullable: false, integer: true, min: 1 })),
       luckPending: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
       exhaustionEpisode: new StringField({ required: true, nullable: false, blank: true, initial: "" }),
