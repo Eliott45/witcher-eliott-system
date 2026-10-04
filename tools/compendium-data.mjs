@@ -11,6 +11,7 @@ import { EQUIPMENT, EQUIPMENT_FOLDERS, getEquipment } from "../scripts/data/equi
 import { INFLUENTIAL_FRIENDS } from "../scripts/data/influential-friends.mjs";
 import { LANGUAGES } from "../scripts/data/languages.mjs";
 import { CORE_EQUIPMENT, LEGACY_GEAR_STATS } from "../scripts/data/core-equipment.mjs";
+import { generalGearContent } from "../scripts/data/general-gear.mjs";
 import { defaultItemIcon } from "../scripts/data/item-icons.mjs";
 import { EFFECT_TEMPLATES, conditionSource } from "../scripts/data/condition-definitions.mjs";
 
@@ -63,7 +64,10 @@ export function compendiumData(translations) {
           + entry.equipment.map(id => `@UUID[${equipmentUuid(id)}]{${localize(getEquipment(id).label)}}`).join(", ") + "</p>" : "")
         + paragraph("WITCHER.Family.WitcherRule")
     })),
-    equipment: [...EQUIPMENT.map(entry => item(entry.documentId, "equipment", entry, { description: paragraph(entry.description), ...LEGACY_GEAR_STATS[entry.id] })),
+    equipment: [...EQUIPMENT.map(entry => {
+      const content = generalGearContent(entry.id);
+      return item(entry.documentId, "equipment", entry, { ...LEGACY_GEAR_STATS[entry.id], ...content, description: paragraph(entry.description) + (content?.description ?? "") });
+    }),
       ...[...CORE_EQUIPMENT, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: entry.system.description ?? `<p>${escapeHTML(entry.system.source)}</p>` }),
         img: entry.img ?? defaultItemIcon(entry) }))],
     "influential-friends": INFLUENTIAL_FRIENDS.map(entry => item(entry.documentId, "influence", entry, {

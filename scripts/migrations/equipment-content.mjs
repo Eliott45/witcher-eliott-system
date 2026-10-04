@@ -8,10 +8,12 @@ import { equipmentIconUpdate } from "../data/item-icons.mjs";
 import { alchemyDescriptionUpdate } from "./alchemy-descriptions.mjs";
 import { toolDescriptionUpdate } from "./tool-descriptions.mjs";
 import { TOOL_RULES } from "../data/tool-rules.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 7;
+import { CORE_GENERAL_ADDITIONS, GENERAL_GEAR_RULES } from "../data/general-gear.mjs";
+import { generalGearDescriptionUpdate } from "./general-gear-descriptions.mjs";
+export const EQUIPMENT_CONTENT_VERSION = 8;
 
 const updatesFor = items => Array.from(items).flatMap(item => {
-  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item), ...toolDescriptionUpdate(item) };
+  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item), ...toolDescriptionUpdate(item), ...generalGearDescriptionUpdate(item) };
   return Object.keys(update).length ? [{ _id: item.id ?? item._id, ...update }] : [];
 });
 
@@ -26,9 +28,9 @@ export async function migrateEquipmentContent() {
   if (!pack) return;
   const index = await pack.getIndex({ fields: ["system.ruleId"] });
   const existing = new Set(Array.from(index.values(), entry => entry.system?.ruleId));
-  const missing = [...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK].filter(entry => !existing.has(entry.id));
+  const missing = [...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS].filter(entry => !existing.has(entry.id));
   const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry =>
-    TOOL_RULES[entry.system?.ruleId] || /^(ammunition|alchemy|potion|oil|decoction)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
+    TOOL_RULES[entry.system?.ruleId] || GENERAL_GEAR_RULES[entry.system?.ruleId] || /^(ammunition|alchemy|potion|oil|decoction)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
   const updates = updatesFor(oldDocuments);
   let documents = [], requiredFolders = [];
   if (missing.length) {

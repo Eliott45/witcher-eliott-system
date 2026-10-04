@@ -91,9 +91,11 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "musical-instrument",
-      "description": "<p>Инструмент, доставшийся персонажу благодаря жизни среди артистов. Конкретный вид выбирает игрок.</p>",
       "weight": 1,
-      "price": 38
+      "price": 38,
+      "description": "<p>Инструмент, доставшийся персонажу благодаря жизни среди артистов. Конкретный вид выбирает игрок.</p><p>Музыкальный инструмент на выбор игрока: например, лютня, флейта, цимбалы или барабан. Конкретный вид можно указать в названии предмета.</p><p><small>Базовая книга, стр. 93, 94</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 94"
     },
     "effects": [],
     "folder": "gearFolderFamily",
@@ -127,9 +129,11 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "sacred-symbol",
-      "description": "<p>Символ веры Великого Солнца, полученный благодаря воспитанию среди высшего духовенства.</p>",
       "weight": 0.1,
-      "price": 14
+      "price": 14,
+      "description": "<p>Символ веры Великого Солнца, полученный благодаря воспитанию среди высшего духовенства.</p><p>Знак веры: амулет, украшение или иной символ почитаемого божества. Вид зависит от религии владельца.</p><p><small>Базовая книга, стр. 93, 94</small></p>",
+      "properties": "Религиозный символ",
+      "source": "Базовая книга, стр. 93, 94"
     },
     "effects": [],
     "folder": "gearFolderFamily",
@@ -146,8 +150,8 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "trained-bird",
-      "description": "<p>Прирученная и обученная птица. Вид можно выбрать совместно с мастером.</p>",
-      "kind": "companion"
+      "kind": "companion",
+      "description": "<p>Прирученная и обученная птица. Вид можно выбрать совместно с мастером.</p>"
     },
     "effects": [],
     "folder": "gearFolderFamily",
@@ -164,8 +168,8 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "trained-snake",
-      "description": "<p>Прирученная и обученная змея, оставшаяся у персонажа со времён жизни в услужении.</p>",
-      "kind": "companion"
+      "kind": "companion",
+      "description": "<p>Прирученная и обученная змея, оставшаяся у персонажа со времён жизни в услужении.</p>"
     },
     "effects": [],
     "folder": "gearFolderFamily",
@@ -590,12 +594,13 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "shoulder-bag",
-      "description": "",
       "weight": 1,
       "price": 14,
       "capacity": 30,
       "properties": "Для небольших предметов",
-      "kind": "container"
+      "kind": "container",
+      "description": "<p>Вместительная сумка на ремне для небольших предметов, которые удобно носить через плечо.</p><h3>Применение и правила</h3><ul><li>Вместимость: 30 кг. Для небольших предметов.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "source": "Базовая книга, стр. 93, 95"
     },
     "effects": [],
     "folder": "gearFolderFriend",
@@ -3452,9 +3457,9 @@
       "price": 20,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "Длина 20 м",
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Двадцатиметровая верёвка для подъёма, спуска, крепления груза и помощи спутникам.</p><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3476,8 +3481,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Дорожная подстилка с одеялом для сна на стоянке.</p><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3498,9 +3503,9 @@
       "price": 5,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "Свечи: 5 шт.; Освещение +1 · 2 м",
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Набор из пяти свечей для небольшого источника света. Сильный ветер может погасить пламя.</p><h3>Применение и правила</h3><ul><li>Горящая свеча повышает уровень освещения на 1 в радиусе 2 м. Вес и цена указаны за набор из пяти свечей.</li></ul><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3522,8 +3527,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Белый мелок для пометок, рисунков и обозначения пройденного пути.</p><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3545,8 +3550,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Кремень и кресало для высекания искр и разведения огня.</p><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3567,9 +3572,9 @@
       "price": 13,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "+2 к лазанию",
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Крюк с четырьмя зацепами и кольцом для верёвки, позволяющий закрепиться при подъёме.</p><h3>Применение и правила</h3><ul><li>Даёт +2 к проверке лазания при использовании крюка-кошки.</li></ul><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3591,8 +3596,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Небольшое ручное зеркало для ухода за внешностью и других бытовых задач.</p><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3614,8 +3619,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Книга с чистыми страницами в прочном переплёте для личных записей, расчётов и ведения счетов.</p><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3636,9 +3641,9 @@
       "price": 33,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "Освещение +2 · 3 м",
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Свеча в металлическом фонаре, защищающем огонь во время путешествий.</p><h3>Применение и правила</h3><ul><li>Повышает уровень освещения на 2 в радиусе 3 м.</li></ul><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3659,9 +3664,9 @@
       "price": 34,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "Взлом замков СЛ 15",
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Обычный замок для запирания дверей, сундуков и других подходящих креплений.</p><h3>Применение и правила</h3><ul><li>Для вскрытия нужна проверка Взлома замков со СЛ 15.</li></ul><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3682,9 +3687,9 @@
       "price": 68,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "Взлом замков СЛ 18",
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Усиленный замок с более сложным механизмом, который труднее вскрыть или сломать.</p><h3>Применение и правила</h3><ul><li>Для вскрытия нужна проверка Взлома замков со СЛ 18.</li></ul><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3705,9 +3710,9 @@
       "price": 30,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "Взлом замков СЛ 16; Сломать: Сила СЛ 18",
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Металлические оковы, соединяющие запястья пленника.</p><h3>Применение и правила</h3><ul><li>Вскрыть наручники: Взлом замков СЛ 16. Разорвать их силой: Сила СЛ 18.</li></ul><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3728,9 +3733,9 @@
       "price": 18,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "+3 к Выживанию при ориентировании",
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Карта Континента с основными землями, дорогами и географическими ориентирами.</p><h3>Применение и правила</h3><ul><li>Даёт +3 к Выживанию в дикой природе при ориентировании по карте. Бонус не относится ко всем проверкам Выживания.</li></ul><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3752,8 +3757,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Курительная трубка для табака. Табак приобретается отдельно.</p><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3774,9 +3779,9 @@
       "price": 10,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "Колышки: 5 шт.; Импровизированный урон 1d6",
+      "source": "Базовая книга, стр. 93, 94",
+      "description": "<p>Набор из пяти металлических колышков для закрепления верёвок и палаток. Колышком можно воспользоваться как импровизированным оружием.</p><h3>Применение и правила</h3><ul><li>При использовании колышка как оружия он наносит 1d6 урона. Вес и цена указаны за набор из пяти колышков.</li></ul><p><small>Базовая книга, стр. 93, 94</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3798,8 +3803,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 95",
+      "description": "<p>Кусок мыла для мытья и очистки вещей.</p><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3821,8 +3826,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 95",
+      "description": "<p>Плотное полотно для защиты груза от непогоды или устройства временного навеса.</p><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3843,9 +3848,9 @@
       "price": 19,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "2 спальных места",
+      "source": "Базовая книга, стр. 93, 95",
+      "description": "<p>Небольшая дорожная палатка для ночлега двух человек.</p><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3866,9 +3871,9 @@
       "price": 36,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "8 спальных мест",
+      "source": "Базовая книга, стр. 93, 95",
+      "description": "<p>Просторная палатка на восемь человек; внутри найдётся место для жаровни.</p><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3889,9 +3894,9 @@
       "price": 1,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "Освещение +1 · 5 м",
+      "source": "Базовая книга, стр. 93, 95",
+      "description": "<p>Простой факел для освещения пути. При необходимости его можно использовать как импровизированную дубинку.</p><h3>Применение и правила</h3><ul><li>Повышает уровень освещения на 1 в радиусе 5 м.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3913,8 +3918,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 95",
+      "description": "<p>Дорожный бурдюк для воды или другого напитка.</p><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3935,9 +3940,9 @@
       "price": 5,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "Рацион на 1 день",
+      "source": "Базовая книга, стр. 93, 95",
+      "description": "<p>Запас дорожной еды длительного хранения на один день.</p><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3958,9 +3963,9 @@
       "price": 8,
       "rarity": "",
       "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "properties": "Алхимическая основа; Выпитая бутылка: Стойкость СЛ 16",
+      "source": "Базовая книга, стр. 93, 95",
+      "description": "<p>Крепкий очищенный спирт, используемый как основа для алхимических составов. Употребление целой бутылки опасно.</p><h3>Применение и правила</h3><ul><li>Выпивший бутылку получает отравление и опьянение. Проверка Стойкости со СЛ 16 позволяет избавиться от этих эффектов, но даже при успехе опьянение продолжается (12 − ТЕЛ) часов. «Слёзы жён» позволяют протрезветь.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -3982,8 +3987,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 95",
+      "description": "<p>Пиво местного сорта — обычный напиток трактиров и таверн.</p><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -4005,8 +4010,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 95",
+      "description": "<p>Крепкий алкоголь для застолий и дорожных запасов.</p><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -4028,8 +4033,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 96",
+      "description": "<p>Бутылка вина; сорт и происхождение можно выбрать по месту покупки.</p><p><small>Базовая книга, стр. 93, 96</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -4050,10 +4055,10 @@
       "price": 3,
       "rarity": "",
       "kind": "container",
-      "properties": "Для небольших предметов",
+      "properties": "Для маленьких предметов",
       "source": "Базовая книга, стр. 93, 95",
       "capacity": 20,
-      "description": "<p>Базовая книга, стр. 93, 95</p>"
+      "description": "<p>Простой мешок для переноски маленьких предметов и припасов.</p><h3>Применение и правила</h3><ul><li>Вместимость: 20 кг. Для маленьких предметов.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -4077,7 +4082,7 @@
       "properties": "Для маленьких предметов",
       "source": "Базовая книга, стр. 93, 95",
       "capacity": 5,
-      "description": "<p>Базовая книга, стр. 93, 95</p>"
+      "description": "<p>Небольшая поясная сумка для денег, мелких принадлежностей и других маленьких предметов.</p><h3>Применение и правила</h3><ul><li>Вместимость: 5 кг. Для маленьких предметов.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -4101,7 +4106,7 @@
       "properties": "Для маленьких предметов; крупные предметы крепятся снаружи",
       "source": "Базовая книга, стр. 93, 95",
       "capacity": 25,
-      "description": "<p>Базовая книга, стр. 93, 95</p>"
+      "description": "<p>Наплечная перевязь с карманами для мелочей. Более крупные вещи можно закрепить снаружи.</p><h3>Применение и правила</h3><ul><li>Вместимость: 25 кг. Для маленьких предметов; крупные предметы крепятся снаружи.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -4123,8 +4128,8 @@
       "rarity": "",
       "kind": "gear",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 96",
+      "description": "<p>Повседневный комплект одежды: рубаха, штаны и обувь либо платье и другие подходящие вещи.</p><p><small>Базовая книга, стр. 93, 96</small></p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -4145,9 +4150,588 @@
       "price": 45,
       "rarity": "",
       "kind": "gear",
+      "properties": "+5 к Стойкости против холода",
+      "source": "Базовая книга, стр. 93, 96",
+      "description": "<p>Утеплённая одежда для путешествий и работы в холодную погоду.</p><h3>Применение и правила</h3><ul><li>При ношении даёт +5 к Стойкости против холода.</li></ul><p><small>Базовая книга, стр. 93, 96</small></p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000001",
+    "name": "Доска для покера на костях",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.dice-poker-board",
+      "weight": 0.5,
+      "price": 25,
+      "kind": "gear",
+      "description": "<p>Переносная доска для покера на костях с местом для бросков. В комплект входят десять игральных костей.</p><p><small>Базовая книга, стр. 93, 94</small></p>",
+      "properties": "10 игральных костей",
+      "source": "Базовая книга, стр. 93, 94"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000002",
+    "name": "Колода для гвинта",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.gwent-deck",
+      "weight": 0.1,
+      "price": 5,
+      "kind": "gear",
+      "description": "<p>Колода для гвинта с изображениями известных героев и исторических лиц.</p><p><small>Базовая книга, стр. 93, 94</small></p>",
       "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "source": "Базовая книга, стр. 93, 94"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000003",
+    "name": "Песочные часы (час)",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.hourglass-hour",
+      "weight": 1,
+      "price": 38,
+      "kind": "gear",
+      "description": "<p>Песочные часы, отмеряющие один час после переворачивания.</p><p><small>Базовая книга, стр. 93, 94</small></p>",
+      "properties": "Отсчёт 1 час",
+      "source": "Базовая книга, стр. 93, 94"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000004",
+    "name": "Песочные часы (минута)",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.hourglass-minute",
+      "weight": 0.1,
+      "price": 18,
+      "kind": "gear",
+      "description": "<p>Небольшие песочные часы, отмеряющие одну минуту.</p><p><small>Базовая книга, стр. 93, 94</small></p>",
+      "properties": "Отсчёт 1 минута",
+      "source": "Базовая книга, стр. 93, 94"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000005",
+    "name": "Фонарь «бычий глаз»",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.bullseye-lantern",
+      "weight": 1,
+      "price": 39,
+      "kind": "gear",
+      "description": "<p>Фонарь с линзой и заслонкой, направляющий свет узким пучком. Заслонкой можно закрыть свет.</p><h3>Применение и правила</h3><ul><li>Повышает уровень освещения на 3 в конусе длиной 5 м.</li></ul><p><small>Базовая книга, стр. 93, 94</small></p>",
+      "properties": "Освещение +3 · конус 5 м",
+      "source": "Базовая книга, стр. 93, 94"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000006",
+    "name": "Шулерские кости",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.loaded-dice",
+      "weight": 0.1,
+      "price": 12,
+      "kind": "gear",
+      "description": "<p>Игральные кости со смещённым балансом для нечестной игры.</p><h3>Применение и правила</h3><ul><li>При игре этими костями: +3 к Азартным играм. Распознать подделку можно проверкой Внимания со СЛ 16.</li></ul><p><small>Базовая книга, стр. 93, 94</small></p>",
+      "properties": "+3 к Азартным играм; Обнаружение: Внимание СЛ 16",
+      "source": "Базовая книга, стр. 93, 94"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000007",
+    "name": "Духи / одеколон",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.perfume",
+      "weight": 0.1,
+      "price": 22,
+      "kind": "gear",
+      "description": "<p>Флакон духов или одеколона с выбранным ароматом для повседневного ухода за собой.</p><p><small>Базовая книга, стр. 93, 94</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 94"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000008",
+    "name": "Простой протез",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.simple-prosthesis",
+      "weight": 1,
+      "price": 50,
+      "kind": "gear",
+      "description": "<p>Простая замена утраченной руки или ноги с ограниченной подвижностью: деревянная кисть для простого удержания вещей или опора для ходьбы.</p><p><small>Базовая книга, стр. 93, 94</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 94"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000009",
+    "name": "Качественный протез",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.quality-prosthesis",
+      "weight": 1.5,
+      "price": 100,
+      "kind": "gear",
+      "description": "<p>Более сложный протез с деревянными и металлическими деталями, шарнирами и тягами. Обеспечивает большую подвижность по сравнению с простым протезом.</p><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000010",
+    "name": "Кандалы",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.shackles",
+      "weight": 2,
+      "price": 50,
+      "kind": "gear",
+      "description": "<p>Тяжёлые оковы, соединяющие руки и ноги и серьёзно ограничивающие передвижение.</p><h3>Применение и правила</h3><ul><li>В кандалах Скорость не может превышать 3. Вскрыть: Взлом замков СЛ 20. Разорвать: Сила СЛ 22 (боковая колонка на стр. 94).</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "properties": "СКОР не выше 3; Взлом замков СЛ 20; Сломать: Сила СЛ 22",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000011",
+    "name": "Табак",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.tobacco",
+      "weight": 0.1,
+      "price": 4,
+      "kind": "gear",
+      "description": "<p>Табак для курения в трубке.</p><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000012",
+    "name": "Корзина",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.basket",
+      "weight": 0.5,
+      "price": 10,
+      "kind": "container",
+      "capacity": 15,
+      "properties": "Для небольших предметов",
+      "description": "<p>Плетёная корзина для переноски небольших предметов.</p><h3>Применение и правила</h3><ul><li>Вместимость: 15 кг. Для небольших предметов.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000013",
+    "name": "Потайной карман",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.hidden-pocket",
+      "weight": 0.1,
+      "price": 11,
+      "kind": "container",
+      "capacity": 5,
+      "properties": "Для маленьких предметов; Обнаружение: Внимание СЛ 16",
+      "description": "<p>Потайной карман в одежде для небольшого тайника.</p><h3>Применение и правила</h3><ul><li>Вместимость: 5 кг. Для маленьких предметов.</li><li>Чтобы обнаружить карман, нужна проверка Внимания со СЛ 16.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000014",
+    "name": "Чехол для лука",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.bow-case",
+      "weight": 1.5,
+      "price": 24,
+      "kind": "container",
+      "capacity": 0,
+      "properties": "Для лука и стрел",
+      "description": "<p>Чехол для лука и стрел, защищающий их от дождя и непогоды.</p><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000015",
+    "name": "Набедренные ножны",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.thigh-sheath",
+      "weight": 0.1,
+      "price": 11,
+      "kind": "container",
+      "capacity": 0,
+      "properties": "Для клинка; Обнаружение: Внимание СЛ 18",
+      "description": "<p>Ножны для ношения клинка на бедре под одеждой.</p><h3>Применение и правила</h3><ul><li>Обнаружить скрытые ножны: Внимание СЛ 18.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000016",
+    "name": "Наручные ножны",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.wrist-sheath",
+      "weight": 0.1,
+      "price": 13,
+      "kind": "container",
+      "capacity": 0,
+      "properties": "Для небольшого клинка; Обнаружение: Внимание СЛ 15",
+      "description": "<p>Ножны для небольшого клинка на внутренней стороне предплечья, скрытого рукавом.</p><h3>Применение и правила</h3><ul><li>Обнаружить скрытые ножны: Внимание СЛ 15.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000017",
+    "name": "Деревянный сундук",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.wooden-chest",
+      "weight": 1,
+      "price": 18,
+      "kind": "container",
+      "capacity": 30,
+      "properties": "Для небольших предметов",
+      "description": "<p>Деревянный сундук для хранения и перевозки небольших предметов.</p><h3>Применение и правила</h3><ul><li>Вместимость: 30 кг. Для небольших предметов.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000018",
+    "name": "Большой деревянный сундук",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.large-wooden-chest",
+      "weight": 10,
+      "price": 30,
+      "kind": "container",
+      "capacity": 50,
+      "properties": "Для крупных предметов",
+      "description": "<p>Большой деревянный сундук для объёмного груза и крупных вещей.</p><h3>Применение и правила</h3><ul><li>Вместимость: 50 кг. Для крупных предметов.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000019",
+    "name": "Простой обед",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.simple-meal",
+      "weight": 1,
+      "price": 10,
+      "kind": "gear",
+      "description": "<p>Обычный сытный обед из доступных продуктов: например, картофеля, рыбы или простой похлёбки.</p><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000020",
+    "name": "Хороший обед",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.good-meal",
+      "weight": 2.5,
+      "price": 30,
+      "kind": "gear",
+      "description": "<p>Полноценный обед из качественных продуктов, с мясом и овощами.</p><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000021",
+    "name": "Пир",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.feast",
+      "weight": 5,
+      "price": 100,
+      "kind": "gear",
+      "description": "<p>Обильное праздничное угощение из нескольких блюд.</p><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000022",
+    "name": "Сырое мясо",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.raw-meat",
+      "weight": 1,
+      "price": 8,
+      "kind": "gear",
+      "description": "<p>Свежее сырое мясо для приготовления пищи.</p><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000023",
+    "name": "Сладости",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.sweets",
+      "weight": 1,
+      "price": 5,
+      "kind": "gear",
+      "description": "<p>Сладости на основе сахара, мёда или фруктов.</p><p><small>Базовая книга, стр. 93, 95</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 95"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000024",
+    "name": "Модная одежда",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.fashionable-clothing",
+      "weight": 2,
+      "price": 70,
+      "kind": "gear",
+      "description": "<p>Дорогой наряд по последней моде для приёмов и выхода в общество. Со временем такой костюм может выйти из моды.</p><p><small>Базовая книга, стр. 93, 96</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 96"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000025",
+    "name": "Украшения",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.jewelry",
+      "weight": 0.5,
+      "price": 50,
+      "kind": "gear",
+      "description": "<p>Декоративные украшения выбранного стиля: кольца, серьги, ожерелья или другие изделия.</p><p><small>Базовая книга, стр. 93, 96</small></p>",
+      "properties": "",
+      "source": "Базовая книга, стр. 93, 96"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ggen000000000026",
+    "name": "Тёмная одежда",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.dark-clothing",
+      "weight": 1.5,
+      "price": 50,
+      "kind": "gear",
+      "description": "<p>Тёмный неброский комплект одежды с капюшоном, помогающий скрываться.</p><h3>Применение и правила</h3><ul><li>При ношении даёт +1 к Скрытности.</li></ul><p><small>Базовая книга, стр. 93, 96</small></p>",
+      "properties": "+1 к Скрытности",
+      "source": "Базовая книга, стр. 93, 96"
     },
     "effects": [],
     "folder": "gearFolderCore01",

@@ -6,6 +6,7 @@ import { EQUIPMENT, EQUIPMENT_FOLDERS, getEquipment } from "../scripts/data/equi
 import { selectionEntries, filterEntries } from "../scripts/sheets/selection-data.mjs";
 import { compendiumData, compendiumFolders } from "../tools/compendium-data.mjs";
 import { equipmentUuid } from "../scripts/data/compendiums.mjs";
+import { generalGearContent } from "../scripts/data/general-gear.mjs";
 
 const translations = JSON.parse(await readFile(new URL("../lang/ru.json", import.meta.url), "utf8"));
 const localize = key => key.split(".").reduce((value, part) => value[part], translations);
@@ -34,7 +35,7 @@ test("items are sorted by lifepath source and family descriptions do not contain
     assert.deepEqual(item.effects, []);
     assert.equal(item.folder, EQUIPMENT_FOLDERS[entry.source].id);
     assert.ok(!item.system.description.includes("+"), "Bonuses belong to the lifepath, not the equipment");
-    assert.equal(item.system.description, entry.source === "family" ? `<p>${localize(entry.description)}</p>` : "");
+    assert.equal(item.system.description, (entry.source === "family" ? `<p>${localize(entry.description)}</p>` : "") + (generalGearContent(entry.id)?.description ?? ""));
   }
   assert.equal(getEquipment("noble-charter").documentId, "gear000000000001");
   assert.equal(getEquipment("trained-snake").documentId, "gear000000000010");

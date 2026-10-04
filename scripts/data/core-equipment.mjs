@@ -1,5 +1,6 @@
 import { CORE_TRANSPORT, CORE_TACK } from "./core-transport.mjs";
 import { toolContent } from "./tool-rules.mjs";
+import { CORE_GENERAL_ADDITIONS, generalGearContent } from "./general-gear.mjs";
 // User-provided core pp. 73–74, 79–80, 92–93. Values are per item, except explicitly named packs.
 import { CORE_CONTAINERS } from "./core-containers.mjs";
 import { CORE_AMMUNITION } from "./core-ammunition.mjs";
@@ -88,10 +89,10 @@ export const LEGACY_GEAR_STATS = {
   "trained-bird": { kind: "companion" }, "trained-snake": { kind: "companion" }
 };
 for (const entry of CORE_GEAR) {
-  const tools = toolContent(entry.id);
-  if (tools) Object.assign(entry.system, tools);
   const container = CORE_CONTAINERS[entry.id];
   if (container) Object.assign(entry.system, container, { kind: "container", source: "Базовая книга, стр. 93, 95" });
+  const content = toolContent(entry.id) ?? generalGearContent(entry.id);
+  if (content) Object.assign(entry.system, content);
 }
 Object.assign(LEGACY_GEAR_STATS["shoulder-bag"], CORE_CONTAINERS["shoulder-bag"], { kind: "container" });
-export const CORE_EQUIPMENT = [...CORE_WEAPONS, ...CORE_ARMOR, ...CORE_GEAR, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK];
+export const CORE_EQUIPMENT = [...CORE_WEAPONS, ...CORE_ARMOR, ...CORE_GEAR, ...CORE_GENERAL_ADDITIONS, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK];

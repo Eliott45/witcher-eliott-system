@@ -361,7 +361,7 @@ for (const entry of EQUIPMENT) {
   // Common models retain foreign IDs in this server-side harness.
   assert.equal(document.folder, EQUIPMENT_FOLDERS[entry.source].id);
   assert.ok(game.packs.get(equipmentPack).folders.has(document.folder));
-  assert.equal(Boolean(document.system.description), entry.source === "family");
+  assert.equal(Boolean(document.system.description), entry.source === "family" || entry.id === "shoulder-bag");
 }
 for (const origin of ORIGINS) {
   const document = documents.get(originUuid(origin.id));
@@ -857,6 +857,21 @@ const persistedTool = reopenedTools.items.contents[0];
 assert.match(persistedTool.system.description,/только при ловле рыбы/);
 assert.equal(getToolRules(persistedTool).modifiers[0].condition,"fishing");
 assert.ok(!reopenedTools.system.statistics.modifiers.some(modifier=>modifier.source==="gear.fishing-tools"),"Carrying fishing gear alone grants no passive Survival bonus");
+const { getGeneralGearRules } = await import("../scripts/data/general-gear.mjs");
+const generalSource = id => {
+  const item = [...documents.values()].find(entry => entry.system.ruleId === id);
+  return item.toObject ? item.toObject() : structuredClone(item);
+};
+const generalBasket = generalSource("gear.basket"), generalDice = generalSource("gear.loaded-dice"), generalCoat = generalSource("gear.warm-clothing");
+generalDice.system.containerId = generalBasket._id;
+const generalActor = new foundry.documents.BaseActor({name:"General gear persistence",type:"character",items:[generalBasket,generalDice,generalCoat]});
+const reopenedGeneral = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(generalActor.toObject())));
+reopenedGeneral.system.prepareDerivedData();
+assert.equal(reopenedGeneral.items.get(generalBasket._id).system.capacity, 15);
+assert.equal(reopenedGeneral.items.get(generalDice._id).system.containerId, generalBasket._id);
+assert.equal(getGeneralGearRules(reopenedGeneral.items.get(generalDice._id)).modifiers[0].value, 3);
+assert.match(reopenedGeneral.items.get(generalCoat._id).system.description, /\+5 к Стойкости против холода/);
+assert.ok(!reopenedGeneral.system.statistics.modifiers.some(modifier => ["gear.loaded-dice","gear.warm-clothing"].includes(modifier.source)), "Situational equipment bonuses are not passive carrying bonuses");
 const pickerTemplate = handlebars.compile(await readFile(new URL("../templates/reference-picker.hbs", import.meta.url), "utf8"), { strict: true });
 for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   const entries = selectionEntries(kind, key => foundry.utils.getProperty(translations, key));
