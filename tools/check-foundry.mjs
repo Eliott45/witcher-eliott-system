@@ -847,6 +847,16 @@ for (const uuid of documents.keys()) {
   assert.ok(!rendered.includes("prose-mirror"), "Locked references must show descriptions, not editors");
 }
 const { selectionEntries } = await import("../scripts/sheets/selection-data.mjs");
+// Tool rules resolve from the existing canonical ID after native Actor/Item persistence.
+const { getToolRules } = await import("../scripts/data/tool-rules.mjs");
+const toolSource = [...documents.values()].find(item=>item.system.ruleId==="gear.fishing-tools");
+const toolActor = new foundry.documents.BaseActor({name:"Tool persistence",type:"character",items:[toolSource.toObject ? toolSource.toObject() : toolSource]});
+const reopenedTools = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(toolActor.toObject())));
+reopenedTools.system.prepareDerivedData();
+const persistedTool = reopenedTools.items.contents[0];
+assert.match(persistedTool.system.description,/только при ловле рыбы/);
+assert.equal(getToolRules(persistedTool).modifiers[0].condition,"fishing");
+assert.ok(!reopenedTools.system.statistics.modifiers.some(modifier=>modifier.source==="gear.fishing-tools"),"Carrying fishing gear alone grants no passive Survival bonus");
 const pickerTemplate = handlebars.compile(await readFile(new URL("../templates/reference-picker.hbs", import.meta.url), "utf8"), { strict: true });
 for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   const entries = selectionEntries(kind, key => foundry.utils.getProperty(translations, key));

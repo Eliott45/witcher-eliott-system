@@ -2,14 +2,17 @@ import { SYSTEM_ID } from "../config.mjs";
 import { equipmentEntry } from "../data/equipment-search.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
 import { browseEquipmentCatalog } from "./equipment-browser.mjs";
+import { toolContent } from "../data/tool-rules.mjs";
 
 export async function itemPresentation(item, { secrets = false } = {}) {
   const properties = item.system.properties?.trim() ?? "";
   const description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description ?? "", { secrets, relativeTo: item });
+  const tool = toolContent(item.system.ruleId);
+  const rulesInDescription = tool && item.system.description === tool.description && properties === tool.properties;
   return { ...equipmentEntry(item), name: item.name,
     // Full alchemy descriptions already include the rules paragraph. Keep the separate
     // properties line only when it adds information, including for older/custom items.
-    properties: properties && !description.includes(properties) ? properties : "",
+    properties: properties && !description.includes(properties) && !rulesInDescription ? properties : "",
     description };
 }
 export async function toggleItemDescription(_event, target) {

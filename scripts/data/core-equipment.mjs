@@ -1,4 +1,5 @@
 import { CORE_TRANSPORT, CORE_TACK } from "./core-transport.mjs";
+import { toolContent } from "./tool-rules.mjs";
 // User-provided core pp. 73–74, 79–80, 92–93. Values are per item, except explicitly named packs.
 import { CORE_CONTAINERS } from "./core-containers.mjs";
 import { CORE_AMMUNITION } from "./core-ammunition.mjs";
@@ -87,6 +88,8 @@ export const LEGACY_GEAR_STATS = {
   "trained-bird": { kind: "companion" }, "trained-snake": { kind: "companion" }
 };
 for (const entry of CORE_GEAR) {
+  const tools = toolContent(entry.id);
+  if (tools) Object.assign(entry.system, tools);
   const container = CORE_CONTAINERS[entry.id];
   if (container) Object.assign(entry.system, container, { kind: "container", source: "Базовая книга, стр. 93, 95" });
 }

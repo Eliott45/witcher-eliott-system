@@ -1,4 +1,5 @@
 import { CORE_TRANSPORT, CORE_TACK } from "../scripts/data/core-transport.mjs";
+import { TOOL_RULES, LEGACY_TOOL_SOURCE } from "../scripts/data/tool-rules.mjs";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readFile } from "node:fs/promises";
@@ -102,6 +103,23 @@ function applyUpdate(item, update) {
     else item[key] = value;
   }
 }
+
+test("version-six worlds enrich existing tools in the pack and owned copies without duplicates",async()=>{
+  const state=migrationFixture({startVersion:6});
+  sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)).forEach(item=>state.index.set(item._id,structuredClone(item)));
+  const tools=sources.filter(item=>TOOL_RULES[item.system.ruleId]).map(source=>({ ...structuredClone(source),system:{...source.system,description:`<p>${LEGACY_TOOL_SOURCE}</p>`,source:LEGACY_TOOL_SOURCE,properties:TOOL_RULES[source.system.ruleId].legacyProperties,concealment:"large"}}));
+  tools.forEach(item=>state.index.set(item._id,item));
+  game.items=[structuredClone(tools[0])];
+  const owned=structuredClone(tools[1]);
+  const actor={uuid:"Actor.tools",isOwner:true,items:[owned],async updateEmbeddedDocuments(_type,updates){updates.forEach(update=>applyUpdate(owned,update));}};
+  game.actors=[actor];
+  const before=state.index.size;
+  await migrateEquipmentContent();
+  assert.equal(state.index.size,before);assert.equal(state.writes.some(([type])=>type==="items"),false);
+  assert.equal(state.pack.locked,true);assert.equal(state.version,EQUIPMENT_CONTENT_VERSION);
+  for(const item of [...tools,...game.items,owned])assert.match(item.system.description,/Применение и правила/);
+  const writes=state.writes.length;await migrateEquipmentContent();assert.equal(state.writes.length,writes);
+});
 
 test("old packs convert once, preserving total value/weight, custom art and names", () => {
   const old = { _id: "old", type: "equipment", name: "Мои стрелы", img: "custom.webp", system: {

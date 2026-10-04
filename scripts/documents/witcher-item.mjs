@@ -2,12 +2,13 @@ import { conditionUpdate, isPhysical } from "../data/physical-items.mjs";
 import { isTransport, isMount, canHitch, cargoSection } from "../data/transport.mjs";
 import { isContainer, canContain, containerParent, isCarried } from "../data/containers.mjs";
 import { ammunitionUpdate } from "../migrations/ammunition-data.mjs";
+import { toolDescriptionUpdate } from "../migrations/tool-descriptions.mjs";
 import { defaultItemIcon, equipmentIconUpdate } from "../data/item-icons.mjs";
 export class WitcherItem extends foundry.documents.Item {
   async _preCreate(data, options, user) {
     const result = await super._preCreate(data, options, user);
     if (result === false) return false;
-    this.updateSource(ammunitionUpdate(this));
+    this.updateSource({...ammunitionUpdate(this),...toolDescriptionUpdate(this)});
     if (isPhysical(this)) this.updateSource(!data.img && (!this.img || this.img === "icons/svg/item-bag.svg")
       ? { img: defaultItemIcon(this) } : equipmentIconUpdate(this));
     if (isContainer(this)) this.updateSource({ "system.quantity": 1, "system.equipped": false });

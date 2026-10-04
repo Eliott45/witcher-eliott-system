@@ -2,6 +2,7 @@ import { isTransport } from "./transport.mjs";
 import { EQUIPMENT_KINDS, RARITIES, ARMOR_COVERAGE, armorZones, CONCEALMENT, isAmmunition } from "./physical-items.mjs";
 import { effectiveItem } from "./workshop.mjs";
 import { equipmentTrait } from "./equipment-traits.mjs";
+import { toolTraitDescription } from "./tool-rules.mjs";
 
 export const EQUIPMENT_CATEGORIES = [{ id: "weapon", name: "Оружие" }, { id: "shield", name: "Щиты" }, { id: "armor", name: "Броня" }, ...EQUIPMENT_KINDS, { id: "recipe", name: "Чертежи / формулы" }];
 export const equipmentCategory = item => item.type === "weapon" && item.system.category === "shield" ? "shield" : item.type === "equipment" ? (item.system.kind || "gear") : item.type;
@@ -29,7 +30,7 @@ export function equipmentEntry(item) {
   if (item.type === "armor") facts.push(`ПБ ${data.stoppingPower?.value ?? 0}/${data.stoppingPower?.max ?? 0}`, `Скованность ${data.encumbrance}`);
   if (isAmmunition(item)) facts.push(`Тип урона ${data.damageType}`, `Н ${data.reliability?.value ?? 0}/${data.reliability?.max ?? 0}`, `Скрытность: ${label(CONCEALMENT, data.concealment)}`);
   return { id: item.uuid ?? item.id, label: item.name, img: item.img, group: category, groupLabel: label(EQUIPMENT_CATEGORIES, category),
-    traits, traitDetails: traits.map(equipmentTrait), summary: facts.join(" · "), details: [], price: data.price ?? 0, weight: data.weight ?? 0,
+    traits, traitDetails: traits.map(label=>({label,description:toolTraitDescription(item,label)??equipmentTrait(label).description})), summary: facts.join(" · "), details: [], price: data.price ?? 0, weight: data.weight ?? 0,
     rarity: data.rarity ?? "", weaponCategory: item.type === "weapon" ? data.category : "", hands: item.type === "weapon" ? String(data.hands) : "",
     armorClass: item.type === "armor" ? data.armorClass : "", zone: item.type === "armor" ? data.zone : "", zones: item.type === "armor" ? armorZones(item) : [], source: data.source ?? "",
     search: [item.name, ...traits, plain(data.properties), plain(data.description), data.source].join(" ").toLocaleLowerCase() };
