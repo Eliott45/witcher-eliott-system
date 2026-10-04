@@ -12,12 +12,17 @@ export function hasAbility(actor, id) {
 const counterWrites = new Map();
 export function adjustStubbornness(actor, change) {
   if (!actor.isOwner || !hasAbility(actor, "human.stubbornness") || ![-1, 0, 1].includes(change)) return Promise.resolve();
-  const previous = counterWrites.get(actor.uuid) ?? Promise.resolve();
-  const work = previous.catch(() => {}).then(() => {
+  return withStubbornnessLock(actor, () => {
     if (!actor.isOwner || !hasAbility(actor, "human.stubbornness")) return;
     const used = change === 0 ? 0 : Math.min(3, Math.max(0, actor.system.abilityState.stubbornnessUsed + change));
     return actor.update({ "system.abilityState.stubbornnessUsed": used });
   });
+}
+
+/** Sheet corrections and chat rerolls share the same per-actor charge queue. */
+export function withStubbornnessLock(actor, operation) {
+  const previous = counterWrites.get(actor.uuid) ?? Promise.resolve();
+  const work = previous.catch(() => {}).then(operation);
   counterWrites.set(actor.uuid, work);
   const clear = () => { if (counterWrites.get(actor.uuid) === work) counterWrites.delete(actor.uuid); };
   work.then(clear, clear);

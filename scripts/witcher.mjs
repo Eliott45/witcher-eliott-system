@@ -1,4 +1,5 @@
 import { registerOilExpiry } from "./workshop/upgrades.mjs";
+import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
 import { WitcherRecipeData } from "./data/witcher-recipe-data.mjs";
 import { ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID } from "./config.mjs";
 import { applyActorTokenDefaults } from "./combat/token-defaults.mjs";
@@ -32,7 +33,7 @@ import { preventIncapacitatedMovement, preventIncapacitatedPositionUpdate } from
 import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
 
 Hooks.once("init", async () => {
-  await foundry.applications.handlebars.loadTemplates(["profession", "lifepath", "inventory", "structured-fields", "workshop-item", "workshop-actor"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
+  await foundry.applications.handlebars.loadTemplates(["profession", "profession-node", "lifepath", "inventory", "structured-fields", "workshop-item", "workshop-actor"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Actor.documentClass = WitcherActor;
   CONFIG.Item.documentClass = WitcherItem;
@@ -42,6 +43,7 @@ Hooks.once("init", async () => {
   CONFIG.Combat.initiative.formula = "1d10wc + @statistics.initiative";
   registerStatusEffects();
   registerOilExpiry();
+  registerStubbornnessChat();
   CONFIG.time.roundTime = 3;
   registerVisionMigration();
   registerCompendiumFolderMigration();

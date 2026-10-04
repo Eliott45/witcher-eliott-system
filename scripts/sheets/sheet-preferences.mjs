@@ -3,6 +3,7 @@ import { SYSTEM_ID } from "../config.mjs";
 export const SHEET_TABS = [
   { id: "main", label: "WITCHER.Sheet.Main", icon: "fa-solid fa-user" },
   { id: "skills", label: "WITCHER.Skills.Title", icon: "fa-solid fa-graduation-cap" },
+  { id: "profession", label: "WITCHER.Professions.Title", icon: "fa-solid fa-diagram-project" },
   { id: "inventory", label: "WITCHER.Inventory.Title", icon: "fa-solid fa-sack" },
   { id: "actions", label: "WITCHER.Actions.Title", icon: "fa-solid fa-swords" },
   { id: "biography", label: "WITCHER.Sheet.Biography", icon: "fa-solid fa-book-open" },

@@ -284,7 +284,6 @@
           <i class="fa-solid {{#if skills.editing}}fa-toggle-on{{else}}fa-toggle-off{{/if}}" aria-hidden="true"></i> {{localize "WITCHER.Skills.Edit"}}
         </button>
       </div>
-      {{> "systems/witcher-eliott-system/templates/profession.hbs"}}
       <div class="witcher-skill-rules">{{localize "WITCHER.Skills.Rules"}}</div>
       <div class="witcher-ability-controls">
         {{#if abilities.hasTrust}}
@@ -370,6 +369,10 @@
     <section id="{{rootId}}-inventory" class="witcher-character-content witcher-inventory tab {{tabs.inventory.cssClass}}"
              data-group="character" data-tab="inventory" aria-label="{{localize 'WITCHER.Inventory.Title'}}">
       {{> "systems/witcher-eliott-system/templates/inventory.hbs"}}
+    </section>
+    <section id="{{rootId}}-profession" class="witcher-character-content witcher-profession-page tab {{tabs.profession.cssClass}}"
+             data-group="character" data-tab="profession" aria-label="{{localize 'WITCHER.Professions.Title'}}">
+      {{> "systems/witcher-eliott-system/templates/profession.hbs"}}
     </section>
     <section id="{{rootId}}-actions" class="witcher-character-content tab {{tabs.actions.cssClass}}"
              data-group="character" data-tab="actions" aria-label="{{localize 'WITCHER.Actions.Title'}}">

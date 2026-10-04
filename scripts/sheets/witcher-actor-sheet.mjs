@@ -39,6 +39,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       equipItem, createInventoryItem, browseEquipment, addCatalogItem,
       editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent,
       rollProfessionAbility,
+      toggleProfession: WitcherActorSheet.#onToggleProfession,
       viewRace: WitcherActorSheet.#onViewReference,
       viewOrigin: WitcherActorSheet.#onViewReference,
       viewFamilyStatus: WitcherActorSheet.#onViewReference,
@@ -67,7 +68,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static PARTS = {
     content: {
       template: `systems/${SYSTEM_ID}/templates/actor-sheet.hbs`,
-      scrollable: [".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
+      scrollable: [".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=profession]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
     }
   };
 
@@ -102,6 +103,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       conditions,
       lifepath: lifepathContext(this.actor),
       profession: professionContext(this.actor),
+      editingProfession: this.isEditable && this.#editingProfession,
       skills: skillsContext(this.actor, {
         localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
       }, { query: this.#skillQuery, editing: this.isEditable && this.#editingSkills }),
@@ -163,7 +165,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     await super._onRender(context, options);
     bindInventory(this);
     for (const input of this.element.querySelectorAll("[data-profession-level]")) input.addEventListener("change", () => {
-      if (this.isEditable && this.#editingSkills) setProfessionLevel(this.actor, input.dataset.professionLevel, input.value).catch(reportPreferencesError);
+      if (this.isEditable && this.#editingProfession) setProfessionLevel(this.actor, input.dataset.professionLevel, input.value).catch(reportPreferencesError);
     });
     this.element.querySelector("[data-skill-search]").addEventListener("input", event => {
       this.#skillQuery = event.target.value;
@@ -224,6 +226,13 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
 
   #skillQuery = "";
   #editingSkills = false;
+  #editingProfession = false;
+
+  static async #onToggleProfession() {
+    if (!this.isEditable) return;
+    this.#editingProfession = !this.#editingProfession;
+    await this.render({ force: true });
+  }
   #languageWrites = Promise.resolve();
 
   static async #onToggleSkills() {

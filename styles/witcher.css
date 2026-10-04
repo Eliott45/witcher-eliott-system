@@ -332,19 +332,51 @@
 .witcher-dice-tray button:disabled { opacity: 0.4; cursor: default; }
 
 /* Profession ranks use existing embedded abilities, including drag/drop. */
-.witcher-profession { border:1px solid #b7a68a; padding:12px; margin:12px 0; }
-.witcher-profession > summary { font-size:20px; color:#713c36; cursor:pointer; }
-.witcher-profession p { font-size:12px; }
-.witcher-profession-tree { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
-.witcher-profession-tree h3 { font-size:15px; text-align:center; }
-.witcher-profession-node { min-height:115px; padding:8px; margin:8px 0; background:#e6dfd1; border:1px solid #b7a68a; display:flex; flex-direction:column; gap:4px; }
-.witcher-profession-node.locked { border-style:dashed; }
-.witcher-profession-node > button { white-space:normal; height:auto; min-height:32px; }
-.witcher-profession-ability,.witcher-profession-rank { display:flex; align-items:center; gap:6px; }
-.witcher-profession-rank input,.witcher-profession-ability input { width:50px; }
-.witcher-profession-ability > button:first-child { flex:1; }
-.witcher-profession-rank button,.witcher-profession-ability > button:last-child { width:30px; }
+/* Compact tree: one root and three ordered, connected branches. */
+.witcher-profession-page { padding:12px 16px; }
+.witcher-profession-heading { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:9px; }
+.witcher-profession-heading small { font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:#786951; }
+.witcher-profession-heading h2 { margin:2px 0 0; border:0; color:#6b3030; text-shadow:none; font:bold 23px Georgia,serif; }
+.witcher-profession-heading > button { width:auto; padding:3px 7px; height:27px; background:#f9f5eb; color:#664c32; border:1px solid #bcab8c; font-size:11px; box-shadow:none; }
+.witcher-profession { --branch-color:#77512b; --branch-tint:#f5ebd7; }
+.witcher-profession-root { width:76%; margin:0 auto; position:relative; padding-bottom:17px; }
+.witcher-profession-root::after { content:''; position:absolute; left:50%; bottom:0; height:17px; border-left:2px solid #b4a384; }
+.witcher-profession-tree { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.witcher-profession-branch { position:relative; min-width:0; padding-top:13px; --branch-color:#345b70; --branch-tint:#e4edf0; }
+.witcher-profession-branch[data-branch="1"] { --branch-color:#51643f; --branch-tint:#e8ecdf; }
+.witcher-profession-branch[data-branch="2"] { --branch-color:#86423c; --branch-tint:#f0e3dd; }
+.witcher-profession-branch::before { content:''; position:absolute; top:0; left:-5px; right:-5px; border-top:2px solid #b4a384; }
+.witcher-profession-branch:first-child::before { left:50%; }
+.witcher-profession-branch:last-child::before { right:50%; }
+.witcher-profession-branch::after { content:''; position:absolute; left:50%; top:0; height:12px; border-left:2px solid var(--branch-color); }
+.witcher-profession-tree h3 { display:flex; align-items:center; justify-content:center; min-height:26px; margin:0 0 6px; border:0; color:var(--branch-color); text-shadow:none; text-align:center; font:bold 13px/1.2 Georgia,serif; }
+.witcher-profession-node { position:relative; min-width:0; padding:4px 6px; background:#fcf8ef; border:1px solid #c3b69e; border-top:3px solid var(--branch-color); border-radius:5px; box-shadow:0 2px 4px #3f301510; }
+.witcher-profession-node + .witcher-profession-node { margin-top:14px; }
+.witcher-profession-node + .witcher-profession-node::before { content:''; position:absolute; bottom:calc(100% + 3px); height:14px; left:50%; border-left:2px solid var(--branch-color); opacity:.65; }
+.witcher-profession-node.locked { background:#e7e1d5; border-top-color:#ae9f88; }
+.witcher-profession-node.defining { background:#f7efde; }
+.witcher-profession-node-label { display:flex; align-items:center; gap:5px; min-height:27px; }
+.witcher-profession-tier { display:grid; place-items:center; flex:0 0 19px; height:21px; background:var(--branch-color); color:#fff7e8; font-size:10px; clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); }
+.witcher-profession-node .witcher-profession-name { flex:1; min-width:0; padding:0; margin:0; height:auto; justify-content:flex-start; white-space:normal; text-align:left; background:transparent; border:0; border-radius:0; box-shadow:none; color:#3d3027; font:600 12px/1.2 var(--font-body); overflow-wrap:anywhere; }
+.witcher-profession-node .witcher-profession-name:hover { color:var(--branch-color); text-decoration:underline; }
+.witcher-profession-lock { color:#85765d; font-size:9px; cursor:help; }
+.witcher-profession-rank { display:flex; align-items:center; gap:5px; margin-top:3px; font-size:10px; color:#6b5b45; }
+.witcher-profession-attribute { flex:1; min-width:0; }
+.witcher-profession-level { display:flex; align-items:center; gap:3px; }
+.witcher-profession-level output { min-width:17px; color:#4a3527; text-align:center; font-size:14px; font-weight:bold; }
+.witcher-profession-level input { width:34px; height:25px; margin:0; padding:1px; border:1px solid #b8a68a; background:#fffaf0; color:#3f3025; text-align:center; }
+.witcher-profession-node .witcher-profession-roll { display:flex; align-items:center; justify-content:center; gap:4px; width:auto; min-width:40px; height:25px; margin:0; padding:2px 5px; border:1px solid #b7a990; border-radius:4px; background:var(--branch-tint); color:var(--branch-color); font-size:11px; box-shadow:none; }
+.witcher-profession-roll strong { font-size:13px; }
+.witcher-profession-info { margin-top:14px; border-top:1px solid #c3b69e; padding-top:10px; color:#675642; font-size:11px; line-height:1.5; }
+.witcher-profession-info summary { cursor:pointer; }
+.witcher-profession-empty { text-align:center; padding:45px 15px; color:#786951; }
+.witcher-profession-empty > i { font-size:36px; color:#a69370; }
+.witcher-profession-empty button { width:auto; background:#f8f0e2; color:#6b3030; }
 .witcher-profession-choice { margin:12px 0; }
+.witcher-chat-stubbornness { margin-top:8px; padding:8px; border:1px solid #a89570; border-radius:4px; background:#f4ecda; color:#473526; line-height:1.4; }
+.witcher-chat-stubbornness small { display:block; font-size:11px; margin-top:3px; }
+.witcher-chat-stubbornness > strong { color:#3b623d; font-size:17px; }
+.witcher-chat-stubbornness button { margin-top:7px; width:100%; min-height:30px; white-space:normal; background:#553330; color:#fff0d8; border:1px solid #9b8058; font-size:12px; }
 .witcher-item-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:12px 0; }
 
 .witcher-lifepath-heading, .witcher-lifepath-entry header { display: flex; align-items: center; gap: .6rem; }

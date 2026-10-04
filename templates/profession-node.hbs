@@ -1,0 +1,12 @@
+<article class="witcher-profession-node {{#if defining}}defining{{/if}} {{#unless ability.unlocked}}locked{{/unless}}">
+  <div class="witcher-profession-node-label">
+    <span class="witcher-profession-tier" aria-hidden="true">{{#if defining}}<i class="fa-solid fa-star"></i>{{else}}{{ability.tier}}{{/if}}</span>
+    <button type="button" class="witcher-profession-name" data-action="viewSheetItem" data-item-id="{{ability.itemId}}" data-uuid="{{ability.uuid}}" data-tooltip="{{ability.description}}">{{ability.name}}</button>
+    {{#unless ability.unlocked}}<i class="fa-solid fa-lock witcher-profession-lock" data-tooltip="{{localize 'WITCHER.Professions.Requires'}}: {{ability.prerequisite}} — 5" tabindex="0" aria-label="{{localize 'WITCHER.Professions.Requires'}}: {{ability.prerequisite}} — 5"></i>{{/unless}}
+  </div>
+  <div class="witcher-profession-rank">
+    <span class="witcher-profession-attribute">{{#if defining}}{{localize "WITCHER.Professions.Defining"}} · {{/if}}{{ability.attributeLabel}}</span>
+    <label class="witcher-profession-level"><span>{{localize "WITCHER.Professions.Rank"}}</span>{{#if editing}}<input type="number" min="0" max="10" step="1" value="{{ability.level}}" data-profession-level="{{ability.id}}" aria-label="{{ability.name}} — {{localize 'WITCHER.Skills.Level'}}">{{else}}<output aria-label="{{ability.name}} — {{localize 'WITCHER.Skills.Level'}}">{{ability.level}}</output>{{/if}}</label>
+    {{#if ability.attribute}}<button type="button" class="witcher-profession-roll" data-action="rollProfessionAbility" data-ability-id="{{ability.id}}" data-tooltip="{{ability.rollHint}}" aria-label="{{ability.rollHint}}" {{#if ability.rollUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}><i class="fa-solid fa-dice-d10" aria-hidden="true"></i><strong>{{ability.total}}</strong></button>{{/if}}
+  </div>
+</article>

@@ -436,7 +436,7 @@ handlebars.registerHelper("localize", key => foundry.utils.getProperty(translati
 handlebars.registerHelper("not", value => !value);
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["profession", "lifepath", "inventory", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["profession", "profession-node", "lifepath", "inventory", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -479,7 +479,7 @@ assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
 assert.ok(!html.includes("witcher-footnote"));
-assert.equal([...html.matchAll(/data-action="tab"/g)].length, 8);
+assert.equal([...html.matchAll(/data-action="tab"/g)].length, 9);
 assert.equal([...html.matchAll(/name="system.attributes\./g)].length, 0, "Base attributes are locked by default");
 sheet.submit = async () => {};
 sheet.render = async () => {};
@@ -531,7 +531,7 @@ sheet.tabGroups.character = "main";
 await updateSheetPreferences(sheet.actor.uuid, { hiddenTabs: ["main"], collapsed: { parents: true, appearance: true } });
 const customized = await sheet._prepareContext({});
 assert.equal(sheet.tabGroups.character, "skills", "Hiding the active tab must select a visible one");
-assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "inventory", "actions", "biography", "family", "lifepath", "effects"]);
+assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "inventory", "actions", "biography", "family", "lifepath", "effects"]);
 assert.equal(customized.familySections.find(section => section.id === "parents").open, false);
 assert.equal(customized.biographySections.find(section => section.id === "appearance").open, false);
 assert.ok(!template(customized).includes('data-action="tab" data-group="character" data-tab="main"'));
@@ -663,7 +663,9 @@ for (const definition of PROFESSIONS) {
   assert.equal(context.profession.defining.level, 5);
   assert.equal(context.profession.branches[0].entries[0].unlocked, true);
   assert.equal(context.abilities.entries.filter(entry => entry.ruleId?.startsWith("profession.")).length, 0);
-  assert.ok(template(context).includes(`data-profession-level="${definition.abilities[0].id}"`));
+  assert.ok(!template(context).includes('data-profession-level='), "Profession ranks start locked");
+  assert.equal([...template(context).matchAll(/class="witcher-profession-node /g)].length, 10);
+  assert.equal([...template({ ...context, editingProfession: true }).matchAll(/data-profession-level=/g)].length, 10, "All three branches use the independent profession edit mode");
 }
 let professionDrop;
 sheet.isEditable = true;
@@ -711,7 +713,7 @@ for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   assert.ok(!rendered.includes("undefined"));
 }
 const tabsTemplate = handlebars.compile(await readFile(new URL("../templates/sheet-tabs.hbs", import.meta.url), "utf8"), { strict: true });
-assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 8);
+assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 9);
 // Exercise Luck against the installed parser, real evaluated dice, and chat schema.
 const aliasHook = registerHooks({ resolve(specifier, context, next) {
   return next(specifier.startsWith("@common/") ? new URL(specifier.slice(8), core).href : specifier, context);
@@ -796,6 +798,46 @@ for (const [sequence, expected] of sequences) {
   releaseMessageLuck("critical-check");
   assert.deepEqual(Array.from(luckActor.system.luckSpent), [1, 2, 3, 4]);
 }
+// A Stubbornness reroll rebuilds a fresh wc chain while keeping the previous Luck
+// term. The new selected Luck must survive for the player's next separate check.
+const { rerollStubbornness } = await import("../scripts/chat/stubbornness.mjs");
+const stubbornActor = { uuid: "Actor.nativeStubborn", isOwner: true, items: [],
+  system: { details: { race: "human" }, abilityState: { stubbornnessUsed: 0 }, luckPending: 2 },
+  async update(changes) { this.system.abilityState.stubbornnessUsed = changes["system.abilityState.stubbornnessUsed"]; }
+};
+const originalDiceRollClass = foundry.dice.Roll;
+foundry.dice.Roll = class extends CoreRoll {
+  async toMessage(data, options) {
+    const document = new foundry.documents.BaseChatMessage({ ...data, author: game.user.id, rolls: [this.toJSON()] });
+    const message = { id: "native-reroll", speakerActor: stubbornActor, flags: document.flags,
+      rolls: [this], flavor: document.flavor, options, updateSource(changes) {
+        document.updateSource(changes); Object.assign(this, { flags: document.flags, flavor: document.flavor });
+      }
+    };
+    await prepareMessageLuck(message, "stubborn-check");
+    prepareCriticalResult(message);
+    assert.equal(message.rolls[0].total, 25);
+    assert.ok(message.flavor.includes("10 + 11 + 4 = 25"));
+    return message;
+  }
+};
+for (const { data } of criticalNativeRolls) {
+  const queue = [10, 1];
+  CONFIG.Dice.randomUniform = () => 1 - (queue.shift() - 0.5) / 10;
+  stubbornActor.system.abilityState.stubbornnessUsed = 0;
+  const original = CoreRoll.fromData(JSON.parse(JSON.stringify(data)));
+  const message = { id: "original-check", isOwner: true, isContentVisible: true, speakerActor: stubbornActor,
+    speaker: { actor: "stubborn00000001" }, whisper: [game.user.id], blind: true, rolls: [original],
+    flags: { [game.system.id]: { skillCheck: { key: "courage" }, luck: { bonus: 4, rollIndex: 0 } } },
+    async update(changes) { this.flags[game.system.id].stubbornness = changes[`flags.${game.system.id}.stubbornness`]; }
+  };
+  await rerollStubbornness(message);
+  assert.equal(queue.length, 0, "Every previous positive/negative chain creates a new independent 10 → 1");
+  assert.equal(message.flags[game.system.id].stubbornness.kept, Math.max(original.total, 25));
+  assert.equal(stubbornActor.system.abilityState.stubbornnessUsed, 1);
+  assert.equal(stubbornActor.system.luckPending, 2);
+}
+foundry.dice.Roll = originalDiceRollClass;
 // STUN and the ordinary dice tray retain their plain-d10 formulas.
 for (const face of [1, 10]) {
   let draws = 0;

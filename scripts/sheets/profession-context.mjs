@@ -11,6 +11,7 @@ export function professionContext(actor) {
     const state = professionAbilityState(actor, ability);
     return { ...ability, level: state.level, unlocked: state.unlocked, prerequisite: state.prerequisite, itemId: state.owned?.id ?? "", uuid: `Compendium.${SYSTEM_ID}.abilities.Item.${ability.documentId}`,
       total: state.attribute === null ? "—" : state.attribute + state.level + state.bonus,
+      rollHint: `${ability.name}: 1d10 + ${state.attribute ?? "—"} + ${state.level}${state.bonus ? ` + (${state.bonus})` : ""}`,
       rollUnavailable: !ability.attribute || state.attribute === null || !conditionRules(actor).canAct,
       attributeLabel: ability.attribute ? localize(`WITCHER.Attributes.${ability.attribute}.Short`) : localize("WITCHER.Professions.Passive") };
   });

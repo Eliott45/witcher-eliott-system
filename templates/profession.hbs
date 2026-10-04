@@ -1,34 +1,32 @@
+<div class="witcher-profession-heading">
+  <div><small>{{localize "WITCHER.Professions.Tree"}}</small><h2>{{#if profession}}{{profession.name}}{{else}}{{localize "WITCHER.Professions.Title"}}{{/if}}</h2></div>
+  {{#if profession}}<button type="button" data-action="toggleProfession" role="switch" aria-checked="{{editingProfession}}" title="{{localize 'WITCHER.Professions.Edit'}}" aria-label="{{localize 'WITCHER.Professions.Edit'}}" {{disabled (not editable)}}><i class="fa-solid {{#if editingProfession}}fa-toggle-on{{else}}fa-toggle-off{{/if}}" aria-hidden="true"></i> {{localize "WITCHER.Skills.Edit"}}</button>{{/if}}
+</div>
 {{#if profession}}
-<details class="witcher-profession" open>
-  <summary>{{profession.name}} · {{localize "WITCHER.Professions.Tree"}}</summary>
+<div class="witcher-profession" aria-label="{{localize 'WITCHER.Professions.Tree'}}">
+  <div class="witcher-profession-root">
+    {{> "systems/witcher-eliott-system/templates/profession-node.hbs" ability=profession.defining defining=true editing=editingProfession editable=editable}}
+  </div>
+  <div class="witcher-profession-tree">
+    {{#each profession.branches as |branch|}}
+    <section class="witcher-profession-branch" data-branch="{{@index}}" aria-label="{{branch.name}}">
+      <h3>{{branch.name}}</h3>
+      {{#each branch.entries as |ability|}}
+        {{> "systems/witcher-eliott-system/templates/profession-node.hbs" ability=ability defining=false editing=../../editingProfession editable=../../editable}}
+      {{/each}}
+    </section>
+    {{/each}}
+  </div>
+</div>
+<details class="witcher-profession-info">
+  <summary><i class="fa-regular fa-circle-question" aria-hidden="true"></i> {{localize "WITCHER.Professions.Details"}}</summary>
+  <p>{{localize "WITCHER.Professions.Advancement"}}</p>
   <p>{{profession.skillNames}}</p>
   {{#if profession.combatSkillNames}}<p>{{localize "WITCHER.Professions.CombatChoices"}}: {{profession.combatSkillNames}}</p>{{/if}}
   {{#if profession.languageChoices}}<p>{{localize "WITCHER.Professions.LanguageChoices"}}: {{profession.languageChoices}}</p>{{/if}}
   <p>{{profession.magic}}</p>
   <p>{{localize "WITCHER.Professions.EquipmentChoices"}}: {{profession.equipmentChoices}}. {{profession.equipment}}</p>
-  <p class="witcher-drop-hint">{{localize "WITCHER.Professions.Advancement"}}</p>
-  {{#with profession.defining as |ability|}}
-  <div class="witcher-profession-ability">
-    <button type="button" data-action="viewSheetItem" data-item-id="{{ability.itemId}}" data-uuid="{{ability.uuid}}" data-tooltip="{{ability.description}}">{{ability.name}}</button>
-    <span>{{ability.attributeLabel}}</span>
-    <input type="number" min="0" max="10" step="1" value="{{ability.level}}" data-profession-level="{{ability.id}}" aria-label="{{ability.name}} — {{localize 'WITCHER.Skills.Level'}}" {{disabled (not ../skills.editing)}}>
-    <output>{{ability.total}}</output>
-    <button type="button" data-action="rollProfessionAbility" data-ability-id="{{ability.id}}" title="{{localize 'WITCHER.Professions.Roll'}}" {{disabled ability.rollUnavailable}}><i class="fa-solid fa-dice-d10"></i></button>
-  </div>
-  {{/with}}
-  <div class="witcher-profession-tree">
-  {{#each profession.branches as |branch|}}<section><h3>{{branch.name}}</h3>
-    {{#each branch.entries as |ability|}}
-    <article class="witcher-profession-node {{#unless ability.unlocked}}locked{{/unless}}">
-      <button type="button" data-action="viewSheetItem" data-item-id="{{ability.itemId}}" data-uuid="{{ability.uuid}}" data-tooltip="{{ability.description}}">{{ability.name}}</button>
-      <small>{{ability.attributeLabel}}</small>
-      <div class="witcher-profession-rank">
-        <input type="number" min="0" max="10" step="1" value="{{ability.level}}" data-profession-level="{{ability.id}}" aria-label="{{ability.name}} — {{localize 'WITCHER.Skills.Level'}}" {{disabled (not ../../skills.editing)}}>
-        {{#if ability.attribute}}<output>{{ability.total}}</output><button type="button" data-action="rollProfessionAbility" data-ability-id="{{ability.id}}" title="{{localize 'WITCHER.Professions.Roll'}}" {{disabled ability.rollUnavailable}}><i class="fa-solid fa-dice-d10"></i></button>{{/if}}
-      </div>
-      {{#unless ability.unlocked}}<small>{{localize "WITCHER.Professions.Requires"}}: {{ability.prerequisite}} 5</small>{{/unless}}
-    </article>{{/each}}
-  </section>{{/each}}
-  </div>
 </details>
+{{else}}
+<div class="witcher-profession-empty"><i class="fa-solid fa-diagram-project" aria-hidden="true"></i><p>{{localize "WITCHER.Professions.Empty"}}</p><button type="button" data-action="chooseReference" data-kind="profession" {{disabled (not editable)}}>{{localize "WITCHER.Professions.Choose"}}</button></div>
 {{/if}}
