@@ -1,3 +1,4 @@
+import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
 import { getProfession as selectionProfession } from "../data/professions.mjs";
 import { inventoryContext, bindInventory, equipItem, createInventoryItem, browseEquipment, addCatalogItem } from "./inventory-context.mjs";
 import { lifepathContext, editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent } from "./lifepath-context.mjs";
@@ -34,6 +35,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
+      ...workshopActorActions,
       equipItem, createInventoryItem, browseEquipment, addCatalogItem,
       editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent,
       rollProfessionAbility,
@@ -105,6 +107,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       }, { query: this.#skillQuery, editing: this.isEditable && this.#editingSkills }),
       abilities: await abilitiesContext(this.actor),
       inventory: inventoryContext(this.actor),
+      workshop: await workshopActorContext(this.actor),
       abilitiesOpen: !preferences.collapsed?.abilities,
       editingAttributes: this.isEditable && this.#editingAttributes,
       effects: await Promise.all(this.actor.effects.map(async effect => {

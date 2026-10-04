@@ -1,3 +1,5 @@
+import { mutationModifiers, installationBonuses } from "./workshop.mjs";
+import { equippedItems } from "./physical-items.mjs";
 import { backgroundModifiers, modifierTotal } from "./background-modifiers.mjs";
 import { dyingHealth } from "./death.mjs";
 import { witcherModifiers } from "./witcher-lifepath.mjs";
@@ -9,8 +11,8 @@ export const ATTRIBUTE_KEYS = ["intelligence", "reflex", "dexterity", "body", "s
 const WOUNDED_ATTRIBUTES = new Set(["intelligence", "reflex", "dexterity", "will"]);
 
 /** Use base BODY/WILL for resource limits: wound penalties must not lower their own threshold. */
-export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, vigor = 0 }, { dying = false, dead = false, abilityIds = [], items = [] } = {}) {
-  const modifiers = [...backgroundModifiers(details, abilityIds), ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath })];
+export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, mutations = [], vigor = 0 }, { dying = false, dead = false, abilityIds = [], items = [] } = {}) {
+  const modifiers = [...backgroundModifiers(details, abilityIds), ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(installationBonuses)];
   const ev = armorEncumbrance(items, modifierTotal(modifiers, "armorEncumbrance"));
   for (const target of ["attributes.reflex", "attributes.dexterity", "skills.spellCasting", "skills.hexWeaving", "skills.ritualCrafting"])
     if (ev) modifiers.push({ source: "equipment.ev", label: "Скованность брони", category: "equipment", target, value: -ev });
@@ -34,7 +36,7 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const { speed } = effective;
   const run = speed === null ? null : speed * 3;
   return {
-    healthMax, staminaMax, encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),
+    healthMax, staminaMax, meleeDamageBonus: modifierTotal(modifiers, "meleeDamage"), encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),
     stun: physical === null ? null : Math.min(10, physical),
     recovery: physical, woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
     reputationBonus: modifierTotal(modifiers, "reputation"), naturalArmor: modifierTotal(modifiers, "naturalArmor"),

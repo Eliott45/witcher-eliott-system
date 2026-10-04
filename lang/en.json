@@ -14,7 +14,8 @@
       "language": "Language (2)",
       "profession": "Profession",
       "weapon": "Оружие / щит",
-      "armor": "Броня"
+      "armor": "Броня",
+      "recipe": "Diagram / formula"
     }
   },
   "WITCHER": {

@@ -1,3 +1,6 @@
+import { workshopItemContext, workshopItemActions, workshopAction } from "./workshop-item-context.mjs";
+import { installUpgrade, removeArmorUpgrade, augmentItem, applyOil } from "../workshop/upgrades.mjs";
+import { prepareMutagen, applyMutagen } from "../workshop/mutagens.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { physicalItemContext } from "./physical-item-context.mjs";
 
@@ -8,6 +11,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     classes: ["witcher-eliott", "reference-sheet"],
     position: { width: 560, height: 620 },
     window: { resizable: true },
+    actions: { ...workshopItemActions, installUpgrade: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item);}), removeArmorUpgrade:workshopAction(async function(_e,target){if(this.isEditable)await removeArmorUpgrade(this.item,target.dataset.installationId);}), augmentItem:workshopAction(async function(){if(this.isEditable)await augmentItem(this.item);}), applyOil:workshopAction(async function(){if(this.isEditable)await applyOil(this.item);}), prepareMutagen:workshopAction(async function(){if(this.isEditable)await prepareMutagen(this.item);}), applyMutagen:workshopAction(async function(){if(this.isEditable)await applyMutagen(this.item);}) },
     form: { submitOnChange: true, closeOnSubmit: false }
   };
 
@@ -30,6 +34,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
       };
     }));
     return Object.assign(context, {
+      workshop: await workshopItemContext(this.item),
       item: this.item,
       system: this.item.system,
       physicalGroups: physicalItemContext(this.item, this.isEditable),

@@ -22,6 +22,61 @@
     "flags": {}
   },
   {
+    "_id": "gearMaterials001",
+    "name": "Материалы и ингредиенты",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "gearAlchemy00001",
+    "name": "Алхимия",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "gearMutagens0001",
+    "name": "Мутагены",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "gearUpgrades0001",
+    "name": "Улучшения",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
+    "_id": "gearRecipes00001",
+    "name": "Чертежи и формулы",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
     "_id": "gearFolderWeapon",
     "name": "Оружие и щиты",
     "type": "Item",

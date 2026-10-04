@@ -1,0 +1,18 @@
+{{#if workshop}}
+<section class="witcher-workshop-item">
+{{#if workshop.repairable}}<p>{{#if workshop.effective.stoppingPower}}ПБ: {{workshop.effective.stoppingPower.value}} / {{workshop.effective.stoppingPower.max}}{{/if}}{{#if workshop.effective.reliability}}Надёжность: {{workshop.effective.reliability.value}} / {{workshop.effective.reliability.max}}{{/if}} · с улучшениями</p>{{/if}}
+{{#if workshop.bonusPath}}<h3>Бонусы</h3>{{#each workshop.bonuses}}<p>{{label}}: {{value}} <button type="button" data-action="removeWorkshopBonus" data-index="{{index}}" {{disabled (not ../editable)}} aria-label="Удалить бонус"><i class="fa-solid fa-xmark"></i></button></p>{{/each}}<button type="button" data-action="addWorkshopBonus" {{disabled (not editable)}}>Добавить бонус</button>{{/if}}
+{{#if workshop.recipe}}
+<h2>Рецепт</h2><p><strong>{{workshop.resultName}}</strong> · {{workshop.time}}</p>
+<div class="witcher-item-actions"><button type="button" data-action="chooseRecipeResult" {{disabled (not editable)}}>Выбрать результат</button><button type="button" data-action="addRecipeComponent" {{disabled (not editable)}}>Добавить компонент</button></div>
+<ul>{{#each workshop.components}}<li>{{name}} ×{{quantity}} <button type="button" data-action="removeRecipeComponent" data-index="{{index}}" aria-label="Удалить компонент: {{name}}" {{disabled (not ../editable)}}><i class="fa-solid fa-xmark"></i></button></li>{{/each}}</ul>
+<button type="button" data-action="configureRecipeTools" {{disabled (not editable)}}>Настроить инструменты</button>
+{{#if workshop.owned}}<button type="button" data-action="craftRecipe" {{disabled (not editable)}}><i class="fa-solid fa-hammer"></i> Создать по рецепту</button>{{/if}}
+{{/if}}
+{{#if workshop.repairable}}<button type="button" data-action="repairItem" {{disabled (not editable)}}><i class="fa-solid fa-screwdriver-wrench"></i> Ремонт</button>{{/if}}
+{{#if workshop.upgradeable}}<p>Свободные слоты: {{workshop.slots}}</p><button type="button" data-action="installUpgrade" {{disabled (not editable)}}>Установить улучшение</button><button type="button" data-action="augmentItem" {{disabled (not editable)}}>Модификация ремесленника</button>{{#if workshop.canOil}}<button type="button" data-action="applyOil" {{disabled (not editable)}}>Нанести масло</button>{{/if}}{{/if}}
+{{#each workshop.installations}}<p><strong>{{name}}</strong> · {{properties}}{{#if zone}} · {{zoneLabel}}{{/if}} {{#if removable}}<button type="button" data-action="removeArmorUpgrade" data-installation-id="{{id}}" {{disabled (not ../editable)}}>Снять накладку</button>{{/if}}</p>{{/each}}
+{{#if workshop.oil}}<p class="witcher-oil"><i class="fa-solid fa-droplet"></i> {{workshop.oil.name}}: +{{workshop.oil.bonus}} против {{workshop.oil.targetLabel}}</p>{{/if}}
+{{#if workshop.isMutagen}}{{#if workshop.owned}}<button type="button" data-action="prepareMutagen" {{disabled (or (not editable) (not workshop.canPrepare))}}>Подготовить мутаген</button><button type="button" data-action="applyMutagen" {{disabled (or (not editable) (not workshop.canApply))}}>Применить мутаген</button>{{/if}}{{/if}}
+</section>
+{{/if}}

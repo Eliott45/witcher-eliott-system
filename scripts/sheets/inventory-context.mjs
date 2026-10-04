@@ -1,13 +1,14 @@
+import { effectiveItem, activeOil } from "../data/workshop.mjs";
 import { ARMOR_ZONES, EQUIPMENT_KINDS, isPhysical, equippedItems, conditionKey, carriedWeight } from "../data/physical-items.mjs";
 import { chooseReference } from "./reference-picker.mjs";
 export function inventoryContext(actor) {
   const items = Array.from(actor.items ?? []).filter(isPhysical);
-  return { weight: carriedWeight(items), categories: [{ id: "weapon", name: "Оружие / щиты" }, { id: "armor", name: "Броня" }, ...EQUIPMENT_KINDS],
-    zones: ARMOR_ZONES.map(zone => ({ ...zone, items: equippedItems(items).filter(item => item.type === "armor" && item.system.zone === zone.id).map(item => ({ id: item.id, name: item.name, condition: item.system.stoppingPower })) })),
-    items: items.map(item => ({ id: item.id, name: item.name, img: item.img, ...item.system,
-      category: item.type === "equipment" ? item.system.kind : item.type, canEquip: item.type !== "equipment",
-      condition: conditionKey(item) ? item.system[conditionKey(item)] : null, conditionLabel: item.type === "armor" ? "ПБ" : "Н",
-      totalWeight: Math.round(item.system.weight * item.system.quantity * 1000) / 1000 })) };
+  return { weight: carriedWeight(items), categories: [{ id: "weapon", name: "Оружие / щиты" }, { id: "armor", name: "Броня" }, ...EQUIPMENT_KINDS, {id:"recipe",name:"Чертежи / формулы"}],
+    zones: ARMOR_ZONES.map(zone => ({ ...zone, items: equippedItems(items).filter(item => item.type === "armor" && item.system.zone === zone.id).map(item => ({ id: item.id, name: item.name, condition: effectiveItem(item).stoppingPower })) })),
+    items: items.map(item => ({ id: item.id, name: item.name, img: item.img, ...item.system, isRecipe:item.type==="recipe", oil:activeOil(item,globalThis.game?.time?.worldTime??0),
+      category: item.type === "equipment" ? item.system.kind : item.type, canEquip: ["weapon","armor"].includes(item.type),
+      condition: conditionKey(item) ? effectiveItem(item)[conditionKey(item)] : null, conditionLabel: item.type === "armor" ? "ПБ" : "Н",
+      totalWeight: Math.round(effectiveItem(item).weight * item.system.quantity * 1000) / 1000 })) };
 }
 const queues = new WeakMap();
 export function inventoryWrite(actor, operation) {
@@ -31,7 +32,7 @@ export async function equipItem(_event, target) {
 }
 export async function createInventoryItem() {
   if (!this.isEditable) return;
-  const type = await foundry.applications.api.DialogV2.prompt({ window: { title: "Новый предмет" }, content: '<label>Тип <select name="type"><option value="equipment">Снаряжение</option><option value="weapon">Оружие / щит</option><option value="armor">Броня</option></select></label>',
+  const type = await foundry.applications.api.DialogV2.prompt({ window: { title: "Новый предмет" }, content: '<label>Тип <select name="type"><option value="equipment">Снаряжение</option><option value="weapon">Оружие / щит</option><option value="armor">Броня</option><option value="recipe">Чертёж / формула</option></select></label>',
     ok: { label: "Создать", callback: (_event, button) => new FormData(button.form).get("type") }, rejectClose: false });
   if (!type || !this.isEditable) return;
   const [item] = await this.actor.createEmbeddedDocuments("Item", [{ name: "Новый предмет", type, img: type === "weapon" ? "icons/svg/sword.svg" : type === "armor" ? "icons/svg/shield.svg" : "icons/svg/item-bag.svg" }]);
@@ -44,7 +45,7 @@ export async function addCatalogItem() {
   if (!this.isEditable) return;
   const pack = game.packs.get("witcher-eliott-system.equipment");
   const documents = (await pack.getDocuments()).filter(isPhysical);
-  const groups = Object.fromEntries([{ id: "weapon", name: "Оружие / щиты" }, { id: "armor", name: "Броня" }, ...EQUIPMENT_KINDS].map(entry => [entry.id, entry.name]));
+  const groups = Object.fromEntries([{ id: "weapon", name: "Оружие / щиты" }, { id: "armor", name: "Броня" }, ...EQUIPMENT_KINDS, {id:"recipe",name:"Чертежи / формулы"}].map(entry => [entry.id, entry.name]));
   const selected = await chooseReference("inventory", "", { title: "Добавить из каталога", groups,
     hint: "Выбранный предмет добавится в инвентарь. Кроны не списываются.", entries: documents.map(item => ({ id: item.id, label: item.name,
       group: item.type === "equipment" ? item.system.kind : item.type, groupLabel: groups[item.type === "equipment" ? item.system.kind : item.type],

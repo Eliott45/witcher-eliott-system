@@ -1,0 +1,18 @@
+const runes = [
+ ["chernobog","Чернобог",575,"Когда оружие повреждается: 1d6, на 4–6 повреждение отменяется."], ["dazhbog","Даждьбог",600,"Горение (30%)"],
+ ["devana","Девана",575,"Кровотечение (30%)"], ["morana","Марена",575,"Отравление (30%)"], ["perun","Перун",575,"При получении кости адреналина — ещё одна."],
+ ["stribog","Стрибог",500,"Ошеломление (30%)"], ["svarog","Сварог",600,"Пробивающее броню (не суммируется с таким же свойством)"],
+ ["triglav","Триглав",575,"Дезориентирующее (−1)"], ["veles","Велес",600,"Улучшенное фокусирующее"], ["zoria","Зоря",550,"Замораживание (30%)"]
+];
+export const UPGRADES = runes.map(([id,name,price,properties],i)=>({id:`rune.${id}`,documentId:`upgr${String(i+1).padStart(12,"0")}`,type:"equipment",source:"upgrades",name:`Руна ${name}`,system:{kind:"upgrade",weight:.5,price,properties,upgrade:{category:"rune",target:"weapon",bonuses:[]},source:"Базовая книга, стр. 256"}}));
+UPGRADES.push(...["Магия","Воздух","Земля","Огонь","Вода"].map((name,i)=>({id:`glyph.${["magic","air","earth","fire","water"][i]}`,documentId:`upgr${String(i+101).padStart(12,"0")}`,type:"equipment",source:"upgrades",name:`Глиф: ${name}`,system:{kind:"upgrade",weight:.5,price:575,properties:`Заклинания элемента «${name}»: на выбор +3 к СЛ или +1d6 урона, пока броня надета.`,upgrade:{category:"glyph",target:"armor",bonuses:[]},source:"Базовая книга, стр. 256"}})));
+const armor = [["mail","Кольчужное",3,3,125,"rare","Сопротивление дробящему и режущему урону"],["dwarven","Краснолюдское",5,3.5,195,"unique","Сопротивление режущему и колющему урону"],["elven","Эльфское",3,.5,200,"unique","Сопротивление дробящему и колющему урону; +1 к Скрытности"],["cloth","Ткань",1,.5,40,"everywhere","Сопротивление кровотечению"],["hardened-leather","Укреплённая кожа",2,1.5,130,"common","Сопротивление огню и дробящему урону"],["steel","Стальное",4,3.5,145,"rare","Сопротивление режущему и колющему урону"],["studded-leather","Клёпаная кожа",2,1,80,"common","Сопротивление режущему урону"]];
+UPGRADES.push(...armor.map(([id,name,sp,weight,price,rarity,properties],i)=>({id:`armor-upgrade.${id}`,documentId:`upgr${String(i+201).padStart(12,"0")}`,type:"equipment",source:"upgrades",name:`Усиление брони: ${name}`,system:{kind:"upgrade",weight,price,rarity,properties,upgrade:{category:"armor",target:"armor",bonuses:[{target:"stoppingPower",value:sp},...(id==="elven"?[{target:"skills.stealth",value:1}]:[])]},source:"Базовая книга, стр. 90; комплект для трёх зон"}})));
+export const AUGMENTATIONS = [
+ {id:"reinforced-weapon",name:"Укрепление",target:"weapon",dc:14,bonuses:[{target:"reliability",value:2}],properties:"+2 к надёжности"},
+ {id:"serrated",name:"Зазубривание / шипы",target:"weapon",dc:16,bonuses:[],properties:"+25% к вероятности кровотечения"},
+ {id:"lightened",name:"Облегчение",target:"weapon",dc:18,bonuses:[{target:"accuracy",value:1}],properties:"+1 к точности"},
+ {id:"reinforced-armor",name:"Укрепление",target:"armor",dc:14,bonuses:[{target:"stoppingPower",value:2}],properties:"+2 ПБ"},
+ {id:"camouflage",name:"Камуфляж",target:"armor",dc:16,bonuses:[{target:"skills.stealth",value:1}],properties:"+1 к Скрытности"},
+ {id:"spikes",name:"Шипы",target:"armor",dc:18,bonuses:[],properties:"2 урона тому, кто проводит захват"}
+];

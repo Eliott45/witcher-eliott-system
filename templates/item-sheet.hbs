@@ -10,6 +10,7 @@
       {{/if}}
     </div>
   </header>
+  {{> "systems/witcher-eliott-system/templates/workshop-item.hbs"}}
   {{#each physicalGroups as |group|}}<fieldset class="witcher-physical-fields"><legend>{{group.title}}</legend>{{> "systems/witcher-eliott-system/templates/structured-fields.hbs" fields=group.fields}}</fieldset>{{/each}}
   {{#if isAbility}}<div class="witcher-item-fields"><label>{{localize "WITCHER.Skills.Level"}}<input type="number" name="system.level" min="0" max="10" step="1" value="{{system.level}}" {{disabled (not editable)}}></label><label>{{localize "WITCHER.Skills.Attribute"}}<select name="system.attribute" {{disabled (not editable)}}>{{#each attributeChoices}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label></div>{{/if}}
   {{#if editable}}

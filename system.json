@@ -86,7 +86,8 @@
         "htmlFields": [
           "description"
         ]
-      }
+      },
+      "recipe": {}
     }
   },
   "packs": [

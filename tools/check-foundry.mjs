@@ -269,10 +269,11 @@ const { raceUuid, abilityUuid, originUuid, familyStatusUuid, equipmentUuid, infl
 const { WitcherAbilityData } = await import("../scripts/data/witcher-ability-data.mjs");
 const { WitcherEquipmentData } = await import("../scripts/data/witcher-equipment-data.mjs");
 const { WitcherWeaponData } = await import("../scripts/data/witcher-weapon-data.mjs");
+const { WitcherRecipeData } = await import("../scripts/data/witcher-recipe-data.mjs");
 const { WitcherArmorData } = await import("../scripts/data/witcher-armor-data.mjs");
 const oldGear = new WitcherEquipmentData({ ruleId: "old-custom", description: "<p>Старый предмет</p>" });
 assert.equal(oldGear.quantity, 1); assert.equal(oldGear.weight, 0); assert.equal(oldGear.description, "<p>Старый предмет</p>");
-CONFIG.Item.dataModels = { profession: WitcherReferenceData, race: WitcherRaceData, ability: WitcherAbilityData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherEquipmentData, weapon: WitcherWeaponData, armor: WitcherArmorData, influence: WitcherInfluenceData, language: WitcherReferenceData };
+CONFIG.Item.dataModels = { profession: WitcherReferenceData, race: WitcherRaceData, ability: WitcherAbilityData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherEquipmentData, weapon: WitcherWeaponData, armor: WitcherArmorData, recipe: WitcherRecipeData, influence: WitcherInfluenceData, language: WitcherReferenceData };
 const equipmentPack = `${game.system.id}.equipment`;
 for (const source of await readJSON("../pack-sources/equipment.folders.json")) {
   const folder = new foundry.documents.BaseFolder(source, { pack: equipmentPack });
@@ -293,7 +294,7 @@ for (const pack of game.system.packs) {
     documents.set(uuid, document);
   }
 }
-assert.equal(documents.size, 231 + (await import("../scripts/data/core-equipment.mjs")).CORE_EQUIPMENT.length);
+assert.equal(documents.size, Object.values((await import("./compendium-data.mjs")).compendiumData(await readJSON("../lang/ru.json"))).flat().length);
 CONFIG.Actor.dataModels.character = WitcherActorData;
 const armored = new foundry.documents.BaseActor({ name: "Inventory round trip", type: "character", system: { attributes: { reflex: 5, dexterity: 4 }, health: { value: 20, max: 20 } }, items: [
   { name: "Бригантина", type: "armor", system: { weight: 7, equipped: true, zone: "torso", encumbrance: 1, stoppingPower: { value: 8, max: 12 } } },
@@ -307,6 +308,23 @@ const restoredInventory = new foundry.documents.BaseActor(JSON.parse(JSON.string
 restoredInventory.system.prepareDerivedData();
 assert.equal(restoredInventory.system.carriedWeight, 8);
 assert.equal(restoredInventory.items.find(item => item.type === "armor").system.stoppingPower.value, 8);
+// Permanent mutations, prepared doses, installed upgrades and recipes round-trip through real schemas.
+const workshopActor = new foundry.documents.BaseActor({ name: "Workshop round trip", type: "character", system: {
+  attributes:{body:10,will:10}, health:{value:50,max:50},
+  mutations:[{id:"mutation",name:"Бес",sourceUuid:"Compendium.mutagen",category:"mutagen",bonuses:[{target:"attributes.body",value:1}]}],
+  harvest:[{id:"loot",uuid:"Compendium.material",quantity:2,skill:"alchemy",dc:16,attempted:true}]
+},items:[
+  {name:"Prepared",type:"equipment",system:{kind:"mutagen",mutagen:{prepared:true,dc:18,bonuses:[{target:"meleeDamage",value:2}]}}},
+  {name:"Enhanced",type:"armor",system:{stoppingPower:{value:8,max:5},installations:[{id:"kit",name:"Kit",category:"armor",bonuses:[{target:"stoppingPower",value:3}]}]}},
+  {name:"Recipe",type:"recipe",system:{recipe:{resultUuid:"Compendium.result",dc:18,time:60,components:[{uuid:"Compendium.material",quantity:2}],memorized:true}}}
+]});
+const reopenedWorkshop=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(workshopActor.toObject())));
+assert.equal(reopenedWorkshop.system.statistics.adjusted.body,11);
+assert.equal(reopenedWorkshop.system.harvest[0].attempted,true);
+assert.equal(reopenedWorkshop.items.find(i=>i.name==="Prepared").system.mutagen.prepared,true);
+assert.equal(reopenedWorkshop.items.find(i=>i.name==="Recipe").system.recipe.components[0].quantity,2);
+const {effectiveItem}=await import("../scripts/data/workshop.mjs");
+assert.equal(effectiveItem(reopenedWorkshop.items.find(i=>i.name==="Enhanced")).stoppingPower.max,8);
 const { addLanguageFromItem, LANGUAGES } = await import("../scripts/data/languages.mjs");
 const { languageUuid } = await import("../scripts/data/compendiums.mjs");
 const languageActor = { uuid: "Actor.languageImport", isOwner: true, system: new WitcherActorData(),
@@ -418,7 +436,7 @@ handlebars.registerHelper("localize", key => foundry.utils.getProperty(translati
 handlebars.registerHelper("not", value => !value);
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["profession", "lifepath", "inventory", "structured-fields"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["profession", "lifepath", "inventory", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {

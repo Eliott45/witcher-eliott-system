@@ -385,6 +385,22 @@
 .witcher-inventory-row > input { width:48px; text-align:center; }
 .witcher-inventory-row > button { width:30px; flex:none; padding:0; }
 .witcher-inventory-row > button[aria-pressed=true] { background:#733c35; color:#fff4dc; border-color:#b39450; }
-.witcher-physical-fields { border:1px solid #b4a17b; margin:10px 0; padding:12px; }
-.witcher-physical-fields legend { color:#733c35; font-weight:bold; }
+.witcher-physical-fields { border:1px solid #b4a17b; margin:10px 0; padding:12px; background:#e2dacb; color:#332b26; }
+.witcher-physical-fields legend { color:#733c35; background:#e2dacb; padding:2px 6px; font-weight:bold; }
 .witcher-physical-fields label { color:#332b26; }
+
+/* Workshop uses the existing sheet palette and inventory, not a second app shell. */
+.witcher-eliott .witcher-workshop-item { padding: 12px; margin-block: 12px; border: 1px solid var(--witcher-gold, #bca66c); border-radius: 4px; background: #e2dacb; color:#332b26; --color-text-primary:#332b26; }
+.witcher-eliott .witcher-workshop-item button { width: auto; margin: 3px; color:#fff0d8; background:#533b34; border:1px solid #806950; }
+.witcher-eliott .witcher-workshop-item :is(h2,h3) { color:#733c35; text-shadow:none; }
+.witcher-eliott .witcher-workshop-item ul { padding-left: 18px; }
+.witcher-eliott .witcher-workshop-item li { display: flex; align-items: center; justify-content: space-between; }
+.witcher-eliott .witcher-mutations, .witcher-eliott .witcher-harvest { margin-block: 12px; padding: 12px; background: #e2dacb; border-left: 3px solid #7c3935; }
+.witcher-eliott .witcher-mutations h2 small { font: 12px sans-serif; float: right; }
+.witcher-eliott .witcher-mutations summary { cursor: pointer; padding: 6px 0; }
+.witcher-eliott .witcher-mutations summary span { font-size: 11px; color: #6a6054; }
+.witcher-eliott .witcher-harvest-row { display: flex; align-items: center; gap: 6px; margin-block: 5px; }
+.witcher-eliott .witcher-harvest-row span:first-child { flex: 1; }
+.witcher-workshop-dialog table { width: 100%; margin-block: 12px; }
+.witcher-workshop-dialog td, .witcher-workshop-dialog th { padding: 5px; text-align: left; }
+.witcher-workshop-dialog label { display: flex; gap: 8px; align-items: center; margin-block: 8px; }
