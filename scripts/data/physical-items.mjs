@@ -1,10 +1,11 @@
 import { effectiveItem } from "./workshop.mjs";
 import { isCarried, containerParent } from "./containers.mjs";
+import { EQUIPMENT_ICONS } from "./item-icons.mjs";
 export const PHYSICAL_TYPES = ["equipment", "weapon", "armor", "recipe"];
 export const isPhysical = item => PHYSICAL_TYPES.includes(item.type);
 export const isAmmunition = item => item.type === "equipment" && item.system.kind === "ammunition";
 export const CONCEALMENT = [{ id: "tiny", name: "Маленькое — в кармане" }, { id: "small", name: "Небольшое — под курткой" }, { id: "large", name: "Крупное — под плащом" }, { id: "none", name: "Не спрятать" }];
-export const ARMOR_ZONES = [{ id: "head", name: "Голова", icon: "fa-helmet-safety" }, { id: "torso", name: "Корпус / руки", icon: "fa-shirt" }, { id: "legs", name: "Ноги", icon: "fa-person-walking" }];
+export const ARMOR_ZONES = [{ id: "head", name: "Голова", img: EQUIPMENT_ICONS.head }, { id: "torso", name: "Корпус / руки", img: EQUIPMENT_ICONS.torso }, { id: "legs", name: "Ноги", img: EQUIPMENT_ICONS.legs }];
 export const RARITIES = [{ id: "everywhere", name: "Повсеместное" }, { id: "common", name: "Обычное" }, { id: "rare", name: "Редкое" }, { id: "unique", name: "Уникальное" }];
 export const EQUIPMENT_KINDS = [{ id: "gear", name: "Снаряжение" }, { id: "tool", name: "Инструменты" }, { id: "container", name: "Контейнеры" }, { id: "ammunition", name: "Боеприпасы" }, { id: "companion", name: "Компаньон" }, { id: "material", name: "Материалы" }, { id: "alchemy", name: "Алхимия" }, { id: "upgrade", name: "Улучшения" }, { id: "mutagen", name: "Мутагены" }];
 export const itemWeight = item => item.system.kind === "companion" ? 0 : (effectiveItem(item).weight ?? 0) * (item.system.quantity ?? 1);

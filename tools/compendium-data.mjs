@@ -11,6 +11,7 @@ import { EQUIPMENT, EQUIPMENT_FOLDERS, getEquipment } from "../scripts/data/equi
 import { INFLUENTIAL_FRIENDS } from "../scripts/data/influential-friends.mjs";
 import { LANGUAGES } from "../scripts/data/languages.mjs";
 import { CORE_EQUIPMENT, LEGACY_GEAR_STATS } from "../scripts/data/core-equipment.mjs";
+import { defaultItemIcon } from "../scripts/data/item-icons.mjs";
 
 const coreFolders = { materials: {id:"gearMaterials001",name:"Материалы и ингредиенты"}, alchemy:{id:"gearAlchemy00001",name:"Алхимия"}, mutagens:{id:"gearMutagens0001",name:"Мутагены"}, upgrades:{id:"gearUpgrades0001",name:"Улучшения"}, recipes:{id:"gearRecipes00001",name:"Чертежи и формулы"}, weapons: { id: "gearFolderWeapon", name: "Оружие и щиты" }, ammunition: { id: "gearAmmo00000001", name: "Боеприпасы" }, armor: { id: "gearFolderArmors", name: "Броня" }, tools: { id: "gearFolderTools1", name: "Инструменты" }, core: { id: "gearFolderCore01", name: "Снаряжение" } };
 
@@ -62,7 +63,7 @@ export function compendiumData(translations) {
     })),
     equipment: [...EQUIPMENT.map(entry => item(entry.documentId, "equipment", entry, { description: paragraph(entry.description), ...LEGACY_GEAR_STATS[entry.id] })),
       ...[...CORE_EQUIPMENT, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: entry.system.description ?? `<p>${escapeHTML(entry.system.source)}</p>` }),
-        img: entry.img ?? (entry.type === "weapon" ? "icons/svg/sword.svg" : entry.type === "armor" ? "icons/svg/shield.svg" : "icons/svg/item-bag.svg") }))],
+        img: entry.img ?? defaultItemIcon(entry) }))],
     "influential-friends": INFLUENTIAL_FRIENDS.map(entry => item(entry.documentId, "influence", entry, {
       region: entry.group, roll: entry.roll,
       description: paragraph(FAMILY_GROUPS[entry.group])

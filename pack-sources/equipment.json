@@ -1955,7 +1955,7 @@
     "_id": "weap000000000101",
     "name": "Кожаный щит",
     "type": "weapon",
-    "img": "icons/svg/sword.svg",
+    "img": "icons/svg/shield.svg",
     "system": {
       "ruleId": "weapon.leather-shield",
       "skill": "melee",
@@ -1992,7 +1992,7 @@
     "_id": "weap000000000102",
     "name": "Стальной баклер",
     "type": "weapon",
-    "img": "icons/svg/sword.svg",
+    "img": "icons/svg/shield.svg",
     "system": {
       "ruleId": "weapon.buckler",
       "skill": "melee",
@@ -2029,7 +2029,7 @@
     "_id": "weap000000000103",
     "name": "Темерский щит",
     "type": "weapon",
-    "img": "icons/svg/sword.svg",
+    "img": "icons/svg/shield.svg",
     "system": {
       "ruleId": "weapon.temerian-shield",
       "skill": "melee",
@@ -2066,7 +2066,7 @@
     "_id": "weap000000000104",
     "name": "Щит налётчика со Скеллиге",
     "type": "weapon",
-    "img": "icons/svg/sword.svg",
+    "img": "icons/svg/shield.svg",
     "system": {
       "ruleId": "weapon.skellige-shield",
       "skill": "melee",
@@ -2103,7 +2103,7 @@
     "_id": "weap000000000105",
     "name": "Каэдвенский щит",
     "type": "weapon",
-    "img": "icons/svg/sword.svg",
+    "img": "icons/svg/shield.svg",
     "system": {
       "ruleId": "weapon.kaedwen-shield",
       "skill": "melee",
@@ -2140,7 +2140,7 @@
     "_id": "weap000000000106",
     "name": "Стальной каплевидный щит",
     "type": "weapon",
-    "img": "icons/svg/sword.svg",
+    "img": "icons/svg/shield.svg",
     "system": {
       "ruleId": "weapon.kite-shield",
       "skill": "melee",
@@ -2177,7 +2177,7 @@
     "_id": "weap000000000107",
     "name": "Павеза",
     "type": "weapon",
-    "img": "icons/svg/sword.svg",
+    "img": "icons/svg/shield.svg",
     "system": {
       "ruleId": "weapon.pavise",
       "skill": "melee",
@@ -2214,7 +2214,7 @@
     "_id": "weap000000000108",
     "name": "Нильфгаардская павеза",
     "type": "weapon",
-    "img": "icons/svg/sword.svg",
+    "img": "icons/svg/shield.svg",
     "system": {
       "ruleId": "weapon.nilfgaard-pavise",
       "skill": "melee",
@@ -2251,7 +2251,7 @@
     "_id": "armo000000000001",
     "name": "Капюшон вердэнского лучника",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
     "system": {
       "ruleId": "armor.head.1",
       "zone": "head",
@@ -2281,7 +2281,7 @@
     "_id": "armo000000000002",
     "name": "Двуслойный капюшон",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
     "system": {
       "ruleId": "armor.head.2",
       "zone": "head",
@@ -2311,7 +2311,7 @@
     "_id": "armo000000000003",
     "name": "Каркасный шлем с полумаской",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
     "system": {
       "ruleId": "armor.head.3",
       "zone": "head",
@@ -2341,7 +2341,7 @@
     "_id": "armo000000000004",
     "name": "Кольчужный капюшон",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
     "system": {
       "ruleId": "armor.head.4",
       "zone": "head",
@@ -2371,7 +2371,7 @@
     "_id": "armo000000000005",
     "name": "Усиленный капюшон",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
     "system": {
       "ruleId": "armor.head.5",
       "zone": "head",
@@ -2401,7 +2401,7 @@
     "_id": "armo000000000006",
     "name": "Темерский армет",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
     "system": {
       "ruleId": "armor.head.6",
       "zone": "head",
@@ -2431,7 +2431,7 @@
     "_id": "armo000000000007",
     "name": "Топфхельм",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
     "system": {
       "ruleId": "armor.head.7",
       "zone": "head",
@@ -2461,7 +2461,7 @@
     "_id": "armo000000000008",
     "name": "Скеллигский шлем",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
     "system": {
       "ruleId": "armor.head.8",
       "zone": "head",
@@ -2491,7 +2491,7 @@
     "_id": "armo000000000009",
     "name": "Нильфгаардский шлем",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
     "system": {
       "ruleId": "armor.head.9",
       "zone": "head",
@@ -2521,7 +2521,7 @@
     "_id": "armo000000000010",
     "name": "Гамбезон",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
     "system": {
       "ruleId": "armor.torso.1",
       "zone": "torso",
@@ -2551,7 +2551,7 @@
     "_id": "armo000000000011",
     "name": "Аэдирнский гамбезон",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
     "system": {
       "ruleId": "armor.torso.2",
       "zone": "torso",
@@ -2581,7 +2581,7 @@
     "_id": "armo000000000012",
     "name": "Двуслойный гамбезон",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
     "system": {
       "ruleId": "armor.torso.3",
       "zone": "torso",
@@ -2611,7 +2611,7 @@
     "_id": "armo000000000013",
     "name": "Бригантина",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
     "system": {
       "ruleId": "armor.torso.4",
       "zone": "torso",
@@ -2641,7 +2641,7 @@
     "_id": "armo000000000014",
     "name": "Броня реданского алебардщика",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
     "system": {
       "ruleId": "armor.torso.5",
       "zone": "torso",
@@ -2671,7 +2671,7 @@
     "_id": "armo000000000015",
     "name": "Кожаная куртка из Лирии",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
     "system": {
       "ruleId": "armor.torso.6",
       "zone": "torso",
@@ -2701,7 +2701,7 @@
     "_id": "armo000000000016",
     "name": "Латный доспех",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
     "system": {
       "ruleId": "armor.torso.7",
       "zone": "torso",
@@ -2731,7 +2731,7 @@
     "_id": "armo000000000017",
     "name": "Хиндарсфьяльский тяжёлый доспех",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
     "system": {
       "ruleId": "armor.torso.8",
       "zone": "torso",
@@ -2761,7 +2761,7 @@
     "_id": "armo000000000018",
     "name": "Нильфгаардский латный доспех",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
     "system": {
       "ruleId": "armor.torso.9",
       "zone": "torso",
@@ -2791,7 +2791,7 @@
     "_id": "armo000000000019",
     "name": "Кавалерийские штаны",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
     "system": {
       "ruleId": "armor.legs.1",
       "zone": "legs",
@@ -2821,7 +2821,7 @@
     "_id": "armo000000000020",
     "name": "Стёганые штаны",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
     "system": {
       "ruleId": "armor.legs.2",
       "zone": "legs",
@@ -2851,7 +2851,7 @@
     "_id": "armo000000000021",
     "name": "Двуслойные штаны",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
     "system": {
       "ruleId": "armor.legs.3",
       "zone": "legs",
@@ -2881,7 +2881,7 @@
     "_id": "armo000000000022",
     "name": "Усиленные штаны",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
     "system": {
       "ruleId": "armor.legs.4",
       "zone": "legs",
@@ -2911,7 +2911,7 @@
     "_id": "armo000000000023",
     "name": "Реданские поножи",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
     "system": {
       "ruleId": "armor.legs.5",
       "zone": "legs",
@@ -2941,7 +2941,7 @@
     "_id": "armo000000000024",
     "name": "Кожаные штаны из Лирии",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
     "system": {
       "ruleId": "armor.legs.6",
       "zone": "legs",
@@ -2971,7 +2971,7 @@
     "_id": "armo000000000025",
     "name": "Латные поножи",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
     "system": {
       "ruleId": "armor.legs.7",
       "zone": "legs",
@@ -3001,7 +3001,7 @@
     "_id": "armo000000000026",
     "name": "Хиндарсфьяльские тяжёлые шоссы",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
     "system": {
       "ruleId": "armor.legs.8",
       "zone": "legs",
@@ -3031,7 +3031,7 @@
     "_id": "armo000000000027",
     "name": "Нильфгаардские поножи",
     "type": "armor",
-    "img": "icons/svg/shield.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
     "system": {
       "ruleId": "armor.legs.9",
       "zone": "legs",

@@ -285,7 +285,9 @@ const documents = new Map();
 for (const pack of game.system.packs) {
   for (const source of await readJSON(`../pack-sources/${pack.name}.json`)) {
     const document = new foundry.documents.BaseItem(source, { pack: `${game.system.id}.${pack.name}` });
-    await access(new URL(`public/${source.img}`, app));
+    await access(source.img.startsWith(`systems/${game.system.id}/`)
+      ? new URL(`../${source.img.slice(`systems/${game.system.id}/`.length)}`, import.meta.url)
+      : new URL(`public/${source.img}`, app));
     assert.equal(document.type, source.type);
     const modeled = document.system.toObject();
     assert.deepEqual(Object.fromEntries(Object.keys(source.system).map(key => [key, modeled[key]])), source.system);

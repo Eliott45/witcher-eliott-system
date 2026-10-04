@@ -7,7 +7,7 @@ import { equipmentEntry, filterEquipment } from "../scripts/data/equipment-searc
 import { inventoryContext } from "../scripts/sheets/inventory-context.mjs";
 import { conditionUpdate, carriedWeight } from "../scripts/data/physical-items.mjs";
 import { equipmentQuote, acquireEquipment } from "../scripts/data/equipment-purchase.mjs";
-import { migrateEquipmentContent } from "../scripts/migrations/equipment-content.mjs";
+import { migrateEquipmentContent, EQUIPMENT_CONTENT_VERSION } from "../scripts/migrations/equipment-content.mjs";
 import { ammunitionUpdate } from "../scripts/migrations/ammunition-data.mjs";
 
 const translations = JSON.parse(await readFile(new URL("../lang/ru.json", import.meta.url), "utf8"));
@@ -82,7 +82,7 @@ test("content update appends only missing ammunition, keeps edited entries and r
   game.user = state.gm;
   await migrateEquipmentContent();
   assert.deepEqual(state.writes, [["lock", false], ["folders", 1], ["items", 3], ["lock", true]]);
-  assert.equal(state.version, 2); assert.equal(state.index.size, 4);
+  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 4);
   assert.equal(state.index.get("custom-canonical").system.price, 999);
   await migrateEquipmentContent(); assert.equal(state.writes.length, 4);
 });
@@ -127,7 +127,7 @@ test("version-one worlds repair pack, world, actor and unlinked token copies wit
     assert.equal(item.system.quantity, 10); assert.equal(item.system.weight, .05); assert.equal(item.system.price, 1);
     assert.equal(item.img, CORE_AMMUNITION[0].img); assert.equal(item.name, "Стандартные боеприпасы");
   }
-  assert.equal(state.index.size, 4); assert.equal(state.pack.locked, true); assert.equal(state.version, 2);
+  assert.equal(state.index.size, 4); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
   assert.ok(Array.from(state.index.values()).every(item => item.img === CORE_AMMUNITION[0].img));
   await migrateEquipmentContent(); assert.equal(worldActor.items[0].system.quantity, 10);
 });

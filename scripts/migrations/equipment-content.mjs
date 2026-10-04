@@ -2,9 +2,11 @@ import { SYSTEM_ID } from "../config.mjs";
 import { CORE_AMMUNITION } from "../data/core-ammunition.mjs";
 import { ammunitionUpdate } from "./ammunition-data.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
+import { equipmentIconUpdate } from "../data/item-icons.mjs";
+export const EQUIPMENT_CONTENT_VERSION = 3;
 
 const updatesFor = items => Array.from(items).flatMap(item => {
-  const update = ammunitionUpdate(item);
+  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item) };
   return Object.keys(update).length ? [{ _id: item.id ?? item._id, ...update }] : [];
 });
 
@@ -14,14 +16,14 @@ export function registerEquipmentContentMigration() {
 
 /** Append new canonical entries via Foundry, never open the live LevelDB externally. */
 export async function migrateEquipmentContent() {
-  if (game.user !== game.users.activeGM || game.settings.get(SYSTEM_ID, "equipmentContentVersion") >= 2) return;
+  if (game.user !== game.users.activeGM || game.settings.get(SYSTEM_ID, "equipmentContentVersion") >= EQUIPMENT_CONTENT_VERSION) return;
   const pack = game.packs.get(`${SYSTEM_ID}.equipment`);
   if (!pack) return;
   const index = await pack.getIndex({ fields: ["system.ruleId"] });
   const existing = new Set(Array.from(index.values(), entry => entry.system?.ruleId));
   const missing = CORE_AMMUNITION.filter(entry => !existing.has(entry.id));
-  const ids = new Set(CORE_AMMUNITION.map(entry => entry.id));
-  const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry => ids.has(entry.system?.ruleId)).map(entry => pack.getDocument(entry._id)));
+  const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry =>
+    entry.system?.ruleId?.startsWith("ammunition.") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
   const updates = updatesFor(oldDocuments);
   let documents = [], requiredFolders = [];
   if (missing.length) {
@@ -61,5 +63,5 @@ export async function migrateEquipmentContent() {
     const updates = updatesFor(actor.items);
     if (updates.length) await actor.updateEmbeddedDocuments("Item", updates);
   });
-  await game.settings.set(SYSTEM_ID, "equipmentContentVersion", 2);
+  await game.settings.set(SYSTEM_ID, "equipmentContentVersion", EQUIPMENT_CONTENT_VERSION);
 }

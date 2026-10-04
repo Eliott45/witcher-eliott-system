@@ -18,6 +18,8 @@ export function equipmentEntry(item) {
     item.type === "weapon" ? `${data.hands} рук.` : "",
     item.type === "armor" ? label(ARMOR_CLASSES, data.armorClass) : "",
     item.type === "armor" ? label(ARMOR_ZONES, data.zone) : "",
+    ["armor", "weapon"].includes(item.type) && (item.type === "armor" || data.category === "shield") ? `Скованность ${data.encumbrance ?? 0}` : "",
+    ["armor", "weapon"].includes(item.type) ? `Усиления ${data.enhancementSlots ?? 0}` : "",
     ...String(data.properties ?? "").split(/[;\n]+/).map(plain).filter(property => property.length <= 64)
   ].filter(Boolean))];
   const facts = [`${data.weight ?? 0} кг`, `${data.price ?? 0} крон`];
