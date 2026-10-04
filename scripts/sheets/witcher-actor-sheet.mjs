@@ -1,4 +1,7 @@
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
+import { itemPresentation, toggleItemDescription, postItem, searchItemTrait } from "./item-presentation.mjs";
+import { chooseContainer, toggleContainer, dropPhysicalItem } from "./container-actions.mjs";
+import { isPhysical } from "../data/physical-items.mjs";
 import { getProfession as selectionProfession } from "../data/professions.mjs";
 import { inventoryContext, bindInventory, equipItem, createInventoryItem, browseEquipment, addCatalogItem, changeInventoryQuantity, toggleCarried, toggleInventoryGroup } from "./inventory-context.mjs";
 import { lifepathContext, editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent } from "./lifepath-context.mjs";
@@ -38,6 +41,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       ...workshopActorActions,
       equipItem, createInventoryItem, browseEquipment, addCatalogItem,
       changeInventoryQuantity, toggleCarried, toggleInventoryGroup,
+      toggleItemDescription, postItem, searchItemTrait, chooseContainer, toggleContainer,
       editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent,
       rollProfessionAbility,
       toggleProfession: WitcherActorSheet.#onToggleProfession,
@@ -100,6 +104,12 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       id, path, label: `WITCHER.Sheet.${label}`, rows,
       value: foundry.utils.getProperty(this.actor.system, path), open: !preferences.collapsed?.[id]
     });
+    const inventory = inventoryContext(this.actor, preferences);
+    await Promise.all(inventory.items.map(async row => {
+      row.containerOpen = !this.collapsedContainers?.has(row.id);
+      row.expanded = this.expandedInventoryItems?.has(row.id) ?? false;
+      row.presentation = row.expanded ? await itemPresentation(this.actor.items.get(row.id), { secrets: this.actor.isOwner }) : null;
+    }));
     return Object.assign(context, {
       conditions,
       lifepath: lifepathContext(this.actor),
@@ -109,7 +119,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
         localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
       }, { query: this.#skillQuery, editing: this.isEditable && this.#editingSkills }),
       abilities: await abilitiesContext(this.actor),
-      inventory: inventoryContext(this.actor, preferences),
+      inventory,
       workshop: await workshopActorContext(this.actor),
       abilitiesOpen: !preferences.collapsed?.abilities,
       editingAttributes: this.isEditable && this.#editingAttributes,
@@ -160,6 +170,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       button.disabled = false;
     }
     for (const search of this.element.querySelectorAll("[data-skill-search], [data-inventory-search], [data-action=toggleInventoryGroup], [data-action=browseEquipment]")) search.disabled = false;
+    for (const button of this.element.querySelectorAll("[data-action=toggleItemDescription], [data-action=searchItemTrait], [data-action=toggleContainer]")) button.disabled = false;
   }
 
   async _onRender(context, options) {
@@ -204,6 +215,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
 
   async _onDropItem(event, item) {
     if (!this.isEditable) return null;
+    if (isPhysical(item)) return dropPhysicalItem(this, event, item);
     if (item.type === "profession") {
       if (!item.system.ruleId || !selectionProfession(item.system.ruleId)) return null;
       await this.actor.update(professionSelectionUpdate(this.actor, item.system.ruleId));

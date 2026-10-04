@@ -1,0 +1,26 @@
+    <article class="witcher-inventory-row draggable {{#unless item.carried}}is-stored{{/unless}}" draggable="true" data-item-id="{{item.id}}" data-inventory-name="{{item.name}}" data-category="{{item.category}}" data-item-search="{{item.search}}">
+      <div class="witcher-inventory-name"><button type="button" class="witcher-item-avatar" data-action="postItem" data-item-id="{{item.id}}" aria-label="В чат: {{item.name}}" data-tooltip="Показать в чате" {{disabled (not editable)}}><img src="{{item.img}}" alt=""></button><div><button type="button" data-action="toggleItemDescription" data-item-id="{{item.id}}" aria-expanded="{{item.expanded}}">{{item.name}}</button>{{#if item.condition}}<small>{{item.conditionLabel}} {{item.condition.value}} / {{item.condition.max}}</small>{{/if}}{{#if item.oil}}<small>{{item.oil.name}}</small>{{/if}}{{#unless item.carried}}<small>Не при себе</small>{{/unless}}</div></div>
+      <div class="witcher-inventory-quantity">
+        {{#if item.isContainer}}<span>1</span>{{else}}
+        <button type="button" data-action="changeInventoryQuantity" data-item-id="{{item.id}}" data-delta="-1" aria-label="Уменьшить количество: {{item.name}}" {{disabled (or (not editable) (not item.quantity))}}><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+        <input type="number" data-inventory-quantity data-item-id="{{item.id}}" value="{{item.quantity}}" min="0" step="1" aria-label="Количество: {{item.name}}" {{disabled (not editable)}}>
+        <button type="button" data-action="changeInventoryQuantity" data-item-id="{{item.id}}" data-delta="1" aria-label="Увеличить количество: {{item.name}}" {{disabled (not editable)}}><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
+        {{/if}}
+      </div>
+      <span class="witcher-inventory-weight" data-tooltip="Общий вес: {{item.totalWeight}} кг">{{item.totalWeight}}</span>
+      <div class="witcher-inventory-row-actions">
+        <button type="button" data-action="chooseContainer" data-item-id="{{item.id}}" data-tooltip="Переместить в контейнер или достать" aria-label="Переместить: {{item.name}}" {{disabled (not editable)}}><i class="fa-solid fa-box-open" aria-hidden="true"></i></button>
+        {{#if item.isRecipe}}<button type="button" data-action="craftInventory" data-item-id="{{item.id}}" data-tooltip="Изготовить по рецепту" aria-label="Изготовить: {{item.name}}" {{disabled (not editable)}}><i class="fa-solid fa-hammer" aria-hidden="true"></i></button>{{/if}}
+        {{#if item.canEquip}}<button type="button" data-action="equipItem" data-item-id="{{item.id}}" data-tooltip="{{#if item.equipped}}Снять{{else}}Экипировать{{/if}}" aria-label="Экипировать: {{item.name}}" aria-pressed="{{item.equipped}}" {{disabled (or (not editable) (not item.quantity))}}><i class="fa-solid fa-hand" aria-hidden="true"></i></button>{{/if}}
+        <button type="button" data-action="toggleCarried" data-item-id="{{item.id}}" data-tooltip="{{#if item.carried}}При себе — нажмите, чтобы оставить{{else}}Не при себе — нажмите, чтобы взять{{/if}}" aria-label="При себе: {{item.name}}" aria-pressed="{{item.carried}}" {{disabled (not editable)}}><i class="fa-solid fa-sack" aria-hidden="true"></i></button>
+        <button type="button" data-action="viewSheetItem" data-item-id="{{item.id}}" data-tooltip="Открыть предмет" aria-label="Открыть: {{item.name}}"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></button>
+        <button type="button" data-action="removeSheetItem" data-item-id="{{item.id}}" data-tooltip="Удалить предмет" aria-label="Удалить: {{item.name}}" {{disabled (not editable)}}><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
+      </div>
+      {{#if item.expanded}}<div class="witcher-inventory-description"><div class="witcher-item-traits">{{#each item.presentation.traits}}<button type="button" data-action="searchItemTrait" data-trait="{{this}}">{{this}}</button>{{/each}}</div><p>{{item.presentation.summary}}</p>{{#if item.presentation.properties}}<p>{{item.presentation.properties}}</p>{{/if}}<div>{{{item.presentation.description}}}</div></div>{{/if}}
+      {{#if item.isContainer}}
+      <button type="button" class="witcher-container-load {{#if item.overloaded}}overloaded{{/if}}" data-action="toggleContainer" data-item-id="{{item.id}}" aria-label="Содержимое: {{item.name}}" aria-expanded="{{item.containerOpen}}"><span class="witcher-container-fill" style="width: {{item.loadPercent}}%"></span><span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i> {{item.contentsWeight}} / {{#if item.capacity}}{{item.capacity}}{{else}}—{{/if}} кг · {{item.children.length}} предм.</span></button>
+      <div class="witcher-container-contents" data-container-body data-collapsed="{{not item.containerOpen}}" {{#unless item.containerOpen}}hidden{{/unless}}>
+        {{#each item.children as |child|}}{{> "systems/witcher-eliott-system/templates/inventory-row.hbs" item=child editable=../editable rootId=../rootId}}{{else}}<p class="witcher-container-empty">Перетащите сюда предмет.</p>{{/each}}
+      </div>
+      {{/if}}
+    </article>

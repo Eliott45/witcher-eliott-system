@@ -1,3 +1,4 @@
+import { isCarried } from "./containers.mjs";
 /** Shared, document-independent workshop rules. Catalog entries use the same Items as inventory. */
 export const SUBSTANCES = Object.entries({ vitriol: "Купорос", rebis: "Ребис", aether: "Эфир", quebrith: "Квебрит", hydragenum: "Гидраген", vermilion: "Киноварь", sol: "Солнце", caelum: "Аер", fulgur: "Фульгор" }).map(([id, name]) => ({ id, name }));
 export const MONSTER_CATEGORIES = Object.entries({ beast: "Звери", cursed: "Проклятые", draconid: "Дракониды", elemental: "Духи стихий", humanoid: "Гуманоиды", hybrid: "Гибриды", insectoid: "Инсектоиды", necrophage: "Трупоеды", ogroid: "Огры", relict: "Реликты", specter: "Духи", vampire: "Вампиры" }).map(([id, name]) => ({ id, name }));
@@ -7,7 +8,7 @@ export const WORKSHOP_BONUS_LABELS = {
   healthMax: "Максимум ПЗ", vigor: "Предел магии", reliability: "Надёжность", stoppingPower: "ПБ",
   accuracy: "Точность", weight: "Вес", "skills.stealth": "Скрытность"
 };
-export const available = item => item.system.carried !== false && item.system.quantity > 0;
+export const available = item => isCarried(item) && item.system.quantity > 0;
 export const sameItem = (item, reference) => Boolean(reference && (item.uuid === reference.uuid || (reference.system.ruleId && item.system.ruleId === reference.system.ruleId) || item._stats?.compendiumSource === reference.uuid));
 
 /** Reserve exact ingredients first so a mandatory component cannot also pay for a substance. */

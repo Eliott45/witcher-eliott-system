@@ -225,11 +225,11 @@
             </div>
           </div>
           {{/if}}
-        </div>
-      </div>
-<div class="witcher-profession-choice"><label>{{localize "WITCHER.Professions.Title"}}</label><div class="witcher-reference-value">
+<div class="witcher-profession-choice"><label class="witcher-field-label">{{localize "WITCHER.Professions.Title"}}</label><div class="witcher-reference-value">
 {{#if profession}}<button type="button" class="witcher-select-reference" data-action="viewSheetItem" data-uuid="{{profession.uuid}}">{{profession.name}} <i class="fa-solid fa-ellipsis-vertical"></i></button>{{else}}<span class="witcher-select-reference">{{localize "WITCHER.Professions.Unset"}}</span>{{/if}}
 <button type="button" class="witcher-reference-inspect" data-action="chooseReference" data-kind="profession" title="{{localize 'WITCHER.Professions.Choose'}}" aria-label="{{localize 'WITCHER.Professions.Choose'}}" {{disabled (not editable)}}><i class="fa-solid fa-magnifying-glass"></i></button></div></div>
+        </div>
+      </div>
       <div class="witcher-demographics">
         <label for="{{rootId}}-gender">{{localize "WITCHER.Sheet.Gender"}}
           <input id="{{rootId}}-gender" name="system.details.gender" type="text" value="{{system.details.gender}}" {{disabled (not editable)}}>

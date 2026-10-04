@@ -592,7 +592,10 @@
       "ruleId": "shoulder-bag",
       "description": "",
       "weight": 1,
-      "price": 14
+      "price": 14,
+      "capacity": 30,
+      "properties": "Для небольших предметов",
+      "kind": "container"
     },
     "effects": [],
     "folder": "gearFolderFriend",
@@ -4030,10 +4033,11 @@
       "weight": 0.1,
       "price": 3,
       "rarity": "",
-      "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "kind": "container",
+      "properties": "Для небольших предметов",
+      "source": "Базовая книга, стр. 93, 95",
+      "capacity": 20,
+      "description": "<p>Базовая книга, стр. 93, 95</p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -4053,10 +4057,11 @@
       "weight": 0.1,
       "price": 7,
       "rarity": "",
-      "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "kind": "container",
+      "properties": "Для маленьких предметов",
+      "source": "Базовая книга, стр. 93, 95",
+      "capacity": 5,
+      "description": "<p>Базовая книга, стр. 93, 95</p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",
@@ -4076,10 +4081,11 @@
       "weight": 1,
       "price": 19,
       "rarity": "",
-      "kind": "gear",
-      "properties": "",
-      "source": "Базовая книга, стр. 92–93",
-      "description": "<p>Базовая книга, стр. 92–93</p>"
+      "kind": "container",
+      "properties": "Для маленьких предметов; крупные предметы крепятся снаружи",
+      "source": "Базовая книга, стр. 93, 95",
+      "capacity": 25,
+      "description": "<p>Базовая книга, стр. 93, 95</p>"
     },
     "effects": [],
     "folder": "gearFolderCore01",

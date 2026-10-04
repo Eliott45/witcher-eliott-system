@@ -1,5 +1,6 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { escapeTooltip } from "./statistics-tooltips.mjs";
+import { isContainer } from "../data/containers.mjs";
 
 export async function viewSheetItem(_event, target) {
   const item = target.dataset.itemId ? this.actor.items.get(target.dataset.itemId)
@@ -29,7 +30,7 @@ export async function removeSheetItem(_event, target) {
   if (!item) return;
   const confirmed = await foundry.applications.api.DialogV2.confirm({
     window: { title: item.name },
-    content: `<p>${escapeTooltip(game.i18n.format("WITCHER.Abilities.RemoveConfirm", { name: item.name }))}</p>`,
+    content: `<p>${escapeTooltip(game.i18n.format("WITCHER.Abilities.RemoveConfirm", { name: item.name }))}</p>${isContainer(item) ? "<p>Содержимое сохранится в инвентаре.</p>" : ""}`,
     rejectClose: false
   });
   if (confirmed && this.isEditable) await item.delete();

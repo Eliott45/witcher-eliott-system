@@ -1,35 +1,49 @@
 import { effectiveItem, activeOil } from "../data/workshop.mjs";
-import { ARMOR_ZONES, EQUIPMENT_KINDS, isPhysical, equippedItems, conditionKey, carriedWeight } from "../data/physical-items.mjs";
-import { chooseReference } from "./reference-picker.mjs";
+import { ARMOR_ZONES, isPhysical, equippedItems, conditionKey, carriedWeight, itemWeight } from "../data/physical-items.mjs";
+import { isContainer, containerParent, containerContents, isCarried } from "../data/containers.mjs";
+import { chooseEquipment } from "./equipment-browser.mjs";
+import { EQUIPMENT_CATEGORIES, equipmentCategory, equipmentEntry } from "../data/equipment-search.mjs";
 import { sheetPreferences, updateSheetPreferences, reportPreferencesError } from "./sheet-preferences.mjs";
 
-const CATEGORIES = [{ id: "weapon", name: "Оружие / щиты" }, { id: "armor", name: "Броня" }, ...EQUIPMENT_KINDS, { id: "recipe", name: "Чертежи / формулы" }];
 // Display groups reuse Item types/kinds. They are not a second item classification.
 const GROUPS = [
-  { id: "weapon", name: "Оружие и щиты", icon: "fa-swords", categories: ["weapon"] },
+  { id: "weapon", name: "Оружие и щиты", icon: "fa-swords", categories: ["weapon", "shield"] },
   { id: "armor", name: "Броня", icon: "fa-shield-halved", categories: ["armor"] },
   { id: "gear", name: "Снаряжение и инструменты", icon: "fa-sack", categories: ["gear", "tool"] },
   { id: "alchemy", name: "Алхимия и мутагены", icon: "fa-flask", categories: ["alchemy", "mutagen"] },
   { id: "ammunition", name: "Боеприпасы", icon: "fa-bullseye", categories: ["ammunition"] },
   { id: "material", name: "Материалы и улучшения", icon: "fa-hammer", categories: ["material", "upgrade"] },
   { id: "recipe", name: "Чертежи и формулы", icon: "fa-scroll", categories: ["recipe"] },
-  { id: "companion", name: "Компаньоны", icon: "fa-paw", categories: ["companion"] }
+  { id: "companion", name: "Компаньоны", icon: "fa-paw", categories: ["companion"] },
+  { id: "container", name: "Контейнеры", icon: "fa-box-open", categories: ["container"] }
 ];
-const categoryOf = item => item.type === "equipment" ? (item.system.kind || "gear") : item.type;
 export function inventoryContext(actor, preferences = {}) {
   const items = Array.from(actor.items ?? []).filter(isPhysical);
   const rows = items.map(item => ({ id: item.id, name: item.name, img: item.img, ...item.system, sort: item.sort ?? 0,
-    quantity: item.system.quantity ?? 1, carried: item.system.carried !== false,
+    quantity: item.system.quantity ?? 1, carried: isCarried(item, items), expanded: false, presentation: null,
+    isContainer: isContainer(item), parentId: containerParent(item, items)?.id ?? "", children: [], containerOpen: true,
     isRecipe: item.type === "recipe", oil: activeOil(item, globalThis.game?.time?.worldTime ?? 0),
-    category: categoryOf(item), canEquip: ["weapon", "armor"].includes(item.type),
+    category: equipmentCategory(item), search: equipmentEntry(item).search, canEquip: ["weapon", "armor"].includes(item.type),
     condition: conditionKey(item) ? effectiveItem(item)[conditionKey(item)] : null, conditionLabel: item.type === "armor" ? "ПБ" : "Н",
-    totalWeight: Math.round((effectiveItem(item).weight ?? 0) * (item.system.quantity ?? 1) * 1000) / 1000 }));
+    totalWeight: Math.round(itemWeight(item) * 1000) / 1000 }));
+  for (const row of rows) {
+    if (row.parentId) rows.find(parent => parent.id === row.parentId).children.push(row);
+    if (row.isContainer) {
+      row.contentsWeight = Math.round(containerContents(items.find(item => item.id === row.id), items).reduce((sum, item) => sum + itemWeight(item), 0) * 1000) / 1000;
+      row.capacity = row.capacity ?? 0;
+      row.loadPercent = row.capacity > 0 ? Math.min(100, row.contentsWeight / row.capacity * 100) : 0;
+      row.overloaded = row.capacity > 0 && row.contentsWeight > row.capacity;
+      row.totalWeight = Math.round((row.totalWeight + row.contentsWeight) * 1000) / 1000;
+    }
+  }
+  const sortRows = rows => rows.sort((a, b) => a.sort - b.sort || a.name.localeCompare(b.name, "ru"));
+  for (const row of rows) sortRows(row.children);
   const weight = carriedWeight(items), capacity = actor.system?.statistics?.carryMax;
   return { weight, capacity: capacity ?? "—", overloaded: capacity != null && weight > capacity,
     loadPercent: capacity > 0 ? Math.min(100, weight / capacity * 100) : weight > 0 && capacity === 0 ? 100 : 0,
-    categories: CATEGORIES, items: rows,
+    categories: EQUIPMENT_CATEGORIES, items: rows,
     groups: GROUPS.map(group => ({ ...group, open: !preferences.collapsed?.[`inventory-${group.id}`],
-      items: rows.filter(item => group.categories.includes(item.category)).sort((a, b) => a.sort - b.sort || a.name.localeCompare(b.name, "ru")) })),
+      items: sortRows(rows.filter(item => !item.parentId && group.categories.includes(item.category))) })),
     zones: ARMOR_ZONES.map(zone => ({ ...zone, items: equippedItems(items).filter(item => item.type === "armor" && item.system.zone === zone.id).map(item => ({ id: item.id, name: item.name, condition: effectiveItem(item).stoppingPower })) })),
     workshopOpen: !preferences.collapsed?.["inventory-workshop"] };
 }
@@ -49,7 +63,7 @@ export async function equipItem(_event, target) {
       for (const other of equippedItems(this.actor.items)) if (other.type === "armor" && other.system.zone === item.system.zone && other.system.layer === item.system.layer && other.id !== item.id)
         updates.push({ _id: other.id, "system.equipped": false });
     }
-    updates.push({ _id: item.id, "system.equipped": !item.system.equipped, "system.carried": true });
+    updates.push({ _id: item.id, "system.equipped": !item.system.equipped, "system.carried": true, "system.containerId": "" });
     await this.actor.updateEmbeddedDocuments("Item", updates);
   });
 }
@@ -57,7 +71,7 @@ export async function changeInventoryQuantity(_event, target) {
   if (!this.isEditable) return;
   await inventoryWrite(this.actor, async () => {
     const item = this.actor.items.get(target.dataset.itemId);
-    if (!item || !isPhysical(item)) return;
+    if (!item || !isPhysical(item) || isContainer(item)) return;
     const quantity = Math.max(0, (item.system.quantity ?? 1) + Number(target.dataset.delta));
     await item.update({ "system.quantity": quantity });
   });
@@ -67,8 +81,8 @@ export async function toggleCarried(_event, target) {
   await inventoryWrite(this.actor, async () => {
     const item = this.actor.items.get(target.dataset.itemId);
     if (!item || !isPhysical(item)) return;
-    const carried = item.system.carried === false;
-    await item.update({ "system.carried": carried, ...(!carried ? { "system.equipped": false } : {}) });
+    const carried = !isCarried(item, this.actor.items);
+    await item.update({ "system.carried": carried, "system.containerId": "", ...(!carried ? { "system.equipped": false } : {}) });
   });
 }
 export async function toggleInventoryGroup(_event, target) {
@@ -88,10 +102,11 @@ export async function toggleInventoryGroup(_event, target) {
 export async function createInventoryItem(_event, target) {
   if (!this.isEditable) return;
   const group = GROUPS.find(entry => entry.id === target?.dataset.inventoryGroupId);
-  const type = group ? (["weapon", "armor", "recipe"].includes(group.id) ? group.id : "equipment") : await foundry.applications.api.DialogV2.prompt({ window: { title: "Новый предмет" }, content: '<label>Тип <select name="type"><option value="equipment">Снаряжение</option><option value="weapon">Оружие / щит</option><option value="armor">Броня</option><option value="recipe">Чертёж / формула</option></select></label>',
+  const type = group ? (["weapon", "armor", "recipe"].includes(group.id) ? group.id : "equipment") : await foundry.applications.api.DialogV2.prompt({ window: { title: "Новый предмет" }, content: '<label>Тип <select name="type"><option value="equipment">Снаряжение</option><option value="container">Контейнер</option><option value="weapon">Оружие / щит</option><option value="armor">Броня</option><option value="recipe">Чертёж / формула</option></select></label>',
     ok: { label: "Создать", callback: (_event, button) => new FormData(button.form).get("type") }, rejectClose: false });
   if (!type || !this.isEditable) return;
-  const [item] = await this.actor.createEmbeddedDocuments("Item", [{ name: "Новый предмет", type, system: type === "equipment" && group ? { kind: group.id } : {}, img: type === "weapon" ? "icons/svg/sword.svg" : type === "armor" ? "icons/svg/shield.svg" : "icons/svg/item-bag.svg" }]);
+  const itemType = type === "container" ? "equipment" : type;
+  const [item] = await this.actor.createEmbeddedDocuments("Item", [{ name: type === "container" || group?.id === "container" ? "Новый контейнер" : "Новый предмет", type: itemType, system: type === "container" ? { kind: "container" } : itemType === "equipment" && group ? { kind: group.id } : {}, img: type === "weapon" ? "icons/svg/sword.svg" : type === "armor" ? "icons/svg/shield.svg" : "icons/svg/item-bag.svg" }]);
   item.sheet.render(true);
 }
 export async function browseEquipment() {
@@ -99,17 +114,12 @@ export async function browseEquipment() {
 }
 export async function addCatalogItem(_event, target) {
   if (!this.isEditable) return;
-  const pack = game.packs.get("witcher-eliott-system.equipment");
   const group = GROUPS.find(entry => entry.id === target?.dataset.inventoryGroupId);
-  const documents = (await pack.getDocuments()).filter(item => isPhysical(item) && (!group || group.categories.includes(categoryOf(item))));
-  const groups = Object.fromEntries(CATEGORIES.filter(entry => !group || group.categories.includes(entry.id)).map(entry => [entry.id, entry.name]));
-  const selected = await chooseReference("inventory", "", { title: "Добавить из каталога", groups,
-    hint: "Выбранный предмет добавится в инвентарь. Кроны не списываются.", entries: documents.map(item => ({ id: item.id, label: item.name,
-      group: categoryOf(item), groupLabel: groups[categoryOf(item)],
-      summary: `${item.system.weight} кг · ${item.system.price} крон · ${item.system.properties}`, details: [] })) });
+  const selected = await chooseEquipment({ categories: group?.categories });
   if (!selected || !this.isEditable) return;
-  const data = game.items.fromCompendium(documents.find(item => item.id === selected), { clearFolder: true, keepId: false });
+  const data = game.items.fromCompendium(selected, { clearFolder: true, keepId: false });
   data.system.equipped = false;
+  data.system.containerId = "";
   await this.actor.createEmbeddedDocuments("Item", [data]);
 }
 export function bindInventory(sheet) {
@@ -124,10 +134,11 @@ export function bindInventory(sheet) {
     let matches = 0;
     for (const group of root.querySelectorAll("[data-inventory-group]")) {
       let count = 0;
-      for (const row of group.querySelectorAll("[data-inventory-name]")) {
-        row.hidden = !row.dataset.inventoryName.toLocaleLowerCase().includes(query);
+      for (const row of Array.from(group.querySelectorAll("[data-inventory-name]")).reverse()) {
+        row.hidden = !row.dataset.itemSearch.includes(query) && !Array.from(row.querySelectorAll("[data-inventory-name]")).some(child => !child.hidden);
         if (!row.hidden) count++;
       }
+      for (const body of group.querySelectorAll("[data-container-body]")) body.hidden = !query && body.dataset.collapsed === "true";
       matches += count;
       group.hidden = Boolean(query && !count);
       const open = query ? !sheet.inventorySearchCollapsed.has(group.dataset.inventoryGroup) : group.dataset.collapsed !== "true";

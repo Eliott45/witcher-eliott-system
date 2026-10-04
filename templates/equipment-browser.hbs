@@ -1,0 +1,20 @@
+<div class="witcher-picker-content">
+  <div class="witcher-picker-top"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" class="witcher-picker-search" placeholder="Название, свойство или описание…" aria-label="Поиск предметов" autocomplete="off"></div>
+  <div class="witcher-picker-columns">
+    <aside class="witcher-picker-filters" aria-label="Фильтры предметов">
+      <div class="witcher-equipment-sort"><label>Сортировка<select data-equipment-filter="sort"><option value="name">Название</option><option value="price">Цена</option><option value="weight">Вес</option></select></label><label><input type="checkbox" data-equipment-filter="descending"> По убыванию</label></div>
+      <button type="button" data-clear-equipment>Сбросить фильтры</button>
+      <details open><summary>Типы предметов</summary>{{#each facets.types}}<label><input type="checkbox" data-equipment-filter="types" value="{{id}}"> {{name}}</label>{{/each}}</details>
+      <details><summary>Свойства</summary><label>Совпадение<select data-equipment-filter="traitMode"><option value="all">Все выбранные</option><option value="any">Любое из выбранных</option></select></label><div class="witcher-facet-options">{{#each facets.traits}}<label><input type="checkbox" data-equipment-filter="traits" value="{{this}}"> {{this}}</label>{{/each}}</div></details>
+      <details><summary>Доступность</summary>{{#each facets.rarities}}<label><input type="checkbox" data-equipment-filter="rarities" value="{{id}}"> {{name}}</label>{{/each}}</details>
+      <details><summary>Оружие</summary><label>Вид<select data-equipment-filter="weaponCategory"><option value="">Любой</option>{{#each facets.weaponCategories}}<option value="{{id}}">{{name}}</option>{{/each}}</select></label><label>Хват<select data-equipment-filter="hands"><option value="">Любой</option><option value="1">Одна рука</option><option value="2">Две руки</option></select></label></details>
+      <details><summary>Броня</summary><label>Класс<select data-equipment-filter="armorClass"><option value="">Любой</option>{{#each facets.armorClasses}}<option value="{{id}}">{{name}}</option>{{/each}}</select></label><label>Зона<select data-equipment-filter="zone"><option value="">Любая</option>{{#each facets.zones}}<option value="{{id}}">{{name}}</option>{{/each}}</select></label></details>
+      <details><summary>Цена и вес</summary><label>Цена от<input type="number" min="0" step="0.01" data-equipment-filter="priceMin"></label><label>Цена до<input type="number" min="0" step="0.01" data-equipment-filter="priceMax"></label><label>Вес от<input type="number" min="0" step="0.001" data-equipment-filter="weightMin"></label><label>Вес до<input type="number" min="0" step="0.001" data-equipment-filter="weightMax"></label></details>
+      <details><summary>Источник</summary><select data-equipment-filter="source" aria-label="Источник"><option value="">Любой</option>{{#each facets.sources}}<option value="{{this}}">{{this}}</option>{{/each}}</select></details>
+      <p>{{hintKey}}</p>
+    </aside>
+    <section class="witcher-picker-results"><p class="witcher-picker-count" aria-live="polite"></p><p class="witcher-picker-empty" hidden>Ничего не найдено. Попробуйте снять часть фильтров.</p><div class="witcher-picker-list">
+      {{#each entries as |entry|}}<article class="witcher-picker-entry" data-entry-id="{{entry.id}}"><label class="witcher-picker-option"><input type="radio" name="reference-choice" value="{{entry.id}}"><img src="{{entry.img}}" alt=""><span><strong>{{entry.label}}</strong><small>{{entry.groupLabel}}</small><span class="witcher-picker-summary">{{entry.summary}}</span><span class="witcher-item-traits">{{#each entry.traits}}<span>{{this}}</span>{{/each}}</span></span></label></article>{{/each}}
+    </div></section>
+  </div>
+</div>

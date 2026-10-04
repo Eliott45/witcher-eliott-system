@@ -437,7 +437,7 @@ handlebars.registerHelper("not", value => !value);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["profession", "profession-node", "lifepath", "inventory", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["profession", "profession-node", "lifepath", "inventory", "inventory-row", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -471,8 +471,28 @@ const html = template(await sheet._prepareContext({}));
 // Render saved inventory through the same strict template used by old and new actors.
 const { inventoryContext } = await import("../scripts/sheets/inventory-context.mjs");
 const inventoryHTML = handlebars.compile(await readFile(new URL("../templates/inventory.hbs", import.meta.url), "utf8"), { strict: true });
+const bagActor = new foundry.documents.BaseActor({ name: "Containers round trip", type: "character", items: [
+  { _id: "bag0000000000001", name: "Bag", type: "equipment", system: { kind: "container", capacity: 5, weight: 1 } },
+  { _id: "bag0000000000002", name: "Pouch", type: "equipment", system: { kind: "container", capacity: 1, weight: 0.2, containerId: "bag0000000000001" } },
+  { _id: "ore0000000000001", name: "Ore", type: "equipment", system: { kind: "material", weight: 0.4, quantity: 2, containerId: "bag0000000000002" } }
+] });
+const reopenedBags = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(bagActor.toObject())));
+const bagContext = inventoryContext(reopenedBags);
+assert.equal(bagContext.weight, 2);
+assert.equal(bagContext.groups.find(group => group.id === "container").items[0].children[0].children[0].name, "Ore");
+const bagHTML = inventoryHTML({ rootId: "nested-inventory", editable: true, system: reopenedBags.system, inventory: bagContext, workshop: { witcher: false, npc: false } });
+assert.ok(bagHTML.includes("1 / 5 кг")); assert.ok(bagHTML.includes("0.8 / 1 кг"));
+assert.equal([...bagHTML.matchAll(/data-inventory-name=/g)].length, 3);
+const legacyBag = new foundry.documents.BaseItem({ name: "Legacy bag", type: "equipment", system: { ruleId: "gear.bag" } });
+assert.equal(legacyBag.system.kind, "container"); assert.equal(legacyBag.system.capacity, 20);
+const customBag = new foundry.documents.BaseItem({ name: "Customized bag", type: "equipment", system: { ruleId: "gear.bag", kind: "gear", capacity: 0, quantity: 3 } });
+assert.equal(customBag.system.kind, "gear"); assert.equal(customBag.system.quantity, 3);
 const savedInventoryContext = inventoryContext(restoredInventory);
 const savedInventoryHTML = inventoryHTML({ rootId: "saved-inventory", editable: true, system: restoredInventory.system, inventory: savedInventoryContext, workshop: { witcher: false, npc: false } });
+const { equipmentEntry, equipmentFacets } = await import("../scripts/data/equipment-search.mjs");
+const browserEntries = [...documents.values()].filter(item => ["weapon", "armor", "equipment", "recipe"].includes(item.type)).map(equipmentEntry);
+const browserHTML = handlebars.compile(await readFile(new URL("../templates/equipment-browser.hbs", import.meta.url), "utf8"), { strict: true })({ entries: browserEntries, facets: equipmentFacets(browserEntries), hintKey: "Каталог" });
+assert.ok(browserHTML.includes('value="shield"')); assert.ok(browserHTML.includes('data-equipment-filter="priceMax"'));
 assert.equal(savedInventoryContext.groups.flatMap(group => group.items).length, 2);
 assert.equal([...savedInventoryHTML.matchAll(/data-inventory-quantity /g)].length, 2);
 assert.ok(savedInventoryHTML.includes("ПБ 8 / 12"));

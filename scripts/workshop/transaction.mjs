@@ -33,5 +33,6 @@ export function copyPhysical(source, quantity = 1) {
   const data = game.items.fromCompendium(source, { clearFolder: true, keepId: false });
   delete data._id;
   data.system.quantity = quantity; data.system.carried = true; data.system.equipped = false;
+  data.system.containerId = "";
   return data;
 }

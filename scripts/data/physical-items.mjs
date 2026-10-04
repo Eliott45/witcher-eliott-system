@@ -1,15 +1,17 @@
 import { effectiveItem } from "./workshop.mjs";
+import { isCarried, containerParent } from "./containers.mjs";
 export const PHYSICAL_TYPES = ["equipment", "weapon", "armor", "recipe"];
 export const isPhysical = item => PHYSICAL_TYPES.includes(item.type);
 export const ARMOR_ZONES = [{ id: "head", name: "Голова", icon: "fa-helmet-safety" }, { id: "torso", name: "Корпус / руки", icon: "fa-shirt" }, { id: "legs", name: "Ноги", icon: "fa-person-walking" }];
 export const RARITIES = [{ id: "everywhere", name: "Повсеместное" }, { id: "common", name: "Обычное" }, { id: "rare", name: "Редкое" }, { id: "unique", name: "Уникальное" }];
-export const EQUIPMENT_KINDS = [{ id: "gear", name: "Снаряжение" }, { id: "tool", name: "Инструменты" }, { id: "ammunition", name: "Боеприпасы" }, { id: "companion", name: "Компаньон" }, { id: "material", name: "Материалы" }, { id: "alchemy", name: "Алхимия" }, { id: "upgrade", name: "Улучшения" }, { id: "mutagen", name: "Мутагены" }];
+export const EQUIPMENT_KINDS = [{ id: "gear", name: "Снаряжение" }, { id: "tool", name: "Инструменты" }, { id: "container", name: "Контейнеры" }, { id: "ammunition", name: "Боеприпасы" }, { id: "companion", name: "Компаньон" }, { id: "material", name: "Материалы" }, { id: "alchemy", name: "Алхимия" }, { id: "upgrade", name: "Улучшения" }, { id: "mutagen", name: "Мутагены" }];
+export const itemWeight = item => item.system.kind === "companion" ? 0 : (effectiveItem(item).weight ?? 0) * (item.system.quantity ?? 1);
 export function carriedWeight(items = []) {
-  return Math.round(Array.from(items).filter(item => isPhysical(item) && item.system.carried !== false && item.system.kind !== "companion")
-    .reduce((sum, item) => sum + (effectiveItem(item).weight ?? 0) * (item.system.quantity ?? 1), 0) * 1000) / 1000;
+  const all = Array.from(items);
+  return Math.round(all.filter(item => isPhysical(item) && isCarried(item, all)).reduce((sum, item) => sum + itemWeight(item), 0) * 1000) / 1000;
 }
 export const conditionKey = item => item.type === "weapon" ? "reliability" : item.type === "armor" ? "stoppingPower" : null;
-export const equippedItems = items => Array.from(items ?? []).filter(item => isPhysical(item) && item.system.equipped && item.system.carried && item.system.quantity > 0);
+export const equippedItems = items => Array.from(items ?? []).filter(item => isPhysical(item) && item.system.equipped && isCarried(item, items) && !containerParent(item, items) && item.system.quantity > 0);
 export function armorEncumbrance(items, reduction = 0) {
   return Math.max(0, equippedItems(items).reduce((sum, item) => sum + (item.system.encumbrance ?? 0), 0) + reduction);
 }
