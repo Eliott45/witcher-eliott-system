@@ -1,6 +1,6 @@
 <header class="witcher-magic-heading"><div><span class="witcher-magic-eyebrow">Искусство управлять хаосом</span><h2>Книга магии <small data-magic-count>{{magic.count}}</small></h2></div><div><button type="button" data-action="browseSpells"><i class="fa-solid fa-magnifying-glass"></i> Каталог</button><button type="button" data-action="createSpell" title="Создать своё заклинание" aria-label="Создать своё заклинание" {{disabled (not editable)}}><i class="fa-solid fa-plus"></i></button></div></header>
 <div class="witcher-magic-dashboard">
-  <div><span>Сотворение</span><strong>{{magic.casting}}</strong><small>Воля + навык + бонусы</small></div>
+  <div><span>Сотворение</span><strong>{{magic.casting}}</strong><small>Ритуалы {{magic.ritualCasting}} · Порчи {{magic.hexCasting}}</small><small>Воля + навык + бонусы</small></div>
   <div><span>Выносливость</span><strong>{{magic.stamina}} <small>/ {{magic.staminaMax}}</small></strong><small>Запас сил</small></div>
   <div class="witcher-magic-capacity"><span>Магия за раунд {{#if magic.combat}}{{magic.round}}{{/if}}</span><strong>{{magic.spent}} <small>/ {{magic.vigor}}</small></strong><div class="witcher-magic-meter" role="meter" aria-label="Расход магии за раунд" aria-valuenow="{{magic.spent}}" aria-valuemin="0" aria-valuemax="{{magic.vigor}}"><span style="width:{{magic.percent}}%"></span></div><small>До перегрузки: {{magic.remaining}}</small></div>
 </div>

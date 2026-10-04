@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
-import {CORE_SPELLS,CORE_INVOCATIONS,spellSources,spellFolders,spellRange,spellDuration,SPELL_ELEMENTS,SPELL_GRADES} from "../scripts/data/spells.mjs";
-import {castingCost,focusOptions,magicFumble,roundSpent,magicRoundKey} from "../scripts/magic/rules.mjs";
+import {CORE_MAGIC,CORE_SIGNS,CORE_RITUALS,CORE_HEXES,CORE_SPELLS,CORE_INVOCATIONS,spellSources,spellFolders,spellRange,spellDuration,SPELL_ELEMENTS,SPELL_GRADES} from "../scripts/data/spells.mjs";
+import {castingCost,focusOptions,magicFumble,roundSpent,magicRoundKey,maintenanceCost,ritualDifficulty,signPotency,hexIdentification} from "../scripts/magic/rules.mjs";
+import {prepareMagicResult} from "../scripts/chat/magic-result.mjs";
 import {castSpell,castingQuote,learnSpell,endConcentration,resetMagicRound} from "../scripts/magic/casting.mjs";
 import {deriveStatistics,ATTRIBUTE_KEYS} from "../scripts/data/statistics.mjs";
 const SYS="witcher-eliott-system";
@@ -10,22 +11,23 @@ function fixture() {
   const events=[],messages=[];
   const actor={isOwner:true,uuid:"Actor.magic",id:"mage",effects:[],items:[],system:{
     attributes:Object.fromEntries(ATTRIBUTE_KEYS.map(key=>[key,8])),health:{value:40,max:40},stamina:{value:40,max:40},vigor:20,
-    skills:{spellCasting:6},abilityState:{},details:{profession:"mage"},magic:{roundKey:"",spent:0,sustainedId:"",maintainedRound:""}}};
+    skills:{spellCasting:6,ritualCrafting:4,hexWeaving:3},abilityState:{},details:{profession:"mage"},magic:{roundKey:"",spent:0,sustainedId:"",maintainedRound:"",sustainedCost:0}}};
   Object.defineProperty(actor.system,"statistics",{get(){return deriveStatistics(actor.system,{items:actor.items});}});
   actor.items.get=id=>actor.items.find(item=>item.id===id);
   actor.update=async changes=>{events.push("update");for(const [path,value]of Object.entries(changes)){const keys=path.split('.');let at=actor;for(const k of keys.slice(0,-1))at=at[k];at[keys.at(-1)]=value;}};
   actor.toggleStatusEffect=async id=>{events.push(id);actor.effects.push({id,statuses:new Set([id])});};
   actor.createEmbeddedDocuments=async(_type,sources)=>sources.map((source,index)=>{const item={...source,id:`owned${actor.items.length+index}`,parent:actor};actor.items.push(item);return item;});
-  const source=id=>{const row=[...CORE_SPELLS,...CORE_INVOCATIONS].find(entry=>entry.id===(id.startsWith("invocation.")?id:`spell.${id}`));return {id:row.documentId,name:row.name,type:"spell",uuid:`Compendium.spells.Item.${row.documentId}`,system:structuredClone(row.system),testUserPermission:()=>true,toObject(){return {name:this.name,type:this.type,system:structuredClone(this.system),folder:"old"};}};};
+  const source=id=>{const row=CORE_MAGIC.find(entry=>entry.id===(id.includes(".")?id:`spell.${id}`));return {id:row.documentId,name:row.name,type:"spell",uuid:`Compendium.spells.Item.${row.documentId}`,system:structuredClone(row.system),testUserPermission:()=>true,toObject(){return {name:this.name,type:this.type,system:structuredClone(this.system),folder:"old"};}};};
   const spell=id=>{const entry=source(id);entry.parent=actor;actor.items.push(entry);return entry;};
-  const state={severity:0,cancel:false,mode:"public"};
+  const state={severity:0,cancel:false,mode:"public",total:20,percent:50};
+  const message=data=>{const msg={...data,updateSource(changes){if(changes.flavor)this.flavor=changes.flavor;if(changes[`flags.${SYS}.magicCast`])this.flags[SYS].magicCast=changes[`flags.${SYS}.magicCast`];}};prepareMagicResult(msg);messages.push(msg);return msg;};
   globalThis.game={combat:null,user:{id:"player"},settings:{get:()=>state.mode},i18n:{localize:key=>key,format:(_key,data)=>JSON.stringify(data)}};
   globalThis.ui={notifications:{error:message=>events.push(message)}};
   globalThis.foundry={applications:{ux:{TextEditor:{implementation:{enrichHTML:async html=>html}}}},
     dice:{Roll:class{constructor(formula){this.formula=formula;this.dice=[{options:{[SYS]:{criticalChains:state.severity?[{kind:"fumble",total:-state.severity}]:[]}}}];}
-      async evaluate(options){events.push("roll");this.options=options;return this;}
-      async toMessage(data,options){events.push("message");if(state.cancel)return null;const message={...data,options,roll:this};messages.push(message);return message;}}},
-    documents:{ChatMessage:{getSpeaker:({actor})=>({actor:actor.id}),applyMode:(data,mode)=>({...data,mode}),create:async data=>{events.push("message");messages.push(data);return data;}}}};
+      async evaluate(options){events.push("roll");this.options=options;this.total=this.formula==="1d100"?state.percent:state.total;return this;}
+      async toMessage(data,options){events.push("message");if(state.cancel)return null;return message({...data,options,roll:this,rolls:[this]});}}},
+    documents:{ChatMessage:{getSpeaker:({actor})=>({actor:actor.id}),applyMode:(data,mode)=>({...data,mode}),create:async data=>{events.push("message");return state.cancel?null:message({...data,rolls:data.rolls??[]});}}}};
   return {actor,spell,source,state,events,messages};
 }
 
@@ -51,7 +53,7 @@ test("28 invocations share the catalog, with deity, graded folders, alternate ra
   assert.equal(CORE_INVOCATIONS.length,28);
   assert.deepEqual(Object.keys(SPELL_GRADES).map(grade=>CORE_INVOCATIONS.filter(s=>s.system.grade===grade).length),[12,6,4,6]);
   const sources=spellSources(),folders=spellFolders();
-  assert.equal(new Set(sources.map(s=>s._id)).size,93);assert.equal(new Set(sources.map(s=>s.system.ruleId)).size,93);
+  assert.equal(new Set(sources.map(s=>s._id)).size,124);assert.equal(new Set(sources.map(s=>s.system.ruleId)).size,124);
   assert.equal(new Set(folders.map(f=>f._id)).size,folders.length);
   for(const f of folders){assert.match(f._id,/^[a-zA-Z0-9]{16}$/);if(f.folder)assert.ok(folders.some(parent=>parent._id===f.folder));}
   for(const inv of CORE_INVOCATIONS){assert.equal(inv.system.element,"mixed");assert.ok(inv.system.page>=110&&inv.system.page<=113);if(inv.system.grade==="archpriest")assert.ok(inv.system.deity);}
@@ -155,6 +157,80 @@ test("a focus cannot be spoofed by its ID and variable costs must be set explici
   assert.throws(()=>castingQuote(actor,item),/стоимость|Стоимость/);
   assert.throws(()=>castingQuote(actor,item,{cost:2,focusId:"unknown"}),/не экипирован/);
   assert.equal(castingQuote(actor,item,{cost:2}).stamina,2);
+});
+
+test("31 additions have distinct kinds, structured ritual reagents and complete lifting conditions",()=>{
+  assert.equal(CORE_SIGNS.length,10);assert.equal(CORE_RITUALS.length,15);assert.equal(CORE_HEXES.length,6);
+  for(const s of CORE_SIGNS){assert.equal(s.system.kind,"sign");assert.equal(s.system.costMax,7);}
+  assert.deepEqual(CORE_RITUALS.map(s=>s.system.ritual.preparationRounds),[5,5,5,5,5,5,5,5,5,10,10,10,10,10,10]);
+  assert.equal(CORE_RITUALS.find(s=>s.id==="ritual.telecommunication").system.ritual.components[0].consumed,false);
+  assert.deepEqual(CORE_HEXES.map(s=>s.system.hex.danger),["low","low","medium","medium","high","high"]);
+  for(const s of CORE_HEXES)assert.ok(s.system.hex.lifting.length>80);
+  assert.deepEqual(hexIdentification("high"),[26,22]);
+});
+
+test("sign tiers cap at seven, allow confirmed overload and record chosen power independently of focus",async()=>{
+  const {actor,spell,messages}=fixture();actor.system.vigor=2;
+  const item=spell("sign.igni");
+  for(const cost of [0,8,1.5])await assert.rejects(castSpell(actor,item.id,{cost,allowOverexertion:true}),/Стоимость/);
+  await assert.rejects(castSpell(actor,item.id,{cost:3}),/Подтвердите/);
+  await castSpell(actor,item.id,{cost:3,allowOverexertion:true});
+  assert.equal(actor.system.stamina.value,37);assert.equal(actor.system.health.value,35);
+  assert.match(messages[0].flavor,/Урон: 3d6/);
+  assert.match(signPotency(spell("sign.yrden").system,7),/−4/);
+});
+
+test("variable sign upkeep survives reopening and charges initial cost or half rounded down",async()=>{
+  for(const [name,cost,upkeep] of [["active-shield",5,5],["firestream",5,2],["firestream",1,1]]) {
+    const {actor,spell}=fixture();game.combat={id:"signs",started:true,round:1};
+    const item=spell(`sign.${name}`);await castSpell(actor,item.id,{cost});
+    actor.system.magic=JSON.parse(JSON.stringify(actor.system.magic));assert.equal(actor.system.magic.sustainedCost,cost);
+    assert.equal(maintenanceCost(item.system,cost),upkeep);game.combat.round=2;
+    await castSpell(actor,item.id,{maintenance:true});assert.equal(actor.system.stamina.value,40-cost-upkeep);
+    await endConcentration(actor);assert.equal(actor.system.magic.sustainedCost,0);
+  }
+});
+
+test("rituals use Ritual Crafting, preparation and helpers, with their own fumble damage",async()=>{
+  const {actor,spell,state,events,messages}=fixture(),item=spell("ritual.hydromancy");
+  await assert.rejects(castSpell(actor,item.id),/подготовки/);assert.deepEqual(events,[]);
+  assert.throws(()=>ritualDifficulty(item.system,{helpers:5}),/помощников/);
+  state.severity=9;state.total=10;
+  await castSpell(actor,item.id,{prepared:true,dc:18,helpers:4});
+  assert.equal(messages[0].roll.formula,"1d10wc + 12");
+  assert.equal(messages[0].flags[SYS].magicCast.difficulty.target,14);
+  assert.equal(actor.system.health.value,35,"Ritual fumble causes damage equal to STA cost, not the fumble die");
+  assert.equal(actor.system.stamina.value,35);assert.equal(actor.effects.length,0);assert.equal(actor.system.magic.sustainedId,"");
+  assert.match(messages[0].flavor,/Ритуал не удался/);assert.match(messages[0].flavor,/Ингредиенты учитываются вручную/);
+});
+
+test("ritual difficulty resolves from Luck-adjusted persisted result, including exact DC",()=>{
+  const cast={kind:"ritual",difficulty:{base:18,helpers:3,target:15},maintenance:false};
+  const message={flags:{[SYS]:{magicCast:cast,luck:{bonus:4}}},rolls:[{total:15}],flavor:"cast",
+    updateSource(changes){this.flavor=changes.flavor;this.flags[SYS].magicCast=changes[`flags.${SYS}.magicCast`];}};
+  prepareMagicResult(message);assert.equal(message.flags[SYS].magicCast.succeeded,true);assert.match(message.flavor,/15 ≥ 15/);
+  const flavor=message.flavor;prepareMagicResult(message);assert.equal(message.flavor,flavor);
+});
+
+test("telecommunication has no skill die or Luck expense, requires preparation and preserves its device",async()=>{
+  const {actor,spell,events,messages}=fixture();
+  await castSpell(actor,spell("ritual.telecommunication").id,{prepared:true});
+  assert.equal(actor.system.stamina.value,37);assert.equal(events.includes("roll"),false);
+  assert.equal(messages[0].flags[SYS].skipLuck,true);assert.equal(messages[0].flags[SYS].magicCast.succeeded,true);
+  assert.match(messages[0].flavor,/Телекоммуникатор ×1 \(сохраняется\)/);
+});
+
+test("hex fumbles use a separate percentage die and never regular fumble damage or elemental effects",async()=>{
+  for(const [percent,reflected]of [[1,true],[50,true],[51,false],[100,false]]){
+    const {actor,spell,state,messages}=fixture();state.severity=26;state.percent=percent;
+    await castSpell(actor,spell("hex.shadows").id);
+    const message=messages[0];assert.equal(message.rolls.length,2);assert.equal(message.rolls[0].formula,"1d10wc + 11");
+    assert.equal(message.rolls[1].formula,"1d100");assert.equal(message.flags[SYS].magicCast.reflected,reflected);
+    assert.equal(actor.system.health.value,40);assert.equal(actor.effects.length,0);assert.equal(actor.system.stamina.value,36);
+    assert.equal(message.flags[SYS].skipLuck,undefined,"Only the primary skill roll receives native selected Luck");
+  }
+  const {actor,spell,state,messages}=fixture();state.total=2;
+  await castSpell(actor,spell("hex.shadows").id);assert.equal(messages[0].rolls.length,1,"Ordinary failure never rolls backlash");
 });
 
 test("magic consequences wait for both chat and Dice So Nice, and display listeners are released",async()=>{

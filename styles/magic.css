@@ -42,7 +42,7 @@
 .witcher-spell-body dl>div { display:flex; gap:6px; justify-content:space-between; }
 .witcher-spell-body dt { color:#766247; font-size:11px; text-shadow:none; }
 .witcher-spell-card .witcher-spell-body .witcher-description { color:var(--witcher-ink); font-size:12px; }
-.witcher-spell-card .witcher-spell-body dd { margin:0; text-align:right; max-width:72%; color:#3e382e; text-shadow:none; }
+.witcher-spell-body dd { margin:0; text-align:right; max-width:72%; color:#3e382e; text-shadow:none; }
 .witcher-spell-source { display:block; color:#8a7659; font-size:10px; margin-top:8px; }
 .witcher-spell-card footer { display:flex; gap:6px; border-top:1px solid #e0d5c3; padding:6px 9px; background:#e8dfcf55; }
 .witcher-spell-card footer button { flex:0 0 auto; height:27px; font-size:11px; }
@@ -61,6 +61,18 @@
 .witcher-cast-dialog output { white-space:pre-line; background:#e4d8c2; padding:14px; border-left:3px solid #927147; line-height:1.6; }
 .witcher-cast-dialog label.witcher-overload-confirm { flex-direction:row; align-items:center; color:#933b30; }
 .witcher-cast-dialog [data-cast-error] { color:#933b30; margin:0; }
+.witcher-cast-dialog .witcher-cast-confirm {flex-direction:row;align-items:center;}
+.witcher-cast-grid {display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.witcher-ritual-setup {padding:12px;border:1px solid #c7bca5;border-radius:5px;background:#f5eee0;font-size:12px;}
+.witcher-ritual-setup p {margin:8px 0;}
+.witcher-magic-requirements {border-top:1px solid #d8cbb6;margin-top:12px;padding:10px 0 0;color:#3e382e;font-size:12px;}
+.witcher-magic-requirements strong,.witcher-magic-requirements b {color:#594165;}
+.witcher-magic-requirements small {color:#705e47;}
+.witcher-ritual-component {display:flex;align-items:center;gap:8px;margin:5px 0;}
+.witcher-ritual-component span {flex:1;}
+.witcher-ritual-component button {flex:0 0 auto;}
+.witcher-spell-card[data-tradition=ritual] {--spell-accent:#876f46;}
+.witcher-spell-card[data-tradition=hex] {--spell-accent:#8a4053;}
 .witcher-cast-dialog [hidden],.witcher-spell-card[hidden],.witcher-magic-empty[hidden] { display:none; }
 .witcher-spell-info { display:flex; flex-wrap:wrap; gap:6px; color:#705a41; padding:12px; background:#e9dfcf; border-bottom:1px solid #cdb997; font-size:12px; }
 .witcher-magic-chat h3 { font-size:17px; margin:5px 0; }

@@ -7,7 +7,7 @@ export function registerSpellContentMigration() {
 
 /** Append only missing canonical records; preserve imported copies, custom writing and pack locks. */
 export async function migrateSpellContent() {
-  if(game.user!==game.users.activeGM||game.settings.get(SYSTEM_ID,"spellContentVersion")>=1)return;
+  if(game.user!==game.users.activeGM||game.settings.get(SYSTEM_ID,"spellContentVersion")>=2)return;
   const pack=game.packs.get(`${SYSTEM_ID}.spells`);
   if(!pack)return;
   const index=await pack.getIndex({fields:["system.ruleId"]});
@@ -24,8 +24,8 @@ export async function migrateSpellContent() {
       // Parents must exist before their children; normal entries retain their existing folders.
       for(const folder of createFolders)await foundry.documents.Folder.implementation.createDocuments([folder],{pack:pack.collection,keepId:true});
       const created=await foundry.documents.Item.implementation.createDocuments(missing,{pack:pack.collection,keepId:true});
-      if(created.length!==missing.length)throw new Error("Добавлены не все инвокации; обновление повторится при следующем входе мастера.");
+      if(created.length!==missing.length)throw new Error("Добавлена не вся магия; обновление повторится при следующем входе мастера.");
     }finally {if(locked)await pack.configure({locked:true});}
   }
-  await game.settings.set(SYSTEM_ID,"spellContentVersion",1);
+  await game.settings.set(SYSTEM_ID,"spellContentVersion",2);
 }

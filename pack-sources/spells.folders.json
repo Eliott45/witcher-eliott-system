@@ -118,5 +118,85 @@
     "sort": 0,
     "color": "#805c89",
     "flags": {}
+  },
+  {
+    "_id": "magsig0000000000",
+    "name": "Ведьмачьи знаки",
+    "type": "Item",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "magsignovice0000",
+    "name": "Новичок",
+    "type": "Item",
+    "folder": "magsig0000000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "magsigjourneyman",
+    "name": "Подмастерье",
+    "type": "Item",
+    "folder": "magsig0000000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "magrit0000000000",
+    "name": "Ритуалы",
+    "type": "Item",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "magritnovice0000",
+    "name": "Новичок",
+    "type": "Item",
+    "folder": "magrit0000000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "magritjourneyman",
+    "name": "Подмастерье",
+    "type": "Item",
+    "folder": "magrit0000000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "magritmaster0000",
+    "name": "Мастер",
+    "type": "Item",
+    "folder": "magrit0000000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "maghex0000000000",
+    "name": "Порчи",
+    "type": "Item",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
   }
 ]

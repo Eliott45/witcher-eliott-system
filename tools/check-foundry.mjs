@@ -472,7 +472,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["magic", "magic-filters", "magic-spells", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -506,18 +506,20 @@ sheet.isEditable = true;
 const html = template(await sheet._prepareContext({}));
 // A new optional magic state round-trips on old/new actors without touching old resources.
 assert.equal(legacyActorData.magic.spent,0);
-const magicRoundTrip = new WitcherActorData({...legacyActorData.toObject(),magic:{roundKey:"combat:2",spent:7,sustainedId:"spell00000000001",maintainedRound:"combat:2"}});
+const magicRoundTrip = new WitcherActorData({...legacyActorData.toObject(),magic:{roundKey:"combat:2",spent:7,sustainedId:"spell00000000001",maintainedRound:"combat:2",sustainedCost:5}});
 const magicRestored = new WitcherActorData(JSON.parse(JSON.stringify(magicRoundTrip.toObject())));
 assert.equal(magicRestored.magic.spent,7);assert.equal(magicRestored.health.value,legacyActorData.health.value);
 assert.equal(magicRestored.magic.sustainedId,"spell00000000001");
+assert.equal(magicRestored.magic.sustainedCost,5);assert.equal(legacyActorData.magic.sustainedCost,0);
 const {spellSources:magicSources}=await import("../scripts/data/spells.mjs");
 const nativeSpell = new foundry.documents.BaseItem(magicSources()[0]);
 const restoredSpell = new foundry.documents.BaseItem(JSON.parse(JSON.stringify(nativeSpell.toObject())));
 assert.equal(restoredSpell.system.duration.maintenance,2);
 assert.deepEqual(Array.from(restoredSpell.system.defense),["none"]);
 assert.equal(restoredSpell.type,"spell");
-const legacySpellSource=nativeSpell.toObject();delete legacySpellSource.system.tradition;
+const legacySpellSource=nativeSpell.toObject();delete legacySpellSource.system.tradition;delete legacySpellSource.system.kind;
 assert.equal(new foundry.documents.BaseItem(legacySpellSource).system.tradition,"mage","Existing spells default to mage without a migration");
+assert.equal(new foundry.documents.BaseItem(legacySpellSource).system.kind,"spell");
 const nativeInvocation=new foundry.documents.BaseItem(magicSources().find(s=>s.system.ruleId==="invocation.healing-rest"));
 const reopenedInvocation=new foundry.documents.BaseItem(JSON.parse(JSON.stringify(nativeInvocation.toObject())));
 assert.equal(reopenedInvocation.system.deity,"Мелитэле");assert.equal(reopenedInvocation.system.duration.kind,"days");
@@ -531,6 +533,19 @@ assert.equal(spellItemContext(nativeSpell,true).groups[0].fields.find(f=>f.key==
 const invocationHTML=magicOnlyTemplate({magic:await magicContext({...magicActor,items:[reopenedInvocation]}),editable:true});
 assert.match(invocationHTML,/Целительный покой/);assert.match(invocationHTML,/Мелитэле/);assert.match(invocationHTML,/1 день/);
 assert.match(invocationHTML,/data-magic-tradition/);
+const expandedMagic=magicSources().filter(s=>s.system.kind).map(source=>new foundry.documents.BaseItem(JSON.parse(JSON.stringify(new foundry.documents.BaseItem(source).toObject()))));
+assert.equal(expandedMagic.length,31);
+for(const item of expandedMagic){
+  const context=spellItemContext(item,true);assert.equal(context.isRitual,item.system.kind==="ritual");
+  const rendered=magicOnlyTemplate({magic:await magicContext({...magicActor,items:[item]}),editable:true});
+  assert.ok(rendered.includes(item.name));
+  if(context.isRitual){assert.match(rendered,/Подготовка/);assert.ok(context.groups[0].fields.some(f=>f.key==="ritual.dc"));}
+  if(context.isHex)assert.match(rendered,/Снятие порчи/);
+}
+const shield=expandedMagic.find(item=>item.system.ruleId==="sign.active-shield");
+assert.equal(shield.system.duration.maintenanceMode,"fullCost");
+const communicator=expandedMagic.find(item=>item.system.ruleId==="ritual.telecommunication");
+assert.equal(communicator.system.ritual.components[0].consumed,false);
 // Render both permission levels with real service schema; native browser host is stubbed above.
 const { WitcherServicesSheet } = await import("../scripts/sheets/witcher-services-sheet.mjs");
 const servicesTemplate=handlebars.compile(await readFile(new URL("../templates/services-sheet.hbs",import.meta.url),"utf8"),{strict:true});

@@ -6,7 +6,38 @@ export function magicFields() {
   const {SchemaField,StringField,NumberField}=foundry.data.fields;
   const text=()=>new StringField({required:true,nullable:false,initial:"",blank:true});
   return new SchemaField({roundKey:text(),spent:new NumberField({required:true,nullable:false,min:0,integer:true,initial:0}),
-    sustainedId:text(),maintainedRound:text()});
+    sustainedId:text(),maintainedRound:text(),sustainedCost:new NumberField({required:true,nullable:false,min:0,integer:true,initial:0})});
+}
+
+export const castingSkill=system=>system.kind==="ritual"?"ritualCrafting":system.kind==="hex"?"hexWeaving":"spellCasting";
+export const CASTING_SKILL_LABELS={spellCasting:"Сотворение заклинаний",ritualCrafting:"Проведение ритуалов",hexWeaving:"Наведение порчи"};
+export function maintenanceCost(system,initialCost=0) {
+  if(system.duration.maintenanceMode==="fullCost")return initialCost;
+  // TODO(core p.115): no sign-specific odd-cost rounding clarification was found.
+  // Keep integer STA and the existing minimum of one; round half-cost upkeep down.
+  if(system.duration.maintenanceMode==="halfCost")return Math.max(1,Math.floor(initialCost/2));
+  return system.duration.maintenance;
+}
+export function ritualDifficulty(system,{dc=system.ritual.dc,helpers=0}={}) {
+  if(!Number.isInteger(dc)||dc<0||!Number.isInteger(helpers)||helpers<0||helpers>4)throw new Error("Укажите целую СЛ и от 0 до 4 помощников.");
+  if(system.ritual.dc===0)return {base:0,helpers:0,target:0};
+  if(dc===0)throw new Error("Для этого ритуала требуется СЛ выше 0.");
+  return {base:dc,helpers,target:Math.max(1,dc-helpers)};
+}
+export function ritualComponents(system) {return (system.ritual?.components??[]).map(c=>`${c.name} ×${c.quantity}${c.consumed?"":" (сохраняется)"}`).join("; ");}
+export function hexIdentification(danger) {return {low:[16,14],medium:[20,18],high:[26,22]}[danger]??[16,14];}
+/** Sign potency is based on the chosen cost, not the discounted inventory expense. */
+export function signPotency(system,cost) {
+  switch(system.ruleId) {
+    case "sign.yrden":return `Штраф к СКОР и РЕА: −${Math.min(4,1+Math.floor((cost-1)/2))}`;
+    case "sign.axii":return `Штраф к испытанию УСТ: −${1+Math.floor((cost-1)/2)}`;
+    case "sign.aard":case "sign.aard-sweep":return `Вероятность сбить с ног: ${10*cost}%`;
+    case "sign.igni":case "sign.firestream":return `Урон: ${cost}d6; горение ${system.ruleId==="sign.igni"?50:75}%`;
+    case "sign.quen":return `ПЗ щита: ${5*cost}; до 10 раундов`;
+    case "sign.active-shield":return `ПЗ щита: ${10*cost}; поддержание ${cost} ВЫН/раунд`;
+    case "sign.puppet":case "sign.magic-trap":return `Длительность: ${cost} раундов`;
+    default:return "";
+  }
 }
 
 /** Use one equipped focus; bonuses from multiple foci never stack (core p.167). */

@@ -22,6 +22,7 @@
   {{else}}
   {{#if description}}<div class="witcher-description">{{{description}}}</div>{{/if}}
   {{/if}}
+  {{#if spell}}<div class="witcher-spell-body">{{> "systems/witcher-eliott-system/templates/magic-requirements.hbs" spell}}</div>{{/if}}
   {{#if abilities}}
   <section aria-labelledby="{{rootId}}-abilities-title">
     <h2 id="{{rootId}}-abilities-title">{{localize "WITCHER.Sheet.RacialAbilities"}}</h2>
@@ -39,6 +40,7 @@
   {{#if hasDetails}}<section class="witcher-item-tab tab {{tabs.details.cssClass}}" data-group="item" data-tab="details">
   {{#each physicalGroups as |group|}}<fieldset class="witcher-physical-fields"><legend>{{group.title}}</legend>{{> "systems/witcher-eliott-system/templates/structured-fields.hbs" fields=group.fields}}</fieldset>{{/each}}
   {{#if spell}}<label class="witcher-physical-fields">Способы защиты (несколько)<select name="system.defense" multiple {{disabled (not editable)}}>{{#each spell.defenses}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>{{/if}}
+  {{#if spell}}{{#if spell.isRitual}}<section class="witcher-magic-requirements"><strong>Ингредиенты</strong>{{#each spell.components}}<div class="witcher-ritual-component"><span>{{name}} ×{{quantity}} {{#unless consumed}}· сохраняется{{/unless}}</span><button type="button" data-action="removeRitualComponent" data-index="{{index}}" aria-label="Удалить {{name}}" {{disabled (not ../editable)}}><i class="fa-solid fa-trash"></i></button></div>{{/each}}<button type="button" data-action="addRitualComponent" {{disabled (not editable)}}><i class="fa-solid fa-plus"></i> Добавить ингредиент</button></section>{{/if}}{{/if}}
   {{#if isAbility}}<div class="witcher-item-fields"><label>{{localize "WITCHER.Skills.Level"}}<input type="number" name="system.level" min="0" max="10" step="1" value="{{system.level}}" {{disabled (not editable)}}></label><label>{{localize "WITCHER.Skills.Attribute"}}<select name="system.attribute" {{disabled (not editable)}}>{{#each attributeChoices}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label></div>{{/if}}
   {{#if editable}}<button type="submit" class="witcher-item-save"><i class="fa-solid fa-floppy-disk"></i> {{localize "WITCHER.ItemTabs.Save"}}</button>{{/if}}
   </section>{{/if}}

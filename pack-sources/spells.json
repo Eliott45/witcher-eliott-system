@@ -3915,5 +3915,1801 @@
     },
     "sort": 0,
     "flags": {}
+  },
+  {
+    "_id": "sign000000000001",
+    "name": "Ирден",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "sign.yrden",
+      "kind": "sign",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 7,
+      "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+      "description": "<p>Круг замедляет любого, кто в него входит: −1 к СКОР и РЕА за первую ВЫН и ещё −1 за каждые 2 ВЫН сверх первой, максимум −4. Штраф действует только внутри круга. Бестелесные существа в круге становятся материальными.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "radius",
+        "value": 3
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "5",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 114; официальная errata",
+      "page": 114
+    },
+    "effects": [],
+    "folder": "magsignovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "sign000000000002",
+    "name": "Аард",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "sign.aard",
+      "kind": "sign",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 7,
+      "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+      "description": "<p>Телекинетическая волна ошеломляет цели. Вероятность сбить с ног — 10% за каждую вложенную ВЫН.</p>",
+      "grade": "novice",
+      "element": "air",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "cone",
+        "value": 2
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 114; официальная errata",
+      "page": 114
+    },
+    "effects": [],
+    "folder": "magsignovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "sign000000000003",
+    "name": "Игни",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "sign.igni",
+      "kind": "sign",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 7,
+      "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+      "description": "<p>Пламя наносит 1d6 урона за каждую вложенную ВЫН и поджигает с вероятностью 50%. Обычно поражает торс; в упор можно прицелиться в другую часть тела.</p>",
+      "grade": "novice",
+      "element": "fire",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "cone",
+        "value": 2
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "1d6",
+      "source": "Базовая книга, стр. 114; официальная errata",
+      "page": 114
+    },
+    "effects": [],
+    "folder": "magsignovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "sign000000000004",
+    "name": "Аксий",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "sign.axii",
+      "kind": "sign",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 7,
+      "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+      "description": "<p>Дезориентирует цель. Испытание УСТ получает штраф −1 за первую ВЫН и ещё −1 за каждые 2 ВЫН сверх первой. Для убеждения можно противопоставить Сотворение заклинаний Сопротивлению магии; белое свечение руки и головы цели заметно окружающим.</p>",
+      "grade": "novice",
+      "element": "water",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "distance",
+        "value": 8
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До успешного испытания УСТ"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 114; официальная errata",
+      "page": 114
+    },
+    "effects": [],
+    "folder": "magsignovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "sign000000000005",
+    "name": "Квен",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "sign.quen",
+      "kind": "sign",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 7,
+      "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+      "description": "<p>Щит получает 5 ПЗ за каждую вложенную ВЫН. Если персонаж не защитился, входящий смертельный или несмертельный урон сначала снимает ПЗ щита; остаток проходит обычную броню и сопротивления. Не защищает от неблокируемой магии и уже действующих яда, болезни или удушья. Повторный Квен возможен только после окончания предыдущего.</p>",
+      "grade": "novice",
+      "element": "earth",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "self",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "10 раундов или до разрушения щита"
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 114; официальная errata",
+      "page": 114
+    },
+    "effects": [],
+    "folder": "magsignovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "sign000000000006",
+    "name": "Магическая ловушка",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "sign.magic-trap",
+      "kind": "sign",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 7,
+      "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+      "description": "<p>Подготовка занимает 1 раунд. Каждый раунд ловушка атакует ближайшего врага проверкой ВОЛЯ + Сотворение заклинаний и наносит 3d6 урона. Союзников не атакует.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "radius",
+        "value": 3
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "По 1 раунду за вложенную ВЫН"
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "3d6",
+      "source": "Базовая книга, стр. 115; официальная errata",
+      "page": 115
+    },
+    "effects": [],
+    "folder": "magsigjourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "sign000000000007",
+    "name": "Сметающий Аард",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "sign.aard-sweep",
+      "kind": "sign",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 7,
+      "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+      "description": "<p>Сферическая волна ошеломляет всё в зоне и с вероятностью 10% за каждую вложенную ВЫН сбивает с ног. Попавшие под знак летающие существа падают на землю.</p>",
+      "grade": "journeyman",
+      "element": "air",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "radius",
+        "value": 4
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 115; официальная errata",
+      "page": 115
+    },
+    "effects": [],
+    "folder": "magsigjourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "sign000000000008",
+    "name": "Марионетка",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "sign.puppet",
+      "kind": "sign",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 7,
+      "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+      "description": "<p>Заставляет противника сражаться за заклинателя. Каждый раунд цель может повторять Сопротивление магии против результата сотворения, чтобы освободиться.</p>",
+      "grade": "journeyman",
+      "element": "water",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "distance",
+        "value": 8
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "По 1 раунду за вложенную ВЫН или до освобождения"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 115; официальная errata",
+      "page": 115
+    },
+    "effects": [],
+    "folder": "magsigjourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "sign000000000009",
+    "name": "Активный щит",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "sign.active-shield",
+      "kind": "sign",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 7,
+      "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+      "description": "<p>Щит имеет 10 ПЗ за вложенную ВЫН и защищает заклинателя и ещё одну тесно прижавшуюся цель. Не пропускает материальные объекты, пока цел; бегать нельзя. При прекращении отталкивает всё рядом, включая союзников, на 2 м и наносит 1d6 урона в торс. Закреплённые объекты и цели тяжелее 226 кг не отлетают, но получают урон.</p>",
+      "grade": "journeyman",
+      "element": "earth",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "self",
+        "value": 0
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 0,
+        "maintenanceMode": "fullCost",
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "1d6",
+      "source": "Базовая книга, стр. 115; официальная errata",
+      "page": 115
+    },
+    "effects": [],
+    "folder": "magsigjourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "sign000000000010",
+    "name": "Огненный поток",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "sign.firestream",
+      "kind": "sign",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 7,
+      "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+      "description": "<p>Постоянная струя пламени наносит 1d6 урона за вложенную ВЫН; вероятность поджечь — 75%. В свой ход можно сменить цель или прицелиться в часть тела. Каждый следующий раунд требует половины исходной стоимости.</p>",
+      "grade": "journeyman",
+      "element": "fire",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "distance",
+        "value": 3
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 0,
+        "maintenanceMode": "halfCost",
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "1d6",
+      "source": "Базовая книга, стр. 115; официальная errata",
+      "page": 115
+    },
+    "effects": [],
+    "folder": "magsigjourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000001",
+    "name": "Ритуал очищения",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.cleansing",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 12,
+        "alternateDC": 18,
+        "dcHint": "12 — алкоголь и наркотики; 15 — яды и масла; 18 — тяжёлые болезни",
+        "preparationRounds": 5,
+        "requirements": "",
+        "components": [
+          {
+            "name": "Листья балиссы",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Вороний глаз",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Мелок",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Омела",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Крепкий алкоголь",
+            "quantity": 1,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Очищает одну цель от алкоголя и наркотиков (СЛ 12), ядов и масел (15), тяжёлых болезней (18). Не излечивает эпидемии вроде Бича Катрионы.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 117; официальная errata",
+      "page": 117
+    },
+    "effects": [],
+    "folder": "magritnovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000002",
+    "name": "Гидромантия",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.hydromancy",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 15,
+        "alternateDC": 18,
+        "dcHint": "15 — прошлое; 18 — настоящее",
+        "preparationRounds": 5,
+        "requirements": "Небольшая водная поверхность или чаша воды.",
+        "components": [
+          {
+            "name": "Лунная крошка",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Пятая эссенция",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Лепестки белого мирта",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Жемчуг",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Плод берберки",
+            "quantity": 1,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>На водной глади показывает происходящие сейчас или произошедшие за последние два дня события. Настоящее требует СЛ 18, прошлое — 15. Наблюдающий за целью маг может заметить слежку Магическими познаниями против результата ритуала.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 117; официальная errata",
+      "page": 117
+    },
+    "effects": [],
+    "folder": "magritnovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000003",
+    "name": "Магическое сообщение",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.magic-message",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 12,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 5,
+        "requirements": "Вместо обычных ингредиентов можно использовать 1 совершенный самоцвет (не необработанный).",
+        "components": [
+          {
+            "name": "Пятая эссенция",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Стекло",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Ртутный раствор",
+            "quantity": 1,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Записывает сообщение длиной до 5 минут в самоцвет или стекло с магическим символом. Можно задать до трёх условий воспроизведения. При срабатывании появляется говорящий образ заклинателя; новая активация снова воспроизводит запись. Совершенный самоцвет делает образ неотличимым от присутствующего рядом человека.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "permanent",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 117; официальная errata",
+      "page": 117
+    },
+    "effects": [],
+    "folder": "magritnovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000004",
+    "name": "Пиромантия",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.pyromancy",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 15,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 5,
+        "requirements": "Небольшой огонь.",
+        "components": [
+          {
+            "name": "Пятая эссенция",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Пепел",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Calcium equum",
+            "quantity": 5,
+            "consumed": true
+          },
+          {
+            "name": "Вороний глаз",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Воск",
+            "quantity": 2,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>В пламени показывает события настоящего; прошлого не показывает. Маг в месте наблюдения может обнаружить слежку Магическими познаниями против результата ритуала.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 5,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 117; официальная errata",
+      "page": 117
+    },
+    "effects": [],
+    "folder": "magritnovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000005",
+    "name": "Ритуал жизни",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.life",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 15,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 5,
+        "requirements": "",
+        "components": [
+          {
+            "name": "Мелок",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Пепел",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Воск",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Корень мандрагоры",
+            "quantity": 2,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Создаёт круг: первая вошедшая цель восстанавливает по 3 ПЗ в ход в течение 10 раундов, пока остаётся внутри. После выхода цели круг исчезает.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "Одно использование"
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 117; официальная errata",
+      "page": 117
+    },
+    "effects": [],
+    "folder": "magritnovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000006",
+    "name": "Магический ритуал",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.magic-circle",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 15,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 5,
+        "requirements": "",
+        "components": [
+          {
+            "name": "Мелок",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Стекло",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Сера",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Дымная пыль",
+            "quantity": 1,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Первая магически одарённая цель, вошедшая в круг и сосредоточившаяся, получает на 5 часов бонус к Энергии, равный половине уровня Проведения ритуалов заклинателя. Вместо этого круг можно истощить, получив 1d6/2 единиц пятой эссенции.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "Одно использование"
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 117; официальная errata",
+      "page": 117
+    },
+    "effects": [],
+    "folder": "magritnovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000007",
+    "name": "Сосуд заклятия",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.spell-jar",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 15,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 5,
+        "requirements": "",
+        "components": [
+          {
+            "name": "Речная глина",
+            "quantity": 5,
+            "consumed": true
+          },
+          {
+            "name": "Пятая эссенция",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Нитки",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Мелок",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Воск",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Волокна хана",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Дымная пыль",
+            "quantity": 1,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Запечатанный глиняный сосуд удерживает магический вихрь 1d6 дней. При разбивании бросьте 1d10/2: 1 — Тюрьма Тальфрина, 2 — Зефир, 3 — Танио Ильхар, 4 — Туман Дормина, 5 — Статическая буря.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "days",
+        "formula": "1d6",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 118; официальная errata",
+      "page": 118
+    },
+    "effects": [],
+    "folder": "magritnovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000008",
+    "name": "Спиритический сеанс",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.seance",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 12,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 5,
+        "requirements": "Место захоронения и кровь умершего или его родственника.",
+        "components": [
+          {
+            "name": "Корень мандрагоры",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Грибы-шибальцы",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Аконит",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Сера",
+            "quantity": 2,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>На месте захоронения вызывает дух с памятью и разумом умершего, включая воспоминания о смерти; также зовёт погребённых в пределах 20 м родственников. Дух уходит добровольно или после уничтожения. Он может овладеть телом через Сотворение против Сопротивления магии; жертва повторяет защиту каждые 1d6 раундов. Против чуждых ей поступков защита получает +5, против смертельно опасных — +10.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "permanent",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 118; официальная errata",
+      "page": 118
+    },
+    "effects": [],
+    "folder": "magritnovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000009",
+    "name": "Телекоммуникация",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.telecommunication",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 0,
+        "alternateDC": 0,
+        "dcHint": "Проверка не требуется",
+        "preparationRounds": 5,
+        "requirements": "",
+        "components": [
+          {
+            "name": "Телекоммуникатор",
+            "quantity": 1,
+            "consumed": false
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Связывает владельцев телекоммуникаторов в любых точках Континента. Оба собеседника проводят ритуал; проверка не требуется. Телекоммуникатор сохраняется после использования.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "hours",
+        "formula": "1",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 118; официальная errata",
+      "page": 118
+    },
+    "effects": [],
+    "folder": "magritnovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000010",
+    "name": "Освящение",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.consecration",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 18,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 10,
+        "requirements": "",
+        "components": [
+          {
+            "name": "Пятая эссенция",
+            "quantity": 5,
+            "consumed": true
+          },
+          {
+            "name": "Дымная пыль",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Мелок",
+            "quantity": 4,
+            "consumed": true
+          },
+          {
+            "name": "Серебро или метеорит",
+            "quantity": 5,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Круг радиусом до 10 м отталкивает чудовищ. Для входа или выхода они проходят Сопротивление магии против результата ритуала. Внутри не действуют заклинания, создаваемые чудовищами; магические снаряды не останавливаются. Для уязвимых к серебру чудовищ используют серебро, для уязвимых к метеориту — метеорит.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 12,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До рассеивания"
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 118; официальная errata",
+      "page": 118
+    },
+    "effects": [],
+    "folder": "magritjourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000011",
+    "name": "Магический барьер",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.magic-barrier",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 18,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 10,
+        "requirements": "",
+        "components": [
+          {
+            "name": "Пятая эссенция",
+            "quantity": 5,
+            "consumed": true
+          },
+          {
+            "name": "Дымная пыль",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Мелок",
+            "quantity": 4,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Материальный барьер диаметром 10 м имеет 50 ПЗ. В свой ход заклинатель может восстанавливать по 5 ПЗ барьера за 1 ВЫН. Воздух внутри обновляется; при отключении обновления его хватает на 20 раундов минус 1 за каждого дополнительного персонажа. Бестелесные существа и телепортация проходят барьер.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 10,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 118; официальная errata",
+      "page": 118
+    },
+    "effects": [],
+    "folder": "magritjourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000012",
+    "name": "Онейромантия",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.oneiromancy",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 15,
+        "alternateDC": 18,
+        "dcHint": "15 — прошлое; 18 — настоящее",
+        "preparationRounds": 10,
+        "requirements": "Место, где можно спать.",
+        "components": []
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Сон раскрывает тайны прошлого (СЛ 15) или настоящего (18). Слежка обнаруживается как при Гидромантии. Можно разделить сон с числом участников, равным уровню Проведения ритуалов: они должны искренне ответить на личные вопросы заклинателя.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 8,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 118; официальная errata",
+      "page": 118
+    },
+    "effects": [],
+    "folder": "magritjourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000013",
+    "name": "Артефактная компрессия",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.artifact-compression",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 18,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 10,
+        "requirements": "",
+        "components": [
+          {
+            "name": "Совершенный самоцвет",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Пятая эссенция",
+            "quantity": 5,
+            "consumed": true
+          },
+          {
+            "name": "Дымная пыль",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Речная глина",
+            "quantity": 4,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Сжимает существо в пределах 10 м до 1/10 размера и заключает в нефрит. Цель без сознания, не стареет; Стойкость СЛ 15 спасает от 6d6 урона в торс при превращении. У фигурки 1/5 максимальных ПЗ цели с округлением вверх: 0 ПЗ или потеря головы означает смерть без стабилизации. Сила СЛ 14 либо 5 урона отламывают конечность; при возвращении утрата и последствия сохраняются. После декомпрессии цель дезориентирована до успешного испытания УСТ.</p>",
+      "grade": "master",
+      "element": "mixed",
+      "cost": 16,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До отмены"
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 119; официальная errata",
+      "page": 119
+    },
+    "effects": [],
+    "folder": "magritmaster0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000014",
+    "name": "Сотворение голема",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.golem",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 20,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 10,
+        "requirements": "",
+        "components": [
+          {
+            "name": "Камень",
+            "quantity": 10,
+            "consumed": true
+          },
+          {
+            "name": "Мелок",
+            "quantity": 2,
+            "consumed": true
+          },
+          {
+            "name": "Совершенный самоцвет",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Укреплённое дерево",
+            "quantity": 10,
+            "consumed": true
+          },
+          {
+            "name": "Дымная пыль",
+            "quantity": 5,
+            "consumed": true
+          },
+          {
+            "name": "Пятая эссенция",
+            "quantity": 2,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Создаёт голема, служащего до своей смерти. Он исполняет последний приказ и повторяет неудачные попытки до успеха или отмены. Не способен самостоятельно мыслить и выполнять тонкую работу пальцами; бессрочные приказы выполняет до отмены или гибели.</p>",
+      "grade": "master",
+      "element": "mixed",
+      "cost": 15,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "permanent",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 119; официальная errata",
+      "page": 119
+    },
+    "effects": [],
+    "folder": "magritmaster0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "ritu000000000015",
+    "name": "Интерактивная иллюзия",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "ritual.interactive-illusion",
+      "kind": "ritual",
+      "ritual": {
+        "dc": 18,
+        "alternateDC": 0,
+        "dcHint": "",
+        "preparationRounds": 10,
+        "requirements": "",
+        "components": [
+          {
+            "name": "Царская водка",
+            "quantity": 3,
+            "consumed": true
+          },
+          {
+            "name": "Совершенный самоцвет",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Пятая эссенция",
+            "quantity": 5,
+            "consumed": true
+          },
+          {
+            "name": "Дымная пыль",
+            "quantity": 1,
+            "consumed": true
+          },
+          {
+            "name": "Стекло",
+            "quantity": 2,
+            "consumed": true
+          }
+        ]
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Управляемая заклинателем иллюзия радиусом 20 м воздействует на зрение, слух, обоняние и осязание. Против мнимой опасности цель проходит Сопротивление магии или Стойкость СЛ 12. При провале верит в полученный урон и делает испытание УСТ; такой урон не убивает, но может дезориентировать.</p>",
+      "grade": "master",
+      "element": "mixed",
+      "cost": 12,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До рассеивания"
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 119; официальная errata",
+      "page": 119
+    },
+    "effects": [],
+    "folder": "magritmaster0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "hexx000000000001",
+    "name": "Теневая порча",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "hex.shadows",
+      "kind": "hex",
+      "hex": {
+        "danger": "low",
+        "lifting": "При полумесяце принести на поляну чистую воду, ветвь белого мирта и чернила. В высшей точке луны смешать чернила с водой, обмакнуть ветвь и, задержав дыхание, окропить круг вокруг себя."
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Жертва слышит шёпот и видит призрачные силуэты на краю зрения. Ведущий периодически просит проверки Внимания без настоящей угрозы: это видения.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 4,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До снятия порчи"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 121; официальная errata",
+      "page": 121
+    },
+    "effects": [],
+    "folder": "maghex0000000000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "hexx000000000002",
+    "name": "Вечный зуд",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "hex.eternal-itch",
+      "kind": "hex",
+      "hex": {
+        "danger": "low",
+        "lifting": "Связать склеродерм, собачью петрушку и переступень, сжечь на костре. Произнося магические слова, посыпать пеплом поражённое место."
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Постоянный болезненный зуд даёт −1 ко всем действиям без урона; при раздевании дополнительно −5 к Соблазнению.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 4,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До снятия порчи"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 121; официальная errata",
+      "page": 121
+    },
+    "effects": [],
+    "folder": "maghex0000000000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "hexx000000000003",
+    "name": "Дьявольская удача",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "hex.devils-luck",
+      "kind": "hex",
+      "hex": {
+        "danger": "medium",
+        "lifting": "Вбить серебряный гвоздь в дверную раму дома, подвесить на своём локоне 2 единицы аконита. Стоя под гвоздём, поджечь связку и глубоко вдохнуть дым."
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>В стрессовых обстоятельствах — например, в бою, при ограниченном времени или СЛ выше 15 — критический провал наступает при натуральной 1 или 2 на d10.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 8,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До снятия порчи"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 121; официальная errata",
+      "page": 121
+    },
+    "effects": [],
+    "folder": "maghex0000000000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "hexx000000000004",
+    "name": "Кошмар",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "hex.nightmare",
+      "kind": "hex",
+      "hex": {
+        "danger": "medium",
+        "lifting": "Подготовить 5 свечей, 5 единиц костей животных и 1 светящейся руды. На ночь расставить свечи вокруг себя, соединить их костями, положить руду под голову и проспать так всю ночь."
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Каждую ночь Сопротивление убеждению против результата Наведения порчи. Успех позволяет спать; провал лишает сна и ночного восстановления ПЗ и ВЫН. После трёх проваленных ночей ВЫН уменьшается вдвое и все действия получают −2 до полноценного ночного сна.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 8,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До снятия порчи"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 121; официальная errata",
+      "page": 121
+    },
+    "effects": [],
+    "folder": "maghex0000000000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "hexx000000000005",
+    "name": "Поцелуй Песты",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "hex.pestas-kiss",
+      "kind": "hex",
+      "hex": {
+        "danger": "high",
+        "lifting": "Из 3 единиц речной глины, 1 угля, 3 смолы и 1 дымной пыли изготовить тотем с угольными глазами (Искусство СЛ 14). Наполнить его своей силой, произнося магические слова, затем разбить, растолочь угольные глаза и съесть порошок."
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>При контакте с больным вероятность заражения — 75%. Даже слегка тошнотворный запах требует Стойкости СЛ 16; провал вызывает тошноту.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 12,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До снятия порчи"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 121; официальная errata",
+      "page": 121
+    },
+    "effects": [],
+    "folder": "maghex0000000000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "hexx000000000006",
+    "name": "Звериная порча",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "hex.beast",
+      "kind": "hex",
+      "hex": {
+        "danger": "high",
+        "lifting": "При полной луне провести обряд с небольшим живым животным, 2 единицами омелы, 1 фосфора, 2 вороньего глаза и 3 корня мандрагоры. Жертва порчи перерезает животному горло и выпивает кровь; затем сжигает тело с травами, бросив в пламя фосфор при начале горения шерсти или чешуи. После угасания носит кости с собой целый день."
+      },
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Животные в пределах 10 м недоверчивы: −3 к Выживанию в дикой природе при обращении с ними. При каждом приближении на 10 м животное нападает с вероятностью 50%.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 12,
+      "variableCost": false,
+      "range": {
+        "kind": "special",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До снятия порчи"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 121; официальная errata",
+      "page": 121
+    },
+    "effects": [],
+    "folder": "maghex0000000000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
   }
 ]

@@ -1,6 +1,7 @@
 import { prepareMessageLuck, settleMessageLuck, releaseMessageLuck } from "../chat/luck-rolls.mjs";
 import { prepareCriticalResult } from "../chat/critical-result.mjs";
 import { prepareDeathResult } from "../chat/death-result.mjs";
+import { prepareMagicResult } from "../chat/magic-result.mjs";
 
 /** The async document lifecycle also covers native /roll and the chat dice tray. */
 export class WitcherChatMessage extends foundry.documents.ChatMessage {
@@ -9,6 +10,7 @@ export class WitcherChatMessage extends foundry.documents.ChatMessage {
     await prepareMessageLuck(this, options.witcherLuckOperation);
     prepareCriticalResult(this);
     prepareDeathResult(this);
+    prepareMagicResult(this);
   }
 
   static async createDocuments(data = [], operation = {}) {

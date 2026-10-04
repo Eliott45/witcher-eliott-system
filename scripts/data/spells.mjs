@@ -1,10 +1,17 @@
 import { INVOCATION_ROWS } from "./invocations.mjs";
+import { SIGN_ROWS } from "./signs.mjs";
+import { RITUAL_ROWS } from "./rituals.mjs";
+import { HEX_ROWS } from "./hexes.mjs";
 // Core RU pp.99–108. Brief descriptions are paraphrased; numbers follow the book + official errata.
 export const SPELL_ELEMENTS={mixed:"Смешанные",earth:"Земля",air:"Воздух",fire:"Огонь",water:"Вода"};
 export const SPELL_GRADES={novice:"Новичок",journeyman:"Подмастерье",master:"Мастер",archpriest:"Верховный жрец"};
 export const MAGIC_TRADITIONS={mage:"Маг",druid:"Друид",priest:"Проповедник"};
+export const MAGIC_KINDS={spell:"Заклинание / инвокация",sign:"Знак",ritual:"Ритуал",hex:"Порча"};
+export const MAGIC_CATEGORIES={...MAGIC_TRADITIONS,sign:"Ведьмачьи знаки",ritual:"Ритуалы",hex:"Порчи"};
+export const HEX_DANGERS={low:"Низкая",medium:"Средняя",high:"Высокая"};
+export const magicCategory=system=>system.kind&&system.kind!=="spell"?system.kind:system.tradition??"mage";
 export const SPELL_DEFENSES={none:"Нет",willTriple:"Воля цели × 3",dodge:"Уклонение",block:"Блокирование",resistMagic:"Сопротивление магии",spellCasting:"Сотворение заклинаний",gm:"СЛ определяет ведущий"};
-export const SPELL_RANGE_KINDS={distance:"Дистанция, м",self:"На себя",selfOrDistance:"На себя или дистанция",radius:"Радиус, м",cone:"Конус, м",unlimited:"Неограниченная"};
+export const SPELL_RANGE_KINDS={distance:"Дистанция, м",self:"На себя",selfOrDistance:"На себя или дистанция",radius:"Радиус, м",cone:"Конус, м",unlimited:"Неограниченная",special:"По описанию"};
 export const SPELL_DURATION_KINDS={instant:"Мгновенно",rounds:"Раунды",hours:"Часы",days:"Дни",sustained:"Поддержание",permanent:"Постоянно",special:"Особая"};
 const rows=[];
 const add=(grade,element,page,spells)=>{for(const [id,name,cost,range,duration,defense,description,damage=""] of spells)rows.push({id:`spell.${id}`,name,grade,element,page,cost,range,duration,defense,description,damage});};
@@ -111,19 +118,24 @@ add("master","water",108,[
 ]);
 
 function magicEntry(row,documentId) {
-  const rangeKind=typeof row.range==="number"?"distance":row.range==="self"||row.range==="unlimited"?row.range:row.range.startsWith("selfOr")?"selfOrDistance":row.range[0]==="r"?"radius":"cone";
+  const rangeKind=typeof row.range==="number"?"distance":["self","unlimited","special"].includes(row.range)?row.range:row.range.startsWith("selfOr")?"selfOrDistance":row.range[0]==="r"?"radius":"cone";
   const durationPrefix=row.duration[0];
   const durationKind=({i:"instant",r:"rounds",h:"hours",d:"days",s:"sustained",p:"permanent"})[durationPrefix]??"special";
   return {id:row.id,documentId,name:row.name,
-    system:{ruleId:row.id,tradition:row.tradition??"mage",deity:row.deity??"",costStep:row.costStep??1,costMax:row.costMax??0,costHint:row.costHint??"",description:`<p>${row.description}</p>`,grade:row.grade,element:row.element,
+    system:{ruleId:row.id,...(row.kind?{kind:row.kind}:{}),...(row.ritual?{ritual:row.ritual}:{}),...(row.hex?{hex:row.hex}:{}),tradition:row.tradition??"mage",deity:row.deity??"",costStep:row.costStep??1,costMax:row.costMax??0,costHint:row.costHint??"",description:`<p>${row.description}</p>`,grade:row.grade,element:row.element,
       cost:row.cost,variableCost:row.variableCost??row.id==="spell.dispel",range:{kind:rangeKind,value:typeof row.range==="number"?row.range:Number(String(row.range).replace(/^[a-z]+/i,""))||0},
-      duration:{kind:durationKind,formula:["rounds","hours","days"].includes(durationKind)?row.duration.slice(1):"",maintenance:durationKind==="sustained"?Number(row.duration.slice(1)):0,text:durationKind==="special"?row.duration:""},
+      duration:{kind:durationKind,formula:["rounds","hours","days"].includes(durationKind)?row.duration.slice(1):"",maintenance:durationKind==="sustained"?Number(row.duration.slice(1)):0,...(row.maintenanceMode?{maintenanceMode:row.maintenanceMode}:{}),text:durationKind==="special"?row.duration:""},
       defense:row.defense.split(","),damage:row.damage??"",source:`Базовая книга, стр. ${row.page}; официальная errata`,page:row.page}};
 }
 export const CORE_SPELLS=rows.map((row,index)=>magicEntry(row,`spel${String(index+1).padStart(12,"0")}`));
 export const CORE_INVOCATIONS=INVOCATION_ROWS.map((row,index)=>magicEntry(row,`invo${String(index+1).padStart(12,"0")}`));
+export const CORE_SIGNS=SIGN_ROWS.map((row,index)=>magicEntry(row,`sign${String(index+1).padStart(12,"0")}`));
+export const CORE_RITUALS=RITUAL_ROWS.map((row,index)=>magicEntry(row,`ritu${String(index+1).padStart(12,"0")}`));
+export const CORE_HEXES=HEX_ROWS.map((row,index)=>magicEntry(row,`hexx${String(index+1).padStart(12,"0")}`));
+export const CORE_MAGIC=[...CORE_SPELLS,...CORE_INVOCATIONS,...CORE_SIGNS,...CORE_RITUALS,...CORE_HEXES];
 export const spellFolderId=(grade,tradition="mage")=>tradition==="mage"?`spell${grade.padEnd(11,"0")}`:`inv${tradition.slice(0,3)}${grade.padEnd(10,"0")}`;
-export const spellSources=()=>[...CORE_SPELLS,...CORE_INVOCATIONS].map(entry=>({_id:entry.documentId,name:entry.name,type:"spell",img:"icons/svg/book.svg",system:structuredClone(entry.system),effects:[],folder:spellFolderId(entry.system.grade,entry.system.tradition),ownership:{default:2},sort:0,flags:{}}));
+const kindFolder=(kind,grade="")=>`mag${kind.slice(0,3)}${grade}`.padEnd(16,"0");
+export const spellSources=()=>CORE_MAGIC.map(entry=>({_id:entry.documentId,name:entry.name,type:"spell",img:"icons/svg/book.svg",system:structuredClone(entry.system),effects:[],folder:entry.system.kind?kindFolder(entry.system.kind,entry.system.kind==="hex"?"":entry.system.grade):spellFolderId(entry.system.grade,entry.system.tradition),ownership:{default:2},sort:0,flags:{}}));
 export const spellFolders=()=>{
   const folder=(_id,name,parent=null)=>({_id,name,type:"Item",folder:parent,sorting:"a",sort:0,color:"#805c89",flags:{}});
   const folders=["novice","journeyman","master"].map(grade=>folder(spellFolderId(grade),SPELL_GRADES[grade]));
@@ -132,11 +144,15 @@ export const spellFolders=()=>{
     folders.push(folder(parent,tradition==="druid"?"Инвокации друида":"Инвокации жреца"));
     for(const grade of new Set(CORE_INVOCATIONS.filter(s=>s.system.tradition===tradition).map(s=>s.system.grade)))folders.push(folder(spellFolderId(grade,tradition),SPELL_GRADES[grade],parent));
   }
+  for(const kind of ["sign","ritual","hex"]) {
+    const parent=kindFolder(kind);folders.push(folder(parent,MAGIC_CATEGORIES[kind]));
+    if(kind!=="hex")for(const grade of new Set(CORE_MAGIC.filter(s=>s.system.kind===kind).map(s=>s.system.grade)))folders.push(folder(kindFolder(kind,grade),SPELL_GRADES[grade],parent));
+  }
   return folders;
 };
-export function spellRange({kind,value}) {return kind==="self"?"На себя":kind==="unlimited"?"Неограниченная":`${kind==="selfOrDistance"?"На себя / ":kind==="radius"?"Радиус ":kind==="cone"?"Конус ":""}${value} м`;}
-export function spellDuration({kind,formula,maintenance,text}) {
-  if(kind==="sustained")return `Поддержание · ${maintenance} ВЫН/раунд`;
+export function spellRange({kind,value}) {return kind==="special"?"По описанию":kind==="self"?"На себя":kind==="unlimited"?"Неограниченная":`${kind==="selfOrDistance"?"На себя / ":kind==="radius"?"Радиус ":kind==="cone"?"Конус ":""}${value} м`;}
+export function spellDuration({kind,formula,maintenance,text,maintenanceMode}) {
+  if(kind==="sustained")return `Поддержание · ${maintenanceMode==="fullCost"?"исходная стоимость":maintenanceMode==="halfCost"?"½ исходной стоимости":`${maintenance} ВЫН`}/раунд`;
   if(["rounds","hours","days"].includes(kind)) {
     const plural=/^\d+$/.test(formula)?new Intl.PluralRules("ru").select(Number(formula)):"many";
     const words={rounds:{one:"раунд",few:"раунда",many:"раундов"},hours:{one:"час",few:"часа",many:"часов"},days:{one:"день",few:"дня",many:"дней"}};
