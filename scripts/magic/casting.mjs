@@ -7,7 +7,7 @@ import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { escapeTooltip as escape } from "../sheets/statistics-tooltips.mjs";
 import { skillCalculationTooltip } from "../sheets/skills-context.mjs";
 import { SPELL_DEFENSES, spellRange, spellDuration } from "../data/spells.mjs";
-import { castingCost, focusOptions, magicRoundKey, roundSpent, magicFumble, ELEMENTAL_MISHAPS, learnedSpell } from "./rules.mjs";
+import { castingCost, spellBaseCost, focusOptions, magicRoundKey, roundSpent, magicFumble, ELEMENTAL_MISHAPS, learnedSpell } from "./rules.mjs";
 
 export async function learnSpell(actor,source) {
   return inventoryWrite(actor,async()=>{
@@ -38,7 +38,7 @@ export function castingQuote(actor,item,{cost,focusId="",maintenance=false}={}) 
   // specified. Preserve the printed upkeep until an official clarification covers it.
   const focus=maintenance?null:focusOptions(actor).find(entry=>entry.id===focusId);
   if(!maintenance&&focusId&&!focus)throw new Error("Фокусирующий предмет больше не экипирован.");
-  const base=maintenance?item.system.duration.maintenance:item.system.variableCost?Number(cost):item.system.cost;
+  const base=spellBaseCost(item.system,cost,maintenance);
   const quote=castingCost({cost:base,focus:focus?.rating??0,spent:roundSpent(actor.system.magic,roundKey),vigor:actor.system.statistics.vigor});
   if(quote.stamina>actor.system.stamina.value)throw new Error(`Недостаточно Выносливости: нужно ${quote.stamina}, доступно ${actor.system.stamina.value}.`);
   return {...quote,roundKey,skill,focus};
@@ -65,9 +65,9 @@ function performCast(actor,itemId,options) {
     try {
       const roll=options.maintenance?null:await new foundry.dice.Roll(`1d10wc + ${quote.skill.total}`).evaluate({allowInteractive:messageMode!=="blind"});
       const fumble=roll?magicFumble(roll):{severity:0,failed:false,elemental:false,explosion:false};
-      const element=actor.system.details.profession==="priest"?"mixed":item.system.element;
+      const element=actor.system.details.profession==="priest"||["druid","priest"].includes(item.system.tradition)?"mixed":item.system.element;
       const elemental=fumble.elemental||quote.excess>0;
-      const title=options.maintenance?"Поддержание":"Сотворение";
+      const title=options.maintenance?"Поддержание":["druid","priest"].includes(item.system.tradition)?"Инвокация":"Сотворение";
       const calc=skillCalculationTooltip(actor.system,quote.skill,{localize:key=>game.i18n.localize(key),format:(key,data)=>game.i18n.format(key,data)});
       const summary=[`${quote.base} − ${quote.focus?.rating??0} = ${quote.stamina} ВЫН (минимум 1)`,
         `За раунд: ${quote.before} + ${quote.stamina} = ${quote.after}; предел ${quote.vigor}`];

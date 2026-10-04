@@ -1,9 +1,11 @@
+import { INVOCATION_ROWS } from "./invocations.mjs";
 // Core RU pp.99–108. Brief descriptions are paraphrased; numbers follow the book + official errata.
 export const SPELL_ELEMENTS={mixed:"Смешанные",earth:"Земля",air:"Воздух",fire:"Огонь",water:"Вода"};
-export const SPELL_GRADES={novice:"Новичок",journeyman:"Подмастерье",master:"Мастер"};
-export const SPELL_DEFENSES={none:"Нет",dodge:"Уклонение",block:"Блокирование",resistMagic:"Сопротивление магии",spellCasting:"Сотворение заклинаний",gm:"СЛ определяет ведущий"};
-export const SPELL_RANGE_KINDS={distance:"Дистанция, м",self:"На себя",radius:"Радиус, м",cone:"Конус, м",unlimited:"Неограниченная"};
-export const SPELL_DURATION_KINDS={instant:"Мгновенно",rounds:"Раунды",hours:"Часы",sustained:"Поддержание",permanent:"Постоянно",special:"Особая"};
+export const SPELL_GRADES={novice:"Новичок",journeyman:"Подмастерье",master:"Мастер",archpriest:"Верховный жрец"};
+export const MAGIC_TRADITIONS={mage:"Маг",druid:"Друид",priest:"Проповедник"};
+export const SPELL_DEFENSES={none:"Нет",willTriple:"Воля цели × 3",dodge:"Уклонение",block:"Блокирование",resistMagic:"Сопротивление магии",spellCasting:"Сотворение заклинаний",gm:"СЛ определяет ведущий"};
+export const SPELL_RANGE_KINDS={distance:"Дистанция, м",self:"На себя",selfOrDistance:"На себя или дистанция",radius:"Радиус, м",cone:"Конус, м",unlimited:"Неограниченная"};
+export const SPELL_DURATION_KINDS={instant:"Мгновенно",rounds:"Раунды",hours:"Часы",days:"Дни",sustained:"Поддержание",permanent:"Постоянно",special:"Особая"};
 const rows=[];
 const add=(grade,element,page,spells)=>{for(const [id,name,cost,range,duration,defense,description,damage=""] of spells)rows.push({id:`spell.${id}`,name,grade,element,page,cost,range,duration,defense,description,damage});};
 // Range: numeric metres, r = radius, c = cone, self, unlimited.
@@ -108,18 +110,37 @@ add("master","water",108,[
  ["tryferi-gaeaf","Трифери Геаф",22,20,"r1d10","dodge,block","Создаёт число двухметровых шипов, равное половине уровня Сотворения. Каждый атакует отдельно: 5d6 урона с пробиванием брони. Только причинивший урон шип замораживает цель и наносит 2 урона за раунд до Силы СЛ 20, 20 урона по шипу или конца заклинания.","5d6"]
 ]);
 
-export const CORE_SPELLS=rows.map((row,index)=>{
-  const rangeKind=typeof row.range==="number"?"distance":row.range==="self"||row.range==="unlimited"?row.range:row.range[0]==="r"?"radius":"cone";
+function magicEntry(row,documentId) {
+  const rangeKind=typeof row.range==="number"?"distance":row.range==="self"||row.range==="unlimited"?row.range:row.range.startsWith("selfOr")?"selfOrDistance":row.range[0]==="r"?"radius":"cone";
   const durationPrefix=row.duration[0];
-  const durationKind=({i:"instant",r:"rounds",h:"hours",s:"sustained",p:"permanent"})[durationPrefix]??"special";
-  return {id:row.id,documentId:`spel${String(index+1).padStart(12,"0")}`,name:row.name,
-    system:{ruleId:row.id,description:`<p>${row.description}</p>`,grade:row.grade,element:row.element,
-      cost:row.cost,variableCost:row.id==="spell.dispel",range:{kind:rangeKind,value:typeof row.range==="number"?row.range:Number(String(row.range).slice(1))||0},
-      duration:{kind:durationKind,formula:["rounds","hours"].includes(durationKind)?row.duration.slice(1):"",maintenance:durationKind==="sustained"?Number(row.duration.slice(1)):0,text:durationKind==="special"?row.duration:""},
-      defense:row.defense.split(","),damage:row.damage,source:`Базовая книга, стр. ${row.page}; официальная errata`,page:row.page}};
-});
-export const spellFolderId=grade=>`spell${grade.padEnd(11,"0")}`;
-export const spellSources=()=>CORE_SPELLS.map(entry=>({_id:entry.documentId,name:entry.name,type:"spell",img:"icons/svg/book.svg",system:structuredClone(entry.system),effects:[],folder:spellFolderId(entry.system.grade),ownership:{default:2},sort:0,flags:{}}));
-export const spellFolders=()=>Object.entries(SPELL_GRADES).map(([id,name])=>({_id:spellFolderId(id),name,type:"Item",folder:null,sorting:"a",sort:0,color:"#805c89",flags:{}}));
-export function spellRange({kind,value}) {return kind==="self"?"На себя":kind==="unlimited"?"Неограниченная":`${kind==="radius"?"Радиус ":kind==="cone"?"Конус ":""}${value} м`;}
-export function spellDuration({kind,formula,maintenance,text}) {return kind==="sustained"?`Поддержание · ${maintenance} ВЫН/раунд`:["rounds","hours"].includes(kind)?`${formula} ${kind==="rounds"?"раундов":"часов"}`:kind==="special"?text:SPELL_DURATION_KINDS[kind];}
+  const durationKind=({i:"instant",r:"rounds",h:"hours",d:"days",s:"sustained",p:"permanent"})[durationPrefix]??"special";
+  return {id:row.id,documentId,name:row.name,
+    system:{ruleId:row.id,tradition:row.tradition??"mage",deity:row.deity??"",costStep:row.costStep??1,costMax:row.costMax??0,costHint:row.costHint??"",description:`<p>${row.description}</p>`,grade:row.grade,element:row.element,
+      cost:row.cost,variableCost:row.variableCost??row.id==="spell.dispel",range:{kind:rangeKind,value:typeof row.range==="number"?row.range:Number(String(row.range).replace(/^[a-z]+/i,""))||0},
+      duration:{kind:durationKind,formula:["rounds","hours","days"].includes(durationKind)?row.duration.slice(1):"",maintenance:durationKind==="sustained"?Number(row.duration.slice(1)):0,text:durationKind==="special"?row.duration:""},
+      defense:row.defense.split(","),damage:row.damage??"",source:`Базовая книга, стр. ${row.page}; официальная errata`,page:row.page}};
+}
+export const CORE_SPELLS=rows.map((row,index)=>magicEntry(row,`spel${String(index+1).padStart(12,"0")}`));
+export const CORE_INVOCATIONS=INVOCATION_ROWS.map((row,index)=>magicEntry(row,`invo${String(index+1).padStart(12,"0")}`));
+export const spellFolderId=(grade,tradition="mage")=>tradition==="mage"?`spell${grade.padEnd(11,"0")}`:`inv${tradition.slice(0,3)}${grade.padEnd(10,"0")}`;
+export const spellSources=()=>[...CORE_SPELLS,...CORE_INVOCATIONS].map(entry=>({_id:entry.documentId,name:entry.name,type:"spell",img:"icons/svg/book.svg",system:structuredClone(entry.system),effects:[],folder:spellFolderId(entry.system.grade,entry.system.tradition),ownership:{default:2},sort:0,flags:{}}));
+export const spellFolders=()=>{
+  const folder=(_id,name,parent=null)=>({_id,name,type:"Item",folder:parent,sorting:"a",sort:0,color:"#805c89",flags:{}});
+  const folders=["novice","journeyman","master"].map(grade=>folder(spellFolderId(grade),SPELL_GRADES[grade]));
+  for(const tradition of ["druid","priest"]) {
+    const parent=`inv${tradition.padEnd(13,"0")}`;
+    folders.push(folder(parent,tradition==="druid"?"Инвокации друида":"Инвокации жреца"));
+    for(const grade of new Set(CORE_INVOCATIONS.filter(s=>s.system.tradition===tradition).map(s=>s.system.grade)))folders.push(folder(spellFolderId(grade,tradition),SPELL_GRADES[grade],parent));
+  }
+  return folders;
+};
+export function spellRange({kind,value}) {return kind==="self"?"На себя":kind==="unlimited"?"Неограниченная":`${kind==="selfOrDistance"?"На себя / ":kind==="radius"?"Радиус ":kind==="cone"?"Конус ":""}${value} м`;}
+export function spellDuration({kind,formula,maintenance,text}) {
+  if(kind==="sustained")return `Поддержание · ${maintenance} ВЫН/раунд`;
+  if(["rounds","hours","days"].includes(kind)) {
+    const plural=/^\d+$/.test(formula)?new Intl.PluralRules("ru").select(Number(formula)):"many";
+    const words={rounds:{one:"раунд",few:"раунда",many:"раундов"},hours:{one:"час",few:"часа",many:"часов"},days:{one:"день",few:"дня",many:"дней"}};
+    return `${formula} ${words[kind][plural]??words[kind].many}`;
+  }
+  return kind==="special"?text:SPELL_DURATION_KINDS[kind];
+}

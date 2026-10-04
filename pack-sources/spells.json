@@ -6,6 +6,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.afan-mirror",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Создаёт 1d10 нематериальных копий заклинателя. Управление ими не требует действия; копии не могут выходить за пределы дистанции.</p>",
       "grade": "novice",
       "element": "mixed",
@@ -43,6 +48,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.blinding-dust",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Пыль ослепляет цель на время действия заклинания.</p>",
       "grade": "novice",
       "element": "mixed",
@@ -81,6 +91,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.dispel",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Отменяет заклинание, ритуал или порчу. Затраты — половина исходной стоимости отменяемой магии. Проверка Сотворения заклинаний должна превысить исходную проверку. Может использоваться как защита от магической атаки, в том числе с физической составляющей.</p>",
       "grade": "novice",
       "element": "mixed",
@@ -118,6 +133,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.glamour",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Иллюзия привлекательности: +3 к Соблазнению, Харизме и Лидерству на время действия.</p>",
       "grade": "novice",
       "element": "mixed",
@@ -155,6 +175,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.magic-compass",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Указывает направление на знакомое заклинателю место либо на север.</p>",
       "grade": "novice",
       "element": "mixed",
@@ -192,6 +217,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.mind-manipulation",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>На время действия навязывает цели ненависть, любовь, подавленность или эйфорию.</p>",
       "grade": "novice",
       "element": "mixed",
@@ -229,6 +259,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.summon-staff",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Дематериализует собственный посох и отправляет в место, посещённое за последний день. Повторное сотворение возвращает посох.</p>",
       "grade": "novice",
       "element": "mixed",
@@ -266,6 +301,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.telepathy",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Мысленное общение с одной целью без языкового барьера. При чтении мыслей маг может заметить вторжение: каждый раунд Магические познания против исходной проверки Телепатии.</p>",
       "grade": "novice",
       "element": "mixed",
@@ -303,6 +343,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.cenlly-graig",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Камни наносят 1d6 урона за каждый пункт превышения защиты цели, максимум 10d6. Это одна атака (errata).</p>",
       "grade": "novice",
       "element": "earth",
@@ -341,6 +386,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.codi-bywyd",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>За один ход превращает семечко в небольшое взрослое растение. Подходит для трав, в том числе алхимических, но не для крупных деревьев.</p>",
       "grade": "novice",
       "element": "earth",
@@ -378,6 +428,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.diagnostic-spell",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Показывает оставшиеся ПЗ, критические ранения, болезни и отравление цели.</p>",
       "grade": "novice",
       "element": "earth",
@@ -415,6 +470,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.earthen-spike",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Каменный сталагмит наносит 5d6 урона. Он остаётся на месте, пока не получит 20 пунктов урона и не будет уничтожен.</p>",
       "grade": "novice",
       "element": "earth",
@@ -453,6 +513,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.korath-breath",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Осколки земли и скал в конусе ослепляют не защитившихся противников на 1d6 раундов.</p>",
       "grade": "novice",
       "element": "earth",
@@ -491,6 +556,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.luthien-quill",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Создаёт текст или рисунок на твёрдой неживой поверхности.</p>",
       "grade": "novice",
       "element": "earth",
@@ -528,6 +598,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.magic-healing",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Восстанавливает 3 ПЗ за ход в течение действия. Может применяться несколько раз для лечения критического ранения; тогда обычные ПЗ не восстанавливаются.</p>",
       "grade": "novice",
       "element": "earth",
@@ -565,6 +640,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.talfryn-prison",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Опутывает цель корнями. Корни уничтожаются 15 пунктами урона. Каждый раунд цель может действием пройти Уклонение/Изворотливость против результата сотворения, чтобы вырваться.</p>",
       "grade": "novice",
       "element": "earth",
@@ -602,6 +682,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.adenydd",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Позволяет планировать: за каждые 2 м падения перемещение на 2 м в выбранном направлении. Достигнув земли во время действия, заклинатель не получает урон от падения.</p>",
       "grade": "novice",
       "element": "air",
@@ -639,6 +724,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.air-pocket",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Пузырь свежего воздуха радиусом 1 м под водой или в непригодной для дыхания среде.</p>",
       "grade": "novice",
       "element": "air",
@@ -676,6 +766,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.bronwyn-gust",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Отталкивает цель на столько метров, на сколько сотворение превысило защиту, и наносит 1d6 урона. Столкновение с преградой вызывает урон от таранного удара.</p>",
       "grade": "novice",
       "element": "air",
@@ -713,6 +808,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.freshen-air",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Очищает воздух в радиусе 4 м вокруг заклинателя от дыма, ядовитого газа и других загрязнений.</p>",
       "grade": "novice",
       "element": "air",
@@ -750,6 +850,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.urien-shelter",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Защищает зону вокруг заклинателя от сильной жары, холода, дождя и снега.</p>",
       "grade": "novice",
       "element": "air",
@@ -787,6 +892,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.static-storm",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Все в радиусе, кроме заклинателя, кто носит металлическую броню или держит металлическое оружие, получают 2 урона за раунд.</p>",
       "grade": "novice",
       "element": "air",
@@ -824,6 +934,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.telekinesis",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Поднимает и перемещает предмет массой до 5 кг за уровень Сотворения заклинаний. Манипуляции используют Волю + Сотворение со штрафом −3, сложные действия −5. Дальность метания определяется Волей вместо ТЕЛ.</p>",
       "grade": "novice",
       "element": "air",
@@ -861,6 +976,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.zephyr",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Отталкивает всех в радиусе 2 м на 6 м и наносит 1d6 урона (errata). Столкновение вызывает дополнительный таранный урон.</p>",
       "grade": "novice",
       "element": "air",
@@ -898,6 +1018,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.aenye",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Огненный сгусток наносит 4d6 урона; вероятность горения — 75%.</p>",
       "grade": "novice",
       "element": "fire",
@@ -936,6 +1061,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.aine-versesos",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Создаёт яркий свет в радиусе 4 м вокруг заклинателя.</p>",
       "grade": "novice",
       "element": "fire",
@@ -973,6 +1103,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.brand-fire",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Выжигает на обнажённой коже простой символ или клеймо, нанося 1d6 урона и оставляя шрам. Лечащее прикосновение СЛ 15 может удалить клеймо, но остаётся большой шрам.</p>",
       "grade": "novice",
       "element": "fire",
@@ -1010,6 +1145,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.cadfan-grasp",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Нагревает металлический предмет. Держащий его отпускает предмет либо получает 2d6 урона в соответствующую конечность. Можно нагреть оружие: +2d6 урона и 50% вероятности горения.</p>",
       "grade": "novice",
       "element": "fire",
@@ -1047,6 +1187,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.magic-flare",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Вспышка видна за 10 км. Все в радиусе 8 м проходят Сопротивление магии, иначе ослеплены на 1d6 раундов.</p>",
       "grade": "novice",
       "element": "fire",
@@ -1084,6 +1229,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.raise-flame",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Распространяет уже горящее пламя на 2 м за раунд; уменьшает или усиливает небольшой огонь, изменяя его урон на 1.</p>",
       "grade": "novice",
       "element": "fire",
@@ -1121,6 +1271,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.tanio-ilchar",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Всполох в зоне 2×2 м с вероятностью 100% поджигает цели внутри.</p>",
       "grade": "novice",
       "element": "fire",
@@ -1158,6 +1313,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.fire-stream",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Поток огня в трёхметровом конусе наносит 2d6 урона и с вероятностью 50% поджигает цель.</p>",
       "grade": "novice",
       "element": "fire",
@@ -1196,6 +1356,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.carys-hail",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>За каждый пункт превышения защиты цели — 1d6 урона, максимум 5d6; вероятность заморозить — 25%. Это одна атака (errata).</p>",
       "grade": "novice",
       "element": "water",
@@ -1234,6 +1399,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.control-water",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Меняет течение воды: удваивает скорость пловцов, увеличивает скорость кораблей в полтора раза, замедляет или останавливает речное течение.</p>",
       "grade": "novice",
       "element": "water",
@@ -1271,6 +1441,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.curse-sedna",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Создаёт водоворот размером 4 м. В пределах 5 м от него цель каждый раунд проходит Плавание против результата сотворения либо уходит под воду. Для всплытия повторяет проверку; иначе задыхается.</p>",
       "grade": "novice",
       "element": "water",
@@ -1308,6 +1483,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.dormyn-fog",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Плотный туман: −3 к Вниманию, обзор сокращается до 4 м для всех находящихся в зоне.</p>",
       "grade": "novice",
       "element": "water",
@@ -1345,6 +1525,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.downpour",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Сильный дождь гасит открытое пламя и снимает горение в зоне.</p>",
       "grade": "novice",
       "element": "water",
@@ -1382,6 +1567,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.ice-slick",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Ледяной участок 2×2 м. Пересекающий его проходит Атлетику против результата сотворения, иначе падает.</p>",
       "grade": "novice",
       "element": "water",
@@ -1419,6 +1609,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.puro-dwr",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Очищает 1 м³ воды от яда и болезней, но не удаляет живые существа. В большом водоёме после окончания эффекта вода постепенно снова загрязняется.</p>",
       "grade": "novice",
       "element": "water",
@@ -1456,6 +1651,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.rhewi",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Слой льда делает цель замороженной. Покрытый льдом неживой предмет нельзя использовать или перемещать.</p>",
       "grade": "novice",
       "element": "water",
@@ -1493,6 +1693,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.eilhart-technique",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Извлекает из памяти цели одну тайну. Критический провал при защите навсегда уменьшает ИНТ цели на 1.</p>",
       "grade": "journeyman",
       "element": "mixed",
@@ -1530,6 +1735,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.illusion",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Создаёт зрительную иллюзию, в которую верят провалившие защиту. Она не имеет запаха, не звучит и неосязаема.</p>",
       "grade": "journeyman",
       "element": "mixed",
@@ -1567,6 +1777,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.teleportation",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Переносит только заклинателя и его вещи в знакомое место: Сотворение СЛ 15. Провал смещает точку на 1d6 миль. С предметом из незнакомого места можно телепортироваться туда против СЛ 20; при провале — смещение не более 2d10 миль.</p>",
       "grade": "journeyman",
       "element": "mixed",
@@ -1604,6 +1819,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.elgan-theory",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Магнитит металлический предмет. Металл в пределах 2 м притягивается и прилипает к нему; оторвать — Сила СЛ 18. Примагниченные к экипировке вещи входят в переносимый вес.</p>",
       "grade": "journeyman",
       "element": "earth",
@@ -1641,6 +1861,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.rhwystr-graig",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Создаёт каменную стену 2×3 м с прочностью 30 в пределах 20 м (errata).</p>",
       "grade": "journeyman",
       "element": "earth",
@@ -1678,6 +1903,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.stammelford-tremor",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Разрушает поверхность в зоне 10 м: −2 РЕА и −3 СКОР. Небольшие строения рушатся с вероятностью 10%. Каждый раунд требуется Атлетика, чтобы не провалиться в землю; провалившиеся задыхаются до успешного выхода. После окончания земля остаётся повреждённой.</p>",
       "grade": "journeyman",
       "element": "earth",
@@ -1715,6 +1945,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.alzur-thunder",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Молния наносит 8d6 урона с вероятностью горения 75%. Проходит через цели по прямой; после каждой цели урон следующей уменьшается на 1d6.</p>",
       "grade": "journeyman",
       "element": "air",
@@ -1752,6 +1987,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.gwynt-troelli",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Ветровой барьер отражает дистанционные атаки, не превысившие результат сотворения. Снаряд отлетает на 8 м в случайном направлении.</p>",
       "grade": "journeyman",
       "element": "air",
@@ -1789,6 +2029,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.suffocate",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Наносит цели 1d10 урона за ход; цель ошеломлена. Эффект прекращается, если заклинателя ранят оружием или он теряет концентрацию.</p>",
       "grade": "journeyman",
       "element": "air",
@@ -1826,6 +2071,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.demetia-crest",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Сфера чистой магии поглощает урон, равный удвоенному уровню Сотворения заклинаний. Попавшие снаряды уничтожаются; живые существа проходят свободно.</p>",
       "grade": "journeyman",
       "element": "fire",
@@ -1863,6 +2113,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.flaming-vortex",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Огненный торнадо шириной 2 м перемещается за ход на число метров, равное уровню Сотворения. При касании цели нужна встречная проверка против Уклонения. Попадание: 5d6 урона, горение 50%. Вихрь не выходит за дистанцию.</p>",
       "grade": "journeyman",
       "element": "fire",
@@ -1900,6 +2155,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.seirff-haul",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Огненные змеи захватывают цель, и она горит до успешного Уклонения против сотворения. Каждый раунд неудачи увеличивает СЛ следующего выхода на 1.</p>",
       "grade": "journeyman",
       "element": "fire",
@@ -1937,6 +2197,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.anialwch",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Высушивает цель: 4d6 урона, игнорирующего броню и щиты, и уменьшение текущей Выносливости на отдельные 4d6.</p>",
       "grade": "journeyman",
       "element": "water",
@@ -1974,6 +2239,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.merigold-hailstorm",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Каждый раунд все в зоне проходят Уклонение против сотворения либо получают 2d6 урона по каждой части тела.</p>",
       "grade": "journeyman",
       "element": "water",
@@ -2011,6 +2281,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.waves-naglfar",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Ледяная волна наносит не защитившимся 4d6 урона и замораживает их.</p>",
       "grade": "journeyman",
       "element": "water",
@@ -2049,6 +2324,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.mental-command",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Внушает точный приказ. Приказ, противоречащий природе цели, даёт ей +5 к защите. Цель может повторять Сопротивление магии каждые 1d6 раундов, чтобы освободиться.</p>",
       "grade": "master",
       "element": "mixed",
@@ -2086,6 +2366,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.magical-portal",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Открывает в пределах 10 м портал 1×2 м в знакомое место. Всё подходящее по размеру проходит сквозь него. Закрытие на проходящем объекте разрезает его: для существа — критическая потеря конечности. Незнакомое место доступно по правилам телепортации вслепую.</p>",
       "grade": "master",
       "element": "mixed",
@@ -2123,6 +2408,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.polymorphism",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Превращает в змею, кошку, птицу или собаку с физическими параметрами этого животного; вещи меняются вместе с телом. Для возвращения нужно снова сотворить заклинание. Двимерит в животной форме лишает возможности вернуться.</p>",
       "grade": "master",
       "element": "earth",
@@ -2160,6 +2450,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.transmutation",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Изменяет свойства минералов и металлов: один металл в другой, необработанный самоцвет — в обработанный для магии. Не создаёт и не изменяет двимерит и соприкасающиеся с ним металлы.</p>",
       "grade": "master",
       "element": "earth",
@@ -2197,6 +2492,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.dervish",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Торнадо отражает дистанционные атаки как Гвинт Троэлли и действует на окружающих как Зефир. Заклинатель может двигаться и атаковать. Если он сам приближается к цели ближе 2 м, Зефир на неё не действует.</p>",
       "grade": "master",
       "element": "air",
@@ -2234,6 +2534,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.storm",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Каждый раунд любой в зоне, кроме заклинателя, с вероятностью 35% становится целью молнии. При провале Уклонения — 8d6 урона в торс и вероятность горения 75%.</p>",
       "grade": "master",
       "element": "air",
@@ -2271,6 +2576,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.melgar-fire",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Каждый в зоне, кроме заклинателя, с вероятностью 75% становится целью огненного шара. Защита против результата сотворения; попадание наносит 4d6 урона в случайную часть тела и с вероятностью 75% поджигает.</p>",
       "grade": "master",
       "element": "fire",
@@ -2309,6 +2619,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.mirror-effect",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Луч наносит 10d6 урона. Его можно блокировать, но блокирующий предмет также получает урон; ветер не отражает луч. Зеркальная поверхность отражает его в случайном направлении, сама получая урон. Заклинание обычно не действует в помещении; при сильном снегопаде или пасмурной погоде урон вдвое меньше.</p>",
       "grade": "master",
       "element": "fire",
@@ -2347,6 +2662,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.part-water",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Создаёт свободное от воды пространство до 10×100×10 м. Водные существа покидают зону, проход сквозь водяные стены не пропускает воду внутрь. Пространство можно ориентировать вертикально; подводное сотворение открывает путь вместе с заклинателем.</p>",
       "grade": "master",
       "element": "water",
@@ -2384,6 +2704,11 @@
     "img": "icons/svg/book.svg",
     "system": {
       "ruleId": "spell.tryferi-gaeaf",
+      "tradition": "mage",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
       "description": "<p>Создаёт число двухметровых шипов, равное половине уровня Сотворения. Каждый атакует отдельно: 5d6 урона с пробиванием брони. Только причинивший урон шип замораживает цель и наносит 2 урона за раунд до Силы СЛ 20, 20 урона по шипу или конца заклинания.</p>",
       "grade": "master",
       "element": "water",
@@ -2409,6 +2734,1182 @@
     },
     "effects": [],
     "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000001",
+    "name": "Кипящая кровь",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.blood-boil",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Заставляет животное или неразумное чудовище нападать на указанную цель до окончания инвокации.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 8
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "willTriple"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 110; официальная errata",
+      "page": 110
+    },
+    "effects": [],
+    "folder": "invdrunovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000002",
+    "name": "Проклятая болезнь",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.cursed-illness",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 2,
+      "costMax": 6,
+      "costHint": "2 ВЫН — ошеломление; 4 — Дезориентация; 6 — отравление.",
+      "description": "<p>За 2 ВЫН цель кашляет и ошеломлена; за 4 ВЫН сильная тошнота вызывает Дезориентацию; за 6 ВЫН болезнь действует как отравление. Успешная проверка Стойкости против результата сотворения прекращает эффект.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 2,
+      "variableCost": true,
+      "range": {
+        "kind": "distance",
+        "value": 8
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "Стойкость против результата сотворения завершает эффект"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 110; официальная errata",
+      "page": 110
+    },
+    "effects": [],
+    "folder": "invdrunovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000003",
+    "name": "Друг животных",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.animal-friend",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Даёт +3 к Выживанию в дикой природе при обращении с животными. Вместо этого может успокоить одно животное в пределах 5 м: Сотворение должно превысить его Волю × 3.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 1,
+      "variableCost": false,
+      "range": {
+        "kind": "selfOrDistance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "hours",
+        "formula": "1d6",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "willTriple"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 110; официальная errata",
+      "page": 110
+    },
+    "effects": [],
+    "folder": "invdrunovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000004",
+    "name": "Дар природы",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.natures-gift",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "Выберите число пунктов ВЫН: каждый обеспечивает едой одного человека на день.",
+      "description": "<p>Выращивает съедобные растения на любой почве. Они кормят в течение дня столько человек, сколько ВЫН затрачено на инвокацию.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 1,
+      "variableCost": true,
+      "range": {
+        "kind": "distance",
+        "value": 2
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 110; официальная errata",
+      "page": 110
+    },
+    "effects": [],
+    "folder": "invdrunovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000005",
+    "name": "Взор природы",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.natures-sight",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Позволяет видеть чуждых этому измерению существ в пределах 50 м даже сквозь препятствия. Такие чудовища выглядят светящимися.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "self",
+        "value": 0
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 1,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 110; официальная errata",
+      "page": 110
+    },
+    "effects": [],
+    "folder": "invdrunovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000006",
+    "name": "Символ скрытого",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.symbol-hidden",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Природная маскировка скрывает зону размером 3 м и даёт находящимся внутри +5 к Скрытности, но они не могут двигаться. Повторное сотворение снимает маскировку; заросли также можно уничтожить 10 пунктами урона.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "self",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До рассеивания"
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 110; официальная errata",
+      "page": 110
+    },
+    "effects": [],
+    "folder": "invdrunovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000007",
+    "name": "Благословение исцеления",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.healing-blessing",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Восстанавливает цели 3 ПЗ за раунд. Повторные применения могут лечить критическое ранение; в таком случае обычные ПЗ не восстанавливаются.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 2
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 3,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 110; официальная errata",
+      "page": 110
+    },
+    "effects": [],
+    "folder": "invdrujourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000008",
+    "name": "Животная сила",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.animal-strength",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Пробуждает резервы цели: +2 к урону в ближнем бою и −2 к ИНТ на время действия.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 6,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "2d6",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 110; официальная errata",
+      "page": 110
+    },
+    "effects": [],
+    "folder": "invdrujourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000009",
+    "name": "Нити жизни",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.threads-life",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Показывает оставшиеся ПЗ и критические ранения видимых заклинателю существ в пределах дистанции.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 4,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 110; официальная errata",
+      "page": 110
+    },
+    "effects": [],
+    "folder": "invdrujourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000010",
+    "name": "Управление природой",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.control-nature",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Превращает небольшое дерево в служащего заклинателю голема с обычными параметрами голема. После окончания оно снова становится деревом. Убитый деревянный голем оставляет только 2d10 единиц древесины.</p>",
+      "grade": "master",
+      "element": "mixed",
+      "cost": 12,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 111; официальная errata",
+      "page": 111
+    },
+    "effects": [],
+    "folder": "invdrumaster0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000011",
+    "name": "Песнь небес",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.song-sky",
+      "tradition": "druid",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Меняет погоду: ясная; облачная с малым количеством солнечного света; ливень, гасящий огонь; штормовой ветер (−2 к ЛВК для дистанционных атак); гроза с вероятностью удара молнии 35%, как у заклинания «Гроза».</p>",
+      "grade": "master",
+      "element": "mixed",
+      "cost": 10,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 50
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 5,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 111; официальная errata",
+      "page": 111
+    },
+    "effects": [],
+    "folder": "invdrumaster0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000012",
+    "name": "Благословение удачи",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.blessing-fortune",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Даёт цели временные очки Удачи: половина превышения результата сотворения над СЛ 12, максимум 5. Базовый запас Удачи не меняется; полученные очки учитывайте отдельно.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 1,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "Пока полученная Удача не потрачена"
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 111; официальная errata",
+      "page": 111
+    },
+    "effects": [],
+    "folder": "invprinovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000013",
+    "name": "Благословение любви",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.blessing-love",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Даёт заклинателю +3 к Харизме и Соблазнению на время действия. В книге указана дистанция 5 м.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 111; официальная errata",
+      "page": 111
+    },
+    "effects": [],
+    "folder": "invprinovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000014",
+    "name": "Священный свет",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.holy-light",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Освещает пространство вокруг заклинателя, как факел. Свет не даёт тепла и не поджигает предметы.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 1,
+      "variableCost": false,
+      "range": {
+        "kind": "self",
+        "value": 0
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "3d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 111; официальная errata",
+      "page": 111
+    },
+    "effects": [],
+    "folder": "invprinovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000015",
+    "name": "Хранилище знаний",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.knowledge-vault",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Позволяет заново пережить собственное воспоминание или вспомнить когда-либо полученное знание.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "self",
+        "value": 0
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 111; официальная errata",
+      "page": 111
+    },
+    "effects": [],
+    "folder": "invprinovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000016",
+    "name": "Воды очищения",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.cleansing-waters",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Мгновенно отрезвляет цель: прекращает опьянение от крепкого алкоголя и соответствующих алхимических составов.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 1,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 111; официальная errata",
+      "page": 111
+    },
+    "effects": [],
+    "folder": "invprinovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000017",
+    "name": "Паутина лжи",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.web-lies",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Сомнения дезориентируют цель. Раз в раунд в свой ход цель бросает 1d10: результат строго ниже её ИНТ прекращает эффект. Это не обычное испытание УСТ.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 8
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "1d10 ниже ИНТ завершает эффект"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 111; официальная errata",
+      "page": 111
+    },
+    "effects": [],
+    "folder": "invprinovice0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000018",
+    "name": "Очищающее пламя",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.cleansing-fire",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Поджигает цель и наносит 3d6 урона.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 6,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "Пока не потушат"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "3d6",
+      "source": "Базовая книга, стр. 112; официальная errata",
+      "page": 112
+    },
+    "effects": [],
+    "folder": "invprijourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000019",
+    "name": "Святая защита",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.holy-protection",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Позволяет цели заново пройти проверку против эффектов действующего на неё заклинания.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 112; официальная errata",
+      "page": 112
+    },
+    "effects": [],
+    "folder": "invprijourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000020",
+    "name": "Свет истины",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.light-truth",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Белое пламя заставляет одну цель говорить правду. Каждый раунд она вновь проходит защиту; при провале обязана правдиво отвечать на заданные вопросы.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 4,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 112; официальная errata",
+      "page": 112
+    },
+    "effects": [],
+    "folder": "invprijourneyman",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000021",
+    "name": "Божественный портал",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.divine-portal",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>На 1 раунд открывает портал для заклинателя и других существ в знакомое место. В остальном действует как «Магический портал».</p>",
+      "grade": "master",
+      "element": "mixed",
+      "cost": 12,
+      "variableCost": false,
+      "range": {
+        "kind": "unlimited",
+        "value": 0
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 112; официальная errata",
+      "page": 112
+    },
+    "effects": [],
+    "folder": "invprimaster0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000022",
+    "name": "Божественная мудрость",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.divine-wisdom",
+      "tradition": "priest",
+      "deity": "",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Даёт ответ на один вопрос, но не предсказывает будущее. Сложность сотворения назначает ведущий по секретности информации.</p>",
+      "grade": "master",
+      "element": "mixed",
+      "cost": 10,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 50
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 5,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 112; официальная errata",
+      "page": 112
+    },
+    "effects": [],
+    "folder": "invprimaster0000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000023",
+    "name": "Благословение смерти",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.blessing-death",
+      "tradition": "priest",
+      "deity": "Корам Агх Тэра",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Провалившая защиту цель оказывается при смерти, как от обычного урона. Первая помощь или Лечащее прикосновение со СЛ 16 возвращают ей ПЗ до значения перед инвокацией.</p>",
+      "grade": "archpriest",
+      "element": "mixed",
+      "cost": 16,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 113; официальная errata",
+      "page": 113
+    },
+    "effects": [],
+    "folder": "invpriarchpriest",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000024",
+    "name": "Вечный суд",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.eternal-judgement",
+      "tradition": "priest",
+      "deity": "Вечный Огонь",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Белое пламя с красными всполохами наносит двойной урон от горения. Погасить его можно магией или полным погружением в воду на 3 раунда. Касание поджигает обычным огнём, который можно погасить за полный раунд.</p>",
+      "grade": "archpriest",
+      "element": "mixed",
+      "cost": 16,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "Пока не потушат"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 113; официальная errata",
+      "page": 113
+    },
+    "effects": [],
+    "folder": "invpriarchpriest",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000025",
+    "name": "Храбрость Фрейи",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.freya-courage",
+      "tradition": "priest",
+      "deity": "Фрейя",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Аура даёт невосприимчивость к ужасу и 25 дополнительных ПЗ всем внутри, включая неверующих. После выхода бонус держится ещё 1d6 раундов; повторное возвращение и выход обновляют этот срок. Заклинатель может снять эффект с отдельной цели.</p>",
+      "grade": "archpriest",
+      "element": "mixed",
+      "cost": 16,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 20
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "20",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 113; официальная errata",
+      "page": 113
+    },
+    "effects": [],
+    "folder": "invpriarchpriest",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000026",
+    "name": "Целительный покой",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.healing-rest",
+      "tradition": "priest",
+      "deity": "Мелитэле",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Число целей до уровня Сотворения впадает в глубокую кому на день: они не действуют и не реагируют даже на перемещение или атаки. В конце полностью восстанавливают ПЗ и исцеляют уже обработанные критические ранения. Постоянные штрафы смертельных критических ранений остаются.</p>",
+      "grade": "archpriest",
+      "element": "mixed",
+      "cost": 16,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "days",
+        "formula": "1",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 113; официальная errata",
+      "page": 113
+    },
+    "effects": [],
+    "folder": "invpriarchpriest",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000027",
+    "name": "Божественная удача",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.divine-fortune",
+      "tradition": "priest",
+      "deity": "Крева",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Даёт отдельный запас очков, равный утроенному уровню Сотворения. В течение часа их можно тратить на свои броски, а также на бонусы или штрафы к броскам любого в пределах 10 м. Не изменяет постоянную характеристику Удачи.</p>",
+      "grade": "archpriest",
+      "element": "mixed",
+      "cost": 16,
+      "variableCost": false,
+      "range": {
+        "kind": "selfOrDistance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "hours",
+        "formula": "1",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 113; официальная errata",
+      "page": 113
+    },
+    "effects": [],
+    "folder": "invpriarchpriest",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "invo000000000028",
+    "name": "Белое пламя",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "invocation.white-flame",
+      "tradition": "priest",
+      "deity": "Великое Солнце",
+      "costStep": 1,
+      "costMax": 0,
+      "costHint": "",
+      "description": "<p>Аура светит как ясное солнце, не обжигает и растапливает лёд. Рассеивает водные заклинания в радиусе; новое водное заклинание должно превысить результат сотворения жреца. Уязвимые к солнцу чудовища в ауре получают удвоенные штрафы.</p>",
+      "grade": "archpriest",
+      "element": "mixed",
+      "cost": 16,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 10
+      },
+      "duration": {
+        "kind": "hours",
+        "formula": "1",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 113; официальная errata",
+      "page": 113
+    },
+    "effects": [],
+    "folder": "invpriarchpriest",
     "ownership": {
       "default": 2
     },

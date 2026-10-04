@@ -1,6 +1,6 @@
 import { SYSTEM_ID } from "../config.mjs";
-import { SPELL_ELEMENTS,SPELL_GRADES,SPELL_DEFENSES,spellRange,spellDuration,SPELL_RANGE_KINDS,SPELL_DURATION_KINDS } from "../data/spells.mjs";
-import { focusOptions,magicRoundKey,roundSpent,castingCost } from "../magic/rules.mjs";
+import { MAGIC_TRADITIONS,SPELL_ELEMENTS,SPELL_GRADES,SPELL_DEFENSES,spellRange,spellDuration,SPELL_RANGE_KINDS,SPELL_DURATION_KINDS } from "../data/spells.mjs";
+import { focusOptions,magicRoundKey,roundSpent,castingCost,spellCostLabel,spellBaseCost } from "../magic/rules.mjs";
 import { castSpell,castingQuote,learnSpell,endConcentration,resetMagicRound } from "../magic/casting.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { skillValue } from "../data/skills.mjs";
@@ -9,12 +9,12 @@ import { escapeTooltip as escape } from "./statistics-tooltips.mjs";
 
 export const SPELL_ICONS={mixed:"fa-solid fa-sparkles",earth:"fa-solid fa-mountain",air:"fa-solid fa-wind",fire:"fa-solid fa-fire",water:"fa-solid fa-droplet"};
 export function spellEntry(item) {
-  const s=item.system;
-  return {id:item.id,uuid:item.uuid,name:item.name,img:item.img,element:s.element,grade:s.grade,
-    icon:SPELL_ICONS[s.element],elementLabel:SPELL_ELEMENTS[s.element],gradeLabel:SPELL_GRADES[s.grade],
-    cost:s.variableCost?"½ исходной стоимости":`${s.cost} ВЫН`,range:spellRange(s.range),duration:spellDuration(s.duration),
+  const s=item.system,tradition=s.tradition??"mage";
+  return {id:item.id,uuid:item.uuid,name:item.name,img:item.img,element:s.element,grade:s.grade,tradition,traditionLabel:MAGIC_TRADITIONS[tradition],deity:s.deity,
+    icon:tradition==="druid"?"fa-solid fa-leaf":tradition==="priest"?"fa-solid fa-hands-praying":SPELL_ICONS[s.element],elementLabel:tradition==="mage"?SPELL_ELEMENTS[s.element]:MAGIC_TRADITIONS[tradition],gradeLabel:SPELL_GRADES[s.grade],
+    cost:spellCostLabel(s),range:spellRange(s.range),duration:spellDuration(s.duration),
     defense:s.defense.map(key=>SPELL_DEFENSES[key]).join(" / "),damage:s.damage,durationFormula:s.duration.formula,
-    source:s.source,search:`${item.name} ${s.description} ${SPELL_ELEMENTS[s.element]}`.replace(/<[^>]*>/g," ").toLocaleLowerCase("ru")};
+    source:s.source,search:`${item.name} ${s.description} ${SPELL_ELEMENTS[s.element]} ${s.deity??""} ${MAGIC_TRADITIONS[tradition]}`.replace(/<[^>]*>/g," ").toLocaleLowerCase("ru")};
 }
 export async function magicContext(actor) {
   const roundKey=magicRoundKey(game.combat),spent=roundSpent(actor.system.magic,roundKey),vigor=actor.system.statistics.vigor;
@@ -28,6 +28,7 @@ export async function magicContext(actor) {
     combat:Boolean(game.combat?.started),round:game.combat?.round,
     active:active?spellEntry(active):null,canMaintain:canCast&&Boolean(active)&&actor.system.magic.maintainedRound!==roundKey,
     elements:Object.entries(SPELL_ELEMENTS).map(([id,label])=>({id,label,icon:SPELL_ICONS[id]})),
+    traditions:Object.entries(MAGIC_TRADITIONS).map(([id,label])=>({id,label})),
     grades:Object.entries(SPELL_GRADES).map(([id,label])=>({id,label}))};
 }
 
@@ -35,17 +36,18 @@ export function bindSpellFilters(root,filters={},onChange=()=>{}) {
   for(const [key,value] of Object.entries(filters))root.querySelector(`[data-magic-${key}]`).value=value;
   const refresh=()=>{
     const query=root.querySelector("[data-magic-search]").value.trim().toLocaleLowerCase("ru");
+    const tradition=root.querySelector("[data-magic-tradition]").value;
     const element=root.querySelector("[data-magic-element]").value,grade=root.querySelector("[data-magic-grade]").value;
     let count=0;
     for(const row of root.querySelectorAll("[data-spell-row]")) {
-      row.hidden=!(row.dataset.search.includes(query)&&(!element||row.dataset.element===element)&&(!grade||row.dataset.grade===grade));
+      row.hidden=!(row.dataset.search.includes(query)&&(!tradition||row.dataset.tradition===tradition)&&(!element||row.dataset.element===element)&&(!grade||row.dataset.grade===grade));
       if(!row.hidden)count++;
     }
     root.querySelector("[data-magic-empty]").hidden=count>0;
     root.querySelector("[data-magic-count]").textContent=count;
-    onChange({search:root.querySelector("[data-magic-search]").value,element,grade});
+    onChange({search:root.querySelector("[data-magic-search]").value,element,grade,tradition});
   };
-  for(const input of root.querySelectorAll("[data-magic-search], [data-magic-element], [data-magic-grade]"))input.addEventListener("input",refresh);
+  for(const input of root.querySelectorAll("[data-magic-search], [data-magic-element], [data-magic-grade], [data-magic-tradition]"))input.addEventListener("input",refresh);
   refresh();
 }
 
@@ -65,7 +67,7 @@ async function castDialog(actor,item,maintenance=false) {
   // the table supply an integer cost rather than silently truncate Actor resources.
   const focuses=focusOptions(actor),cost=maintenance?item.system.duration.maintenance:item.system.cost;
   const content=`<div class="witcher-cast-dialog"><p>${escape(item.name)} · ${escape(spellDuration(item.system.duration))}</p>`
-    +(!maintenance&&item.system.variableCost?'<label>Стоимость сотворения, ВЫН<input name="variableCost" type="number" min="1" step="1" value="1" required></label><small>Рассеивание: половина исходной стоимости. Укажите согласованную с ведущим стоимость целыми пунктами.</small>':"")
+    +(!maintenance&&item.system.variableCost?`<label>Стоимость сотворения, ВЫН<input name="variableCost" type="number" min="${Math.max(1,cost)}" step="${item.system.costStep??1}" ${item.system.costMax?`max="${item.system.costMax}"`:""} value="${Math.max(1,cost)}" required></label><small>${escape(item.system.costHint||(item.system.ruleId==="spell.dispel"?"Рассеивание: половина исходной стоимости. Укажите согласованную с ведущим целую стоимость.":"Выберите стоимость по описанию магии."))}</small>`:"")
     +(!maintenance?`<label>Фокус в руках<select name="focus"><option value="">Без фокуса</option>${focuses.map(f=>`<option value="${f.id}">${escape(f.name)} · −${f.rating} ВЫН</option>`).join("")}</select></label>`:"")
     +'<output data-cast-quote></output><label class="witcher-overload-confirm" data-overload-row hidden><input type="checkbox" name="overload"> Сотворить с перегрузкой и получить урон</label><p data-cast-error role="alert"></p></div>';
   return foundry.applications.api.DialogV2.wait({window:{title:maintenance?"Поддержание магии":"Сотворение заклинания"},classes:["witcher-picker"],position:{width:470},content,
@@ -79,7 +81,8 @@ async function castDialog(actor,item,maintenance=false) {
         const focusId=root.querySelector('[name="focus"]')?.value??"",selected=focuses.find(f=>f.id===focusId);
         const base=item.system.variableCost&&!maintenance?Number(root.querySelector('[name="variableCost"]').value):cost;
         try {
-          const preview=castingCost({cost:base,focus:selected?.rating??0,spent:roundSpent(actor.system.magic,magicRoundKey(game.combat)),vigor:actor.system.statistics.vigor});
+          const validated=spellBaseCost(item.system,base,maintenance);
+          const preview=castingCost({cost:validated,focus:selected?.rating??0,spent:roundSpent(actor.system.magic,magicRoundKey(game.combat)),vigor:actor.system.statistics.vigor});
           root.querySelector("[data-cast-quote]").textContent=`${base} − ${selected?.rating??0} = ${preview.stamina} ВЫН (минимум 1)\nЗа раунд: ${preview.after} / ${preview.vigor}${preview.damage?`\nПерегрузка: ${preview.excess} × 5 = ${preview.damage} урона ПЗ + стихийный эффект`:""}`;
           root.querySelector("[data-overload-row]").hidden=!preview.damage;
           castingQuote(actor,item,{cost:base,focusId,maintenance});
@@ -92,7 +95,7 @@ async function castDialog(actor,item,maintenance=false) {
 const action=fn=>async function(event,target){try{return await fn.call(this,event,target);}catch(error){console.error(`${SYSTEM_ID} | Magic`,error);ui.notifications.error(error.message);}};
 export const magicActions={
   browseSpells:action(async function(){return (await import("./spell-browser.mjs")).browseSpells(this.actor);}),
-  createSpell:action(async function(){if(!this.isEditable)return;const [item]=await this.actor.createEmbeddedDocuments("Item",[{name:"Новое заклинание",type:"spell",img:"icons/svg/book.svg"}]);return item.sheet.render({force:true});}),
+  createSpell:action(async function(){if(!this.isEditable)return;const priest=this.actor.system.details.profession==="priest";const [item]=await this.actor.createEmbeddedDocuments("Item",[{name:priest?"Новая инвокация":"Новое заклинание",type:"spell",img:"icons/svg/book.svg",system:{tradition:priest?"priest":"mage"}}]);return item.sheet.render({force:true});}),
   castSpell:action(function(_e,target){return castDialog(this.actor,this.actor.items.get(target.dataset.itemId));}),
   maintainSpell:action(function(){return castDialog(this.actor,this.actor.items.get(this.actor.system.magic.sustainedId),true);}),
   endConcentration:action(function(){return endConcentration(this.actor);}),
@@ -104,8 +107,8 @@ export const magicActions={
     if(!formula||!foundry.dice.Roll.validate(formula))throw new Error("Укажите корректную формулу в параметрах заклинания.");
     const roll=await new foundry.dice.Roll(formula).evaluate();
     return roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor:this.actor}),
-      flavor:`${duration?"Длительность":"Базовый урон / одно попадание"}: ${escape(item.name)}${duration?` (${item.system.duration.kind==="hours"?"часов":"раундов"})`:" — масштабирование и защиту учитывайте отдельно"}`,
-      flags:{[SYSTEM_ID]:{skipLuck:true,...(duration?{effectDuration:{value:roll.total*(item.system.duration.kind==="hours"?3600:1),units:item.system.duration.kind==="hours"?"seconds":"rounds"}}:{})}}},{messageMode:game.settings.get("core","messageMode")});
+      flavor:`${duration?"Длительность":"Базовый урон / одно попадание"}: ${escape(item.name)}${duration?` (${item.system.duration.kind==="hours"?"часов":item.system.duration.kind==="days"?"дней":"раундов"})`:" — масштабирование и защиту учитывайте отдельно"}`,
+      flags:{[SYSTEM_ID]:{skipLuck:true,...(duration?{effectDuration:{value:roll.total*(item.system.duration.kind==="hours"?3600:item.system.duration.kind==="days"?86400:1),units:["hours","days"].includes(item.system.duration.kind)?"seconds":"rounds"}}:{})}}},{messageMode:game.settings.get("core","messageMode")});
   })
 };
 export {learnSpell};
@@ -113,8 +116,9 @@ export {learnSpell};
 export function spellItemContext(item,editable) {
   if(item.type!=="spell")return null;
   const choices=record=>Object.entries(record).map(([id,name])=>({id,name}));
-  const fields=[choiceField("grade","Уровень",choices(SPELL_GRADES)),choiceField("element","Стихия",choices(SPELL_ELEMENTS)),
+  const fields=[choiceField("tradition","Традиция",choices(MAGIC_TRADITIONS)),textField("deity","Божество (если требуется)"),choiceField("grade","Уровень",choices(SPELL_GRADES)),choiceField("element","Стихия",choices(SPELL_ELEMENTS)),
     numberField("cost","Стоимость, ВЫН"),{key:"variableCost",label:"Переменная стоимость (при сотворении)",type:"boolean"},
+    numberField("costStep","Шаг переменной стоимости"),numberField("costMax","Максимальная стоимость (0 — без ограничения)"),textField("costHint","Подсказка стоимости"),
     choiceField("range.kind","Вид дальности",choices(SPELL_RANGE_KINDS)),numberField("range.value","Дальность, м"),
     choiceField("duration.kind","Длительность",choices(SPELL_DURATION_KINDS)),textField("duration.formula","Формула длительности"),
     numberField("duration.maintenance","Поддержание, ВЫН/раунд"),textField("duration.text","Особая длительность"),

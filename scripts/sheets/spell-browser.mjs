@@ -1,5 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
-import { SPELL_ELEMENTS,SPELL_GRADES } from "../data/spells.mjs";
+import { MAGIC_TRADITIONS,SPELL_ELEMENTS,SPELL_GRADES } from "../data/spells.mjs";
 import { spellEntry,bindSpellFilters } from "./magic-context.mjs";
 import { learnedSpell } from "../magic/rules.mjs";
 import { learnSpell } from "../magic/casting.mjs";
@@ -12,9 +12,9 @@ export async function browseSpells(actor) {
   const spells=await Promise.all(documents.map(async item=>({...spellEntry(item),id:item.uuid,
     description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:false,relativeTo:item})})));
   const content=await foundry.applications.handlebars.renderTemplate(`systems/${SYSTEM_ID}/templates/spell-browser.hbs`,{
-    spells,actorName:actor.name,elements:Object.entries(SPELL_ELEMENTS).map(([id,label])=>({id,label})),grades:Object.entries(SPELL_GRADES).map(([id,label])=>({id,label}))});
+    spells,actorName:actor.name,traditions:Object.entries(MAGIC_TRADITIONS).map(([id,label])=>({id,label})),elements:Object.entries(SPELL_ELEMENTS).map(([id,label])=>({id,label})),grades:Object.entries(SPELL_GRADES).map(([id,label])=>({id,label}))});
   const subscriptions=[];
-  try {return await foundry.applications.api.DialogV2.wait({classes:["witcher-picker","witcher-spell-browser"],window:{title:"Гримуар · каталог заклинаний",resizable:true},position:{width:840,height:700},content,
+  try {return await foundry.applications.api.DialogV2.wait({classes:["witcher-picker","witcher-spell-browser"],window:{title:"Каталог магии · заклинания и инвокации",resizable:true},position:{width:840,height:700},content,
     buttons:[{action:"close",label:"Закрыть"}],render:(_event,dialog)=>{
       const root=dialog.element;let busy=false;
       const refresh=()=>{

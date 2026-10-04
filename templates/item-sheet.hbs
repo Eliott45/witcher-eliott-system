@@ -11,7 +11,7 @@
     </div>
   </header>
   {{#if itemTraits.length}}<div class="witcher-item-traits" aria-label="Свойства для поиска">{{#each itemTraits}}<button type="button" data-action="searchItemTrait" data-trait="{{label}}" data-tooltip="{{description}} Нажмите, чтобы найти похожие предметы.">{{label}}</button>{{/each}}</div>{{/if}}
-  {{#if spell}}<div class="witcher-spell-info"><strong>{{spell.elementLabel}} · {{spell.gradeLabel}}</strong><span>{{spell.cost}}</span><span>{{spell.range}}</span><span>{{spell.duration}}</span><span>Защита: {{spell.defense}}</span></div>{{/if}}
+  {{#if spell}}<div class="witcher-spell-info"><strong>{{spell.elementLabel}} · {{spell.gradeLabel}}{{#if spell.deity}} · {{spell.deity}}{{/if}}</strong><span>{{spell.cost}}</span><span>{{spell.range}}</span><span>{{spell.duration}}</span><span>Защита: {{spell.defense}}</span></div>{{/if}}
   <nav class="witcher-item-tabs tabs" aria-label="{{localize 'WITCHER.ItemTabs.Navigation'}}">{{#each itemTabs}}<button type="button" data-action="tab" data-group="{{group}}" data-tab="{{id}}" class="{{cssClass}}" aria-pressed="{{active}}"><i class="{{icon}}"></i> {{localize label}}</button>{{/each}}</nav>
   <section class="witcher-item-tab tab {{tabs.description.cssClass}}" data-group="item" data-tab="description">
   {{#if editable}}

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
-import {CORE_SPELLS,spellSources,spellFolders,SPELL_ELEMENTS,SPELL_GRADES} from "../scripts/data/spells.mjs";
+import {CORE_SPELLS,CORE_INVOCATIONS,spellSources,spellFolders,spellRange,spellDuration,SPELL_ELEMENTS,SPELL_GRADES} from "../scripts/data/spells.mjs";
 import {castingCost,focusOptions,magicFumble,roundSpent,magicRoundKey} from "../scripts/magic/rules.mjs";
 import {castSpell,castingQuote,learnSpell,endConcentration,resetMagicRound} from "../scripts/magic/casting.mjs";
 import {deriveStatistics,ATTRIBUTE_KEYS} from "../scripts/data/statistics.mjs";
@@ -16,7 +16,7 @@ function fixture() {
   actor.update=async changes=>{events.push("update");for(const [path,value]of Object.entries(changes)){const keys=path.split('.');let at=actor;for(const k of keys.slice(0,-1))at=at[k];at[keys.at(-1)]=value;}};
   actor.toggleStatusEffect=async id=>{events.push(id);actor.effects.push({id,statuses:new Set([id])});};
   actor.createEmbeddedDocuments=async(_type,sources)=>sources.map((source,index)=>{const item={...source,id:`owned${actor.items.length+index}`,parent:actor};actor.items.push(item);return item;});
-  const source=id=>{const row=CORE_SPELLS.find(entry=>entry.id===`spell.${id}`);return {id:row.documentId,name:row.name,type:"spell",uuid:`Compendium.spells.Item.${row.documentId}`,system:structuredClone(row.system),testUserPermission:()=>true,toObject(){return {name:this.name,type:this.type,system:structuredClone(this.system),folder:"old"};}};};
+  const source=id=>{const row=[...CORE_SPELLS,...CORE_INVOCATIONS].find(entry=>entry.id===(id.startsWith("invocation.")?id:`spell.${id}`));return {id:row.documentId,name:row.name,type:"spell",uuid:`Compendium.spells.Item.${row.documentId}`,system:structuredClone(row.system),testUserPermission:()=>true,toObject(){return {name:this.name,type:this.type,system:structuredClone(this.system),folder:"old"};}};};
   const spell=id=>{const entry=source(id);entry.parent=actor;actor.items.push(entry);return entry;};
   const state={severity:0,cancel:false,mode:"public"};
   globalThis.game={combat:null,user:{id:"player"},settings:{get:()=>state.mode},i18n:{localize:key=>key,format:(_key,data)=>JSON.stringify(data)}};
@@ -31,7 +31,7 @@ function fixture() {
 
 test("all 65 core spells have unique identities, structured fields and stable grade folders",()=>{
   assert.equal(CORE_SPELLS.length,65);assert.equal(new Set(CORE_SPELLS.map(s=>s.id)).size,65);
-  assert.deepEqual(Object.keys(SPELL_GRADES).map(grade=>CORE_SPELLS.filter(s=>s.system.grade===grade).length),[40,15,10]);
+  assert.deepEqual(Object.keys(SPELL_GRADES).map(grade=>CORE_SPELLS.filter(s=>s.system.grade===grade).length),[40,15,10,0]);
   for(const element of Object.keys(SPELL_ELEMENTS))assert.equal(CORE_SPELLS.filter(s=>s.system.element===element).length,13);
   for(const spell of spellSources()){assert.match(spell._id,/^[a-zA-Z0-9]{16}$/);assert.ok(spellFolders().some(f=>f._id===spell.folder));assert.ok(spell.system.description.length>35);assert.ok(spell.system.defense.length);}
   assert.equal(CORE_SPELLS.find(s=>s.id==="spell.zephyr").system.damage,"1d6");
@@ -45,6 +45,40 @@ test("cost counts only additional overexertion, enforces focus minimum and rejec
   for(const cost of [-1,NaN,Infinity,1.5])assert.throws(()=>castingCost({cost}));
   assert.equal(roundSpent({roundKey:"battle:2",spent:8},"battle:3"),0);
   assert.equal(magicRoundKey({started:true,id:"battle",round:3}),"battle:3");
+});
+
+test("28 invocations share the catalog, with deity, graded folders, alternate ranges and days",()=>{
+  assert.equal(CORE_INVOCATIONS.length,28);
+  assert.deepEqual(Object.keys(SPELL_GRADES).map(grade=>CORE_INVOCATIONS.filter(s=>s.system.grade===grade).length),[12,6,4,6]);
+  const sources=spellSources(),folders=spellFolders();
+  assert.equal(new Set(sources.map(s=>s._id)).size,93);assert.equal(new Set(sources.map(s=>s.system.ruleId)).size,93);
+  assert.equal(new Set(folders.map(f=>f._id)).size,folders.length);
+  for(const f of folders){assert.match(f._id,/^[a-zA-Z0-9]{16}$/);if(f.folder)assert.ok(folders.some(parent=>parent._id===f.folder));}
+  for(const inv of CORE_INVOCATIONS){assert.equal(inv.system.element,"mixed");assert.ok(inv.system.page>=110&&inv.system.page<=113);if(inv.system.grade==="archpriest")assert.ok(inv.system.deity);}
+  assert.equal(spellRange(CORE_INVOCATIONS.find(s=>s.id==="invocation.animal-friend").system.range),"На себя / 5 м");
+  assert.equal(spellDuration(CORE_INVOCATIONS.find(s=>s.id==="invocation.healing-rest").system.duration),"1 день");
+  assert.deepEqual(CORE_INVOCATIONS.find(s=>s.id==="invocation.blood-boil").system.defense,["willTriple"]);
+});
+
+test("invocation variable tiers reject invalid spending before rolling; focus follows chosen tier",async()=>{
+  const {actor,spell,events,messages}=fixture();actor.system.details.profession="priest";
+  const item=spell("invocation.cursed-illness");
+  for(const cost of [undefined,0,1,3,5,7,8,2.5])await assert.rejects(castSpell(actor,item.id,{cost}),/Стоимость/);
+  assert.deepEqual(events,[]);
+  actor.items.push({id:"amulet",name:"Амулет",type:"equipment",system:{carried:true,equipped:true,quantity:1,containerId:"",properties:"Фокусирующее (1)"}});
+  await castSpell(actor,item.id,{cost:6,focusId:"amulet"});
+  assert.equal(actor.system.stamina.value,35);assert.equal(actor.system.magic.spent,5);
+  assert.match(messages[0].flavor,/Инвокация: Проклятая болезнь/);assert.match(messages[0].flavor,/6 − 1 = 5/);
+});
+
+test("invocation upkeep and mixed fumbles reuse magic state and do not spend extra Luck",async()=>{
+  const {actor,spell,state,messages}=fixture();actor.system.details.profession="priest";game.combat={id:"p",started:true,round:1};
+  const heal=spell("invocation.healing-blessing");await castSpell(actor,heal.id);
+  assert.equal(actor.system.magic.sustainedId,heal.id);game.combat.round=2;
+  await castSpell(actor,heal.id,{maintenance:true});assert.equal(actor.system.stamina.value,32);assert.equal(messages[1].flags[SYS].skipLuck,true);
+  await endConcentration(actor);state.severity=7;
+  await castSpell(actor,spell("invocation.cleansing-fire").id);
+  assert.equal(actor.effects.length,0);assert.match(messages[2].flavor,/ведущий выбирает/);
 });
 test("focus comes from one equipped carried item, excludes broken/in-container gear and non-magic-users",()=>{
   const {actor}=fixture();

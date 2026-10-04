@@ -26,6 +26,22 @@ export function magicRoundKey(combat) {
 }
 export function roundSpent(magic,roundKey) {return magic.roundKey===roundKey?magic.spent:0;}
 
+/** Validate the spell's printed cost before focus discounts, including invocation tiers. */
+export function spellBaseCost(system,chosen,maintenance=false) {
+  if(maintenance)return system.duration.maintenance;
+  if(!system.variableCost)return system.cost;
+  const cost=Number(chosen),min=Math.max(1,system.cost),step=system.costStep??1,max=system.costMax??0;
+  if(!Number.isInteger(cost)||cost<min||(cost-min)%step!==0||max>0&&cost>max)
+    throw new Error(`Стоимость: от ${min}${max?` до ${max}`:""} ВЫН, шаг ${step}.`);
+  return cost;
+}
+
+export function spellCostLabel(system) {
+  if(!system.variableCost)return `${system.cost} ВЫН`;
+  if(system.ruleId==="spell.dispel")return "½ исходной стоимости";
+  return system.costMax?`${Math.max(1,system.cost)}–${system.costMax} ВЫН`:`От ${Math.max(1,system.cost)} ВЫН`;
+}
+
 /** Only newly exceeded points cause damage; casting twice must not charge old excess again. */
 export function castingCost({cost,focus=0,spent=0,vigor=0}) {
   if (![cost,focus,spent,vigor].every(value=>Number.isInteger(value)&&value>=0)) throw new Error("Стоимость магии должна быть целым неотрицательным числом.");

@@ -516,12 +516,21 @@ const restoredSpell = new foundry.documents.BaseItem(JSON.parse(JSON.stringify(n
 assert.equal(restoredSpell.system.duration.maintenance,2);
 assert.deepEqual(Array.from(restoredSpell.system.defense),["none"]);
 assert.equal(restoredSpell.type,"spell");
+const legacySpellSource=nativeSpell.toObject();delete legacySpellSource.system.tradition;
+assert.equal(new foundry.documents.BaseItem(legacySpellSource).system.tradition,"mage","Existing spells default to mage without a migration");
+const nativeInvocation=new foundry.documents.BaseItem(magicSources().find(s=>s.system.ruleId==="invocation.healing-rest"));
+const reopenedInvocation=new foundry.documents.BaseItem(JSON.parse(JSON.stringify(nativeInvocation.toObject())));
+assert.equal(reopenedInvocation.system.deity,"Мелитэле");assert.equal(reopenedInvocation.system.duration.kind,"days");
+assert.equal(reopenedInvocation.system.tradition,"priest");assert.equal(reopenedInvocation.system.grade,"archpriest");
 const {magicContext,spellItemContext}=await import("../scripts/sheets/magic-context.mjs");
 const magicOnlyTemplate=handlebars.compile(await readFile(new URL("../templates/magic.hbs",import.meta.url),"utf8"),{strict:true});
 const magicActor={...sheet.actor,items:[nativeSpell]};
 const magicHTML=magicOnlyTemplate({magic:await magicContext(magicActor),editable:true});
 assert.match(magicHTML,/data-action="castSpell"/);assert.match(magicHTML,/Зеркало Афана/);
 assert.equal(spellItemContext(nativeSpell,true).groups[0].fields.find(f=>f.key==="duration.maintenance").value,2);
+const invocationHTML=magicOnlyTemplate({magic:await magicContext({...magicActor,items:[reopenedInvocation]}),editable:true});
+assert.match(invocationHTML,/Целительный покой/);assert.match(invocationHTML,/Мелитэле/);assert.match(invocationHTML,/1 день/);
+assert.match(invocationHTML,/data-magic-tradition/);
 // Render both permission levels with real service schema; native browser host is stubbed above.
 const { WitcherServicesSheet } = await import("../scripts/sheets/witcher-services-sheet.mjs");
 const servicesTemplate=handlebars.compile(await readFile(new URL("../templates/services-sheet.hbs",import.meta.url),"utf8"),{strict:true});

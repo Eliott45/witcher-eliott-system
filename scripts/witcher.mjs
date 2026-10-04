@@ -1,4 +1,5 @@
 import { WitcherSpellData } from "./data/witcher-spell-data.mjs";
+import { registerSpellContentMigration,migrateSpellContent } from "./migrations/spell-content.mjs";
 import { registerOilExpiry } from "./workshop/upgrades.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
@@ -60,6 +61,7 @@ Hooks.once("init", async () => {
   registerVisionMigration();
   registerCompendiumFolderMigration();
   registerEquipmentContentMigration();
+  registerSpellContentMigration();
   registerSheetPreferences();
   for (const type of COMBAT_ACTOR_TYPES) {
     CONFIG.Actor.dataModels[type] = WitcherActorData;
@@ -120,6 +122,10 @@ Hooks.on("updateCombat", (_combat,changes) => {
   }
 });
 Hooks.once("ready", () => {
+  migrateSpellContent().catch(error=>{
+    console.error(`${SYSTEM_ID} | Could not update magic content`,error);
+    ui.notifications.error("Не удалось обновить каталог магии. Подробности в консоли.");
+  });
   migrateEquipmentContent().catch(error => {
     console.error(`${SYSTEM_ID} | Could not update equipment content`, error);
     ui.notifications.error("Не удалось обновить каталог предметов. Подробности в консоли.");

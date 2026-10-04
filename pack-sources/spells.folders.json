@@ -28,5 +28,95 @@
     "sort": 0,
     "color": "#805c89",
     "flags": {}
+  },
+  {
+    "_id": "invdruid00000000",
+    "name": "Инвокации друида",
+    "type": "Item",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "invdrunovice0000",
+    "name": "Новичок",
+    "type": "Item",
+    "folder": "invdruid00000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "invdrujourneyman",
+    "name": "Подмастерье",
+    "type": "Item",
+    "folder": "invdruid00000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "invdrumaster0000",
+    "name": "Мастер",
+    "type": "Item",
+    "folder": "invdruid00000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "invpriest0000000",
+    "name": "Инвокации жреца",
+    "type": "Item",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "invprinovice0000",
+    "name": "Новичок",
+    "type": "Item",
+    "folder": "invpriest0000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "invprijourneyman",
+    "name": "Подмастерье",
+    "type": "Item",
+    "folder": "invpriest0000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "invprimaster0000",
+    "name": "Мастер",
+    "type": "Item",
+    "folder": "invpriest0000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
+  },
+  {
+    "_id": "invpriarchpriest",
+    "name": "Верховный жрец",
+    "type": "Item",
+    "folder": "invpriest0000000",
+    "sorting": "a",
+    "sort": 0,
+    "color": "#805c89",
+    "flags": {}
   }
 ]

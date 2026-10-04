@@ -1,5 +1,6 @@
 <div class="witcher-magic-filters">
   <label class="witcher-magic-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" data-magic-search placeholder="Найти заклинание…" aria-label="Поиск заклинаний"></label>
+  <select data-magic-tradition aria-label="Традиция"><option value="">Все традиции</option>{{#each traditions}}<option value="{{id}}">{{label}}</option>{{/each}}</select>
   <select data-magic-element aria-label="Стихия"><option value="">Все стихии</option>{{#each elements}}<option value="{{id}}">{{label}}</option>{{/each}}</select>
   <select data-magic-grade aria-label="Уровень"><option value="">Все уровни</option>{{#each grades}}<option value="{{id}}">{{label}}</option>{{/each}}</select>
 </div>
