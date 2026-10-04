@@ -1,3 +1,4 @@
+import { queueActorWrite } from "./actor-writes.mjs";
 // Stable compendium IDs also identify the corresponding entries on the actor.
 export const LANGUAGES = [
   { id: "language.common", documentId: "lang000000000001", name: "WITCHER.Languages.Common.Name", label: "WITCHER.Languages.Common.Label",
@@ -20,20 +21,15 @@ export function languageForEntry(entry) {
 }
 
 // Serialize all array writes so dropping several languages or editing during a drop preserves both changes.
-const writes = new Map();
 export function updateLanguages(actor, transform) {
   if (!actor.isOwner) return Promise.resolve(null);
-  const work = (writes.get(actor.uuid) ?? Promise.resolve()).catch(() => {}).then(async () => {
+  return queueActorWrite(actor, async () => {
     if (!actor.isOwner) return null;
     const languages = transform(actor.system.languages.map(entry => ({ ...entry })));
     if (!languages) return null;
     await actor.update({ "system.languages": languages });
     return languages;
   });
-  writes.set(actor.uuid, work);
-  const clear = () => { if (writes.get(actor.uuid) === work) writes.delete(actor.uuid); };
-  work.then(clear, clear);
-  return work;
 }
 
 export function addLanguageFromItem(actor, item) {

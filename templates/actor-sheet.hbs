@@ -115,6 +115,10 @@
     <header class="witcher-character-name">
       <label class="witcher-sr-only" for="{{rootId}}-name">{{localize "WITCHER.Sheet.Name"}}</label>
       <input id="{{rootId}}-name" name="name" type="text" value="{{actor.name}}" required {{disabled (not editable)}}>
+      <button type="button" class="witcher-experience" data-action="openAdvancement" aria-label="{{localize 'WITCHER.Advancement.Title'}}" {{disabled (not editable)}}>
+        <span>{{localize "WITCHER.Advancement.Experience"}}</span><strong>{{system.experience}}</strong>
+        <span><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> {{localize "WITCHER.Advancement.Open"}}</span>
+      </button>
       <div class="witcher-luck">
         <div class="witcher-luck-heading">
           <label for="{{rootId}}-luck" data-tooltip="{{stats.luck.tooltip}}" tabindex="0">{{localize "WITCHER.Attributes.luck.Label"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></label>

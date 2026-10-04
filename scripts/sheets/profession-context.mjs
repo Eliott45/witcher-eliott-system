@@ -2,6 +2,8 @@ import { SYSTEM_ID } from "../config.mjs";
 import { getProfession, getProfessionAbility, professionAbilityState, COMBAT_SKILLS } from "../data/professions.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { escapeTooltip } from "./statistics-tooltips.mjs";
+import { queueActorWrite, pendingActorWrite } from "../data/actor-writes.mjs";
+import { professionItemData } from "../data/profession-item.mjs";
 
 export function professionContext(actor) {
   const definition = getProfession(actor.system.details.profession);
@@ -21,31 +23,21 @@ export function professionContext(actor) {
     defining: entries[0], branches: definition.branches.map((name, index) => ({ name, entries: entries.filter(entry => entry.branch === String(index)) })) };
 }
 
-const writes = new WeakMap();
 export function setProfessionLevel(actor, id, level) {
-  const previous = writes.get(actor) ?? Promise.resolve();
-  const work = previous.then(async () => {
+  return queueActorWrite(actor, async () => {
     if (!actor.isOwner) return;
     const definition = getProfessionAbility(id);
     if (!definition || definition.profession !== actor.system.details.profession) return;
     level = Math.max(0, Math.min(10, Math.trunc(Number(level) || 0)));
     const { owned } = professionAbilityState(actor, definition);
     if (owned) return owned.update({ "system.level": level });
-    const source = await foundry.utils.fromUuid(`Compendium.${SYSTEM_ID}.abilities.Item.${definition.documentId}`);
-    const data = source ? source.toObject() : { name: definition.name, type: "ability", img: "icons/svg/book.svg",
-      system: { ruleId: definition.id, description: `<p>${escapeTooltip(definition.description)}</p>`, attribute: definition.attribute } };
-    delete data._id;
-    delete data.folder;
-    data.system.level = level;
-    return actor.createEmbeddedDocuments("Item", [data]);
+    return actor.createEmbeddedDocuments("Item", [await professionItemData(definition, level)]);
   });
-  writes.set(actor, work.catch(() => {}));
-  return work;
 }
 
 export async function rollProfessionAbility(_event, target) {
   if (!this.isEditable || target.disabled) return;
-  await (writes.get(this.actor) ?? Promise.resolve());
+  await pendingActorWrite(this.actor).catch(() => {});
   const definition = getProfessionAbility(target.dataset.abilityId);
   if (!definition || definition.profession !== this.actor.system.details.profession || !definition.attribute || !conditionRules(this.actor).canAct) return;
   const { level, attribute, bonus } = professionAbilityState(this.actor, definition);

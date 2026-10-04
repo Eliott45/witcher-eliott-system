@@ -1,4 +1,5 @@
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
+import { openAdvancement } from "./advancement-window.mjs";
 import { itemPresentation, toggleItemDescription, postItem, searchItemTrait } from "./item-presentation.mjs";
 import { chooseContainer, toggleContainer, dropPhysicalItem } from "./container-actions.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
@@ -39,6 +40,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
       ...workshopActorActions,
+      openAdvancement,
       equipItem, createInventoryItem, browseEquipment, addCatalogItem,
       changeInventoryQuantity, toggleCarried, toggleInventoryGroup,
       toggleItemDescription, postItem, searchItemTrait, chooseContainer, toggleContainer,

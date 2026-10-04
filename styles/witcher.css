@@ -1,3 +1,5 @@
+@import url("advancement.css");
+
 .witcher-eliott.actor-sheet, .witcher-eliott.reference-sheet {
   --witcher-ink: #ece5d8;
   --witcher-muted: #b6ad9f;
@@ -73,9 +75,13 @@
 .witcher-death-result small { display: block; margin-top: 4px; font-size: 11px; }
 .witcher-death-result p { margin: 6px 0; }
 .witcher-character-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; color: #2f2a26; }
-.witcher-character-name { flex: none; background: linear-gradient(100deg, #482021, #66292a); min-height: 86px; padding: 17px 22px 13px; }
+.witcher-character-name { flex: none; display: grid; grid-template-columns: minmax(0, 1fr) 92px; column-gap: 14px; background: linear-gradient(100deg, #482021, #66292a); min-height: 86px; padding: 17px 22px 13px; }
 .witcher-character-name > input { width: 100%; height: 36px; color: #f8eddb; background: transparent; border: 0; border-radius: 0; padding: 0; font-family: Georgia, serif; font-size: 27px; font-weight: 700; }
-.witcher-luck { margin-top: 7px; color: #ead8b0; }
+.witcher-luck { grid-column: 1; min-width: 0; margin-top: 7px; color: #ead8b0; }
+.witcher-character-name .witcher-experience { grid-column: 2; grid-row: 1 / 3; align-self: start; display: flex; flex-direction: column; gap: 3px; width: 100%; height: auto; padding: 7px 5px; line-height: 1.4; background: #25121745; color: #ead8b0; border: 1px solid #b599625c; border-radius: 5px; }
+.witcher-experience > span { font-size: 10px; }
+.witcher-experience > strong { font: bold 29px/1.1 Georgia, serif; color: #f8eddb; font-variant-numeric: tabular-nums; }
+.witcher-character-name .witcher-experience:hover { background: #b599622e; border-color: #d2b476; }
 .witcher-luck-heading { display: flex; align-items: center; gap: 8px; }
 .witcher-luck-heading { flex-wrap: wrap; }
 .witcher-luck-selected { font-size: 11px; color: #a3edab; }

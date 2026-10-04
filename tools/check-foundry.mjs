@@ -441,7 +441,7 @@ for (const name of ["profession", "profession-node", "lifepath", "inventory", "i
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
-  api: { HandlebarsApplicationMixin: Base => Base },
+  api: { HandlebarsApplicationMixin: Base => Base, ApplicationV2: class {} },
   sheets: { ActorSheetV2: class {
     tabGroups = {};
     async _prepareContext() {
@@ -468,6 +468,40 @@ sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/s
 sheet.token = null;
 sheet.isEditable = true;
 const html = template(await sheet._prepareContext({}));
+// Paid advancement uses the existing schema and an atomic parent update, including new embedded abilities.
+const { advancementContext } = await import("../scripts/sheets/advancement-window.mjs");
+const { advancementFingerprint } = await import("../scripts/data/advancement.mjs");
+const { purchaseAdvancement } = await import("../scripts/data/advancement-purchase.mjs");
+const advancementHTML = handlebars.compile(await readFile(new URL("../templates/advancement.hbs", import.meta.url), "utf8"), { strict: true });
+assert.equal(legacyActorData.experience, 0, "Old actors gain a zero IP balance without migration");
+assert.equal(new WitcherActorData().experience, 0);
+const advancingActor = new foundry.documents.BaseActor({ name: "Advancement round trip", type: "character", system: {
+  experience: 100, attributes: { body: 5, will: 5 }, health: { value: 21, max: 25 }, stamina: { value: 12, max: 25 },
+  details: { profession: "bard" }, skills: { swordsmanship: 4 }, languages: [{ id: "customLanguage1", name: "Custom language", level: 1 }]
+}, items: [{ _id: "keepweapon000001", name: "Old sword", type: "weapon", system: { weight: 1.5 } }] });
+Object.defineProperty(advancingActor, "isOwner", { value: true });
+let advancementWrites = 0;
+advancingActor.update = async update => { advancingActor.updateSource(update); advancementWrites++; return advancingActor; };
+const bardDefinition = (await import("../scripts/data/professions.mjs")).getProfession("bard").abilities[0];
+await purchaseAdvancement(advancingActor, { "skill:swordsmanship": 7, "attribute:body": 6,
+  "language:lang000000000002": 1, [`ability:${bardDefinition.id}`]: 1 }, advancementFingerprint(advancingActor), game.i18n.localize);
+assert.equal(advancementWrites, 1, "Points, stats, languages and embedded Items share one update");
+const reopenedAdvancement = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(advancingActor.toObject())));
+reopenedAdvancement.system.prepareDerivedData();
+assert.equal(reopenedAdvancement.system.experience, 32);
+assert.equal(reopenedAdvancement.system.skills.swordsmanship, 7);
+assert.equal(reopenedAdvancement.system.attributes.body, 6);
+assert.equal(reopenedAdvancement.system.health.value, 21, "Increasing an attribute does not heal");
+assert.equal(reopenedAdvancement.system.stamina.value, 12);
+assert.equal(reopenedAdvancement.system.languages.length, 2);
+assert.equal(reopenedAdvancement.items.size, 2, "The old sword survives the embedded ability insert");
+assert.equal([...reopenedAdvancement.items].find(item => item.type === "ability").system.level, 1);
+await purchaseAdvancement(advancingActor, { [`ability:${bardDefinition.id}`]: 2 }, advancementFingerprint(advancingActor));
+assert.equal(advancingActor.items.size, 2, "A second purchase updates the same ability Item");
+for (const category of ["skills", "languages", "attributes", "profession"]) {
+  assert.ok(advancementHTML({ ...advancementContext(advancingActor, {}, category), query: "", notice: "" }).includes("witcher-advancement-buy"));
+}
+assert.ok(advancementHTML({ ...advancementContext(advancingActor, { "skill:swordsmanship": 8 }), query: "", notice: "" }).includes("7 → 8"));
 // Render saved inventory through the same strict template used by old and new actors.
 const { inventoryContext } = await import("../scripts/sheets/inventory-context.mjs");
 const inventoryHTML = handlebars.compile(await readFile(new URL("../templates/inventory.hbs", import.meta.url), "utf8"), { strict: true });

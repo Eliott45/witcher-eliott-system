@@ -144,12 +144,16 @@ export const getProfession = id => PROFESSIONS.find(entry => entry.id === id) ??
 export const getProfessionAbility = id => PROFESSION_ABILITIES.find(entry => entry.id === id) ?? null;
 export const COMBAT_SKILLS = ["archery", "athletics", "brawling", "crossbow", "melee", "riding", "smallBlades", "staffSpear", "swordsmanship", "tactics"];
 
+export function professionPrerequisite(definition) {
+  const profession = getProfession(definition.profession);
+  return definition.tier === 0 ? null : definition.tier === 1 ? profession.abilities[0]
+    : profession.abilities.find(entry => entry.branch === definition.branch && entry.tier === definition.tier - 1);
+}
+
 export function professionAbilityState(actor, definition) {
   const items = [...(actor.items ?? [])];
   const owned = items.find(item => item.type === "ability" && item.system.ruleId === definition.id);
-  const profession = getProfession(definition.profession);
-  const prerequisite = definition.tier === 0 ? null : definition.tier === 1 ? profession.abilities[0]
-    : profession.abilities.find(entry => entry.branch === definition.branch && entry.tier === definition.tier - 1);
+  const prerequisite = professionPrerequisite(definition);
   const predecessor = prerequisite && items.find(item => item.type === "ability" && item.system.ruleId === prerequisite.id);
   const level = owned?.system.level ?? 0;
   const bonus = cappedSkillModifiers(level, (actor.system.statistics.modifiers ?? []).filter(modifier => modifier.target === definition.id)).reduce((sum, entry) => sum + entry.value, 0);

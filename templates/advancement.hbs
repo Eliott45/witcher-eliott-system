@@ -1,0 +1,53 @@
+<div class="witcher-advancement-layout">
+  <header class="witcher-advancement-hero">
+    <div><span>{{localize "WITCHER.Advancement.Title"}}</span><h2>{{actorName}}</h2></div>
+    <div class="witcher-advancement-balance"><strong>{{points}}</strong><span>{{localize "WITCHER.Advancement.Available"}}</span></div>
+  </header>
+  <div class="witcher-advancement-body">
+    <aside class="witcher-advancement-sidebar">
+      <nav aria-label="{{localize 'WITCHER.Advancement.Title'}}">
+        {{#each categories}}
+        <button type="button" data-action="category" data-category="{{id}}" aria-pressed="{{active}}"><i class="{{icon}}" aria-hidden="true"></i>{{localize label}}</button>
+        {{/each}}
+      </nav>
+      <p class="witcher-advancement-rule">{{rules}}</p>
+      <p class="witcher-advancement-note">{{localize "WITCHER.Advancement.SessionRule"}}</p>
+      {{#if editable}}
+      <details class="witcher-advancement-adjust">
+        <summary><i class="fa-solid fa-pen" aria-hidden="true"></i> {{localize "WITCHER.Advancement.Adjust"}}</summary>
+        <label>{{localize "WITCHER.Advancement.Balance"}}<input type="number" min="0" step="1" required value="{{points}}" data-experience-value></label>
+        <button type="button" data-action="savePoints">{{localize "WITCHER.Advancement.Save"}}</button>
+      </details>
+      {{/if}}
+    </aside>
+    <section class="witcher-advancement-catalog">
+      <label class="witcher-advancement-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" value="{{query}}" data-advancement-search placeholder="{{localize 'WITCHER.Advancement.Search'}}" aria-label="{{localize 'WITCHER.Advancement.Search'}}"></label>
+      <div class="witcher-advancement-columns"><span>{{localize "WITCHER.Advancement.Entry"}}</span><span>{{localize "WITCHER.Advancement.Rank"}}</span><span>{{localize "WITCHER.Advancement.NextRank"}}</span></div>
+      <div class="witcher-advancement-list">
+        {{#each rows}}
+        <article class="witcher-advancement-row {{#if selected}}selected{{/if}}" data-search="{{search}}">
+          <div class="witcher-advancement-label"><strong>{{name}} {{#if badge}}<small data-tooltip="{{ruleHint}}">{{badge}}</small>{{/if}}</strong><span>{{detail}}</span>{{#if ranksHint}}<span class="witcher-advancement-origin">{{ranksHint}}</span>{{/if}}</div>
+          <div class="witcher-advancement-ranks"><span>{{displayLevel}}</span>{{#if selected}}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i><strong>{{displayTarget}}</strong>{{/if}}</div>
+          <div class="witcher-advancement-controls">
+            <button type="button" data-action="decrease" data-entry="{{id}}" aria-label="{{localize 'WITCHER.Advancement.Decrease'}}: {{name}}" {{disabled cannotDecrease}}><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+            <button type="button" data-action="increase" data-entry="{{id}}" aria-label="{{localize 'WITCHER.Advancement.Increase'}}: {{name}}" data-tooltip="{{hint}}" {{disabled cannotIncrease}}><i class="fa-solid fa-plus" aria-hidden="true"></i> {{price}}</button>
+          </div>
+        </article>
+        {{/each}}
+        <p class="witcher-advancement-empty" data-no-results>{{localize "WITCHER.Advancement.Empty"}}</p>
+      </div>
+    </section>
+  </div>
+  <footer class="witcher-advancement-footer">
+    {{#if notice}}<p class="witcher-advancement-notice" role="status">{{notice}}</p>{{/if}}
+    <div class="witcher-advancement-cart">
+      {{#each changes}}<span data-tooltip="{{calculation}}">{{name}} <b>{{level}} → {{to}}</b> · {{cost}} {{localize "WITCHER.Advancement.Unit"}}</span>{{else}}<p>{{localize "WITCHER.Advancement.PlanHint"}}</p>{{/each}}
+    </div>
+    <div class="witcher-advancement-checkout">
+      <button type="button" class="witcher-advancement-reset" data-action="reset">{{localize "WITCHER.Advancement.Reset"}}</button>
+      <div><span>{{localize "WITCHER.Advancement.Cost"}} <b>{{cost}}</b></span><span class="{{#if error}}error{{/if}}">{{localize "WITCHER.Advancement.Remaining"}} <b>{{remaining}}</b></span></div>
+      <button type="button" class="witcher-advancement-buy" data-action="purchase" {{disabled (not valid)}} {{disabled (not editable)}}><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> {{localize "WITCHER.Advancement.Buy"}}</button>
+    </div>
+    {{#if error}}<p class="witcher-advancement-error" role="alert">{{error}}</p>{{/if}}
+  </footer>
+</div>
