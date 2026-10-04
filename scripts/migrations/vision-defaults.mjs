@@ -1,4 +1,4 @@
-import { ACTOR_TYPES, SYSTEM_ID, VISION_ANGLE } from "../config.mjs";
+import { COMBAT_ACTOR_TYPES, SYSTEM_ID, VISION_ANGLE } from "../config.mjs";
 
 export function registerVisionMigration() {
   game.settings.register(SYSTEM_ID, "visionDefaultsVersion", {
@@ -10,13 +10,13 @@ export function registerVisionMigration() {
 export async function migrateVisionDefaults() {
   if (game.user !== game.users.activeGM || game.settings.get(SYSTEM_ID, "visionDefaultsVersion") >= 1) return;
 
-  const actors = game.actors.filter(actor => ACTOR_TYPES.includes(actor.type) && actor.prototypeToken.sight.angle === 180);
+  const actors = game.actors.filter(actor => COMBAT_ACTOR_TYPES.includes(actor.type) && actor.prototypeToken.sight.angle === 180);
   if (actors.length) await foundry.documents.Actor.updateDocuments(actors.map(actor => ({
     _id: actor.id, "prototypeToken.sight.angle": VISION_ANGLE
   })));
 
   for (const scene of game.scenes) {
-    const tokens = scene.tokens.filter(token => ACTOR_TYPES.includes(token.actor?.type) && token.sight.angle === 180);
+    const tokens = scene.tokens.filter(token => COMBAT_ACTOR_TYPES.includes(token.actor?.type) && token.sight.angle === 180);
     if (tokens.length) await scene.updateEmbeddedDocuments("Token", tokens.map(token => ({
       _id: token.id, "sight.angle": VISION_ANGLE
     })));

@@ -50,6 +50,13 @@ assert.equal(foundry.documents.BaseSetting.metadata.permissions.create(player, {
 }, {}), true, "An ordinary player may store their personal sheet settings");
 
 const { WitcherActorData } = await import("../scripts/data/witcher-actor-data.mjs");
+const { WitcherServicesData } = await import("../scripts/data/witcher-services-data.mjs");
+CONFIG.Actor.dataModels.services = WitcherServicesData;
+const servicesData = new WitcherServicesData();
+assert.equal(servicesData.services.length,24);
+assert.equal(servicesData.closed,false);
+assert.equal(servicesData.health,undefined,"Establishments have no character resources");
+assert.notEqual(servicesData.services,new WitcherServicesData().services);
 const { RACES } = await import("../scripts/data/races.mjs");
 const { ORIGINS } = await import("../scripts/data/origins.mjs");
 const { FAMILY_STATUSES } = await import("../scripts/data/family-statuses.mjs");
@@ -309,6 +316,13 @@ assert.equal(armored.system.carriedWeight, 8);
 assert.equal(armored.system.statistics.effective.reflex, 4);
 assert.equal(armored.system.statistics.effective.dexterity, 3);
 const restoredInventory = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(armored.toObject())));
+const providerActor = new foundry.documents.BaseActor({name:"Test inn",type:"services"});
+providerActor.updateSource({"system.services":providerActor.system.services.map(entry=>({...entry,enabled:entry.id==="hot-bath",price:entry.id==="hot-bath"?23:entry.price})),"system.greeting":"Добро пожаловать"});
+const reopenedProvider = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(providerActor.toObject())));
+assert.equal(reopenedProvider.system.services.filter(entry=>entry.enabled).length,1);
+assert.equal(reopenedProvider.system.services.find(entry=>entry.id==="hot-bath").price,23);
+assert.equal(reopenedProvider.system.greeting,"Добро пожаловать");
+assert.equal(reopenedProvider.system.health,undefined);
 restoredInventory.system.prepareDerivedData();
 assert.equal(restoredInventory.system.carriedWeight, 8);
 assert.equal(restoredInventory.items.find(item => item.type === "armor").system.stoppingPower.value, 8);
@@ -453,6 +467,7 @@ for (const statusId of ["dying", "dead"]) {
 }
 handlebars.registerHelper("localize", key => foundry.utils.getProperty(translations, key) ?? key);
 handlebars.registerHelper("not", value => !value);
+handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
@@ -488,6 +503,25 @@ sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/s
 sheet.token = null;
 sheet.isEditable = true;
 const html = template(await sheet._prepareContext({}));
+// Render both permission levels with real service schema; native browser host is stubbed above.
+const { WitcherServicesSheet } = await import("../scripts/sheets/witcher-services-sheet.mjs");
+const servicesTemplate=handlebars.compile(await readFile(new URL("../templates/services-sheet.hbs",import.meta.url),"utf8"),{strict:true});
+const serviceSheet=new WitcherServicesSheet();
+serviceSheet.actor=reopenedProvider;
+Object.defineProperty(serviceSheet,"isEditable",{get:()=>game.user.isGM});
+const serviceTestGlobals={actors:game.actors,messages:game.messages,users:game.users,user:game.user};
+game.actors=[{id:"customer",uuid:"Actor.customer",type:"character",name:"Test visitor",system:{crowns:50},testUserPermission:()=>true}];
+game.messages=[];game.users={activeGM:game.user};
+const providerGMHtml=servicesTemplate(await serviceSheet._prepareContext({}));
+assert.ok(providerGMHtml.includes("Сохранить ассортимент и цены"));
+assert.ok(providerGMHtml.includes('value="23"'));
+game.user=player;
+const providerPlayerHtml=servicesTemplate(await serviceSheet._prepareContext({}));
+assert.ok(!providerPlayerHtml.includes("data-provider-name"));
+assert.ok(!providerPlayerHtml.includes('data-tab="manage"'));
+assert.ok(providerPlayerHtml.includes('data-action="sendServiceOrder" data-player-control'));
+assert.ok(providerPlayerHtml.includes("Test visitor"));
+Object.assign(game,serviceTestGlobals);
 // Paid advancement uses the existing schema and an atomic parent update, including new embedded abilities.
 const { advancementContext } = await import("../scripts/sheets/advancement-window.mjs");
 const { advancementFingerprint } = await import("../scripts/data/advancement.mjs");

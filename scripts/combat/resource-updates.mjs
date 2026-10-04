@@ -1,4 +1,4 @@
-import { ACTOR_TYPES, SYSTEM_ID } from "../config.mjs";
+import { COMBAT_ACTOR_TYPES, SYSTEM_ID } from "../config.mjs";
 import { WitcherActorData } from "../data/witcher-actor-data.mjs";
 import { setStunned, reportEffectError } from "./status-effects.mjs";
 import { prepareDeathTransition, applyDeathTransition, syncDeathStatus } from "./death-state.mjs";
@@ -6,7 +6,7 @@ import { applyExhaustion, syncExhaustion, regainConsciousness } from "./exhausti
 
 /** Validate the entire proposed system update so changed maxima and current values agree. */
 export function prepareResourceUpdate(actor, changes, options) {
-  if (!ACTOR_TYPES.includes(actor.type)) return;
+  if (!COMBAT_ACTOR_TYPES.includes(actor.type)) return;
   foundry.utils.expandObjectInPlace(changes);
   const patch = changes;
   const source = foundry.utils.mergeObject(actor.system.toObject(), patch.system ?? {}, { inplace: false });
@@ -39,12 +39,12 @@ export async function applyResourceUpdate(actor, _changes, options, userId) {
 }
 
 export function prepareInitialResources(actor) {
-  if (!ACTOR_TYPES.includes(actor.type)) return;
+  if (!COMBAT_ACTOR_TYPES.includes(actor.type)) return;
   actor.updateSource({ "system.health.value": actor.system.health.value, "system.stamina.value": actor.system.stamina.value });
 }
 
 export async function applyInitialConditions(actor, _options, userId) {
-  if (game.user.id !== userId || !actor.isOwner || !ACTOR_TYPES.includes(actor.type)) return;
+  if (game.user.id !== userId || !actor.isOwner || !COMBAT_ACTOR_TYPES.includes(actor.type)) return;
   await syncExhaustion(actor).catch(reportEffectError);
   await syncDeathStatus(actor).catch(reportEffectError);
 }

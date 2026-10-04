@@ -2,7 +2,8 @@
   "TYPES": {
     "Actor": {
       "character": "Персонаж",
-      "npc": "NPC / противник"
+      "npc": "NPC / противник",
+      "services": "Услуги / заведение"
     },
     "Item": {
       "ability": "Способность",

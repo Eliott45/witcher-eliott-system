@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { applyActorTokenDefaults } from "../scripts/combat/token-defaults.mjs";
 
 // The hook contract uses a pending document and the caller's partial creation data.
-globalThis.CONST = { TOKEN_DISPLAY_MODES: { OWNER_HOVER: 30 } };
+globalThis.CONST = { TOKEN_DISPLAY_MODES: { OWNER_HOVER: 30, NONE:0 }, DOCUMENT_OWNERSHIP_LEVELS:{OBSERVER:2} };
 globalThis.foundry = {
   utils: {
     hasProperty: (object, path) => {
@@ -61,4 +61,13 @@ test("partial prototypes receive only missing defaults", () => {
 
 test("future non-creature actor types are left alone", () => {
   assert.equal(create("loot"), undefined);
+});
+
+test("service tokens are linked, publicly readable, without vision or health bars; imported permissions survive",()=>{
+  const defaults=create("services");
+  assert.equal(defaults["ownership.default"],2);assert.equal(defaults["prototypeToken.actorLink"],true);
+  assert.equal(defaults["prototypeToken.sight.enabled"],false);assert.equal(defaults["prototypeToken.displayBars"],0);
+  assert.equal(defaults["prototypeToken.bar1.attribute"],null);assert.ok(defaults.img.endsWith("/services.svg"));
+  const imported=create("services",{ownership:{default:0},img:"my-store.webp",prototypeToken:{texture:{src:"my-token.webp"}}});
+  assert.equal(imported["ownership.default"],undefined);assert.equal(imported.img,undefined);assert.equal(imported["prototypeToken.texture.src"],undefined);
 });

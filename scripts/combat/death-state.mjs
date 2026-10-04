@@ -1,4 +1,4 @@
-import { ACTOR_TYPES, SYSTEM_ID } from "../config.mjs";
+import { COMBAT_ACTOR_TYPES, SYSTEM_ID } from "../config.mjs";
 import { dyingHealth } from "../data/death.mjs";
 import { hasStatus, setStatus, DYING, DEAD, reportEffectError } from "./status-effects.mjs";
 import { rollDeathSave } from "./death-roll.mjs";
@@ -96,7 +96,7 @@ export function rollDeath(actor) {
 
 /** Existing/imported dying actors get the visible status without retrospective saves. */
 export function syncDeathStatus(actor) {
-  if (!actor.isOwner || !ACTOR_TYPES.includes(actor.type)) return Promise.resolve();
+  if (!actor.isOwner || !COMBAT_ACTOR_TYPES.includes(actor.type)) return Promise.resolve();
   if (hasStatus(actor, DEAD)) return setStatus(actor, DYING, false);
   if (actor.system.statistics.dying) return setStatus(actor, DYING, true);
   return Promise.resolve();

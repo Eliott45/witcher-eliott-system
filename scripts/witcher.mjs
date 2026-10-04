@@ -2,7 +2,10 @@ import { registerOilExpiry } from "./workshop/upgrades.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
 import { WitcherRecipeData } from "./data/witcher-recipe-data.mjs";
-import { ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID } from "./config.mjs";
+import { COMBAT_ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID } from "./config.mjs";
+import { WitcherServicesData } from "./data/witcher-services-data.mjs";
+import { WitcherServicesSheet } from "./sheets/witcher-services-sheet.mjs";
+import { registerServiceOrders } from "./services/orders.mjs";
 import { applyActorTokenDefaults } from "./combat/token-defaults.mjs";
 import { WitcherActorData } from "./data/witcher-actor-data.mjs";
 import { WitcherActor } from "./documents/witcher-actor.mjs";
@@ -51,15 +54,18 @@ Hooks.once("init", async () => {
   registerOilExpiry();
   registerStubbornnessChat();
   registerEffectDurationChat();
+  registerServiceOrders();
   CONFIG.time.roundTime = 3;
   registerVisionMigration();
   registerCompendiumFolderMigration();
   registerEquipmentContentMigration();
   registerSheetPreferences();
-  for (const type of ACTOR_TYPES) {
+  for (const type of COMBAT_ACTOR_TYPES) {
     CONFIG.Actor.dataModels[type] = WitcherActorData;
     CONFIG.Actor.trackableAttributes[type] = { bar: ["health", "stamina"], value: [] };
   }
+  CONFIG.Actor.dataModels.services = WitcherServicesData;
+  CONFIG.Actor.trackableAttributes.services = { bar: [], value: [] };
   CONFIG.Item.dataModels.race = WitcherRaceData;
   CONFIG.Item.dataModels.ability = WitcherAbilityData;
   CONFIG.Item.dataModels.profession = WitcherReferenceData;
@@ -76,7 +82,13 @@ Hooks.once("init", async () => {
     foundry.documents.Actor,
     SYSTEM_ID,
     WitcherActorSheet,
-    { types: ACTOR_TYPES, makeDefault: true, label: "WITCHER.Sheet.Title" }
+    { types: COMBAT_ACTOR_TYPES, makeDefault: true, label: "WITCHER.Sheet.Title" }
+  );
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(
+    foundry.documents.Actor,
+    SYSTEM_ID,
+    WitcherServicesSheet,
+    { types: ["services"], makeDefault: true, label: "TYPES.Actor.services" }
   );
   foundry.applications.apps.DocumentSheetConfig.registerSheet(
     foundry.documents.Item,

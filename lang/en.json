@@ -2,7 +2,8 @@
   "TYPES": {
     "Actor": {
       "character": "Character",
-      "npc": "NPC / opponent"
+      "npc": "NPC / opponent",
+      "services": "Services / establishment"
     },
     "Item": {
       "ability": "Ability",

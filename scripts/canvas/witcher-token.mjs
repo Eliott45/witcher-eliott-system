@@ -1,4 +1,4 @@
-import { ACTOR_TYPES, PREVIEW_VISION_ANGLE } from "../config.mjs";
+import { COMBAT_ACTOR_TYPES, PREVIEW_VISION_ANGLE } from "../config.mjs";
 import { drawFacingMarker } from "../combat/facing-marker.mjs";
 
 export class WitcherToken extends foundry.canvas.placeables.Token {
@@ -7,7 +7,7 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
   #visionPreview = false;
 
   get hasFacing() {
-    return ACTOR_TYPES.includes(this.actor?.type);
+    return COMBAT_ACTOR_TYPES.includes(this.actor?.type);
   }
 
   get visionPreviewActive() {

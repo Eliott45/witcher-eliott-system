@@ -1,4 +1,4 @@
-import { ACTOR_TYPES } from "../config.mjs";
+import { COMBAT_ACTOR_TYPES } from "../config.mjs";
 import { conditionRules } from "./condition-rules.mjs";
 import { hasStatus, setStatus, setStunned, EXHAUSTED_STUN, UNCONSCIOUS, DEAD } from "./status-effects.mjs";
 
@@ -17,7 +17,7 @@ export async function regainConsciousness(actor) {
 }
 
 export async function syncExhaustion(actor) {
-  if (!actor.isOwner || !ACTOR_TYPES.includes(actor.type) || hasStatus(actor, DEAD)) return;
+  if (!actor.isOwner || !COMBAT_ACTOR_TYPES.includes(actor.type) || hasStatus(actor, DEAD)) return;
   if (actor.system.stamina.max > 0 && actor.system.stamina.value <= 0) await applyExhaustion(actor);
 }
 

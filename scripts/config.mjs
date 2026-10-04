@@ -1,5 +1,6 @@
 export const SYSTEM_ID = "witcher-eliott-system";
 export const VISION_ANGLE = 360;
 export const PREVIEW_VISION_ANGLE = 180;
-export const ACTOR_TYPES = ["character", "npc"];
+export const COMBAT_ACTOR_TYPES = ["character", "npc"];
+export const ACTOR_TYPES = [...COMBAT_ACTOR_TYPES, "services"];
 export const ITEM_TYPES = ["race", "ability", "origin", "familyStatus", "equipment", "influence", "language", "profession", "weapon", "armor", "recipe"];

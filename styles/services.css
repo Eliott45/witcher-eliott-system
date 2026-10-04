@@ -1,0 +1,104 @@
+/* Establishments use the character sheet palette, with a separate, read-only storefront. */
+.witcher-eliott.services-sheet { min-width:650px; min-height:500px; }
+.witcher-eliott.services-sheet .window-content { background:#eee9df; }
+.witcher-services { --service-line:#cbbca0; --service-ink:#453b32; --service-muted:#7b6b55; --service-gold:#b69656; color:var(--service-ink); display:flex; flex-direction:column; height:100%; min-height:0; font-size:13px; }
+.witcher-services :is(h1,h2,h3) { color:#713833; font-family:Georgia,serif; text-shadow:none; border:0; margin:0; }
+.witcher-services h2 { font-size:21px; }
+.witcher-services p { line-height:1.45; }
+.witcher-services small { color:var(--service-muted); line-height:1.4; }
+.witcher-services label { display:flex; flex-direction:column; gap:4px; color:#6b5140; font-size:12px; }
+.witcher-services :is(input,select,textarea) { width:100%; min-width:0; color:#3a3027; background:#faf7ef; border:1px solid var(--service-line); border-radius:4px; padding:5px 8px; font-size:13px; box-shadow:none; }
+.witcher-services select option { color:#3a3027; background:#faf7ef; }
+.witcher-services textarea { resize:vertical; min-height:50px; }
+.witcher-services input[type=checkbox] { width:18px; height:18px; padding:0; flex:none; accent-color:#8a633d; }
+.witcher-services button { width:auto; height:auto; min-height:30px; border:1px solid var(--service-line); color:#614932; background:#f5eddc; border-radius:4px; line-height:1.25; padding:7px 10px; box-shadow:none; }
+.witcher-services button:hover:not(:disabled) { background:#e8d8b8; border-color:#b08d4d; }
+.witcher-services button:disabled { opacity:.5; cursor:default; }
+.witcher-services .witcher-service-header { display:flex; align-items:center; flex:none; gap:16px; padding:18px 22px; background:linear-gradient(115deg,#482425,#65322d); color:#f7edda; border-bottom:2px solid var(--service-gold); }
+.witcher-service-header h1 { color:#f7edda; font-size:27px; overflow-wrap:anywhere; }
+.witcher-service-header p { margin:5px 0 0; color:#d9c4a6; font-size:12px; }
+.witcher-service-header > div { flex:1; min-width:0; }
+.witcher-service-eyebrow { display:block; color:#a47b40; font-size:10px; letter-spacing:.14em; margin-bottom:5px; }
+.witcher-service-header .witcher-service-eyebrow { color:#d4b477; }
+.witcher-services .witcher-service-portrait { flex:none; padding:0; width:66px; height:66px; border:1px solid #b6965680; background:#352526; overflow:hidden; }
+.witcher-service-portrait img { width:100%; height:100%; border:0; object-fit:cover; }
+.witcher-service-header .witcher-service-portrait:disabled { opacity:1; }
+.witcher-service-open { flex:none; color:#e6efdb; background:#446044; border:1px solid #83966d; border-radius:16px; padding:5px 9px; font-size:11px; white-space:nowrap; }
+.witcher-service-open.closed { background:#6d3733; color:#f0ccbd; border-color:#ae7060; }
+.witcher-services .witcher-service-tabs { display:flex; flex:none; justify-content:flex-start; gap:0; background:#303e41; border:0; padding:0 14px; }
+.witcher-services .witcher-service-tabs button { color:#daceb5; background:transparent; border:0; border-radius:0; padding:11px 15px; border-bottom:3px solid transparent; }
+.witcher-services .witcher-service-tabs button.active { background:#ffffff0c; color:#fff3d8; border-bottom-color:#c6a56b; }
+.witcher-services .witcher-service-tabs button:hover { background:#ffffff15; }
+.witcher-service-tabs span { display:inline-block; padding:1px 5px; margin-left:3px; background:#1a2526; border-radius:8px; font-size:10px; }
+.witcher-services > .tab { display:none; min-height:0; flex:1; }
+.witcher-services > .witcher-service-store.active { display:grid; grid-template-columns:minmax(0,1fr) 300px; }
+.witcher-service-catalog { overflow-y:auto; padding:16px; min-width:0; }
+.witcher-services .witcher-service-search { display:flex; flex-direction:row; align-items:center; background:#faf7ef; border:1px solid var(--service-line); border-radius:5px; padding:0 9px; margin-bottom:17px; }
+.witcher-service-search input { border:0; background:transparent; height:32px; }
+.witcher-service-group + .witcher-service-group { margin-top:20px; }
+.witcher-service-group h2 { border-bottom:1px solid var(--service-line); padding-bottom:7px; margin-bottom:8px; font-size:19px; }
+.witcher-services .witcher-service-card { width:100%; display:grid; grid-template-columns:minmax(0,1fr) auto 8px; align-items:center; gap:9px; margin:0 0 6px; padding:12px; text-align:left; background:#faf7ef; border:1px solid #d4c8b3; border-left:3px solid transparent; transition:background .15s,border-color .15s; }
+.witcher-services .witcher-service-card[hidden] { display:none; }
+.witcher-services .witcher-service-card.selected { background:#e6dcc7; border-left-color:#8b4937; }
+.witcher-service-card strong { display:block; color:#4f352a; font-size:14px; margin-bottom:4px; }
+.witcher-service-card small { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:11px; }
+.witcher-service-card b { max-width:102px; font-size:12px; color:#7c542e; text-align:right; }
+.witcher-service-card > i { font-size:10px; color:#aa9675; }
+.witcher-service-order-panel { overflow-y:auto; min-width:0; padding:18px; border-left:1px solid var(--service-line); background:#e7dfd0; }
+.witcher-service-order-panel > :is(label,fieldset) { margin-top:12px; }
+.witcher-service-order-panel > p { font-size:12px; }
+.witcher-service-order-panel .witcher-service-rules { color:#766349; font-size:11px; padding:9px 0; border-block:1px solid #c9b99d; }
+.witcher-service-wounds { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin:0; padding:9px; border:1px solid var(--service-line); border-radius:4px; }
+.witcher-service-wounds legend { font-size:11px; color:#7b6247; }
+.witcher-service-total { display:flex; align-items:baseline; justify-content:space-between; gap:6px; margin-top:16px; padding-top:12px; border-top:1px solid var(--service-line); }
+.witcher-service-total strong { font:24px Georgia,serif; color:#713833; }
+.witcher-service-order-panel > small { display:block; font-size:10px; margin-top:6px; }
+.witcher-services .witcher-service-primary { color:#fff3db; background:#6d3933; border-color:#6d3933; font-weight:600; }
+.witcher-services .witcher-service-primary:hover:not(:disabled) { color:#fff6e8; background:#884c40; }
+.witcher-service-order-panel .witcher-service-primary { width:100%; margin-top:14px; min-height:39px; }
+.witcher-services > .witcher-service-orders.active { display:block; overflow-y:auto; padding:20px; }
+.witcher-service-order-card { padding:14px; background:#faf7ef; border:1px solid var(--service-line); border-radius:5px; margin-top:12px; }
+.witcher-service-order-card :is(header,footer) { display:flex; gap:12px; justify-content:space-between; align-items:center; }
+.witcher-service-order-card h3 { font-size:18px; }
+.witcher-service-order-card p { font-size:12px; }
+.witcher-service-order-card footer { flex-wrap:wrap; }
+.witcher-service-order-card footer > div { display:flex; gap:5px; }
+.witcher-service-order-card button { font-size:11px; }
+.witcher-service-order-note { border-left:2px solid #b39a67; padding-left:9px; white-space:pre-wrap; overflow-wrap:anywhere; }
+.order-status { color:#7b6247; font-size:12px; }
+.order-status.accepted { color:#39643e; }.order-status.rejected { color:#8a443d; }
+.witcher-service-empty { padding:20px 8px; color:#85735e; text-align:center; }
+.witcher-services > .witcher-service-manage.active { display:flex; flex-direction:column; gap:10px; padding:16px 20px; }
+.witcher-service-settings-heading { display:flex; align-items:center; gap:20px; }
+.witcher-service-settings-heading > label:first-child { flex:1; }
+.witcher-services .witcher-service-check { display:flex; flex-direction:row; align-items:center; gap:8px; }
+.witcher-service-preset { display:flex; gap:8px; align-items:center; margin-top:5px; }
+.witcher-service-preset select { flex:1; }
+.witcher-service-preset button { font-size:12px; flex:none; }
+.witcher-service-settings-list { overflow-y:auto; min-height:0; flex:1; border-block:1px solid var(--service-line); }
+.witcher-service-settings-list details { border-bottom:1px solid #d0c4ad; background:#f6f0e5; }
+.witcher-service-settings-list summary { display:flex; align-items:center; gap:10px; padding:10px 9px; cursor:pointer; list-style:none; }
+.witcher-service-settings-list summary strong { flex:1; font-size:13px; }
+.witcher-service-settings-list summary span { font-size:12px; color:#806344; }
+.witcher-service-settings-list summary > i { font-size:10px; transition:transform .2s; }
+.witcher-service-settings-list details[open] summary > i { transform:rotate(180deg); }
+.witcher-service-editor { display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px; padding:5px 12px 14px; }
+.witcher-service-editor .wide { grid-column:1/-1; }
+.witcher-service-manage > footer { display:flex; justify-content:flex-end; }
+.witcher-service-help { color:#7d6b54; font-size:11px; }
+.witcher-service-receipt { color:inherit; border:1px solid #a58b63; border-radius:5px; padding:10px; }
+.witcher-service-receipt header { color:inherit; font-weight:700; border-bottom:1px solid #a58b6360; padding-bottom:7px; }
+.witcher-service-receipt h3 { color:inherit; font-size:17px; margin:9px 0; text-shadow:none; }
+.witcher-service-receipt p { font-size:12px; line-height:1.4; }
+.witcher-service-receipt footer { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; }
+.witcher-service-order-actions { display:flex; gap:5px; margin-top:8px; }
+.witcher-service-order-actions button { font-size:12px; height:auto; white-space:normal; }
+@container witcher-sheet (max-width:740px) {
+  .witcher-services > .witcher-service-store.active { grid-template-columns:minmax(0,1fr) 260px; }
+  .witcher-services .witcher-service-card { grid-template-columns:minmax(0,1fr) 8px; }
+  .witcher-service-card b { text-align:left; max-width:none; grid-row:2; }
+  .witcher-service-card > i { grid-column:2; grid-row:1/3; }
+  .witcher-service-header h1 { font-size:22px; }
+  .witcher-service-header .witcher-service-open { display:none; }
+}
+@media (prefers-reduced-motion:reduce) { .witcher-service-card,.witcher-service-settings-list summary > i { transition:none; } }
