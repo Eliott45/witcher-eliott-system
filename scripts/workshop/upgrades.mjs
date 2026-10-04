@@ -21,16 +21,23 @@ async function toolsAvailable(actor) {
   if(actor.items.some(item=>available(item)&&item.system.ruleId==="gear.crafting-tools"))return true;
   return foundry.applications.api.DialogV2.confirm({window:{title:"Инструменты ремесленника"},content:"<p>Нужны инструменты ремесленника. Они доступны вам в мастерской или взяты у союзника?</p>",rejectClose:false});
 }
-export async function installUpgrade(target) {
+export async function installUpgrade(target, { withoutCheck = false } = {}) {
   const actor=target.actor;if(!actor?.isOwner)return;
   const source=await chooseOwned(actor,"Установить улучшение",item=>canInstall(target,item));if(!source)return;
   const category=source.system.upgrade.category;
-  const confirmed=await foundry.applications.api.DialogV2.confirm({window:{title:"Установка улучшения"},content:`<p><b>${esc(source.name)}</b> → ${esc(target.name)}</p><p>${esc(source.system.properties)}</p><p>${category==="armor"?"Накладка занимает слот. Полный раунд, Изготовление СЛ 14. Остальные части комплекта остаются в инвентаре.":"Руна / глиф расходуется и устанавливается НАВСЕГДА. Снять её нельзя."}</p>`,rejectClose:false});
-  if(!confirmed || (category==="armor"&&!await toolsAvailable(actor)))return;
+  const confirmed=await foundry.applications.api.DialogV2.confirm({window:{title:"Установка улучшения"},content:`<p><b>${esc(source.name)}</b> → ${esc(target.name)}</p><p>${esc(source.system.properties)}</p><p>${category==="armor"?`${withoutCheck?"Установка без проверки и инструментов.":"Полный раунд, Изготовление СЛ 14."} Накладка занимает слот; остальные части комплекта остаются в инвентаре.`:"Руна / глиф расходуется и устанавливается НАВСЕГДА. Снять её нельзя."}</p>`,rejectClose:false});
+  if(!confirmed)return;
+  return installOwnedUpgrade(target, source, { withoutCheck });
+}
+/** Manual installation keeps ownership, slots and material accounting; only the crafting check/tools are bypassed. */
+export async function installOwnedUpgrade(target, source, { withoutCheck = false } = {}) {
+  const actor=target.actor;if(!actor?.isOwner)return;
+  const category=source.system.upgrade.category;
+  if(category==="armor"&&!withoutCheck&&!await toolsAvailable(actor))return;
   return inventoryWrite(actor,async()=>{
     if(!canInstall(target,source))throw new Error("Установка больше недоступна.");
     if(target.system.quantity!==1)throw new Error("Для улучшения оставьте один экземпляр предмета в этой записи инвентаря.");
-    if(category==="armor" && !(await workshopCheck(actor,{name:"Установка накладки",skill:"crafting",dc:14})).success)return;
+    if(category==="armor" && !withoutCheck && !(await workshopCheck(actor,{name:"Установка накладки",skill:"crafting",dc:14})).success)return;
     if(!canInstall(target,source))throw new Error("Свободные слоты или предметы изменились.");
     const zone=category==="armor"?target.system.zone:"";
     const installation={id:foundry.utils.randomID(),name:source.name,sourceUuid:source._stats.compendiumSource||source.uuid,category,zone,properties:source.system.properties,
