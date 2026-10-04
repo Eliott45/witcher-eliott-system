@@ -1,4 +1,6 @@
 import { magicContext, magicActions, bindMagic, learnSpell } from "./magic-context.mjs";
+import { combatContext, combatActions, bindCombat } from "./combat-context.mjs";
+import { changeGrip } from "./inventory-context.mjs";
 import { learningContext, learningActions } from "./learning-context.mjs";
 import { transportContext, transportActions, bindTransport } from "./transport-context.mjs";
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
@@ -48,7 +50,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
-      ...effectActions, ...transportActions, ...magicActions, ...learningActions,
+      ...effectActions, ...transportActions, ...magicActions, ...learningActions, ...combatActions, changeGrip,
       ...workshopActorActions,
       openAdvancement,
       toggleExperience: WitcherActorSheet.#onToggleExperience,
@@ -128,6 +130,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       row.presentation = row.expanded ? await itemPresentation(this.actor.items.get(row.id), { secrets: this.actor.isOwner }) : null;
     }));
     return Object.assign(context, {
+      combat: combatContext(this.actor,this.combatOptions),
       conditions,
       lifepath: lifepathContext(this.actor),
       profession: professionContext(this.actor),
@@ -189,6 +192,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   async _onRender(context, options) {
     await super._onRender(context, options);
     bindInventory(this); bindTransport(this);
+    bindCombat(this);
     bindMagic(this);
     for (const input of this.element.querySelectorAll("[data-header-counter]")) {
       input.addEventListener("change", event => {

@@ -39,7 +39,7 @@ for (const [name, documents] of Object.entries(packs)) {
         assert.deepEqual(await collection.getMany(folders.map(folder => folder._id)), folders);
       }
       const type = manifest.packs.find(pack=>pack.name===name).type;
-      const items = db.sublevel(type === "ActiveEffect" ? "effects" : "items", { valueEncoding: "json" });
+      const items = db.sublevel(({ActiveEffect:"effects",Actor:"actors",Item:"items"})[type], { valueEncoding: "json" });
       // Upsert only our stable IDs; never delete unrelated/user-added records.
       await items.batch(documents.map(document => ({ type: "put", key: document._id, value: document })));
       const stored = await items.getMany(documents.map(document => document._id));

@@ -1,4 +1,5 @@
 import { spellSources, spellFolders } from "../scripts/data/spells.mjs";
+import { bestiarySources } from "../scripts/data/bestiary.mjs";
 import { MATERIALS } from "../scripts/data/workshop-materials.mjs";
 import { ALCHEMY, MUTAGENS } from "../scripts/data/workshop-alchemy.mjs";
 import { UPGRADES } from "../scripts/data/workshop-upgrades.mjs";
@@ -39,6 +40,7 @@ export function compendiumData(translations) {
   });
   const professionAbility = entry => ({...item(entry.documentId, "ability", entry, { description: '<p>' + escapeHTML(entry.description) + '</p><p>Базовая книга, дерево профессии.</p>', level: 0, attribute: entry.attribute }), folder: getProfessionFolder(entry.profession)});
   return {
+    bestiary: bestiarySources(),
     effects: EFFECT_TEMPLATES.map(entry=>conditionSource(entry,text=>text.startsWith("WITCHER.")?localize(text):text)),
     professions: PROFESSIONS.map(entry => item(entry.documentId, "profession", entry, { description: '<p>Базовая книга: стр. ' + entry.page + ', дерево: стр. ' + entry.treePage + '.</p><p>Предел магии: ' + entry.vigor + '. ' + escapeHTML(entry.magic) + '</p><p>' + entry.skills.map(key => localize('WITCHER.Skills.Entries.' + key + '.Label')).join(', ') + '</p><p>Языков на выбор: ' + entry.languageChoices + '. Снаряжение — выберите ' + entry.equipmentChoices + ': ' + escapeHTML(entry.equipment) + '</p><p>' + entry.abilities.map(ability => '@UUID[Compendium.witcher-eliott-system.abilities.Item.' + ability.documentId + ']{' + ability.name + '}').join('<br>') + '</p>' })),
     languages: LANGUAGES.map(language => item(language.documentId, "language", language, {

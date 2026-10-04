@@ -15,5 +15,5 @@ export function workshopEquipmentFields() {
 }
 export function workshopActorFields() {
   const { ArrayField, SchemaField, BooleanField } = foundry.data.fields;
-  return { mutations: installationFields({ monster: text() }), harvest: new ArrayField(new SchemaField({ id: text(), uuid: text(), quantity: number(1, { integer: true }), skill: text(), dc: number(), attempted: new BooleanField({ initial: false }) })) };
+  return { mutations: installationFields({ monster: text() }), harvest: new ArrayField(new SchemaField({ id: text(), uuid: text(), quantity: number(1, { integer: true }), formula: text(), skill: text(), dc: number(), attempted: new BooleanField({ initial: false }) })) };
 }

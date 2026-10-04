@@ -45,12 +45,14 @@ test("cycles are rejected; dangling references and corrupt old cycles remain acc
 test("owned moves preserve Items, packing unequips, equipping takes the item out, invalid and read-only moves do nothing", async () => {
   const { actor, bag, ore, items } = fixture();
   globalThis.ui = { notifications: { warn() {} } };
+  globalThis.foundry = { applications: { api: { DialogV2: { wait: async () => 1 } } } };
   ore.type = "weapon"; ore.system.equipped = true;
   assert.equal(equippedItems(items).length, 0);
   await moveItemToContainer(actor, ore.id, bag.id);
   assert.equal(ore.system.containerId, bag.id); assert.equal(ore.system.equipped, false);
   await equipItem.call({ actor, isEditable: true }, null, { dataset: { itemId: ore.id } });
   assert.equal(ore.system.containerId, ""); assert.equal(equippedItems(items).length, 1);
+  assert.equal(ore.system.grip, 1);
   await moveItemToContainer(actor, bag.id, bag.id); assert.equal(bag.system.containerId, "");
   actor.isOwner = false; await moveItemToContainer(actor, ore.id, bag.id); assert.equal(ore.system.containerId, "");
 });

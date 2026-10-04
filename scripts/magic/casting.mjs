@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { actionQuote, actionNote, actionUpdate } from "../combat/action-economy.mjs";
 import { powerBonus } from "./power-place-rules.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
@@ -44,7 +45,8 @@ export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,he
   if(maintenance&&base<1)throw new Error("Не сохранена стоимость поддерживаемого знака. Прекратите поддержание и сотворите его заново.");
   const quote=castingCost({cost:base,focus:focus?.rating??0,spent:roundSpent(actor.system.magic,roundKey),vigor:actor.system.statistics.vigor+power.vigor});
   if(quote.stamina>actor.system.stamina.value)throw new Error(`Недостаточно Выносливости: нужно ${quote.stamina}, доступно ${actor.system.stamina.value}.`);
-  return {...quote,roundKey,skill:poweredSkill,skillKey,focus,power,difficulty:item.system.kind==="ritual"?ritualDifficulty(item.system,{dc,helpers}):null};
+  const action = maintenance ? {extra:false,penalty:0,stamina:0,roundKey:""} : actionQuote(actor,{cost:quote.stamina});
+  return {...quote,action,roundKey,skill:{...poweredSkill,total:poweredSkill.total+action.penalty},skillKey,focus,power,difficulty:item.system.kind==="ritual"?ritualDifficulty(item.system,{dc,helpers}):null};
 }
 
 const pendingCasts=new WeakMap();
@@ -96,7 +98,7 @@ function performCast(actor,itemId,options) {
       const flavor=`<section class="witcher-magic-chat"><h3>${title}: ${escape(item.name)}</h3>`
         +`<p data-tooltip="${escape(calc)}">Воля + ${CASTING_SKILL_LABELS[quote.skillKey]}: ${quote.skill.total}</p>`
         +`<p>${escape(spellRange(item.system.range))} · ${escape(spellDuration(item.system.duration))}</p>`
-        +`<p>Защита: ${escape(item.system.defense.map(key=>SPELL_DEFENSES[key]).join(" / "))}</p>`
+        +`<p>Защита: ${escape(item.system.defense.map(key=>SPELL_DEFENSES[key]).join(" / "))}</p>`+actionNote(quote.action)
         +`<ul>${summary.map(line=>`<li>${escape(line)}</li>`).join("")}</ul>`
         +`<details><summary>Действие магии</summary>${await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:false,relativeTo:item})}${hex?`<p>Снятие: ${escape(item.system.hex.lifting)}</p>`:""}</details></section>`;
       const flags={[SYSTEM_ID]:{...display.flags[SYSTEM_ID],...(!roll?{skipLuck:true}:{}),
@@ -108,8 +110,8 @@ function performCast(actor,itemId,options) {
       await display.wait(posted);
       const ritualSuccess=options.maintenance||!ritual||posted.flags[SYSTEM_ID].magicCast.succeeded;
       const concentration=item.system.duration.kind==="sustained"&&ritualSuccess&&!fumble.failed&&!(elemental&&element==="earth")
-        &&actor.system.stamina.value>quote.stamina&&actor.system.health.value>quote.damage+fumbleDamage;
-      await actor.update({"system.stamina.value":Math.max(0,actor.system.stamina.value-quote.stamina),
+        &&actor.system.stamina.value>quote.stamina+quote.action.stamina&&actor.system.health.value>quote.damage+fumbleDamage;
+      await actor.update({...actionUpdate(actor,quote.action,quote.stamina),
         "system.health.value":actor.system.health.value-quote.damage-fumbleDamage,
         "system.magic.roundKey":quote.roundKey,"system.magic.spent":quote.after,
         "system.magic.sustainedId":concentration?item.id:"","system.magic.maintainedRound":concentration?quote.roundKey:"",

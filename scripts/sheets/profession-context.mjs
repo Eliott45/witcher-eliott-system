@@ -42,12 +42,11 @@ export async function rollProfessionAbility(_event, target) {
   if (!definition || definition.profession !== this.actor.system.details.profession || !definition.attribute || !conditionRules(this.actor).canAct) return;
   const { level, attribute, bonus } = professionAbilityState(this.actor, definition);
   if (attribute === null) return;
-  const messageMode = game.settings.get("core", "messageMode");
-  const roll = await new foundry.dice.Roll(`1d10wc + ${attribute + level + bonus}`).evaluate({ allowInteractive: messageMode !== "blind" });
-  return roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: this.actor }),
+  const { rollActionCheck } = await import("../combat/action-economy.mjs");
+  return rollActionCheck(this.actor, { formula: `1d10wc + ${attribute + level + bonus}`,
     flavor: `<span data-tooltip="${escapeTooltip(`${definition.name}: ${attribute} + ${level} + ${bonus}`)}">${escapeTooltip(definition.name)}</span>`,
     flags: { [SYSTEM_ID]: { professionCheck: { id: definition.id, level, attribute, bonus, base: attribute + level + bonus } } }
-  }, { messageMode });
+  });
 }
 
 /** Only initialize an untouched/default magic pool. Existing custom values survive profession changes. */

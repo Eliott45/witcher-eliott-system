@@ -1,5 +1,6 @@
 import { cappedSkillModifiers } from "./background-modifiers.mjs";
 import { languageForEntry } from "./languages.mjs";
+import { creatureSkillAttribute } from "./creatures.mjs";
 // Stable IDs match background-modifiers.mjs; language is a template for named entries.
 const groups = {
   intelligence: ["awareness", "wildernessSurvival", "deduction", "monsterLore", "education", "streetwise", "teaching", "tactics", "business", "socialEtiquette", "language"],
@@ -24,11 +25,12 @@ export function skillValue(system, key, languageId = "") {
   if (key === "language" && !language) return null;
   const level = language ? language.level : system.skills[key];
   const statistics = system.statistics;
-  const attribute = statistics.effective[skill.attribute];
+  const override = creatureSkillAttribute(system,key);
+  const attribute = override?.value ?? statistics.effective[skill.attribute];
   const modifiers = cappedSkillModifiers(level, statistics.modifiers.filter(modifier => modifier.target === `skills.${key}`
     && (!modifier.languageId || (language && languageForEntry(language)?.id === modifier.languageId))
     && (!modifier.condition || (modifier.condition === "humanTarget" && system.abilityState.trustEnabled))));
   const bonus = modifiers.reduce((sum, modifier) => sum + modifier.value, 0);
-  return { ...skill, language, level, attributeValue: attribute, bonus, modifiers,
+  return { ...skill, language, level, attributeValue: attribute, attributeOverride:override, bonus, modifiers,
     total: attribute === null ? null : attribute + level + bonus };
 }

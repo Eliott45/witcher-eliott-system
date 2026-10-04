@@ -1,6 +1,7 @@
 <div class="witcher-character-layout{{#if stats.death.dead}} is-dead{{else if stats.death.active}} is-dying{{/if}}">
   <aside class="witcher-character-sidebar">
     <div class="witcher-brand">THE WITCHER</div>
+    <button type="button" class="witcher-sidebar-extra" data-action="toggleExtraAction" aria-pressed="{{combat.extra}}" {{disabled (not editable)}} data-tooltip="Дополнительное действие: 3 ВЫН и −3 к его проверкам; переключатель сбрасывается после действия."><i class="fa-solid fa-bolt"></i> Второе действие{{#if combat.extra}} · −3{{/if}}</button>
     <section class="witcher-resources" aria-label="{{localize 'WITCHER.Sheet.Resources'}}">
     <fieldset class="witcher-resource health">
       <legend><span data-tooltip="{{stats.healthTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Sheet.Health"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></legend>
@@ -397,6 +398,7 @@
     </section>
     <section id="{{rootId}}-actions" class="witcher-character-content tab {{tabs.actions.cssClass}}"
              data-group="character" data-tab="actions" aria-label="{{localize 'WITCHER.Actions.Title'}}">
+      {{> "systems/witcher-eliott-system/templates/combat-actions.hbs"}}
       {{> "systems/witcher-eliott-system/templates/learning.hbs"}}
     </section>
     <section id="{{rootId}}-biography" class="witcher-character-content witcher-biography tab {{tabs.biography.cssClass}}"

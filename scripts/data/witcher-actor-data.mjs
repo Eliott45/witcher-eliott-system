@@ -1,4 +1,6 @@
 import { magicFields } from "../magic/rules.mjs";
+import { actionFields } from "../combat/action-economy.mjs";
+import { creatureFields } from "./creatures.mjs";
 import { workshopActorFields } from "./workshop-schema.mjs";
 import { PROFESSIONS } from "./professions.mjs";
 import { lifepathSchema } from "./lifepath-fields.mjs";
@@ -25,6 +27,8 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
 
     return {
       magic: magicFields(),
+      combatAction: actionFields(),
+      creature: creatureFields(),
       lifepath: lifepathSchema(),
       ...workshopActorFields(),
       // Null distinguishes an unfilled statistic from an explicitly entered zero on old actors.

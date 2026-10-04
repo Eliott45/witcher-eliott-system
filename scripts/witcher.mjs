@@ -1,4 +1,5 @@
 import { WitcherSpellData } from "./data/witcher-spell-data.mjs";
+import { registerWeaponChat } from "./combat/weapon-rolls.mjs";
 import { WitcherPowerPlaceData } from "./data/witcher-power-place-data.mjs";
 import { WitcherPowerPlaceSheet } from "./sheets/witcher-power-place-sheet.mjs";
 import { registerSpellContentMigration,migrateSpellContent } from "./migrations/spell-content.mjs";
@@ -19,6 +20,7 @@ import { WitcherChatMessage } from "./documents/witcher-chat-message.mjs";
 import { WitcherCombat } from "./documents/witcher-combat.mjs";
 import { registerCriticalDice } from "./dice/critical-chain.mjs";
 import { WitcherActorSheet } from "./sheets/witcher-actor-sheet.mjs";
+import { WitcherNPCSheet } from "./sheets/witcher-npc-sheet.mjs";
 import { WitcherAbilityData } from "./data/witcher-ability-data.mjs";
 import { WitcherEquipmentData } from "./data/witcher-equipment-data.mjs";
 import { WitcherWeaponData } from "./data/witcher-weapon-data.mjs";
@@ -44,7 +46,7 @@ import { preventIncapacitatedMovement, preventIncapacitatedPositionUpdate } from
 import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
 
 Hooks.once("init", async () => {
-  await foundry.applications.handlebars.loadTemplates(["learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
+  const templatesReady = foundry.applications.handlebars.loadTemplates(["combat-actions", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Actor.documentClass = WitcherActor;
   CONFIG.ActiveEffect.documentClass = WitcherActiveEffect;
@@ -52,6 +54,7 @@ Hooks.once("init", async () => {
   CONFIG.ChatMessage.documentClass = WitcherChatMessage;
   CONFIG.Combat.documentClass = WitcherCombat;
   registerCriticalDice();
+  registerWeaponChat();
   CONFIG.Combat.initiative.formula = "1d10wc + @statistics.initiative";
   registerStatusEffects();
   registerConditionSaves();
@@ -104,8 +107,11 @@ Hooks.once("init", async () => {
     WitcherItemSheet,
     { types: ITEM_TYPES, makeDefault: true, label: "WITCHER.Sheet.ReferenceTitle" }
   );
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(foundry.documents.Actor,SYSTEM_ID,WitcherNPCSheet,
+    {types:["npc"],makeDefault:true,label:"Лист существа"});
   foundry.applications.apps.DocumentSheetConfig.registerSheet(foundry.documents.Actor,SYSTEM_ID,WitcherPowerPlaceSheet,
     {types:["powerPlace"],makeDefault:true,label:"TYPES.Actor.powerPlace"});
+  await templatesReady;
 });
 
 Hooks.on("preCreateActor", applyActorTokenDefaults);
@@ -124,7 +130,7 @@ Hooks.on("renderChatInput", renderDiceTray);
 Hooks.on("updateCombat", (_combat,changes) => {
   if (!("round" in changes)) return;
   for (const app of foundry.applications.instances.values()) {
-    if (app instanceof WitcherActorSheet && app.rendered) app.render({force:false});
+    if ((app instanceof WitcherActorSheet || app instanceof WitcherNPCSheet) && app.rendered) app.render({force:false});
   }
 });
 Hooks.once("ready", () => {

@@ -1,4 +1,5 @@
 import { isTransport, cargoSections, cargoSection } from "../data/transport.mjs";
+import { gripOf } from "../combat/weapon-rules.mjs";
 import { effectiveItem, activeOil } from "../data/workshop.mjs";
 import { ARMOR_ZONES, armorZones, isPhysical, equippedItems, conditionKey, carriedWeight, itemWeight } from "../data/physical-items.mjs";
 import { isContainer, containerParent, containerContents, isCarried } from "../data/containers.mjs";
@@ -26,6 +27,7 @@ export function inventoryContext(actor, preferences = {}) {
     quantity: item.system.quantity ?? 1, carried: isCarried(item, items), expanded: false, presentation: null, cargoSections: [], onTransport: false,
     isContainer: isContainer(item), parentId: containerParent(item, items)?.id ?? "", children: [], containerOpen: true,
     isRecipe: item.type === "recipe", oil: activeOil(item, globalThis.game?.time?.worldTime ?? 0),
+    isWeapon: item.type === "weapon" && !item.system.natural, grip: gripOf(item),
     category: equipmentCategory(item), search: equipmentEntry(item).search, canEquip: ["weapon", "armor"].includes(item.type),
     condition: conditionKey(item) ? effectiveItem(item)[conditionKey(item)] : null, conditionLabel: item.type === "armor" ? "ПБ" : "Н",
     totalWeight: Math.round(itemWeight(item) * 1000) / 1000 }));
@@ -64,6 +66,8 @@ export function inventoryContext(actor, preferences = {}) {
 }
 export async function equipItem(_event, target) {
   if (!this.isEditable) return;
+  const weapon=this.actor.items.get(target.dataset.itemId);
+  if(weapon?.type==="weapon"&&!weapon.system.natural)return changeGrip.call(this,_event,target);
   await inventoryWrite(this.actor, async () => {
     const item = this.actor.items.get(target.dataset.itemId);
     if (!item || !isPhysical(item) || item.system.quantity <= 0) return;
@@ -84,6 +88,23 @@ export async function changeInventoryQuantity(_event, target) {
     if (!item || !isPhysical(item) || isContainer(item)) return;
     const quantity = Math.max(0, (item.system.quantity ?? 1) + Number(target.dataset.delta));
     await item.update({ "system.quantity": quantity });
+  });
+}
+export async function changeGrip(_event,target) {
+  if(!this.isEditable)return;
+  const item=this.actor.items.get(target.dataset.itemId);
+  if(item?.type!=="weapon"||item.system.natural)return;
+  const grip=await foundry.applications.api.DialogV2.wait({window:{title:`Хват: ${item.name}`},content:`<p>Нужно рук для атаки: ${item.system.hands}. Выберите текущий хват. При смене оружия лишнее оружие будет убрано.</p>`,
+    buttons:[{action:"stow",label:"Убрать",callback:()=>0},{action:"one",label:"1 рукой",callback:()=>1},{action:"two",label:"2 руками",callback:()=>2}],rejectClose:false});
+  if(![0,1,2].includes(grip))return;
+  await inventoryWrite(this.actor,async()=>{
+    const updates=[{_id:item.id,"system.grip":grip||gripOf(item),"system.equipped":grip>0,...(grip?{"system.carried":true,"system.containerId":""}:{})}];
+    let occupied=grip;
+    for(const other of equippedItems(this.actor.items).filter(other=>other.type==="weapon"&&other.id!==item.id&&!other.system.natural)) {
+      if(grip&&occupied+gripOf(other)>2)updates.push({_id:other.id,"system.equipped":false});
+      else occupied+=gripOf(other);
+    }
+    await this.actor.updateEmbeddedDocuments("Item",updates);
   });
 }
 export async function toggleCarried(_event, target) {

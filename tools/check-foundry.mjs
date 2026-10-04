@@ -39,7 +39,7 @@ assert.equal(game.system.grid.distance, 2);
 assert.equal(game.system.grid.units, "m");
 const [packFolder] = game.system.packFolders;
 assert.equal(packFolder.name, "Witcher");
-assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "spells"]);
+assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "spells", "bestiary"]);
 game.model = { ...game.system.documentTypes, ActiveEffect:{base:{}}, Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type, folders: new Map() }]));
 game.user = { id: "testuser00000001", isGM: true };
@@ -297,6 +297,9 @@ for (const source of await readJSON("../pack-sources/equipment.folders.json")) {
   assert.equal(folder.name, source.name);
   game.packs.get(equipmentPack).folders.set(folder.id, folder);
 }
+CONFIG.Actor.dataModels.npc = WitcherActorData;
+foundry.data.PrototypeTokenOverrides.overrides = { base: {} };
+const assertSubset=(actual,expected)=>{for(const [key,value] of Object.entries(expected))if(value&&typeof value==="object")assertSubset(actual[key],value);else assert.deepEqual(actual[key],value);};
 const documents = new Map();
 for (const pack of game.system.packs) {
   for (const source of await readJSON(`../pack-sources/${pack.name}.json`)) {
@@ -306,9 +309,10 @@ for (const pack of game.system.packs) {
       : new URL(`public/${source.img}`, app));
     assert.equal(document.type, source.type);
     const modeled = document.system.toObject?.() ?? document.system;
-    assert.deepEqual(Object.fromEntries(Object.keys(source.system).map(key => [key, modeled[key]])), source.system);
+    if(pack.type === "Actor") assertSubset(modeled,source.system);
+    else assert.deepEqual(Object.fromEntries(Object.keys(source.system).map(key => [key, modeled[key]])), source.system);
     if (pack.type === "Item") assert.equal(document.effects.size, 0, "Reference items must not contain automated effects");
-    else assert.deepEqual(document.toObject().flags,source.flags,"Effect rules survive native serialization");
+    else if(pack.type === "ActiveEffect") assert.deepEqual(document.toObject().flags,source.flags,"Effect rules survive native serialization");
     const uuid = `Compendium.${game.system.id}.${pack.name}.${pack.type}.${document.id}`;
     documents.set(uuid, document);
   }
@@ -479,7 +483,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["combat-actions", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -1204,4 +1208,42 @@ if (process.argv[3]) {
   }
   console.log("Installed Dice So Nice: all nine critical chains produce the correct successive d10 throws");
 }
+
+// Creature presets use native NPC schemas and the same embedded Items as characters.
+const {bestiarySources}=await import('../scripts/data/bestiary.mjs');
+const {WitcherNPCSheet}=await import('../scripts/sheets/witcher-npc-sheet.mjs');
+const {weaponAttack}=await import('../scripts/combat/weapon-rules.mjs');
+const npcTemplate=handlebars.compile(await readFile(new URL('../templates/npc-sheet.hbs',import.meta.url),'utf8'),{strict:true});
+const creatureTestGlobals={user:game.user,fromUuid:foundry.utils.fromUuid};
+game.user={id:'gmCreature',isGM:true};foundry.utils.fromUuid=async uuid=>documents.get(uuid);
+const creatureViews=[];
+for(const source of bestiarySources()) {
+  const initial=new foundry.documents.BaseActor(source);
+  const actor=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(initial.toObject())));
+  Object.defineProperty(actor,'isOwner',{value:true});actor.system.prepareDerivedData();
+  assert.equal(actor.system.health.value,source.system.health.value);assert.equal(actor.system.stamina.max,source.system.stamina.max);
+  for(const item of actor.items)assert.equal(item.system.ruleId,initial.items.get(item.id).system.ruleId);
+  const npcSheet=new WitcherNPCSheet();npcSheet.actor=actor;npcSheet.isEditable=true;
+  for(const editing of [false,true]) {
+    npcSheet.editing=editing;
+    const view=await npcSheet._prepareContext({});const rendered=npcTemplate(view);
+    assert.ok(rendered.includes(source.name));assert.ok(rendered.includes('data-action="attackWeapon"'));assert.ok(!rendered.includes('data-mode="strong"'));
+    if(!editing)creatureViews.push({actor,sheet:npcSheet,view,html:rendered});
+  }
+  if(source.name==='Утопец') {
+    assert.equal(skillValue(actor.system,'awareness').total,15);assert.equal(skillValue(actor.system,'wildernessSurvival').total,13);
+    assert.equal(skillValue(actor.system,'education').total,1);assert.equal(actor.system.harvest.length,3);
+    const claws=actor.items.find(i=>i.type==='weapon');assert.equal(weaponAttack(actor,claws,{mode:'npc'}).total,13);
+    assert.equal(weaponAttack(actor,claws,{mode:'npc'}).damage,'(3d6)');
+  } else {
+    assert.equal(skillValue(actor.system,'swordsmanship').total,12);
+    assert.equal(actor.items.find(i=>i.system.ruleId==='weapon.hand-crossbow').system.accuracy,1);
+  }
+}
+const emptyCreature=new foundry.documents.BaseActor({name:'New creature',type:'npc'});
+const emptySheet=new WitcherNPCSheet();emptySheet.actor=emptyCreature;emptySheet.isEditable=true;
+assert.match(npcTemplate(await emptySheet._prepareContext({})),/Бандит/);
+assert.equal(new WitcherActorData(legacyActorData.toObject()).creature.category,'humanoid');
+game.user=creatureTestGlobals.user;foundry.utils.fromUuid=creatureTestGlobals.fromUuid;
+
 console.log(`Installed Foundry core: data, ${documents.size} compendium documents, templates, native Luck, death saves and all nine critical chains OK`);

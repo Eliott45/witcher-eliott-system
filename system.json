@@ -207,6 +207,17 @@
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
       }
+    },
+    {
+      "name": "bestiary",
+      "label": "Бестиарий",
+      "path": "packs/bestiary",
+      "type": "Actor",
+      "system": "witcher-eliott-system",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     }
   ],
   "packFolders": [
@@ -224,7 +235,8 @@
         "influential-friends",
         "languages",
         "professions",
-        "spells"
+        "spells",
+        "bestiary"
       ]
     }
   ],

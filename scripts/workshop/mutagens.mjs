@@ -37,6 +37,8 @@ export async function harvestMaterial(npc,id) {
   if(!npc.isOwner)return;
   const entry=npc.system.harvest.find(row=>row.id===id);
   if(!entry||entry.attempted)throw new Error("Добыча уже собрана или попытка извлечения потрачена.");
+  if(entry.formula&&!npc.system.creature.lootGenerated)throw new Error("Сначала определите случайную добычу в разделе «Сведения».");
+  if(entry.quantity<=0)throw new Error("Этого материала в добыче нет.");
   const source=await foundry.utils.fromUuid(entry.uuid);if(!source)throw new Error("Исходный материал недоступен.");
   const actors=game.actors.filter(actor=>actor.isOwner&&actor.id!==npc.id);
   const targetId=await foundry.applications.api.DialogV2.prompt({window:{title:"Получатель добычи"},content:`<label>Персонаж<select name="actor">${actors.map(actor=>`<option value="${actor.id}">${esc(actor.name)}</option>`).join("")}</select></label><p>${esc(source.name)} ×${entry.quantity}. ${entry.skill?`СЛ ${entry.dc}`:"Проверка для этой добычи не задана"}.</p>`,ok:{label:"Извлечь",callback:(_e,b)=>new FormData(b.form).get("actor")},rejectClose:false});

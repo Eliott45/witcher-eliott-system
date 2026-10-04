@@ -1,4 +1,5 @@
 import { ATTRIBUTE_KEYS } from "../data/statistics.mjs";
+import { rollActionCheck } from "./action-economy.mjs";
 import { conditionRules } from "./condition-rules.mjs";
 
 export async function rollAttribute(actor, key) {
@@ -12,12 +13,10 @@ export async function rollAttribute(actor, key) {
     ui.notifications.warn(game.i18n.localize("WITCHER.Statistics.UnfilledAttribute"));
     return;
   }
-  const messageMode = game.settings.get("core", "messageMode");
-  const roll = await new foundry.dice.Roll(`1d10wc + ${value}`).evaluate({ allowInteractive: messageMode !== "blind" });
-  return roll.toMessage({
-    speaker: foundry.documents.ChatMessage.getSpeaker({ actor }),
+  return rollActionCheck(actor, {
+    formula: `1d10wc + ${value}`,
     flavor: game.i18n.format("WITCHER.Statistics.AttributeRoll", {
       attribute: game.i18n.localize(`WITCHER.Attributes.${key}.Label`), value
     })
-  }, { messageMode });
+  });
 }

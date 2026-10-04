@@ -1,0 +1,47 @@
+.witcher-eliott.npc-sheet { min-width:620px; min-height:520px; color:#443b30; }
+.witcher-eliott.npc-sheet .window-content { background:#eee8dc; }
+.witcher-npc-layout { display:flex; flex-direction:column; height:100%; min-height:0; font:14px/1.5 var(--font-primary,sans-serif); }
+.witcher-npc-header { display:flex; gap:18px; padding:22px 24px; background:radial-gradient(ellipse at right top,#47626955,transparent 70%),#273b3b; color:#f1e6cb; border-bottom:3px solid #bd985a; }
+.witcher-npc-portrait { width:94px; height:110px; object-fit:cover; border:1px solid #a88955; border-radius:8px 8px 30px 8px; cursor:pointer; }
+.witcher-npc-identity { flex:1; min-width:0; align-self:center; }
+.witcher-npc-identity>small { font-size:10px; letter-spacing:.18em; color:#bfa77e; }
+.witcher-npc-identity h1 { color:#f7edd7; font:700 34px/1.2 Georgia,serif; margin:6px 0 12px; border:0; }
+.witcher-npc-traits { display:flex; flex-wrap:wrap; gap:5px; }
+.witcher-npc-traits span { border:1px solid #6a797066; background:#14282866; border-radius:3px; padding:2px 7px; font-size:10px; letter-spacing:.03em; }
+.witcher-npc-edit { align-self:start; background:transparent; color:#cfba91; border-color:#7d8c7944; width:30px; height:30px; }
+.witcher-npc-tabs { display:flex; gap:2px; padding:0 22px; background:#dcd2c0; border-bottom:1px solid #c0ac8a; }
+.witcher-npc-tabs>button { border:0; border-radius:0; background:none; color:#655640; font-size:13px; height:42px; padding:0 18px; box-shadow:none; }
+.witcher-npc-tabs>button.active { color:#723e31; background:#eee8dc; box-shadow:inset 0 -3px #8d4c39; }
+.witcher-npc-body { overflow:auto; padding:20px 24px 28px; flex:1; min-height:0; scrollbar-color:#9a7453 transparent; }
+.witcher-npc-body>.tab { display:none; }.witcher-npc-body>.tab.active { display:block; }
+.witcher-npc-body input,.witcher-npc-body select,.witcher-npc-body textarea { background:#faf6ed; border:1px solid #c9b99d; color:#44392b; border-radius:4px; }
+.witcher-npc-body input { height:30px; }.witcher-npc-body textarea { width:100%; }
+.witcher-npc-body button { color:#644534; background:#f4edde; border-color:#c7b493; box-shadow:none; }
+.witcher-npc-resources { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.witcher-npc-resources>label,.witcher-npc-resources>div { display:flex; flex-direction:column; align-items:center; justify-content:space-between; border:1px solid #c8b59a; border-top:3px solid #8b4a38; border-radius:5px; background:#faf5eb; padding:9px 12px 7px; }
+.witcher-npc-resources>*>span { font-size:10px; letter-spacing:.1em; color:#7a6047; }
+.witcher-npc-resources>*>div { display:flex; align-items:center; gap:5px; font:22px Georgia,serif; }
+.witcher-npc-resources input { width:62px; height:40px; font:700 28px Georgia,serif; text-align:center; border:0; border-bottom:1px solid #ceb893; background:transparent; }
+.witcher-npc-resources strong { font:700 30px/40px Georgia,serif; }
+.witcher-npc-resources button { font-size:11px; border:0; background:none; height:24px; padding:0; }
+.witcher-npc-resources small { font-size:11px; color:#7d6650; }
+.witcher-npc-resources .npc-stamina { border-top-color:#547068; }.witcher-npc-resources .npc-stun { border-top-color:#af8b51; }
+.witcher-npc-stats { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); margin-top:14px; border:1px solid #c9b99f; border-radius:5px; background:#e5ddce; }
+.witcher-npc-stats>div { display:grid; text-align:center; border-right:1px solid #cebea6; padding:5px; }.witcher-npc-stats>div:last-child { border:0; }
+.witcher-npc-stats span { font-size:10px; color:#8d7050; }.witcher-npc-stats button { font:700 23px Georgia,serif; border:0; background:none; padding:0; height:30px; }
+.witcher-npc-stats input { width:100%; text-align:center; padding:0; }
+.witcher-npc-movement { display:flex; flex-wrap:wrap; gap:6px 22px; padding:8px 0 12px; font-size:12px; color:#77634b; }.witcher-npc-movement b { color:#463e33; margin-left:3px; }
+.witcher-npc-defense { display:flex; flex-wrap:wrap; gap:6px; }.witcher-npc-defense button { flex:1; height:auto; padding:5px 8px; font-size:10px; white-space:nowrap; background:#e1e5da; border-color:#b2b9a5; color:#485f51; }.witcher-npc-defense b { font-size:16px; }
+.witcher-npc-armor { display:flex; flex-wrap:wrap; align-items:center; gap:16px; padding:10px 0 16px; margin-bottom:16px; border-bottom:1px solid #c4b195; font-size:11px; color:#7b644d; }.witcher-npc-armor>span { display:flex; gap:5px; align-items:center; }.witcher-npc-armor img { width:20px; height:20px; border:0; }.witcher-npc-armor button { border:0; background:none; padding:0 4px; height:22px; }
+.witcher-npc-section-title { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:18px 0 9px; border-bottom:1px solid #bea882; padding-bottom:7px; }.witcher-npc-section-title h2 { font:700 21px Georgia,serif; color:#713f31; border:0; margin:0; }.witcher-npc-section-title>div { display:flex; gap:5px; }.witcher-npc-section-title button { width:auto; height:27px; padding:0 9px; font-size:11px; }
+.witcher-npc-abilities { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }.witcher-npc-abilities details,.witcher-npc-lore { border:1px solid #cbb99b; background:#f7f0e3; border-radius:4px; }.witcher-npc-abilities summary { padding:8px 10px; font-size:12px; font-weight:bold; color:#5a503d; cursor:pointer; }.witcher-npc-abilities summary button { float:right; height:20px; padding:0 3px; background:none; border:0; font-size:10px; }.witcher-npc-abilities details>div { padding:0 10px 10px; font-size:12px; }.witcher-npc-abilities p { margin:5px 0; }
+.witcher-npc-skills { margin-top:18px; border-top:1px solid #c5b494; padding-top:12px; }.witcher-npc-skills summary { color:#70533b; font:bold 17px Georgia,serif; cursor:pointer; }.witcher-npc-skills summary span { font-size:12px; margin-left:6px; }.witcher-npc-skills>div { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px 15px; margin-top:10px; }.witcher-npc-skills label { display:flex; align-items:center; gap:6px; }.witcher-npc-skills button { width:100%; display:flex; justify-content:space-between; text-align:left; font-size:11px; padding:4px 8px; background:none; border:0; border-bottom:1px solid #ddcfb8; }.witcher-npc-skills input { width:44px; }
+.witcher-npc-facts { display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; margin:12px 0 20px; }.witcher-npc-facts label { display:grid; gap:4px; font-size:12px; }.witcher-npc-facts span { color:#8b7454; font-size:11px; }.witcher-npc-facts b { font-weight:500; }
+.witcher-npc-body blockquote { border-left:3px solid #71826e; padding:10px 14px; margin:16px 0; background:#dfe2d655; font-size:13px; color:#56604d; }
+.witcher-npc-lore { margin-top:10px; padding:10px 12px; }.witcher-npc-lore summary { font-weight:bold; cursor:pointer; }.witcher-npc-lore summary span { float:right; color:#8d704c; font-size:12px; }.witcher-npc-lore p { font-size:13px; }
+.witcher-npc-loot>div { display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px solid #cebea3; font-size:13px; }.witcher-npc-loot input { min-width:30px; width:100%; }.witcher-npc-loot label { display:flex; align-items:center; }
+.witcher-npc-effects details { border:1px solid #b37955; border-radius:4px; background:#ebd4c3; padding:5px 10px; margin-bottom:7px; font-size:12px; }.witcher-npc-effects summary img { width:18px; height:18px; vertical-align:middle; margin-right:5px; border:0; }
+.witcher-npc-danger { display:flex; align-items:center; gap:10px; padding:9px; margin:10px 0; background:#7a302c; color:#fff0d8; }.witcher-npc-danger label { display:flex; align-items:center; gap:7px; }.witcher-npc-danger input { width:50px; }
+.witcher-npc-presets { padding:15px; margin-bottom:15px; background:#ded8c7; border:1px dashed #9c8460; border-radius:8px; }.witcher-npc-presets button { display:inline-flex; padding:0 15px; width:auto; margin-right:10px; }
+.witcher-npc-body .witcher-combat-heading h2 { font-size:22px; }.witcher-npc-body .witcher-combat-panel { margin-bottom:12px; }
+@container witcher-sheet (max-width:660px) { .witcher-npc-body { padding:16px; } .witcher-npc-header { padding:16px; } .witcher-npc-defense { display:grid; grid-template-columns:1fr 1fr; } .witcher-npc-identity h1 { font-size:28px; } .witcher-npc-abilities { grid-template-columns:1fr; } }

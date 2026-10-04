@@ -20,7 +20,9 @@ export function registerStatusEffects() {
 
 export function localizeStatusEffects() {
   for (const definition of Object.values(CONFIG.statusEffects)) {
-    const text = STATUS_DEFINITIONS[definition.id].description;
+    const own = STATUS_DEFINITIONS[definition.id];
+    if (!own) continue; // Other modules may add their own statuses before localization.
+    const text = own.description;
     definition.description = `<p>${text.startsWith("WITCHER.") ? game.i18n.localize(text) : text}</p>`;
   }
 }

@@ -12,7 +12,10 @@ const CONCEALMENT_FIELD = choice("concealment", "Скрытность", CONCEALM
 const WEAPON = [choice("category", "Категория оружия", [{ id: "melee", name: "Ближний бой" }, { id: "ranged", name: "Стрелковое" }, { id: "thrown", name: "Метательное" }, { id: "shield", name: "Щит" }]),
   choice("skill", "Навык", ["swordsmanship", "smallBlades", "melee", "brawling", "staffSpear", "archery", "crossbow", "athletics"].map(id => ({ id, name: `WITCHER.Skills.Entries.${id}.Label` }))),
   text("damage", "Урон (формула)"), DAMAGE_TYPE, number("accuracy", "Точность (WA)", -100),
-  ...RELIABILITY, number("hands", "Хват (рук)", 1),
+  ...RELIABILITY, number("hands", "Необходимое число рук", 1),
+  choice("grip", "Текущий хват", [{id:0,name:"По требованиям оружия"},{id:1,name:"Одна рука"},{id:2,name:"Две руки"}]),
+  number("attackRate", "Скорострельность (СА), для NPC", 1), bool("natural", "Естественное оружие"),
+  bool("damageIncludesBody", "Урон уже включает Телосложение (бестиарий)"), bool("loaded", "Арбалет заряжен"),
   decimal("range", "Дальность, м"), decimal("rangeBodyMultiplier", "Либо дальность: ТЕЛ ×"),
   CONCEALMENT_FIELD,
   number("enhancementSlots", "Слоты усиления"), number("encumbrance", "Скованность (EV, для щита)")];

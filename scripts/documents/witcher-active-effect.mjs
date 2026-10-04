@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { immuneToCondition } from "../data/creatures.mjs";
 import { effectRules } from "../data/condition-definitions.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
@@ -8,6 +9,7 @@ export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
     if (await super._preCreate(data, options, user) === false) return false;
     const actor=this.parent;
     if(actor?.documentName!=="Actor")return;
+    if(immuneToCondition(actor,this.statuses)){ui.notifications.info("У существа иммунитет к этому состоянию.");return false;}
     if(actor.effects.some(effect=>!effect.disabled&&!effect.isSuppressed&&[...this.statuses].some(status=>effect.statuses.has(status)))) {
       ui.notifications.info("Это состояние уже действует на персонажа."); return false;
     }

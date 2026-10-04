@@ -1,0 +1,513 @@
+[
+  {
+    "_id": "bestiaryBandit01",
+    "name": "Бандит",
+    "type": "npc",
+    "img": "systems/witcher-eliott-system/assets/creatures/bandit.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Бандит",
+      "texture": {
+        "src": "systems/witcher-eliott-system/assets/creatures/bandit.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 3,
+        "reflex": 6,
+        "dexterity": 5,
+        "body": 5,
+        "speed": 4,
+        "empathy": 3,
+        "craft": 4,
+        "will": 4,
+        "luck": 0
+      },
+      "health": {
+        "value": 20,
+        "max": 20
+      },
+      "stamina": {
+        "value": 20,
+        "max": 20
+      },
+      "skills": {
+        "swordsmanship": 6,
+        "crossbow": 4,
+        "smallBlades": 5,
+        "brawling": 6,
+        "dodgeEscape": 4,
+        "athletics": 4,
+        "awareness": 6,
+        "stealth": 3,
+        "wildernessSurvival": 5,
+        "resistMagic": 4,
+        "resistCoercion": 5,
+        "endurance": 5,
+        "courage": 7
+      },
+      "creature": {
+        "category": "humanoid",
+        "difficulty": "Простые / обычные",
+        "reward": 10,
+        "size": "Обычный человеческий рост",
+        "weight": "Обычный человеческий вес",
+        "habitat": "Тракты и окрестности городов",
+        "intellect": "Человеческий",
+        "group": "Банда из 3–15 разбойников",
+        "source": "Базовая книга, стр. 270–271; официальная errata (Борьба +6, точность арбалета +1)",
+        "description": "Разбойники, дезертиры и наёмники без нанимателя. Опасны числом и подготовленной засадой; способны договариваться и сдаваться.",
+        "tactics": "Бойцы с мечами давят в ближнем бою, арбалетчики стреляют из укрытия. Потеря товарищей может спровоцировать ярость; тяжёлые потери обычно заставляют отступить. СА каждого оружия — 1. Для смены оружия выберите его хват.",
+        "lore": [
+          {
+            "name": "Общее мнение",
+            "skill": "education",
+            "dc": 8,
+            "text": "Война и голод увеличивают число разбойников. Они подстерегают путников и выбирают удобные места для засады."
+          },
+          {
+            "name": "Академические знания",
+            "skill": "education",
+            "dc": 10,
+            "text": "Большинство — бывшие солдаты и дезертиры. Обычно ими движут безопасность и деньги; переговоры часто возможны."
+          }
+        ],
+        "loot": [
+          {
+            "name": "Кроны",
+            "formula": "3d10",
+            "currency": true
+          },
+          {
+            "name": "Обычные предметы",
+            "formula": "1d6"
+          }
+        ]
+      }
+    },
+    "items": [
+      {
+        "_id": "weap000000000001",
+        "name": "Железный полуторный меч",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "skill": "swordsmanship",
+          "damageType": "Р/К",
+          "accuracy": 0,
+          "rarity": "everywhere",
+          "damage": "2d6+2",
+          "reliability": {
+            "value": 10,
+            "max": 10
+          },
+          "hands": 2,
+          "range": 0,
+          "rangeBodyMultiplier": 0,
+          "concealment": "large",
+          "enhancementSlots": 0,
+          "weight": 1.5,
+          "price": 160,
+          "properties": "",
+          "category": "melee",
+          "encumbrance": 0,
+          "source": "Базовая книга, стр. 73–74 / 80",
+          "ruleId": "weapon.iron-longsword",
+          "equipped": true,
+          "damageIncludesBody": true
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.weap000000000001"
+          }
+        }
+      },
+      {
+        "_id": "weap000000000010",
+        "name": "Кинжал",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "skill": "smallBlades",
+          "damageType": "Р/К",
+          "accuracy": 0,
+          "rarity": "everywhere",
+          "damage": "1d6",
+          "reliability": {
+            "value": 10,
+            "max": 10
+          },
+          "hands": 1,
+          "range": 0,
+          "rangeBodyMultiplier": 0,
+          "concealment": "small",
+          "enhancementSlots": 0,
+          "weight": 0.5,
+          "price": 50,
+          "properties": "",
+          "category": "melee",
+          "encumbrance": 0,
+          "source": "Базовая книга, стр. 271: урон кинжала в блоке разбойника 1d6",
+          "ruleId": "weapon.dagger",
+          "equipped": false,
+          "damageIncludesBody": true
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.weap000000000010"
+          }
+        }
+      },
+      {
+        "_id": "weap000000000033",
+        "name": "Ручной арбалет",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "skill": "crossbow",
+          "damageType": "К",
+          "accuracy": 1,
+          "rarity": "everywhere",
+          "damage": "2d6+2",
+          "reliability": {
+            "value": 5,
+            "max": 5
+          },
+          "hands": 1,
+          "range": 50,
+          "rangeBodyMultiplier": 0,
+          "concealment": "large",
+          "enhancementSlots": 1,
+          "weight": 0.5,
+          "price": 285,
+          "properties": "Медленно перезаряжающееся",
+          "category": "ranged",
+          "encumbrance": 0,
+          "source": "Базовая книга, стр. 73–74 / 80",
+          "ruleId": "weapon.hand-crossbow",
+          "equipped": false,
+          "damageIncludesBody": true
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.weap000000000033"
+          }
+        }
+      },
+      {
+        "_id": "armo000000000002",
+        "name": "Двуслойный капюшон",
+        "type": "armor",
+        "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
+        "system": {
+          "zone": "head",
+          "armorClass": "light",
+          "stoppingPower": {
+            "value": 5,
+            "max": 5
+          },
+          "rarity": "rare",
+          "enhancementSlots": 1,
+          "encumbrance": 0,
+          "weight": 1,
+          "price": 175,
+          "properties": "",
+          "source": "Базовая книга, стр. 79–80",
+          "ruleId": "armor.head.2",
+          "equipped": true
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.armo000000000002"
+          }
+        }
+      },
+      {
+        "_id": "armo000000000011",
+        "name": "Аэдирнский гамбезон",
+        "type": "armor",
+        "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+        "system": {
+          "zone": "torso",
+          "armorClass": "light",
+          "stoppingPower": {
+            "value": 5,
+            "max": 5
+          },
+          "rarity": "rare",
+          "enhancementSlots": 1,
+          "encumbrance": 0,
+          "weight": 1.5,
+          "price": 175,
+          "properties": "",
+          "source": "Базовая книга, стр. 79–80",
+          "ruleId": "armor.torso.2",
+          "equipped": true
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.armo000000000011"
+          }
+        }
+      },
+      {
+        "_id": "armo000000000020",
+        "name": "Стёганые штаны",
+        "type": "armor",
+        "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
+        "system": {
+          "zone": "legs",
+          "armorClass": "light",
+          "stoppingPower": {
+            "value": 5,
+            "max": 5
+          },
+          "rarity": "common",
+          "enhancementSlots": 1,
+          "encumbrance": 0,
+          "weight": 1,
+          "price": 125,
+          "properties": "",
+          "source": "Базовая книга, стр. 79–80",
+          "ruleId": "armor.legs.2",
+          "equipped": true
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.armo000000000020"
+          }
+        }
+      },
+      {
+        "_id": "banditBolts00001",
+        "name": "Болты",
+        "type": "equipment",
+        "img": "icons/weapons/ammunition/arrow-simple.webp",
+        "system": {
+          "kind": "ammunition",
+          "quantity": 20,
+          "weight": 0.05,
+          "price": 1,
+          "description": "<p>Стандартные арбалетные болты. Добыча разбойника: 20 штук.</p>"
+        }
+      },
+      {
+        "_id": "beastA0000000006",
+        "name": "Яд повешенного",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.hanged-man-venom",
+          "description": "<p>Гуманоид уязвим к яду повешенного. Используйте описание нанесённого на оружие состава.</p>"
+        }
+      }
+    ]
+  },
+  {
+    "_id": "bestiaryDrowner1",
+    "name": "Утопец",
+    "type": "npc",
+    "img": "systems/witcher-eliott-system/assets/creatures/drowner.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Утопец",
+      "texture": {
+        "src": "systems/witcher-eliott-system/assets/creatures/drowner.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 7,
+        "dexterity": 7,
+        "body": 6,
+        "speed": 6,
+        "empathy": 1,
+        "craft": 1,
+        "will": 4,
+        "luck": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25
+      },
+      "stamina": {
+        "value": 25,
+        "max": 25
+      },
+      "skills": {
+        "melee": 6,
+        "brawling": 6,
+        "dodgeEscape": 5,
+        "athletics": 6,
+        "awareness": 8,
+        "stealth": 5,
+        "wildernessSurvival": 6,
+        "resistMagic": 4,
+        "endurance": 6,
+        "courage": 8
+      },
+      "creature": {
+        "category": "necrophage",
+        "difficulty": "Простые / обычные",
+        "reward": 10,
+        "size": "Около человеческого роста",
+        "weight": "Около человеческого веса",
+        "habitat": "Берега рек, озёр и морей",
+        "intellect": "Как у рыбы",
+        "group": "Стая из 3–6 утопцев",
+        "source": "Базовая книга, стр. 276–277",
+        "description": "Земноводный трупоед, появившийся после Сопряжения сфер. Название обманчиво: это не оживший утопленник. Стаи скрываются у воды и нападают на одиноких путников.",
+        "tactics": "Окружает добычу вместе со стаей, набрасывается и рвёт когтями. Пока не почуял кровь, может отвлечься на блестящую вещь. Горящий утопец продолжает бой, пока ПЗ не опустятся ниже 10.",
+        "lore": [
+          {
+            "name": "Общее мнение",
+            "skill": "education",
+            "dc": 14,
+            "text": "Селяне считают утопцев утонувшими злодеями. Их встречают у воды, и лучше не приближаться к стае в одиночку."
+          },
+          {
+            "name": "Знания охотника",
+            "skill": "monsterLore",
+            "dc": 10,
+            "text": "Это отдельный вид чудовищ с примитивным разумом. Не тонут, не боятся ядов и магии мыслей. Слабости — огонь и масло против трупоедов."
+          }
+        ],
+        "loot": []
+      },
+      "harvest": [
+        {
+          "id": "drownerHarvest0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000121",
+          "quantity": 1,
+          "formula": "",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "drownerHarvest1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000242",
+          "quantity": 1,
+          "formula": "",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "drownerHarvest2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000181",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "drownerClaws0001",
+        "name": "Когти",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "3d6",
+          "damageType": "Р",
+          "natural": true,
+          "damageIncludesBody": true,
+          "equipped": true,
+          "attackRate": 1,
+          "description": "<p>Естественное оружие утопца. СА 1; эффектов нет.</p>",
+          "source": "Базовая книга, стр. 277"
+        }
+      },
+      {
+        "_id": "beastA0000000000",
+        "name": "Дикий",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.wild",
+          "description": "<p>Внимание и Выживание в дикой природе рассчитываются с Интеллектом 7. Остальные проверки используют обычный Интеллект существа.</p>"
+        }
+      },
+      {
+        "_id": "beastA0000000001",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        }
+      },
+      {
+        "_id": "beastA0000000002",
+        "name": "Земноводный",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.amphibian",
+          "description": "<p>Может неограниченно долго находиться под водой, не тонет и не получает штрафов за действия под водой.</p>"
+        }
+      },
+      {
+        "_id": "beastA0000000003",
+        "name": "Беспросветная тупость",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.mindless",
+          "description": "<p>Невосприимчив к магии, воздействующей на мысли и эмоции. Применимость конкретного заклинания определяет ведущий.</p>"
+        }
+      },
+      {
+        "_id": "beastA0000000004",
+        "name": "Уязвимость к огню",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fire-vulnerable",
+          "description": "<p>Существо уязвимо к огню, включая состояние «Горение». Учитывается ведущим при применении урона.</p>"
+        }
+      },
+      {
+        "_id": "beastA0000000005",
+        "name": "Масло против трупоедов",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.necrophage-oil",
+          "description": "<p>На существо действует масло против трупоедов. Его бонус учитывается при нанесении урона подходящим оружием.</p>"
+        }
+      },
+      {
+        "_id": "beastA0000000007",
+        "name": "Чудовище: сталь и серебро",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.monster-resistance",
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+        }
+      }
+    ]
+  }
+]
