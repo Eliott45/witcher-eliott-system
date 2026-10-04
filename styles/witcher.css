@@ -525,7 +525,8 @@
 .witcher-inventory-name .witcher-item-avatar { flex:0 0 27px; width:27px; height:27px; padding:0; border:0; background:#6e604f; border-radius:3px; overflow:hidden; }
 .witcher-item-avatar img { display:block; width:100%; height:100%; }
 .witcher-inventory-name [aria-expanded=true] { color:#802d2c; }
-.witcher-inventory-name .witcher-item-expand { display:flex; align-items:center; align-self:stretch; gap:8px; flex:1; width:100%; min-width:0; min-height:34px; padding:4px 6px; border-radius:3px; }
+.witcher-inventory-name .witcher-item-expand { display:flex; justify-content:flex-start; align-items:center; align-self:stretch; gap:8px; flex:1; width:100%; min-width:0; min-height:34px; padding:4px 6px; border-radius:3px; }
+.witcher-item-expand > span { min-width:0; text-align:left; }
 .witcher-item-expand > i { flex:none; font-size:9px; color:#988363; transition:transform .15s ease; }
 .witcher-item-expand[aria-expanded=true] > i { transform:rotate(90deg); }
 .witcher-item-expand:hover, .witcher-item-expand:focus-visible { background:#a3834820; }

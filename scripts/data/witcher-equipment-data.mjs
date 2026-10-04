@@ -1,6 +1,6 @@
 import { WitcherReferenceData } from "./witcher-reference-data.mjs";
 import { EQUIPMENT_KINDS, RARITIES } from "./physical-items.mjs";
-import { itemNumber, itemText } from "./item-fields.mjs";
+import { itemNumber, itemText, itemCondition } from "./item-fields.mjs";
 export { itemNumber, itemText, itemCondition } from "./item-fields.mjs";
 import { workshopEquipmentFields } from "./workshop-schema.mjs";
 import { upgradeLegacyContainer } from "./core-containers.mjs";
@@ -15,6 +15,8 @@ export class WitcherEquipmentData extends WitcherReferenceData {
       kind: itemText("gear", { choices: EQUIPMENT_KINDS.map(entry => entry.id) }),
       carried: new foundry.data.fields.BooleanField({ initial: true }), equipped: new foundry.data.fields.BooleanField({ initial: false }),
       containerId: itemText(), capacity: itemNumber(),
+      damageType: itemText(), reliability: itemCondition(),
+      concealment: itemText("large", { choices: ["tiny", "small", "large", "none"] }),
       properties: itemText(), source: itemText() };
   }
 }

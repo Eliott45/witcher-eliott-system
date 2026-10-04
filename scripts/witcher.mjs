@@ -25,6 +25,7 @@ import { WitcherToken } from "./canvas/witcher-token.mjs";
 import { renderTokenVisionToggle } from "./combat/token-hud.mjs";
 import { migrateVisionDefaults, registerVisionMigration } from "./migrations/vision-defaults.mjs";
 import { migrateCompendiumFolders, registerCompendiumFolderMigration } from "./migrations/compendium-folders.mjs";
+import { migrateEquipmentContent, registerEquipmentContentMigration } from "./migrations/equipment-content.mjs";
 import { renderDiceTray } from "./chat/dice-tray.mjs";
 import { registerStatusEffects, localizeStatusEffects, reportEffectError } from "./combat/status-effects.mjs";
 import { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources, applyInitialConditions } from "./combat/resource-updates.mjs";
@@ -47,6 +48,7 @@ Hooks.once("init", async () => {
   CONFIG.time.roundTime = 3;
   registerVisionMigration();
   registerCompendiumFolderMigration();
+  registerEquipmentContentMigration();
   registerSheetPreferences();
   for (const type of ACTOR_TYPES) {
     CONFIG.Actor.dataModels[type] = WitcherActorData;
@@ -91,6 +93,10 @@ Hooks.once("i18nInit", localizeStatusEffects);
 Hooks.on("renderTokenHUD", renderTokenVisionToggle);
 Hooks.on("renderChatInput", renderDiceTray);
 Hooks.once("ready", () => {
+  migrateEquipmentContent().catch(error => {
+    console.error(`${SYSTEM_ID} | Could not add equipment content`, error);
+    ui.notifications.error("Не удалось добавить боеприпасы в компендиум. Подробности в консоли.");
+  });
   syncExistingDeathStates().catch(reportEffectError);
   syncExistingExhaustion().catch(reportEffectError);
   migrateVisionDefaults().catch(error => {

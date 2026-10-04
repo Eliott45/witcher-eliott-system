@@ -1,16 +1,19 @@
 import { textField as text, numberField as number, choiceField as choice, formFields } from "../data/structured-fields.mjs";
-import { isPhysical, ARMOR_ZONES, RARITIES, EQUIPMENT_KINDS } from "../data/physical-items.mjs";
+import { isPhysical, isAmmunition, ARMOR_ZONES, RARITIES, EQUIPMENT_KINDS, CONCEALMENT } from "../data/physical-items.mjs";
 import { SUBSTANCES, MONSTER_CATEGORIES } from "../data/workshop.mjs";
 const decimal = (key, label) => ({ ...number(key, label), step: "0.001" });
 const bool = (key, label) => ({ key, label, type: "boolean" });
 const COMMON = [number("quantity", "Количество"), decimal("weight", "Вес единицы, кг"), decimal("price", "Цена единицы, кроны"),
   choice("rarity", "Доступность", RARITIES), bool("carried", "При себе"), bool("equipped", "Экипировано"), text("source", "Источник / страница")];
+const DAMAGE_TYPE = text("damageType", "Тип урона: Р / К / Д / С");
+const RELIABILITY = [number("reliability.value", "Надёжность: текущая"), number("reliability.max", "Надёжность: базовый максимум")];
+const CONCEALMENT_FIELD = choice("concealment", "Скрытность", CONCEALMENT);
 const WEAPON = [choice("category", "Категория оружия", [{ id: "melee", name: "Ближний бой" }, { id: "ranged", name: "Стрелковое" }, { id: "thrown", name: "Метательное" }, { id: "shield", name: "Щит" }]),
   choice("skill", "Навык", ["swordsmanship", "smallBlades", "melee", "brawling", "staffSpear", "archery", "crossbow", "athletics"].map(id => ({ id, name: `WITCHER.Skills.Entries.${id}.Label` }))),
-  text("damage", "Урон (формула)"), text("damageType", "Тип урона: Р / К / Д / С"), number("accuracy", "Точность (WA)", -100),
-  number("reliability.value", "Надёжность: текущая"), number("reliability.max", "Надёжность: базовый максимум"), number("hands", "Хват (рук)", 1),
+  text("damage", "Урон (формула)"), DAMAGE_TYPE, number("accuracy", "Точность (WA)", -100),
+  ...RELIABILITY, number("hands", "Хват (рук)", 1),
   decimal("range", "Дальность, м"), decimal("rangeBodyMultiplier", "Либо дальность: ТЕЛ ×"),
-  choice("concealment", "Скрытность", [{ id: "tiny", name: "Маленькое — в кармане" }, { id: "small", name: "Небольшое — под курткой" }, { id: "large", name: "Крупное — под плащом" }, { id: "none", name: "Не спрятать" }]),
+  CONCEALMENT_FIELD,
   number("enhancementSlots", "Слоты усиления"), number("encumbrance", "Скованность (EV, для щита)")];
 const ARMOR = [choice("zone", "Зона брони", ARMOR_ZONES), choice("armorClass", "Класс брони", [{ id: "light", name: "Лёгкая" }, { id: "medium", name: "Средняя" }, { id: "heavy", name: "Тяжёлая" }]),
   number("stoppingPower.value", "ПБ: текущая"), number("stoppingPower.max", "ПБ: базовый максимум"), number("encumbrance", "Скованность (EV)"),
@@ -20,6 +23,7 @@ export function physicalItemContext(item, editable) {
   const groups = [{ title: "Предмет", fields: COMMON }, { title: item.type === "weapon" ? "Оружие" : item.type === "armor" ? "Броня" : "Снаряжение",
     fields: item.type === "weapon" ? WEAPON : item.type === "armor" ? ARMOR : [choice("kind", "Категория", EQUIPMENT_KINDS)] },
   { title: "Особенности", fields: [text("properties", "Эффекты и условия")] }];
+  if (isAmmunition(item)) groups.splice(2, 0, { title: "Боеприпасы", fields: [DAMAGE_TYPE, ...RELIABILITY, CONCEALMENT_FIELD] });
   if(item.type === "equipment" && item.system.kind === "container") groups.push({ title: "Контейнер", fields: [decimal("capacity", "Вместимость, кг (0 — не задана)")] });
   if(item.type==="recipe") groups.push({title:"Чертёж / формула",fields:[
     choice("recipe.category","Вид",[{id:"diagram",name:"Чертёж"},{id:"formula",name:"Формула"}]),

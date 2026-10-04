@@ -14,7 +14,8 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 const translations = JSON.parse(await readFile(join(root, "lang/ru.json"), "utf8"));
 const packs = compendiumData(translations);
 const packFolders = compendiumFolders(translations);
-const requestedPacks = process.argv.slice(3);
+const sourcesOnly = process.argv.includes("--sources-only");
+const requestedPacks = process.argv.slice(3).filter(argument => argument !== "--sources-only");
 for (const name of requestedPacks) assert.ok(name in packs, `Unknown compendium: ${name}`);
 await mkdir(join(root, "packs"), { recursive: true });
 await mkdir(join(root, "pack-sources"), { recursive: true });
@@ -27,25 +28,27 @@ for (const [name, documents] of Object.entries(packs)) {
   for (const document of documents) {
     if (document.folder) assert.ok(folders.some(folder => folder._id === document.folder), `Unknown folder for ${document.name}`);
   }
-  const db = new ClassicLevel(join(root, "packs", name), { keyEncoding: "utf8", valueEncoding: "json" });
-  try {
-    await db.open();
-    if (folders.length) {
-      const collection = db.sublevel("folders", { valueEncoding: "json" });
-      await collection.batch(folders.map(folder => ({ type: "put", key: folder._id, value: folder })));
-      assert.deepEqual(await collection.getMany(folders.map(folder => folder._id)), folders);
+  if (!sourcesOnly) {
+    const db = new ClassicLevel(join(root, "packs", name), { keyEncoding: "utf8", valueEncoding: "json" });
+    try {
+      await db.open();
+      if (folders.length) {
+        const collection = db.sublevel("folders", { valueEncoding: "json" });
+        await collection.batch(folders.map(folder => ({ type: "put", key: folder._id, value: folder })));
+        assert.deepEqual(await collection.getMany(folders.map(folder => folder._id)), folders);
+      }
+      const items = db.sublevel("items", { valueEncoding: "json" });
+      // Upsert only our stable IDs; never delete unrelated/user-added records.
+      await items.batch(documents.map(document => ({ type: "put", key: document._id, value: document })));
+      const stored = await items.getMany(documents.map(document => document._id));
+      assert.deepEqual(stored, documents);
+      const keys = await db.keys().all();
+      await db.compactRange(keys[0], keys.at(-1));
+    } finally {
+      await db.close();
     }
-    const items = db.sublevel("items", { valueEncoding: "json" });
-    // Upsert only our stable IDs; never delete unrelated/user-added records.
-    await items.batch(documents.map(document => ({ type: "put", key: document._id, value: document })));
-    const stored = await items.getMany(documents.map(document => document._id));
-    assert.deepEqual(stored, documents);
-    const keys = await db.keys().all();
-    await db.compactRange(keys[0], keys.at(-1));
-  } finally {
-    await db.close();
   }
   await writeFile(join(root, "pack-sources", `${name}.json`), `${JSON.stringify(documents, null, 2)}\n`);
   if (folders.length) await writeFile(join(root, "pack-sources", `${name}.folders.json`), `${JSON.stringify(folders, null, 2)}\n`);
-  console.log(`${name}: ${documents.length} Item documents, ${folders.length} folders written and verified`);
+  console.log(`${name}: ${documents.length} Item documents, ${folders.length} folders ${sourcesOnly ? "generated (JSON only; live database unchanged)" : "written and verified"}`);
 }

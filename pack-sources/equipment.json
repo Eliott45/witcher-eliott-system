@@ -4142,6 +4142,126 @@
     "flags": {}
   },
   {
+    "_id": "ammo000000000001",
+    "name": "Стандартные (×10)",
+    "type": "equipment",
+    "img": "icons/weapons/ammunition/arrow-simple.webp",
+    "system": {
+      "ruleId": "ammunition.standard",
+      "kind": "ammunition",
+      "quantity": 1,
+      "weight": 0.5,
+      "price": 10,
+      "rarity": "everywhere",
+      "damageType": "К",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "concealment": "large",
+      "properties": "",
+      "description": "<p>Набор из 10 стандартных боеприпасов. Количество в инвентаре считает наборы; цена 10 крон и вес 0,5 кг указаны за весь набор.</p><p>Базовая книга, стр. 74.</p>",
+      "source": "Базовая книга, стр. 74"
+    },
+    "effects": [],
+    "folder": "gearAmmo00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ammo000000000002",
+    "name": "С затупленным наконечником",
+    "type": "equipment",
+    "img": "icons/weapons/ammunition/arrow-simple.webp",
+    "system": {
+      "ruleId": "ammunition.blunt",
+      "kind": "ammunition",
+      "quantity": 1,
+      "weight": 0.1,
+      "price": 5,
+      "rarity": "common",
+      "damageType": "Д",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "concealment": "large",
+      "properties": "Несмертельное",
+      "description": "<p>Один боеприпас с затупленным наконечником. Наносит дробящий урон; позволяет наносить несмертельный урон без штрафа.</p><p>Базовая книга, стр. 74.</p>",
+      "source": "Базовая книга, стр. 74"
+    },
+    "effects": [],
+    "folder": "gearAmmo00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ammo000000000003",
+    "name": "С широким наконечником",
+    "type": "equipment",
+    "img": "icons/weapons/ammunition/arrow-simple.webp",
+    "system": {
+      "ruleId": "ammunition.broadhead",
+      "kind": "ammunition",
+      "quantity": 1,
+      "weight": 0.1,
+      "price": 10,
+      "rarity": "common",
+      "damageType": "К",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "concealment": "large",
+      "properties": "Кровопускающее (100%)",
+      "description": "<p>Один боеприпас с широким наконечником. Если наносит урон цели, вызывает кровотечение.</p><p>Базовая книга, стр. 74.</p>",
+      "source": "Базовая книга, стр. 74"
+    },
+    "effects": [],
+    "folder": "gearAmmo00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ammo000000000004",
+    "name": "Бронебойные",
+    "type": "equipment",
+    "img": "icons/weapons/ammunition/arrow-simple.webp",
+    "system": {
+      "ruleId": "ammunition.armor-piercing",
+      "kind": "ammunition",
+      "quantity": 1,
+      "weight": 0.1,
+      "price": 15,
+      "rarity": "common",
+      "damageType": "К",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "concealment": "large",
+      "properties": "Пробивающее броню",
+      "description": "<p>Один бронебойный боеприпас. Игнорирует сопротивление брони соответствующему типу урона; не уменьшает её ПБ.</p><p>Базовая книга, стр. 74.</p>",
+      "source": "Базовая книга, стр. 74"
+    },
+    "effects": [],
+    "folder": "gearAmmo00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "matr000000000001",
     "name": "Пепел",
     "type": "equipment",

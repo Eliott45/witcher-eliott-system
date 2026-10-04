@@ -88,6 +88,17 @@
     "flags": {}
   },
   {
+    "_id": "gearAmmo00000001",
+    "name": "Боеприпасы",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
     "_id": "gearFolderArmors",
     "name": "Броня",
     "type": "Item",

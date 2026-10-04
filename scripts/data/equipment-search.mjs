@@ -1,4 +1,4 @@
-import { EQUIPMENT_KINDS, RARITIES, ARMOR_ZONES } from "./physical-items.mjs";
+import { EQUIPMENT_KINDS, RARITIES, ARMOR_ZONES, CONCEALMENT, isAmmunition } from "./physical-items.mjs";
 import { effectiveItem } from "./workshop.mjs";
 import { equipmentTrait } from "./equipment-traits.mjs";
 
@@ -23,6 +23,7 @@ export function equipmentEntry(item) {
   const facts = [`${data.weight ?? 0} кг`, `${data.price ?? 0} крон`];
   if (item.type === "weapon") facts.push(`Урон ${data.damage}`, `Точность ${data.accuracy >= 0 ? "+" : ""}${data.accuracy}`, `Н ${data.reliability?.value ?? 0}/${data.reliability?.max ?? 0}`);
   if (item.type === "armor") facts.push(`ПБ ${data.stoppingPower?.value ?? 0}/${data.stoppingPower?.max ?? 0}`, `Скованность ${data.encumbrance}`);
+  if (isAmmunition(item)) facts.push(`Тип урона ${data.damageType}`, `Н ${data.reliability?.value ?? 0}/${data.reliability?.max ?? 0}`, `Скрытность: ${label(CONCEALMENT, data.concealment)}`);
   return { id: item.uuid ?? item.id, label: item.name, img: item.img, group: category, groupLabel: label(EQUIPMENT_CATEGORIES, category),
     traits, traitDetails: traits.map(equipmentTrait), summary: facts.join(" · "), details: [], price: data.price ?? 0, weight: data.weight ?? 0,
     rarity: data.rarity ?? "", weaponCategory: item.type === "weapon" ? data.category : "", hands: item.type === "weapon" ? String(data.hands) : "",

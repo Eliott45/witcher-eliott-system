@@ -1,5 +1,6 @@
 // User-provided core pp. 73–74, 79–80, 92–93. Values are per item, except explicitly named packs.
 import { CORE_CONTAINERS } from "./core-containers.mjs";
+import { CORE_AMMUNITION } from "./core-ammunition.mjs";
 const rarity = code => ({ e: "everywhere", c: "common", r: "rare", u: "unique" })[code];
 const weapon = (n, row) => {
   const [id, name, skill, damageType, accuracy, rare, damage, reliability, hands, range, bodyRange, concealment, slots, weight, price, properties = "", category = "melee", encumbrance = 0] = row;
@@ -93,4 +94,4 @@ for (const entry of CORE_GEAR) {
   if (container) Object.assign(entry.system, container, { kind: "container", source: "Базовая книга, стр. 93, 95" });
 }
 Object.assign(LEGACY_GEAR_STATS["shoulder-bag"], CORE_CONTAINERS["shoulder-bag"], { kind: "container" });
-export const CORE_EQUIPMENT = [...CORE_WEAPONS, ...CORE_ARMOR, ...CORE_GEAR];
+export const CORE_EQUIPMENT = [...CORE_WEAPONS, ...CORE_ARMOR, ...CORE_GEAR, ...CORE_AMMUNITION];
