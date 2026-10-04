@@ -434,6 +434,7 @@ for (const statusId of ["dying", "dead"]) {
 }
 handlebars.registerHelper("localize", key => foundry.utils.getProperty(translations, key) ?? key);
 handlebars.registerHelper("not", value => !value);
+handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
 for (const name of ["profession", "profession-node", "lifepath", "inventory", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
@@ -467,6 +468,16 @@ sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/s
 sheet.token = null;
 sheet.isEditable = true;
 const html = template(await sheet._prepareContext({}));
+// Render saved inventory through the same strict template used by old and new actors.
+const { inventoryContext } = await import("../scripts/sheets/inventory-context.mjs");
+const inventoryHTML = handlebars.compile(await readFile(new URL("../templates/inventory.hbs", import.meta.url), "utf8"), { strict: true });
+const savedInventoryContext = inventoryContext(restoredInventory);
+const savedInventoryHTML = inventoryHTML({ rootId: "saved-inventory", editable: true, system: restoredInventory.system, inventory: savedInventoryContext, workshop: { witcher: false, npc: false } });
+assert.equal(savedInventoryContext.groups.flatMap(group => group.items).length, 2);
+assert.equal([...savedInventoryHTML.matchAll(/data-inventory-quantity /g)].length, 2);
+assert.ok(savedInventoryHTML.includes("ПБ 8 / 12"));
+assert.ok(savedInventoryHTML.includes("Бригантина"));
+assert.ok(savedInventoryHTML.includes('data-action="toggleCarried"'));
 assert.ok(!html.includes("<script>test</script>"), "Actor names must be escaped");
 assert.ok(html.includes('data-action="showPortraitArtwork"'));
 assert.ok(html.includes('data-action="editPortrait"'));
@@ -531,7 +542,7 @@ sheet.tabGroups.character = "main";
 await updateSheetPreferences(sheet.actor.uuid, { hiddenTabs: ["main"], collapsed: { parents: true, appearance: true } });
 const customized = await sheet._prepareContext({});
 assert.equal(sheet.tabGroups.character, "skills", "Hiding the active tab must select a visible one");
-assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "inventory", "actions", "biography", "family", "lifepath", "effects"]);
+assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "actions", "inventory", "biography", "family", "lifepath", "effects"]);
 assert.equal(customized.familySections.find(section => section.id === "parents").open, false);
 assert.equal(customized.biographySections.find(section => section.id === "appearance").open, false);
 assert.ok(!template(customized).includes('data-action="tab" data-group="character" data-tab="main"'));

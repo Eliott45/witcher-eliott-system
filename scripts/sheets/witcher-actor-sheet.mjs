@@ -1,6 +1,6 @@
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
 import { getProfession as selectionProfession } from "../data/professions.mjs";
-import { inventoryContext, bindInventory, equipItem, createInventoryItem, browseEquipment, addCatalogItem } from "./inventory-context.mjs";
+import { inventoryContext, bindInventory, equipItem, createInventoryItem, browseEquipment, addCatalogItem, changeInventoryQuantity, toggleCarried, toggleInventoryGroup } from "./inventory-context.mjs";
 import { lifepathContext, editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent } from "./lifepath-context.mjs";
 import { professionContext, setProfessionLevel, rollProfessionAbility, professionSelectionUpdate } from "./profession-context.mjs";
 import { SYSTEM_ID } from "../config.mjs";
@@ -37,6 +37,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     actions: {
       ...workshopActorActions,
       equipItem, createInventoryItem, browseEquipment, addCatalogItem,
+      changeInventoryQuantity, toggleCarried, toggleInventoryGroup,
       editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent,
       rollProfessionAbility,
       toggleProfession: WitcherActorSheet.#onToggleProfession,
@@ -108,7 +109,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
         localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
       }, { query: this.#skillQuery, editing: this.isEditable && this.#editingSkills }),
       abilities: await abilitiesContext(this.actor),
-      inventory: inventoryContext(this.actor),
+      inventory: inventoryContext(this.actor, preferences),
       workshop: await workshopActorContext(this.actor),
       abilitiesOpen: !preferences.collapsed?.abilities,
       editingAttributes: this.isEditable && this.#editingAttributes,
@@ -158,7 +159,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=viewFriend], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs], [data-action=viewSheetItem], [data-action=browseAbilities], [data-action=browseLanguages]")) {
       button.disabled = false;
     }
-    for (const search of this.element.querySelectorAll("[data-skill-search], [data-inventory-search], [data-inventory-filter], [data-action=browseEquipment]")) search.disabled = false;
+    for (const search of this.element.querySelectorAll("[data-skill-search], [data-inventory-search], [data-action=toggleInventoryGroup], [data-action=browseEquipment]")) search.disabled = false;
   }
 
   async _onRender(context, options) {

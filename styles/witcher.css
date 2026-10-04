@@ -399,24 +399,61 @@
 .witcher-lifepath-summary dt, .witcher-lifepath-summary dd { color: #493c32; text-shadow: none; }
 .witcher-lifepath-summary dt { color: #793a36; }
 .witcher-lifepath-summary small { color: #776956; }
-.witcher-armor-zones { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0; }
-.witcher-armor-zone { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; min-height:140px; border:1px solid #b4a17b; border-radius:8px; background:#dcd6c9; padding:12px 6px; text-align:center; color:#332b26; }
-.witcher-armor-zone > i { color:#733c35; font-size:28px; }
-.witcher-armor-zone h3 { color:#733c35; font-size:16px; margin:0; }
-.witcher-armor-zone button { height:auto; white-space:normal; line-height:1.25; padding:4px; }
-.witcher-inventory-tools { display:grid; grid-template-columns:1fr 190px; gap:8px; margin:12px 0; }
-.witcher-inventory-totals { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; color:#332b26; }
-.witcher-inventory-totals label { display:flex; gap:8px; align-items:center; }
-.witcher-inventory-totals input { width:90px; }
-.witcher-inventory-row { display:flex; gap:6px; align-items:center; border-bottom:1px solid #c3b9a6; padding:7px 0; color:#332b26; }
-.witcher-inventory-row[hidden] { display:none; }
-.witcher-inventory-row img { height:32px; width:32px; border:none; }
-.witcher-inventory-name { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
-.witcher-inventory-name button { height:auto; text-align:left; white-space:normal; justify-content:flex-start; line-height:1.25; }
-.witcher-inventory-name small { color:#625547; padding-left:8px; }
-.witcher-inventory-row > input { width:48px; text-align:center; }
-.witcher-inventory-row > button { width:30px; flex:none; padding:0; }
-.witcher-inventory-row > button[aria-pressed=true] { background:#733c35; color:#fff4dc; border-color:#b39450; }
+.witcher-character-content.witcher-inventory { padding:12px 14px 0; }
+.witcher-inventory [hidden] { display:none !important; }
+.witcher-inventory-bar, .witcher-inventory-bar-actions, .witcher-inventory-coins { display:flex; align-items:center; gap:6px; }
+.witcher-inventory-bar { justify-content:space-between; padding:6px 8px; background:#e0d7c6; border:1px solid #c2b298; border-radius:3px; }
+.witcher-inventory-coins { font-size:12px; color:#654c2e; }
+.witcher-inventory-coins input { width:74px; height:25px; padding:2px 5px; color:#332b26; background:#faf6ed; border:1px solid #b9a98e; font-variant-numeric:tabular-nums; }
+.witcher-inventory-bar-actions button { height:25px; width:auto; }
+.witcher-armor-zones { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin:8px 0; }
+.witcher-armor-zone { display:flex; flex-direction:column; align-items:center; gap:3px; min-width:0; border:1px solid #c7bba6; border-radius:3px; background:#e8e0d2; padding:6px; text-align:center; color:#554839; }
+.witcher-armor-zone h3 { color:#733c35; font-size:11px; margin:0; border:0; font-weight:600; }
+.witcher-armor-zone h3 i { margin-right:3px; }
+.witcher-armor-zone button { max-width:100%; height:auto; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.2; padding:0; background:none; border:0; }
+.witcher-armor-zone :is(strong,span) { font-size:11px; font-variant-numeric:tabular-nums; }
+.witcher-armor-zone > span { color:#8b7b64; padding:3px 0; }
+.witcher-inventory-search { display:flex; align-items:center; gap:7px; padding:0 9px; margin:8px 0; height:29px; border:1px solid #b9a98e; background:#faf6ed; border-radius:3px; color:#89765b; }
+.witcher-inventory-search input { width:100%; height:100%; background:none; border:0; color:#332b26; font-size:12px; }
+.witcher-inventory-group { margin-bottom:5px; }
+.witcher-inventory-group-heading, .witcher-inventory-row { display:grid; grid-template-columns:minmax(0,1fr) 72px 42px 84px; gap:4px; align-items:center; }
+.witcher-inventory-group-heading { min-height:27px; padding:2px 5px; border-radius:2px; background:#6e604f; color:#fff3de; }
+.witcher-inventory .witcher-inventory-group-heading button { border:0; background:none; color:inherit; box-shadow:none; height:23px; }
+.witcher-inventory .witcher-inventory-group-toggle { display:flex; align-items:center; justify-content:flex-start; gap:5px; min-width:0; padding:0; text-align:left; font-size:12px; }
+.witcher-inventory-group-toggle > i { font-size:9px; flex:none; }
+.witcher-inventory-group-toggle[aria-expanded=false] > i { transform:rotate(-90deg); }
+.witcher-inventory-group-toggle span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.witcher-inventory-group-toggle small { opacity:.65; font-size:10px; }
+.witcher-inventory-column-label { color:#e7d8bf; text-transform:uppercase; text-align:center; font-size:9px; }
+.witcher-inventory-group-actions, .witcher-inventory-row-actions { display:flex; align-items:center; justify-content:flex-end; gap:1px; }
+.witcher-inventory-group-actions button, .witcher-inventory-row-actions button { width:20px; padding:0; flex:none; }
+.witcher-inventory-row { min-height:36px; padding:3px 5px; border-bottom:1px solid #cbbfaa; color:#332b26; background:#faf7ef60; }
+.witcher-inventory-row:nth-child(even) { background:#e2d8c930; }
+.witcher-inventory-row:hover { background:#e4d8c4; }
+.witcher-inventory-name { min-width:0; display:flex; align-items:center; gap:6px; }
+.witcher-inventory-name img { height:26px; width:26px; object-fit:cover; border:0; border-radius:2px; flex:none; }
+.witcher-inventory-name > div { min-width:0; }
+.witcher-inventory-name button { height:auto; display:block; padding:0; background:none; border:0; text-align:left; white-space:normal; overflow-wrap:anywhere; font-size:12px; line-height:1.2; color:#332b26; }
+.witcher-inventory-name small { display:block; color:#796b58; font-size:10px; line-height:1.3; }
+.witcher-inventory-row.is-stored .witcher-inventory-name { opacity:.65; }
+.witcher-inventory-quantity { display:flex; align-items:center; justify-content:center; gap:1px; }
+.witcher-inventory-quantity button { width:18px; height:22px; padding:0; border:0; background:none; font-size:9px; }
+.witcher-inventory-quantity input { width:32px; min-width:0; height:24px; padding:0; border:1px solid transparent; background:none; text-align:center; color:#332b26; font-size:12px; appearance:textfield; font-variant-numeric:tabular-nums; }
+.witcher-inventory-quantity input::-webkit-inner-spin-button, .witcher-inventory-quantity input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+.witcher-inventory-quantity input:hover, .witcher-inventory-quantity input:focus { background:#faf6ed; border-color:#b9a98e; }
+.witcher-inventory-weight { text-align:center; font-size:11px; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.witcher-inventory-row-actions button { height:24px; border:0; background:none; color:#837561; font-size:11px; }
+.witcher-inventory-row-actions button[aria-pressed=true] { color:#346477; background:#34647712; }
+.witcher-inventory button:disabled { opacity:.35; cursor:default; }
+.witcher-inventory-workshop { margin-top:10px; color:#654c2e; }
+.witcher-inventory-workshop > summary { cursor:pointer; font-size:12px; }
+.witcher-inventory-load { position:sticky; bottom:0; z-index:1; margin-top:12px; padding:9px 0 10px; background:#eee9df; border-top:1px solid #b8a580; color:#615038; }
+.witcher-inventory-load > div:first-child { display:flex; justify-content:space-between; gap:8px; font-size:11px; }
+.witcher-inventory-load strong { font-variant-numeric:tabular-nums; }
+.witcher-inventory-load-track { height:4px; margin-top:5px; background:#d3c9b7; border-radius:2px; overflow:hidden; }
+.witcher-inventory-load-track span { display:block; height:100%; background:#887345; }
+.witcher-inventory-load.overloaded { color:#8e302d; }
+.witcher-inventory-load.overloaded .witcher-inventory-load-track span { background:#a34339; }
 .witcher-physical-fields { border:1px solid #b4a17b; margin:10px 0; padding:12px; background:#e2dacb; color:#332b26; }
 .witcher-physical-fields legend { color:#733c35; background:#e2dacb; padding:2px 6px; font-weight:bold; }
 .witcher-physical-fields label { color:#332b26; }
