@@ -7,4 +7,10 @@
 <div class="witcher-magic-round-note"><small>Сверх предела — 5 ПЗ за пункт и стихийный эффект.</small>{{#unless magic.combat}}<button type="button" data-action="resetMagicRound" {{disabled (not editable)}}><i class="fa-solid fa-rotate-right"></i> Новый раунд</button>{{/unless}}</div>
 {{#if magic.active}}<aside class="witcher-magic-active"><i class="fa-solid fa-link"></i><div><strong>{{magic.active.name}}</strong><small>{{magic.active.duration}} · Оплачивайте каждый раунд</small><small>Концентрация не позволяет творить другие заклинания.</small></div><button type="button" data-action="maintainSpell" {{disabled (not magic.canMaintain)}}>Поддержать</button><button type="button" data-action="endConcentration" {{disabled (not editable)}}>Прекратить</button></aside>{{/if}}
 {{> "systems/witcher-eliott-system/templates/magic-filters.hbs" elements=magic.elements grades=magic.grades traditions=magic.traditions}}
-{{> "systems/witcher-eliott-system/templates/magic-spells.hbs" spells=magic.spells canCast=magic.canCast editable=editable catalog=false}}
+{{#each magic.groups}}
+<section class="witcher-magic-group" data-magic-group="{{id}}" aria-label="{{label}}">
+  <h3 class="witcher-magic-group-heading"><i class="{{icon}}" aria-hidden="true"></i><span>{{label}}</span><small data-magic-group-count>{{spells.length}}</small></h3>
+  {{> "systems/witcher-eliott-system/templates/magic-spells.hbs" spells=spells canCast=../magic.canCast editable=../editable catalog=false}}
+</section>
+{{/each}}
+<p class="witcher-magic-empty" data-magic-empty><i class="fa-solid fa-book-sparkles"></i> Магия не найдена. Добавьте её из каталога или перетащите из компендиума.</p>

@@ -8,9 +8,15 @@ import { textField,numberField,choiceField,formFields } from "../data/structured
 import { escapeTooltip as escape } from "./statistics-tooltips.mjs";
 
 export const SPELL_ICONS={mixed:"fa-solid fa-sparkles",earth:"fa-solid fa-mountain",air:"fa-solid fa-wind",fire:"fa-solid fa-fire",water:"fa-solid fa-droplet"};
+const MAGIC_GROUPS=[
+  {id:"spell",label:"Обычная магия",icon:"fa-solid fa-sparkles"},
+  {id:"sign",label:"Знаки",icon:"fa-solid fa-hand-sparkles"},
+  {id:"ritual",label:"Ритуалы",icon:"fa-solid fa-circle-nodes"},
+  {id:"hex",label:"Порчи",icon:"fa-solid fa-skull"}
+];
 export function spellEntry(item) {
   const s=item.system,tradition=magicCategory(s),ritual=s.kind==="ritual",hex=s.kind==="hex";
-  return {id:item.id,uuid:item.uuid,name:item.name,img:item.img,element:s.element,grade:s.grade,tradition,traditionLabel:MAGIC_TRADITIONS[tradition],deity:s.deity,
+  return {id:item.id,uuid:item.uuid,name:item.name,img:item.img,kind:s.kind??"spell",element:s.element,grade:s.grade,tradition,traditionLabel:MAGIC_TRADITIONS[tradition],deity:s.deity,
     icon:ritual?"fa-solid fa-circle-nodes":hex?"fa-solid fa-skull":tradition==="sign"?"fa-solid fa-hand-sparkles":tradition==="druid"?"fa-solid fa-leaf":tradition==="priest"?"fa-solid fa-hands-praying":SPELL_ICONS[s.element],elementLabel:tradition==="mage"?SPELL_ELEMENTS[s.element]:MAGIC_CATEGORIES[tradition],gradeLabel:hex?`Опасность: ${HEX_DANGERS[s.hex.danger]}`:SPELL_GRADES[s.grade],
     cost:spellCostLabel(s),range:spellRange(s.range),duration:spellDuration(s.duration),
     skillLabel:CASTING_SKILL_LABELS[castingSkill(s)],isRitual:ritual,isHex:hex,
@@ -26,7 +32,8 @@ export async function magicContext(actor) {
   const spells=await Promise.all(items.filter(item=>item.type==="spell").map(async item=>({...spellEntry(item),
     description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:actor.isOwner,relativeTo:item})})));
   spells.sort((a,b)=>Object.keys(SPELL_GRADES).indexOf(a.grade)-Object.keys(SPELL_GRADES).indexOf(b.grade)||a.name.localeCompare(b.name,"ru"));
-  return {spells,count:spells.length,spent,vigor,remaining:Math.max(0,vigor-spent),percent:vigor?Math.min(100,spent/vigor*100):spent?100:0,
+  const groups=MAGIC_GROUPS.map(group=>({...group,spells:spells.filter(spell=>spell.kind===group.id)})).filter(group=>group.spells.length);
+  return {spells,groups,count:spells.length,spent,vigor,remaining:Math.max(0,vigor-spent),percent:vigor?Math.min(100,spent/vigor*100):spent?100:0,
     stamina:actor.system.stamina.value,staminaMax:actor.system.stamina.max,casting:skill.total??"—",ritualCasting:skillValue(actor.system,"ritualCrafting").total??"—",hexCasting:skillValue(actor.system,"hexWeaving").total??"—",canCast:canCast&&!active,
     combat:Boolean(game.combat?.started),round:game.combat?.round,
     active:active?{...spellEntry(active),duration:`Поддержание · ${maintenanceCost(active.system,actor.system.magic.sustainedCost)} ВЫН/раунд`}:null,canMaintain:canCast&&Boolean(active)&&actor.system.magic.maintainedRound!==roundKey,
@@ -45,6 +52,11 @@ export function bindSpellFilters(root,filters={},onChange=()=>{}) {
     for(const row of root.querySelectorAll("[data-spell-row]")) {
       row.hidden=!(row.dataset.search.includes(query)&&(!tradition||row.dataset.tradition===tradition)&&(!element||row.dataset.element===element)&&(!grade||row.dataset.grade===grade));
       if(!row.hidden)count++;
+    }
+    for(const group of root.querySelectorAll("[data-magic-group]")) {
+      const visible=group.querySelectorAll("[data-spell-row]:not([hidden])").length;
+      group.hidden=visible===0;
+      group.querySelector("[data-magic-group-count]").textContent=visible;
     }
     root.querySelector("[data-magic-empty]").hidden=count>0;
     root.querySelector("[data-magic-count]").textContent=count;

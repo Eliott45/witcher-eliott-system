@@ -22,6 +22,14 @@
 .witcher-magic-filters :is(input,select) { height:32px; font-size:12px; color:#413a31; }
 .witcher-magic-filters select { background:#fcf8ee; border:1px solid #bbaa8d; border-radius:4px; }
 .witcher-spell-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr)); align-items:start; gap:10px; }
+.witcher-magic-group { --magic-group-accent:#736085; margin:18px 0 22px; }
+.witcher-magic-group[data-magic-group=sign] { --magic-group-accent:#477b9b; }
+.witcher-magic-group[data-magic-group=ritual] { --magic-group-accent:#876f46; }
+.witcher-magic-group[data-magic-group=hex] { --magic-group-accent:#8a4053; }
+.witcher-magic-group .witcher-magic-group-heading { display:flex; align-items:center; gap:8px; margin:0 0 10px; padding-bottom:7px; border:0; border-bottom:1px solid #cbbda3; color:#453c30; text-shadow:none; font:600 17px Georgia,serif; }
+.witcher-magic-group-heading>i { color:var(--magic-group-accent); font-size:14px; width:20px; text-align:center; }
+.witcher-magic-group-heading>small { display:grid; place-items:center; min-width:23px; height:23px; padding:0 5px; border:1px solid #cbbda3; border-radius:50%; color:var(--magic-group-accent); font:12px sans-serif; }
+.witcher-magic-group[hidden] { display:none; }
 .witcher-spell-card { --spell-accent:#736085; --witcher-ink:#3e382e; background:#fbf7ee; border:1px solid #cbbda3; border-top:3px solid var(--spell-accent); border-radius:6px; color:var(--witcher-ink); overflow:hidden; animation:witcher-spell-appear .2s ease-out; }
 .witcher-spell-card[data-element=fire] { --spell-accent:#a24e36; }
 .witcher-spell-card[data-element=water] { --spell-accent:#477b9b; }
