@@ -23,7 +23,7 @@ export function physicalItemContext(item, editable) {
   const groups = [{ title: "Предмет", fields: COMMON }, { title: item.type === "weapon" ? "Оружие" : item.type === "armor" ? "Броня" : "Снаряжение",
     fields: item.type === "weapon" ? WEAPON : item.type === "armor" ? ARMOR : [choice("kind", "Категория", EQUIPMENT_KINDS)] },
   { title: "Особенности", fields: [text("properties", "Эффекты и условия")] }];
-  if (isAmmunition(item)) groups.splice(2, 0, { title: "Боеприпасы", fields: [DAMAGE_TYPE, ...RELIABILITY, CONCEALMENT_FIELD] });
+  if (isAmmunition(item)) groups.splice(2, 0, { title: "Боеприпасы", fields: [number("purchaseQuantity", "Штук в пачке при покупке / добавлении", 1), DAMAGE_TYPE, ...RELIABILITY, CONCEALMENT_FIELD] });
   if(item.type === "equipment" && item.system.kind === "container") groups.push({ title: "Контейнер", fields: [decimal("capacity", "Вместимость, кг (0 — не задана)")] });
   if(item.type==="recipe") groups.push({title:"Чертёж / формула",fields:[
     choice("recipe.category","Вид",[{id:"diagram",name:"Чертёж"},{id:"formula",name:"Формула"}]),

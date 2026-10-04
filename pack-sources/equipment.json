@@ -4143,15 +4143,16 @@
   },
   {
     "_id": "ammo000000000001",
-    "name": "Стандартные (×10)",
+    "name": "Стандартные боеприпасы",
     "type": "equipment",
     "img": "icons/weapons/ammunition/arrow-simple.webp",
     "system": {
       "ruleId": "ammunition.standard",
       "kind": "ammunition",
-      "quantity": 1,
-      "weight": 0.5,
-      "price": 10,
+      "quantity": 10,
+      "purchaseQuantity": 10,
+      "weight": 0.05,
+      "price": 1,
       "rarity": "everywhere",
       "damageType": "К",
       "reliability": {
@@ -4160,7 +4161,7 @@
       },
       "concealment": "large",
       "properties": "",
-      "description": "<p>Набор из 10 стандартных боеприпасов. Количество в инвентаре считает наборы; цена 10 крон и вес 0,5 кг указаны за весь набор.</p><p>Базовая книга, стр. 74.</p>",
+      "description": "<p>Стандартные боеприпасы продаются пачками по 10 штук за 10 крон (0,5 кг). В инвентаре учитываются отдельные боеприпасы: 1 штука весит 0,05 кг и стоит 1 крону.</p><p>Базовая книга, стр. 74.</p>",
       "source": "Базовая книга, стр. 74"
     },
     "effects": [],
@@ -4169,7 +4170,11 @@
     "ownership": {
       "default": 2
     },
-    "flags": {}
+    "flags": {
+      "witcher-eliott-system": {
+        "ammunitionUnits": true
+      }
+    }
   },
   {
     "_id": "ammo000000000002",
@@ -4180,6 +4185,7 @@
       "ruleId": "ammunition.blunt",
       "kind": "ammunition",
       "quantity": 1,
+      "purchaseQuantity": 1,
       "weight": 0.1,
       "price": 5,
       "rarity": "common",
@@ -4210,6 +4216,7 @@
       "ruleId": "ammunition.broadhead",
       "kind": "ammunition",
       "quantity": 1,
+      "purchaseQuantity": 1,
       "weight": 0.1,
       "price": 10,
       "rarity": "common",
@@ -4240,6 +4247,7 @@
       "ruleId": "ammunition.armor-piercing",
       "kind": "ammunition",
       "quantity": 1,
+      "purchaseQuantity": 1,
       "weight": 0.1,
       "price": 15,
       "rarity": "common",

@@ -32,7 +32,7 @@ export async function browseEquipmentCatalog({ actor, categories = [], trait = "
               const button = row.querySelector(`[data-catalog-action=${action}]`), buy = action === "buy";
               const reason = buy ? quote.buyReason : quote.addReason;
               button.disabled = busy || Boolean(reason);
-              const help = reason || (buy ? `Купить за ${quote.cost} крон` : "Добавить в инвентарь бесплатно");
+              const help = reason || (buy ? `Купить ${quote.units} шт. за ${quote.cost} крон` : `Добавить ${quote.units} шт. в инвентарь бесплатно`);
               button.dataset.tooltip = help;
               button.parentElement.title = help;
             }
@@ -60,8 +60,8 @@ export async function browseEquipmentCatalog({ actor, categories = [], trait = "
           try {
             busy = true; refreshActions();
             const purchase = button.dataset.catalogAction === "buy", count = Number(quantity.value);
-            await acquireEquipment(actor, item, { purchase, quantity: count });
-            notice.textContent = `${purchase ? "Куплено" : "Добавлено"}: ${item.name} × ${count}`;
+            const created = await acquireEquipment(actor, item, { purchase, quantity: count });
+            notice.textContent = `${purchase ? "Куплено" : "Добавлено"}: ${item.name} × ${created.reduce((sum, entry) => sum + entry.system.quantity, 0)}`;
             notice.classList.remove("error");
           } catch (error) {
             notice.textContent = error.message; notice.classList.add("error");

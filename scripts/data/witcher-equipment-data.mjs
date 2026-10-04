@@ -10,7 +10,7 @@ export class WitcherEquipmentData extends WitcherReferenceData {
     return upgradeLegacyContainer(super.migrateData(source, options));
   }
   static defineSchema() {
-    return { ...super.defineSchema(), ...workshopEquipmentFields(), quantity: itemNumber(1, { integer: true }), weight: itemNumber(), price: itemNumber(),
+    return { ...super.defineSchema(), ...workshopEquipmentFields(), quantity: itemNumber(1, { integer: true }), purchaseQuantity: itemNumber(1, { integer: true, min: 1 }), weight: itemNumber(), price: itemNumber(),
       rarity: itemText("", { choices: ["", ...RARITIES.map(entry => entry.id)] }),
       kind: itemText("gear", { choices: EQUIPMENT_KINDS.map(entry => entry.id) }),
       carried: new foundry.data.fields.BooleanField({ initial: true }), equipped: new foundry.data.fields.BooleanField({ initial: false }),

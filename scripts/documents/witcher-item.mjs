@@ -1,9 +1,11 @@
 import { conditionUpdate, isPhysical } from "../data/physical-items.mjs";
 import { isContainer, canContain, containerParent, isCarried } from "../data/containers.mjs";
+import { ammunitionUpdate } from "../migrations/ammunition-data.mjs";
 export class WitcherItem extends foundry.documents.Item {
   async _preCreate(data, options, user) {
     const result = await super._preCreate(data, options, user);
     if (result === false) return false;
+    this.updateSource(ammunitionUpdate(this));
     if (isContainer(this)) this.updateSource({ "system.quantity": 1, "system.equipped": false });
   }
 

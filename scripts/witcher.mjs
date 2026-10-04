@@ -94,8 +94,8 @@ Hooks.on("renderTokenHUD", renderTokenVisionToggle);
 Hooks.on("renderChatInput", renderDiceTray);
 Hooks.once("ready", () => {
   migrateEquipmentContent().catch(error => {
-    console.error(`${SYSTEM_ID} | Could not add equipment content`, error);
-    ui.notifications.error("Не удалось добавить боеприпасы в компендиум. Подробности в консоли.");
+    console.error(`${SYSTEM_ID} | Could not update equipment content`, error);
+    ui.notifications.error("Не удалось обновить боеприпасы. Подробности в консоли.");
   });
   syncExistingDeathStates().catch(reportEffectError);
   syncExistingExhaustion().catch(reportEffectError);

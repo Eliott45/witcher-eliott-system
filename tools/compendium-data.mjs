@@ -31,7 +31,7 @@ export function compendiumData(translations) {
     folder: coreFolders[entry.source]?.id ?? (type === "equipment" ? EQUIPMENT_FOLDERS[entry.source]?.id ?? null : null),
     sort: 0,
     ownership: { default: 2 },
-    flags: {}
+    flags: entry.flags ?? {}
   });
   const professionAbility = entry => ({...item(entry.documentId, "ability", entry, { description: '<p>' + escapeHTML(entry.description) + '</p><p>Базовая книга, дерево профессии.</p>', level: 0, attribute: entry.attribute }), folder: getProfessionFolder(entry.profession)});
   return {
@@ -62,7 +62,7 @@ export function compendiumData(translations) {
     })),
     equipment: [...EQUIPMENT.map(entry => item(entry.documentId, "equipment", entry, { description: paragraph(entry.description), ...LEGACY_GEAR_STATS[entry.id] })),
       ...[...CORE_EQUIPMENT, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: entry.system.description ?? `<p>${escapeHTML(entry.system.source)}</p>` }),
-        img: entry.type === "weapon" ? "icons/svg/sword.svg" : entry.type === "armor" ? "icons/svg/shield.svg" : entry.system.kind === "ammunition" ? "icons/weapons/ammunition/arrow-simple.webp" : "icons/svg/item-bag.svg" }))],
+        img: entry.img ?? (entry.type === "weapon" ? "icons/svg/sword.svg" : entry.type === "armor" ? "icons/svg/shield.svg" : "icons/svg/item-bag.svg") }))],
     "influential-friends": INFLUENTIAL_FRIENDS.map(entry => item(entry.documentId, "influence", entry, {
       region: entry.group, roll: entry.roll,
       description: paragraph(FAMILY_GROUPS[entry.group])
