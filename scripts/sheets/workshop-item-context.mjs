@@ -8,10 +8,12 @@ export async function workshopItemContext(item) {
   const recipe=item.system.recipe;
   const components=recipe ? await Promise.all(recipe.components.map(async(entry,index)=>({index,quantity:entry.quantity,name:entry.substance?SUBSTANCES.find(s=>s.id===entry.substance)?.name??entry.substance:(await foundry.utils.fromUuid(entry.uuid))?.name??"Недоступный компонент"}))) : [];
   const oil = activeOil(item,game.time?.worldTime??0);
+  const condition=conditionKey(item), effective=effectiveItem(item);
   return { recipe:Boolean(recipe), owned:Boolean(item.actor), repairable:Boolean(item.actor&&conditionKey(item)),
+    condition:condition?{...effective[condition],label:condition==="stoppingPower"?"ПБ":"Надёжность"}:null,
     components, resultName:recipe?(await foundry.utils.fromUuid(recipe.resultUuid))?.name??"Выберите результат":"", time:recipe?durationLabel(recipe.time):"",
     tools:recipe?recipe.tools.join(", "):"", upgradeable:Boolean(item.actor&&conditionKey(item)), slots:freeSlots(item),
-    installations:item.system.installations.map(entry=>({...entry,zoneLabel:({head:"Голова",torso:"Корпус / руки",legs:"Ноги"})[entry.zone],removable:entry.category==="armor"})), oil:oil?{...oil,targetLabel:MONSTER_CATEGORIES.find(c=>c.id===oil.target)?.name??oil.target}:null, effective:effectiveItem(item),
+    installations:item.system.installations.map(entry=>({...entry,zoneLabel:({head:"Голова",torso:"Корпус / руки",legs:"Ноги"})[entry.zone],removable:entry.category==="armor"})), oil:oil?{...oil,targetLabel:MONSTER_CATEGORIES.find(c=>c.id===oil.target)?.name??oil.target}:null, effective,
     bonusPath:["mutagen","upgrade"].includes(item.system.kind)?item.system.kind:"",
     bonuses:["mutagen","upgrade"].includes(item.system.kind)?item.system[item.system.kind].bonuses.map((b,index)=>({...b,index,label:WORKSHOP_BONUS_LABELS[b.target]??b.target})):[],
     canOil:Boolean(item.actor&&item.type==="weapon"&&item.system.category!=="shield"),

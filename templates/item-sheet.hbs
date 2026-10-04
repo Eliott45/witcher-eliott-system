@@ -1,4 +1,4 @@
-<div class="witcher-sheet-body">
+<div class="witcher-item-layout">
   <header class="witcher-reference-header">
     <img src="{{item.img}}" alt="{{item.name}}" data-action="editImage" data-edit="img">
     <div>
@@ -11,9 +11,8 @@
     </div>
   </header>
   {{#if itemTraits.length}}<div class="witcher-item-traits" aria-label="Свойства для поиска">{{#each itemTraits}}<button type="button" data-action="searchItemTrait" data-trait="{{label}}" data-tooltip="{{description}} Нажмите, чтобы найти похожие предметы.">{{label}}</button>{{/each}}</div>{{/if}}
-  {{> "systems/witcher-eliott-system/templates/workshop-item.hbs"}}
-  {{#each physicalGroups as |group|}}<fieldset class="witcher-physical-fields"><legend>{{group.title}}</legend>{{> "systems/witcher-eliott-system/templates/structured-fields.hbs" fields=group.fields}}</fieldset>{{/each}}
-  {{#if isAbility}}<div class="witcher-item-fields"><label>{{localize "WITCHER.Skills.Level"}}<input type="number" name="system.level" min="0" max="10" step="1" value="{{system.level}}" {{disabled (not editable)}}></label><label>{{localize "WITCHER.Skills.Attribute"}}<select name="system.attribute" {{disabled (not editable)}}>{{#each attributeChoices}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label></div>{{/if}}
+  <nav class="witcher-item-tabs tabs" aria-label="{{localize 'WITCHER.ItemTabs.Navigation'}}">{{#each itemTabs}}<button type="button" data-action="tab" data-group="{{group}}" data-tab="{{id}}" class="{{cssClass}}" aria-pressed="{{active}}"><i class="{{icon}}"></i> {{localize label}}</button>{{/each}}</nav>
+  <section class="witcher-item-tab tab {{tabs.description.cssClass}}" data-group="item" data-tab="description">
   {{#if editable}}
   <prose-mirror name="system.description" value="{{system.description}}"
                 data-document-uuid="{{item.uuid}}" collaborate toggled>
@@ -35,4 +34,13 @@
     </ul>
   </section>
   {{/if}}
+  </section>
+  {{#if hasDetails}}<section class="witcher-item-tab tab {{tabs.details.cssClass}}" data-group="item" data-tab="details">
+  {{#each physicalGroups as |group|}}<fieldset class="witcher-physical-fields"><legend>{{group.title}}</legend>{{> "systems/witcher-eliott-system/templates/structured-fields.hbs" fields=group.fields}}</fieldset>{{/each}}
+  {{#if isAbility}}<div class="witcher-item-fields"><label>{{localize "WITCHER.Skills.Level"}}<input type="number" name="system.level" min="0" max="10" step="1" value="{{system.level}}" {{disabled (not editable)}}></label><label>{{localize "WITCHER.Skills.Attribute"}}<select name="system.attribute" {{disabled (not editable)}}>{{#each attributeChoices}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label></div>{{/if}}
+  {{#if editable}}<button type="submit" class="witcher-item-save"><i class="fa-solid fa-floppy-disk"></i> {{localize "WITCHER.ItemTabs.Save"}}</button>{{/if}}
+  </section>{{/if}}
+  {{#if hasActions}}<section class="witcher-item-tab tab {{tabs.actions.cssClass}}" data-group="item" data-tab="actions">
+  {{> "systems/witcher-eliott-system/templates/workshop-item.hbs"}}
+  </section>{{/if}}
 </div>

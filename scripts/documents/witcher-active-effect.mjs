@@ -20,10 +20,11 @@ export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
       try{
         const mode=game.settings.get("core","messageMode");
         const roll=await new foundry.dice.Roll(formula).evaluate({allowInteractive:mode!=="blind"});
+        value=Math.max(1,Math.floor(roll.total));
         const message=await roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),flavor:`Длительность: ${esc(this.name)}`,
-          flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],skipLuck:true}}},{messageMode:mode});
+          flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],skipLuck:true,effectDuration:{value,units:rules.roundsFormula?"rounds":"seconds"}}}},{messageMode:mode});
         if(!message)return false;
-        await display.wait(message); value=Math.max(1,Math.floor(roll.total));
+        await display.wait(message);
       }finally{display.close();}
     }
     this.updateSource({start:this.constructor.getEffectStart(),[`flags.${SYSTEM_ID}.condition`]:structuredClone(rules),[`flags.${SYSTEM_ID}.conditionState`]:{},

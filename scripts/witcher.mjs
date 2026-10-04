@@ -1,4 +1,5 @@
 import { registerOilExpiry } from "./workshop/upgrades.mjs";
+import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
 import { WitcherRecipeData } from "./data/witcher-recipe-data.mjs";
 import { ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID } from "./config.mjs";
@@ -49,6 +50,7 @@ Hooks.once("init", async () => {
   registerConditionSaves();
   registerOilExpiry();
   registerStubbornnessChat();
+  registerEffectDurationChat();
   CONFIG.time.roundTime = 3;
   registerVisionMigration();
   registerCompendiumFolderMigration();

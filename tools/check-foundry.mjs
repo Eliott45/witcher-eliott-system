@@ -476,7 +476,8 @@ foundry.applications = {
       };
     }
   }, ItemSheetV2: class {
-    async _prepareContext() { return { editable: this.isEditable, rootId: "test-item" }; }
+    tabGroups = {};
+    async _prepareContext() { return foundry.applications.sheets.ActorSheetV2.prototype._prepareContext.call(this); }
   } },
   ux: { TextEditor: { implementation: { enrichHTML: async html => html } } }
 };
@@ -835,6 +836,9 @@ for (const uuid of documents.keys()) {
   referenceSheet.item = await foundry.utils.fromUuid(uuid);
   const context = await referenceSheet._prepareContext({});
   const rendered = itemTemplate(context);
+  assert.equal(context.itemTabs[0].id, "description", "Every Item opens with its description");
+  assert.equal(context.itemTabs[0].active, true);
+  assert.match(rendered, /<nav class="witcher-item-tabs tabs"/, "Native ApplicationV2 tab switching requires a tabs navigation");
   assert.ok(rendered.includes(handlebars.escapeExpression(referenceSheet.item.name)));
   for (const ability of context.abilities) {
     assert.ok(rendered.includes(ability.link));

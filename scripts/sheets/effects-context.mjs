@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { effectDurationLabel } from "../data/effect-duration.mjs";
 import { effectRules, EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions.mjs";
 import { STATUS_DEFINITIONS, DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS } from "../combat/status-effects.mjs";
 import { canSaveEffect, requestEffectSave } from "../combat/condition-saves.mjs";
@@ -16,7 +17,7 @@ export async function effectsContext(sheet) {
       save:rules.save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
       autoAllowed:Boolean(rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
-      durationLabel:effect.duration?.label??"",pending,
+      durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,
       action:rules.action,canAct:sheet.isEditable&&conditionRules(sheet.actor).canAct,
       description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(text.startsWith("WITCHER.")?game.i18n.localize(text):text,{secrets:sheet.actor.isOwner,relativeTo:effect})};
   }));

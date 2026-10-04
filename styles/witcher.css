@@ -635,3 +635,35 @@
 .witcher-cargo-section {padding:.3rem;border:1px solid #c7b898;margin:.35rem;}
 .witcher-cargo-section>header {display:flex;justify-content:space-between;font-size:.8rem;background:#e3d8c2;padding:.35rem;}
 .witcher-cargo-section.overloaded>header {color:#9a2828;background:#ecd1c1;}
+/* Read first; mechanics and workshop live in separate native sheet tabs. */
+.witcher-eliott.reference-sheet {--witcher-ink:#342d26;--witcher-muted:#77664f;--witcher-line:#cbbd9e;--witcher-gold:#997544;}
+.witcher-eliott.reference-sheet .window-content {background:#eee9df;overflow:hidden;}
+.witcher-item-layout {display:flex;flex-direction:column;height:100%;min-height:0;}
+.witcher-item-layout .witcher-reference-header {margin:0;padding:16px;background:linear-gradient(115deg,#442323,#682b28);color:#f4e8ce;border:0;}
+.witcher-item-layout .witcher-reference-header img {width:68px;height:68px;object-fit:contain;border:1px solid #b5996a;background:#493c32;border-radius:4px;}
+.witcher-item-layout .witcher-reference-header :is(h1,input) {color:#f4e8ce;font:600 1.4rem Georgia,serif;text-shadow:none;}
+.witcher-item-layout .witcher-reference-header input {background:#ffffff09;border-color:#d0b78a44;}
+.witcher-item-layout>.witcher-item-traits {margin:0;padding:10px 16px;gap:5px;max-height:100px;overflow:auto;}
+.witcher-item-tabs {display:flex;background:#303f42;border-bottom:2px solid #b19660;flex-shrink:0;}
+.witcher-item-tabs button {width:auto;flex:1;box-shadow:none;border:0;border-radius:0;color:#f4e8ce;background:transparent;padding:10px 8px;transition:background .15s;}
+.witcher-item-tabs button.active {background:#50605d;box-shadow:inset 0 -3px #c4a264;}
+.witcher-item-tabs button:hover {background:#455556;}
+.witcher-item-tab {padding:18px;overflow:auto;min-height:0;flex:1;scrollbar-gutter:stable;}
+.witcher-item-tab:not(.active) {display:none;}
+.witcher-item-tab.active {animation:witcher-item-reveal .16s ease-out;}
+.witcher-item-tab :is(input,select,textarea) {color:#342d26;background:#faf6ee;border-color:#c6b798;}
+.witcher-item-tab button {color:#63462a;background:#f7f0e3;border-color:#bca781;}
+.witcher-item-tab .witcher-physical-fields {margin:0 0 16px;border-color:#c8b693;background:#e4ddcf55;border-radius:5px;}
+.witcher-item-tab .witcher-physical-fields legend {color:#7c4036;font-weight:600;}
+.witcher-item-tab .witcher-description {line-height:1.65;}
+.witcher-item-tab .witcher-workshop-item {display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px;}
+.witcher-item-tab .witcher-workshop-item>p,.witcher-item-tab .witcher-workshop-item>h2,.witcher-item-tab .witcher-workshop-item>h3 {width:100%;margin:5px 0;}
+.witcher-item-tab .witcher-workshop-item>button {width:auto;flex:1 1 44%;white-space:normal;height:auto;min-height:34px;line-height:1.3;padding:8px;}
+.witcher-duration-total {font-size:1.35rem;}
+@keyframes witcher-item-reveal {from {opacity:.5;transform:translateY(3px);} to {opacity:1;transform:none;}}
+@media (prefers-reduced-motion:reduce) {.witcher-item-tab.active {animation:none;}}
+.witcher-eliott.reference-sheet .witcher-item-tab prose-mirror.inactive {height:auto;min-height:44px;display:block;}
+.witcher-item-tab prose-mirror.inactive .editor-content {position:relative;inset:auto;height:auto;max-height:none;overflow:visible;}
+.witcher-eliott.reference-sheet .witcher-item-tab prose-mirror.active {min-height:320px;}
+.witcher-transport-fleet button {height:auto;min-height:50px;line-height:1.25;}
+.witcher-transport-stats input {color:#342d26;background:#faf6ee;border:1px solid #c6b798;}

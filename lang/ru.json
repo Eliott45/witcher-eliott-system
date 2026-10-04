@@ -19,6 +19,7 @@
     }
   },
   "WITCHER": {
+    "ItemTabs": {"Save": "Сохранить параметры", "Description": "Описание", "Details": "Параметры", "Actions": "Действия", "Navigation": "Вкладки предмета"},
     "Transport": { "Title": "Транспорт" },
     "Attributes": {
       "intelligence": {

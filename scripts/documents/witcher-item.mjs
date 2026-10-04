@@ -40,7 +40,7 @@ export class WitcherItem extends foundry.documents.Item {
       if(data.mountId && (!this.actor?.items.get(data.mountId) || !canHitch(prospective,this.actor.items.get(data.mountId),this.actor.items))) {
         ui.notifications.warn("Выберите свободное упряжное животное.");return false;
       }
-      const max=Math.max(0,Number(data.health?.max??this.system.transport.health.max));
+      const max=Math.max(0,Number(changes["system.transport.health.max"]??data.health?.max??this.system.transport.health.max));
       const value=Number(changes["system.transport.health.value"]??changes.system?.transport?.health?.value??this.system.transport.health.value);
       changes["system.transport.health.value"]=Math.max(0,Math.min(max,value));
     }

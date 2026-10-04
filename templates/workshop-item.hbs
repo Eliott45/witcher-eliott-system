@@ -1,6 +1,6 @@
 {{#if workshop}}
 <section class="witcher-workshop-item">
-{{#if workshop.repairable}}<p>{{#if workshop.effective.stoppingPower}}ПБ: {{workshop.effective.stoppingPower.value}} / {{workshop.effective.stoppingPower.max}}{{/if}}{{#if workshop.effective.reliability}}Надёжность: {{workshop.effective.reliability.value}} / {{workshop.effective.reliability.max}}{{/if}} · с улучшениями</p>{{/if}}
+{{#if workshop.repairable}}<p>{{workshop.condition.label}}: {{workshop.condition.value}} / {{workshop.condition.max}} · с улучшениями</p>{{/if}}
 {{#if workshop.bonusPath}}<h3>Бонусы</h3>{{#each workshop.bonuses}}<p>{{label}}: {{value}} <button type="button" data-action="removeWorkshopBonus" data-index="{{index}}" {{disabled (not ../editable)}} aria-label="Удалить бонус"><i class="fa-solid fa-xmark"></i></button></p>{{/each}}<button type="button" data-action="addWorkshopBonus" {{disabled (not editable)}}>Добавить бонус</button>{{/if}}
 {{#if workshop.recipe}}
 <h2>Рецепт</h2><p><strong>{{workshop.resultName}}</strong> · {{workshop.time}}</p>

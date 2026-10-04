@@ -19,6 +19,7 @@
     }
   },
   "WITCHER": {
+    "ItemTabs": {"Save": "Save details", "Description": "Description", "Details": "Details", "Actions": "Actions", "Navigation": "Item tabs"},
     "Transport": { "Title": "Transport" },
     "Attributes": {
       "intelligence": {

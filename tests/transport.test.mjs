@@ -53,5 +53,6 @@ test('importing vehicles clears foreign hitches and deleting a mount preserves a
  const {actor,horse,cart,bags,ore}=fixture();cart.system.transport.mountId=horse.id;
  const doc=Object.assign(new WitcherItem(),horse);
  const update={'system.transport.health.value':200};await doc._preUpdate(update,{},{});assert.equal(update['system.transport.health.value'],40);
+ const lower={'system.transport.health.max':20};await doc._preUpdate(lower,{},{});assert.equal(lower['system.transport.health.value'],20);
  await doc._preDelete({},{});assert.equal(cart.system.transport.mountId,'');assert.equal(bags.system.containerId,'');assert.equal(bags.system.carried,false);assert.equal(ore.system.containerId,bags.id);
 });

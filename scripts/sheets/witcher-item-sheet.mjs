@@ -12,22 +12,33 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applications.sheets.ItemSheetV2) {
   static DEFAULT_OPTIONS = {
     classes: ["witcher-eliott", "reference-sheet"],
-    position: { width: 560, height: 620 },
+    position: { width: 620, height: 660 },
     window: { resizable: true },
     actions: { installUpgradeDirect: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item,{withoutCheck:true});}), searchItemTrait, ...workshopItemActions, installUpgrade: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item);}), removeArmorUpgrade:workshopAction(async function(_e,target){if(this.isEditable)await removeArmorUpgrade(this.item,target.dataset.installationId);}), augmentItem:workshopAction(async function(){if(this.isEditable)await augmentItem(this.item);}), applyOil:workshopAction(async function(){if(this.isEditable)await applyOil(this.item);}), prepareMutagen:workshopAction(async function(){if(this.isEditable)await prepareMutagen(this.item);}), applyMutagen:workshopAction(async function(){if(this.isEditable)await applyMutagen(this.item);}) },
     form: { submitOnChange: true, closeOnSubmit: false }
   };
 
   static PARTS = {
-    content: { template: `systems/${SYSTEM_ID}/templates/item-sheet.hbs`, scrollable: [""] }
+    content: { template: `systems/${SYSTEM_ID}/templates/item-sheet.hbs`, scrollable: [".witcher-item-tab"] }
   };
+  static TABS = { item: { initial: "description", tabs: [
+    {id:"description",label:"WITCHER.ItemTabs.Description",icon:"fa-solid fa-book-open"},
+    {id:"details",label:"WITCHER.ItemTabs.Details",icon:"fa-solid fa-sliders"},
+    {id:"actions",label:"WITCHER.ItemTabs.Actions",icon:"fa-solid fa-hammer"}
+  ] } };
 
   _toggleDisabled(disabled) {
     super._toggleDisabled(disabled);
     for (const button of this.element.querySelectorAll('[data-action="searchItemTrait"]')) button.disabled = false;
+    for (const button of this.element.querySelectorAll('[data-action="tab"]')) button.disabled = false;
   }
 
   async _prepareContext(options) {
+    const workshop=await workshopItemContext(this.item);
+    const hasDetails=isPhysical(this.item)||this.item.type==="ability";
+    const hasActions=Boolean(workshop&&(workshop.repairable||workshop.upgradeable||workshop.recipe||workshop.bonusPath||workshop.isMutagen||workshop.oil||workshop.installations.length));
+    const visible=["description",...(hasDetails?["details"]:[]),...(hasActions?["actions"]:[])];
+    if(!visible.includes(this.tabGroups.item))this.tabGroups.item="description";
     const context = await super._prepareContext(options);
     const enrich = html => foundry.applications.ux.TextEditor.implementation.enrichHTML(html, {
       secrets: this.item.isOwner, relativeTo: this.item
@@ -42,7 +53,8 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
       };
     }));
     return Object.assign(context, {
-      workshop: await workshopItemContext(this.item),
+      workshop, hasDetails, hasActions,
+      itemTabs:visible.map(id=>context.tabs[id]),
       item: this.item,
       system: this.item.system,
       physicalGroups: physicalItemContext(this.item, this.isEditable),
