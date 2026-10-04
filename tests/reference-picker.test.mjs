@@ -7,6 +7,18 @@ import { ORIGINS, getOriginBonus } from "../scripts/data/origins.mjs";
 const translations = JSON.parse(await readFile(new URL("../lang/ru.json", import.meta.url), "utf8"));
 const localize = key => key.split(".").reduce((value, part) => value[part], translations);
 
+test("exact profession names take priority over incidental mentions of magic", () => {
+  const entries = selectionEntries("profession", localize);
+  for (const entry of entries) {
+    assert.deepEqual(filterEntries(entries, `  ${entry.label.toLocaleUpperCase()}  `).map(result => result.id), [entry.id]);
+  }
+  assert.deepEqual(filterEntries(entries, "мАг", "magic").map(entry => entry.id), ["mage"]);
+  assert.deepEqual(filterEntries(entries, "маг", "mundane"), []);
+  assert.equal(filterEntries(entries, "").length, 9);
+  assert.equal(filterEntries(entries, "  ", "mundane").length, 6);
+  assert.deepEqual(filterEntries(entries, "познания").map(entry => entry.id), ["mage"]);
+});
+
 test("region filters and multi-word searches match labels and bonus descriptions together", () => {
   const entries = selectionEntries("origin", localize);
   assert.equal(filterEntries(entries, "", "north").length, 10);

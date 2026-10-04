@@ -36,7 +36,10 @@ export function selectionEntries(kind, localize) {
 
 export function filterEntries(entries, search = "", group = "") {
   const terms = normalizeSearch(search).split(/\s+/).filter(Boolean);
-  return entries.filter(entry => {
+  // An exact name wins over incidental mentions in descriptions (e.g. «Маг»).
+  const exactMatches = terms.length ? entries.filter(entry => normalizeSearch(entry.label) === terms.join(" ")) : [];
+  const candidates = exactMatches.length ? exactMatches : entries;
+  return candidates.filter(entry => {
     if (group && entry.group !== group) return false;
     const text = normalizeSearch([entry.label, entry.groupLabel, entry.summary,
       ...entry.details.map(detail => `${detail.name} ${detail.description}`)].join(" "));
