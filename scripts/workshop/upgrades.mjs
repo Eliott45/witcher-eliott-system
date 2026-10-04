@@ -1,6 +1,6 @@
 import { available, freeSlots, effectiveItem, activeOil } from "../data/workshop.mjs";
 import { AUGMENTATIONS } from "../data/workshop-upgrades.mjs";
-import { conditionKey } from "../data/physical-items.mjs";
+import { conditionKey, armorZones } from "../data/physical-items.mjs";
 import { inventoryWrite } from "../sheets/inventory-context.mjs";
 import { chooseReference } from "../sheets/reference-picker.mjs";
 import { workshopCheck, workshopBase, workshopNotice } from "./check.mjs";
@@ -9,7 +9,7 @@ import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 
 export function canInstall(target, source) {
   return available(source) && source.system.kind==="upgrade" && source.system.upgrade.target===target.type && freeSlots(target)>0
-    && (source.system.upgrade.category!=="armor" || source.system.upgrade.zones.includes(target.system.zone));
+    && (source.system.upgrade.category!=="armor" || armorZones(target).every(zone=>source.system.upgrade.zones.includes(zone)));
 }
 async function chooseOwned(actor, title, predicate) {
   const entries=actor.items.filter(predicate);
@@ -34,13 +34,13 @@ export async function installUpgrade(target) {
     if(!canInstall(target,source))throw new Error("Свободные слоты или предметы изменились.");
     const zone=category==="armor"?target.system.zone:"";
     const installation={id:foundry.utils.randomID(),name:source.name,sourceUuid:source._stats.compendiumSource||source.uuid,category,zone,properties:source.system.properties,
-      bonuses:foundry.utils.deepClone(source.system.upgrade.bonuses),weight:category==="armor"?source.system.weight/3:0};
+      bonuses:foundry.utils.deepClone(source.system.upgrade.bonuses),weight:category==="armor"?source.system.weight*armorZones(target).length/3:0};
     const updates=[{_id:target.id,"system.installations":[...target.system.installations,installation]}], creates=[];
     const key=conditionKey(target), conditionBonus=installation.bonuses.filter(b=>b.target===key).reduce((sum,b)=>sum+b.value,0);
     updates[0][`system.${key}.value`]=target.system[key].value+conditionBonus;
     if(category==="armor"){
       installation.bonuses.push({target:"weight",value:installation.weight});
-      const zones=source.system.upgrade.zones.filter(z=>z!==zone);
+      const zones=source.system.upgrade.zones.filter(z=>!armorZones(target).includes(z));
       if(zones.length){const remainder=copyPhysical(source,1);remainder.system.upgrade.zones=zones;creates.push(remainder);}
     }
     await inventoryTransaction(actor,{expenses:[{itemId:source.id,quantity:1}],updates,creates});
@@ -54,7 +54,7 @@ export async function removeArmorUpgrade(target,id) {
     const source=await foundry.utils.fromUuid(entry.sourceUuid);if(!source)throw new Error("Исходный предмет накладки недоступен.");
     if(!(await workshopCheck(actor,{name:"Снять накладку",skill:"crafting",dc:15})).success)return;
     if(!target.system.installations.some(x=>x.id===id))return;
-    const data=copyPhysical(source,1);data.system.upgrade.zones=[entry.zone];
+    const data=copyPhysical(source,1);data.system.upgrade.zones=armorZones({system:{zone:entry.zone}});
     const amount=entry.bonuses.filter(b=>b.target==="stoppingPower").reduce((sum,b)=>sum+b.value,0);
     await inventoryTransaction(actor,{updates:[{_id:target.id,"system.installations":target.system.installations.filter(x=>x.id!==id),"system.stoppingPower.value":Math.max(0,target.system.stoppingPower.value-amount)}],creates:[data]});
   });

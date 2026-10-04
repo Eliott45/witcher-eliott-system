@@ -1,5 +1,5 @@
 import { effectiveItem, activeOil } from "../data/workshop.mjs";
-import { ARMOR_ZONES, isPhysical, equippedItems, conditionKey, carriedWeight, itemWeight } from "../data/physical-items.mjs";
+import { ARMOR_ZONES, armorZones, isPhysical, equippedItems, conditionKey, carriedWeight, itemWeight } from "../data/physical-items.mjs";
 import { isContainer, containerParent, containerContents, isCarried } from "../data/containers.mjs";
 import { browseEquipmentCatalog } from "./equipment-browser.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -46,7 +46,7 @@ export function inventoryContext(actor, preferences = {}) {
     categories: EQUIPMENT_CATEGORIES, items: rows,
     groups: GROUPS.map(group => ({ ...group, open: !preferences.collapsed?.[`inventory-${group.id}`],
       items: sortRows(rows.filter(item => !item.parentId && group.categories.includes(item.category))) })),
-    zones: ARMOR_ZONES.map(zone => ({ ...zone, items: equippedItems(items).filter(item => item.type === "armor" && item.system.zone === zone.id).map(item => ({ id: item.id, name: item.name, condition: effectiveItem(item).stoppingPower })) })),
+    zones: ARMOR_ZONES.map(zone => ({ ...zone, items: equippedItems(items).filter(item => item.type === "armor" && armorZones(item).includes(zone.id)).map(item => ({ id: item.id, name: item.name, condition: effectiveItem(item).stoppingPower })) })),
     workshopOpen: !preferences.collapsed?.["inventory-workshop"] };
 }
 export async function equipItem(_event, target) {
@@ -57,7 +57,7 @@ export async function equipItem(_event, target) {
     const updates = [];
     if (!item.system.equipped && item.type === "armor") {
       // Same layer only. Future layering can expose additional layers without migrating actor data.
-      for (const other of equippedItems(this.actor.items)) if (other.type === "armor" && other.system.zone === item.system.zone && other.system.layer === item.system.layer && other.id !== item.id)
+      for (const other of equippedItems(this.actor.items)) if (other.type === "armor" && armorZones(other).some(zone => armorZones(item).includes(zone)) && other.system.layer === item.system.layer && other.id !== item.id)
         updates.push({ _id: other.id, "system.equipped": false });
     }
     updates.push({ _id: item.id, "system.equipped": !item.system.equipped, "system.carried": true, "system.containerId": "" });

@@ -1,9 +1,10 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { CORE_AMMUNITION } from "../data/core-ammunition.mjs";
+import { ELDER_EQUIPMENT } from "../data/elder-equipment.mjs";
 import { ammunitionUpdate } from "./ammunition-data.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { equipmentIconUpdate } from "../data/item-icons.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 3;
+export const EQUIPMENT_CONTENT_VERSION = 4;
 
 const updatesFor = items => Array.from(items).flatMap(item => {
   const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item) };
@@ -21,7 +22,7 @@ export async function migrateEquipmentContent() {
   if (!pack) return;
   const index = await pack.getIndex({ fields: ["system.ruleId"] });
   const existing = new Set(Array.from(index.values(), entry => entry.system?.ruleId));
-  const missing = CORE_AMMUNITION.filter(entry => !existing.has(entry.id));
+  const missing = [...CORE_AMMUNITION, ...ELDER_EQUIPMENT].filter(entry => !existing.has(entry.id));
   const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry =>
     entry.system?.ruleId?.startsWith("ammunition.") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
   const updates = updatesFor(oldDocuments);
@@ -35,7 +36,7 @@ export async function migrateEquipmentContent() {
     const [sources, folders] = await Promise.all([load("equipment.json"), load("equipment.folders.json")]);
     documents = missing.map(entry => {
       const source = sources.find(document => document._id === entry.documentId && document.system.ruleId === entry.id);
-      if (!source || index.has(entry.documentId)) throw new Error(`Проверьте запись боеприпаса ${entry.id}: источник отсутствует или ID занят.`);
+      if (!source || index.has(entry.documentId)) throw new Error(`Проверьте запись предмета ${entry.id}: источник отсутствует или ID занят.`);
       return source;
     });
     const folderIds = new Set(documents.map(document => document.folder));
@@ -48,7 +49,7 @@ export async function migrateEquipmentContent() {
       if (requiredFolders.length) await foundry.documents.Folder.implementation.createDocuments(requiredFolders, { pack: pack.collection, keepId: true });
       if (documents.length) {
         const created = await foundry.documents.Item.implementation.createDocuments(documents, { pack: pack.collection, keepId: true });
-        if (created.length !== documents.length) throw new Error("Добавлены не все боеприпасы. Обновление будет повторено при следующем входе мастера.");
+        if (created.length !== documents.length) throw new Error("Добавлены не все предметы. Обновление будет повторено при следующем входе мастера.");
       }
       if (updates.length) await foundry.documents.Item.implementation.updateDocuments(updates, { pack: pack.collection });
     } finally { if (locked) await pack.configure({ locked: true }); }

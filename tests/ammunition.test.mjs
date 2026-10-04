@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readFile } from "node:fs/promises";
 import { CORE_AMMUNITION } from "../scripts/data/core-ammunition.mjs";
+import { ELDER_EQUIPMENT } from "../scripts/data/elder-equipment.mjs";
 import { compendiumData, compendiumFolders } from "../tools/compendium-data.mjs";
 import { equipmentEntry, filterEquipment } from "../scripts/data/equipment-search.mjs";
 import { inventoryContext } from "../scripts/sheets/inventory-context.mjs";
@@ -15,7 +16,7 @@ const sources = compendiumData(translations).equipment;
 const folders = compendiumFolders(translations).equipment;
 
 test("four ammunition records reproduce the supplied table and remain separate from weapons", () => {
-  const ammunition = sources.filter(item => item.system.kind === "ammunition");
+  const ammunition = sources.filter(item => CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId));
   assert.equal(ammunition.length, 4);
   assert.equal(new Set(ammunition.map(item => item._id)).size, 4);
   assert.deepEqual(ammunition.map(item => [item.system.damageType, item.system.rarity, item.system.weight, item.system.price]), [
@@ -45,9 +46,10 @@ test("standard ammunition buys packs of ten but counts individual projectiles an
   assert.deepEqual(conditionUpdate(standard, { "system.reliability.value": 20 }), { "system.reliability.value": 10 });
 });
 
-function migrationFixture({ fail = false, locked = true, startVersion = 0 } = {}) {
+function migrationFixture({ fail = false, locked = true, startVersion = 0, elder = true } = {}) {
   const gm = {}, writes = [], index = new Map(), packFolders = new Map();
   let version = startVersion;
+  if (elder) for (const item of sources.filter(item=>ELDER_EQUIPMENT.some(entry=>entry.id===item.system.ruleId))) index.set(item._id,structuredClone(item));
   const pack = { collection: "witcher-eliott-system.equipment", locked, folders: packFolders,
     getIndex: async () => index,
     getDocument: async id => index.get(id),
@@ -82,7 +84,7 @@ test("content update appends only missing ammunition, keeps edited entries and r
   game.user = state.gm;
   await migrateEquipmentContent();
   assert.deepEqual(state.writes, [["lock", false], ["folders", 1], ["items", 3], ["lock", true]]);
-  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 4);
+  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 34);
   assert.equal(state.index.get("custom-canonical").system.price, 999);
   await migrateEquipmentContent(); assert.equal(state.writes.length, 4);
 });
@@ -114,7 +116,7 @@ test("old packs convert once, preserving total value/weight, custom art and name
 
 test("version-one worlds repair pack, world, actor and unlinked token copies without duplication", async () => {
   const state = migrationFixture({ startVersion: 1 });
-  sources.filter(item => item.system.kind === "ammunition").forEach(item => state.index.set(item._id, { ...structuredClone(item), img: "icons/svg/arrow.svg" }));
+  sources.filter(item => CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)).forEach(item => state.index.set(item._id, { ...structuredClone(item), img: "icons/svg/arrow.svg" }));
   const old = { _id: "old", name: "Стандартные (×10)", img: "icons/svg/arrow.svg", type: "equipment", system: { ruleId: "ammunition.standard", quantity: 1, price: 10, weight: .5 } };
   const standard = state.index.get(CORE_AMMUNITION[0].documentId);
   Object.assign(standard, structuredClone({ ...old, flags: {}, _id: standard._id }));
@@ -127,8 +129,8 @@ test("version-one worlds repair pack, world, actor and unlinked token copies wit
     assert.equal(item.system.quantity, 10); assert.equal(item.system.weight, .05); assert.equal(item.system.price, 1);
     assert.equal(item.img, CORE_AMMUNITION[0].img); assert.equal(item.name, "Стандартные боеприпасы");
   }
-  assert.equal(state.index.size, 4); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
-  assert.ok(Array.from(state.index.values()).every(item => item.img === CORE_AMMUNITION[0].img));
+  assert.equal(state.index.size, 34); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
+  assert.ok(Array.from(state.index.values()).filter(item=>item.system.kind==="ammunition").every(item => item.img === CORE_AMMUNITION[0].img));
   await migrateEquipmentContent(); assert.equal(worldActor.items[0].system.quantity, 10);
 });
 
@@ -153,6 +155,15 @@ test("failed live content update restores lock and does not mark migration compl
   await migrateEquipmentContent();
   assert.equal(unlocked.pack.locked, false);
   assert.equal(unlocked.writes.some(([action]) => action === "lock"), false);
+});
+
+test("version-three worlds append all thirty Elder Folk items without recreating ammunition", async () => {
+  const state=migrationFixture({startVersion:3,elder:false});
+  for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
+  await migrateEquipmentContent();
+  assert.equal(state.index.size,34);
+  assert.equal(state.writes.find(([key])=>key==="items")[1],30);
+  assert.equal(state.version,EQUIPMENT_CONTENT_VERSION);
 });
 
 test("creating or dropping an old pack normalizes once while new individual stacks stay unchanged", async () => {

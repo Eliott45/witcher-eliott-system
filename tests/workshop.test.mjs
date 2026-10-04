@@ -4,7 +4,7 @@ import { MATERIALS } from "../scripts/data/workshop-materials.mjs";
 import { ALCHEMY, MUTAGENS } from "../scripts/data/workshop-alchemy.mjs";
 import { UPGRADES } from "../scripts/data/workshop-upgrades.mjs";
 import { RECIPES } from "../scripts/data/workshop-recipes.mjs";
-import { CORE_EQUIPMENT } from "../scripts/data/core-equipment.mjs";
+import { CORE_EQUIPMENT, CORE_WEAPONS, CORE_ARMOR } from "../scripts/data/core-equipment.mjs";
 import { materialPlan, repairRecipe, effectiveItem, freeSlots, oilDamage, mutationModifiers, equipmentUuid } from "../scripts/data/workshop.mjs";
 import { carriedWeight, conditionUpdate } from "../scripts/data/physical-items.mjs";
 import { deriveStatistics } from "../scripts/data/statistics.mjs";
@@ -16,7 +16,8 @@ test("workshop catalog has unique canonical identities and every recipe resolves
  assert.equal(new Set(catalog.map(x=>x.documentId)).size,catalog.length);
  const uuids=new Map(catalog.map(x=>[equipmentUuid(x.documentId),x]));
  for(const entry of RECIPES){const r=entry.system.recipe;assert(uuids.has(r.resultUuid),entry.id);assert(r.dc>0&&r.time>0&&r.quantity>0);for(const c of r.components)assert((c.uuid&&uuids.has(c.uuid))||c.substance,entry.id);}
- for(const item of CORE_EQUIPMENT.filter(i=>i.type==="weapon"||i.type==="armor"))assert(RECIPES.some(r=>r.system.recipe.resultUuid===equipmentUuid(item.documentId)),item.id);
+ // This workshop catalogue covers the core human recipes; Elder Folk recipe tables are separate.
+ for(const item of [...CORE_WEAPONS,...CORE_ARMOR])assert(RECIPES.some(r=>r.system.recipe.resultUuid===equipmentUuid(item.documentId)),item.id);
  assert.equal(MUTAGENS.length,12);assert.equal(ALCHEMY.filter(x=>x.system.alchemy.category==="oil").length,12);
 });
 test("exact components reserve before substances and cannot be double-spent; split stacks and shortages",()=>{

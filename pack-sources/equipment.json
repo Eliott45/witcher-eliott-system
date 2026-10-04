@@ -4270,6 +4270,1068 @@
     "flags": {}
   },
   {
+    "_id": "eldw000000000001",
+    "name": "Эльфский мессер",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.elven-messer",
+      "skill": "swordsmanship",
+      "damageType": "К/Р",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "3d6+4",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 2,
+      "weight": 2,
+      "price": 595,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000002",
+    "name": "Клинок бригады «Врихедд»",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.vrihedd-blade",
+      "skill": "swordsmanship",
+      "damageType": "К/Р",
+      "accuracy": 3,
+      "rarity": "unique",
+      "damage": "4d6+4",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 2.5,
+      "price": 745,
+      "properties": "Кровопускающее (25%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000003",
+    "name": "Меч из метеоритной стали",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.meteorite-sword",
+      "skill": "swordsmanship",
+      "damageType": "К/Р",
+      "accuracy": 1,
+      "rarity": "unique",
+      "damage": "5d6",
+      "reliability": {
+        "value": 20,
+        "max": 20
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 3,
+      "price": 875,
+      "properties": "Сбалансированное; Метеоритное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000004",
+    "name": "Гномий гвихир",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.gnomish-gwyhyr",
+      "skill": "swordsmanship",
+      "damageType": "К/Р",
+      "accuracy": 3,
+      "rarity": "unique",
+      "damage": "5d6+3",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 1090,
+      "properties": "Кровопускающее (50%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000005",
+    "name": "Клинок из Тир Тохаира",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.tir-tochair-blade",
+      "skill": "swordsmanship",
+      "damageType": "К/Р",
+      "accuracy": 3,
+      "rarity": "unique",
+      "damage": "6d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 3,
+      "price": 1175,
+      "properties": "Кровопускающее (25%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000006",
+    "name": "Низушечий рондель",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.halfling-rondel",
+      "skill": "smallBlades",
+      "damageType": "К/Р",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "small",
+      "enhancementSlots": 1,
+      "weight": 1,
+      "price": 485,
+      "properties": "Пробивающее броню",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000007",
+    "name": "Краснолюдский секач",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.dwarven-cleaver",
+      "skill": "smallBlades",
+      "damageType": "Р/Д",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "3d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "small",
+      "enhancementSlots": 1,
+      "weight": 1.5,
+      "price": 500,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000008",
+    "name": "Краснолюдский топор",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.dwarven-axe",
+      "skill": "melee",
+      "damageType": "Р",
+      "accuracy": 3,
+      "rarity": "unique",
+      "damage": "5d6+3",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 1,
+      "weight": 4,
+      "price": 740,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000009",
+    "name": "Гномий чёрный топор",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.gnomish-black-axe",
+      "skill": "melee",
+      "damageType": "Р",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "6d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 910,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000010",
+    "name": "Махакамский мартель",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.mahakam-martell",
+      "skill": "melee",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "5d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 1,
+      "weight": 3.5,
+      "price": 750,
+      "properties": "Пробивающее броню",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000011",
+    "name": "Кистень из метеоритной стали",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.meteorite-flail",
+      "skill": "melee",
+      "damageType": "Д",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "6d6",
+      "reliability": {
+        "value": 20,
+        "max": 20
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 4,
+      "price": 900,
+      "properties": "Захватное; Метеоритное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000012",
+    "name": "Краснолюдский боевой молот",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.dwarven-pole-hammer",
+      "skill": "staffSpear",
+      "damageType": "К/Д",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "5d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 4,
+      "price": 835,
+      "properties": "Длинное; Дезориентирующее (−2)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000013",
+    "name": "Эльфская глефа",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.elven-glaive",
+      "skill": "staffSpear",
+      "damageType": "Р/К/Д",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "4d6+3",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 3,
+      "price": 925,
+      "properties": "Длинное; Кровопускающее (25%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000014",
+    "name": "Гномий посох",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.gnomish-staff",
+      "skill": "staffSpear",
+      "damageType": "Д",
+      "accuracy": 1,
+      "rarity": "unique",
+      "damage": "3d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 910,
+      "properties": "Длинное; Фокусирующее (3)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000015",
+    "name": "Эльфский дорожный посох",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.elven-travel-staff",
+      "skill": "staffSpear",
+      "damageType": "Д",
+      "accuracy": 1,
+      "rarity": "unique",
+      "damage": "3d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 1.5,
+      "price": 975,
+      "properties": "Длинное; Фокусирующее (3); Улучшенное фокусирующее",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000016",
+    "name": "Эльфский походный лук",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.elven-travel-bow",
+      "skill": "archery",
+      "damageType": "К",
+      "accuracy": 1,
+      "rarity": "unique",
+      "damage": "4d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 200,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 1,
+      "weight": 1,
+      "price": 575,
+      "properties": "",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000017",
+    "name": "Эльфский зефар",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.elven-zefar",
+      "skill": "archery",
+      "damageType": "К",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "6d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 350,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 1100,
+      "properties": "Улучшенное пробивающее броню",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000018",
+    "name": "Гномий ручной арбалет",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.gnomish-hand-crossbow",
+      "skill": "crossbow",
+      "damageType": "К",
+      "accuracy": 3,
+      "rarity": "unique",
+      "damage": "2d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 100,
+      "rangeBodyMultiplier": 0,
+      "concealment": "small",
+      "enhancementSlots": 1,
+      "weight": 1,
+      "price": 425,
+      "properties": "Медленно перезаряжающееся",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "eldw000000000019",
+    "name": "Краснолюдский тяжёлый арбалет",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.dwarven-heavy-crossbow",
+      "skill": "crossbow",
+      "damageType": "К",
+      "accuracy": 3,
+      "rarity": "unique",
+      "damage": "5d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 300,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 3.5,
+      "price": 850,
+      "properties": "Медленно перезаряжающееся",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elds000000000001",
+    "name": "Гномий баклер",
+    "type": "weapon",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "weapon.gnomish-buckler",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "0",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 1,
+      "price": 450,
+      "properties": "",
+      "category": "shield",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elds000000000002",
+    "name": "Эльфский щит",
+    "type": "weapon",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "weapon.elven-shield",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "0",
+      "reliability": {
+        "value": 25,
+        "max": 25
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 3,
+      "price": 700,
+      "properties": "",
+      "category": "shield",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elds000000000003",
+    "name": "Махакамская павеза",
+    "type": "weapon",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "weapon.mahakam-pavise",
+      "skill": "melee",
+      "damageType": "",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "0",
+      "reliability": {
+        "value": 35,
+        "max": 35
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 5.5,
+      "price": 1050,
+      "properties": "Полное укрытие",
+      "category": "shield",
+      "encumbrance": 1,
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Базовая книга, стр. 83–84 — вооружение Старших Народов</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elda000000000001",
+    "name": "Низушечий защитный дублет",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.halfling-doublet",
+      "zone": "torso",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 8,
+        "max": 8
+      },
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 1,
+      "price": 375,
+      "properties": "Скрытая броня: Внимание СЛ 20",
+      "resistances": "",
+      "rarity": "unique",
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Защитный дублет можно принять за обычную одежду. Распознать броню позволяет Внимание СЛ 20.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elda000000000002",
+    "name": "Кольчуга гномьей работы",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.gnomish-chain",
+      "zone": "all",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 10,
+        "max": 10
+      },
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 5,
+      "price": 975,
+      "properties": "Сопротивление режущему урону",
+      "resistances": "Р",
+      "rarity": "unique",
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Цельный доспех: защищает голову, корпус, руки и ноги. Вес и цена учитываются за весь комплект.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elda000000000003",
+    "name": "Краснолюдский плащ",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.dwarven-cloak",
+      "zone": "all",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 16,
+        "max": 16
+      },
+      "enhancementSlots": 1,
+      "encumbrance": 0,
+      "weight": 5,
+      "price": 1400,
+      "properties": "",
+      "resistances": "",
+      "rarity": "unique",
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Цельный доспех: защищает голову, корпус, руки и ноги. Вес и цена учитываются за весь комплект.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elda000000000004",
+    "name": "Броня скоя’таэля",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.scoiatael-armor",
+      "zone": "all",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 20,
+        "max": 20
+      },
+      "enhancementSlots": 2,
+      "encumbrance": 1,
+      "weight": 12,
+      "price": 2325,
+      "properties": "+2 к Скрытности в дикой природе",
+      "resistances": "",
+      "rarity": "unique",
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Цельный доспех: защищает голову, корпус, руки и ноги. Вес и цена учитываются за весь комплект.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elda000000000005",
+    "name": "Драгунская броня гномьей работы",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.gnomish-dragoon",
+      "zone": "all",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 25,
+        "max": 25
+      },
+      "enhancementSlots": 2,
+      "encumbrance": 2,
+      "weight": 20,
+      "price": 2850,
+      "properties": "Сопротивление режущему и колющему урону; +2 к Верховой езде на лошади",
+      "resistances": "Р/К",
+      "rarity": "unique",
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Цельный доспех: защищает голову, корпус, руки и ноги. Вес и цена учитываются за весь комплект.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elda000000000006",
+    "name": "Махакамские латы",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.mahakam-plate",
+      "zone": "all",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 30,
+        "max": 30
+      },
+      "enhancementSlots": 3,
+      "encumbrance": 2,
+      "weight": 30,
+      "price": 3525,
+      "properties": "Сопротивление режущему, колющему и дробящему урону",
+      "resistances": "Р/К/Д",
+      "rarity": "unique",
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов",
+      "description": "<p>Цельный доспех: защищает голову, корпус, руки и ноги. Вес и цена учитываются за весь комплект.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elde000000000001",
+    "name": "Эльфские ввинчивающиеся",
+    "type": "equipment",
+    "img": "icons/weapons/ammunition/arrow-simple.webp",
+    "system": {
+      "ruleId": "ammunition.elven-burrowing",
+      "kind": "ammunition",
+      "quantity": 1,
+      "purchaseQuantity": 1,
+      "weight": 0.1,
+      "price": 50,
+      "damageType": "К",
+      "rarity": "unique",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "concealment": "large",
+      "properties": "Кровопускающее (100%)",
+      "description": "<p>Наконечник остаётся в ране. Кровотечение прекращается после его извлечения: Первая помощь СЛ 16.</p>",
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов"
+    },
+    "effects": [],
+    "folder": "gearAmmo00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "elde000000000002",
+    "name": "Краснолюдские пробивные",
+    "type": "equipment",
+    "img": "icons/weapons/ammunition/arrow-simple.webp",
+    "system": {
+      "ruleId": "ammunition.dwarven-impact",
+      "kind": "ammunition",
+      "quantity": 1,
+      "purchaseQuantity": 1,
+      "weight": 0.1,
+      "price": 50,
+      "damageType": "Д",
+      "rarity": "unique",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "concealment": "large",
+      "properties": "Разрушающее",
+      "description": "<p>Тяжёлый наконечник повреждает броню при попадании: 1d6 / 2 урона её прочности.</p>",
+      "source": "Базовая книга, стр. 83–84 — вооружение Старших Народов"
+    },
+    "effects": [],
+    "folder": "gearAmmo00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "matr000000000001",
     "name": "Пепел",
     "type": "equipment",

@@ -6,6 +6,8 @@ export const isPhysical = item => PHYSICAL_TYPES.includes(item.type);
 export const isAmmunition = item => item.type === "equipment" && item.system.kind === "ammunition";
 export const CONCEALMENT = [{ id: "tiny", name: "Маленькое — в кармане" }, { id: "small", name: "Небольшое — под курткой" }, { id: "large", name: "Крупное — под плащом" }, { id: "none", name: "Не спрятать" }];
 export const ARMOR_ZONES = [{ id: "head", name: "Голова", img: EQUIPMENT_ICONS.head }, { id: "torso", name: "Корпус / руки", img: EQUIPMENT_ICONS.torso }, { id: "legs", name: "Ноги", img: EQUIPMENT_ICONS.legs }];
+export const ARMOR_COVERAGE = [...ARMOR_ZONES, { id: "all", name: "Все зоны" }];
+export const armorZones = item => item.system.zone === "all" ? ARMOR_ZONES.map(zone => zone.id) : [item.system.zone];
 export const RARITIES = [{ id: "everywhere", name: "Повсеместное" }, { id: "common", name: "Обычное" }, { id: "rare", name: "Редкое" }, { id: "unique", name: "Уникальное" }];
 export const EQUIPMENT_KINDS = [{ id: "gear", name: "Снаряжение" }, { id: "tool", name: "Инструменты" }, { id: "container", name: "Контейнеры" }, { id: "ammunition", name: "Боеприпасы" }, { id: "companion", name: "Компаньон" }, { id: "material", name: "Материалы" }, { id: "alchemy", name: "Алхимия" }, { id: "upgrade", name: "Улучшения" }, { id: "mutagen", name: "Мутагены" }];
 export const itemWeight = item => item.system.kind === "companion" ? 0 : (effectiveItem(item).weight ?? 0) * (item.system.quantity ?? 1);

@@ -29,7 +29,7 @@ test("catalog identifiers are unique and shields have reliability instead of SP"
   assert.equal(new Set(CORE_EQUIPMENT.map(item => item.id)).size, CORE_EQUIPMENT.length);
   assert.equal(new Set(CORE_EQUIPMENT.map(item => item.documentId)).size, CORE_EQUIPMENT.length);
   const shields = CORE_EQUIPMENT.filter(item => item.system.category === "shield");
-  assert.equal(shields.length, 8);
+  assert.equal(shields.length, 11);
   for (const shield of shields) { assert.ok(shield.system.reliability.max > 0); assert.equal(shield.system.stoppingPower, undefined); }
 });
 

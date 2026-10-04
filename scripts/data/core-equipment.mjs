@@ -1,13 +1,9 @@
 // User-provided core pp. 73–74, 79–80, 92–93. Values are per item, except explicitly named packs.
 import { CORE_CONTAINERS } from "./core-containers.mjs";
 import { CORE_AMMUNITION } from "./core-ammunition.mjs";
-const rarity = code => ({ e: "everywhere", c: "common", r: "rare", u: "unique" })[code];
-const weapon = (n, row) => {
-  const [id, name, skill, damageType, accuracy, rare, damage, reliability, hands, range, bodyRange, concealment, slots, weight, price, properties = "", category = "melee", encumbrance = 0] = row;
-  return { id: `weapon.${id}`, documentId: `weap${String(n).padStart(12, "0")}`, type: "weapon", name, source: "weapons", system: {
-    skill, damageType, accuracy, rarity: rarity(rare), damage, reliability: { value: reliability, max: reliability }, hands,
-    range, rangeBodyMultiplier: bodyRange, concealment, enhancementSlots: slots, weight, price, properties, category, encumbrance, source: "Базовая книга, стр. 73–74 / 80" } };
-};
+import { rarity, weaponRecord } from "./equipment-records.mjs";
+import { ELDER_EQUIPMENT } from "./elder-equipment.mjs";
+const weapon = (n, row) => weaponRecord(`weap${String(n).padStart(12, "0")}`, row, "Базовая книга, стр. 73–74 / 80");
 export const CORE_WEAPONS = [
   ["iron-longsword", "Железный полуторный меч", "swordsmanship", "Р/К", 0,"e","2d6+2",10,2,0,0,"large",0,1.5,160],
   ["arming-sword", "Рыцарский меч", "swordsmanship", "Р/К", 0,"c","2d6+4",15,1,0,0,"large",0,2.5,270],
@@ -94,4 +90,4 @@ for (const entry of CORE_GEAR) {
   if (container) Object.assign(entry.system, container, { kind: "container", source: "Базовая книга, стр. 93, 95" });
 }
 Object.assign(LEGACY_GEAR_STATS["shoulder-bag"], CORE_CONTAINERS["shoulder-bag"], { kind: "container" });
-export const CORE_EQUIPMENT = [...CORE_WEAPONS, ...CORE_ARMOR, ...CORE_GEAR, ...CORE_AMMUNITION];
+export const CORE_EQUIPMENT = [...CORE_WEAPONS, ...CORE_ARMOR, ...CORE_GEAR, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT];

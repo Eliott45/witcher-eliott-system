@@ -1,5 +1,5 @@
 import { textField as text, numberField as number, choiceField as choice, formFields } from "../data/structured-fields.mjs";
-import { isPhysical, isAmmunition, ARMOR_ZONES, RARITIES, EQUIPMENT_KINDS, CONCEALMENT } from "../data/physical-items.mjs";
+import { isPhysical, isAmmunition, ARMOR_COVERAGE, RARITIES, EQUIPMENT_KINDS, CONCEALMENT } from "../data/physical-items.mjs";
 import { SUBSTANCES, MONSTER_CATEGORIES } from "../data/workshop.mjs";
 const decimal = (key, label) => ({ ...number(key, label), step: "0.001" });
 const bool = (key, label) => ({ key, label, type: "boolean" });
@@ -15,7 +15,7 @@ const WEAPON = [choice("category", "Категория оружия", [{ id: "me
   decimal("range", "Дальность, м"), decimal("rangeBodyMultiplier", "Либо дальность: ТЕЛ ×"),
   CONCEALMENT_FIELD,
   number("enhancementSlots", "Слоты усиления"), number("encumbrance", "Скованность (EV, для щита)")];
-const ARMOR = [choice("zone", "Зона брони", ARMOR_ZONES), choice("armorClass", "Класс брони", [{ id: "light", name: "Лёгкая" }, { id: "medium", name: "Средняя" }, { id: "heavy", name: "Тяжёлая" }]),
+const ARMOR = [choice("zone", "Зона брони", ARMOR_COVERAGE), choice("armorClass", "Класс брони", [{ id: "light", name: "Лёгкая" }, { id: "medium", name: "Средняя" }, { id: "heavy", name: "Тяжёлая" }]),
   number("stoppingPower.value", "ПБ: текущая"), number("stoppingPower.max", "ПБ: базовый максимум"), number("encumbrance", "Скованность (EV)"),
   number("enhancementSlots", "Слоты усиления"), text("resistances", "Сопротивления")];
 export function physicalItemContext(item, editable) {
