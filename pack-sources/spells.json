@@ -1,0 +1,2418 @@
+[
+  {
+    "_id": "spel000000000001",
+    "name": "Зеркало Афана",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.afan-mirror",
+      "description": "<p>Создаёт 1d10 нематериальных копий заклинателя. Управление ими не требует действия; копии не могут выходить за пределы дистанции.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000002",
+    "name": "Слепящая пыль",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.blinding-dust",
+      "description": "<p>Пыль ослепляет цель на время действия заклинания.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 4
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000003",
+    "name": "Рассеивание",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.dispel",
+      "description": "<p>Отменяет заклинание, ритуал или порчу. Затраты — половина исходной стоимости отменяемой магии. Проверка Сотворения заклинаний должна превысить исходную проверку. Может использоваться как защита от магической атаки, в том числе с физической составляющей.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 0,
+      "variableCost": true,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "spellCasting"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000004",
+    "name": "Очарование",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.glamour",
+      "description": "<p>Иллюзия привлекательности: +3 к Соблазнению, Харизме и Лидерству на время действия.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "self",
+        "value": 0
+      },
+      "duration": {
+        "kind": "hours",
+        "formula": "1d6",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000005",
+    "name": "Магический компас",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.magic-compass",
+      "description": "<p>Указывает направление на знакомое заклинателю место либо на север.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "self",
+        "value": 0
+      },
+      "duration": {
+        "kind": "hours",
+        "formula": "1d6",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000006",
+    "name": "Управление чувствами",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.mind-manipulation",
+      "description": "<p>На время действия навязывает цели ненависть, любовь, подавленность или эйфорию.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000007",
+    "name": "Призыв посоха",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.summon-staff",
+      "description": "<p>Дематериализует собственный посох и отправляет в место, посещённое за последний день. Повторное сотворение возвращает посох.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "unlimited",
+        "value": 0
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000008",
+    "name": "Телепатия",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.telepathy",
+      "description": "<p>Мысленное общение с одной целью без языкового барьера. При чтении мыслей маг может заметить вторжение: каждый раунд Магические познания против исходной проверки Телепатии.</p>",
+      "grade": "novice",
+      "element": "mixed",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 1,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000009",
+    "name": "Сенлли Грейг",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.cenlly-graig",
+      "description": "<p>Камни наносят 1d6 урона за каждый пункт превышения защиты цели, максимум 10d6. Это одна атака (errata).</p>",
+      "grade": "novice",
+      "element": "earth",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "1d6",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000010",
+    "name": "Коди Бивид",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.codi-bywyd",
+      "description": "<p>За один ход превращает семечко в небольшое взрослое растение. Подходит для трав, в том числе алхимических, но не для крупных деревьев.</p>",
+      "grade": "novice",
+      "element": "earth",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 4
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000011",
+    "name": "Магическое обследование",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.diagnostic-spell",
+      "description": "<p>Показывает оставшиеся ПЗ, критические ранения, болезни и отравление цели.</p>",
+      "grade": "novice",
+      "element": "earth",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000012",
+    "name": "Каменный шип",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.earthen-spike",
+      "description": "<p>Каменный сталагмит наносит 5d6 урона. Он остаётся на месте, пока не получит 20 пунктов урона и не будет уничтожен.</p>",
+      "grade": "novice",
+      "element": "earth",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 6
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "5d6",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000013",
+    "name": "Дыхание Кората",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.korath-breath",
+      "description": "<p>Осколки земли и скал в конусе ослепляют не защитившихся противников на 1d6 раундов.</p>",
+      "grade": "novice",
+      "element": "earth",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "cone",
+        "value": 3
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000014",
+    "name": "Перо Лютиэнь",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.luthien-quill",
+      "description": "<p>Создаёт текст или рисунок на твёрдой неживой поверхности.</p>",
+      "grade": "novice",
+      "element": "earth",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 1
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 102; официальная errata",
+      "page": 102
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000015",
+    "name": "Магическое исцеление",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.magic-healing",
+      "description": "<p>Восстанавливает 3 ПЗ за ход в течение действия. Может применяться несколько раз для лечения критического ранения; тогда обычные ПЗ не восстанавливаются.</p>",
+      "grade": "novice",
+      "element": "earth",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 2
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000016",
+    "name": "Тюрьма Тальфрина",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.talfryn-prison",
+      "description": "<p>Опутывает цель корнями. Корни уничтожаются 15 пунктами урона. Каждый раунд цель может действием пройти Уклонение/Изворотливость против результата сотворения, чтобы вырваться.</p>",
+      "grade": "novice",
+      "element": "earth",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "Пока корни не уничтожены"
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000017",
+    "name": "Адэнидд",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.adenydd",
+      "description": "<p>Позволяет планировать: за каждые 2 м падения перемещение на 2 м в выбранном направлении. Достигнув земли во время действия, заклинатель не получает урон от падения.</p>",
+      "grade": "novice",
+      "element": "air",
+      "cost": 4,
+      "variableCost": false,
+      "range": {
+        "kind": "self",
+        "value": 0
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000018",
+    "name": "Воздушный пузырь",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.air-pocket",
+      "description": "<p>Пузырь свежего воздуха радиусом 1 м под водой или в непригодной для дыхания среде.</p>",
+      "grade": "novice",
+      "element": "air",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 12
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "2d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000019",
+    "name": "Шквал Бронвина",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.bronwyn-gust",
+      "description": "<p>Отталкивает цель на столько метров, на сколько сотворение превысило защиту, и наносит 1d6 урона. Столкновение с преградой вызывает урон от таранного удара.</p>",
+      "grade": "novice",
+      "element": "air",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 2
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "1d6",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000020",
+    "name": "Освежение воздуха",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.freshen-air",
+      "description": "<p>Очищает воздух в радиусе 4 м вокруг заклинателя от дыма, ядовитого газа и других загрязнений.</p>",
+      "grade": "novice",
+      "element": "air",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 4
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000021",
+    "name": "Убежище Уриена",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.urien-shelter",
+      "description": "<p>Защищает зону вокруг заклинателя от сильной жары, холода, дождя и снега.</p>",
+      "grade": "novice",
+      "element": "air",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 8
+      },
+      "duration": {
+        "kind": "hours",
+        "formula": "1d6",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000022",
+    "name": "Статическая буря",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.static-storm",
+      "description": "<p>Все в радиусе, кроме заклинателя, кто носит металлическую броню или держит металлическое оружие, получают 2 урона за раунд.</p>",
+      "grade": "novice",
+      "element": "air",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 5
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "2d6",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000023",
+    "name": "Телекинез",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.telekinesis",
+      "description": "<p>Поднимает и перемещает предмет массой до 5 кг за уровень Сотворения заклинаний. Манипуляции используют Волю + Сотворение со штрафом −3, сложные действия −5. Дальность метания определяется Волей вместо ТЕЛ.</p>",
+      "grade": "novice",
+      "element": "air",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000024",
+    "name": "Зефир",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.zephyr",
+      "description": "<p>Отталкивает всех в радиусе 2 м на 6 м и наносит 1d6 урона (errata). Столкновение вызывает дополнительный таранный урон.</p>",
+      "grade": "novice",
+      "element": "air",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 2
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "1d6",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000025",
+    "name": "Энье",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.aenye",
+      "description": "<p>Огненный сгусток наносит 4d6 урона; вероятность горения — 75%.</p>",
+      "grade": "novice",
+      "element": "fire",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 12
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "4d6",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000026",
+    "name": "Айна Версеос",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.aine-versesos",
+      "description": "<p>Создаёт яркий свет в радиусе 4 м вокруг заклинателя.</p>",
+      "grade": "novice",
+      "element": "fire",
+      "cost": 1,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 4
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000027",
+    "name": "Огненное клеймо",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.brand-fire",
+      "description": "<p>Выжигает на обнажённой коже простой символ или клеймо, нанося 1d6 урона и оставляя шрам. Лечащее прикосновение СЛ 15 может удалить клеймо, но остаётся большой шрам.</p>",
+      "grade": "novice",
+      "element": "fire",
+      "cost": 4,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 8
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "1d6",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000028",
+    "name": "Хватка Кадфана",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.cadfan-grasp",
+      "description": "<p>Нагревает металлический предмет. Держащий его отпускает предмет либо получает 2d6 урона в соответствующую конечность. Можно нагреть оружие: +2d6 урона и 50% вероятности горения.</p>",
+      "grade": "novice",
+      "element": "fire",
+      "cost": 4,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 8
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d6",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "2d6",
+      "source": "Базовая книга, стр. 103; официальная errata",
+      "page": 103
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000029",
+    "name": "Магическая вспышка",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.magic-flare",
+      "description": "<p>Вспышка видна за 10 км. Все в радиусе 8 м проходят Сопротивление магии, иначе ослеплены на 1d6 раундов.</p>",
+      "grade": "novice",
+      "element": "fire",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 8
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000030",
+    "name": "Управление пламенем",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.raise-flame",
+      "description": "<p>Распространяет уже горящее пламя на 2 м за раунд; уменьшает или усиливает небольшой огонь, изменяя его урон на 1.</p>",
+      "grade": "novice",
+      "element": "fire",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000031",
+    "name": "Танио Ильхар",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.tanio-ilchar",
+      "description": "<p>Всполох в зоне 2×2 м с вероятностью 100% поджигает цели внутри.</p>",
+      "grade": "novice",
+      "element": "fire",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 8
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000032",
+    "name": "Волна огня",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.fire-stream",
+      "description": "<p>Поток огня в трёхметровом конусе наносит 2d6 урона и с вероятностью 50% поджигает цель.</p>",
+      "grade": "novice",
+      "element": "fire",
+      "cost": 4,
+      "variableCost": false,
+      "range": {
+        "kind": "cone",
+        "value": 3
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "2d6",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000033",
+    "name": "Град Кэрис",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.carys-hail",
+      "description": "<p>За каждый пункт превышения защиты цели — 1d6 урона, максимум 5d6; вероятность заморозить — 25%. Это одна атака (errata).</p>",
+      "grade": "novice",
+      "element": "water",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 5
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "1d6",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000034",
+    "name": "Управление водой",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.control-water",
+      "description": "<p>Меняет течение воды: удваивает скорость пловцов, увеличивает скорость кораблей в полтора раза, замедляет или останавливает речное течение.</p>",
+      "grade": "novice",
+      "element": "water",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "gm"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000035",
+    "name": "Проклятие Седны",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.curse-sedna",
+      "description": "<p>Создаёт водоворот размером 4 м. В пределах 5 м от него цель каждый раунд проходит Плавание против результата сотворения либо уходит под воду. Для всплытия повторяет проверку; иначе задыхается.</p>",
+      "grade": "novice",
+      "element": "water",
+      "cost": 5,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 12
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000036",
+    "name": "Туман Дормина",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.dormyn-fog",
+      "description": "<p>Плотный туман: −3 к Вниманию, обзор сокращается до 4 м для всех находящихся в зоне.</p>",
+      "grade": "novice",
+      "element": "water",
+      "cost": 3,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000037",
+    "name": "Ливень",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.downpour",
+      "description": "<p>Сильный дождь гасит открытое пламя и снимает горение в зоне.</p>",
+      "grade": "novice",
+      "element": "water",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 8
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 2,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000038",
+    "name": "Гололёд",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.ice-slick",
+      "description": "<p>Ледяной участок 2×2 м. Пересекающий его проходит Атлетику против результата сотворения, иначе падает.</p>",
+      "grade": "novice",
+      "element": "water",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "2d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000039",
+    "name": "Пиро Дюр",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.puro-dwr",
+      "description": "<p>Очищает 1 м³ воды от яда и болезней, но не удаляет живые существа. В большом водоёме после окончания эффекта вода постепенно снова загрязняется.</p>",
+      "grade": "novice",
+      "element": "water",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 4
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000040",
+    "name": "Рьеви",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.rhewi",
+      "description": "<p>Слой льда делает цель замороженной. Покрытый льдом неживой предмет нельзя использовать или перемещать.</p>",
+      "grade": "novice",
+      "element": "water",
+      "cost": 2,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 8
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 104; официальная errata",
+      "page": 104
+    },
+    "effects": [],
+    "folder": "spellnovice00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000041",
+    "name": "Метод Эйльхарт",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.eilhart-technique",
+      "description": "<p>Извлекает из памяти цели одну тайну. Критический провал при защите навсегда уменьшает ИНТ цели на 1.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 12,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 3
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 105; официальная errata",
+      "page": 105
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000042",
+    "name": "Иллюзия",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.illusion",
+      "description": "<p>Создаёт зрительную иллюзию, в которую верят провалившие защиту. Она не имеет запаха, не звучит и неосязаема.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 8,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 20
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 4,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 105; официальная errata",
+      "page": 105
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000043",
+    "name": "Телепортация",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.teleportation",
+      "description": "<p>Переносит только заклинателя и его вещи в знакомое место: Сотворение СЛ 15. Провал смещает точку на 1d6 миль. С предметом из незнакомого места можно телепортироваться туда против СЛ 20; при провале — смещение не более 2d10 миль.</p>",
+      "grade": "journeyman",
+      "element": "mixed",
+      "cost": 10,
+      "variableCost": false,
+      "range": {
+        "kind": "unlimited",
+        "value": 0
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 105; официальная errata",
+      "page": 105
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000044",
+    "name": "Теория Эльгана",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.elgan-theory",
+      "description": "<p>Магнитит металлический предмет. Металл в пределах 2 м притягивается и прилипает к нему; оторвать — Сила СЛ 18. Примагниченные к экипировке вещи входят в переносимый вес.</p>",
+      "grade": "journeyman",
+      "element": "earth",
+      "cost": 10,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 8
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "2d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 105; официальная errata",
+      "page": 105
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000045",
+    "name": "Ристр Грейг",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.rhwystr-graig",
+      "description": "<p>Создаёт каменную стену 2×3 м с прочностью 30 в пределах 20 м (errata).</p>",
+      "grade": "journeyman",
+      "element": "earth",
+      "cost": 15,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 20
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "Пока не уничтожена"
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 105; официальная errata",
+      "page": 105
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000046",
+    "name": "Землетрясение Стаммельфорда",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.stammelford-tremor",
+      "description": "<p>Разрушает поверхность в зоне 10 м: −2 РЕА и −3 СКОР. Небольшие строения рушатся с вероятностью 10%. Каждый раунд требуется Атлетика, чтобы не провалиться в землю; провалившиеся задыхаются до успешного выхода. После окончания земля остаётся повреждённой.</p>",
+      "grade": "journeyman",
+      "element": "earth",
+      "cost": 12,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 30
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 105; официальная errata",
+      "page": 105
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000047",
+    "name": "Гром Альзура",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.alzur-thunder",
+      "description": "<p>Молния наносит 8d6 урона с вероятностью горения 75%. Проходит через цели по прямой; после каждой цели урон следующей уменьшается на 1d6.</p>",
+      "grade": "journeyman",
+      "element": "air",
+      "cost": 15,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 25
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "8d6",
+      "source": "Базовая книга, стр. 106; официальная errata",
+      "page": 106
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000048",
+    "name": "Гвинт Троэлли",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.gwynt-troelli",
+      "description": "<p>Ветровой барьер отражает дистанционные атаки, не превысившие результат сотворения. Снаряд отлетает на 8 м в случайном направлении.</p>",
+      "grade": "journeyman",
+      "element": "air",
+      "cost": 12,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 4,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 106; официальная errata",
+      "page": 106
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000049",
+    "name": "Удушение",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.suffocate",
+      "description": "<p>Наносит цели 1d10 урона за ход; цель ошеломлена. Эффект прекращается, если заклинателя ранят оружием или он теряет концентрацию.</p>",
+      "grade": "journeyman",
+      "element": "air",
+      "cost": 14,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 4,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "1d10",
+      "source": "Базовая книга, стр. 106; официальная errata",
+      "page": 106
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000050",
+    "name": "Вспышка Деметии Крест",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.demetia-crest",
+      "description": "<p>Сфера чистой магии поглощает урон, равный удвоенному уровню Сотворения заклинаний. Попавшие снаряды уничтожаются; живые существа проходят свободно.</p>",
+      "grade": "journeyman",
+      "element": "fire",
+      "cost": 12,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 4,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 106; официальная errata",
+      "page": 106
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000051",
+    "name": "Пылающий вихрь",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.flaming-vortex",
+      "description": "<p>Огненный торнадо шириной 2 м перемещается за ход на число метров, равное уровню Сотворения. При касании цели нужна встречная проверка против Уклонения. Попадание: 5d6 урона, горение 50%. Вихрь не выходит за дистанцию.</p>",
+      "grade": "journeyman",
+      "element": "fire",
+      "cost": 15,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 4,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "5d6",
+      "source": "Базовая книга, стр. 106; официальная errata",
+      "page": 106
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000052",
+    "name": "Сейриф Хайль",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.seirff-haul",
+      "description": "<p>Огненные змеи захватывают цель, и она горит до успешного Уклонения против сотворения. Каждый раунд неудачи увеличивает СЛ следующего выхода на 1.</p>",
+      "grade": "journeyman",
+      "element": "fire",
+      "cost": 10,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "2d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 106; официальная errata",
+      "page": 106
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000053",
+    "name": "Аньяльх",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.anialwch",
+      "description": "<p>Высушивает цель: 4d6 урона, игнорирующего броню и щиты, и уменьшение текущей Выносливости на отдельные 4d6.</p>",
+      "grade": "journeyman",
+      "element": "water",
+      "cost": 8,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "4d6",
+      "source": "Базовая книга, стр. 106; официальная errata",
+      "page": 106
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000054",
+    "name": "Градобитие Меригольд",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.merigold-hailstorm",
+      "description": "<p>Каждый раунд все в зоне проходят Уклонение против сотворения либо получают 2d6 урона по каждой части тела.</p>",
+      "grade": "journeyman",
+      "element": "water",
+      "cost": 15,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 30
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 4,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "2d6",
+      "source": "Базовая книга, стр. 106; официальная errata",
+      "page": 106
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000055",
+    "name": "Волны Нагльфара",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.waves-naglfar",
+      "description": "<p>Ледяная волна наносит не защитившимся 4d6 урона и замораживает их.</p>",
+      "grade": "journeyman",
+      "element": "water",
+      "cost": 10,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 3
+      },
+      "duration": {
+        "kind": "instant",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "4d6",
+      "source": "Базовая книга, стр. 106; официальная errata",
+      "page": 106
+    },
+    "effects": [],
+    "folder": "spelljourneyman0",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000056",
+    "name": "Мысленный приказ",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.mental-command",
+      "description": "<p>Внушает точный приказ. Приказ, противоречащий природе цели, даёт ей +5 к защите. Цель может повторять Сопротивление магии каждые 1d6 раундов, чтобы освободиться.</p>",
+      "grade": "master",
+      "element": "mixed",
+      "cost": 25,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 10
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До выполнения приказа"
+      },
+      "defense": [
+        "resistMagic"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 107; официальная errata",
+      "page": 107
+    },
+    "effects": [],
+    "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000057",
+    "name": "Магический портал",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.magical-portal",
+      "description": "<p>Открывает в пределах 10 м портал 1×2 м в знакомое место. Всё подходящее по размеру проходит сквозь него. Закрытие на проходящем объекте разрезает его: для существа — критическая потеря конечности. Незнакомое место доступно по правилам телепортации вслепую.</p>",
+      "grade": "master",
+      "element": "mixed",
+      "cost": 22,
+      "variableCost": false,
+      "range": {
+        "kind": "unlimited",
+        "value": 0
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 6,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 107; официальная errata",
+      "page": 107
+    },
+    "effects": [],
+    "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000058",
+    "name": "Полиморфизм",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.polymorphism",
+      "description": "<p>Превращает в змею, кошку, птицу или собаку с физическими параметрами этого животного; вещи меняются вместе с телом. Для возвращения нужно снова сотворить заклинание. Двимерит в животной форме лишает возможности вернуться.</p>",
+      "grade": "master",
+      "element": "earth",
+      "cost": 22,
+      "variableCost": false,
+      "range": {
+        "kind": "self",
+        "value": 0
+      },
+      "duration": {
+        "kind": "special",
+        "formula": "",
+        "maintenance": 0,
+        "text": "До повторного сотворения"
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 107; официальная errata",
+      "page": 107
+    },
+    "effects": [],
+    "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000059",
+    "name": "Трансмутация",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.transmutation",
+      "description": "<p>Изменяет свойства минералов и металлов: один металл в другой, необработанный самоцвет — в обработанный для магии. Не создаёт и не изменяет двимерит и соприкасающиеся с ним металлы.</p>",
+      "grade": "master",
+      "element": "earth",
+      "cost": 25,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 2
+      },
+      "duration": {
+        "kind": "permanent",
+        "formula": "",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 107; официальная errata",
+      "page": 107
+    },
+    "effects": [],
+    "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000060",
+    "name": "Дервиш",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.dervish",
+      "description": "<p>Торнадо отражает дистанционные атаки как Гвинт Троэлли и действует на окружающих как Зефир. Заклинатель может двигаться и атаковать. Если он сам приближается к цели ближе 2 м, Зефир на неё не действует.</p>",
+      "grade": "master",
+      "element": "air",
+      "cost": 22,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 2
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 6,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 107; официальная errata",
+      "page": 107
+    },
+    "effects": [],
+    "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000061",
+    "name": "Гроза",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.storm",
+      "description": "<p>Каждый раунд любой в зоне, кроме заклинателя, с вероятностью 35% становится целью молнии. При провале Уклонения — 8d6 урона в торс и вероятность горения 75%.</p>",
+      "grade": "master",
+      "element": "air",
+      "cost": 25,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 20
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 6,
+        "text": ""
+      },
+      "defense": [
+        "dodge"
+      ],
+      "damage": "8d6",
+      "source": "Базовая книга, стр. 107; официальная errata",
+      "page": 107
+    },
+    "effects": [],
+    "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000062",
+    "name": "Огонь Мельгара",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.melgar-fire",
+      "description": "<p>Каждый в зоне, кроме заклинателя, с вероятностью 75% становится целью огненного шара. Защита против результата сотворения; попадание наносит 4d6 урона в случайную часть тела и с вероятностью 75% поджигает.</p>",
+      "grade": "master",
+      "element": "fire",
+      "cost": 25,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 40
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "2d6",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "4d6",
+      "source": "Базовая книга, стр. 108; официальная errata",
+      "page": 108
+    },
+    "effects": [],
+    "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000063",
+    "name": "Зеркальный эффект",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.mirror-effect",
+      "description": "<p>Луч наносит 10d6 урона. Его можно блокировать, но блокирующий предмет также получает урон; ветер не отражает луч. Зеркальная поверхность отражает его в случайном направлении, сама получая урон. Заклинание обычно не действует в помещении; при сильном снегопаде или пасмурной погоде урон вдвое меньше.</p>",
+      "grade": "master",
+      "element": "fire",
+      "cost": 25,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 20
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "2d6",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "10d6",
+      "source": "Базовая книга, стр. 108; официальная errata",
+      "page": 108
+    },
+    "effects": [],
+    "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000064",
+    "name": "Расступление вод",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.part-water",
+      "description": "<p>Создаёт свободное от воды пространство до 10×100×10 м. Водные существа покидают зону, проход сквозь водяные стены не пропускает воду внутрь. Пространство можно ориентировать вертикально; подводное сотворение открывает путь вместе с заклинателем.</p>",
+      "grade": "master",
+      "element": "water",
+      "cost": 25,
+      "variableCost": false,
+      "range": {
+        "kind": "radius",
+        "value": 10
+      },
+      "duration": {
+        "kind": "sustained",
+        "formula": "",
+        "maintenance": 6,
+        "text": ""
+      },
+      "defense": [
+        "none"
+      ],
+      "damage": "",
+      "source": "Базовая книга, стр. 108; официальная errata",
+      "page": 108
+    },
+    "effects": [],
+    "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  },
+  {
+    "_id": "spel000000000065",
+    "name": "Трифери Геаф",
+    "type": "spell",
+    "img": "icons/svg/book.svg",
+    "system": {
+      "ruleId": "spell.tryferi-gaeaf",
+      "description": "<p>Создаёт число двухметровых шипов, равное половине уровня Сотворения. Каждый атакует отдельно: 5d6 урона с пробиванием брони. Только причинивший урон шип замораживает цель и наносит 2 урона за раунд до Силы СЛ 20, 20 урона по шипу или конца заклинания.</p>",
+      "grade": "master",
+      "element": "water",
+      "cost": 22,
+      "variableCost": false,
+      "range": {
+        "kind": "distance",
+        "value": 20
+      },
+      "duration": {
+        "kind": "rounds",
+        "formula": "1d10",
+        "maintenance": 0,
+        "text": ""
+      },
+      "defense": [
+        "dodge",
+        "block"
+      ],
+      "damage": "5d6",
+      "source": "Базовая книга, стр. 108; официальная errata",
+      "page": 108
+    },
+    "effects": [],
+    "folder": "spellmaster00000",
+    "ownership": {
+      "default": 2
+    },
+    "sort": 0,
+    "flags": {}
+  }
+]

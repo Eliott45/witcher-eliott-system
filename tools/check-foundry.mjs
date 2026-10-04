@@ -39,7 +39,7 @@ assert.equal(game.system.grid.distance, 2);
 assert.equal(game.system.grid.units, "m");
 const [packFolder] = game.system.packFolders;
 assert.equal(packFolder.name, "Witcher");
-assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions"]);
+assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "spells"]);
 game.model = { ...game.system.documentTypes, ActiveEffect:{base:{}}, Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type, folders: new Map() }]));
 game.user = { id: "testuser00000001", isGM: true };
@@ -277,11 +277,12 @@ const { raceUuid, abilityUuid, originUuid, familyStatusUuid, equipmentUuid, infl
 const { WitcherAbilityData } = await import("../scripts/data/witcher-ability-data.mjs");
 const { WitcherEquipmentData } = await import("../scripts/data/witcher-equipment-data.mjs");
 const { WitcherWeaponData } = await import("../scripts/data/witcher-weapon-data.mjs");
+const { WitcherSpellData } = await import("../scripts/data/witcher-spell-data.mjs");
 const { WitcherRecipeData } = await import("../scripts/data/witcher-recipe-data.mjs");
 const { WitcherArmorData } = await import("../scripts/data/witcher-armor-data.mjs");
 const oldGear = new WitcherEquipmentData({ ruleId: "old-custom", description: "<p>Старый предмет</p>" });
 assert.equal(oldGear.quantity, 1); assert.equal(oldGear.weight, 0); assert.equal(oldGear.description, "<p>Старый предмет</p>");
-CONFIG.Item.dataModels = { profession: WitcherReferenceData, race: WitcherRaceData, ability: WitcherAbilityData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherEquipmentData, weapon: WitcherWeaponData, armor: WitcherArmorData, recipe: WitcherRecipeData, influence: WitcherInfluenceData, language: WitcherReferenceData };
+CONFIG.Item.dataModels = { profession: WitcherReferenceData, race: WitcherRaceData, ability: WitcherAbilityData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherEquipmentData, weapon: WitcherWeaponData, armor: WitcherArmorData, recipe: WitcherRecipeData, spell: WitcherSpellData, influence: WitcherInfluenceData, language: WitcherReferenceData };
 const equipmentPack = `${game.system.id}.equipment`;
 for (const source of await readJSON("../pack-sources/equipment.folders.json")) {
   const folder = new foundry.documents.BaseFolder(source, { pack: equipmentPack });
@@ -471,7 +472,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["magic", "magic-filters", "magic-spells", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -503,6 +504,24 @@ sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/s
 sheet.token = null;
 sheet.isEditable = true;
 const html = template(await sheet._prepareContext({}));
+// A new optional magic state round-trips on old/new actors without touching old resources.
+assert.equal(legacyActorData.magic.spent,0);
+const magicRoundTrip = new WitcherActorData({...legacyActorData.toObject(),magic:{roundKey:"combat:2",spent:7,sustainedId:"spell00000000001",maintainedRound:"combat:2"}});
+const magicRestored = new WitcherActorData(JSON.parse(JSON.stringify(magicRoundTrip.toObject())));
+assert.equal(magicRestored.magic.spent,7);assert.equal(magicRestored.health.value,legacyActorData.health.value);
+assert.equal(magicRestored.magic.sustainedId,"spell00000000001");
+const {spellSources:magicSources}=await import("../scripts/data/spells.mjs");
+const nativeSpell = new foundry.documents.BaseItem(magicSources()[0]);
+const restoredSpell = new foundry.documents.BaseItem(JSON.parse(JSON.stringify(nativeSpell.toObject())));
+assert.equal(restoredSpell.system.duration.maintenance,2);
+assert.deepEqual(Array.from(restoredSpell.system.defense),["none"]);
+assert.equal(restoredSpell.type,"spell");
+const {magicContext,spellItemContext}=await import("../scripts/sheets/magic-context.mjs");
+const magicOnlyTemplate=handlebars.compile(await readFile(new URL("../templates/magic.hbs",import.meta.url),"utf8"),{strict:true});
+const magicActor={...sheet.actor,items:[nativeSpell]};
+const magicHTML=magicOnlyTemplate({magic:await magicContext(magicActor),editable:true});
+assert.match(magicHTML,/data-action="castSpell"/);assert.match(magicHTML,/Зеркало Афана/);
+assert.equal(spellItemContext(nativeSpell,true).groups[0].fields.find(f=>f.key==="duration.maintenance").value,2);
 // Render both permission levels with real service schema; native browser host is stubbed above.
 const { WitcherServicesSheet } = await import("../scripts/sheets/witcher-services-sheet.mjs");
 const servicesTemplate=handlebars.compile(await readFile(new URL("../templates/services-sheet.hbs",import.meta.url),"utf8"),{strict:true});
@@ -634,7 +653,7 @@ assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
 assert.ok(!html.includes("witcher-footnote"));
-assert.equal([...html.matchAll(/data-action="tab"/g)].length, 10);
+assert.equal([...html.matchAll(/data-action="tab"/g)].length, 11);
 assert.equal([...html.matchAll(/name="system.attributes\./g)].length, 0, "Base attributes are locked by default");
 sheet.submit = async () => {};
 sheet.render = async () => {};
@@ -701,7 +720,7 @@ sheet.tabGroups.character = "main";
 await updateSheetPreferences(sheet.actor.uuid, { hiddenTabs: ["main"], collapsed: { parents: true, appearance: true } });
 const customized = await sheet._prepareContext({});
 assert.equal(sheet.tabGroups.character, "skills", "Hiding the active tab must select a visible one");
-assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "actions", "inventory", "transport", "biography", "family", "lifepath", "effects"]);
+assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "actions", "magic", "inventory", "transport", "biography", "family", "lifepath", "effects"]);
 assert.equal(customized.familySections.find(section => section.id === "parents").open, false);
 assert.equal(customized.biographySections.find(section => section.id === "appearance").open, false);
 assert.ok(!template(customized).includes('data-action="tab" data-group="character" data-tab="main"'));
@@ -915,7 +934,7 @@ for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   assert.ok(!rendered.includes("undefined"));
 }
 const tabsTemplate = handlebars.compile(await readFile(new URL("../templates/sheet-tabs.hbs", import.meta.url), "utf8"), { strict: true });
-assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 10);
+assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 11);
 // New transport Items survive native schema round trips without changing old Actor shapes.
 const { CORE_TRANSPORT, CORE_TACK } = await import("../scripts/data/core-transport.mjs");
 const { transportContext } = await import("../scripts/sheets/transport-context.mjs");
@@ -980,6 +999,7 @@ for (const formula of ["1d10 + 10", "2d6 + 1d4", "(1d6 + 2) * 3", "{2d6, 1d10}kh
 }
 const { registerCriticalDice } = await import("../scripts/dice/critical-chain.mjs");
 const { prepareCriticalResult } = await import("../scripts/chat/critical-result.mjs");
+const { magicFumble } = await import("../scripts/magic/rules.mjs");
 registerCriticalDice();
 const sequences = [
   [[10, 4], 14], [[10, 10, 7], 27], [[10, 10, 10, 2], 32], [[10, 1], 11],
@@ -1009,6 +1029,7 @@ for (const [sequence, expected] of sequences) {
   await prepareMessageLuck(message, "critical-check");
   prepareCriticalResult(message);
   assert.equal(message.rolls[0].total, 14 + expected, "Luck is added after the signed chain");
+  assert.equal(magicFumble(message.rolls[0]).severity,expected<0?-expected:0,"Magic reads the signed natural chain even after Luck and native serialization");
   assert.deepEqual(message.rolls[0].dice[0].results.map(result => result.result), sequence);
   assert.match(message.flavor, sequence[0] === 1 ? /Критический провал/ : /Критический успех/);
   assert.match(message.flavor, /\+4 от Удачи/);

@@ -5,6 +5,7 @@ export const SHEET_TABS = [
   { id: "skills", label: "WITCHER.Skills.Title", icon: "fa-solid fa-graduation-cap" },
   { id: "profession", label: "WITCHER.Professions.Title", icon: "fa-solid fa-diagram-project" },
   { id: "actions", label: "WITCHER.Actions.Title", icon: "fa-solid fa-swords" },
+  { id: "magic", label: "WITCHER.Magic.Title", icon: "fa-solid fa-wand-magic-sparkles" },
   { id: "inventory", label: "WITCHER.Inventory.Title", icon: "fa-solid fa-sack" },
   { id: "transport", label: "WITCHER.Transport.Title", icon: "fa-solid fa-horse" },
   { id: "biography", label: "WITCHER.Sheet.Biography", icon: "fa-solid fa-book-open" },

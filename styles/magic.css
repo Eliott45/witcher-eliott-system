@@ -1,0 +1,69 @@
+.witcher-magic-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.witcher-magic-heading h2 { margin:3px 0 0; color:#713936; font-family:Georgia,serif; font-size:24px; border:0; }
+.witcher-magic-heading h2 small { font:14px sans-serif; display:inline-grid; place-items:center; min-width:25px; min-height:25px; border:1px solid #baaa8c; border-radius:50%; color:#78694e; vertical-align:middle; }
+.witcher-magic-heading>div:last-child { display:flex; gap:6px; }
+.witcher-magic-eyebrow { color:#85745f; font-size:10px; text-transform:uppercase; letter-spacing:.13em; }
+.witcher-magic-dashboard { display:grid; grid-template-columns:1fr 1fr 1.35fr; gap:1px; background:#aa926a; border:1px solid #aa926a; border-radius:7px; overflow:hidden; }
+.witcher-magic-dashboard>div { padding:12px 14px; display:flex; flex-direction:column; gap:4px; background:#333f43; color:#ede8dd; }
+.witcher-magic-dashboard span { font-size:12px; color:#d8c6a6; }
+.witcher-magic-dashboard strong { font:28px Georgia,serif; }
+.witcher-magic-dashboard strong small { font-size:17px; color:#c4bdaa; }
+.witcher-magic-dashboard small { font-size:10px; color:#c4bdaa; }
+.witcher-magic-meter { height:3px; background:#151c20; overflow:hidden; border-radius:3px; }
+.witcher-magic-meter span { display:block; height:100%; background:#d3b272; transition:width .3s; }
+.witcher-magic-round-note { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:8px 0 16px; color:#776653; }
+.witcher-magic-round-note button { font-size:11px; }
+.witcher-magic-active { display:flex; align-items:center; gap:10px; padding:12px; border:1px solid #a697b0; background:#e6dfe9; border-radius:5px; margin-bottom:12px; color:#594165; }
+.witcher-magic-active>div { flex:1; display:flex; flex-direction:column; gap:3px; }
+.witcher-magic-active small { font-size:11px; }
+.witcher-magic-filters { display:grid; grid-template-columns:minmax(0,1.6fr) 1fr 1fr; gap:7px; margin-bottom:12px; }
+.witcher-magic-search { display:flex; align-items:center; gap:8px; border:1px solid #bbaa8d; background:#fcf8ee; border-radius:4px; padding:0 10px; color:#847455; }
+.witcher-magic-search input { width:100%; background:transparent!important; border:0!important; box-shadow:none!important; }
+.witcher-magic-filters :is(input,select) { height:32px; font-size:12px; color:#413a31; }
+.witcher-magic-filters select { background:#fcf8ee; border:1px solid #bbaa8d; border-radius:4px; }
+.witcher-spell-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr)); align-items:start; gap:10px; }
+.witcher-spell-card { --spell-accent:#736085; --witcher-ink:#3e382e; background:#fbf7ee; border:1px solid #cbbda3; border-top:3px solid var(--spell-accent); border-radius:6px; color:var(--witcher-ink); overflow:hidden; animation:witcher-spell-appear .2s ease-out; }
+.witcher-spell-card[data-element=fire] { --spell-accent:#a24e36; }
+.witcher-spell-card[data-element=water] { --spell-accent:#477b9b; }
+.witcher-spell-card[data-element=earth] { --spell-accent:#718052; }
+.witcher-spell-card[data-element=air] { --spell-accent:#6d929b; }
+.witcher-spell-card details>summary { display:flex; align-items:center; gap:9px; padding:12px 10px; cursor:pointer; list-style:none; }
+.witcher-spell-card summary::-webkit-details-marker { display:none; }
+.witcher-spell-card summary:hover { background:#e8dece66; }
+.witcher-spell-sigil { display:grid; place-items:center; width:28px; height:28px; border:1px solid var(--spell-accent); border-radius:50%; color:var(--spell-accent); flex-shrink:0; }
+.witcher-spell-name { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+.witcher-spell-name strong { font:600 15px Georgia,serif; line-height:1.2; overflow-wrap:anywhere; }
+.witcher-spell-name small { font-size:10px; color:#88785f; }
+.witcher-spell-cost { font-size:11px; font-weight:bold; max-width:75px; text-align:right; color:var(--spell-accent); }
+.witcher-spell-card summary>.fa-chevron-down { font-size:9px; color:#a38b61; transition:transform .15s; }
+.witcher-spell-card details[open] summary>.fa-chevron-down { transform:rotate(180deg); }
+.witcher-spell-body { padding:0 12px 12px; font-size:12px; line-height:1.5; }
+.witcher-spell-body dl { margin:0 0 8px; border-block:1px solid #d8cbb6; padding:7px 0; }
+.witcher-spell-body dl>div { display:flex; gap:6px; justify-content:space-between; }
+.witcher-spell-body dt { color:#766247; font-size:11px; text-shadow:none; }
+.witcher-spell-card .witcher-spell-body .witcher-description { color:var(--witcher-ink); font-size:12px; }
+.witcher-spell-body dd { margin:0; text-align:right; max-width:72%; }
+.witcher-spell-source { display:block; color:#8a7659; font-size:10px; margin-top:8px; }
+.witcher-spell-card footer { display:flex; gap:6px; border-top:1px solid #e0d5c3; padding:6px 9px; background:#e8dfcf55; }
+.witcher-spell-card footer button { flex:0 0 auto; height:27px; font-size:11px; }
+.witcher-spell-card footer>button:last-child { margin-left:auto; }
+.witcher-spell-card button.witcher-cast-button { background:var(--spell-accent); color:#fff5e4; border-color:var(--spell-accent); padding-inline:12px; }
+.witcher-spell-extra { display:flex; flex-wrap:wrap; gap:5px; margin-top:10px; }
+.witcher-spell-extra button { font-size:10px; }
+.witcher-magic-empty { text-align:center; padding:35px 15px; color:#91806b; font-size:13px; }
+.witcher-magic-empty>i { display:block; font-size:26px; margin-bottom:10px; }
+.witcher-magic-catalog { color:#453c30; }
+.witcher-spell-browser .window-content { background:#eee9df; overflow-y:auto; }
+.witcher-spell-browser .dialog-content { min-height:0; overflow-y:auto; }
+.witcher-spell-catalog-hint { color:#85745f; font-size:12px; margin:0 0 12px; }
+.witcher-cast-dialog { display:flex; flex-direction:column; gap:12px; color:#453c30; }
+.witcher-cast-dialog label { display:flex; flex-direction:column; gap:5px; }
+.witcher-cast-dialog output { white-space:pre-line; background:#e4d8c2; padding:14px; border-left:3px solid #927147; line-height:1.6; }
+.witcher-cast-dialog label.witcher-overload-confirm { flex-direction:row; align-items:center; color:#933b30; }
+.witcher-cast-dialog [data-cast-error] { color:#933b30; margin:0; }
+.witcher-cast-dialog [hidden],.witcher-spell-card[hidden],.witcher-magic-empty[hidden] { display:none; }
+.witcher-spell-info { display:flex; flex-wrap:wrap; gap:6px; color:#705a41; padding:12px; background:#e9dfcf; border-bottom:1px solid #cdb997; font-size:12px; }
+.witcher-magic-chat h3 { font-size:17px; margin:5px 0; }
+.witcher-magic-chat p,.witcher-magic-chat ul { font-size:12px; }
+@keyframes witcher-spell-appear { from { opacity:0; transform:translateY(3px); } to { opacity:1; transform:none; } }
+@media(prefers-reduced-motion:reduce) { .witcher-spell-card {animation:none;} .witcher-magic-meter span,.witcher-spell-card summary>.fa-chevron-down {transition:none;} }

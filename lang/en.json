@@ -16,12 +16,21 @@
       "profession": "Profession",
       "weapon": "Оружие / щит",
       "armor": "Броня",
-      "recipe": "Diagram / formula"
+      "recipe": "Diagram / formula",
+      "spell": "Spell"
     }
   },
   "WITCHER": {
-    "ItemTabs": {"Save": "Save details", "Description": "Description", "Details": "Details", "Actions": "Actions", "Navigation": "Item tabs"},
-    "Transport": { "Title": "Transport" },
+    "ItemTabs": {
+      "Save": "Save details",
+      "Description": "Description",
+      "Details": "Details",
+      "Actions": "Actions",
+      "Navigation": "Item tabs"
+    },
+    "Transport": {
+      "Title": "Transport"
+    },
     "Attributes": {
       "intelligence": {
         "Label": "Intelligence",
@@ -1279,8 +1288,8 @@
       "Cap": "Final reputation is capped at 10."
     },
     "Advancement": {
-        "Title": "Character advancement",
-        "TreeHint": "Add ranks at each node · price next to +",
+      "Title": "Character advancement",
+      "TreeHint": "Add ranks at each node · price next to +",
       "Experience": "Experience · IP",
       "Open": "Advance",
       "Unit": "IP",
@@ -1327,6 +1336,9 @@
       "Insufficient": "Not enough improvement points for this plan.",
       "SaveFailed": "Changes were not saved. No IP was spent.",
       "InvalidPoints": "Experience must be a non-negative whole number."
+    },
+    "Magic": {
+      "Title": "Magic"
     }
   }
 }

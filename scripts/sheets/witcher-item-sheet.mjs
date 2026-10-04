@@ -1,3 +1,4 @@
+import { spellItemContext } from "./magic-context.mjs";
 import { workshopItemContext, workshopItemActions, workshopAction } from "./workshop-item-context.mjs";
 import { installUpgrade, removeArmorUpgrade, augmentItem, applyOil } from "../workshop/upgrades.mjs";
 import { prepareMutagen, applyMutagen } from "../workshop/mutagens.mjs";
@@ -35,7 +36,8 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
 
   async _prepareContext(options) {
     const workshop=await workshopItemContext(this.item);
-    const hasDetails=isPhysical(this.item)||this.item.type==="ability";
+    const spell=spellItemContext(this.item,this.isEditable);
+    const hasDetails=isPhysical(this.item)||this.item.type==="ability"||Boolean(spell);
     const hasActions=Boolean(workshop&&(workshop.repairable||workshop.upgradeable||workshop.recipe||workshop.bonusPath||workshop.isMutagen||workshop.oil||workshop.installations.length));
     const visible=["description",...(hasDetails?["details"]:[]),...(hasActions?["actions"]:[])];
     if(!visible.includes(this.tabGroups.item))this.tabGroups.item="description";
@@ -53,11 +55,11 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
       };
     }));
     return Object.assign(context, {
-      workshop, hasDetails, hasActions,
+      workshop, spell, hasDetails, hasActions,
       itemTabs:visible.map(id=>context.tabs[id]),
       item: this.item,
       system: this.item.system,
-      physicalGroups: physicalItemContext(this.item, this.isEditable),
+      physicalGroups: spell?.groups ?? physicalItemContext(this.item, this.isEditable),
       itemTraits: isPhysical(this.item) ? equipmentEntry(this.item).traitDetails : [],
       isAbility: this.item.type === "ability",
       attributeChoices: [{value: "", label: game.i18n.localize("WITCHER.Professions.Passive")}, ...["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"].map(value => ({value, label: game.i18n.localize(`WITCHER.Attributes.${value}.Label`)}))].map(entry => ({...entry, selected: entry.value === this.item.system.attribute})),

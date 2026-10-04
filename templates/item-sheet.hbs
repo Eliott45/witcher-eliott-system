@@ -11,6 +11,7 @@
     </div>
   </header>
   {{#if itemTraits.length}}<div class="witcher-item-traits" aria-label="Свойства для поиска">{{#each itemTraits}}<button type="button" data-action="searchItemTrait" data-trait="{{label}}" data-tooltip="{{description}} Нажмите, чтобы найти похожие предметы.">{{label}}</button>{{/each}}</div>{{/if}}
+  {{#if spell}}<div class="witcher-spell-info"><strong>{{spell.elementLabel}} · {{spell.gradeLabel}}</strong><span>{{spell.cost}}</span><span>{{spell.range}}</span><span>{{spell.duration}}</span><span>Защита: {{spell.defense}}</span></div>{{/if}}
   <nav class="witcher-item-tabs tabs" aria-label="{{localize 'WITCHER.ItemTabs.Navigation'}}">{{#each itemTabs}}<button type="button" data-action="tab" data-group="{{group}}" data-tab="{{id}}" class="{{cssClass}}" aria-pressed="{{active}}"><i class="{{icon}}"></i> {{localize label}}</button>{{/each}}</nav>
   <section class="witcher-item-tab tab {{tabs.description.cssClass}}" data-group="item" data-tab="description">
   {{#if editable}}
@@ -37,6 +38,7 @@
   </section>
   {{#if hasDetails}}<section class="witcher-item-tab tab {{tabs.details.cssClass}}" data-group="item" data-tab="details">
   {{#each physicalGroups as |group|}}<fieldset class="witcher-physical-fields"><legend>{{group.title}}</legend>{{> "systems/witcher-eliott-system/templates/structured-fields.hbs" fields=group.fields}}</fieldset>{{/each}}
+  {{#if spell}}<label class="witcher-physical-fields">Способы защиты (несколько)<select name="system.defense" multiple {{disabled (not editable)}}>{{#each spell.defenses}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>{{/if}}
   {{#if isAbility}}<div class="witcher-item-fields"><label>{{localize "WITCHER.Skills.Level"}}<input type="number" name="system.level" min="0" max="10" step="1" value="{{system.level}}" {{disabled (not editable)}}></label><label>{{localize "WITCHER.Skills.Attribute"}}<select name="system.attribute" {{disabled (not editable)}}>{{#each attributeChoices}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label></div>{{/if}}
   {{#if editable}}<button type="submit" class="witcher-item-save"><i class="fa-solid fa-floppy-disk"></i> {{localize "WITCHER.ItemTabs.Save"}}</button>{{/if}}
   </section>{{/if}}

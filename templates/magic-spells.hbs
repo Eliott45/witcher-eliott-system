@@ -1,0 +1,13 @@
+<div class="witcher-spell-list">
+{{#each spells as |spell|}}
+<article class="witcher-spell-card draggable" data-spell-row="{{id}}" data-search="{{search}}" data-element="{{element}}" data-grade="{{grade}}" draggable="true" data-item-id="{{id}}">
+  <details><summary><span class="witcher-spell-sigil"><i class="{{icon}}" aria-hidden="true"></i></span><span class="witcher-spell-name"><strong>{{name}}</strong><small>{{elementLabel}} · {{gradeLabel}}</small></span><span class="witcher-spell-cost">{{cost}}</span><i class="fa-solid fa-chevron-down"></i></summary>
+  <div class="witcher-spell-body"><dl><div><dt>Дистанция</dt><dd>{{range}}</dd></div><div><dt>Длительность</dt><dd>{{duration}}</dd></div><div><dt>Защита</dt><dd>{{defense}}</dd></div></dl><div class="witcher-description">{{{description}}}</div><small class="witcher-spell-source">{{source}}</small>
+  {{#unless ../catalog}}<div class="witcher-spell-extra">
+    {{#if damage}}<button type="button" data-action="rollSpellDetail" data-item-id="{{id}}" data-spell-roll="damage" {{disabled (not ../editable)}}><i class="fa-solid fa-dice"></i> Базовый урон: {{damage}}</button>{{/if}}
+    {{#if durationFormula}}<button type="button" data-action="rollSpellDetail" data-item-id="{{id}}" data-spell-roll="duration" {{disabled (not ../editable)}}><i class="fa-solid fa-hourglass-half"></i> Длительность</button>{{/if}}
+  </div>{{/unless}}</div></details>
+  <footer>{{#if ../catalog}}<button type="button" data-view-spell title="Открыть описание и параметры"><i class="fa-solid fa-book-open"></i> Подробнее</button><button type="button" data-learn-spell><i class="fa-solid fa-plus"></i> Добавить в книгу</button>
+  {{else}}<button type="button" data-action="viewSheetItem" data-item-id="{{id}}" title="Открыть заклинание" aria-label="Открыть {{name}}"><i class="fa-solid fa-book-open"></i></button><button type="button" data-action="removeSheetItem" data-item-id="{{id}}" title="Убрать из книги" aria-label="Убрать {{name}}" {{disabled (not ../editable)}}><i class="fa-solid fa-trash"></i></button><button type="button" class="witcher-cast-button" data-action="castSpell" data-item-id="{{id}}" {{disabled (not ../canCast)}}><i class="fa-solid fa-dice-d10"></i> Сотворить</button>{{/if}}</footer>
+</article>{{/each}}
+</div><p class="witcher-magic-empty" data-magic-empty><i class="fa-solid fa-book-sparkles"></i> Заклинаний не найдено. Добавьте их из каталога или перетащите из компендиума.</p>

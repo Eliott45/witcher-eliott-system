@@ -1,3 +1,4 @@
+import { spellSources, spellFolders } from "../scripts/data/spells.mjs";
 import { MATERIALS } from "../scripts/data/workshop-materials.mjs";
 import { ALCHEMY, MUTAGENS } from "../scripts/data/workshop-alchemy.mjs";
 import { UPGRADES } from "../scripts/data/workshop-upgrades.mjs";
@@ -64,6 +65,7 @@ export function compendiumData(translations) {
           + entry.equipment.map(id => `@UUID[${equipmentUuid(id)}]{${localize(getEquipment(id).label)}}`).join(", ") + "</p>" : "")
         + paragraph("WITCHER.Family.WitcherRule")
     })),
+    spells: spellSources(),
     equipment: [...EQUIPMENT.map(entry => {
       const content = generalGearContent(entry.id);
       return item(entry.documentId, "equipment", entry, { ...LEGACY_GEAR_STATS[entry.id], ...content, description: paragraph(entry.description) + (content?.description ?? "") });
@@ -85,7 +87,7 @@ export function compendiumData(translations) {
 /** Folders inside a compendium, distinct from the world sidebar's Witcher pack folder. */
 export function compendiumFolders(translations) {
   const localize = key => key.split(".").reduce((value, part) => value[part], translations);
-  return { abilities: PROFESSIONS.map(entry => ({ _id: getProfessionFolder(entry.id), name: entry.name, type: "Item", description: "", folder: null, sorting: "a", sort: 0, color: "#947641", flags: {} })), equipment: Object.values(EQUIPMENT_FOLDERS).map(folder => ({
+  return { spells: spellFolders(), abilities: PROFESSIONS.map(entry => ({ _id: getProfessionFolder(entry.id), name: entry.name, type: "Item", description: "", folder: null, sorting: "a", sort: 0, color: "#947641", flags: {} })), equipment: Object.values(EQUIPMENT_FOLDERS).map(folder => ({
     _id: folder.id, name: localize(folder.label), type: "Item", description: "",
     folder: null, sorting: "a", sort: 0, color: "#947641", flags: {}
   })).concat(Object.values(coreFolders).map(folder => ({ _id: folder.id, name: folder.name, type: "Item", description: "", folder: null, sorting: "a", sort: 0, color: "#947641", flags: {} }))) };

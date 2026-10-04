@@ -9,7 +9,7 @@ export function registerCompendiumFolderMigration() {
 /** packFolders handles new worlds; existing worlds can already have explicit folder:null settings. */
 export async function migrateCompendiumFolders() {
   const version = game.settings.get(SYSTEM_ID, "compendiumFoldersVersion");
-  if (game.user !== game.users.activeGM || version >= 7) return;
+  if (game.user !== game.users.activeGM || version >= 8) return;
   const names = [
     ...(version < 1 ? ["races", "abilities"] : []),
     ...(version < 2 ? ["origins"] : []),
@@ -17,7 +17,8 @@ export async function migrateCompendiumFolders() {
     ...(version < 4 ? ["influential-friends"] : []),
     ...(version < 5 ? ["languages"] : []),
     ...(version < 6 ? ["professions"] : []),
-    "effects"
+    ...(version < 7 ? ["effects"] : []),
+    "spells"
   ];
   const packs = names.map(name => game.packs.get(`${SYSTEM_ID}.${name}`));
   if (packs.some(pack => !pack)) return;
@@ -26,5 +27,5 @@ export async function migrateCompendiumFolders() {
     name: "Witcher", type: "Compendium", sorting: "a", color: "#947641"
   });
   for (const pack of packs) await pack.setFolder(folder);
-  await game.settings.set(SYSTEM_ID, "compendiumFoldersVersion", 7);
+  await game.settings.set(SYSTEM_ID, "compendiumFoldersVersion", 8);
 }

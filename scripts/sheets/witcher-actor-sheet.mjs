@@ -1,3 +1,4 @@
+import { magicContext, magicActions, bindMagic, learnSpell } from "./magic-context.mjs";
 import { transportContext, transportActions, bindTransport } from "./transport-context.mjs";
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
 import { openAdvancement } from "./advancement-window.mjs";
@@ -46,7 +47,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
-      ...effectActions, ...transportActions,
+      ...effectActions, ...transportActions, ...magicActions,
       ...workshopActorActions,
       openAdvancement,
       toggleExperience: WitcherActorSheet.#onToggleExperience,
@@ -88,7 +89,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static PARTS = {
     content: {
       template: `systems/${SYSTEM_ID}/templates/actor-sheet.hbs`,
-      scrollable: [".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=profession]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=transport]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
+      scrollable: [".witcher-character-content[data-tab=magic]", ".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=profession]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=transport]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
     }
   };
 
@@ -134,6 +135,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
         localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
       }, { query: this.#skillQuery, editing: this.isEditable && this.#editingSkills }),
       abilities: await abilitiesContext(this.actor),
+      magic: await magicContext(this.actor),
       inventory, transport: transportContext(this.actor,inventory,this.selectedTransportId),
       workshop: await workshopActorContext(this.actor),
       abilitiesOpen: !preferences.collapsed?.abilities,
@@ -175,16 +177,17 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   _toggleDisabled(disabled) {
     super._toggleDisabled(disabled);
     // Foundry disables every form button for observers, including read-only actions.
-    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=viewFriend], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs], [data-action=viewSheetItem], [data-action=browseAbilities], [data-action=browseLanguages]")) {
+    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=viewFriend], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs], [data-action=viewSheetItem], [data-action=browseAbilities], [data-action=browseLanguages], [data-action=browseSpells]")) {
       button.disabled = false;
     }
-    for (const search of this.element.querySelectorAll("[data-skill-search], [data-inventory-search], [data-action=toggleInventoryGroup], [data-action=browseEquipment]")) search.disabled = false;
+    for (const search of this.element.querySelectorAll("[data-magic-search], [data-magic-element], [data-magic-grade], [data-skill-search], [data-inventory-search], [data-action=toggleInventoryGroup], [data-action=browseEquipment]")) search.disabled = false;
     for (const button of this.element.querySelectorAll("[data-action=toggleItemDescription], [data-action=searchItemTrait], [data-action=toggleContainer], [data-action=selectTransport]")) button.disabled = false;
   }
 
   async _onRender(context, options) {
     await super._onRender(context, options);
     bindInventory(this); bindTransport(this);
+    bindMagic(this);
     for (const input of this.element.querySelectorAll("[data-header-counter]")) {
       input.addEventListener("change", event => {
         event.stopPropagation(); // Counters share the guarded actor queue with paid advancement.
@@ -234,6 +237,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   async _onDropItem(event, item) {
     if (!this.isEditable) return null;
     if (isPhysical(item)) return dropPhysicalItem(this, event, item);
+    if (item.type === "spell") { await learnSpell(this.actor,item); return null; }
     if (item.type === "profession") {
       if (!item.system.ruleId || !selectionProfession(item.system.ruleId)) return null;
       await this.actor.update(professionSelectionUpdate(this.actor, item.system.ruleId));

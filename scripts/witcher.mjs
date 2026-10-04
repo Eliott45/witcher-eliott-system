@@ -1,3 +1,4 @@
+import { WitcherSpellData } from "./data/witcher-spell-data.mjs";
 import { registerOilExpiry } from "./workshop/upgrades.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
@@ -40,7 +41,7 @@ import { preventIncapacitatedMovement, preventIncapacitatedPositionUpdate } from
 import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
 
 Hooks.once("init", async () => {
-  await foundry.applications.handlebars.loadTemplates(["profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
+  await foundry.applications.handlebars.loadTemplates(["magic", "magic-filters", "magic-spells", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Actor.documentClass = WitcherActor;
   CONFIG.ActiveEffect.documentClass = WitcherActiveEffect;
@@ -75,6 +76,7 @@ Hooks.once("init", async () => {
   CONFIG.Item.dataModels.weapon = WitcherWeaponData;
   CONFIG.Item.dataModels.armor = WitcherArmorData;
   CONFIG.Item.dataModels.recipe = WitcherRecipeData;
+  CONFIG.Item.dataModels.spell = WitcherSpellData;
   CONFIG.Item.dataModels.influence = WitcherInfluenceData;
   CONFIG.Item.dataModels.language = WitcherReferenceData;
 
@@ -110,6 +112,13 @@ Hooks.on("preUpdateToken", preventIncapacitatedPositionUpdate);
 Hooks.once("i18nInit", localizeStatusEffects);
 Hooks.on("renderTokenHUD", renderTokenVisionToggle);
 Hooks.on("renderChatInput", renderDiceTray);
+// Round usage is derived from the combat key. Refresh open sheets without writing Actor data.
+Hooks.on("updateCombat", (_combat,changes) => {
+  if (!("round" in changes)) return;
+  for (const app of foundry.applications.instances.values()) {
+    if (app instanceof WitcherActorSheet && app.rendered) app.render({force:false});
+  }
+});
 Hooks.once("ready", () => {
   migrateEquipmentContent().catch(error => {
     console.error(`${SYSTEM_ID} | Could not update equipment content`, error);
