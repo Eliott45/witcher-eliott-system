@@ -79,9 +79,13 @@
 .witcher-character-name > input { width: 100%; height: 36px; color: #f8eddb; background: transparent; border: 0; border-radius: 0; padding: 0; font-family: Georgia, serif; font-size: 27px; font-weight: 700; }
 .witcher-luck { grid-column: 1; min-width: 0; margin-top: 7px; color: #ead8b0; }
 .witcher-character-name .witcher-experience { grid-column: 2; grid-row: 1 / 3; align-self: start; display: flex; flex-direction: column; gap: 3px; width: 100%; height: auto; padding: 7px 5px; line-height: 1.4; background: #25121745; color: #ead8b0; border: 1px solid #b599625c; border-radius: 5px; }
-.witcher-experience > span { font-size: 10px; }
-.witcher-experience > strong { font: bold 29px/1.1 Georgia, serif; color: #f8eddb; font-variant-numeric: tabular-nums; }
-.witcher-character-name .witcher-experience:hover { background: #b599622e; border-color: #d2b476; }
+.witcher-experience-heading { display:flex; align-items:center; justify-content:space-between; gap:2px; font-size:10px; }
+.witcher-experience-heading button { flex:none; width:21px; height:21px; padding:0; background:transparent; border:0; color:#d8bd8d; box-shadow:none; }
+.witcher-experience-heading button[aria-checked=true] { color:#b6ddb0; }
+.witcher-experience > strong, .witcher-experience > input { font:bold 29px/1.1 Georgia,serif; color:#f8eddb; font-variant-numeric:tabular-nums; text-align:center; height:33px; }
+.witcher-experience > input { width:100%; padding:0 2px; border:1px solid #bca16b; background:#1e111855; }
+.witcher-experience .witcher-experience-open { width:100%; height:25px; padding:2px; font-size:10px; color:#ead8b0; border:0; border-top:1px solid #b5996240; border-radius:0; background:transparent; box-shadow:none; }
+.witcher-experience button:hover:not(:disabled) { color:#fff4dc; background:#b599622e; }
 .witcher-luck-heading { display: flex; align-items: center; gap: 8px; }
 .witcher-luck-heading { flex-wrap: wrap; }
 .witcher-luck-selected { font-size: 11px; color: #a3edab; }

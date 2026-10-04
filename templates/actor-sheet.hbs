@@ -115,10 +115,11 @@
     <header class="witcher-character-name">
       <label class="witcher-sr-only" for="{{rootId}}-name">{{localize "WITCHER.Sheet.Name"}}</label>
       <input id="{{rootId}}-name" name="name" type="text" value="{{actor.name}}" required {{disabled (not editable)}}>
-      <button type="button" class="witcher-experience" data-action="openAdvancement" aria-label="{{localize 'WITCHER.Advancement.Title'}}" {{disabled (not editable)}}>
-        <span>{{localize "WITCHER.Advancement.Experience"}}</span><strong>{{system.experience}}</strong>
-        <span><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> {{localize "WITCHER.Advancement.Open"}}</span>
-      </button>
+      <div class="witcher-experience">
+        <div class="witcher-experience-heading"><span>{{localize "WITCHER.Advancement.Experience"}}</span><button type="button" data-action="toggleExperience" role="switch" aria-checked="{{editingExperience}}" aria-label="{{localize 'WITCHER.Advancement.Adjust'}}" data-tooltip="{{localize 'WITCHER.Advancement.Adjust'}}" {{disabled (not editable)}}><i class="fa-regular {{#if editingExperience}}fa-square-check{{else}}fa-square{{/if}}" aria-hidden="true"></i></button></div>
+        {{#if editingExperience}}<input type="number" min="0" step="1" required value="{{system.experience}}" data-sheet-experience data-expected="{{system.experience}}" aria-label="{{localize 'WITCHER.Advancement.Balance'}}">{{else}}<strong>{{system.experience}}</strong>{{/if}}
+        <button type="button" class="witcher-experience-open" data-action="openAdvancement" aria-label="{{localize 'WITCHER.Advancement.Title'}}" {{disabled (not editable)}}><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> {{localize "WITCHER.Advancement.Open"}}</button>
+      </div>
       <div class="witcher-luck">
         <div class="witcher-luck-heading">
           <label for="{{rootId}}-luck" data-tooltip="{{stats.luck.tooltip}}" tabindex="0">{{localize "WITCHER.Attributes.luck.Label"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></label>

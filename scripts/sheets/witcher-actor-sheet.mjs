@@ -1,5 +1,6 @@
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
 import { openAdvancement } from "./advancement-window.mjs";
+import { setExperience } from "../data/advancement-purchase.mjs";
 import { itemPresentation, toggleItemDescription, postItem, searchItemTrait } from "./item-presentation.mjs";
 import { chooseContainer, toggleContainer, dropPhysicalItem } from "./container-actions.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
@@ -41,6 +42,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     actions: {
       ...workshopActorActions,
       openAdvancement,
+      toggleExperience: WitcherActorSheet.#onToggleExperience,
       equipItem, createInventoryItem, browseEquipment, addCatalogItem,
       changeInventoryQuantity, toggleCarried, toggleInventoryGroup,
       toggleItemDescription, postItem, searchItemTrait, chooseContainer, toggleContainer,
@@ -125,6 +127,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       workshop: await workshopActorContext(this.actor),
       abilitiesOpen: !preferences.collapsed?.abilities,
       editingAttributes: this.isEditable && this.#editingAttributes,
+      editingExperience: this.isEditable && this.#editingExperience,
       effects: await Promise.all(this.actor.effects.map(async effect => {
         const definition = Object.values(STATUS_DEFINITIONS).find(status => effect.statuses.has(status.id));
         return {
@@ -178,6 +181,14 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   async _onRender(context, options) {
     await super._onRender(context, options);
     bindInventory(this);
+    const experience = this.element.querySelector("[data-sheet-experience]");
+    experience?.addEventListener("change", event => {
+      event.stopPropagation(); // This input uses the same guarded queue as paid advancement.
+      this.#saveExperience(experience);
+    });
+    experience?.addEventListener("keydown", event => {
+      if (event.key === "Enter") { event.preventDefault(); experience.blur(); }
+    });
     for (const input of this.element.querySelectorAll("[data-profession-level]")) input.addEventListener("change", () => {
       if (this.isEditable && this.#editingProfession) setProfessionLevel(this.actor, input.dataset.professionLevel, input.value).catch(reportPreferencesError);
     });
@@ -358,7 +369,32 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   }
 
   #editingAttributes = false;
+  #editingExperience = false;
+  #experienceWrite = null;
   #luckWrites = Promise.resolve();
+
+  async #saveExperience(input) {
+    if (!this.isEditable || !this.#editingExperience) return;
+    if (this.#experienceWrite) return this.#experienceWrite;
+    if (!input.reportValidity() || input.value.trim() === "") return;
+    const points = Number(input.value);
+    const expected = Number(input.dataset.expected);
+    if (points === expected) return;
+    input.disabled = true;
+    this.#experienceWrite = setExperience(this.actor, points, expected, key => game.i18n.localize(key))
+      .catch(reportPreferencesError).finally(async () => {
+        this.#experienceWrite = null;
+        if (this.rendered) await this.render({ force: true });
+      });
+    return this.#experienceWrite;
+  }
+
+  static async #onToggleExperience() {
+    if (!this.isEditable) return;
+    await this.#experienceWrite;
+    this.#editingExperience = !this.#editingExperience;
+    await this.render({ force: true });
+  }
 
   static async #onToggleAttributes() {
     if (!this.isEditable) return;

@@ -1,12 +1,21 @@
-<article class="witcher-profession-node {{#if defining}}defining{{/if}} {{#unless ability.unlocked}}locked{{/unless}}">
+<article class="witcher-profession-node {{#if defining}}defining{{/if}} {{#unless ability.unlocked}}locked{{/unless}} {{#if advancement}}{{#if ability.selected}}selected{{/if}}{{/if}}" {{#if advancement}}data-search="{{ability.search}}" data-node-id="{{ability.id}}"{{/if}}>
   <div class="witcher-profession-node-label">
     <span class="witcher-profession-tier" aria-hidden="true">{{#if defining}}<i class="fa-solid fa-star"></i>{{else}}{{ability.tier}}{{/if}}</span>
     <button type="button" class="witcher-profession-name" data-action="viewSheetItem" data-item-id="{{ability.itemId}}" data-uuid="{{ability.uuid}}" data-tooltip="{{ability.description}}">{{ability.name}}</button>
-    {{#unless ability.unlocked}}<i class="fa-solid fa-lock witcher-profession-lock" data-tooltip="{{localize 'WITCHER.Professions.Requires'}}: {{ability.prerequisite}} — 5" tabindex="0" aria-label="{{localize 'WITCHER.Professions.Requires'}}: {{ability.prerequisite}} — 5"></i>{{/unless}}
+    {{#if advancement}}<span class="witcher-advancement-node-attribute">{{ability.attributeLabel}}</span>{{/if}}
+    {{#unless ability.unlocked}}<i class="fa-solid fa-lock witcher-profession-lock" data-tooltip="{{localize 'WITCHER.Professions.Requires'}}: {{#if advancement}}{{ability.prerequisiteName}}{{else}}{{ability.prerequisite}}{{/if}} — 5" tabindex="0" aria-label="{{localize 'WITCHER.Professions.Requires'}}: {{#if advancement}}{{ability.prerequisiteName}}{{else}}{{ability.prerequisite}}{{/if}} — 5"></i>{{/unless}}
   </div>
+  {{#if advancement}}
+  <div class="witcher-advancement-node-purchase">
+    {{> "systems/witcher-eliott-system/templates/advancement-controls.hbs" ability}}
+    <div class="witcher-advancement-ranks"><span>{{ability.displayLevel}}</span>{{#if ability.selected}}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i><strong>{{ability.displayTarget}}</strong>{{/if}}</div>
+  </div>
+  <div class="witcher-advancement-progress" aria-hidden="true">{{#each ability.progress}}<span class="{{#if filled}}filled{{/if}} {{#if planned}}planned{{/if}}"></span>{{/each}}</div>
+  {{else}}
   <div class="witcher-profession-rank">
     <span class="witcher-profession-attribute">{{#if defining}}{{localize "WITCHER.Professions.Defining"}} · {{/if}}{{ability.attributeLabel}}</span>
     <label class="witcher-profession-level"><span>{{localize "WITCHER.Professions.Rank"}}</span>{{#if editing}}<input type="number" min="0" max="10" step="1" value="{{ability.level}}" data-profession-level="{{ability.id}}" aria-label="{{ability.name}} — {{localize 'WITCHER.Skills.Level'}}">{{else}}<output aria-label="{{ability.name}} — {{localize 'WITCHER.Skills.Level'}}">{{ability.level}}</output>{{/if}}</label>
     {{#if ability.attribute}}<button type="button" class="witcher-profession-roll" data-action="rollProfessionAbility" data-ability-id="{{ability.id}}" data-tooltip="{{ability.rollHint}}" aria-label="{{ability.rollHint}}" {{#if ability.rollUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}><i class="fa-solid fa-dice-d10" aria-hidden="true"></i><strong>{{ability.total}}</strong></button>{{/if}}
   </div>
+  {{/if}}
 </article>

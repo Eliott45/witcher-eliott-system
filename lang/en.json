@@ -1262,7 +1262,8 @@
       "Error": "Не удалось завершить переброс Упрямства. Проверьте сообщение и счётчик зарядов."
     },
     "Advancement": {
-      "Title": "Character advancement",
+        "Title": "Character advancement",
+        "TreeHint": "Add ranks at each node · price next to +",
       "Experience": "Experience · IP",
       "Open": "Advance",
       "Unit": "IP",

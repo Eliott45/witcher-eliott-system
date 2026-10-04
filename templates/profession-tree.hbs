@@ -1,0 +1,15 @@
+<div class="witcher-profession" aria-label="{{localize 'WITCHER.Professions.Tree'}}">
+  <div class="witcher-profession-root">
+    {{> "systems/witcher-eliott-system/templates/profession-node.hbs" ability=profession.defining defining=true editing=editing editable=editable advancement=advancement}}
+  </div>
+  <div class="witcher-profession-tree">
+    {{#each profession.branches as |branch|}}
+    <section class="witcher-profession-branch" data-branch="{{@index}}" aria-label="{{branch.name}}">
+      <h3>{{branch.name}}</h3>
+      {{#each branch.entries as |ability|}}
+        {{> "systems/witcher-eliott-system/templates/profession-node.hbs" ability=ability defining=false editing=../../editing editable=../../editable advancement=../../advancement}}
+      {{/each}}
+    </section>
+    {{/each}}
+  </div>
+</div>

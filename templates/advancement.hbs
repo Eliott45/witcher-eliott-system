@@ -1,6 +1,6 @@
 <div class="witcher-advancement-layout">
   <header class="witcher-advancement-hero">
-    <div><span>{{localize "WITCHER.Advancement.Title"}}</span><h2>{{actorName}}</h2></div>
+    <div class="witcher-advancement-hero-title"><i class="fa-solid fa-compass-drafting" aria-hidden="true"></i><div><span>{{localize "WITCHER.Advancement.Title"}}</span><h2>{{actorName}}</h2></div></div>
     <div class="witcher-advancement-balance"><strong>{{points}}</strong><span>{{localize "WITCHER.Advancement.Available"}}</span></div>
   </header>
   <div class="witcher-advancement-body">
@@ -22,18 +22,25 @@
     </aside>
     <section class="witcher-advancement-catalog">
       <label class="witcher-advancement-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" value="{{query}}" data-advancement-search placeholder="{{localize 'WITCHER.Advancement.Search'}}" aria-label="{{localize 'WITCHER.Advancement.Search'}}"></label>
+      {{#if isProfession}}
+      <div class="witcher-advancement-tree-heading"><h3>{{#if profession}}{{profession.name}}{{else}}{{localize "WITCHER.Professions.Title"}}{{/if}}</h3><span>{{localize "WITCHER.Advancement.TreeHint"}}</span></div>
+      {{else}}
       <div class="witcher-advancement-columns"><span>{{localize "WITCHER.Advancement.Entry"}}</span><span>{{localize "WITCHER.Advancement.Rank"}}</span><span>{{localize "WITCHER.Advancement.NextRank"}}</span></div>
-      <div class="witcher-advancement-list">
+      {{/if}}
+      <div class="witcher-advancement-list {{#if isProfession}}profession-catalog{{/if}}">
+        {{#if isProfession}}
+          {{#if profession}}
+          {{> "systems/witcher-eliott-system/templates/profession-tree.hbs" profession=profession editing=false editable=editable advancement=true}}
+          {{else}}<p class="witcher-advancement-empty">{{localize "WITCHER.Professions.Empty"}}</p>{{/if}}
+        {{else}}
         {{#each rows}}
         <article class="witcher-advancement-row {{#if selected}}selected{{/if}}" data-search="{{search}}">
           <div class="witcher-advancement-label"><strong>{{name}} {{#if badge}}<small data-tooltip="{{ruleHint}}">{{badge}}</small>{{/if}}</strong><span>{{detail}}</span>{{#if ranksHint}}<span class="witcher-advancement-origin">{{ranksHint}}</span>{{/if}}</div>
           <div class="witcher-advancement-ranks"><span>{{displayLevel}}</span>{{#if selected}}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i><strong>{{displayTarget}}</strong>{{/if}}</div>
-          <div class="witcher-advancement-controls">
-            <button type="button" data-action="decrease" data-entry="{{id}}" aria-label="{{localize 'WITCHER.Advancement.Decrease'}}: {{name}}" {{disabled cannotDecrease}}><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
-            <button type="button" data-action="increase" data-entry="{{id}}" aria-label="{{localize 'WITCHER.Advancement.Increase'}}: {{name}}" data-tooltip="{{hint}}" {{disabled cannotIncrease}}><i class="fa-solid fa-plus" aria-hidden="true"></i> {{price}}</button>
-          </div>
+          {{> "systems/witcher-eliott-system/templates/advancement-controls.hbs" this}}
         </article>
         {{/each}}
+        {{/if}}
         <p class="witcher-advancement-empty" data-no-results>{{localize "WITCHER.Advancement.Empty"}}</p>
       </div>
     </section>

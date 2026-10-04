@@ -1,0 +1,4 @@
+<div class="witcher-advancement-controls">
+  <button type="button" data-action="decrease" data-entry="{{id}}" aria-label="{{localize 'WITCHER.Advancement.Decrease'}}: {{name}}" {{disabled cannotDecrease}}><i class="fa-solid fa-minus" aria-hidden="true"></i></button>
+  <button type="button" data-action="increase" data-entry="{{id}}" aria-label="{{localize 'WITCHER.Advancement.Increase'}}: {{name}}" data-tooltip="{{hint}}" {{disabled cannotIncrease}}><i class="fa-solid fa-plus" aria-hidden="true"></i> {{#if price}}{{price}}{{else}}—{{/if}}</button>
+</div>

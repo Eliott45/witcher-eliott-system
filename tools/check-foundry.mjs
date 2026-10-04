@@ -437,7 +437,7 @@ handlebars.registerHelper("not", value => !value);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["profession", "profession-node", "lifepath", "inventory", "inventory-row", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -502,6 +502,25 @@ for (const category of ["skills", "languages", "attributes", "profession"]) {
   assert.ok(advancementHTML({ ...advancementContext(advancingActor, {}, category), query: "", notice: "" }).includes("witcher-advancement-buy"));
 }
 assert.ok(advancementHTML({ ...advancementContext(advancingActor, { "skill:swordsmanship": 8 }), query: "", notice: "" }).includes("7 → 8"));
+const professionDefinition = (await import("../scripts/data/professions.mjs")).getProfession("bard");
+const rootKey = `ability:${bardDefinition.id}`;
+const branchKey = `ability:${professionDefinition.abilities[1].id}`;
+const treeBefore = advancementContext(advancingActor, {}, "profession");
+assert.equal(treeBefore.profession.branches.length, 3);
+assert.ok(treeBefore.profession.branches.every(branch => branch.entries.length === 3));
+assert.ok(treeBefore.profession.branches.every(branch => branch.entries[0].cannotIncrease));
+const treePlan = advancementContext(advancingActor, { [rootKey]: 5, [branchKey]: 5 }, "profession");
+assert.equal(treePlan.profession.defining.displayLevel, 2);
+assert.equal(treePlan.profession.defining.displayTarget, 5);
+assert.equal(treePlan.profession.defining.progress.filter(pip => pip.filled).length, 2);
+assert.equal(treePlan.profession.defining.progress.filter(pip => pip.planned).length, 3);
+assert.equal(treePlan.profession.branches[0].entries[1].cannotIncrease, false, "Planned rank five opens the next node");
+assert.equal(treePlan.profession.branches[1].entries[1].cannotIncrease, true, "Other branches retain their own prerequisite");
+const plannedTreeHTML = advancementHTML({ ...treePlan, query: "", notice: "" });
+assert.equal([...plannedTreeHTML.matchAll(/data-node-id=/g)].length, 10);
+assert.ok(!plannedTreeHTML.includes('data-action="rollProfessionAbility"'), "Purchasing cannot accidentally roll a node");
+assert.ok(plannedTreeHTML.includes('data-action="viewSheetItem"'));
+assert.equal(advancingActor.items.getName(bardDefinition.name).system.level, 2, "Planning never mutates the actor");
 // Render saved inventory through the same strict template used by old and new actors.
 const { inventoryContext } = await import("../scripts/sheets/inventory-context.mjs");
 const inventoryHTML = handlebars.compile(await readFile(new URL("../templates/inventory.hbs", import.meta.url), "utf8"), { strict: true });
@@ -554,6 +573,13 @@ assert.equal([...editableStatisticsHTML.matchAll(/name="system.attributes\./g)].
 assert.match(editableStatisticsHTML, /role="switch" aria-checked="true"/);
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleAttributes.call(sheet);
 assert.equal((await sheet._prepareContext({})).editingAttributes, false);
+assert.equal((await sheet._prepareContext({})).editingExperience, false);
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleExperience.call(sheet);
+const experienceEditingHTML = template(await sheet._prepareContext({}));
+assert.ok(experienceEditingHTML.includes("data-sheet-experience"));
+assert.ok(!experienceEditingHTML.includes('name="system.experience"'), "XP editing goes through the shared guarded writer");
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleExperience.call(sheet);
+assert.equal((await sheet._prepareContext({})).editingExperience, false);
 assert.equal([...html.matchAll(/data-action="rollSkill"/g)].length, 49);
 assert.equal([...html.matchAll(/name="system.skills\./g)].length, 0, "Skills are locked until editing is enabled");
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleSkills.call(sheet);
@@ -629,6 +655,8 @@ assert.match(readOnlyHTML, /<textarea[^>]*name="system.biography.sessionNotes"[^
 assert.ok(!readOnlyHTML.includes('name="system.attributes.reflex"'));
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleAttributes.call(sheet);
 assert.equal((await sheet._prepareContext({})).editingAttributes, false, "Observers cannot unlock parameters");
+await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleExperience.call(sheet);
+assert.equal((await sheet._prepareContext({})).editingExperience, false, "Observers cannot unlock the XP balance");
 const originalData = sheet.actor.system;
 sheet.actor.system = restored;
 sheet.tabGroups.character = "main";
