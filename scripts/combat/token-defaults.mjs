@@ -2,10 +2,11 @@ import { COMBAT_ACTOR_TYPES, VISION_ANGLE, SYSTEM_ID } from "../config.mjs";
 
 /** Configure new actors once; placed tokens inherit the actor's prototype. */
 export function applyActorTokenDefaults(actor, data) {
-  if (!COMBAT_ACTOR_TYPES.includes(actor.type) && actor.type !== "services") return;
+  const location = ["services","powerPlace"].includes(actor.type);
+  if (!COMBAT_ACTOR_TYPES.includes(actor.type) && !location) return;
 
-  const icon = `systems/${SYSTEM_ID}/assets/icons/services.svg`;
-  const defaults = actor.type === "services" ? {
+  const icon = `systems/${SYSTEM_ID}/assets/icons/${actor.type==="powerPlace"?"power-place":"services"}.svg`;
+  const defaults = location ? {
     img: icon,
     "ownership.default": CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER,
     "prototypeToken.texture.src": icon,

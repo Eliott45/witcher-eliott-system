@@ -3,7 +3,8 @@
     "Actor": {
       "character": "Персонаж",
       "npc": "NPC / противник",
-      "services": "Услуги / заведение"
+      "services": "Услуги / заведение",
+      "powerPlace": "Место силы"
     },
     "Item": {
       "ability": "Способность",

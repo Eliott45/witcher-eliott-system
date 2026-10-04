@@ -1,0 +1,15 @@
+<div class="witcher-power-content" data-element="{{system.element}}">
+  <header class="witcher-power-hero"><i class="{{element.icon}}" aria-hidden="true"></i><span>МЕСТО СИЛЫ · {{element.name}}</span>{{#if isGM}}<input name="name" value="{{actor.name}}" aria-label="Название места силы">{{else}}<h1>{{actor.name}}</h1>{{/if}}<p>{{element.habitat}}</p></header>
+  <div class="witcher-power-body">
+    {{#if isGM}}<div class="witcher-cast-grid"><label>Стихия<select name="system.element">{{#each elements}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label><label class="witcher-cast-confirm"><input type="checkbox" name="system.available" {{checked system.available}}> Доступно для использования</label></div><label>Описание<textarea name="system.description" rows="2">{{system.description}}</textarea></label>{{else}}<p>{{system.description}}</p>{{/if}}
+    <div class="witcher-power-rewards"><div><strong>3 хода</strong><span>сосредоточения</span></div><div><strong>+10 О.У.</strong><span>только для магии</span></div><div><strong>1 час</strong><span>бонус стихии</span></div></div>
+    <p>Бонус: +5 к пределу магии и +2 к Сотворению заклинаний выбранной стихии. Вместо часового бонуса можно получить 5 единиц пятой эссенции.</p>
+    <label>Персонаж<select data-power-customer aria-label="Персонаж">{{#each customers}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+    <label>Награда<select data-power-reward aria-label="Награда"><option value="blessing">Бонус стихии на 1 час + 10 магических О.У.</option><option value="essence">Пятая эссенция ×5 + 10 магических О.У.</option></select></label>
+    {{#if visit}}<p class="witcher-power-risk">{{#if visit.dc}}Повторное обращение: Стойкость СЛ <b>{{visit.dc}}</b>. Провал: 5d6 урона и последствие стихии.{{else}}Первое обращение в этом месяце — без проверки.{{/if}}</p>{{/if}}
+    <label class="witcher-cast-confirm"><input type="checkbox" data-power-prepared> Три полных хода сосредоточения завершены</label>
+    <button type="button" class="witcher-power-draw" data-action="drawPower" {{disabled (not canDraw)}}><i class="fa-solid fa-hand-sparkles"></i> Почерпнуть силу</button>
+    <small>Магических О.У. у персонажа: {{magicPoints}}. История обращений считается отдельно для каждого персонажа; месяц — 30 игровых дней. Бонус истекает по времени мира.</small>
+    {{#if isGM}}<button type="button" data-action="resetPowerVisit">Сбросить историю выбранного персонажа</button>{{/if}}
+  </div>
+</div>

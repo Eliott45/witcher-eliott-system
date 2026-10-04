@@ -1,4 +1,6 @@
 import { WitcherSpellData } from "./data/witcher-spell-data.mjs";
+import { WitcherPowerPlaceData } from "./data/witcher-power-place-data.mjs";
+import { WitcherPowerPlaceSheet } from "./sheets/witcher-power-place-sheet.mjs";
 import { registerSpellContentMigration,migrateSpellContent } from "./migrations/spell-content.mjs";
 import { registerOilExpiry } from "./workshop/upgrades.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
@@ -68,6 +70,8 @@ Hooks.once("init", async () => {
     CONFIG.Actor.trackableAttributes[type] = { bar: ["health", "stamina"], value: [] };
   }
   CONFIG.Actor.dataModels.services = WitcherServicesData;
+  CONFIG.Actor.dataModels.powerPlace = WitcherPowerPlaceData;
+  CONFIG.Actor.trackableAttributes.powerPlace = { bar: [], value: [] };
   CONFIG.Actor.trackableAttributes.services = { bar: [], value: [] };
   CONFIG.Item.dataModels.race = WitcherRaceData;
   CONFIG.Item.dataModels.ability = WitcherAbilityData;
@@ -100,6 +104,8 @@ Hooks.once("init", async () => {
     WitcherItemSheet,
     { types: ITEM_TYPES, makeDefault: true, label: "WITCHER.Sheet.ReferenceTitle" }
   );
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(foundry.documents.Actor,SYSTEM_ID,WitcherPowerPlaceSheet,
+    {types:["powerPlace"],makeDefault:true,label:"TYPES.Actor.powerPlace"});
 });
 
 Hooks.on("preCreateActor", applyActorTokenDefaults);

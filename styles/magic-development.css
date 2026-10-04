@@ -1,0 +1,24 @@
+.witcher-eliott.power-place-sheet .window-content {padding:0;background:#eee9df;color:#453c30;}
+.witcher-eliott.power-place-sheet {min-width:480px;min-height:480px;}
+.witcher-power-content {overflow-y:auto;--power-accent:#627b69;}
+.witcher-power-content[data-element=fire] {--power-accent:#a45a40;}
+.witcher-power-content[data-element=water] {--power-accent:#4e8099;}
+.witcher-power-content[data-element=air] {--power-accent:#6c8e99;}
+.witcher-power-hero {padding:18px;text-align:center;background:radial-gradient(ellipse at top,#445963,#202c32);color:#efdfbc;border-bottom:3px solid #b69a68;}
+.witcher-power-hero>i {display:block;font-size:30px;margin:0 auto 10px;color:#dfc696;}
+.witcher-power-hero>span {font:11px sans-serif;letter-spacing:2px;}
+.witcher-power-hero h1,.witcher-power-hero input {color:#fff0d2;font:27px Georgia,serif;margin:12px 0;border:0;text-align:center;background:transparent;width:100%;text-shadow:none;}
+.witcher-power-hero p {color:#c8c8bd;font-size:12px;}
+.witcher-power-body {padding:20px;display:flex;flex-direction:column;gap:12px;color:#453c30;}
+.witcher-power-body label {display:flex;flex-direction:column;gap:5px;font-size:12px;}
+.witcher-power-body :is(input,select,textarea) {background:#fcf8ee;color:#453c30;border:1px solid #bbab90;}
+.witcher-power-body .witcher-cast-confirm {flex-direction:row;align-items:center;}
+.witcher-power-body input[type=checkbox] {width:18px;height:18px;flex:none;}
+.witcher-power-body button {height:auto;min-height:30px;color:#614932;background:#f5eddc;border:1px solid #bbab90;font-size:13px;}
+.witcher-power-rewards {display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.witcher-power-rewards>div {display:flex;flex-direction:column;gap:6px;padding:15px 8px;background:#dfd9cc;border-radius:5px;text-align:center;}
+.witcher-power-rewards strong {font:21px Georgia,serif;color:#58482f;}
+.witcher-power-rewards span,.witcher-power-body small {font-size:11px;color:#79684d;}
+.witcher-power-risk {padding:10px 12px;border-left:3px solid #b58954;background:#e7dcc8;color:#624a31;}
+.witcher-power-body .witcher-power-draw {background:var(--power-accent);color:#fff3db;border:0;min-height:40px;}
+.witcher-power-active {display:flex;align-items:center;gap:8px;padding:10px 12px;background:#dce3d9;border:1px solid #aab89f;border-radius:4px;margin-bottom:8px;color:#43543d;font-size:12px;flex-wrap:wrap;}

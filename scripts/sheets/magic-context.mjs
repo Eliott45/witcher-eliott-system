@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { activePowerBenefits } from "../magic/power-place-rules.mjs";
 import { MAGIC_KINDS,MAGIC_CATEGORIES,HEX_DANGERS,magicCategory,MAGIC_TRADITIONS,SPELL_ELEMENTS,SPELL_GRADES,SPELL_DEFENSES,spellRange,spellDuration,SPELL_RANGE_KINDS,SPELL_DURATION_KINDS } from "../data/spells.mjs";
 import { focusOptions,magicRoundKey,roundSpent,spellCostLabel,castingSkill,CASTING_SKILL_LABELS,maintenanceCost,ritualComponents,hexIdentification,signPotency } from "../magic/rules.mjs";
 import { castSpell,castingQuote,learnSpell,endConcentration,resetMagicRound } from "../magic/casting.mjs";
@@ -33,7 +34,7 @@ export async function magicContext(actor) {
     description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:actor.isOwner,relativeTo:item})})));
   spells.sort((a,b)=>Object.keys(SPELL_GRADES).indexOf(a.grade)-Object.keys(SPELL_GRADES).indexOf(b.grade)||a.name.localeCompare(b.name,"ru"));
   const groups=MAGIC_GROUPS.map(group=>({...group,spells:spells.filter(spell=>spell.kind===group.id)})).filter(group=>group.spells.length);
-  return {spells,groups,count:spells.length,spent,vigor,remaining:Math.max(0,vigor-spent),percent:vigor?Math.min(100,spent/vigor*100):spent?100:0,
+  return {spells,groups,powerBenefits:activePowerBenefits(actor).map(effect=>({name:effect.name,minutes:Math.ceil((effect.flags[SYSTEM_ID].powerPlace.expiresAt-game.time.worldTime)/60)})),count:spells.length,spent,vigor,remaining:Math.max(0,vigor-spent),percent:vigor?Math.min(100,spent/vigor*100):spent?100:0,
     stamina:actor.system.stamina.value,staminaMax:actor.system.stamina.max,casting:skill.total??"—",ritualCasting:skillValue(actor.system,"ritualCrafting").total??"—",hexCasting:skillValue(actor.system,"hexWeaving").total??"—",canCast:canCast&&!active,
     combat:Boolean(game.combat?.started),round:game.combat?.round,
     active:active?{...spellEntry(active),duration:`Поддержание · ${maintenanceCost(active.system,actor.system.magic.sustainedCost)} ВЫН/раунд`}:null,canMaintain:canCast&&Boolean(active)&&actor.system.magic.maintainedRound!==roundKey,
@@ -103,6 +104,7 @@ async function castDialog(actor,item,maintenance=false) {
           const preview=castingQuote(actor,item,{cost:base,focusId,maintenance,dc:dcInput?Number(dcInput.value):undefined,helpers});
           root.querySelector("[data-cast-quote]").textContent=`${base} − ${preview.focus?.rating??0} = ${preview.stamina} ВЫН (минимум 1)\nЗа раунд: ${preview.after} / ${preview.vigor}${preview.damage?`\nПерегрузка: ${preview.excess} × 5 = ${preview.damage} урона ПЗ + стихийный эффект`:""}${preview.difficulty?.target?`\nСЛ: ${preview.difficulty.base} − ${helpers} = ${preview.difficulty.target}`:""}\n${signPotency(item.system,base)}`;
           root.querySelector("[data-overload-row]").hidden=!preview.damage;
+          if(preview.power.label)root.querySelector("[data-cast-quote]").textContent+=`\n${preview.power.label}: +${preview.power.vigor} к пределу, +${preview.power.casting} к Сотворению этой стихии`;
           error.textContent="";button.disabled=(preview.damage>0&&!root.querySelector('[name="overload"]').checked)||(ritual&&!root.querySelector('[name="prepared"]').checked);
         }catch(err){error.textContent=err.message;button.disabled=true;}
       };

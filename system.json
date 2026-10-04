@@ -35,7 +35,8 @@
     "Actor": {
       "character": {},
       "npc": {},
-      "services": {}
+      "services": {},
+      "powerPlace": {}
     },
     "Item": {
       "race": {

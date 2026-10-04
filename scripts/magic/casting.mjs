@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { powerBonus } from "./power-place-rules.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -29,8 +30,9 @@ export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,he
   if(maintenance) {
     if(active?.id!==item.id||item.system.duration.kind!=="sustained")throw new Error("Это заклинание не поддерживается.");
   } else if(active)throw new Error("Сначала прекратите поддержание: концентрация не позволяет творить другое заклинание.");
-  const skillKey=castingSkill(item.system),skill=skillValue(actor.system,skillKey);
+  const skillKey=castingSkill(item.system),skill=skillValue(actor.system,skillKey),power=powerBonus(actor,item.system);
   if(skill.total===null)throw new Error("Укажите Волю персонажа.");
+  const poweredSkill={...skill,total:skill.total+power.casting};
   const roundKey=magicRoundKey(game.combat);
   if(maintenance && actor.system.magic.maintainedRound===roundKey)throw new Error("Поддержание в этом раунде уже оплачено.");
   // Focus is selected from equipped inventory each time, not a second editable bonus on Actor.
@@ -40,9 +42,9 @@ export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,he
   if(!maintenance&&focusId&&!focus)throw new Error("Фокусирующий предмет больше не экипирован.");
   const base=maintenance?maintenanceCost(item.system,actor.system.magic.sustainedCost??0):spellBaseCost(item.system,cost);
   if(maintenance&&base<1)throw new Error("Не сохранена стоимость поддерживаемого знака. Прекратите поддержание и сотворите его заново.");
-  const quote=castingCost({cost:base,focus:focus?.rating??0,spent:roundSpent(actor.system.magic,roundKey),vigor:actor.system.statistics.vigor});
+  const quote=castingCost({cost:base,focus:focus?.rating??0,spent:roundSpent(actor.system.magic,roundKey),vigor:actor.system.statistics.vigor+power.vigor});
   if(quote.stamina>actor.system.stamina.value)throw new Error(`Недостаточно Выносливости: нужно ${quote.stamina}, доступно ${actor.system.stamina.value}.`);
-  return {...quote,roundKey,skill,skillKey,focus,difficulty:item.system.kind==="ritual"?ritualDifficulty(item.system,{dc,helpers}):null};
+  return {...quote,roundKey,skill:poweredSkill,skillKey,focus,power,difficulty:item.system.kind==="ritual"?ritualDifficulty(item.system,{dc,helpers}):null};
 }
 
 const pendingCasts=new WeakMap();
@@ -81,6 +83,7 @@ function performCast(actor,itemId,options) {
       const calc=skillCalculationTooltip(actor.system,quote.skill,{localize:key=>game.i18n.localize(key),format:(key,data)=>game.i18n.format(key,data)});
       const summary=[`${quote.base} − ${quote.focus?.rating??0} = ${quote.stamina} ВЫН (минимум 1)`,
         `За раунд: ${quote.before} + ${quote.stamina} = ${quote.after}; предел ${quote.vigor}`];
+      if(quote.power.label)summary.push(`${quote.power.label}: +${quote.power.vigor} к пределу этой стихии${quote.power.casting?`; +${quote.power.casting} к Сотворению`:""}.`);
       if(quote.damage)summary.push(`Перегрузка: ${quote.excess} × 5 = ${quote.damage} урона`);
       if(fumble.severity)summary.push(hex?`Обратная порча: 1d100 = ${backlash.total}; 01–50 — на заклинателя. ${reflected?"Порча поражает заклинателя вместо цели; примените её описание к нему.":"Обратной порчи нет; сравните проверку с защитой цели."}`:ritual?`Критический провал ритуала: ${quote.stamina} потраченных ВЫН = ${fumbleDamage} урона ПЗ.`:`Магический провал ${fumble.severity}: ${fumbleDamage} урона; ${fumble.failed?"заклинание не сработало":"заклинание всё ещё может сработать"}`);
       if(kind==="sign")summary.push(signPotency(item.system,options.maintenance?actor.system.magic.sustainedCost:quote.base));

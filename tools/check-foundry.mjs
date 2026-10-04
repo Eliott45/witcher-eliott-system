@@ -52,6 +52,13 @@ assert.equal(foundry.documents.BaseSetting.metadata.permissions.create(player, {
 const { WitcherActorData } = await import("../scripts/data/witcher-actor-data.mjs");
 const { WitcherServicesData } = await import("../scripts/data/witcher-services-data.mjs");
 CONFIG.Actor.dataModels.services = WitcherServicesData;
+const { WitcherPowerPlaceData } = await import("../scripts/data/witcher-power-place-data.mjs");
+CONFIG.Actor.dataModels.powerPlace = WitcherPowerPlaceData;
+const nativePowerPlace=new foundry.documents.BaseActor({name:"Круг камней",type:"powerPlace",system:{element:"fire",description:"У старого вулкана"}});
+const reopenedPowerPlace=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(nativePowerPlace.toObject())));
+assert.equal(reopenedPowerPlace.system.element,"fire");
+assert.equal(reopenedPowerPlace.system.description,"У старого вулкана");
+assert.equal(reopenedPowerPlace.system.health,undefined);
 const servicesData = new WitcherServicesData();
 assert.equal(servicesData.services.length,24);
 assert.equal(servicesData.closed,false);
@@ -481,6 +488,7 @@ foundry.applications = {
     tabGroups = {};
     async _prepareContext() {
       // Supply ApplicationV2's tab context while keeping its DOM host out of this check.
+      if(!this.constructor.TABS)return {editable:this.isEditable,rootId:"test-location"};
       const [group, { initial, tabs }] = Object.entries(this.constructor.TABS)[0];
       this.tabGroups[group] ??= initial;
       return {
@@ -506,6 +514,12 @@ sheet.isEditable = true;
 const html = template(await sheet._prepareContext({}));
 // A new optional magic state round-trips on old/new actors without touching old resources.
 assert.equal(legacyActorData.magic.spent,0);
+assert.equal(legacyActorData.magic.improvementPoints,0);
+assert.deepEqual(legacyActorData.magic.powerVisits,[]);
+const powerCharacter=new WitcherActorData({...legacyActorData.toObject(),magic:{improvementPoints:10,powerVisits:[{placeUuid:"Actor.power",draws:3,saves:1,lastDraw:700}]}});
+const reopenedPowerCharacter=new WitcherActorData(JSON.parse(JSON.stringify(powerCharacter.toObject())));
+assert.equal(reopenedPowerCharacter.magic.improvementPoints,10);
+assert.equal(reopenedPowerCharacter.magic.powerVisits[0].saves,1);
 const magicRoundTrip = new WitcherActorData({...legacyActorData.toObject(),magic:{roundKey:"combat:2",spent:7,sustainedId:"spell00000000001",maintainedRound:"combat:2",sustainedCost:5}});
 const magicRestored = new WitcherActorData(JSON.parse(JSON.stringify(magicRoundTrip.toObject())));
 assert.equal(magicRestored.magic.spent,7);assert.equal(magicRestored.health.value,legacyActorData.health.value);
@@ -565,6 +579,17 @@ assert.ok(!providerPlayerHtml.includes('data-tab="manage"'));
 assert.ok(providerPlayerHtml.includes('data-action="sendServiceOrder" data-player-control'));
 assert.ok(providerPlayerHtml.includes("Test visitor"));
 Object.assign(game,serviceTestGlobals);
+const {WitcherPowerPlaceSheet}=await import("../scripts/sheets/witcher-power-place-sheet.mjs");
+const powerSheet=new WitcherPowerPlaceSheet();powerSheet.actor=reopenedPowerPlace;
+Object.defineProperty(powerSheet,"isEditable",{get:()=>game.user.isGM});
+const powerTemplate=handlebars.compile(await readFile(new URL("../templates/power-place.hbs",import.meta.url),"utf8"),{strict:true});
+const powerGlobals={actors:game.actors,time:game.time,user:game.user};
+game.time={worldTime:800};game.actors=[{...sheet.actor,id:"visitor",isOwner:true}];
+assert.match(powerTemplate(await powerSheet._prepareContext({})),/name="system.element"/);
+game.user=player;
+const powerPlayerHTML=powerTemplate(await powerSheet._prepareContext({}));
+assert.match(powerPlayerHTML,/data-action="drawPower"/);assert.doesNotMatch(powerPlayerHTML,/name="system.element"/);
+Object.assign(game,powerGlobals);
 // Paid advancement uses the existing schema and an atomic parent update, including new embedded abilities.
 const { advancementContext } = await import("../scripts/sheets/advancement-window.mjs");
 const { advancementFingerprint } = await import("../scripts/data/advancement.mjs");

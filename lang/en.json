@@ -3,7 +3,8 @@
     "Actor": {
       "character": "Character",
       "npc": "NPC / opponent",
-      "services": "Services / establishment"
+      "services": "Services / establishment",
+      "powerPlace": "Place of power"
     },
     "Item": {
       "ability": "Ability",

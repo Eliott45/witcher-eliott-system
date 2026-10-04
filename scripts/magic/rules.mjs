@@ -3,10 +3,12 @@ import { effectiveItem } from "../data/workshop.mjs";
 import { getToolRules } from "../data/tool-rules.mjs";
 
 export function magicFields() {
-  const {SchemaField,StringField,NumberField}=foundry.data.fields;
+  const {SchemaField,StringField,NumberField,ArrayField}=foundry.data.fields;
   const text=()=>new StringField({required:true,nullable:false,initial:"",blank:true});
+  const count=()=>new NumberField({required:true,nullable:false,min:0,integer:true,initial:0});
   return new SchemaField({roundKey:text(),spent:new NumberField({required:true,nullable:false,min:0,integer:true,initial:0}),
-    sustainedId:text(),maintainedRound:text(),sustainedCost:new NumberField({required:true,nullable:false,min:0,integer:true,initial:0})});
+    sustainedId:text(),maintainedRound:text(),sustainedCost:count(),improvementPoints:count(),
+    powerVisits:new ArrayField(new SchemaField({placeUuid:text(),draws:count(),saves:count(),lastDraw:new NumberField({required:true,nullable:false,initial:0})}),{initial:[]})});
 }
 
 export const castingSkill=system=>system.kind==="ritual"?"ritualCrafting":system.kind==="hex"?"hexWeaving":"spellCasting";
