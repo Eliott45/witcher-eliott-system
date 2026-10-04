@@ -8,7 +8,7 @@
   </div>
 </div>
 <div class="witcher-armor-zones" aria-label="Надетая броня">
-{{#each inventory.zones as |zone|}}<section class="witcher-armor-zone"><h3><img class="witcher-zone-icon" src="{{zone.img}}" alt=""> {{zone.name}}</h3>
+{{#each inventory.zones as |zone|}}<section class="witcher-armor-zone"><h3><img class="witcher-zone-icon" src="{{zone.img}}" alt=""><span>{{zone.name}}</span></h3>
 {{#each zone.items as |item|}}<button type="button" data-action="viewSheetItem" data-item-id="{{item.id}}" data-tooltip="{{item.name}}">{{item.name}}</button><strong>ПБ {{item.condition.value}} / {{item.condition.max}}</strong>{{else}}<span>Не надето</span>{{/each}}</section>{{/each}}
 </div>
 <label class="witcher-inventory-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" data-inventory-search placeholder="Поиск в инвентаре…" aria-label="Поиск в инвентаре"></label>

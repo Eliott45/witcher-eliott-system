@@ -4,9 +4,13 @@ import { isPhysical } from "../data/physical-items.mjs";
 import { browseEquipmentCatalog } from "./equipment-browser.mjs";
 
 export async function itemPresentation(item, { secrets = false } = {}) {
+  const properties = item.system.properties?.trim() ?? "";
+  const description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description ?? "", { secrets, relativeTo: item });
   return { ...equipmentEntry(item), name: item.name,
-    properties: item.system.properties ?? "",
-    description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description ?? "", { secrets, relativeTo: item }) };
+    // Full alchemy descriptions already include the rules paragraph. Keep the separate
+    // properties line only when it adds information, including for older/custom items.
+    properties: properties && !description.includes(properties) ? properties : "",
+    description };
 }
 export async function toggleItemDescription(_event, target) {
   this.expandedInventoryItems ??= new Set();
