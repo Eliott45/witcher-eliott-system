@@ -12,6 +12,7 @@
       </nav>
       <p class="witcher-advancement-rule">{{rules}}</p>
       <p class="witcher-advancement-note">{{localize "WITCHER.Advancement.SessionRule"}}</p>
+      {{#if magicPoints}}<p class="witcher-advancement-note">Магические О.У.: <b>{{magicPoints}}</b>. Используются первыми для Сотворения, Ритуалов и Порч.</p>{{/if}}
       {{#if editable}}
       <details class="witcher-advancement-adjust">
         <summary><i class="fa-solid fa-pen" aria-hidden="true"></i> {{localize "WITCHER.Advancement.Adjust"}}</summary>
@@ -55,6 +56,7 @@
       <div><span>{{localize "WITCHER.Advancement.Cost"}} <b>{{cost}}</b></span><span class="{{#if error}}error{{/if}}">{{localize "WITCHER.Advancement.Remaining"}} <b>{{remaining}}</b></span></div>
       <button type="button" class="witcher-advancement-buy" data-action="purchase" {{disabled (not valid)}} {{disabled (not editable)}}><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> {{localize "WITCHER.Advancement.Buy"}}</button>
     </div>
+    {{#if magicSpent}}<p class="witcher-advancement-note">К оплате: {{regularSpent}} обычных + {{magicSpent}} магических О.У. Останется магических: {{magicRemaining}}.</p>{{/if}}
     {{#if error}}<p class="witcher-advancement-error" role="alert">{{error}}</p>{{/if}}
   </footer>
 </div>

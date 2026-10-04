@@ -33,6 +33,16 @@ test("advancement prices every step, including learning complex skills", () => {
   assert.throws(() => advancementCost(2, 1));
   assert.throws(() => advancementCost(1, 1.5));
 });
+test("restricted magic points cannot buy physical skills and participate in the guarded advancement transaction",async()=>{
+  const a=actor();a.system.experience=1;a.system.magic={improvementPoints:10};
+  let plan=advancementPlan(a,{"skill:spellCasting":1,"skill:athletics":1});
+  assert.equal(plan.valid,true);assert.equal(plan.magicSpent,2);assert.equal(plan.regularSpent,1);assert.equal(plan.remaining,0);
+  plan=advancementPlan(a,{"skill:athletics":3});assert.equal(plan.valid,false);assert.equal(plan.magicSpent,0);
+  const expected=advancementFingerprint(a);await purchaseAdvancement(a,{"skill:spellCasting":1,"skill:athletics":1},expected);
+  assert.equal(a.system.magic.improvementPoints,8);assert.equal(a.system.experience,0);
+  assert.equal(a.updates.length,1);assert.equal(a.system.skills.spellCasting,1);
+  await assert.rejects(purchaseAdvancement(a,{"skill:spellCasting":2},expected),/Stale/);
+});
 
 test("lifepath ranks affect price and cap while racial perks remain bonuses", () => {
   const a = actor(); a.system.details.origin = "redania";

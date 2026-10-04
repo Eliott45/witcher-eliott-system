@@ -13,6 +13,7 @@ export function purchaseAdvancement(actor, selection, expected, localize = key =
     const plan = advancementPlan(actor, selection, localize);
     if (!plan.valid) throw new Error(localize(`WITCHER.Advancement.${plan.errors[0] ?? "Invalid"}`));
     const update = { "system.experience": plan.remaining };
+    if(plan.magicSpent)update["system.magic.improvementPoints"]=plan.magicRemaining;
     for (const row of plan.changes) {
       if (row.kind === "skills") update[`system.skills.${row.key}`] = row.target;
       else if (row.kind === "attributes") update[`system.attributes.${row.key}`] = row.target;

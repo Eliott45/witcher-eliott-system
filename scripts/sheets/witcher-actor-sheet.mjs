@@ -1,4 +1,5 @@
 import { magicContext, magicActions, bindMagic, learnSpell } from "./magic-context.mjs";
+import { learningContext, learningActions } from "./learning-context.mjs";
 import { transportContext, transportActions, bindTransport } from "./transport-context.mjs";
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
 import { openAdvancement } from "./advancement-window.mjs";
@@ -47,7 +48,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
-      ...effectActions, ...transportActions, ...magicActions,
+      ...effectActions, ...transportActions, ...magicActions, ...learningActions,
       ...workshopActorActions,
       openAdvancement,
       toggleExperience: WitcherActorSheet.#onToggleExperience,
@@ -136,6 +137,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       }, { query: this.#skillQuery, editing: this.isEditable && this.#editingSkills }),
       abilities: await abilitiesContext(this.actor),
       magic: await magicContext(this.actor),
+      learning: learningContext(this.actor),
       inventory, transport: transportContext(this.actor,inventory,this.selectedTransportId),
       workshop: await workshopActorContext(this.actor),
       abilitiesOpen: !preferences.collapsed?.abilities,

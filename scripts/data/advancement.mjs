@@ -2,6 +2,7 @@ import { ATTRIBUTE_KEYS } from "./statistics.mjs";
 import { SKILLS } from "./skills.mjs";
 import { LANGUAGES, languageForEntry } from "./languages.mjs";
 import { getProfession, professionPrerequisite } from "./professions.mjs";
+import { magicPayment,magicAdvancement } from "../magic/improvement-points.mjs";
 
 /** Book pp. 59, 61: each step uses its old rank; learning a skill starts at one IP. */
 export function advancementCost(from, to, multiplier = 1) {
@@ -46,7 +47,7 @@ export function advancementEntries(actor, localize = key => key) {
 
 // Only advancement-relevant data: wounds, current pools and dice cannot invalidate a plan.
 export function advancementFingerprint(actor) {
-  return JSON.stringify([actor.system.experience ?? 0, actor.system.details.profession,
+  return JSON.stringify([actor.system.experience ?? 0, actor.system.magic?.improvementPoints??0, actor.system.details.profession,
     advancementEntries(actor).map(({ id, base, ranks, itemId }) => [id, base, ranks, itemId])]);
 }
 
@@ -69,7 +70,7 @@ export function advancementPlan(actor, selection, localize) {
     changes.push({ ...row, target, to: target + row.ranks, steps, cost: steps.reduce((sum, cost) => sum + cost, 0) });
   }
   const cost = changes.reduce((sum, row) => sum + row.cost, 0);
-  const points = actor.system.experience ?? 0;
-  if (cost > points) errors.push("Insufficient");
-  return { entries, changes, cost, points, remaining: points - cost, errors, valid: changes.length > 0 && errors.length === 0 };
+  const payment=magicPayment(actor,cost,changes.filter(magicAdvancement).reduce((sum,row)=>sum+row.cost,0));
+  if (payment.remaining<0) errors.push("Insufficient");
+  return { entries, changes, cost, ...payment, errors, valid: changes.length > 0 && errors.length === 0 };
 }

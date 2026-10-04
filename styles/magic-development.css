@@ -22,3 +22,51 @@
 .witcher-power-risk {padding:10px 12px;border-left:3px solid #b58954;background:#e7dcc8;color:#624a31;}
 .witcher-power-body .witcher-power-draw {background:var(--power-accent);color:#fff3db;border:0;min-height:40px;}
 .witcher-power-active {display:flex;align-items:center;gap:8px;padding:10px 12px;background:#dce3d9;border:1px solid #aab89f;border-radius:4px;margin-bottom:8px;color:#43543d;font-size:12px;flex-wrap:wrap;}
+.witcher-learning {color:#453c30;font-size:13px;}
+.witcher-learning :is(h2,h3) {color:#743d36;font-family:Georgia,serif;text-shadow:none;border:0;margin:0;}
+.witcher-learning h2 {font-size:25px;line-height:1.25;}
+.witcher-learning h3 {font-size:21px;}
+.witcher-learning-heading {display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px;}
+.witcher-learning-heading h2>i {font-size:20px;margin-right:5px;}
+.witcher-learning-balance {flex:none;display:flex;flex-direction:column;gap:4px;text-align:right;padding:10px 14px;border-left:2px solid #b69a68;}
+.witcher-learning-balance strong {font:25px Georgia,serif;color:#754338;}
+.witcher-learning-balance small {font:12px sans-serif;}
+.witcher-learning-balance>span {font-size:12px;color:#7a6849;}
+.witcher-study-empty {padding:28px 20px;text-align:center;border:1px solid #cabc9f;border-radius:8px;background:radial-gradient(ellipse at top,#fffaf0,#e9e1d1);}
+.witcher-study-emblem {display:grid;place-items:center;width:58px;height:58px;margin:0 auto 16px;border-radius:50%;border:1px solid #ae9260;color:#947444;font-size:25px;box-shadow:0 0 0 7px #b99b6220;}
+.witcher-study-empty p {margin:12px auto 18px;color:#7d6b53;line-height:1.6;}
+.witcher-learning button {width:auto;min-height:32px;height:auto;padding:7px 12px;border:1px solid #bda980;background:#f7f0e1;color:#62472f;font-size:12px;border-radius:4px;box-shadow:none;}
+.witcher-learning .witcher-study-primary {background:#756084;color:#fff4e0;border-color:#756084;padding:10px 16px;transition:background .18s,transform .18s;}
+.witcher-learning .witcher-study-primary:hover:not(:disabled) {background:#5d466e;transform:translateY(-1px);}
+.witcher-learning button:disabled {opacity:.5;cursor:default;}
+.witcher-study-empty small {display:block;margin:14px auto 0;max-width:410px;color:#876a50;}
+.witcher-learning-reference {margin-top:20px;border-top:1px solid #cabc9f;padding-top:12px;}
+.witcher-learning-reference summary {color:#866742;cursor:pointer;}
+.witcher-learning-reference table {background:transparent;border:1px solid #cabc9f;margin:14px 0;font-size:12px;}
+.witcher-learning-reference th {background:#71614d;color:#fff3dc;padding:8px;text-align:left;}
+.witcher-learning-reference td {padding:7px 8px;}
+.witcher-learning-reference :is(p,small) {color:#7c6c56;line-height:1.5;}
+.witcher-study-card {border:1px solid #c8b89c;border-top:3px solid #756084;background:#fbf7ee;border-radius:6px;padding:18px;animation:witcher-study-reveal .2s ease-out;}
+.witcher-study-card>header {display:flex;gap:10px;align-items:center;justify-content:space-between;}
+.witcher-study-card>header span {font-size:10px;color:#8b7251;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:5px;}
+.witcher-study-teacher {color:#85704f;}
+.witcher-study-progress {display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0;}
+.witcher-study-progress label {display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.witcher-study-progress b {color:#735983;white-space:nowrap;}
+.witcher-study-progress progress {display:block;width:100%;height:8px;border:0;border-radius:5px;overflow:hidden;accent-color:#88709a;}
+.witcher-study-progress progress::-webkit-progress-bar {background:#e6ded0;}
+.witcher-study-progress progress::-webkit-progress-value {background:#88709a;transition:width .2s;}
+.witcher-study-summary {display:flex;flex-direction:column;gap:7px;padding:12px;background:#ece4d6;border-radius:4px;font-size:12px;}
+.witcher-study-summary b {color:#614932;}
+.witcher-study-card footer {margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;}
+.witcher-study-card footer p {flex-basis:100%;color:#817054;font-size:12px;line-height:1.5;}
+.witcher-learning .witcher-study-cancel {margin-left:auto;background:transparent;border-color:transparent;color:#93776a;}
+.witcher-study-metrics {display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0;}
+.witcher-study-metrics>div {display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;background:#e9dfcc;border-radius:5px;}
+.witcher-study-metrics strong {font:25px Georgia,serif;color:#765682;}
+.witcher-study-metrics span {font-size:11px;color:#836947;}
+.witcher-learning-dialog .witcher-learning label {display:flex;flex-direction:column;gap:6px;}
+.witcher-learning-dialog .witcher-learning input {width:100%;background:#fbf7ee;border:1px solid #b9a688;color:#453c30;}
+@keyframes witcher-study-reveal {from {opacity:0;transform:translateY(4px);}to {opacity:1;transform:translateY(0);}}
+@media(prefers-reduced-motion:reduce){.witcher-study-card {animation:none;}.witcher-learning .witcher-study-primary,.witcher-study-progress progress::-webkit-progress-value {transition:none;}}
+@container witcher-sheet (max-width:700px){.witcher-learning-heading{flex-wrap:wrap}.witcher-study-progress{grid-template-columns:1fr}.witcher-learning h2{font-size:22px}}

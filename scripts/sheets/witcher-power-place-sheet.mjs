@@ -26,6 +26,6 @@ export class WitcherPowerPlaceSheet extends foundry.applications.api.HandlebarsA
       elements:Object.entries(POWER_ELEMENTS).map(([id,row])=>({id,...row,selected:id===this.actor.system.element})),
       customers:actors.map(a=>({uuid:a.uuid,name:a.name,selected:a.uuid===this.customerUuid})),visit,canDraw:Boolean(actor&&this.actor.system.available),magicPoints:actor?.system.magic.improvementPoints??0};
   }
-  _onRender(context,options){super._onRender(context,options);this.element.querySelector('[data-power-customer]').addEventListener('change',event=>{this.customerUuid=event.target.value;this.render();});}
+  async _onRender(context,options){await super._onRender(context,options);this.element.querySelector('[data-power-customer]').addEventListener('change',event=>{this.customerUuid=event.target.value;this.render();});}
   _toggleDisabled(disabled){super._toggleDisabled(disabled);for(const control of this.element.querySelectorAll('[data-power-customer],[data-power-prepared],[data-power-reward]'))control.disabled=false;this.element.querySelector('[data-action=drawPower]').disabled=!this.customerUuid||!this.actor.system.available;}
 }

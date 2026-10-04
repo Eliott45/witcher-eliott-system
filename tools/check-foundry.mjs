@@ -479,7 +479,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -520,6 +520,21 @@ const powerCharacter=new WitcherActorData({...legacyActorData.toObject(),magic:{
 const reopenedPowerCharacter=new WitcherActorData(JSON.parse(JSON.stringify(powerCharacter.toObject())));
 assert.equal(reopenedPowerCharacter.magic.improvementPoints,10);
 assert.equal(reopenedPowerCharacter.magic.powerVisits[0].saves,1);
+assert.equal(legacyActorData.magic.study.sourceUuid,"");
+powerCharacter.updateSource({"magic.study":{id:"studynative00001",sourceUuid:"Compendium.witcher-eliott-system.spells.Item.test",sourceName:"Зеркало Афана",teacher:"Книга из Аретузы",skill:"spellCasting",cost:10,baseDays:4,dc:14,required:2,days:2,successes:1,failures:1,regularSpent:4,magicSpent:6}});
+const studyRestored=new WitcherActorData(JSON.parse(JSON.stringify(powerCharacter.toObject())));
+assert.equal(studyRestored.magic.study.teacher,"Книга из Аретузы");assert.equal(studyRestored.magic.study.failures,1);assert.equal(studyRestored.magic.study.magicSpent,6);
+const {learningContext}=await import("../scripts/sheets/learning-context.mjs");
+const learningTemplate=handlebars.compile(await readFile(new URL("../templates/learning.hbs",import.meta.url),"utf8"),{strict:true});
+assert.match(learningTemplate({learning:learningContext(sheet.actor),editable:true}),/Выбрать магию для изучения/);
+const learningHTML=learningTemplate({learning:learningContext({...sheet.actor,system:studyRestored}),editable:true});
+assert.match(learningHTML,/День занятий/);assert.match(learningHTML,/Книга из Аретузы/);
+assert.match(learningHTML,/2 \/ 5/);
+const learnedActor=new foundry.documents.BaseActor({name:"Ученица",type:"character",system:studyRestored.toObject()});
+const {spellSources:studySpellSources}=await import("../scripts/data/spells.mjs");
+learnedActor.updateSource({"system.magic.study.sourceUuid":"",items:[studySpellSources()[0]]});
+const learnedRestored=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(learnedActor.toObject())));
+assert.equal(learnedRestored.items.size,1);assert.equal(learnedRestored.system.magic.study.sourceUuid,"");
 const magicRoundTrip = new WitcherActorData({...legacyActorData.toObject(),magic:{roundKey:"combat:2",spent:7,sustainedId:"spell00000000001",maintainedRound:"combat:2",sustainedCost:5}});
 const magicRestored = new WitcherActorData(JSON.parse(JSON.stringify(magicRoundTrip.toObject())));
 assert.equal(magicRestored.magic.spent,7);assert.equal(magicRestored.health.value,legacyActorData.health.value);
