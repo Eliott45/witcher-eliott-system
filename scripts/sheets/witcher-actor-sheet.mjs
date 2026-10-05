@@ -176,7 +176,6 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
         section("parents", "biography.family.parents", "Parents", 5),
         section("siblings", "biography.family.siblings", "Siblings", 5)
       ],
-      originExcluded: this.actor.system.details.race === "witcher" && Boolean(this.actor.system.details.origin),
       typeLabel: `TYPES.Actor.${this.actor.type}`
     });
   }
