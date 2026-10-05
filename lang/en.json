@@ -715,7 +715,18 @@
       "Success": "Critical success",
       "Fumble": "Critical failure",
       "FirstOne": "The first 1 starts the chain and does not count toward the total.",
-      "Total": "Check total"
+      "Total": "Check total",
+      "Manual": {
+        "Success": "Critical success · continuation",
+        "Fumble": "Critical fumble · continuation",
+        "Pending": "The check is not complete. Roll the next d10.",
+        "Complete": "Chain complete. See the final check message for its total.",
+        "Cancelled": "Roll cancelled. No resources spent.",
+        "Interrupted": "The connection interrupted this chain. Make the check again.",
+        "Continue": "Roll another 1d10",
+        "Cancel": "Cancel",
+        "LuckLocked": "Finish the critical chain first. Select Luck before rolling."
+      }
     },
     "Death": {
       "Roll": "Death save",
@@ -1340,6 +1351,13 @@
     },
     "Magic": {
       "Title": "Magic"
+    },
+    "Settings": {
+      "AutomaticCriticalDice": "Roll critical chains automatically",
+      "AutomaticCriticalDiceHint": "On: natural 1/10 chains continue automatically. Off: click + in chat for each additional d10. Ordinary dice and Stun saves are unchanged.",
+      "Language": "System language",
+      "LanguageHint": "Language of translated system labels for this user. Foundry itself is unchanged. Catalog content and untranslated sections remain in Russian. Requires reload.",
+      "FoundryLanguage": "Use Foundry language"
     }
   }
 }

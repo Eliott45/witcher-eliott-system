@@ -672,3 +672,10 @@
 .witcher-eliott.reference-sheet .witcher-item-tab prose-mirror.active {min-height:320px;}
 .witcher-transport-fleet button {height:auto;min-height:50px;line-height:1.25;}
 .witcher-transport-stats input {color:#342d26;background:#faf6ee;border:1px solid #c6b798;}
+.witcher-manual-critical {padding:9px 10px;border-left:3px solid #937447;background:#c7b69322;}
+.witcher-manual-critical .witcher-chain-path {margin:8px 0;flex-wrap:wrap;gap:6px;}
+.witcher-manual-critical small {display:block;line-height:1.4;}
+.witcher-critical-controls {display:flex;gap:7px;margin:9px 0;}
+.witcher-critical-controls button {height:auto;min-height:34px;padding:7px 10px;white-space:normal;line-height:1.2;}
+.witcher-critical-controls .witcher-critical-continue {flex:1;background:#795139;color:#fff4df;border:1px solid #af8956;font-weight:700;}
+.witcher-critical-controls .witcher-critical-cancel {flex:0 0 auto;font-size:11px;}

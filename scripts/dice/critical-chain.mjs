@@ -1,4 +1,6 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { automaticCriticalDice } from "../settings.mjs";
+import { beginManualCritical } from "../chat/manual-critical.mjs";
 
 // Same safety ceiling as Foundry's recursive exploding dice. Never silently
 // truncate a chain and present an incomplete result as a finished check.
@@ -18,17 +20,28 @@ export async function witcherCritical(modifier) {
     const negative = first.result === 1;
     const chain = { kind: negative ? "fumble" : "critical", results: [first.result], total: negative ? 0 : 10 };
     if (negative) first.count = 0;
+    const manual = automaticCriticalDice() ? null : await beginManualCritical(first, chain);
     let previous = first;
-    for (let step = 0; ; step++) {
-      if (step >= MAX_CONTINUATIONS) throw new Error("Maximum Witcher critical chain length exceeded");
-      // DSN uses the native exploded marker to animate successive throws in order.
-      previous.exploded = true;
-      const next = await this.roll({ explode: true });
-      if (negative) next.count = -next.result;
-      chain.results.push(next.result);
-      chain.total += negative ? -next.result : next.result;
-      if (next.result !== 10) break;
-      previous = next;
+    let failure;
+    try {
+      for (let step = 0; ; step++) {
+        if (step >= MAX_CONTINUATIONS) throw new Error("Maximum Witcher critical chain length exceeded");
+        await manual?.wait();
+        // DSN uses the native exploded marker to animate successive throws in order.
+        previous.exploded = true;
+        const next = await this.roll({ explode: true });
+        if (negative) next.count = -next.result;
+        chain.results.push(next.result);
+        chain.total += negative ? -next.result : next.result;
+        await manual?.show(next, next.result !== 10);
+        if (next.result !== 10) break;
+        previous = next;
+      }
+    } catch (error) {
+      failure = error;
+      throw error;
+    } finally {
+      await manual?.close(failure);
     }
     chains.push(chain);
   }

@@ -1,4 +1,6 @@
 import { WitcherSpellData } from "./data/witcher-spell-data.mjs";
+import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from "./settings.mjs";
+import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
 import { migrateBestiaryContent,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
 import { registerWeaponChat } from "./combat/weapon-rolls.mjs";
 import { WitcherPowerPlaceData } from "./data/witcher-power-place-data.mjs";
@@ -47,6 +49,8 @@ import { preventIncapacitatedMovement, preventIncapacitatedPositionUpdate } from
 import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
 
 Hooks.once("init", async () => {
+  registerSystemSettings();
+  registerManualCriticalChat();
   const templatesReady = foundry.applications.handlebars.loadTemplates(["combat-actions", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Actor.documentClass = WitcherActor;
@@ -125,7 +129,7 @@ Hooks.on("preUpdateCombat", prepareDeathRound);
 Hooks.on("updateCombat", applyDeathRound);
 Hooks.on("preMoveToken", preventIncapacitatedMovement);
 Hooks.on("preUpdateToken", preventIncapacitatedPositionUpdate);
-Hooks.once("i18nInit", localizeStatusEffects);
+Hooks.once("i18nInit", () => {applyLoadedLanguage();localizeStatusEffects();});
 Hooks.on("renderTokenHUD", renderTokenVisionToggle);
 Hooks.on("renderChatInput", renderDiceTray);
 // Round usage is derived from the combat key. Refresh open sheets without writing Actor data.
@@ -135,7 +139,8 @@ Hooks.on("updateCombat", (_combat,changes) => {
     if ((app instanceof WitcherActorSheet || app instanceof WitcherNPCSheet) && app.rendered) app.render({force:false});
   }
 });
-Hooks.once("ready", () => {
+Hooks.once("ready", async () => {
+  await ensureSystemLanguage();localizeStatusEffects();
   migrateBestiaryContent().catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось восстановить предметы бестиария. Подробности в консоли.");});
   migrateSpellContent().catch(error=>{
     console.error(`${SYSTEM_ID} | Could not update magic content`,error);

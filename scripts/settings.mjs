@@ -1,0 +1,25 @@
+import { SYSTEM_ID } from "./config.mjs";
+
+let languageLoad=Promise.resolve(null),languageData;
+export function registerSystemSettings() {
+  game.settings.register(SYSTEM_ID,"automaticCriticalDice",{
+    name:"WITCHER.Settings.AutomaticCriticalDice",hint:"WITCHER.Settings.AutomaticCriticalDiceHint",
+    scope:"world",config:true,type:Boolean,default:true
+  });
+  game.settings.register(SYSTEM_ID,"systemLanguage",{
+    name:"WITCHER.Settings.Language",hint:"WITCHER.Settings.LanguageHint",scope:"client",config:true,
+    type:String,default:"",choices:{"":"WITCHER.Settings.FoundryLanguage",ru:"Русский",en:"English"},requiresReload:true
+  });
+  const language=game.settings.get(SYSTEM_ID,"systemLanguage");
+  if(["ru","en"].includes(language))languageLoad=fetch(`systems/${SYSTEM_ID}/lang/${language}.json`)
+    .then(response=>{if(!response.ok)throw new Error(`Language HTTP ${response.status}`);return response.json();})
+    .then(data=>{languageData=data;return data;}).catch(error=>{console.error(`${SYSTEM_ID} | Language`,error);return null;});
+}
+export function applyLoadedLanguage() {
+  if(languageData)foundry.utils.mergeObject(game.i18n.translations,languageData,{inplace:true});
+}
+export async function ensureSystemLanguage() {await languageLoad;applyLoadedLanguage();}
+export function automaticCriticalDice() {
+  // Core schema tests and rolls evaluated before init keep the established automatic behavior.
+  try{return globalThis.game?.settings?.get(SYSTEM_ID,"automaticCriticalDice")!==false;}catch{return true;}
+}

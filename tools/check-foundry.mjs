@@ -1205,6 +1205,12 @@ if (process.argv[3]) {
     assert.deepEqual(Array.from(notation.throws, entry => Array.from(entry.dice, die => die.result)), sequence.map(result => [result]),
       "DSN must receive the complete chain as successive throws of the original natural faces");
     assert.ok(notation.throws.every(entry => entry.dice.every(die => die.type === "d10")));
+    const shown=CoreRoll.fromData(data);
+    for(const die of shown.dice)for(const result of die.results)result.hidden=true;
+    const manualNotation=new DiceNotation(shown);
+    assert.equal(manualNotation.throws.flatMap(entry=>entry.dice).length,0,"Already animated manual faces must not replay with the final message");
+    assert.equal(shown.total,CoreRoll.fromData(data).total,"DSN visibility must not alter the check");
+    assert.equal(shown.dice[0].getTooltipData().rolls.length,sequence.length,"Manual faces remain in the native chat tooltip");
   }
   console.log("Installed Dice So Nice: all nine critical chains produce the correct successive d10 throws");
 }
@@ -1267,3 +1273,9 @@ game.items=priorWorldItems;
 game.user=creatureTestGlobals.user;foundry.utils.fromUuid=creatureTestGlobals.fromUuid;
 
 console.log(`Installed Foundry core: data, ${documents.size} compendium documents, templates, native Luck, death saves and all nine critical chains OK`);
+const {faceRoll}=await import('../scripts/chat/manual-critical.mjs');
+for(const face of [1,4,10]) {
+  const display=faceRoll(face);
+  assert.equal(display.total,face);assert.equal(display.dice[0].results[0].result,face);
+  assert.equal(CoreRoll.fromData(display.toJSON()).total,face);
+}

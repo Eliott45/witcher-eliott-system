@@ -29,6 +29,7 @@ import { requestEffectSave } from "../combat/condition-saves.mjs";
 import { effectsContext, effectActions } from "./effects-context.mjs";
 import { rollAttribute } from "../combat/attribute-roll.mjs";
 import { selectLuckPoints } from "../data/luck.mjs";
+import { hasPendingCritical } from "../chat/manual-critical.mjs";
 import { DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS } from "../combat/status-effects.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { recoverStamina } from "../combat/exhaustion.mjs";
@@ -442,6 +443,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
 
   static async #onLuck(_event, target) {
     if (!this.isEditable) return;
+    if(hasPendingCritical()){ui.notifications.warn(game.i18n.localize("WITCHER.Critical.Manual.LuckLocked"));return;}
     const number = Number(target.dataset.point);
     const reset = target.dataset.action === "resetLuck";
     const work = this.#luckWrites.then(async () => {
