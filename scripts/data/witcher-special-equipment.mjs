@@ -2,19 +2,25 @@ import { weaponRecord } from "./equipment-records.mjs";
 import { AMMUNITION_ICON } from "./core-ammunition.mjs";
 
 const unpriced = { "witcher-eliott-system": { priceUnavailable: true } };
-const relic = (id, row, page, description) => {
+const specialWeapon = (id, row, page, description) => {
   const item = weaponRecord(id, row, `Базовая книга, стр. ${page}; официальная errata v4`);
   item.flags = structuredClone(unpriced);
   item.system.description = `<p>${description}</p>`;
   return item;
 };
 
-/** Core equipment needed by the page 12 pregen, using the existing physical Item types. */
+/** Witcher equipment and pregen relics, using the existing physical Item types. */
 export const WITCHER_SPECIAL_EQUIPMENT = [
-  relic("relicWolf0000001", ["wolf", "Волк", "swordsmanship", "Р/К", 2, "u", "7d6", 15, 2, 0, 0, "none", 3, 4, 0,
+  specialWeapon("witchSteelSword1", ["witcher-steel-sword", "Стальной ведьмачий меч", "swordsmanship", "К/Р", 0, "u", "4d6+2", 15, 1, 0, 0, "none", 2, 2.5, 0,
+    "Пробивающее броню; Метеоритное"], 247,
+    "Одноручный меч из метеоритной стали — один из двух клинков ведьмака. Пробивает сопротивление брони режущему и колющему урону; ПБ по-прежнему защищает от удара."),
+  specialWeapon("witchSilvSword01", ["witcher-silver-sword", "Серебряный ведьмачий меч", "swordsmanship", "К/Р", 0, "u", "1d6+2", 10, 1, 0, 0, "none", 2, 1.5, 0,
+    "Серебряное (3d6)"], 247,
+    "Серебряный клинок для охоты на чудовищ. Мягкий металл наносит меньше обычного урона, но по существам, уязвимым к серебру, дополнительно наносит [[/r 3d6]] серебряного урона."),
+  specialWeapon("relicWolf0000001", ["wolf", "Волк", "swordsmanship", "Р/К", 2, "u", "7d6", 15, 2, 0, 0, "none", 3, 4, 0,
     "Реликвия; Пробивающее броню; Кровопускающее (75%)"], 258,
     "Стальной полуторный меч с островов Скеллиге, связанный с легендой об Уффе Кровавобородом. Историю можно вспомнить Образованием СЛ 16. Игнорирует сопротивление брони типу урона; при нанесении урона вызывает кровотечение с вероятностью 75%."),
-  relic("relicMoonBlade01", ["moon-blade", "Лунный клинок", "swordsmanship", "Р/К", 1, "u", "3d6", 10, 2, 0, 0, "none", 3, 4, 0,
+  specialWeapon("relicMoonBlade01", ["moon-blade", "Лунный клинок", "swordsmanship", "Р/К", 1, "u", "3d6", 10, 2, 0, 0, "none", 3, 4, 0,
     "Реликвия; Серебряное (7d6+4); Улучшенное фокусирующее"], 263,
     "Серебряный полуторный меч из легенды о ведьмаке Олеке и демоне из Элландера. История: Образование СЛ 18. По уязвимым к серебру чудовищам дополнительно наносит [[/r 7d6+4]] серебряного урона. Улучшенное фокусирующее повышает на 2 СЛ проверок против заклинаний, сотворённых с этим оружием (стр. 72). Серебряный урон применяется отдельно от обычного."),
   { id: "armor.raven", documentId: "relicRavenArmor1", name: "Доспехи Ворона", type: "armor", source: "armor", flags: unpriced,

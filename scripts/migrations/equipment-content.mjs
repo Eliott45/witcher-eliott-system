@@ -12,7 +12,7 @@ import { TOOL_RULES } from "../data/tool-rules.mjs";
 import { CORE_GENERAL_ADDITIONS, GENERAL_GEAR_RULES } from "../data/general-gear.mjs";
 import { generalGearDescriptionUpdate } from "./general-gear-descriptions.mjs";
 import { specialEquipmentDescriptionUpdate } from "./special-equipment-descriptions.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 12;
+export const EQUIPMENT_CONTENT_VERSION = 13;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {

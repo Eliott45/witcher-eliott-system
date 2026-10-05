@@ -33,6 +33,7 @@ export function consumptionPlan(item) {
 }
 
 export const consumedDose = effect => effect.flags?.[SYSTEM_ID]?.consumable;
+export const doseToxicity = effect => Math.max(0, Number(consumedDose(effect)?.toxicity) || 0);
 export const activeDoses = actor => Array.from(actor.effects ?? []).filter(effect => activeEffect(effect) && consumedDose(effect));
 export const hasDose = (actor, ruleId) => activeDoses(actor).some(effect => consumedDose(effect).ruleId === ruleId);
 export function toxicityState(actor) {
@@ -40,8 +41,9 @@ export function toxicityState(actor) {
   const rank = witcher && actor.system.details?.profession === "witcher"
     ? Math.min(10, Math.max(0, Number(Array.from(actor.items ?? []).find(item => item.type === "ability" && item.system.ruleId === "profession.witcher.iron-stomach")?.system.level) || 0)) : 0;
   const limit = 100 + (rank === 10 ? 50 : Math.ceil(rank / 2) * 5);
-  const value = activeDoses(actor).reduce((sum, effect) => sum + Math.max(0, Number(consumedDose(effect).toxicity) || 0), 0);
-  return { value, limit, witcher, visible: witcher || value > 0, overloaded: value > limit, percent: Math.min(100, value / limit * 100) };
+  const value = activeDoses(actor).reduce((sum, effect) => sum + doseToxicity(effect), 0);
+  const poisoned = Array.from(actor.effects ?? []).some(effect => activeEffect(effect) && effect.flags?.[SYSTEM_ID]?.toxicity);
+  return { value, limit, witcher, poisoned, visible: witcher || value > 0, overloaded: value > limit, percent: Math.min(100, value / limit * 100) };
 }
 const modifiers = {
   "potion.petri": ["spellCasting", "hexWeaving", "ritualCrafting"].map(skill => ({ target: `skills.${skill}`, value: 2 })),

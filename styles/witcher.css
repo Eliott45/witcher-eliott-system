@@ -45,7 +45,17 @@
   .is-dying .witcher-death-state h3 > i { animation: none; }
 }
 .witcher-character-sidebar { min-height: 0; overflow-y: auto; background: linear-gradient(155deg, #482021, #241718); border-right: 2px solid #b39a67; padding: 22px 16px; }
-.witcher-brand { font-family: Georgia, serif; font-size: 20px; letter-spacing: 0.08em; color: #e0cc9e; padding-bottom: 14px; text-align: center; }
+.witcher-sidebar-toxicity { margin: -4px 0 16px; color: #e5ead1; }
+.witcher-toxicity-heading, .witcher-toxicity-caption { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.witcher-toxicity-heading > span { font-size: 13px; }
+.witcher-toxicity-heading output { font-size: 26px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.witcher-toxicity-heading small { font-size: 14px; margin-left: 2px; }
+.witcher-sidebar-toxicity progress { display: block; width: 100%; height: 7px; margin: 7px 0; accent-color: #b5c68b; }
+.witcher-toxicity-caption { flex-wrap: wrap; font-size: 11px; color: #cebc9a; }
+.witcher-sidebar-toxicity.is-overloaded { color: #ffbf9e; }
+.witcher-sidebar-toxicity.is-overloaded progress { accent-color: #ee9f74; }
+.witcher-toxicity-caption strong { color: #ffbf9e; font-weight: 600; }
+.witcher-effect-toxicity { color: #354b28; background: #e4e8d5; border: 1px solid #adb898; border-radius: 4px; padding: 5px 8px; }
 .witcher-character-sidebar .witcher-resources { display: flex; flex-direction: column; gap: 12px; }
 .witcher-character-sidebar .witcher-resource { border: 0; margin: 0; padding: 5px 0 0; min-width: 0; border-top: 1px solid #b39a6770; }
 .witcher-character-sidebar legend { color: #e0cc9e; padding: 0 4px 0 0; font-family: Georgia, serif; font-size: 16px; }

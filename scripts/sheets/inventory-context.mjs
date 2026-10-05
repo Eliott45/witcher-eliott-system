@@ -59,7 +59,7 @@ export function inventoryContext(actor, preferences = {}) {
   const sortRows = rows => rows.sort((a, b) => a.sort - b.sort || a.name.localeCompare(b.name, "ru"));
   for (const row of rows) sortRows(row.children);
   const weight = carriedWeight(items), capacity = actor.system?.statistics?.carryMax;
-  return { weight, toxicity: toxicityState(actor), capacity: capacity ?? "—", overloaded: capacity != null && weight > capacity,
+  return { weight, toxicity: toxicityState(actor), showToxicity: actor.type === "npc", capacity: capacity ?? "—", overloaded: capacity != null && weight > capacity,
     loadPercent: capacity > 0 ? Math.min(100, weight / capacity * 100) : weight > 0 && capacity === 0 ? 100 : 0,
     categories: EQUIPMENT_CATEGORIES, items: rows,
     groups: GROUPS.map(group => ({ ...group, open: !preferences.collapsed?.[`inventory-${group.id}`],

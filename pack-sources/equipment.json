@@ -6511,6 +6511,88 @@
     "flags": {}
   },
   {
+    "_id": "witchSteelSword1",
+    "name": "Стальной ведьмачий меч",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.witcher-steel-sword",
+      "skill": "swordsmanship",
+      "damageType": "К/Р",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "4d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 0,
+      "properties": "Пробивающее броню; Метеоритное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 247; официальная errata v4",
+      "description": "<p>Одноручный меч из метеоритной стали — один из двух клинков ведьмака. Пробивает сопротивление брони режущему и колющему урону; ПБ по-прежнему защищает от удара.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "witchSilvSword01",
+    "name": "Серебряный ведьмачий меч",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.witcher-silver-sword",
+      "skill": "swordsmanship",
+      "damageType": "К/Р",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "1d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 1.5,
+      "price": 0,
+      "properties": "Серебряное (3d6)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 247; официальная errata v4",
+      "description": "<p>Серебряный клинок для охоты на чудовищ. Мягкий металл наносит меньше обычного урона, но по существам, уязвимым к серебру, дополнительно наносит [[/r 3d6]] серебряного урона.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
     "_id": "relicWolf0000001",
     "name": "Волк",
     "type": "weapon",

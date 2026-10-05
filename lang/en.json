@@ -23,6 +23,12 @@
     }
   },
   "WITCHER": {
+    "Toxicity": {
+      "Title": "Toxicity",
+      "Limit": "Limit",
+      "Poisoned": "Poisoned",
+      "Hint": "Combined toxicity of active potions and decoctions. Exceeding the limit poisons a witcher. A DC 18 Endurance check ends the poisoning and the last dose; falling below the limit also ends the poisoning. Iron Stomach raises the limit."
+    },
     "Visor": {
       "Up": "Visor raised",
       "Down": "Visor lowered",

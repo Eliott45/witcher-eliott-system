@@ -4,7 +4,7 @@ import { SYSTEM_ID } from "../scripts/config.mjs";
 import { consumableContext, consumptionPlan, potionEffectSource, toxicityState, activeDoses, potionImmunity } from "../scripts/data/consumables.mjs";
 import { ALCHEMY, MUTAGENS } from "../scripts/data/workshop-alchemy.mjs";
 import { WITCHER_SPECIAL_EQUIPMENT } from "../scripts/data/witcher-special-equipment.mjs";
-import { consumeOwnedItem, useConsumable, reconcileToxicity, endToxicityPoison } from "../scripts/workshop/consumption.mjs";
+import { consumeOwnedItem, useConsumable, reconcileToxicity, endToxicityPoison, registerConsumption } from "../scripts/workshop/consumption.mjs";
 import { deriveStatistics, ATTRIBUTE_KEYS } from "../scripts/data/statistics.mjs";
 import { specialEquipmentDescriptionUpdate } from "../scripts/migrations/special-equipment-descriptions.mjs";
 
@@ -206,4 +206,60 @@ test("medallion cleanup removes only the shipped Geralt sentence, preserving cus
   assert(!source.system.description.includes("Геральта"));
   const legacy = { system: { ruleId: source.id, description: "<p>Подвеска. У Геральта — медальон школы Волка.</p><p>Моя гравировка.</p>" } };
   assert.equal(specialEquipmentDescriptionUpdate(legacy)["system.description"], "<p>Подвеска.</p><p>Моя гравировка.</p>");
+});
+
+test("100% is safe on intake; established toxicity poisoning persists until below the limit", async () => {
+  environment(); const owner = actor(), swallow = item(owner, "potion.swallow", 2);
+  await consumeOwnedItem(swallow); await consumeOwnedItem(swallow);
+  assert.equal(toxicityState(owner).value, 100); assert.equal(toxicityState(owner).poisoned, false);
+  await consumeOwnedItem(item(owner, "potion.cat"));
+  assert.equal(toxicityState(owner).poisoned, true);
+  const cat = activeDoses(owner).find(effect => effect.flags[SYSTEM_ID].consumable.ruleId === "potion.cat");
+  cat.disabled = true; await reconcileToxicity(owner);
+  assert.equal(toxicityState(owner).value, 100); assert.equal(toxicityState(owner).poisoned, true);
+  activeDoses(owner)[0].duration.expired = true; await reconcileToxicity(owner);
+  assert.equal(toxicityState(owner).value, 50); assert.equal(toxicityState(owner).poisoned, false);
+});
+
+function consumptionHooks() {
+  const hooks = new Map();
+  globalThis.Hooks = { on: (name, callback) => hooks.set(name, callback) };
+  game.users = { activeGM: game.user };
+  registerConsumption();
+  return hooks;
+}
+
+test("dose creation and reactivation reconcile toxicity; editing a timer cannot undo a successful save", async () => {
+  environment(); const hooks = consumptionHooks(), owner = actor();
+  const potion = item(owner, "potion.petri");
+  const doses = await owner.createEmbeddedDocuments("ActiveEffect", [1,2,3].map(sort => ({...potionEffectSource(potion),sort})));
+  doses.forEach(effect => { effect.parent = owner; });
+  await hooks.get("createActiveEffect")(doses[2], {});
+  assert.equal(toxicityState(owner).poisoned, true);
+  await endToxicityPoison(owner, owner.effects.find(effect => effect.flags[SYSTEM_ID].toxicity));
+  await hooks.get("deleteActiveEffect")(doses[2]);
+  assert.equal(toxicityState(owner).value, 150); assert.equal(toxicityState(owner).poisoned, false);
+  await hooks.get("updateActiveEffect")(doses[0], {duration:{value:60}});
+  assert.equal(toxicityState(owner).poisoned, false);
+  doses[0].disabled = true; await hooks.get("updateActiveEffect")(doses[0], {disabled:true});
+  assert.equal(toxicityState(owner).value, 75);
+  doses[0].disabled = false; await hooks.get("updateActiveEffect")(doses[0], {disabled:false});
+  assert.equal(toxicityState(owner).poisoned, true);
+  doses[0].duration.expired = true; await hooks.get("updateActiveEffect")(doses[0], {duration:{expired:true}});
+  assert.equal(toxicityState(owner).poisoned, false);
+});
+
+test("changing Iron Stomach updates poison as well as the displayed limit; other clients do not write", async () => {
+  environment(); const hooks = consumptionHooks(), owner = actor();
+  await consumeOwnedItem(item(owner, "potion.petri", 1)); await consumeOwnedItem(item(owner, "potion.swallow", 1));
+  const ability = item(owner, "profession.witcher.iron-stomach"); ability.type = "ability"; ability.parent = owner;
+  ability.system.level = 10;
+  await hooks.get("updateItem")(ability, {"system.level":10});
+  assert.equal(toxicityState(owner).limit, 150); assert.equal(toxicityState(owner).poisoned, false);
+  ability.system.level = 0;
+  game.user = {id:"other"};
+  await hooks.get("updateItem")(ability, {"system.level":0}); assert.equal(toxicityState(owner).poisoned, false);
+  game.user = game.users.activeGM;
+  await hooks.get("updateItem")(ability, {name:"Мой желудок"}); assert.equal(toxicityState(owner).poisoned, false);
+  await hooks.get("deleteItem")(ability); assert.equal(toxicityState(owner).poisoned, true);
 });

@@ -166,10 +166,28 @@ export function useConsumable(item) {
   return work;
 }
 export function registerConsumption() {
-  const reconcile = effect => {
-    const actor = effect.parent;
+  const reconcile = (actor, newDose = false) => {
     if (actor?.documentName !== "Actor" || game.user !== (game.users.activeGM ?? game.users.find(user => user.active && actor.testUserPermission(user, "OWNER")))) return;
-    if (consumedDose(effect)) inventoryWrite(actor, () => reconcileToxicity(actor, { newDose: consumedDose(effect).ruleId === "potion.golden-oriole" })).catch(error => console.error(`${SYSTEM_ID} | Toxicity`, error));
+    return inventoryWrite(actor, () => reconcileToxicity(actor, { newDose })).catch(error => console.error(`${SYSTEM_ID} | Toxicity`, error));
   };
-  for (const hook of ["deleteActiveEffect", "updateActiveEffect"]) Hooks.on(hook, reconcile);
+  Hooks.on("createActiveEffect", (effect, options) => {
+    if (consumedDose(effect) && !options.witcherRestoreEffects) return reconcile(effect.parent, activeEffect(effect));
+  });
+  Hooks.on("updateActiveEffect", (effect, changes) => {
+    if (!consumedDose(effect)) return;
+    // Editing the clock or auto-save must not reinstate poisoning cured by a save.
+    const activated = changes.disabled === false && activeEffect(effect);
+    return reconcile(effect.parent, activated || consumedDose(effect).ruleId === "potion.golden-oriole");
+  });
+  Hooks.on("deleteActiveEffect", effect => {
+    if (consumedDose(effect)) return reconcile(effect.parent, consumedDose(effect).ruleId === "potion.golden-oriole");
+  });
+  // The profession ability changes the threshold, not the toxicity stored on doses.
+  const reconcileAbility = item => {
+    if (item.type === "ability" && item.system.ruleId === "profession.witcher.iron-stomach") return reconcile(item.parent, true);
+  };
+  for (const hook of ["createItem", "deleteItem"]) Hooks.on(hook, reconcileAbility);
+  Hooks.on("updateItem", (item, changes) => {
+    if (changes["system.level"] !== undefined || changes.system?.level !== undefined) return reconcileAbility(item);
+  });
 }

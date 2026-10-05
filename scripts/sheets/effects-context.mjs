@@ -8,6 +8,7 @@ import { chooseReference } from "./reference-picker.mjs";
 import { editEffectDuration, canEditEffectDuration } from "./effect-duration-editor.mjs";
 import { applyEffectItem } from "../data/effect-items.mjs";
 import { effectCounter, changeEffectCounter } from "../data/effect-counters.mjs";
+import { doseToxicity } from "../data/consumables.mjs";
 
 export async function effectsContext(sheet) {
   return Promise.all(sheet.actor.effects.filter(effect=>!effect.disabled&&!effect.isSuppressed&&!effect.duration?.expired).map(async effect=>{
@@ -17,7 +18,7 @@ export async function effectsContext(sheet) {
     const text=effect.description||definition?.description||"";
     return {id:effect.id,name:legacy?game.i18n.localize(definition.name):effect.name,img:effect.img??definition?.img,inactive:effect.disabled||effect.isSuppressed,
       canRemove:sheet.isEditable&&(game.user.isGM||![DYING,DEAD,EXHAUSTED_STUN,UNCONSCIOUS].some(status=>effect.statuses.has(status))),
-      counter:effectCounter(effect),save:rules.save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
+      toxicity:doseToxicity(effect),counter:effectCounter(effect),save:rules.save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
       autoAllowed:Boolean(rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
       durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,canEditDuration:sheet.isEditable&&canEditEffectDuration(effect),
