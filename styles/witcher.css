@@ -504,7 +504,7 @@
 .witcher-inventory-search { display:flex; align-items:center; gap:7px; padding:0 9px; margin:8px 0; height:29px; border:1px solid #b9a98e; background:#faf6ed; border-radius:3px; color:#89765b; }
 .witcher-inventory-search input { width:100%; height:100%; background:none; border:0; color:#332b26; font-size:12px; }
 .witcher-inventory-group { margin-bottom:5px; }
-.witcher-inventory-group-heading, .witcher-inventory-row { display:grid; grid-template-columns:minmax(0,1fr) 72px 42px 104px; gap:4px; align-items:center; }
+.witcher-inventory-group-heading, .witcher-inventory-row { display:grid; grid-template-columns:minmax(0,1fr) 72px 42px 126px; gap:4px; align-items:center; }
 .witcher-inventory-group-heading { min-height:27px; padding:2px 5px; border-radius:2px; background:#6e604f; color:#fff3de; }
 .witcher-inventory .witcher-inventory-group-heading button { border:0; background:none; color:inherit; box-shadow:none; height:23px; }
 .witcher-inventory .witcher-inventory-group-toggle { display:flex; align-items:center; justify-content:flex-start; gap:5px; min-width:0; padding:0; text-align:left; font-size:12px; }
@@ -723,3 +723,11 @@
 .witcher-critical-controls button {height:auto;min-height:34px;padding:7px 10px;white-space:normal;line-height:1.2;}
 .witcher-critical-controls .witcher-critical-continue {flex:1;background:#795139;color:#fff4df;border:1px solid #af8956;font-weight:700;}
 .witcher-critical-controls .witcher-critical-cancel {flex:0 0 auto;font-size:11px;}
+
+.witcher-eliott .witcher-consume-controls { display:flex; align-items:center; gap:12px; margin-bottom:12px; color:#544331; }
+.witcher-eliott .witcher-consume-controls button { width:auto; background:#455d49; color:#fff9ec; padding:6px 14px; }
+.witcher-eliott .witcher-toxicity { display:flex; align-items:center; gap:10px; margin:0 0 12px; padding:8px 12px; border:1px solid #b4b99c; background:#e4e8d5; color:#354532; border-radius:5px; }
+.witcher-eliott .witcher-toxicity progress { flex:1; height:8px; accent-color:#546d43; }
+.witcher-eliott .witcher-toxicity.is-overloaded { border-color:#a55039; background:#f2d9c9; color:#7d2f26; }
+.witcher-consume-dialog .witcher-consume-description { max-height:300px; overflow:auto; padding:8px 12px; background:#f7f1e5; color:#342c25; border-radius:6px; }
+.witcher-consume-dialog .witcher-consume-description :is(h2,h3,h4,strong) { color:#59412e; text-shadow:none; }

@@ -45,15 +45,15 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const { speed } = effective;
   const run = speed === null ? null : speed * 3;
   return {
-    healthMax, staminaMax, meleeDamageBonus: modifierTotal(modifiers, "meleeDamage"), encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),
+    healthMax, staminaMax, meleeDamageBonus: modifierTotal(modifiers, "meleeDamage"), physicalDamageBonus: modifierTotal(modifiers, "physicalDamage"), encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),
     stun: physical === null ? null : Math.min(10, physical),
-    recovery: physical, woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
+    recovery: physical === null ? null : physical + modifierTotal(modifiers, "recovery"), woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
     reputationBonus, reputation: reputationTotal, naturalArmor: modifierTotal(modifiers, "naturalArmor"),
     skillBonuses: Object.fromEntries([...new Set(modifiers.filter(modifier => modifier.target.startsWith("skills.")).map(modifier => modifier.target))]
       .map(target => [target.slice(7), modifierTotal(modifiers, target, abilityState.trustEnabled ? ["humanTarget"] : [])])),
     initiative: effective.reflex,
     run, leap: run === null ? null : Math.floor(run / 5),
-    carryMax: effective.body === null ? null : effective.body * 10 + modifierTotal(modifiers, "carryMax")
+    carryMax: effective.body === null ? null : (effective.body * 10 + modifierTotal(modifiers, "carryMax")) * (1 + modifierTotal(modifiers, "carryMultiplier"))
   };
 }
 

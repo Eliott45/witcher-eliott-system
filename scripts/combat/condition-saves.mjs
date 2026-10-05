@@ -5,6 +5,7 @@ import { conditionRules } from "./condition-rules.mjs";
 import { rollStun } from "./stun-roll.mjs";
 import { rollDeath } from "./death-state.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
+import { endToxicityPoison } from "../workshop/consumption.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 
 const queues=new Map();
@@ -97,7 +98,7 @@ export async function performEffectSave(actor,effect,{turn="",automatic=false,me
       await message.update({flavor:`${flavor}<p><strong>${success?"Успех":"Неудача"}: ${total}</strong>${success&&!save.ends?" — одна иллюзия распознана; эффект остаётся.":""}</p>`});
       completed=true;
       if(!present(actor,effect))return message;
-      if(success&&save.ends)await effect.delete();
+      if(success&&save.ends&&!await endToxicityPoison(actor,effect))await effect.delete();
       else if(effect.statuses.has("fisstech")&&total<10){
         const source=conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="fisstech-unconscious"));
         delete source._id;

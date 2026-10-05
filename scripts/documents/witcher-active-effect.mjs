@@ -11,8 +11,10 @@ export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
     if (await super._preCreate(data, options, user) === false) return false;
     const actor=this.parent;
     if(actor?.documentName!=="Actor")return;
+    if(options.witcherRestoreEffects)return;
     if(immuneToCondition(actor,this.statuses)){ui.notifications.info("У существа иммунитет к этому состоянию.");return false;}
-    if(actor.effects.some(effect=>activeEffect(effect)&&[...this.statuses].some(status=>effect.statuses.has(status)))) {
+    if(actor.effects.some(effect=>activeEffect(effect)&&[...this.statuses].some(status=>effect.statuses.has(status)
+      && (status!=="poisoned" || Boolean(effect.flags?.[SYSTEM_ID]?.toxicity)===Boolean(this.flags?.[SYSTEM_ID]?.toxicity))))) {
       ui.notifications.info("Это состояние уже действует на персонажа."); return false;
     }
     const rules=effectRules(this);

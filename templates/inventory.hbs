@@ -7,6 +7,7 @@
     <button type="button" data-action="createInventoryItem" data-tooltip="Создать предмет" aria-label="Создать предмет" {{disabled (not editable)}}><i class="fa-solid fa-plus" aria-hidden="true"></i></button>
   </div>
 </div>
+{{#if inventory.toxicity.visible}}<div class="witcher-toxicity {{#if inventory.toxicity.overloaded}}is-overloaded{{/if}}"><span><i class="fa-solid fa-flask"></i> Токсичность</span><strong>{{inventory.toxicity.value}} / {{inventory.toxicity.limit}}%</strong><progress value="{{inventory.toxicity.value}}" max="{{inventory.toxicity.limit}}" aria-label="Токсичность"></progress></div>{{/if}}
 <div class="witcher-armor-zones" aria-label="Надетая броня">
 {{#each inventory.zones as |zone|}}<section class="witcher-armor-zone"><h3><img class="witcher-zone-icon" src="{{zone.img}}" alt=""><span>{{zone.name}}</span></h3>
 {{#each zone.items as |item|}}

@@ -12,6 +12,8 @@ import { editEffectDuration } from "./effect-duration-editor.mjs";
 import { effectDurationLabel } from "../data/effect-duration.mjs";
 import { initialEffectTemplate } from "../data/effect-items.mjs";
 import { alchemyDescriptionDetails } from "../data/alchemy-descriptions.mjs";
+import { consumptionActions } from "./consumption-actions.mjs";
+import { consumableContext } from "../data/consumables.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const effectItemActions={
@@ -25,7 +27,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     classes: ["witcher-eliott", "reference-sheet"],
     position: { width: 620, height: 660 },
     window: { resizable: true },
-    actions: { ...effectItemActions, ...ritualComponentActions, installUpgradeDirect: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item,{withoutCheck:true});}), searchItemTrait, ...workshopItemActions, installUpgrade: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item);}), removeArmorUpgrade:workshopAction(async function(_e,target){if(this.isEditable)await removeArmorUpgrade(this.item,target.dataset.installationId);}), augmentItem:workshopAction(async function(){if(this.isEditable)await augmentItem(this.item);}), applyOil:workshopAction(async function(){if(this.isEditable)await applyOil(this.item);}), prepareMutagen:workshopAction(async function(){if(this.isEditable)await prepareMutagen(this.item);}), applyMutagen:workshopAction(async function(){if(this.isEditable)await applyMutagen(this.item);}) },
+    actions: { ...consumptionActions, ...effectItemActions, ...ritualComponentActions, installUpgradeDirect: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item,{withoutCheck:true});}), searchItemTrait, ...workshopItemActions, installUpgrade: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item);}), removeArmorUpgrade:workshopAction(async function(_e,target){if(this.isEditable)await removeArmorUpgrade(this.item,target.dataset.installationId);}), augmentItem:workshopAction(async function(){if(this.isEditable)await augmentItem(this.item);}), applyOil:workshopAction(async function(){if(this.isEditable)await applyOil(this.item);}), prepareMutagen:workshopAction(async function(){if(this.isEditable)await prepareMutagen(this.item);}), applyMutagen:workshopAction(async function(){if(this.isEditable)await applyMutagen(this.item);}) },
     form: { submitOnChange: true, closeOnSubmit: false }
   };
 
@@ -68,6 +70,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     }));
     return Object.assign(context, {
       workshop, spell, hasDetails, hasActions, isEffectItem,
+      consumption: this.item.actor ? consumableContext(this.item) : { enabled: false },
       effectTemplates:isEffectItem?await Promise.all(this.item.effects.map(async effect=>({id:effect.id,uuid:effect.uuid,name:effect.name,description:effect.description,enriched:await enrich(effect.description),duration:effectDurationLabel(effect)}))):[],
       itemTabs:visible.map(id=>context.tabs[id]),
       item: this.item,

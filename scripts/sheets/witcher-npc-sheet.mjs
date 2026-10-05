@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { consumptionActions } from "./consumption-actions.mjs";
 import { applyEffectItem } from "../data/effect-items.mjs";
 import { ATTRIBUTE_KEYS } from "../data/statistics.mjs";
 import { SKILLS, skillValue } from "../data/skills.mjs";
@@ -28,7 +29,7 @@ const guard=fn=>async function(...args){try{return await fn.apply(this,args);}ca
 export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
   editing=false;
   static DEFAULT_OPTIONS={classes:["witcher-eliott","npc-sheet"],position:{width:820,height:820},window:{resizable:true},form:{submitOnChange:true,closeOnSubmit:false},actions:{
-    ...combatActions,...effectActions,...workshopActorActions,
+    ...combatActions,...effectActions,...workshopActorActions,...consumptionActions,
     equipItem,toggleVisor,changeGrip,createInventoryItem,browseEquipment,addCatalogItem,changeInventoryQuantity,toggleCarried,toggleInventoryGroup,
     toggleItemDescription,postItem,searchItemTrait,chooseContainer,toggleContainer,viewSheetItem,removeSheetItem,createAbility,browseAbilities,
     editCreature:guard(async function(){if(this.isEditable){this.editing=!this.editing;await this.render();}}),

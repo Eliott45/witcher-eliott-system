@@ -1,7 +1,7 @@
 import { available, freeSlots, effectiveItem, activeOil } from "../data/workshop.mjs";
 import { AUGMENTATIONS } from "../data/workshop-upgrades.mjs";
 import { conditionKey, armorZones } from "../data/physical-items.mjs";
-import { inventoryWrite } from "../sheets/inventory-context.mjs";
+import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { chooseReference } from "../sheets/reference-picker.mjs";
 import { workshopCheck, workshopBase, workshopNotice } from "./check.mjs";
 import { inventoryTransaction, copyPhysical } from "./transaction.mjs";
@@ -89,14 +89,14 @@ export async function augmentItem(target) {
     await target.update({"system.installations":[...target.system.installations,{id:foundry.utils.randomID(),name:`Модификация: ${entry.name}`,sourceUuid:`augmentation.${id}`,category:"craftsman",properties:entry.properties,bonuses:entry.bonuses}], [`system.${key}.value`]:target.system[key].value+bonus});
   });
 }
-export async function applyOil(target) {
+export async function applyOil(target, source) {
   const actor=target.actor;if(!actor?.isOwner)return;
   if(target.type!=="weapon"||target.system.category==="shield")throw new Error("Масло наносится на оружие.");
-  const source=await chooseOwned(actor,"Нанести масло",item=>available(item)&&item.system.alchemy?.category==="oil");if(!source)return;
+  source??=await chooseOwned(actor,"Нанести масло",item=>available(item)&&item.system.alchemy?.category==="oil");if(!source)return;
   const old=activeOil(target,game.time.worldTime);
   if(old&&!await foundry.applications.api.DialogV2.confirm({window:{title:"Заменить покрытие?"},content:`<p>На оружии уже ${esc(old.name)}. Новое масло заменит покрытие.</p>`,rejectClose:false}))return;
   return inventoryWrite(actor,async()=>{
-    if(!available(source)||target.system.quantity!==1)throw new Error("Нужно масло при себе и один экземпляр оружия.");
+    if(source.actor!==actor||source.system.alchemy?.category!=="oil"||!available(source)||target.system.quantity!==1)throw new Error("Нужно масло при себе и один экземпляр оружия.");
     const oil=source.system.alchemy;
     await inventoryTransaction(actor,{expenses:[{itemId:source.id,quantity:1}],updates:[{_id:target.id,"system.oil":{name:source.name,sourceUuid:source._stats.compendiumSource||source.uuid,target:oil.target,bonus:oil.bonus,expiresAt:game.time.worldTime+oil.duration}}]});
   });

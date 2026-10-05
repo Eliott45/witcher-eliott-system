@@ -14,6 +14,7 @@
   {{#if spell}}<div class="witcher-spell-info"><strong>{{spell.elementLabel}} · {{spell.gradeLabel}}{{#if spell.deity}} · {{spell.deity}}{{/if}}</strong><span>{{spell.cost}}</span><span>{{spell.range}}</span><span>{{spell.duration}}</span><span>Защита: {{spell.defense}}</span></div>{{/if}}
   <nav class="witcher-item-tabs tabs" aria-label="{{localize 'WITCHER.ItemTabs.Navigation'}}">{{#each itemTabs}}<button type="button" data-action="tab" data-group="{{group}}" data-tab="{{id}}" class="{{cssClass}}" aria-pressed="{{active}}"><i class="{{icon}}"></i> {{localize label}}</button>{{/each}}</nav>
   <section class="witcher-item-tab tab {{tabs.description.cssClass}}" data-group="item" data-tab="description">
+  {{#if consumption.enabled}}<div class="witcher-consume-controls"><button type="button" data-action="useConsumable" {{disabled (or (not editable) (not consumption.canUse))}}><i class="fa-solid fa-hand-sparkles"></i> Использовать</button><span>Осталось применений: {{consumption.remaining}}</span></div>{{/if}}
   {{{alchemyDetails}}}
   {{#if isEffectItem}}
   <p class="witcher-effects-hint">Перетащите этот предмет на лист персонажа или существа, чтобы наложить эффект. Длительность и модификаторы настраиваются во вкладке «Подробности».</p>

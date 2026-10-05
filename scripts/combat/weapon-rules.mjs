@@ -66,7 +66,7 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   const melee=["melee","thrown","shield"].includes(weapon.category);
   const shield=weapon.category==="shield"&&weapon.damage==="0";
   const body=shield?shieldPunch(actor.system.statistics.effective.body,shieldClass(weapon)):melee&&!weapon.damageIncludesBody?bodyDamage(actor.system.statistics.effective.body):0;
-  const bonus=melee?actor.system.statistics.meleeDamageBonus??0:0;
+  const bonus=(melee?actor.system.statistics.meleeDamageBonus??0:0)+(actor.system.statistics.physicalDamageBonus??0);
   const unarmedBonus=weapon.ruleId==="weapon.brass-knuckles"&&!weapon.damageIncludesBody?" + 1d6":"";
   const damage=`(${shield?"1d6":weapon.damage}${unarmedBonus}${body+bonus?` + ${body+bonus}`:""})${attack.multiplier===2?" * 2":""}`;
   const blocked=shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":"");

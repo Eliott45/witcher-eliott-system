@@ -49,7 +49,14 @@ export function effectRules(effect) {
   return effect.flags?.[SYSTEM_ID]?.condition ?? CONDITION_DEFINITIONS.find(entry=>effect.statuses.has(entry.id))?.rules ?? {};
 }
 export function conditionModifiers(effects = []) {
-  return Array.from(effects).filter(effect=>!effect.disabled&&!effect.isSuppressed).flatMap(effect=>(effectRules(effect).modifiers??[]).map(modifier=>({
+  const doses = new Set();
+  return Array.from(effects).filter(effect=>{
+    if(effect.disabled||effect.isSuppressed||effect.duration?.expired)return false;
+    const ruleId=effect.flags?.[SYSTEM_ID]?.consumable?.ruleId;
+    if(ruleId&&doses.has(ruleId))return false;
+    if(ruleId)doses.add(ruleId);
+    return true;
+  }).flatMap(effect=>(effectRules(effect).modifiers??[]).map(modifier=>({
     ...modifier,source:`effect.${effect.id}`,label:effect.name,category:"effect"
   })));
 }

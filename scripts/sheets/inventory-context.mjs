@@ -1,5 +1,6 @@
 import { isTransport, cargoSections, cargoSection } from "../data/transport.mjs";
 import { gripOf } from "../combat/weapon-rules.mjs";
+import { consumableContext, toxicityState } from "../data/consumables.mjs";
 import { supportsVisor } from "../data/visor.mjs";
 import { effectiveItem, activeOil } from "../data/workshop.mjs";
 import { ARMOR_ZONES, armorZones, isPhysical, equippedItems, conditionKey, carriedWeight, itemWeight } from "../data/physical-items.mjs";
@@ -26,7 +27,7 @@ const visorContext = item => ({ hasVisor: supportsVisor(item), visorDown: Boolea
 export function inventoryContext(actor, preferences = {}) {
   const items = Array.from(actor.items ?? []).filter(isPhysical);
   const rows = items.map(item => ({ id: item.id, name: item.name, img: item.img, ...item.system, ...visorContext(item), sort: item.sort ?? 0,
-    quantity: item.system.quantity ?? 1, carried: isCarried(item, items), expanded: false, presentation: null, cargoSections: [], onTransport: false,
+    quantity: item.system.quantity ?? 1, consumption: consumableContext(item), carried: isCarried(item, items), expanded: false, presentation: null, cargoSections: [], onTransport: false,
     isContainer: isContainer(item), parentId: containerParent(item, items)?.id ?? "", children: [], containerOpen: true,
     isRecipe: item.type === "recipe", oil: activeOil(item, globalThis.game?.time?.worldTime ?? 0),
     isWeapon: item.type === "weapon" && !item.system.natural, grip: gripOf(item),
@@ -58,7 +59,7 @@ export function inventoryContext(actor, preferences = {}) {
   const sortRows = rows => rows.sort((a, b) => a.sort - b.sort || a.name.localeCompare(b.name, "ru"));
   for (const row of rows) sortRows(row.children);
   const weight = carriedWeight(items), capacity = actor.system?.statistics?.carryMax;
-  return { weight, capacity: capacity ?? "—", overloaded: capacity != null && weight > capacity,
+  return { weight, toxicity: toxicityState(actor), capacity: capacity ?? "—", overloaded: capacity != null && weight > capacity,
     loadPercent: capacity > 0 ? Math.min(100, weight / capacity * 100) : weight > 0 && capacity === 0 ? 100 : 0,
     categories: EQUIPMENT_CATEGORIES, items: rows,
     groups: GROUPS.map(group => ({ ...group, open: !preferences.collapsed?.[`inventory-${group.id}`],

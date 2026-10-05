@@ -9,6 +9,7 @@ import { WitcherPowerPlaceData } from "./data/witcher-power-place-data.mjs";
 import { WitcherPowerPlaceSheet } from "./sheets/witcher-power-place-sheet.mjs";
 import { registerSpellContentMigration,migrateSpellContent } from "./migrations/spell-content.mjs";
 import { registerOilExpiry } from "./workshop/upgrades.mjs";
+import { registerConsumption } from "./workshop/consumption.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
 import { WitcherRecipeData } from "./data/witcher-recipe-data.mjs";
@@ -68,6 +69,7 @@ Hooks.once("init", async () => {
   registerConditionSaves();
   registerEffectExpiry();
   registerOilExpiry();
+  registerConsumption();
   registerStubbornnessChat();
   registerEffectDurationChat();
   registerServiceOrders();

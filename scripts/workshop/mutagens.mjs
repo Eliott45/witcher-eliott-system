@@ -1,5 +1,5 @@
 import { available } from "../data/workshop.mjs";
-import { inventoryWrite } from "../sheets/inventory-context.mjs";
+import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { inventoryTransaction, copyPhysical } from "./transaction.mjs";
 import { workshopCheck, workshopNotice } from "./check.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";

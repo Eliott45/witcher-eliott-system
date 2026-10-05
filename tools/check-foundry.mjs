@@ -1430,3 +1430,47 @@ for(const face of [1,4,10]) {
   assert.equal(display.total,face);assert.equal(display.dice[0].results[0].result,face);
   assert.equal(CoreRoll.fromData(display.toJSON()).total,face);
 }
+
+// Consumables: native schema defaults, lifecycle and strict templates, without a running UI.
+const { consumableContext, potionEffectSource, toxicityState } = await import('../scripts/data/consumables.mjs');
+const savedEffectDocuments = foundry.documents;
+foundry.documents = {...foundry.documents, ActiveEffect: class extends foundry.documents.BaseActiveEffect {
+  async _preCreate() {}
+  static getEffectStart() { return {time:100}; }
+}};
+const { WitcherActiveEffect } = await import('../scripts/documents/witcher-active-effect.mjs');
+const doseActor = new foundry.documents.BaseActor({name:'Consumables',type:'character',system:{details:{race:'witcher',profession:'witcher'},attributes:{body:8,will:8},health:{value:40,max:40}}});
+const nativePetriSource = Array.from(documents.values()).find(doc=>doc.system?.ruleId==='potion.petri').toObject();
+nativePetriSource._id = 'nativePetri00001';
+doseActor.updateSource({items:[nativePetriSource]});
+Object.defineProperty(doseActor,'isOwner',{value:true});
+const nativePetri = doseActor.items.get('nativePetri00001');
+Object.defineProperty(nativePetri,'actor',{value:doseActor});
+assert.equal(nativePetri.system.consumption.mode,'auto');
+assert.ok(consumableContext(nativePetri).enabled);
+const nativeDose = new WitcherActiveEffect({...potionEffectSource(nativePetri),_id:'nativeDose000001'},{parent:doseActor});
+await nativeDose._preCreate(nativeDose.toObject(),{},game.user);
+assert.equal(nativeDose.duration.value,45);
+assert.equal(nativeDose.duration.units,'seconds');
+assert.equal(nativeDose.start.time,100);
+doseActor.updateSource({effects:[nativeDose.toObject()]});
+const persistedDoseActor = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(doseActor.toObject())));
+assert.equal(toxicityState(persistedDoseActor).value,75);
+assert.equal(persistedDoseActor.system.statistics.skillBonuses.spellCasting,2);
+assert.equal(persistedDoseActor.effects.get(nativeDose.id).duration.value,45);
+nativePetri.updateSource({'system.consumption.usesPerItem':25,'system.consumption.spentUses':4});
+assert.equal(consumableContext(new foundry.documents.BaseItem(JSON.parse(JSON.stringify(nativePetri.toObject())))).remaining,21);
+const restoredDose = new WitcherActiveEffect({...nativeDose.toObject(),start:{time:20}},{parent:doseActor});
+await restoredDose._preCreate(restoredDose.toObject(),{witcherRestoreEffects:true},game.user);
+assert.equal(restoredDose.start.time,20,'Transaction rollback must preserve elapsed effect time');
+referenceSheet.item=nativePetri;referenceSheet.isEditable=true;
+const consumptionItemHTML=itemTemplate(await referenceSheet._prepareContext({}));
+assert.ok(consumptionItemHTML.includes('data-action="useConsumable"'));
+assert.ok(consumptionItemHTML.includes('system.consumption.mode'));
+const inventoryPartial=handlebars.compile(await readFile(new URL('../templates/inventory.hbs',import.meta.url),'utf8'),{strict:true});
+const { inventoryContext: consumableInventory } = await import('../scripts/sheets/inventory-context.mjs');
+const consumptionInventoryHTML=inventoryPartial({rootId:'consumption',system:doseActor.system,editable:true,inventory:consumableInventory(doseActor),workshop:{witcher:false,npc:false}});
+assert.ok(consumptionInventoryHTML.includes('Токсичность'));
+assert.ok(consumptionInventoryHTML.includes('data-action="useConsumable"'));
+foundry.documents=savedEffectDocuments;
+console.log('Consumables: native timed effects, dose persistence, Item fields and inventory controls OK');

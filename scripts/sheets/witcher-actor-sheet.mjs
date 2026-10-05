@@ -1,6 +1,7 @@
 import { magicContext, magicActions, bindMagic, learnSpell } from "./magic-context.mjs";
 import { combatContext, combatActions, bindCombat } from "./combat-context.mjs";
 import { changeGrip, toggleVisor } from "./inventory-context.mjs";
+import { consumptionActions } from "./consumption-actions.mjs";
 import { learningContext, learningActions } from "./learning-context.mjs";
 import { transportContext, transportActions, bindTransport } from "./transport-context.mjs";
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
@@ -52,7 +53,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
-      ...effectActions, ...transportActions, ...magicActions, ...learningActions, ...combatActions, changeGrip,
+      ...effectActions, ...transportActions, ...magicActions, ...learningActions, ...combatActions, ...consumptionActions, changeGrip,
       ...workshopActorActions,
       openAdvancement,
       toggleExperience: WitcherActorSheet.#onToggleExperience,

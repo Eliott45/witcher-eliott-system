@@ -1,5 +1,6 @@
 import { itemText, itemNumber } from "./item-fields.mjs";
 import { MONSTER_CATEGORIES } from "./workshop.mjs";
+import { potionImmunity } from "./consumables.mjs";
 
 /** NPC metadata only. Statistics, attacks, skills, abilities and equipment keep their existing models. */
 export function creatureFields() {
@@ -28,5 +29,5 @@ export function creatureSkillAttribute(system,key) {
   return {value:stats.dying||stats.dead?2:stats.wounded?3:7,label:"Дикий: ИНТ 7 для Внимания и Выживания"};
 }
 export function immuneToCondition(actor,statuses) {
-  return Array.from(statuses).includes("poisoned")&&(actor.items??[]).some(item=>item.type==="ability"&&item.system.ruleId==="creature.poison-immunity");
+  return potionImmunity(actor,statuses) || Array.from(statuses).includes("poisoned")&&(actor.items??[]).some(item=>item.type==="ability"&&item.system.ruleId==="creature.poison-immunity");
 }
