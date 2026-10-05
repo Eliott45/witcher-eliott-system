@@ -81,13 +81,6 @@
     <p class="witcher-exhaustion-notice">{{localize "WITCHER.Effects.Unconscious"}}</p>
     {{/if}}
   </section>
-    {{#if inventory.toxicity.visible}}
-    <section class="witcher-sidebar-toxicity {{#if inventory.toxicity.overloaded}}is-overloaded{{/if}}" aria-label="{{localize 'WITCHER.Toxicity.Title'}}">
-      <div class="witcher-toxicity-heading"><span data-tooltip="{{localize 'WITCHER.Toxicity.Hint'}}" data-tooltip-direction="RIGHT" tabindex="0"><i class="fa-solid fa-flask" aria-hidden="true"></i> {{localize "WITCHER.Toxicity.Title"}}</span><output>{{inventory.toxicity.value}}<small>%</small></output></div>
-      <progress value="{{inventory.toxicity.value}}" max="{{inventory.toxicity.limit}}" aria-label="{{localize 'WITCHER.Toxicity.Title'}}"></progress>
-      <div class="witcher-toxicity-caption"><span>{{localize "WITCHER.Toxicity.Limit"}} {{inventory.toxicity.limit}}%</span>{{#if inventory.toxicity.poisoned}}<strong>{{localize "WITCHER.Toxicity.Poisoned"}}</strong>{{/if}}</div>
-    </section>
-    {{/if}}
     <section class="witcher-derived" aria-label="{{localize 'WITCHER.Statistics.Physical'}}">
       <div class="witcher-stat-row">
         <span data-tooltip="{{stats.stunTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Statistics.Stun"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span><strong>{{stats.stunValue}}</strong>
@@ -97,6 +90,13 @@
         <i class="fa-solid fa-dice-d10" aria-hidden="true"></i> {{localize "WITCHER.Statistics.RollStun"}}
       </button>
     </section>
+    {{#if inventory.toxicity.visible}}
+    <section class="witcher-sidebar-toxicity {{#if inventory.toxicity.overloaded}}is-overloaded{{/if}}" aria-label="{{localize 'WITCHER.Toxicity.Title'}}">
+      <div class="witcher-toxicity-heading"><span data-tooltip="{{localize 'WITCHER.Toxicity.Hint'}}" data-tooltip-direction="RIGHT" tabindex="0"><i class="fa-solid fa-flask" aria-hidden="true"></i> {{localize "WITCHER.Toxicity.Title"}}</span><output>{{inventory.toxicity.value}}<small>%</small></output></div>
+      <progress value="{{inventory.toxicity.value}}" max="{{inventory.toxicity.limit}}" aria-label="{{localize 'WITCHER.Toxicity.Title'}}"></progress>
+      <div class="witcher-toxicity-caption"><span>{{localize "WITCHER.Toxicity.Limit"}} {{inventory.toxicity.limit}}%</span>{{#if inventory.toxicity.poisoned}}<strong>{{localize "WITCHER.Toxicity.Poisoned"}}</strong>{{/if}}</div>
+    </section>
+    {{/if}}
     <section class="witcher-derived" aria-label="{{localize 'WITCHER.Statistics.Combat'}}">
       {{#each stats.movementRows as |stat|}}
       <div class="witcher-stat-row">

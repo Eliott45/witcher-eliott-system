@@ -1481,7 +1481,7 @@ assert.match(doseSheetHTML, /Предел 100%/);
 assert.match(doseSheetHTML, /witcher-effect-toxicity[\s\S]*?\+75%/);
 const doseSidebar = doseSheetHTML.split('</aside>')[0];
 assert.ok(doseSidebar.includes('witcher-sidebar-toxicity'));
-assert.ok(doseSidebar.indexOf('witcher-sidebar-toxicity') > doseSidebar.indexOf('data-action="recoverStamina"'));
+assert.ok(doseSidebar.indexOf('witcher-sidebar-toxicity') > doseSidebar.indexOf('data-action="rollStun"'));
 assert.ok(!html.includes('THE WITCHER'));
 assert.ok(!html.includes('witcher-sidebar-toxicity'),'Non-witchers do not see the toxicity meter');
 const npcToxicityHTML=inventoryPartial({rootId:'npc-consumption',system:doseActor.system,editable:true,inventory:{...consumableInventory(doseActor),showToxicity:true},workshop:{witcher:false,npc:true}});
