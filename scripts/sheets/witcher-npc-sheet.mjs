@@ -34,7 +34,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     creaturePortrait:guard(async function(){if(this.isEditable)new foundry.applications.apps.FilePicker.implementation({type:"image",current:this.actor.img,document:this.actor,callback:path=>this.actor.update({img:path})}).browse();}),
     creatureInitiative:guard(async function(){if(this.isEditable)await this.actor.rollInitiative({createCombatants:true,rerollInitiative:true});}),
     creatureSkill:guard(async function(_e,target){if(this.isEditable)await rollSkill(this.actor,target.dataset.skill);}),
-    creatureDefense:guard(async function(_e,target){if(!this.isEditable||!conditionRules(this.actor).canDefend)return;const skill=skillValue(this.actor.system,target.dataset.skill);if(skill?.total!=null)await rollActionCheck(this.actor,{formula:`1d10wc + ${skill.total}`,flavor:`Защита: ${game.i18n.localize(skill.label)}. Повторная защита за раунд стоит 1 ВЫН (учтите вручную).`},{ignoreExtra:true});}),
+    creatureDefense:guard(async function(_e,target){if(!this.isEditable||!conditionRules(this.actor).canDefend)return;const skill=skillValue(this.actor.system,target.dataset.skill);if(skill?.total!=null)await rollActionCheck(this.actor,{formula:`1d10wc + ${skill.total}`,flavor:`Сопротивление: ${game.i18n.localize(skill.label)}.`},{ignoreExtra:true});}),
     creatureAttribute:guard(async function(_e,target){if(this.isEditable)await rollAttribute(this.actor,target.dataset.attribute);}),
     creatureStun:guard(async function(){if(!this.isEditable)return;const effect=this.actor.effects.find(e=>!e.disabled&&(e.statuses.has("stunned")||e.statuses.has("exhausted-stun")));if(effect)await requestEffectSave(this.actor,effect);else await rollStun(this.actor);}),
     creatureDeath:guard(async function(){if(this.isEditable)await rollDeath(this.actor);}),
@@ -71,7 +71,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
       attributes:ATTRIBUTE_KEYS.filter(key=>key!=="luck").map(key=>({key,name:i18n.localize(`WITCHER.Attributes.${key}.Short`),label:i18n.localize(`WITCHER.Attributes.${key}.Label`),base:system.attributes[key],value:stats.effective[key]??"—"})),
       skills:SKILLS.filter(skill=>skill.key!=="language"&&(editing||system.skills[skill.key]>0)).map(skill=>{const value=skillValue(system,skill.key);return {...value,name:i18n.localize(skill.label),calculation:skillCalculationTooltip(system,value,i18n)};}),
       facts:[{key:"size",label:"Рост"},{key:"weight",label:"Вес тела"},{key:"habitat",label:"Среда обитания"},{key:"intellect",label:"Интеллект"},{key:"group",label:"Численность"}].map(entry=>({...entry,value:system.creature[entry.key]})),
-      defenses:["dodgeEscape","athletics","resistMagic","endurance"].map(key=>({key,name:i18n.localize(`WITCHER.Skills.Entries.${key}.Label`),total:skillValue(system,key).total??"—"}))};
+      defenses:["resistMagic","endurance"].map(key=>({key,name:i18n.localize(`WITCHER.Skills.Entries.${key}.Label`),total:skillValue(system,key).total??"—"}))};
   }
   async _onRender(context,options) {
     await super._onRender(context,options);bindInventory(this);bindCombat(this);

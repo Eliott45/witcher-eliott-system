@@ -11,4 +11,9 @@
     {{#if needsReload}}<button type="button" data-action="reloadWeapon" data-item-id="{{id}}" class="witcher-reload" {{disabled (not ../editable)}}><i class="fa-solid fa-rotate"></i> Перезарядить · действие</button>{{/if}}</article>
   {{else}}<p class="witcher-combat-empty">Добавьте оружие в инвентарь — здесь появятся его атаки и готовые модификаторы.</p>{{/each}}</div>
   <p class="witcher-combat-muted">Каждый бросок атаки сравнивается с защитой. Урон бросается из сообщения в чате; броня и зона попадания учитываются после броска.</p>
+  <section class="witcher-defenses"><header><h3><i class="fa-solid fa-shield-halved"></i> Защита</h3><label class="witcher-repeat-defense"><input type="checkbox" data-combat-option="repeat" {{checked combat.repeat}} {{disabled (not editable)}}> Повторная · 1 ВЫН</label></header>
+    <div class="witcher-defense-options"><label>Входящая атака<select data-combat-option="incoming">{{#each combat.incoming}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label><label>Модификатор защиты<input type="number" data-combat-option="defenseModifier" value="{{combat.defenseModifier}}" min="-100" max="100" step="1"></label></div>
+    <div class="witcher-defense-buttons">{{#each combat.defenses}}<button type="button" data-action="defend" data-mode="{{mode}}" data-item-id="{{itemId}}" data-tooltip="{{hint}}" {{disabled (or disabled (not ../editable))}}><span>{{name}} <b>{{base}}</b></span>{{#if weaponName}}<small>{{weaponName}}</small>{{/if}}</button>{{/each}}</div>
+    <p class="witcher-combat-muted">Первая защита бесплатна. Для последующих включите «Повторная»; при активном уклонении на весь раунд оставьте выключенной. Защита не расходует второе действие.</p>
+  </section>
 </section>

@@ -5,11 +5,16 @@ import { actionRoundKey, actionQuote, actionUpdate } from "../combat/action-econ
 import { attackModes, weaponAttack, gripOf, signed, ATTACK_LOCATIONS, RANGED_BANDS } from "../combat/weapon-rules.mjs";
 import { rollWeaponAttack } from "../combat/weapon-rolls.mjs";
 import { SYSTEM_ID } from "../config.mjs";
+import { defenseQuote, rollDefense, INCOMING_ATTACKS } from "../combat/defense-rolls.mjs";
 
 export function combatContext(actor,options={}) {
   const extra=Boolean(actor.system.combatAction?.extra),key=actionRoundKey(actor),used=Boolean(key&&actor.system.combatAction?.lastExtraRound===key);
   const canAct=conditionRules(actor).canAct;
+  const defenses=[{mode:"dodge"},{mode:"reposition"},...equippedItems(actor.items).filter(item=>item.type==="weapon"&&["melee","shield"].includes(item.system.category)).flatMap(item=>[{mode:"block",itemId:item.id},{mode:"parry",itemId:item.id}])]
+    .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
   return { extra,used,canAct,location:options.location??"random",range:options.range??"normal",modifier:options.modifier??0,
+    defenses,repeat:Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
+    incoming:INCOMING_ATTACKS.map(entry=>({...entry,selected:entry.id===(options.incoming??"melee")})),
     locations:ATTACK_LOCATIONS.map(entry=>({...entry,selected:entry.id===(options.location??"random")})),
     ranges:RANGED_BANDS.map(entry=>({...entry,selected:entry.id===(options.range??"normal")})),
     weapons:Array.from(actor.items ?? []).filter(item=>item.type==="weapon").map(item=>{
@@ -26,6 +31,7 @@ export function combatContext(actor,options={}) {
 }
 const guard=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){ui.notifications.warn(error.message);}};
 export const combatActions={
+  defend:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollDefense(this.actor,{...this.combatOptions,mode:target.dataset.mode,itemId:target.dataset.itemId});}finally{await this.render();}}),
   toggleExtraAction:guard(async function(){if(!this.isEditable)return;await inventoryWrite(this.actor,()=>this.actor.update({"system.combatAction.extra":!this.actor.system.combatAction.extra}));}),
   attackWeapon:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollWeaponAttack(this.actor,target.dataset.itemId,{...this.combatOptions,mode:target.dataset.mode});}finally{await this.render();}}),
   reloadWeapon:guard(async function(_event,target){
@@ -50,7 +56,7 @@ export const combatActions={
 export function bindCombat(sheet) {
   for(const control of sheet.element.querySelectorAll("[data-combat-option]"))control.addEventListener("change",()=>{
     const key=control.dataset.combatOption;
-    sheet.combatOptions={...sheet.combatOptions,[key]:key==="modifier"?Math.min(100,Math.max(-100,Number(control.value)||0)):control.value};
+    sheet.combatOptions={...sheet.combatOptions,[key]:control.type==="checkbox"?control.checked:["modifier","defenseModifier"].includes(key)?Math.min(100,Math.max(-100,Number(control.value)||0)):control.value};
     sheet.render();
   });
 }

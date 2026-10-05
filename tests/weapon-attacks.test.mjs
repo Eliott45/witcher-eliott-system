@@ -1,8 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { attackModes, weaponAttack, bodyDamage, gripOf } from "../scripts/combat/weapon-rules.mjs";
+import { attackModes, weaponAttack, bodyDamage, gripOf, hitLocation, shieldPunch } from "../scripts/combat/weapon-rules.mjs";
 import { actionQuote, actionUpdate, rollActionCheck } from "../scripts/combat/action-economy.mjs";
-import { rollWeaponAttack, rollWeaponDamage } from "../scripts/combat/weapon-rolls.mjs";
+import { rollWeaponAttack, rollWeaponDamage, rollHitLocation } from "../scripts/combat/weapon-rolls.mjs";
+import { defenseQuote, rollDefense } from "../scripts/combat/defense-rolls.mjs";
+import { shieldClass } from "../scripts/data/shields.mjs";
 import { SYSTEM_ID } from "../scripts/config.mjs";
 function fixture() {
   const weapon={id:"sword",type:"weapon",name:"Sword",system:{hands:2,grip:0,category:"melee",skill:"swordsmanship",damage:"2d6+2",accuracy:1,quantity:1,carried:true,equipped:true,reliability:{value:10,max:10}}};
@@ -64,4 +66,58 @@ test("damage preserves attack snapshot and private recipients without spending L
   await rollWeaponDamage(message);
   assert.equal(result.formula,"(2d6+2) * 2");assert.deepEqual(result.data.whisper,["original-player"]);assert.equal(result.options.messageMode,"gm");assert.equal(result.data.flags[SYSTEM_ID].skipLuck,true);
   message.isContentVisible=false;result=null;await rollWeaponDamage(message);assert.equal(result,null);
+});
+
+test("shield strikes use their class and punch table without adding BODY twice; legacy shields resolve by ID",()=>{
+  const actor=fixture(),shield=actor.items[0];
+  Object.assign(shield.system,{category:"shield",skill:"melee",damage:"0",hands:1,ruleId:"weapon.temerian-shield"});
+  assert.equal(shieldClass(shield.system),"light");
+  assert.equal(weaponAttack(actor,shield).damage,"(1d6 + 6)");
+  shield.system.ruleId="weapon.kaedwen-shield";assert.equal(shieldClass(shield.system),"medium");
+  assert.equal(weaponAttack(actor,shield).damage,"(1d6 + 10)");
+  actor.system.statistics.effective.body=5;
+  assert.deepEqual(["light","medium","heavy"].map(weight=>shieldPunch(5,weight)),[0,4,8]);
+  shield.system.ruleId="homebrew";assert.match(weaponAttack(actor,shield).blocked,/класс/);
+  shield.system.shieldClass="medium";assert.equal(weaponAttack(actor,shield).blocked,"");
+  shield.system.damage="2d6";shield.system.damageIncludesBody=true;assert.equal(weaponAttack(actor,shield).damage,"(2d6 + 2)");
+});
+
+test("defense uses skill without WA or extra-action penalty, and enforces projectile restrictions",()=>{
+  const actor=fixture();actor.system.combatAction.extra=true;
+  assert.equal(defenseQuote(actor,{mode:"block",itemId:"sword"}).total,14);
+  assert.equal(defenseQuote(actor,{mode:"parry",itemId:"sword"}).total,11);
+  assert.equal(defenseQuote(actor,{mode:"parry",itemId:"sword",incoming:"thrown"}).total,9);
+  assert.match(defenseQuote(actor,{mode:"block",itemId:"sword",incoming:"thrown"}).blocked,/щитом/);
+  assert.match(defenseQuote(actor,{mode:"parry",itemId:"sword",incoming:"ranged"}).blocked,/стрелы/);
+  actor.items[0].system.category="shield";
+  assert.equal(defenseQuote(actor,{mode:"block",itemId:"sword",incoming:"ranged"}).blocked,"");
+  actor.items[0].system.reliability.value=0;assert.match(defenseQuote(actor,{mode:"block",itemId:"sword"}).blocked,/сломано/);
+  assert.equal(defenseQuote(actor,{mode:"dodge",repeat:true}).cost,1);
+  actor.system.stamina.value=0;assert.match(defenseQuote(actor,{repeat:true}).blocked,/Выносливости/);
+});
+
+test("repeated defense charges once after chat, cancellation is free and extra action remains selected",async()=>{
+  const actor=fixture();actor.system.combatAction.extra=true;let accepted=false,posted;
+  globalThis.game={settings:{get:()=>"self"}};
+  globalThis.foundry={dice:{Roll:class{constructor(formula){this.formula=formula;}async evaluate(){return this;}async toMessage(data,opts){assert.equal(opts.messageMode,"self");assert.equal(actor.system.stamina.value,20);posted=data;return accepted?data:null;}}},documents:{ChatMessage:{getSpeaker:()=>({actor:"fighter"})}}};
+  await rollDefense(actor,{repeat:true});assert.equal(actor.system.stamina.value,20);
+  accepted=true;const first=rollDefense(actor,{repeat:true}),second=rollDefense(actor,{repeat:true});assert.equal(first,second);await first;
+  assert.equal(actor.system.stamina.value,19);assert.equal(actor.system.combatAction.extra,true);
+  assert.equal(posted.flags[SYSTEM_ID].defense.cost,1);
+});
+
+test("hit location tables cover all d10 results including errata monster torso and right limb",()=>{
+  assert.deepEqual(Array.from({length:10},(_,i)=>hitLocation(i+1).id),["head","torso","torso","torso","rightArm","leftArm","rightLeg","rightLeg","leftLeg","leftLeg"]);
+  assert.deepEqual(Array.from({length:10},(_,i)=>hitLocation(i+1,"monster").id),["head","torso","torso","torso","torso","rightArm","rightArm","leftArm","leftArm","tail"]);
+  assert.equal(hitLocation(1).multiplier,3);assert.equal(hitLocation(10).multiplier,.5);
+  assert.throws(()=>hitLocation(11));assert.throws(()=>hitLocation(1,"unknown"));
+});
+
+test("location roll is ordinary d10 and preserves private audience without using Luck",async()=>{
+  let sent;
+  globalThis.foundry={dice:{Roll:class{constructor(formula){assert.equal(formula,"1d10");this.total=10;}async evaluate(){return this;}async toMessage(data,options){sent={data,options};return sent;}}}};
+  const message={id:"attack",speakerActor:fixture(),isContentVisible:true,blind:true,whisper:["gm"],speaker:{actor:"fighter"},flags:{[SYSTEM_ID]:{weaponAttack:{name:"Sword",location:"random"}}}};
+  await rollHitLocation(message,"monster");assert.deepEqual(sent.data.whisper,["gm"]);assert.equal(sent.options.messageMode,"blind");
+  assert.equal(sent.data.flags[SYSTEM_ID].skipLuck,true);assert.equal(sent.data.flags[SYSTEM_ID].hitLocation.id,"tail");
+  sent=null;message.isContentVisible=false;await rollHitLocation(message,"monster");assert.equal(sent,null);
 });

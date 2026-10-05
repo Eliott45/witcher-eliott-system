@@ -15,7 +15,7 @@ export function carriedWeight(items = []) {
   const all = Array.from(items);
   return Math.round(all.filter(item => isPhysical(item) && isCarried(item, all)).reduce((sum, item) => sum + itemWeight(item), 0) * 1000) / 1000;
 }
-export const conditionKey = item => item.type === "weapon" || isAmmunition(item) ? "reliability" : item.type === "armor" ? "stoppingPower" : null;
+export const conditionKey = item => (item.type === "weapon" && !item.system.natural) || isAmmunition(item) ? "reliability" : item.type === "armor" ? "stoppingPower" : null;
 export const equippedItems = items => Array.from(items ?? []).filter(item => isPhysical(item) && item.system.equipped && isCarried(item, items) && !containerParent(item, items) && item.system.quantity > 0);
 export function armorEncumbrance(items, reduction = 0) {
   return Math.max(0, equippedItems(items).reduce((sum, item) => sum + (item.system.encumbrance ?? 0), 0) + reduction);

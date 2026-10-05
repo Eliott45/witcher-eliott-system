@@ -1,6 +1,5 @@
 import { CORE_EQUIPMENT } from "./core-equipment.mjs";
 import { MATERIALS } from "./workshop-materials.mjs";
-import { AMMUNITION_ICON } from "./core-ammunition.mjs";
 import { CREATURE_TRAITS } from "./creatures.mjs";
 import { defaultItemIcon } from "./item-icons.mjs";
 
@@ -8,7 +7,7 @@ const asset=name=>`systems/witcher-eliott-system/assets/creatures/${name}.svg`;
 const attributes=values=>Object.fromEntries(["intelligence","reflex","dexterity","body","speed","empathy","craft","will","luck"].map((key,i)=>[key,values[i]]));
 const gear=(id,overrides={})=>{
   const entry=CORE_EQUIPMENT.find(entry=>entry.id===id);if(!entry)throw new Error(`Missing bestiary equipment: ${id}`);
-  return { _id:entry.documentId,name:entry.name,type:entry.type,img:entry.img??defaultItemIcon(entry),system:{...structuredClone(entry.system),ruleId:id,equipped:true,...overrides},flags:{core:{sourceId:`Compendium.witcher-eliott-system.equipment.Item.${entry.documentId}`}}};
+  return { _id:entry.documentId,name:entry.name,type:entry.type,img:entry.img??defaultItemIcon(entry),system:{...structuredClone(entry.system),ruleId:id,equipped:true,...overrides},flags:{...structuredClone(entry.flags??{}),core:{sourceId:`Compendium.witcher-eliott-system.equipment.Item.${entry.documentId}`}}};
 };
 const traits=ids=>ids.map(id=>{
   const index=CREATURE_TRAITS.findIndex(entry=>entry.id===`creature.${id}`),entry=CREATURE_TRAITS[index];
@@ -25,7 +24,7 @@ export function bestiarySources() {
     loot:[{name:"Кроны",formula:"3d10",currency:true},{name:"Обычные предметы",formula:"1d6"}]};
   bandit.items=[gear("weapon.iron-longsword",{damageIncludesBody:true}),gear("weapon.dagger",{damage:"1d6",equipped:false,damageIncludesBody:true,source:"Базовая книга, стр. 271: урон кинжала в блоке разбойника 1d6"}),gear("weapon.hand-crossbow",{equipped:false,damageIncludesBody:true}),
     gear("armor.head.2"),gear("armor.torso.2"),gear("armor.legs.2"),
-    {_id:"banditBolts00001",name:"Болты",type:"equipment",img:AMMUNITION_ICON,system:{kind:"ammunition",quantity:20,weight:0.05,price:1,description:"<p>Стандартные арбалетные болты. Добыча разбойника: 20 штук.</p>"}},...traits(["hanged-man-venom"])];
+    {...gear("ammunition.standard",{quantity:20,equipped:false}),_id:"banditBolts00001",name:"Болты"},...traits(["hanged-man-venom"])];
   const drowner=base("bestiaryDrowner1","Утопец","drowner",[1,7,7,6,6,1,1,4,0],25);
   drowner.system.skills={melee:6,brawling:6,dodgeEscape:5,athletics:6,awareness:8,stealth:5,wildernessSurvival:6,resistMagic:4,endurance:6,courage:8};
   drowner.system.creature={category:"necrophage",difficulty:"Простые / обычные",reward:10,size:"Около человеческого роста",weight:"Около человеческого веса",habitat:"Берега рек, озёр и морей",intellect:"Как у рыбы",group:"Стая из 3–6 утопцев",source:"Базовая книга, стр. 276–277",

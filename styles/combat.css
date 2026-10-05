@@ -37,3 +37,18 @@
 .witcher-inventory-row-actions [data-action=changeGrip] small { position:absolute; right:0; bottom:0; background:#eae2d2; border-radius:3px; font-size:9px; padding:0 2px; color:#573927; }
 @container witcher-sheet (max-width:650px) { .witcher-combat-heading { align-items:flex-start; } .witcher-attack-options { grid-template-columns:1fr 1fr; } .witcher-attack-options label:last-child { grid-column:1/-1; grid-template-columns:1fr 70px; align-items:center; } }
 @media(prefers-reduced-motion:reduce) { .witcher-combat-panel button { transition:none; } }
+.witcher-defenses { border-top:1px solid #bfa985; padding-top:14px; margin-top:18px; }
+.witcher-defenses>header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.witcher-defenses h3 { border:0; margin:0; font:700 19px Georgia,serif; color:#425456; }
+.witcher-repeat-defense { display:flex; align-items:center; gap:5px; font-size:12px; }
+.witcher-defense-options { display:grid; grid-template-columns:1fr 160px; gap:10px; margin-bottom:10px; }
+.witcher-defense-options label { display:grid; gap:4px; font-size:11px; color:#77644b; }
+.witcher-defense-options select,.witcher-defense-options input { width:100%; height:30px; font-size:12px; }
+.witcher-defense-buttons { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.witcher-defense-buttons button { display:flex; flex-direction:column; align-items:stretch; height:auto; padding:8px 12px; text-align:left; border-left:3px solid #647776; }
+.witcher-defense-buttons span { display:flex; justify-content:space-between; gap:8px; }
+.witcher-defense-buttons b { color:#435a58; }
+.witcher-defense-buttons small { font-size:11px; color:#806d53; }
+.witcher-defense-buttons button:disabled { opacity:.5; }
+.witcher-location-buttons { display:flex; gap:4px; margin-top:5px; }
+.witcher-location-buttons button { font-size:11px; flex:1; }

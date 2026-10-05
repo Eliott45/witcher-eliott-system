@@ -1,11 +1,25 @@
 import { skillValue } from "../data/skills.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
+import { shieldClass } from "../data/shields.mjs";
 
 export const gripOf = item => item.system.natural ? 0 : item.system.grip || item.system.hands || 1;
 export const signed = value => value >= 0 ? `+${value}` : `−${Math.abs(value)}`;
 // Core p.48 only tabulates BODY 1–13. Do not extrapolate beyond that table.
 export const bodyDamage = body => body == null ? 0 : 2 * Math.ceil(Math.min(13, Math.max(1, body)) / 2) - 6;
+export function weaponReadiness(actor,item,weapon=effectiveItem(item)) {
+  if(!equippedItems(actor.items).some(entry=>entry.id===item.id))return "Возьмите оружие в руки";
+  if(!weapon.natural&&gripOf(item)<(weapon.hands??1))return `Нужно рук: ${weapon.hands}`;
+  if(!weapon.natural&&weapon.reliability?.max&&weapon.reliability.value<=0)return "Оружие сломано";
+  return "";
+}
+export function shieldPunch(body,weightClass) {
+  // TODO: p.164 says two/four levels on the punch table, not +2/+4 damage.
+  // Treat these as rows of p.48; cap at the last printed row. The Item damage field
+  // can override this interpretation until an official numerical example is available.
+  const steps={light:0,medium:2,heavy:4}[weightClass];
+  return steps===undefined?null:Math.min(8,bodyDamage(body)+2*steps);
+}
 export const ATTACK_LOCATIONS = [
   {id:"random",name:"Без прицеливания",penalty:0,multiplier:1},
   {id:"head",name:"Голова",penalty:-6,multiplier:3},
@@ -20,6 +34,12 @@ export const RANGED_BANDS = [{id:"normal",name:"Дистанция: без по�
   {id:"point",name:"В упор (≤ 0,5 м) · +5",penalty:5},{id:"short",name:"Ближняя (¼ дальности) · 0",penalty:0},
   {id:"medium",name:"Средняя (½ дальности) · −2",penalty:-2},{id:"long",name:"Дальняя · −4",penalty:-4},
   {id:"extreme",name:"Предельная (×2) · −6",penalty:-6}];
+export function hitLocation(result,bodyPlan="humanoid") {
+  if(!Number.isInteger(result)||result<1||result>10||!["humanoid","monster"].includes(bodyPlan))throw new Error("Неизвестная зона попадания.");
+  const table=bodyPlan==="humanoid"?["head","torso","torso","torso","rightArm","leftArm","rightLeg","rightLeg","leftLeg","leftLeg"]:
+    ["head","torso","torso","torso","torso","rightArm","rightArm","leftArm","leftArm","tail"];
+  return ATTACK_LOCATIONS.find(entry=>entry.id===table[result-1]);
+}
 export function attackModes(actor,item) {
   if (actor.type === "npc") return [{id:"npc",name:`Атака ×${item.system.attackRate??1}`,count:item.system.attackRate??1,penalty:0,multiplier:1}];
   if (item.system.skill === "crossbow") return [{id:"shot",name:"Выстрел",count:1,penalty:0,multiplier:1}];
@@ -39,15 +59,11 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
     {label:aim.name,value:aim.penalty},{label:band.name,value:band.penalty},{label:"Ситуация",value:Number(modifier)}];
   const total=skill.total===null?null:parts.reduce((sum,part)=>sum+part.value,0);
   const melee=["melee","thrown","shield"].includes(weapon.category);
-  const body=melee&&!weapon.damageIncludesBody?bodyDamage(actor.system.statistics.effective.body):0;
+  const shield=weapon.category==="shield"&&weapon.damage==="0";
+  const body=shield?shieldPunch(actor.system.statistics.effective.body,shieldClass(weapon)):melee&&!weapon.damageIncludesBody?bodyDamage(actor.system.statistics.effective.body):0;
   const bonus=melee?actor.system.statistics.meleeDamageBonus??0:0;
   const unarmedBonus=weapon.ruleId==="weapon.brass-knuckles"&&!weapon.damageIncludesBody?" + 1d6":"";
-  const damage=`(${weapon.damage}${unarmedBonus}${body+bonus?` + ${body+bonus}`:""})${attack.multiplier===2?" * 2":""}`;
-  const ready=equippedItems(actor.items).some(entry=>entry.id===item.id);
-  const gripValid=weapon.natural||gripOf(item)>=(weapon.hands??1);
-  const intact=weapon.natural||!weapon.reliability?.max||weapon.reliability.value>0;
-  // TODO: shield strikes require the BODY punch table and a shield weight class (core p.164),
-  // which old shield Items do not store. Never offer their placeholder 0 as actual damage.
-  const blocked=weapon.category==="shield"&&weapon.damage==="0"?"Удар щитом: задайте урон по таблице рукопашного боя (стр. 48, 164)":!ready?"Возьмите оружие в руки":!gripValid?`Нужно рук: ${weapon.hands}`:!intact?"Оружие сломано":total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":"";
+  const damage=`(${shield?"1d6":weapon.damage}${unarmedBonus}${body+bonus?` + ${body+bonus}`:""})${attack.multiplier===2?" * 2":""}`;
+  const blocked=shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon)|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":"");
   return {weapon,attack,skill,parts,total,damage,body,bonus,aim,band,ranged,blocked,range:weapon.rangeBodyMultiplier?weapon.rangeBodyMultiplier*actor.system.statistics.effective.body:weapon.range};
 }

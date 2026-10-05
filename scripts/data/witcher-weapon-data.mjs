@@ -4,6 +4,7 @@ export class WitcherWeaponData extends WitcherEquipmentData {
     return { ...super.defineSchema(), category: itemText("melee", { choices: ["melee", "ranged", "thrown", "shield"] }),
       skill: itemText("melee", { choices: ["swordsmanship", "smallBlades", "melee", "brawling", "staffSpear", "archery", "crossbow", "athletics"] }),
       damage: itemText("1d6"), accuracy: itemNumber(0, { min: -100, integer: true }),
+      shieldClass: itemText("", {choices:["","light","medium","heavy"]}),
       hands: itemNumber(1, { min: 1, max: 2, integer: true }),
       grip: itemNumber(0, { max: 2, integer: true }),
       natural: new foundry.data.fields.BooleanField({ initial: false }),

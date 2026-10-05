@@ -1228,6 +1228,7 @@ for(const source of bestiarySources()) {
     npcSheet.editing=editing;
     const view=await npcSheet._prepareContext({});const rendered=npcTemplate(view);
     assert.ok(rendered.includes(source.name));assert.ok(rendered.includes('data-action="attackWeapon"'));assert.ok(!rendered.includes('data-mode="strong"'));
+    assert.match(rendered,/<nav class="[^\"]*\btabs\b[^\"]*"/,"Foundry changeTab requires a .tabs navigation container");
     if(!editing)creatureViews.push({actor,sheet:npcSheet,view,html:rendered});
   }
   if(source.name==='Утопец') {
@@ -1244,6 +1245,25 @@ const emptyCreature=new foundry.documents.BaseActor({name:'New creature',type:'n
 const emptySheet=new WitcherNPCSheet();emptySheet.actor=emptyCreature;emptySheet.isEditable=true;
 assert.match(npcTemplate(await emptySheet._prepareContext({})),/Бандит/);
 assert.equal(new WitcherActorData(legacyActorData.toObject()).creature.category,'humanoid');
+// Exercise NPC drop through native Item/Actor schemas; pointer delivery is outside this harness.
+const priorWorldItems=game.items;
+game.items={fromCompendium:item=>item.toObject()};
+const dropActor=new foundry.documents.BaseActor(bestiarySources()[1]);
+Object.defineProperty(dropActor,'isOwner',{value:true});
+dropActor.createEmbeddedDocuments=async(type,sources)=>{
+  assert.equal(type,'Item');
+  const rows=sources.map(source=>({...source,_id:'npcDropWeapon001'}));
+  dropActor.updateSource({items:[...dropActor.items.map(item=>item.toObject()),...rows]});
+  return rows.map(row=>dropActor.items.get(row._id));
+};
+const dropSheet=new WitcherNPCSheet();dropSheet.actor=dropActor;dropSheet.isEditable=true;
+const incomingWeapon=creatureViews[0].actor.items.find(item=>item.type==='weapon');
+const dropped=await dropSheet._onDropItem({target:{closest:()=>null}},incomingWeapon);
+assert.equal(dropped.type,'weapon');assert.equal(dropped.system.equipped,false);assert.equal(dropped.system.containerId,'');
+const reopenedDrop=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(dropActor.toObject())));
+assert.equal(reopenedDrop.items.get(dropped.id).system.damage,incomingWeapon.system.damage);
+assert.ok(reopenedDrop.items.size>1,'Dropping an Item must preserve the creature’s other Items');
+game.items=priorWorldItems;
 game.user=creatureTestGlobals.user;foundry.utils.fromUuid=creatureTestGlobals.fromUuid;
 
 console.log(`Installed Foundry core: data, ${documents.size} compendium documents, templates, native Luck, death saves and all nine critical chains OK`);

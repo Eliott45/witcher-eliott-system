@@ -293,9 +293,29 @@
         "system": {
           "kind": "ammunition",
           "quantity": 20,
+          "purchaseQuantity": 10,
           "weight": 0.05,
           "price": 1,
-          "description": "<p>Стандартные арбалетные болты. Добыча разбойника: 20 штук.</p>"
+          "rarity": "everywhere",
+          "damageType": "К",
+          "reliability": {
+            "value": 10,
+            "max": 10
+          },
+          "concealment": "large",
+          "properties": "",
+          "description": "<p>Стандартные боеприпасы продаются пачками по 10 штук за 10 крон (0,5 кг). В инвентаре учитываются отдельные боеприпасы: 1 штука весит 0,05 кг и стоит 1 крону.</p><p>Базовая книга, стр. 74.</p>",
+          "source": "Базовая книга, стр. 74",
+          "ruleId": "ammunition.standard",
+          "equipped": false
+        },
+        "flags": {
+          "witcher-eliott-system": {
+            "ammunitionUnits": true
+          },
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.ammo000000000001"
+          }
         }
       },
       {
