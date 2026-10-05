@@ -54,7 +54,7 @@
 .witcher-full-turn-grid article { display:flex; flex-direction:column; gap:10px; padding:14px; border:1px solid #cbb99d; border-radius:7px; background:#faf6ed; }
 .witcher-full-turn-grid article.is-active { border-color:#64807a; box-shadow:inset 3px 0 #64807a; background:#edf0e5; }
 .witcher-full-turn-grid header { display:flex; align-items:center; gap:8px; color:#425456; }
-.witcher-full-turn-grid h4 { flex:1; margin:0; font:700 15px Georgia,serif; }
+.witcher-full-turn-grid h4 { flex:1; margin:0; font:700 15px Georgia,serif; color:inherit; text-shadow:none; }
 .witcher-full-turn-grid header>b { font-size:12px; white-space:nowrap; }
 .witcher-full-turn-grid p { flex:1; margin:0; font-size:12px; line-height:1.5; }
 .witcher-full-turn-grid small { color:#806f58; font-size:11px; }
