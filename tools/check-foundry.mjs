@@ -678,6 +678,33 @@ assert.equal(advancingActor.items.getName(bardDefinition.name).system.level, 2, 
 // Render saved inventory through the same strict template used by old and new actors.
 const { inventoryContext } = await import("../scripts/sheets/inventory-context.mjs");
 const inventoryHTML = handlebars.compile(await readFile(new URL("../templates/inventory.hbs", import.meta.url), "utf8"), { strict: true });
+// Old catalog imports default to a raised visor; PC/NPC save/reopen uses one native Boolean.
+const { abilitiesContext } = await import("../scripts/sheets/abilities-context.mjs");
+const { physicalItemContext } = await import("../scripts/sheets/physical-item-context.mjs");
+const legacyVisorSource = await readJSON("../pack-sources/equipment.json").then(entries => entries.find(entry => entry.system.ruleId === "armor.head.6"));
+for (const type of ["character", "npc"]) {
+  const wearer = new foundry.documents.BaseActor({name: "Visor round trip", type, system: {details: {race: "witcher"}, notes: "Existing notes"},
+    items: [{...legacyVisorSource, system: {...legacyVisorSource.system, equipped: true}}]});
+  const helm = wearer.items.contents[0];
+  assert.equal(helm.system.visorDown, false);
+  assert.equal(wearer.system.statistics.skillBonuses.awareness, 1);
+  helm.updateSource({"system.visorDown": true});
+  const reopened = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(wearer.toObject())));
+  const savedHelm = reopened.items.contents[0];
+  assert.equal(savedHelm.system.visorDown, true);
+  assert.equal(reopened.system.notes, "Existing notes");
+  assert.equal(reopened.system.statistics.skillBonuses.awareness ?? 0, 0);
+  const visorHTML = inventoryHTML({rootId: "visor", editable: true, system: reopened.system, inventory: inventoryContext(reopened), workshop: {witcher: false, npc: false}});
+  assert.match(visorHTML, /data-action="toggleVisor"[^>]*aria-pressed="true"/);
+  assert.ok(visorHTML.includes("Забрало опущено"));
+  const observerHTML = inventoryHTML({rootId: "visor", editable: false, system: reopened.system, inventory: inventoryContext(reopened), workshop: {witcher: false, npc: false}});
+  assert.match(observerHTML, /data-action="toggleVisor"[^>]*disabled/);
+  assert.ok(physicalItemContext(savedHelm, true).some(group => group.fields.some(field => field.name === "system.visorDown" && field.value)));
+  assert.equal((await abilitiesContext(reopened)).entries.filter(entry => entry.suppressed).length, 1);
+  savedHelm.updateSource({"system.visorDown": false});
+  assert.equal(reopened.system.statistics.skillBonuses.awareness, 1);
+  assert.equal((await abilitiesContext(reopened)).entries.filter(entry => entry.suppressed).length, 0);
+}
 const bagActor = new foundry.documents.BaseActor({ name: "Containers round trip", type: "character", items: [
   { _id: "bag0000000000001", name: "Bag", type: "equipment", system: { kind: "container", capacity: 5, weight: 1 } },
   { _id: "bag0000000000002", name: "Pouch", type: "equipment", system: { kind: "container", capacity: 1, weight: 0.2, containerId: "bag0000000000001" } },

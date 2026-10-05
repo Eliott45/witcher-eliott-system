@@ -1,7 +1,7 @@
 import { getProfessionAbility } from "../data/professions.mjs";
 import { getRace } from "../data/races.mjs";
 import { abilityUuid } from "../data/compendiums.mjs";
-import { hasAbility } from "../data/abilities.mjs";
+import { hasAbility, abilitySuppressed } from "../data/abilities.mjs";
 import { escapeTooltip } from "./statistics-tooltips.mjs";
 
 export async function abilitiesContext(actor) {
@@ -14,14 +14,14 @@ export async function abilitiesContext(actor) {
     const document = owned ?? await foundry.utils.fromUuid(uuid).catch(() => null);
     const readable = document?.testUserPermission(game.user, "LIMITED");
     return {
-      id: owned?.id ?? "", uuid: readable ? document.uuid : uuid, fromRace: true,
+      id: owned?.id ?? "", uuid: readable ? document.uuid : uuid, fromRace: true, suppressed: abilitySuppressed(actor, ability.id),
       name: readable ? document.name : game.i18n.localize(ability.label),
       img: readable ? document.img : "icons/svg/aura.svg",
       html: readable ? document.system.description : `<p>${escapeTooltip(game.i18n.localize(ability.description))}</p>`
     };
   }));
   for (const item of items.filter(item => !used.has(item.id) && getProfessionAbility(item.system.ruleId)?.profession !== actor.system.details.profession)) entries.push({
-    id: item.id, uuid: item.uuid, fromRace: false, name: item.name, img: item.img, html: item.system.description
+    id: item.id, uuid: item.uuid, fromRace: false, name: item.name, img: item.img, html: item.system.description, suppressed: abilitySuppressed(actor, item.system.ruleId)
   });
   const enriched = await Promise.all(entries.map(async entry => ({ ...entry,
     description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(entry.html,

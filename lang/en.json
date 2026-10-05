@@ -23,6 +23,14 @@
     }
   },
   "WITCHER": {
+    "Visor": {
+      "Up": "Visor raised",
+      "Down": "Visor lowered",
+      "RaiseHint": "Raise the visor to restore vision and witcher senses.",
+      "LowerHint": "Lower the visor: 90° forward vision cone. Witcher senses become unavailable.",
+      "SensesInactive": "Unavailable: visor lowered",
+      "SensesHint": "Restricted Vision disables the racial +1 to Awareness and scent tracking. Raise the visor or remove the helmet to restore them."
+    },
     "ItemTabs": {
       "Save": "Save details",
       "Description": "Description",

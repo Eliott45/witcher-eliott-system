@@ -39,6 +39,7 @@ import { WitcherInfluenceData } from "./data/witcher-influence-data.mjs";
 import { registerSheetPreferences } from "./sheets/sheet-preferences.mjs";
 import { WitcherItemSheet } from "./sheets/witcher-item-sheet.mjs";
 import { WitcherToken } from "./canvas/witcher-token.mjs";
+import { registerVisorVision } from "./canvas/visor-vision.mjs";
 import { renderTokenVisionToggle } from "./combat/token-hud.mjs";
 import { migrateVisionDefaults, registerVisionMigration } from "./migrations/vision-defaults.mjs";
 import { migrateCompendiumFolders, registerCompendiumFolderMigration } from "./migrations/compendium-folders.mjs";
@@ -72,6 +73,7 @@ Hooks.once("init", async () => {
   registerServiceOrders();
   CONFIG.time.roundTime = ROUND_SECONDS;
   registerVisionMigration();
+  registerVisorVision();
   registerCompendiumFolderMigration();
   registerEquipmentContentMigration();
   registerSpellContentMigration();

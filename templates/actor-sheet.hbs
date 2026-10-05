@@ -326,11 +326,13 @@
         </div>
         <p class="witcher-drop-hint">{{localize "WITCHER.Abilities.Hint"}}</p>
         {{#each abilities.entries as |ability|}}
-        <details class="witcher-owned-ability {{#if ability.id}}draggable{{/if}}" data-item-id="{{ability.id}}">
+        <details class="witcher-owned-ability {{#if ability.id}}draggable{{/if}} {{#if ability.suppressed}}is-suppressed{{/if}}" data-item-id="{{ability.id}}">
           <summary>
             <img src="{{ability.img}}" alt=""><span>{{ability.name}}</span>
             {{#if ability.fromRace}}<small>{{localize "WITCHER.Abilities.Race"}}</small>{{/if}}
+            {{#if ability.suppressed}}<small class="witcher-suppression-hint" data-tooltip="{{localize 'WITCHER.Visor.SensesHint'}}"><i class="fa-solid fa-eye-slash" aria-hidden="true"></i> {{localize "WITCHER.Visor.SensesInactive"}}</small>{{/if}}
           </summary>
+          {{#if ability.suppressed}}<p class="witcher-suppression-hint">{{localize "WITCHER.Visor.SensesHint"}}</p>{{/if}}
           <div class="witcher-owned-description">{{{ability.description}}}</div>
           <div class="witcher-owned-buttons">
             <button type="button" data-action="viewSheetItem" data-item-id="{{ability.id}}" data-uuid="{{ability.uuid}}"><i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i> {{localize "WITCHER.Abilities.View"}}</button>

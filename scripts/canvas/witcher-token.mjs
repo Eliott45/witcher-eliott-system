@@ -1,5 +1,6 @@
-import { COMBAT_ACTOR_TYPES, PREVIEW_VISION_ANGLE } from "../config.mjs";
+import { COMBAT_ACTOR_TYPES, PREVIEW_VISION_ANGLE, RESTRICTED_VISION_ANGLE } from "../config.mjs";
 import { drawFacingMarker } from "../combat/facing-marker.mjs";
+import { restrictedVision } from "../data/visor.mjs";
 
 export class WitcherToken extends foundry.canvas.placeables.Token {
   #facingMarker;
@@ -16,7 +17,11 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
   }
 
   get hasLimitedSourceAngle() {
-    return super.hasLimitedSourceAngle || (this.hasSight && this.visionPreviewActive);
+    return super.hasLimitedSourceAngle || (this.hasSight && (this.visionPreviewActive || this.hasRestrictedVision));
+  }
+
+  get hasRestrictedVision() {
+    return this._original?.hasRestrictedVision ?? (this.hasFacing && restrictedVision(this.actor.items));
   }
 
   _getVisionSourceData() {
@@ -25,6 +30,7 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
     // Foundry's zero faces south. Keep artwork upright and align sight with our north-facing arrow.
     data.rotation = (data.rotation + 180) % 360;
     if (this.visionPreviewActive) data.angle = Math.min(data.angle, PREVIEW_VISION_ANGLE);
+    if (this.hasRestrictedVision) data.angle = Math.min(data.angle, RESTRICTED_VISION_ANGLE);
     return data;
   }
 

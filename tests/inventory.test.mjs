@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { carriedWeight, conditionUpdate, armorEncumbrance } from "../scripts/data/physical-items.mjs";
-import { equipItem, inventoryContext, changeInventoryQuantity, toggleCarried } from "../scripts/sheets/inventory-context.mjs";
+import { equipItem, inventoryContext, changeInventoryQuantity, toggleCarried, toggleVisor } from "../scripts/sheets/inventory-context.mjs";
 import { CORE_EQUIPMENT } from "../scripts/data/core-equipment.mjs";
 const item = (id, type, system) => ({ id, name: id, type, system: { quantity: 1, carried: true, equipped: false, weight: 0, layer: 0, ...system } });
 test("inventory weight counts quantity once, excludes storage and companions, tolerates old gear", () => {
@@ -66,4 +66,26 @@ test("quick inventory controls serialize quantity, cannot go negative, and leavi
   sheet.actor.isOwner = false;
   await changeInventoryQuantity.call(sheet, null, target(1));
   assert.equal(sword.system.quantity, 0);
+});
+
+test("visor button uses the equipment queue, requires ownership and a worn helmet, and preserves its state when unequipped", async () => {
+  const helm = item("helm", "armor", {ruleId: "armor.head.6", zone: "head", equipped: true});
+  const pieces = Object.assign([helm], {get: id => pieces.find(item => item.id === id)});
+  const actor = {isOwner: true, items: pieces};
+  helm.update = async changes => { await Promise.resolve(); for (const [key, value] of Object.entries(changes)) helm.system[key.slice(7)] = value; };
+  const sheet = {actor, isEditable: true}, target = {dataset: {itemId: "helm"}};
+  await toggleVisor.call(sheet, null, target);
+  assert.equal(helm.system.visorDown, true);
+  const head = inventoryContext(actor).zones.find(zone => zone.id === "head").items[0];
+  assert.equal(head.hasVisor, true); assert.equal(head.visorDown, true);
+  await Promise.all([toggleVisor.call(sheet, null, target), toggleVisor.call(sheet, null, target)]);
+  assert.equal(helm.system.visorDown, true, "Two queued toggles do not lose a write");
+  sheet.isEditable = false;
+  await toggleVisor.call(sheet, null, target);
+  sheet.isEditable = true; actor.isOwner = false;
+  await toggleVisor.call(sheet, null, target);
+  actor.isOwner = true; helm.system.equipped = false;
+  await toggleVisor.call(sheet, null, target);
+  assert.equal(helm.system.visorDown, true);
+  assert.equal(inventoryContext(actor).zones.find(zone => zone.id === "head").items.length, 0);
 });

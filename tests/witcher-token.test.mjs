@@ -140,3 +140,43 @@ test("unrelated actor types keep native sight and no decoration", async () => {
   assert.equal(token._getVisionSourceData().rotation, 0);
   assert.equal(token.toggleVisionPreview(), false);
 });
+
+test("lowered visor restricts vision to the forward 90° and raising or removing the helmet restores the prior view", () => {
+  const helmet = {id: "helm", type: "armor", system: {ruleId: "armor.head.7", zone: "head", equipped: true, quantity: 1, visorDown: true}};
+  for (const angle of [360, 180, 60]) {
+    const token = new WitcherToken({angle});
+    token.actor.items = [helmet];
+    for (const rotation of [0, 90, 180, 270]) {
+      token.document.rotation = rotation;
+      const data = token._getVisionSourceData();
+      assert.equal(data.angle, Math.min(angle, 90));
+      assert.equal(data.rotation, (rotation + 180) % 360);
+      assert.equal(token.hasLimitedSourceAngle, true);
+      assert.equal(data.lightRadius, 2000);
+    }
+    token.toggleVisionPreview();
+    assert.equal(token._getVisionSourceData().angle, Math.min(angle, 90));
+    token._onRelease({});
+    assert.equal(token._getVisionSourceData().angle, Math.min(angle, 90), "Deselecting cannot bypass the visor");
+    helmet.system.visorDown = false;
+    assert.equal(token._getVisionSourceData().angle, angle);
+    helmet.system.visorDown = true;
+    helmet.system.equipped = false;
+    assert.equal(token._getVisionSourceData().angle, angle);
+    helmet.system.equipped = true;
+    token.actor.items = [];
+    assert.equal(token._getVisionSourceData().angle, angle);
+    assert.equal(token.document.sight.angle, angle, "Never overwrite stored vision or require restoring a saved angle");
+  }
+});
+
+test("token drag/config clone inherits visor state and north-facing cone from original", () => {
+  const original = new WitcherToken();
+  original.actor.items = [{type: "armor", system: {zone: "head", ruleId: "armor.head.6", equipped: true, quantity: 1, visorDown: true}}];
+  const clone = new WitcherToken({rotation: 90});
+  clone._original = original;
+  assert.equal(clone._getVisionSourceData().angle, 90);
+  assert.equal(clone._getVisionSourceData().rotation, 270);
+  original.actor.items[0].system.visorDown = false;
+  assert.equal(clone._getVisionSourceData().angle, 360);
+});

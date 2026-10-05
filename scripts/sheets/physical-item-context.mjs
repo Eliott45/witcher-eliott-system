@@ -3,6 +3,7 @@ import { textField as text, numberField as number, choiceField as choice, formFi
 import { isPhysical, isAmmunition, ARMOR_COVERAGE, RARITIES, EQUIPMENT_KINDS, CONCEALMENT } from "../data/physical-items.mjs";
 import { SUBSTANCES, MONSTER_CATEGORIES } from "../data/workshop.mjs";
 import { SHIELD_CLASSES } from "../data/shields.mjs";
+import { supportsVisor } from "../data/visor.mjs";
 const decimal = (key, label) => ({ ...number(key, label), step: "0.001" });
 const bool = (key, label) => ({ key, label, type: "boolean" });
 const COMMON = [number("quantity", "Количество"), decimal("weight", "Вес единицы, кг"), decimal("price", "Цена единицы, кроны"),
@@ -28,6 +29,7 @@ export function physicalItemContext(item, editable) {
   const groups = [{ title: "Предмет", fields: isTransport(item) ? COMMON.filter(field=>!["weight","quantity","carried","equipped"].includes(field.key)) : COMMON }, { title: item.type === "weapon" ? "Оружие" : item.type === "armor" ? "Броня" : "Снаряжение",
     fields: item.type === "weapon" ? WEAPON : item.type === "armor" ? ARMOR : [choice("kind", "Категория", EQUIPMENT_KINDS)] },
   { title: "Особенности", fields: [text("properties", "Эффекты и условия")] }];
+  if (supportsVisor(item)) groups[1].fields = [...groups[1].fields, bool("visorDown", game.i18n.localize("WITCHER.Visor.Down"))];
   if (isTransport(item)) groups.push({title:"Транспорт",fields:[choice("transport.type","Вид транспорта",TRANSPORT_TYPES),decimal("capacity","Грузоподъёмность, кг"),number("transport.health.value","ПЗ сейчас"),number("transport.health.max","Максимум ПЗ"),number("transport.speed","Скорость"),number("transport.speedModifier","Для повозки: поправка к скорости животного",-100),number("transport.athletics","Атлетика + ЛВК (для животного)"),number("transport.handling","Модификатор управления",-100)]});
   if(item.type==="equipment"&&["tack","container"].includes(item.system.kind)) groups.push({title:"Упряжь",fields:[choice("tack.slot","Место крепления",[{id:"",name:"Не упряжь"},...TACK_SLOTS]),number("tack.speedBonus","Бонус скорости от седла"),number("tack.stoppingPower.value","Конский доспех: ПБ сейчас"),number("tack.stoppingPower.max","Конский доспех: максимум ПБ"),choice("tack.compartments","Отделения сумок",[{id:0,name:"Один общий контейнер"},{id:2,name:"Две седельные сумки"}]),number("tack.externalSlots","Наружных креплений")]});
   if (isAmmunition(item)) groups.splice(2, 0, { title: "Боеприпасы", fields: [number("purchaseQuantity", "Штук в пачке при покупке / добавлении", 1), DAMAGE_TYPE, ...RELIABILITY, CONCEALMENT_FIELD] });

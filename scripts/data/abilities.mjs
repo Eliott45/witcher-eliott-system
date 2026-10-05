@@ -1,10 +1,14 @@
 import { getRace } from "./races.mjs";
+import { ENHANCED_SENSES, witcherSensesSuppressed } from "./visor.mjs";
+
+export const abilitySuppressed = (actor, id) => id === ENHANCED_SENSES && witcherSensesSuppressed(actor.system.details, actor.items);
 
 export function additionalAbilityIds(actor) {
   return (actor.items ?? []).filter(item => item.type === "ability").map(item => item.system.ruleId).filter(Boolean);
 }
 
 export function hasAbility(actor, id) {
+  if (abilitySuppressed(actor, id)) return false;
   return getRace(actor.system.details.race)?.abilities.some(ability => ability.id === id)
     || additionalAbilityIds(actor).includes(id);
 }

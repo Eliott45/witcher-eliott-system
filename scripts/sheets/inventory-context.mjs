@@ -1,5 +1,6 @@
 import { isTransport, cargoSections, cargoSection } from "../data/transport.mjs";
 import { gripOf } from "../combat/weapon-rules.mjs";
+import { supportsVisor } from "../data/visor.mjs";
 import { effectiveItem, activeOil } from "../data/workshop.mjs";
 import { ARMOR_ZONES, armorZones, isPhysical, equippedItems, conditionKey, carriedWeight, itemWeight } from "../data/physical-items.mjs";
 import { isContainer, containerParent, containerContents, isCarried } from "../data/containers.mjs";
@@ -21,9 +22,10 @@ const GROUPS = [
   { id: "companion", name: "Компаньоны", icon: "fa-paw", categories: ["companion"] },
   { id: "container", name: "Контейнеры", icon: "fa-box-open", categories: ["container"] }
 ];
+const visorContext = item => ({ hasVisor: supportsVisor(item), visorDown: Boolean(item.system.visorDown) });
 export function inventoryContext(actor, preferences = {}) {
   const items = Array.from(actor.items ?? []).filter(isPhysical);
-  const rows = items.map(item => ({ id: item.id, name: item.name, img: item.img, ...item.system, sort: item.sort ?? 0,
+  const rows = items.map(item => ({ id: item.id, name: item.name, img: item.img, ...item.system, ...visorContext(item), sort: item.sort ?? 0,
     quantity: item.system.quantity ?? 1, carried: isCarried(item, items), expanded: false, presentation: null, cargoSections: [], onTransport: false,
     isContainer: isContainer(item), parentId: containerParent(item, items)?.id ?? "", children: [], containerOpen: true,
     isRecipe: item.type === "recipe", oil: activeOil(item, globalThis.game?.time?.worldTime ?? 0),
@@ -61,8 +63,16 @@ export function inventoryContext(actor, preferences = {}) {
     categories: EQUIPMENT_CATEGORIES, items: rows,
     groups: GROUPS.map(group => ({ ...group, open: !preferences.collapsed?.[`inventory-${group.id}`],
       items: sortRows(rows.filter(item => !item.parentId && group.categories.includes(item.category))) })),
-    zones: ARMOR_ZONES.map(zone => ({ ...zone, items: equippedItems(items).filter(item => item.type === "armor" && armorZones(item).includes(zone.id)).map(item => ({ id: item.id, name: item.name, condition: effectiveItem(item).stoppingPower })) })),
+    zones: ARMOR_ZONES.map(zone => ({ ...zone, items: equippedItems(items).filter(item => item.type === "armor" && armorZones(item).includes(zone.id)).map(item => ({ id: item.id, name: item.name, ...visorContext(item), condition: effectiveItem(item).stoppingPower })) })),
     workshopOpen: !preferences.collapsed?.["inventory-workshop"] };
+}
+export async function toggleVisor(_event, target) {
+  if (!this.isEditable) return;
+  await inventoryWrite(this.actor, async () => {
+    const item = this.actor.items.get(target.dataset.itemId);
+    if (!supportsVisor(item) || !equippedItems(this.actor.items).includes(item)) return;
+    await item.update({ "system.visorDown": !item.system.visorDown });
+  });
 }
 export async function equipItem(_event, target) {
   if (!this.isEditable) return;

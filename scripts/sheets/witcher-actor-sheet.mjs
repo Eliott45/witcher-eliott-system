@@ -1,6 +1,6 @@
 import { magicContext, magicActions, bindMagic, learnSpell } from "./magic-context.mjs";
 import { combatContext, combatActions, bindCombat } from "./combat-context.mjs";
-import { changeGrip } from "./inventory-context.mjs";
+import { changeGrip, toggleVisor } from "./inventory-context.mjs";
 import { learningContext, learningActions } from "./learning-context.mjs";
 import { transportContext, transportActions, bindTransport } from "./transport-context.mjs";
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
@@ -60,7 +60,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       rollReputation: WitcherActorSheet.#onRollReputation,
       toggleReputationBonus: configureReputationBonus,
       configureReputationBonus,
-      equipItem, createInventoryItem, browseEquipment, addCatalogItem,
+      equipItem, toggleVisor, createInventoryItem, browseEquipment, addCatalogItem,
       changeInventoryQuantity, toggleCarried, toggleInventoryGroup,
       toggleItemDescription, postItem, searchItemTrait, chooseContainer, toggleContainer,
       editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent,
