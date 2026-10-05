@@ -92,5 +92,5 @@ RECIPES.push(...ALCHEMY.map((result,i)=>{
  const components = Object.entries(counts).map(([substance,quantity])=>({substance,quantity,uuid:""}));
  if(recipe.dogTallow) components.push({uuid:materialUuid("dog-tallow"),quantity:1,substance:""});
  if(recipe.mutagenUuid) components.push({uuid:recipe.mutagenUuid,quantity:1,substance:""},{uuid:equipmentUuid(CORE_EQUIPMENT.find(item=>item.id==="gear.spirits").documentId),quantity:1,substance:""});
- return {id:`formula.${result.id}`,documentId:`recp${String(i+501).padStart(12,"0")}`,type:"recipe",source:"recipes",name:`Формула: ${result.name}`,system:{price:recipe.price??0,source:result.system.source,recipe:{category:"formula",resultUuid:equipmentUuid(result.documentId),dc:recipe.dc,time:recipe.time,quantity:1,grade:recipe.grade??"novice",tools:["gear.alchemy-tools"],components}}};
+ return {id:`formula.${result.id}`,documentId:`recp${String(i+501).padStart(12,"0")}`,type:"recipe",source:"recipes",name:`Формула: ${result.name}`,flags:recipe.price === undefined ? structuredClone(result.flags) : {},system:{price:recipe.price??0,source:result.system.source,recipe:{category:"formula",resultUuid:equipmentUuid(result.documentId),dc:recipe.dc,time:recipe.time,quantity:1,grade:recipe.grade??"novice",tools:["gear.alchemy-tools"],components}}};
 }));

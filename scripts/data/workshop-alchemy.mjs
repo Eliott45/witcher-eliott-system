@@ -1,5 +1,6 @@
 import { equipmentUuid, MONSTER_CATEGORIES } from "./workshop.mjs";
 import { alchemyDescription } from "./alchemy-descriptions.mjs";
+import { SYSTEM_ID } from "../config.mjs";
 // Amounts in formula strings are one unit of the named substance per letter.
 export const SUBSTANCE_CODES = { V:"vitriol", R:"rebis", A:"aether", Q:"quebrith", H:"hydragenum", M:"vermilion", S:"sol", C:"caelum", F:"fulgur" };
 const ordinary = [
@@ -43,7 +44,7 @@ const potions = [
 export const ALCHEMY = ordinary.map(([id,name,dc,time,formulaPrice,substances,weight,price,rarity,properties],i)=>({ id:`alchemy.${id}`,documentId:`alch${String(i+1).padStart(12,"0")}`,type:"equipment",name,source:"alchemy",system:{kind:"alchemy",weight,price,rarity,properties,alchemy:{category:"substance"},source:"Базовая книга, стр. 87–88 / 146–147"},formula:{dc,time,price:formulaPrice,substances,grade:i<11?"novice":i<16?"journeyman":"master"} }));
 ALCHEMY.push(...potions.map(([id,name,dc,substances,duration,toxicity,properties],i)=>({id:`potion.${id}`,documentId:`alch${String(i+101).padStart(12,"0")}`,type:"equipment",name:`Эликсир «${name}»`,source:"alchemy",system:{kind:"alchemy",weight:.5,properties,alchemy:{category:"potion",duration,toxicity},source:"Базовая книга, стр. 247 / 249; цена не указана"},formula:{dc,time:1800,substances}})));
 const oilFormulae = [[14,"VA"],[16,"MAHV"],[16,"QQHH"],[16,"RHQM"],[16,"CSVQ"],[16,"RSQF"],[14,"HR"],[16,"HSVQ"],[15,"RQC"],[16,"QMFA"],[16,"RHAF"],[16,"ASSF"]];
-ALCHEMY.push(...MONSTER_CATEGORIES.map((category,i)=>({id:`oil.${category.id}`,documentId:`alch${String(i+201).padStart(12,"0")}`,type:"equipment",name:category.id==="humanoid"?"Яд повешенного":`Масло: ${category.name}`,source:"alchemy",system:{kind:"alchemy",weight:.5,properties:`+5 урона только против категории «${category.name}». Действует на конкретном оружии 30 минут.`,alchemy:{category:"oil",target:category.id,bonus:5,duration:1800},source:"Базовая книга, стр. 248 / 250; цена не указана"},formula:{dc:oilFormulae[i][0],time:900,substances:oilFormulae[i][1],dogTallow:true}})));
+ALCHEMY.push(...MONSTER_CATEGORIES.map((category,i)=>({id:`oil.${category.id}`,documentId:`alch${String(i+201).padStart(12,"0")}`,type:"equipment",name:category.id==="humanoid"?"Яд повешенного":`Масло: ${category.name}`,source:"alchemy",system:{kind:"alchemy",weight:.5,properties:`+5 урона только против категории «${category.name}». Наносится на конкретное оружие.`,alchemy:{category:"oil",target:category.id,bonus:5,duration:1800},source:"Базовая книга, стр. 248 / 250; цена не указана"},formula:{dc:oilFormulae[i][0],time:900,substances:oilFormulae[i][1],dogTallow:true}})));
 export const MUTAGENS = [
  ["griffin","Грифон","red",18,"meleeDamage",2,"Редкие перья"], ["katakan","Катакан","red",22,"attributes.reflex",1,"Высокий рост"],
  ["nekker","Накер","red",15,"meleeDamage",1,"Облысение и серая кожа"], ["werewolf","Волколак","red",20,"meleeDamage",3,"Шерсть на теле"],
@@ -60,4 +61,10 @@ const decoctions = [
  ["werewolf",18,"RSHHF","Длительный бег не расходует Выносливость."], ["wyvern",18,"RRVAF","Успешное попадание даёт +1 к урону следующего удара; суммируется до конца боя или получения урона."]
 ];
 ALCHEMY.push(...decoctions.map(([id,dc,substances,properties],i)=>({id:`decoction.${id}`,documentId:`alch${String(i+301).padStart(12,"0")}`,type:"equipment",name:`Отвар: ${MUTAGENS.find(m=>m.id===`mutagen.${id}`).system.mutagen.monster}`,source:"alchemy",system:{kind:"alchemy",weight:.5,properties,alchemy:{category:"decoction",duration:1800,toxicity:75},source:"Базовая книга, стр. 248 / 250; цена не указана"},formula:{dc,time:1800,substances,mutagenUuid:equipmentUuid(MUTAGENS.find(m=>m.id===`mutagen.${id}`).documentId)}})));
-for (const entry of ALCHEMY) entry.system.description = alchemyDescription(entry);
+for (const entry of [...ALCHEMY, ...MUTAGENS]) {
+  if (entry.system.price === undefined) entry.flags = { [SYSTEM_ID]: { priceUnavailable: true } };
+  entry.system.source = entry.system.source.replace("; цена не указана", "");
+  entry.system.description = entry.system.kind === "mutagen"
+    ? `<p>${entry.system.properties}</p><p><strong>Малая мутация:</strong> ${entry.system.mutagen.mutation}.</p>`
+    : alchemyDescription(entry);
+}

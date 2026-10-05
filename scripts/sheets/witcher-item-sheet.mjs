@@ -11,6 +11,7 @@ import { searchItemTrait } from "./item-presentation.mjs";
 import { editEffectDuration } from "./effect-duration-editor.mjs";
 import { effectDurationLabel } from "../data/effect-duration.mjs";
 import { initialEffectTemplate } from "../data/effect-items.mjs";
+import { alchemyDescriptionDetails } from "../data/alchemy-descriptions.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const effectItemActions={
@@ -77,6 +78,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
       attributeChoices: [{value: "", label: game.i18n.localize("WITCHER.Professions.Passive")}, ...["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"].map(value => ({value, label: game.i18n.localize(`WITCHER.Attributes.${value}.Label`)}))].map(entry => ({...entry, selected: entry.value === this.item.system.attribute})),
       typeLabel: `TYPES.Item.${this.item.type}`,
       description: await enrich(this.item.system.description??""),
+      alchemyDetails: alchemyDescriptionDetails(this.item.system),
       abilities: abilities.filter(Boolean)
     });
   }

@@ -4,6 +4,7 @@ import { isPhysical } from "../data/physical-items.mjs";
 import { browseEquipmentCatalog } from "./equipment-browser.mjs";
 import { toolContent } from "../data/tool-rules.mjs";
 import { generalGearContent } from "../data/general-gear.mjs";
+import { alchemyDescriptionDetails } from "../data/alchemy-descriptions.mjs";
 
 export async function itemPresentation(item, { secrets = false } = {}) {
   const properties = item.system.properties?.trim() ?? "";
@@ -18,7 +19,7 @@ export async function itemPresentation(item, { secrets = false } = {}) {
   });
   return { ...entry, name: item.name,
     properties: rulesInDescription ? "" : extraProperties.join("; "),
-    description };
+    description: alchemyDescriptionDetails(item.system) + description };
 }
 export async function toggleItemDescription(_event, target) {
   this.expandedInventoryItems ??= new Set();

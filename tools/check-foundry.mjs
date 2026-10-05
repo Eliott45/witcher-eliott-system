@@ -1098,6 +1098,11 @@ for (const uuid of documents.keys()) {
   referenceSheet.item = await foundry.utils.fromUuid(uuid);
   const context = await referenceSheet._prepareContext({});
   const rendered = itemTemplate(context);
+  if (referenceSheet.item.system.ruleId === "potion.swallow") {
+    assert.match(rendered, /Длительность:<\/strong> 20 раундов/);
+    assert.match(rendered, /Токсичность:<\/strong> 50%/);
+    assert.doesNotMatch(rendered, /в параметрах состава|цена не указана/);
+  }
   assert.equal(context.itemTabs[0].id, "description", "Every Item opens with its description");
   assert.equal(context.itemTabs[0].active, true);
   assert.match(rendered, /<nav class="witcher-item-tabs tabs"/, "Native ApplicationV2 tab switching requires a tabs navigation");

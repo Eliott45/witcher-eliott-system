@@ -1,4 +1,5 @@
 import { ALCHEMY_EFFECT_KEYS, EFFECT_TEMPLATES, effectUuid } from "./condition-definitions.mjs";
+import { formatEffectDuration } from "./effect-duration.mjs";
 
 const INTRO = {
   adda:"Средство для сохранения пищи и останков от разложения.", alkali:"Порошок для нейтрализации кислоты.",
@@ -15,8 +16,22 @@ const INTRO = {
 };
 export function alchemyDescription(entry) {
   const id=entry.id.split(".")[1], keys=entry.id.startsWith("alchemy.") ? ALCHEMY_EFFECT_KEYS[id]??[] : [];
-  const intro=INTRO[id]??({potion:"Ведьмачий эликсир. Длительность и токсичность указаны в параметрах состава.",oil:"Покрытие для оружия против определённой категории противников.",decoction:"Ведьмачий отвар на основе мутагена."})[entry.system.alchemy.category];
+  const intro=INTRO[id]??({potion:"Ведьмачий эликсир.",oil:"Покрытие для оружия против определённой категории противников.",decoction:"Ведьмачий отвар на основе мутагена."})[entry.system.alchemy.category];
   return `<p>${intro}</p><h3>Действие состава</h3><p>${entry.system.properties}</p>`
-    +(keys.length?`<p><strong>Эффекты:</strong> ${keys.map(key=>`@UUID[${effectUuid(key)}]{${EFFECT_TEMPLATES.find(entry=>entry.key===key).name}}`).join(" · ")}</p><p>Перетащите эффект на персонажа после попадания и необходимых первоначальных проверок. Применения и порции расходуются отдельно.</p>`:"")
-    +`<p><small>${entry.system.source}</small></p>`;
+    +(keys.length?`<p><strong>Эффекты:</strong> ${keys.map(key=>`@UUID[${effectUuid(key)}]{${EFFECT_TEMPLATES.find(entry=>entry.key===key).name}}`).join(" · ")}</p>`:"");
+}
+
+/** Description details use current Item fields, never a second stored copy of duration/toxicity. */
+export function alchemyDescriptionDetails(system) {
+  if (system.kind !== "alchemy") return "";
+  const alchemy = system.alchemy ?? {}, facts = [];
+  if (Number.isFinite(alchemy.duration) && (["potion", "oil", "decoction"].includes(alchemy.category) || alchemy.duration > 0)) {
+    const duration = alchemy.duration === 0 ? "Мгновенно" : formatEffectDuration(alchemy.duration);
+    facts.push(`<strong>Длительность:</strong> ${duration}`);
+  }
+  if (["potion", "decoction"].includes(alchemy.category) || alchemy.toxicity > 0) {
+    const toxicity = Number(alchemy.toxicity);
+    if (Number.isFinite(toxicity)) facts.push(`<strong>Токсичность:</strong> ${toxicity}%`);
+  }
+  return facts.length ? `<p class="witcher-alchemy-details">${facts.join(" · ")}</p>` : "";
 }

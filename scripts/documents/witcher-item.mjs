@@ -6,6 +6,7 @@ import { ammunitionUpdate } from "../migrations/ammunition-data.mjs";
 import { toolDescriptionUpdate } from "../migrations/tool-descriptions.mjs";
 import { generalGearDescriptionUpdate } from "../migrations/general-gear-descriptions.mjs";
 import { specialEquipmentDescriptionUpdate } from "../migrations/special-equipment-descriptions.mjs";
+import { alchemyDescriptionUpdate } from "../migrations/alchemy-descriptions.mjs";
 import { defaultItemIcon, equipmentIconUpdate } from "../data/item-icons.mjs";
 export class WitcherItem extends foundry.documents.Item {
   async _preCreate(data, options, user) {
@@ -16,7 +17,7 @@ export class WitcherItem extends foundry.documents.Item {
       if(!this.effects.size)this.updateSource({effects:[{...initialEffectTemplate(this),_id:foundry.utils.randomID()}]});
       return;
     }
-    this.updateSource({...ammunitionUpdate(this),...toolDescriptionUpdate(this),...generalGearDescriptionUpdate(this),...specialEquipmentDescriptionUpdate(this)});
+    this.updateSource({...ammunitionUpdate(this),...toolDescriptionUpdate(this),...generalGearDescriptionUpdate(this),...specialEquipmentDescriptionUpdate(this),...alchemyDescriptionUpdate(this)});
     if (isPhysical(this)) this.updateSource(!data.img && (!this.img || this.img === "icons/svg/item-bag.svg")
       ? { img: defaultItemIcon(this) } : equipmentIconUpdate(this));
     if (isContainer(this)) this.updateSource({ "system.quantity": 1, "system.equipped": false });
