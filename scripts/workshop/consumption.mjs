@@ -152,7 +152,7 @@ async function usageDialog(item) {
   const effectOptions = keys.length ? `<label>Эффект<select name="effect">${keys.map(key => `<option value="${key}">${esc(EFFECT_TEMPLATES.find(entry => entry.key === key).name)}</option>`).join("")}</select></label>` : "";
   const presentation = await itemPresentation(item), toxicity = toxicityState(actor);
   const answer = await foundry.applications.api.DialogV2.prompt({ classes: ["witcher-eliott", "witcher-consume-dialog"], window: { title: `Использовать: ${item.name}` },
-    content: `<div class="witcher-consume-description">${presentation.description}</div>${options}${effectOptions}<p>Осталось применений: <strong>${context.remaining}</strong>.</p>${potion ? `<p>Токсичность: ${toxicity.value} / ${toxicity.limit}%.${toxicity.witcher ? "" : " При употреблении: Стойкость СЛ 18. Неудача — отравление без эффекта состава."}</p>` : ""}`,
+    content: `<div class="witcher-consume-description">${presentation.description}</div>${options}${effectOptions}<p>Осталось применений: <strong>${context.remaining}</strong>.</p>${potion ? `<p>${toxicity.witcher ? `Токсичность: ${toxicity.value}% / ${toxicity.limit}%.` : "При употреблении: Стойкость СЛ 18. Неудача — отравление без эффекта состава."}</p>` : ""}`,
     ok: { label: "Использовать", callback: (_event, button) => Object.fromEntries(new FormData(button.form)) }, rejectClose: false });
   if (answer) return consumeOwnedItem(item, { apply: self && answer.application === "self", effectKey: answer.effect ?? "" });
 }

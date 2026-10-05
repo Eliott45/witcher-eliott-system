@@ -43,7 +43,7 @@ export function toxicityState(actor) {
   const limit = 100 + (rank === 10 ? 50 : Math.ceil(rank / 2) * 5);
   const value = activeDoses(actor).reduce((sum, effect) => sum + doseToxicity(effect), 0);
   const poisoned = Array.from(actor.effects ?? []).some(effect => activeEffect(effect) && effect.flags?.[SYSTEM_ID]?.toxicity);
-  return { value, limit, witcher, poisoned, visible: witcher || value > 0, overloaded: value > limit, percent: Math.min(100, value / limit * 100) };
+  return { value, limit, witcher, poisoned, visible: witcher, overloaded: value > limit, percent: Math.min(100, value / limit * 100) };
 }
 const modifiers = {
   "potion.petri": ["spellCasting", "hexWeaving", "ritualCrafting"].map(skill => ({ target: `skills.${skill}`, value: 2 })),

@@ -45,7 +45,7 @@
   .is-dying .witcher-death-state h3 > i { animation: none; }
 }
 .witcher-character-sidebar { min-height: 0; overflow-y: auto; background: linear-gradient(155deg, #482021, #241718); border-right: 2px solid #b39a67; padding: 22px 16px; }
-.witcher-sidebar-toxicity { margin: -4px 0 16px; color: #e5ead1; }
+.witcher-sidebar-toxicity { margin: 16px 0; color: #e5ead1; }
 .witcher-toxicity-heading, .witcher-toxicity-caption { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .witcher-toxicity-heading > span { font-size: 13px; }
 .witcher-toxicity-heading output { font-size: 26px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
