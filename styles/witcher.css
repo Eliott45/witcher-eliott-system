@@ -308,10 +308,13 @@
 .witcher-eliott.reference-sheet h2 { color: var(--witcher-ink); font-size: 18px; border: 0; margin: 0 0 14px; }
 .witcher-eliott.reference-sheet prose-mirror { min-height: 160px; }
 .witcher-ability-list { display: flex; flex-direction: column; gap: 10px; list-style: none; margin: 0; padding: 0; }
-.witcher-ability { padding: 14px 16px; background: #232923; border: 1px solid #3a443a; border-left: 3px solid #947641; border-radius: 4px; }
+/* Keep the card palette local: item sheets and Foundry themes use different text colors. */
+.witcher-ability { --witcher-ink: #342d26; --witcher-gold: #6b3c2d; --color-text-primary: #342d26; --color-text-secondary: #77664f; --color-text-emphatic: #342d26; padding: 14px 16px; color: var(--witcher-ink); background: #faf6ed; border: 1px solid #cbbd9e; border-left: 3px solid #947641; border-radius: 4px; }
 .witcher-ability h3 { margin: 0 0 6px; border: 0; color: var(--witcher-gold); font-size: 16px; }
 .witcher-ability p { margin: 0; }
 .witcher-ability .content-link { background: transparent; border: 0; color: var(--witcher-gold); }
+.witcher-ability .content-link i { color: inherit; }
+.witcher-ability .content-link:hover { color: #7b2e23; text-decoration: underline; text-shadow: none; }
 
 /* Searchable, modal reference browser. */
 .witcher-picker { --color-text-primary: #302b26; --color-text-secondary: #706453; color: #302b26; min-width: 550px; }
