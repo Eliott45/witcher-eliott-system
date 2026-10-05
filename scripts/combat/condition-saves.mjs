@@ -1,4 +1,4 @@
-import { SYSTEM_ID } from "../config.mjs";
+import { SYSTEM_ID, ROUND_SECONDS } from "../config.mjs";
 import { effectRules, EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { conditionRules } from "./condition-rules.mjs";
@@ -29,7 +29,7 @@ export function canSaveEffect(actor,effect) {
   const rules=effectRules(effect), conditions=conditionRules(actor);
   if(!present(actor,effect)||!rules.save||conditions.dead)return false;
   if(rules.delayTurns&&(state(effect).elapsedTurns??0)<rules.delayTurns
-    && (game.time?.worldTime??0)-(effect.start?.time??0)<rules.delayTurns*3)return false;
+    && (game.time?.worldTime??0)-(effect.start?.time??0)<rules.delayTurns*ROUND_SECONDS)return false;
   if(rules.save.kind==="death")return true;
   if(rules.save.kind==="stun")return conditions.canStunSave;
   if(rules.save.kind==="stunModified")return true;

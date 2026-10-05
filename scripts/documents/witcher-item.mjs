@@ -1,4 +1,5 @@
 import { conditionUpdate, isPhysical } from "../data/physical-items.mjs";
+import { initialEffectTemplate } from "../data/effect-items.mjs";
 import { isTransport, isMount, canHitch, cargoSection } from "../data/transport.mjs";
 import { isContainer, canContain, containerParent, isCarried } from "../data/containers.mjs";
 import { ammunitionUpdate } from "../migrations/ammunition-data.mjs";
@@ -9,6 +10,11 @@ export class WitcherItem extends foundry.documents.Item {
   async _preCreate(data, options, user) {
     const result = await super._preCreate(data, options, user);
     if (result === false) return false;
+    if(this.type==="effect") {
+      if(!data.img)this.updateSource({img:"icons/svg/aura.svg"});
+      if(!this.effects.size)this.updateSource({effects:[{...initialEffectTemplate(this),_id:foundry.utils.randomID()}]});
+      return;
+    }
     this.updateSource({...ammunitionUpdate(this),...toolDescriptionUpdate(this),...generalGearDescriptionUpdate(this)});
     if (isPhysical(this)) this.updateSource(!data.img && (!this.img || this.img === "icons/svg/item-bag.svg")
       ? { img: defaultItemIcon(this) } : equipmentIconUpdate(this));

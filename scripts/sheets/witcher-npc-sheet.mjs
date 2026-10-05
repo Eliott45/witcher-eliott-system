@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { applyEffectItem } from "../data/effect-items.mjs";
 import { ATTRIBUTE_KEYS } from "../data/statistics.mjs";
 import { SKILLS, skillValue } from "../data/skills.mjs";
 import { MONSTER_CATEGORIES } from "../data/workshop.mjs";
@@ -87,5 +88,5 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     });
   }
   _toggleDisabled(disabled){super._toggleDisabled(disabled);for(const control of this.element.querySelectorAll('[data-action="tab"],[data-action="viewSheetItem"],[data-action="toggleItemDescription"],[data-inventory-search],[data-action="toggleInventoryGroup"],[data-action="toggleContainer"]'))control.disabled=false;}
-  async _onDropItem(event,item){if(!this.isEditable)return null;if(isPhysical(item))return dropPhysicalItem(this,event,item);return super._onDropItem(event,item);}
+  async _onDropItem(event,item){if(!this.isEditable)return null;if(item.type==="effect")return applyEffectItem(this.actor,item);if(isPhysical(item))return dropPhysicalItem(this,event,item);return super._onDropItem(event,item);}
 }

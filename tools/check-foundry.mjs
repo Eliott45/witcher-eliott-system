@@ -42,9 +42,9 @@ assert.equal(packFolder.name, "Witcher");
 assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "spells", "bestiary"]);
 game.model = { ...game.system.documentTypes, ActiveEffect:{base:{}}, Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type, folders: new Map() }]));
-game.user = { id: "testuser00000001", isGM: true };
+game.user = { id: "testuser00000001", isGM: true, can:()=>true };
 let preferences = {};
-const player = { id: "player0000000001", isGM: false, hasPermission: () => false };
+const player = { id: "player0000000001", isGM: false, hasPermission: () => false, can:()=>false };
 assert.equal(foundry.documents.BaseSetting.metadata.permissions.create(player, {
   _source: { key: `${game.system.id}.sheetPreferences`, user: player.id }
 }, {}), true, "An ordinary player may store their personal sheet settings");
@@ -276,6 +276,7 @@ assert.equal(prototype.bar2.attribute, "stamina");
 assert.equal(prototype.light.bright, 0);
 
 const { WitcherReferenceData } = await import("../scripts/data/witcher-reference-data.mjs");
+const { WitcherEffectItemData } = await import("../scripts/data/witcher-effect-item-data.mjs");
 const { WitcherRaceData } = await import("../scripts/data/witcher-race-data.mjs");
 const { WitcherOriginData } = await import("../scripts/data/witcher-origin-data.mjs");
 const { WitcherFamilyStatusData } = await import("../scripts/data/witcher-family-status-data.mjs");
@@ -290,6 +291,7 @@ const { WitcherArmorData } = await import("../scripts/data/witcher-armor-data.mj
 const oldGear = new WitcherEquipmentData({ ruleId: "old-custom", description: "<p>Старый предмет</p>" });
 assert.equal(oldGear.quantity, 1); assert.equal(oldGear.weight, 0); assert.equal(oldGear.description, "<p>Старый предмет</p>");
 CONFIG.Item.dataModels = { profession: WitcherReferenceData, race: WitcherRaceData, ability: WitcherAbilityData, origin: WitcherOriginData, familyStatus: WitcherFamilyStatusData, equipment: WitcherEquipmentData, weapon: WitcherWeaponData, armor: WitcherArmorData, recipe: WitcherRecipeData, spell: WitcherSpellData, influence: WitcherInfluenceData, language: WitcherReferenceData };
+CONFIG.Item.dataModels.effect=WitcherEffectItemData;
 const equipmentPack = `${game.system.id}.equipment`;
 for (const source of await readJSON("../pack-sources/equipment.folders.json")) {
   const folder = new foundry.documents.BaseFolder(source, { pack: equipmentPack });
@@ -505,6 +507,7 @@ foundry.applications = {
     }
   }, ItemSheetV2: class {
     tabGroups = {};
+    _processFormData(_event,_form,formData){return foundry.utils.expandObject(formData.object);}
     async _prepareContext() { return foundry.applications.sheets.ActorSheetV2.prototype._prepareContext.call(this); }
   } },
   ux: { TextEditor: { implementation: { enrichHTML: async html => html } } }
@@ -910,6 +913,45 @@ const { WitcherItemSheet } = await import("../scripts/sheets/witcher-item-sheet.
 const referenceSheet = new WitcherItemSheet();
 referenceSheet.isEditable = false;
 const itemTemplate = handlebars.compile(await readFile(new URL("../templates/item-sheet.hbs", import.meta.url), "utf8"), { strict: true });
+const {effectItemSource}=await import('../scripts/data/effect-items.mjs');
+const {effectDurationUpdate}=await import('../scripts/data/effect-duration.mjs');
+const effectItemData=effectItemSource({...conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==='frozen')),duration:{value:60,units:'seconds',expiry:null,expired:false},changes:[{key:'system.attributes.body',mode:2,value:'1'}]});
+effectItemData.effects[0]._id='effectNative0001';
+const effectItem=new foundry.documents.BaseItem({_id:'effectItemTest01',...effectItemData});
+const reopenedEffectItem=new foundry.documents.BaseItem(JSON.parse(JSON.stringify(effectItem.toObject())));
+assert.equal(reopenedEffectItem.effects.size,1);assert.deepEqual(reopenedEffectItem.system.toObject(),{});
+assert.equal(reopenedEffectItem.effects.contents[0].duration.value,60);
+assert.equal(reopenedEffectItem.effects.contents[0].system.changes[0].value,1);
+referenceSheet.item=reopenedEffectItem;referenceSheet.isEditable=true;
+const effectItemContext=await referenceSheet._prepareContext({});
+assert.ok(itemTemplate(effectItemContext).includes('data-action="editItemEffectDuration"'));
+const descriptionChange=referenceSheet._processFormData(null,null,{object:{'effectDescriptions.effectNative0001':'<p>Новое описание</p>'}});
+reopenedEffectItem.updateSource(descriptionChange);
+assert.equal(reopenedEffectItem.effects.contents[0].description,'<p>Новое описание</p>');
+assert.equal(reopenedEffectItem.effects.contents[0].duration.value,60,'Description editing preserves effect duration and mechanics');
+const durationChange=effectDurationUpdate(2,'minutes',{time:100});
+reopenedEffectItem.effects.contents[0].updateSource(durationChange);
+assert.equal(reopenedEffectItem.effects.contents[0].duration.value,120);
+assert.equal(reopenedEffectItem.effects.contents[0].flags[game.system.id].condition.save.dc,16);
+const effectActor=new foundry.documents.BaseActor({name:'Effect drop test',type:'character',system:{}});
+const effectDropSource={type:'effect',name:reopenedEffectItem.name,img:reopenedEffectItem.img,uuid:'Item.effectItemTest01',effects:reopenedEffectItem.effects,testUserPermission:()=>true};
+let effectDropCount=0;
+const effectDropActor={isOwner:true,async createEmbeddedDocuments(type,sources){
+  assert.equal(type,'ActiveEffect');effectDropCount++;
+  return sources.map(source=>new foundry.documents.BaseActiveEffect(source,{parent:effectActor}));
+}};
+for(const Sheet of [WitcherActorSheet,(await import('../scripts/sheets/witcher-npc-sheet.mjs')).WitcherNPCSheet]){
+  const target=new Sheet();target.actor=effectDropActor;target.isEditable=true;
+  const [applied]=await target._onDropItem(null,effectDropSource);
+  assert.equal(applied.duration.value,120);assert.equal(applied.origin,'Item.effectItemTest01');
+  assert.equal(applied.flags[game.system.id].condition.save.dc,16);
+  assert.equal(effectActor.items.size,0,'An effect Item becomes an ActiveEffect, never carried inventory');
+  const reopened=new foundry.documents.BaseActiveEffect(JSON.parse(JSON.stringify(applied.toObject())),{parent:effectActor});
+  assert.equal(reopened.description,'<p>Новое описание</p>');
+  target.isEditable=false;assert.equal(await target._onDropItem(null,effectDropSource),null);
+}
+assert.equal(effectDropCount,2);
+referenceSheet.isEditable=false;
 const originalSheetActor = sheet.actor;
 const originalEditable = sheet.isEditable;
 const { PROFESSIONS } = await import("../scripts/data/professions.mjs");
@@ -1148,7 +1190,9 @@ for (const { data } of criticalNativeRolls) {
   assert.equal(stubbornActor.system.luckPending, 2);
 }
 foundry.dice.Roll = originalDiceRollClass;
-// STUN and the ordinary dice tray retain their plain-d10 formulas.
+// STUN, initiative and the ordinary dice tray retain their plain-d10 formulas.
+const {INITIATIVE_FORMULA,ROUND_SECONDS}=await import('../scripts/config.mjs');
+assert.equal(ROUND_SECONDS,3);
 for (const face of [1, 10]) {
   let draws = 0;
   CONFIG.Dice.randomUniform = () => { draws++; return 1 - (face - 0.5) / 10; };
@@ -1156,6 +1200,9 @@ for (const face of [1, 10]) {
   assert.equal(plain.total, face);
   assert.equal(draws, 1);
   assert.equal(plain.dice[0].options[game.system.id], undefined);
+  draws=0;
+  const initiative=await new CoreRoll(INITIATIVE_FORMULA,{statistics:{initiative:7}}).evaluate({allowInteractive:false});
+  assert.equal(initiative.total,7+face);assert.equal(draws,1,"Natural 1 and 10 never explode on initiative");
 }
 // Death saves persist a plain d10 and a Luck-adjusted threshold using Foundry's actual chat schema.
 const { prepareDeathResult } = await import("../scripts/chat/death-result.mjs");
@@ -1221,7 +1268,7 @@ const {WitcherNPCSheet}=await import('../scripts/sheets/witcher-npc-sheet.mjs');
 const {weaponAttack}=await import('../scripts/combat/weapon-rules.mjs');
 const npcTemplate=handlebars.compile(await readFile(new URL('../templates/npc-sheet.hbs',import.meta.url),'utf8'),{strict:true});
 const creatureTestGlobals={user:game.user,fromUuid:foundry.utils.fromUuid};
-game.user={id:'gmCreature',isGM:true};foundry.utils.fromUuid=async uuid=>documents.get(uuid);
+game.user={id:'gmCreature',isGM:true,can:()=>true};foundry.utils.fromUuid=async uuid=>documents.get(uuid);
 const creatureViews=[];
 for(const source of bestiarySources()) {
   const initial=new foundry.documents.BaseActor(source);

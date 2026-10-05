@@ -18,7 +18,8 @@
       "weapon": "Оружие / щит",
       "armor": "Броня",
       "recipe": "Diagram / formula",
-      "spell": "Spell"
+      "spell": "Spell",
+      "effect": "Effect"
     }
   },
   "WITCHER": {
@@ -125,7 +126,7 @@
       "StunDescription": "How hard it is to stun or disorient the character. Roll 1d10 strictly under Stun to succeed. A tie fails.",
       "RecoveryDescription": "Recovery (REC) is the amount of Stamina restored by a Recover action. REC 10 restores 10 STA.",
       "WoundThresholdDescription": "Below this threshold, INT, REF, DEX and WILL are halved, rounding down. At a threshold of 10, 10 HP has no penalty but 9 HP does. Resource limits and the threshold itself use base statistics.",
-      "InitiativeDescription": "Determines combat order. Higher results act earlier. Uses current REF, including wound penalties.",
+      "InitiativeDescription": "Determines combat order. Higher results act earlier. Uses current REF, including wound penalties. Plain 1d10: natural 1 and 10 never start a critical chain.",
       "RunDescription": "Maximum running distance in meters.",
       "LeapDescription": "Maximum running leap distance in meters, rounded down.",
       "CarryDescription": "Maximum weight without being overloaded depends on BODY. Carried weight is currently 0 kg; it will be calculated from equipment when inventory is added.",

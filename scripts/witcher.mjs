@@ -1,4 +1,5 @@
 import { WitcherSpellData } from "./data/witcher-spell-data.mjs";
+import { WitcherEffectItemData } from "./data/witcher-effect-item-data.mjs";
 import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from "./settings.mjs";
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
 import { migrateBestiaryContent,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
@@ -10,7 +11,7 @@ import { registerOilExpiry } from "./workshop/upgrades.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
 import { WitcherRecipeData } from "./data/witcher-recipe-data.mjs";
-import { COMBAT_ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID } from "./config.mjs";
+import { COMBAT_ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID, ROUND_SECONDS, INITIATIVE_FORMULA } from "./config.mjs";
 import { WitcherServicesData } from "./data/witcher-services-data.mjs";
 import { WitcherServicesSheet } from "./sheets/witcher-services-sheet.mjs";
 import { registerServiceOrders } from "./services/orders.mjs";
@@ -60,14 +61,14 @@ Hooks.once("init", async () => {
   CONFIG.Combat.documentClass = WitcherCombat;
   registerCriticalDice();
   registerWeaponChat();
-  CONFIG.Combat.initiative.formula = "1d10wc + @statistics.initiative";
+  CONFIG.Combat.initiative.formula = INITIATIVE_FORMULA;
   registerStatusEffects();
   registerConditionSaves();
   registerOilExpiry();
   registerStubbornnessChat();
   registerEffectDurationChat();
   registerServiceOrders();
-  CONFIG.time.roundTime = 3;
+  CONFIG.time.roundTime = ROUND_SECONDS;
   registerVisionMigration();
   registerCompendiumFolderMigration();
   registerEquipmentContentMigration();
@@ -92,6 +93,7 @@ Hooks.once("init", async () => {
   CONFIG.Item.dataModels.armor = WitcherArmorData;
   CONFIG.Item.dataModels.recipe = WitcherRecipeData;
   CONFIG.Item.dataModels.spell = WitcherSpellData;
+  CONFIG.Item.dataModels.effect = WitcherEffectItemData;
   CONFIG.Item.dataModels.influence = WitcherInfluenceData;
   CONFIG.Item.dataModels.language = WitcherReferenceData;
 

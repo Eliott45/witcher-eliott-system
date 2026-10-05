@@ -5,6 +5,8 @@ import { STATUS_DEFINITIONS, DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS } from "..
 import { canSaveEffect, requestEffectSave } from "../combat/condition-saves.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { chooseReference } from "./reference-picker.mjs";
+import { editEffectDuration, canEditEffectDuration } from "./effect-duration-editor.mjs";
+import { applyEffectItem, effectItemSource } from "../data/effect-items.mjs";
 
 export async function effectsContext(sheet) {
   return Promise.all(sheet.actor.effects.map(async effect=>{
@@ -17,20 +19,30 @@ export async function effectsContext(sheet) {
       save:rules.save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
       autoAllowed:Boolean(rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
-      durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,
+      durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,canEditDuration:sheet.isEditable&&canEditEffectDuration(effect),canSaveItem:sheet.isEditable&&game.user.can("ITEM_CREATE"),
       action:rules.action,canAct:sheet.isEditable&&conditionRules(sheet.actor).canAct,
       description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(text.startsWith("WITCHER.")?game.i18n.localize(text):text,{secrets:sheet.actor.isOwner,relativeTo:effect})};
   }));
 }
 const safe=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){console.error(error);ui.notifications.error(error.message);}};
 export const effectActions={
+  editEffectDuration:safe(async function(_event,target){if(this.isEditable)await editEffectDuration(this.actor.effects.get(target.dataset.effectId));}),
+  saveEffectItem:safe(async function(_event,target){
+    const effect=this.actor.effects.get(target.dataset.effectId);
+    if(!effect||!this.isEditable||!game.user.can("ITEM_CREATE"))return;
+    const item=await foundry.documents.Item.create(effectItemSource(effect));
+    if(item)await item.sheet.render({force:true});
+  }),
   browseEffects:safe(async function(){
     if(!this.isEditable)return;
     const pack=game.packs.get(`${SYSTEM_ID}.effects`);
     const effects=pack?await pack.getDocuments():EFFECT_TEMPLATES.map(entry=>conditionSource(entry,text=>game.i18n.localize(text)));
+    effects.push(...game.items.filter(item=>item.type==="effect"&&item.testUserPermission(game.user,"OBSERVER")));
+    const entryId=effect=>effect.uuid??effect.id??effect._id;
     const id=await chooseReference("effect","",{title:"Эффекты",hint:"Выберите состояние. Его также можно перетащить из компендиума или описания состава на лист.",groups:{},
-      entries:effects.map(effect=>({id:effect.id??effect._id,label:effect.name,img:effect.img,summary:effect.description.replace(/<[^>]*>/g," "),details:[]}))});
-    const effect=effects.find(effect=>(effect.id??effect._id)===id);if(!effect)return;
+      entries:effects.map(effect=>({id:entryId(effect),label:effect.name,img:effect.img,summary:(effect.description??effect.effects?.contents?.[0]?.description??"").replace(/<[^>]*>/g," "),details:[]}))});
+    const effect=effects.find(effect=>entryId(effect)===id);if(!effect)return;
+    if(effect.type==="effect")return applyEffectItem(this.actor,effect);
     const data=effect.toObject?effect.toObject():structuredClone(effect);delete data._id;
     data.origin=effect.uuid??null;
     await this.actor.createEmbeddedDocuments("ActiveEffect",[data]);

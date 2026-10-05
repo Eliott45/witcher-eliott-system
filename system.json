@@ -94,7 +94,8 @@
         "htmlFields": [
           "description"
         ]
-      }
+      },
+      "effect": {}
     }
   },
   "packs": [

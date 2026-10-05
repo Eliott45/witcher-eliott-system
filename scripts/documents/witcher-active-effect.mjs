@@ -14,10 +14,11 @@ export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
       ui.notifications.info("Это состояние уже действует на персонажа."); return false;
     }
     const rules=effectRules(this);
-    if(!Object.keys(rules).length)return;
+    if(!Object.keys(rules).length){this.updateSource({start:this.constructor.getEffectStart(),"duration.expired":false});return;}
+    const explicitDuration=this.flags?.[SYSTEM_ID]?.conditionDurationOverride||Number.isFinite(data.duration?.value);
     let value=rules.rounds??rules.seconds??null;
     const formula=rules.roundsFormula??rules.secondsFormula;
-    if(formula){
+    if(formula&&!explicitDuration){
       const display=trackRollDisplay();
       try{
         const mode=game.settings.get("core","messageMode");
@@ -31,6 +32,6 @@ export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
     }
     this.updateSource({start:this.constructor.getEffectStart(),[`flags.${SYSTEM_ID}.condition`]:structuredClone(rules),[`flags.${SYSTEM_ID}.conditionState`]:{},
       [`flags.${SYSTEM_ID}.conditionRequest`]:null,
-      ...(value!==null?{duration:{value,units:rules.rounds||rules.roundsFormula?"rounds":"seconds",expiry:"turnEnd",expired:false}}:{})});
+      ...(!explicitDuration&&value!==null?{duration:{value,units:rules.rounds||rules.roundsFormula?"rounds":"seconds",expiry:"turnEnd",expired:false}}:{"duration.expired":false})});
   }
 }

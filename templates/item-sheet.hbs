@@ -14,6 +14,13 @@
   {{#if spell}}<div class="witcher-spell-info"><strong>{{spell.elementLabel}} · {{spell.gradeLabel}}{{#if spell.deity}} · {{spell.deity}}{{/if}}</strong><span>{{spell.cost}}</span><span>{{spell.range}}</span><span>{{spell.duration}}</span><span>Защита: {{spell.defense}}</span></div>{{/if}}
   <nav class="witcher-item-tabs tabs" aria-label="{{localize 'WITCHER.ItemTabs.Navigation'}}">{{#each itemTabs}}<button type="button" data-action="tab" data-group="{{group}}" data-tab="{{id}}" class="{{cssClass}}" aria-pressed="{{active}}"><i class="{{icon}}"></i> {{localize label}}</button>{{/each}}</nav>
   <section class="witcher-item-tab tab {{tabs.description.cssClass}}" data-group="item" data-tab="description">
+  {{#if isEffectItem}}
+  <p class="witcher-effects-hint">Перетащите этот предмет на лист персонажа или существа, чтобы наложить эффект. Длительность и модификаторы настраиваются во вкладке «Подробности».</p>
+  {{#each effectTemplates}}<section class="witcher-effect-template">
+    {{#if ../editable}}<prose-mirror name="effectDescriptions.{{id}}" value="{{description}}" data-document-uuid="{{uuid}}" toggled>{{{enriched}}}</prose-mirror>
+    {{else}}<div class="witcher-description">{{{enriched}}}</div>{{/if}}
+  </section>{{/each}}
+  {{else}}
   {{#if editable}}
   <prose-mirror name="system.description" value="{{system.description}}"
                 data-document-uuid="{{item.uuid}}" collaborate toggled>
@@ -21,6 +28,7 @@
   </prose-mirror>
   {{else}}
   {{#if description}}<div class="witcher-description">{{{description}}}</div>{{/if}}
+  {{/if}}
   {{/if}}
   {{#if spell}}<div class="witcher-spell-body">{{> "systems/witcher-eliott-system/templates/magic-requirements.hbs" spell}}</div>{{/if}}
   {{#if abilities}}
@@ -38,6 +46,10 @@
   {{/if}}
   </section>
   {{#if hasDetails}}<section class="witcher-item-tab tab {{tabs.details.cssClass}}" data-group="item" data-tab="details">
+  {{#if isEffectItem}}<p class="witcher-effects-hint">1 раунд = 3 секунды · 1 минута = 20 раундов. При наложении отсчёт начинается заново.</p>
+    {{#each effectTemplates}}<article class="witcher-effect-template"><h3>{{name}}</h3><div class="witcher-effect-template-actions"><button type="button" data-action="editItemEffectDuration" data-effect-id="{{id}}" {{disabled (not ../editable)}}><i class="fa-solid fa-clock"></i> {{duration}}</button><button type="button" data-action="editItemEffect" data-effect-id="{{id}}"><i class="fa-solid fa-sliders"></i> Настроить эффект</button></div></article>
+    {{else}}<button type="button" data-action="addItemEffect" {{disabled (not editable)}}>Создать шаблон эффекта</button>{{/each}}
+  {{/if}}
   {{#each physicalGroups as |group|}}<fieldset class="witcher-physical-fields"><legend>{{group.title}}</legend>{{> "systems/witcher-eliott-system/templates/structured-fields.hbs" fields=group.fields}}</fieldset>{{/each}}
   {{#if spell}}<label class="witcher-physical-fields">Способы защиты (несколько)<select name="system.defense" multiple {{disabled (not editable)}}>{{#each spell.defenses}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>{{/if}}
   {{#if spell}}{{#if spell.isRitual}}<section class="witcher-magic-requirements"><strong>Ингредиенты</strong>{{#each spell.components}}<div class="witcher-ritual-component"><span>{{name}} ×{{quantity}} {{#unless consumed}}· сохраняется{{/unless}}</span><button type="button" data-action="removeRitualComponent" data-index="{{index}}" aria-label="Удалить {{name}}" {{disabled (not ../editable)}}><i class="fa-solid fa-trash"></i></button></div>{{/each}}<button type="button" data-action="addRitualComponent" {{disabled (not editable)}}><i class="fa-solid fa-plus"></i> Добавить ингредиент</button></section>{{/if}}{{/if}}

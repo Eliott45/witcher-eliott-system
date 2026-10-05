@@ -101,6 +101,14 @@ test("native effect creation deduplicates all poisons and resets per-turn state 
   await timed._preCreate({}, {}, {});
   assert.deepEqual(timed.duration,{value:4,units:"rounds",expiry:"turnEnd",expired:false});
   assert.equal(f.messages[0].flags[SYSTEM_ID].skipLuck,true);
+  const edited=Object.assign(new WitcherActiveEffect(),conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="clotting")),{parent:f.actor,statuses:new Set(["clotting"])});
+  edited.duration={value:60,units:"seconds",expiry:null,expired:true};
+  const count=f.messages.length;
+  await edited._preCreate({duration:edited.duration},{},{});
+  assert.equal(edited.duration.value,60);assert.equal(edited.duration.expired,false);assert.equal(f.messages.length,count,"Explicit durations must not reroll the template duration");
+  edited.duration.value=null;edited.flags[SYSTEM_ID].conditionDurationOverride=true;
+  await edited._preCreate({duration:edited.duration},{},{});
+  assert.equal(edited.duration.value,null);assert.equal(f.messages.length,count);
 });
 test("alchemy gains real descriptions and resolvable effect links, while migration preserves player notes",()=>{
   for(const entry of ALCHEMY){assert.match(entry.system.description,/<h3>Действие состава/);for(const [,id]of entry.system.description.matchAll(/ActiveEffect\.([^\]]+)/g))assert(EFFECT_TEMPLATES.some(effect=>effect.documentId===id));}

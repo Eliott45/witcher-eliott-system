@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { durationSeconds } from "../data/effect-duration.mjs";
 export const POWER_ELEMENTS={earth:{name:"Земля",icon:"fa-solid fa-mountain",habitat:"Разломы, глубокие природные ямы и пещеры."},air:{name:"Воздух",icon:"fa-solid fa-wind",habitat:"Вершины гор и места частых торнадо."},fire:{name:"Огонь",icon:"fa-solid fa-fire",habitat:"Вулканы и самое жаркое сердце пустыни."},water:{name:"Вода",icon:"fa-solid fa-droplet",habitat:"Слияния рек и озёр, морские пещеры."}};
 export const POWER_MONTH=30*86400;
 export function powerVisit(actor,place,now=game.time.worldTime) {
@@ -11,7 +12,11 @@ export function powerVisit(actor,place,now=game.time.worldTime) {
 export function activePowerBenefits(actor,now=game.time?.worldTime??0) {
   return Array.from(actor.effects??[]).filter(effect=>{
     const data=effect.flags?.[SYSTEM_ID]?.powerPlace;
-    return data&&!effect.disabled&&!effect.isSuppressed&&data.expiresAt>now;
+    if(!data||effect.disabled||effect.isSuppressed||effect.duration?.expired)return false;
+    // Native duration is authoritative after editing; old flag-only effects still work.
+    if(effect.duration?.value==null&&effect.flags[SYSTEM_ID].conditionDurationOverride)return true;
+    if(Number.isFinite(effect.duration?.value)&&Number.isFinite(effect.start?.time))return effect.start.time+durationSeconds(effect.duration.value,effect.duration.units)>now;
+    return data.expiresAt>now;
   });
 }
 /** Conditional bonuses never raise the character's general Vigor or other elements. */
@@ -25,5 +30,5 @@ export function powerBenefitSource(place,now) {
     origin:place.uuid,disabled:false,transfer:false,statuses:[],showIcon:2,
     description:`<p>На 1 час: +5 к пределу магии и +2 к Сотворению заклинаний только для стихии «${POWER_ELEMENTS[element].name}». Повторные бонусы одной стихии не складываются.</p>`,
     start:foundry.documents.ActiveEffect.getEffectStart(),duration:{value:3600,units:"seconds",expiry:null,expired:false},
-    flags:{[SYSTEM_ID]:{powerPlace:{element,expiresAt:now+3600}}}};
+    flags:{[SYSTEM_ID]:{powerPlace:{element}}}};
 }

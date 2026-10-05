@@ -30,6 +30,7 @@ import { effectsContext, effectActions } from "./effects-context.mjs";
 import { rollAttribute } from "../combat/attribute-roll.mjs";
 import { selectLuckPoints } from "../data/luck.mjs";
 import { hasPendingCritical } from "../chat/manual-critical.mjs";
+import { applyEffectItem } from "../data/effect-items.mjs";
 import { DYING, DEAD, EXHAUSTED_STUN, UNCONSCIOUS } from "../combat/status-effects.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { recoverStamina } from "../combat/exhaustion.mjs";
@@ -243,6 +244,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
 
   async _onDropItem(event, item) {
     if (!this.isEditable) return null;
+    if(item.type==="effect")return applyEffectItem(this.actor,item);
     if (isPhysical(item)) return dropPhysicalItem(this, event, item);
     if (item.type === "spell") { await learnSpell(this.actor,item); return null; }
     if (item.type === "profession") {

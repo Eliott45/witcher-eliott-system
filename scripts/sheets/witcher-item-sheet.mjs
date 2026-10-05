@@ -8,15 +8,23 @@ import { physicalItemContext } from "./physical-item-context.mjs";
 import { equipmentEntry } from "../data/equipment-search.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
 import { searchItemTrait } from "./item-presentation.mjs";
+import { editEffectDuration } from "./effect-duration-editor.mjs";
+import { effectDurationLabel } from "../data/effect-duration.mjs";
+import { initialEffectTemplate } from "../data/effect-items.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
+const effectItemActions={
+  editItemEffect:workshopAction(async function(_event,target){await this.item.effects.get(target.dataset.effectId)?.sheet.render({force:true});}),
+  editItemEffectDuration:workshopAction(async function(_event,target){if(this.isEditable)await editEffectDuration(this.item.effects.get(target.dataset.effectId));}),
+  addItemEffect:workshopAction(async function(){if(this.isEditable)await this.item.createEmbeddedDocuments("ActiveEffect",[initialEffectTemplate(this.item)]);})
+};
 
 export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applications.sheets.ItemSheetV2) {
   static DEFAULT_OPTIONS = {
     classes: ["witcher-eliott", "reference-sheet"],
     position: { width: 620, height: 660 },
     window: { resizable: true },
-    actions: { ...ritualComponentActions, installUpgradeDirect: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item,{withoutCheck:true});}), searchItemTrait, ...workshopItemActions, installUpgrade: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item);}), removeArmorUpgrade:workshopAction(async function(_e,target){if(this.isEditable)await removeArmorUpgrade(this.item,target.dataset.installationId);}), augmentItem:workshopAction(async function(){if(this.isEditable)await augmentItem(this.item);}), applyOil:workshopAction(async function(){if(this.isEditable)await applyOil(this.item);}), prepareMutagen:workshopAction(async function(){if(this.isEditable)await prepareMutagen(this.item);}), applyMutagen:workshopAction(async function(){if(this.isEditable)await applyMutagen(this.item);}) },
+    actions: { ...effectItemActions, ...ritualComponentActions, installUpgradeDirect: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item,{withoutCheck:true});}), searchItemTrait, ...workshopItemActions, installUpgrade: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item);}), removeArmorUpgrade:workshopAction(async function(_e,target){if(this.isEditable)await removeArmorUpgrade(this.item,target.dataset.installationId);}), augmentItem:workshopAction(async function(){if(this.isEditable)await augmentItem(this.item);}), applyOil:workshopAction(async function(){if(this.isEditable)await applyOil(this.item);}), prepareMutagen:workshopAction(async function(){if(this.isEditable)await prepareMutagen(this.item);}), applyMutagen:workshopAction(async function(){if(this.isEditable)await applyMutagen(this.item);}) },
     form: { submitOnChange: true, closeOnSubmit: false }
   };
 
@@ -39,7 +47,8 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
   async _prepareContext(options) {
     const workshop=await workshopItemContext(this.item);
     const spell=spellItemContext(this.item,this.isEditable);
-    const hasDetails=isPhysical(this.item)||this.item.type==="ability"||Boolean(spell);
+    const isEffectItem=this.item.type==="effect";
+    const hasDetails=isPhysical(this.item)||this.item.type==="ability"||Boolean(spell)||isEffectItem;
     const hasActions=Boolean(workshop&&(workshop.repairable||workshop.upgradeable||workshop.recipe||workshop.bonusPath||workshop.isMutagen||workshop.oil||workshop.installations.length));
     const visible=["description",...(hasDetails?["details"]:[]),...(hasActions?["actions"]:[])];
     if(!visible.includes(this.tabGroups.item))this.tabGroups.item="description";
@@ -57,7 +66,8 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
       };
     }));
     return Object.assign(context, {
-      workshop, spell, hasDetails, hasActions,
+      workshop, spell, hasDetails, hasActions, isEffectItem,
+      effectTemplates:isEffectItem?await Promise.all(this.item.effects.map(async effect=>({id:effect.id,uuid:effect.uuid,name:effect.name,description:effect.description,enriched:await enrich(effect.description),duration:effectDurationLabel(effect)}))):[],
       itemTabs:visible.map(id=>context.tabs[id]),
       item: this.item,
       system: this.item.system,
@@ -66,8 +76,17 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
       isAbility: this.item.type === "ability",
       attributeChoices: [{value: "", label: game.i18n.localize("WITCHER.Professions.Passive")}, ...["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"].map(value => ({value, label: game.i18n.localize(`WITCHER.Attributes.${value}.Label`)}))].map(entry => ({...entry, selected: entry.value === this.item.system.attribute})),
       typeLabel: `TYPES.Item.${this.item.type}`,
-      description: await enrich(this.item.system.description),
+      description: await enrich(this.item.system.description??""),
       abilities: abilities.filter(Boolean)
     });
+  }
+
+  _processFormData(event,form,formData) {
+    const data=super._processFormData(event,form,formData);
+    if(this.item.type==="effect"&&data.effectDescriptions) {
+      data.effects=Object.entries(data.effectDescriptions).filter(([id])=>this.item.effects.has(id)).map(([_id,description])=>({_id,description}));
+      delete data.effectDescriptions;
+    }
+    return data;
   }
 }
