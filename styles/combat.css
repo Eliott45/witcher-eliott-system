@@ -29,6 +29,21 @@
 .witcher-combat-panel .witcher-reload { margin:0 14px 12px; width:calc(100% - 28px); height:29px; font-size:12px; }
 .witcher-attack-chat h3 { font:700 18px Georgia,serif; color:inherit; }
 .witcher-attack-chat small { display:block; margin:8px 0; }
+.witcher-attack-modifiers { list-style:none; padding:0; margin:8px 0; display:grid; gap:4px; }
+.witcher-attack-modifiers li { display:flex; justify-content:space-between; gap:12px; padding:3px 7px; border-radius:4px; font-size:13px; }
+.witcher-attack-modifiers .is-bonus { color:#365943; background:#dce7db; }
+.witcher-attack-modifiers .is-penalty { color:#7b3b36; background:#f0dfda; }
+.witcher-attack-modifiers b { flex:none; font-variant-numeric:tabular-nums; }
+.combat-tracker .witcher-delay-toggle { flex:0 0 26px; width:26px; margin:0 2px 0 5px; color:inherit; }
+.combat-tracker .witcher-delay-toggle.active,.combat-tracker .witcher-delay-label { color:#dcc188; }
+.combat-tracker .witcher-delay-label { display:block; font-size:11px; }
+.combat-tracker .witcher-is-delayed { border-inline-start:3px solid #b79a60; }
+.witcher-ambush-panel { border:1px solid #c9b58f; border-radius:7px; padding:12px 14px; margin:16px 0; background:#faf6ee; color:#494239; }
+.witcher-ambush-panel header,.witcher-ambush-panel li { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.witcher-ambush-panel h3 { margin:0; border:0; font:700 19px Georgia,serif; color:#425456; }
+.witcher-ambush-panel ul { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.witcher-ambush-panel li b { color:#365943; margin-inline-start:8px; }
+.witcher-ambush-panel button { flex:0 1 auto; width:auto; }
 .witcher-extra-note { border-left:3px solid #a67943; padding-left:7px; font-size:12px; }
 .witcher-inventory-row-actions [data-action=changeGrip] { position:relative; }
 .witcher-inventory-row-actions [data-action=changeGrip] small { position:absolute; right:0; bottom:0; background:#eae2d2; border-radius:3px; font-size:9px; padding:0 2px; color:#573927; }

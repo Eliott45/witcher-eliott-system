@@ -47,7 +47,7 @@ export function attackModes(actor,item) {
   return [{id:"fast",name:item.system.skill==="archery"?"Быстрый выстрел":"Две быстрые",count:item.system.skill==="archery"?1:2,penalty:0,multiplier:1},
     {id:"strong",name:"Сильная",count:1,penalty:-3,multiplier:2}];
 }
-export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="normal",modifier=0}={}) {
+export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="normal",modifier=0,targetContext=null,ambushBonus=0,opening=false}={}) {
   if(item?.type!=="weapon")throw new Error("Выберите оружие.");
   const weapon=effectiveItem(item),attack=attackModes(actor,item).find(entry=>entry.id===mode);
   if(!attack)throw new Error("Этот режим недоступен для данного оружия.");
@@ -59,9 +59,10 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
     {label:"Двуручное оружие одной рукой",value:!weapon.natural&&gripOf(item)<(weapon.hands??1)?-3:0},
     // TODO(p.151): no explicit multi-projectile Aim example in core/errata or Sage's Answers found.
     // Keep one base for the existing attack action (including an NPC's printed rate of fire).
-    {label:"Прицеливание",value:ranged?aimingBonus(actor):0},
+    {label:"Прицеливание",value:ranged&&!targetContext?.blind?aimingBonus(actor):0},
     {label:attack.name,value:attack.penalty},{label:"Дополнительное действие",value:extraPenalty},
-    {label:aim.name,value:aim.penalty},{label:band.name,value:band.penalty},{label:"Ситуация",value:Number(modifier)}];
+    {label:aim.name,value:aim.penalty},{label:band.name.replace(/ · [−+]?\d+$/u,""),value:band.penalty},{label:"Ситуация",value:Number(modifier)},
+    ...(targetContext?.parts??[]), ...(ambushBonus?[{label:"Засада",value:ambushBonus}]:[])];
   const total=skill.total===null?null:parts.reduce((sum,part)=>sum+part.value,0);
   const melee=["melee","thrown","shield"].includes(weapon.category);
   const shield=weapon.category==="shield"&&weapon.damage==="0";
@@ -69,6 +70,6 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   const bonus=(melee?actor.system.statistics.meleeDamageBonus??0:0)+(actor.system.statistics.physicalDamageBonus??0);
   const unarmedBonus=weapon.ruleId==="weapon.brass-knuckles"&&!weapon.damageIncludesBody?" + 1d6":"";
   const damage=`(${shield?"1d6":weapon.damage}${unarmedBonus}${body+bonus?` + ${body+bonus}`:""})${attack.multiplier===2?" * 2":""}`;
-  const blocked=shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":"");
-  return {weapon,attack,skill,parts,total,damage,body,bonus,aim,band,ranged,blocked,range:weapon.rangeBodyMultiplier?weapon.rangeBodyMultiplier*actor.system.statistics.effective.body:weapon.range};
+  const blocked=targetContext?.blind&&location!=="random"?"Нельзя выбирать место удара по цели вне вашего конуса зрения":shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":"");
+  return {weapon,attack:opening?{...attack,count:1,name:`Первая атака из засады${attack.id==="strong"?" · сильная":""}`}:attack,skill,parts,total,damage,body,bonus,aim,band,ranged,blocked,range:weapon.rangeBodyMultiplier?weapon.rangeBodyMultiplier*actor.system.statistics.effective.body:weapon.range};
 }

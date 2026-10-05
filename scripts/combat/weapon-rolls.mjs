@@ -5,12 +5,27 @@ import { actionQuote, actionNote, actionUpdate } from "./action-economy.mjs";
 import { weaponAttack, signed, hitLocation } from "./weapon-rules.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { consumeAiming } from "./full-turn-rules.mjs";
+import { selectedAttackTarget } from "./attack-target.mjs";
+import { ambushAttack, ambushState, tacticsFlags } from "./tactics-rules.mjs";
+import { requestTactic } from "./combat-tactics.mjs";
+
+export function attackModifierMarkup(parts) {
+  return `<ul class="witcher-attack-modifiers">${parts.filter(part=>part.value&&part.label!=="Основа навыка").map(part=>
+    `<li class="${part.value>0?"is-bonus":"is-penalty"}"><span>${esc(part.label)}</span><b>${signed(part.value)}</b></li>`).join("")}</ul>`;
+}
 
 const pending = new WeakMap();
 export function rollWeaponAttack(actor,itemId,options={}) {
   if(pending.has(actor))return pending.get(actor);
   const work=inventoryWrite(actor,async()=>{
-    const item=actor.items.get(itemId),action=actionQuote(actor),quote=weaponAttack(actor,item,{...options,extraPenalty:action.penalty});
+    const targetContext=selectedAttackTarget(actor),combat=globalThis.game?.combat;
+    const actorCombatants=Array.from(combat?.combatants??[]).filter(entry=>entry.actor?.uuid===actor.uuid);
+    if(actorCombatants.some(entry=>tacticsFlags(entry).tacticRequest))throw new Error("Дождитесь завершения запроса в трекере боя.");
+    if(!targetContext&&actorCombatants.some(entry=>ambushState(combat,entry)))throw new Error("Выберите цель атаки, чтобы учесть засаду.");
+    const ambush=targetContext?ambushAttack(combat,targetContext.attacker,targetContext.target):{bonus:0,opening:false};
+    if(ambush.opening&&!game.users.activeGM)throw new Error("Для начала боя из засады нужен подключённый мастер.");
+    const item=actor.items.get(itemId),action=actionQuote(actor,{ignoreExtra:ambush.opening}),quote=weaponAttack(actor,item,{...options,
+      extraPenalty:action.penalty,targetContext,ambushBonus:ambush.bonus,opening:ambush.opening});
     if(quote.blocked)throw new Error(quote.blocked);
     const display=trackRollDisplay(),messageMode=game.settings.get("core","messageMode");
     try {
@@ -18,19 +33,25 @@ export function rollWeaponAttack(actor,itemId,options={}) {
       for(let i=0;i<quote.attack.count;i++)rolls.push(await new foundry.dice.Roll(`1d10wc + ${quote.total}`,{}, {flavor:`${item.name} · ${i+1}/${quote.attack.count}`}).evaluate({allowInteractive:messageMode!=="blind"}));
       const math=quote.parts.filter(part=>part.value||part.label==="Основа навыка").map(part=>`${part.label}: ${signed(part.value)}`).join("; ");
       const flavor=`<section class="witcher-attack-chat"><h3>${esc(item.name)} · ${esc(quote.attack.name)}</h3><p data-tooltip="${esc(math)}">База проверки <b>${signed(quote.total)}</b> · ${quote.attack.count} ${quote.attack.count===1?"бросок":"броска"}</p>`
+        +(targetContext?`<p>Цель: <b>${esc(targetContext.target.name)}</b></p>`:"<small>Цель не выбрана — направление взгляда не учтено.</small>")
+        +attackModifierMarkup(quote.parts)
+        +(targetContext?.blind?"<small>Вне конуса зрения: бонус прицеливания не применяется.</small>":"")
         +`<p>${esc(quote.aim.name)}${quote.aim.id!=="random"?` · урон ×${quote.aim.multiplier} после брони`:" · место попадания после успешной атаки"}</p>`
         +actionNote(action)+`<button type="button" data-weapon-damage><i class="fa-solid fa-dice-d6"></i> Урон: ${esc(quote.damage)}</button>`
         +(quote.aim.id==="random"?'<div class="witcher-location-buttons"><button type="button" data-hit-location="humanoid">Место: гуманоид</button><button type="button" data-hit-location="monster">Место: чудовище</button></div>':"")
         +`<small>Каждое попадание — отдельный урон и зона. Сравните атаку с защитой цели.</small></section>`;
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls,flavor,
         flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId,name:item.name,mode:quote.attack.id,base:quote.total,count:quote.attack.count,
-          damage:quote.damage,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus}}}},messageMode));
+          damage:quote.damage,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
+          target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,
+          opening:ambush.opening,ambushCombatant:ambush.combatant?.id??null}}}},messageMode));
       if(!message)return;
       await display.wait(message);
       const update=actionUpdate(actor,action);
       if(item.system.skill==="crossbow")update.items=[{_id:item.id,"system.loaded":false}];
       if(Object.keys(update).length)await actor.update(update);
       await consumeAiming(actor);
+      if(ambush.opening)await requestTactic(ambush.combatant,"initiative",{message:message.id});
       return message;
     } finally {display.close();}
   });

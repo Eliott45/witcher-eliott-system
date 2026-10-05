@@ -1,8 +1,17 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { endTurnConditions } from "../combat/condition-saves.mjs";
 import { startTurnPoison } from "../combat/poison-damage.mjs";
+import { tacticsFlags } from "../combat/tactics-rules.mjs";
 
 export class WitcherCombat extends foundry.documents.Combat {
+  _sortCombatants(a,b) {
+    const aOrder=tacticsFlags(a).turnOrder,bOrder=tacticsFlags(b).turnOrder;
+    if(Number.isFinite(aOrder)||Number.isFinite(bOrder)) {
+      const order=(Number.isFinite(bOrder)?bOrder:-Infinity)-(Number.isFinite(aOrder)?aOrder:-Infinity);
+      if(order)return order;
+    }
+    return super._sortCombatants(a,b);
+  }
   async _onStartTurn(combatant, context) {
     await super._onStartTurn(combatant,context);
     try { await startTurnPoison(this,combatant,context); }

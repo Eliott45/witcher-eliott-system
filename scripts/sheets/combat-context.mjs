@@ -9,15 +9,22 @@ import { defenseQuote, rollDefense, INCOMING_ATTACKS } from "../combat/defense-r
 import { fullTurnContext, performFullTurnAction } from "../combat/full-turn-actions.mjs";
 import { recoverStamina } from "../combat/exhaustion.mjs";
 import { consumeAiming } from "../combat/full-turn-rules.mjs";
+import { prepareAmbush, requestTactic } from "../combat/combat-tactics.mjs";
+import { ambushState, tacticsFlags } from "../combat/tactics-rules.mjs";
 
 export function combatContext(actor,options={}) {
   const extra=Boolean(actor.system.combatAction?.extra),key=actionRoundKey(actor),used=Boolean(key&&actor.system.combatAction?.lastExtraRound===key);
   const canAct=conditionRules(actor).canAct;
   const fullTurn=fullTurnContext(actor);
+  const encounter=globalThis.game?.combat,ambusher=encounter?.combatants.find(entry=>entry.actor?.uuid===actor.uuid);
+  const ambush=ambushState(encounter,ambusher);
+  const ambushTargets=(ambush?.targets??[]).map(uuid=>({uuid,name:encounter.combatants.find(entry=>entry.token?.uuid===uuid)?.name??"Цель"}));
   const defenses=[{mode:"dodge"},{mode:"reposition"},...equippedItems(actor.items).filter(item=>item.type==="weapon"&&["melee","shield"].includes(item.system.category)).flatMap(item=>[{mode:"block",itemId:item.id},{mode:"parry",itemId:item.id}])]
     .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
   return { extra,used,canAct,location:options.location??"random",range:options.range??"normal",modifier:options.modifier??0,
-    fullTurn,defenses,repeat:!fullTurn.activeDodge&&Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
+    fullTurn,defenses,ambush:{active:Boolean(ambush),opening:Boolean(ambush?.opening),targets:ambushTargets,
+      canPrepare:Boolean(canAct&&ambusher&&!encounter.started&&!tacticsFlags(ambusher).tacticRequest),pending:Boolean(tacticsFlags(ambusher).tacticRequest)},
+    repeat:!fullTurn.activeDodge&&Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
     incoming:INCOMING_ATTACKS.map(entry=>({...entry,selected:entry.id===(options.incoming??"melee")})),
     locations:ATTACK_LOCATIONS.map(entry=>({...entry,selected:entry.id===(options.location??"random")})),
     ranges:RANGED_BANDS.map(entry=>({...entry,selected:entry.id===(options.range??"normal")})),
@@ -35,6 +42,15 @@ export function combatContext(actor,options={}) {
 }
 const guard=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){ui.notifications.warn(error.message);}};
 export const combatActions={
+  prepareAmbush:guard(async function(_event,target){
+    if(!this.isEditable||target.disabled)return;target.disabled=true;
+    try{await prepareAmbush(this.actor);}finally{await this.render();}
+  }),
+  revealAmbushTarget:guard(async function(_event,target){
+    if(!this.isEditable||target.disabled)return;target.disabled=true;
+    try{const combatant=game.combat?.combatants.find(entry=>entry.actor?.uuid===this.actor.uuid&&ambushState(game.combat,entry));
+      await requestTactic(combatant,"reveal",{target:target.dataset.targetUuid});}finally{await this.render();}
+  }),
   fullTurnAction:guard(async function(_event,target){
     if(!this.isEditable||target.disabled)return;
     target.disabled=true;

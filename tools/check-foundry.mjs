@@ -1501,3 +1501,25 @@ assert.ok(!toxicSheetHTML.includes('data-action="toggleEffectSave"'),'Legacy tox
 assert.ok(toxicSheetHTML.includes('В начале своего хода получаете 3 урона'));
 foundry.documents=savedEffectDocuments;
 console.log('Consumables: native timed effects, dose persistence, Item fields and inventory controls OK');
+
+// Tactical effects round-trip through installed Foundry 14, including the active ambush template branch.
+const {tacticalEffect}=await import('../scripts/combat/tactics-rules.mjs');
+for(const kind of ['delay','ambush']) {
+  const source=tacticalEffect(kind,{id:'combatTactics001',round:1},{id:'combatantTest001'},'Описание');
+  await access(new URL(`public/${source.img}`,app));
+  const effect=new foundry.documents.BaseActiveEffect(source);
+  assert.equal(effect.validationFailures.fields,null);
+  const restored=new foundry.documents.BaseActiveEffect(JSON.parse(JSON.stringify(effect.toObject())));
+  assert.equal(restored.flags[game.system.id].tactic.kind,kind);
+  assert.equal(restored.showIcon,CONST.ACTIVE_EFFECT_SHOW_ICON.ALWAYS);
+}
+const tacticsTemplate=handlebars.compile(await readFile(new URL('../templates/combat-actions.hbs',import.meta.url),'utf8'),{strict:true});
+const {combatContext:prepareTacticsContext}=await import('../scripts/sheets/combat-context.mjs');
+const tacticsView=prepareTacticsContext(doseActor);
+tacticsView.ambush={active:true,opening:true,pending:false,canPrepare:true,targets:[{uuid:'Scene.scene.Token.enemy',name:'Цель <1>'}]};
+const tacticsHTML=tacticsTemplate({combat:tacticsView,editable:true});
+assert.ok(tacticsHTML.includes('Цель &lt;1&gt;'));
+assert.match(tacticsHTML,/data-action="revealAmbushTarget"[^>]*>/);
+assert.ok(!tacticsHTML.match(/data-action="revealAmbushTarget"[^>]*disabled/));
+assert.ok(tacticsHTML.includes('Первая атака — вне инициативы'));
+console.log('Combat tactics: native effects, core icons and active ambush controls OK');

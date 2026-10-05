@@ -12,6 +12,7 @@ globalThis.foundry = {
     }
   },
   documents: { Combat: class {
+    _sortCombatants(a,b){return ((b.initiative??-Infinity)-(a.initiative??-Infinity))||(a.id>b.id?1:-1);}
     turn = 2;
     combatants = new Map([
       ["one", { id: "one", actorId: "actor", tokenId: "token-one", isOwner: true }],
@@ -41,4 +42,14 @@ test("initiative adopts the posted Luck total only for the correct token in the 
   assert.deepEqual(inspectedOptions.messageOptions.flags.other, { keep: true });
   assert.equal(messageOptions.flags[SYSTEM_ID], undefined);
   assert.deepEqual(documentUpdate, { type: "Combatant", updates: [{ _id: "one", initiative: 21 }], options: { turnEvents: false, combatTurn: 2 } });
+});
+
+test("native unbound sort honors delayed order, survives tied initiatives, and handles newcomers",()=>{
+  const combat=new WitcherCombat();
+  const a={id:"a",initiative:20,flags:{[SYSTEM_ID]:{turnOrder:1}}},b={id:"B",initiative:20,flags:{[SYSTEM_ID]:{turnOrder:3}}},c={id:"c",initiative:10,flags:{[SYSTEM_ID]:{turnOrder:2}}};
+  assert.deepEqual([a,b,c].sort(combat._sortCombatants).map(c=>c.id),["B","c","a"]);
+  const newcomer={id:"new",initiative:null};
+  assert.deepEqual([newcomer,a,c,b].sort(combat._sortCombatants).map(c=>c.id),["B","c","a","new"]);
+  for(const entry of [a,b,c])entry.flags[SYSTEM_ID].turnOrder=null;
+  assert.deepEqual([a,b,c].sort(combat._sortCombatants).map(c=>c.id),["B","a","c"]);
 });

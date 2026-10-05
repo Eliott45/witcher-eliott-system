@@ -5,6 +5,7 @@ import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from 
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
 import { migrateBestiaryContent,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
 import { registerWeaponChat } from "./combat/weapon-rolls.mjs";
+import { registerCombatTactics } from "./combat/combat-tactics.mjs";
 import { WitcherPowerPlaceData } from "./data/witcher-power-place-data.mjs";
 import { WitcherPowerPlaceSheet } from "./sheets/witcher-power-place-sheet.mjs";
 import { registerSpellContentMigration,migrateSpellContent } from "./migrations/spell-content.mjs";
@@ -65,6 +66,7 @@ Hooks.once("init", async () => {
   CONFIG.Combat.documentClass = WitcherCombat;
   registerCriticalDice();
   registerWeaponChat();
+  registerCombatTactics();
   CONFIG.Combat.initiative.formula = INITIATIVE_FORMULA;
   registerStatusEffects();
   registerConditionSaves();
