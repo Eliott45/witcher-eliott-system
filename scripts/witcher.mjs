@@ -1,5 +1,6 @@
 import { WitcherSpellData } from "./data/witcher-spell-data.mjs";
 import { WitcherEffectItemData } from "./data/witcher-effect-item-data.mjs";
+import { registerEffectExpiry } from "./combat/effect-expiry.mjs";
 import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from "./settings.mjs";
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
 import { migrateBestiaryContent,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
@@ -64,6 +65,7 @@ Hooks.once("init", async () => {
   CONFIG.Combat.initiative.formula = INITIATIVE_FORMULA;
   registerStatusEffects();
   registerConditionSaves();
+  registerEffectExpiry();
   registerOilExpiry();
   registerStubbornnessChat();
   registerEffectDurationChat();

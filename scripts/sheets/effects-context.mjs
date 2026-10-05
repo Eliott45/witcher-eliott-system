@@ -6,10 +6,10 @@ import { canSaveEffect, requestEffectSave } from "../combat/condition-saves.mjs"
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { chooseReference } from "./reference-picker.mjs";
 import { editEffectDuration, canEditEffectDuration } from "./effect-duration-editor.mjs";
-import { applyEffectItem, effectItemSource } from "../data/effect-items.mjs";
+import { applyEffectItem } from "../data/effect-items.mjs";
 
 export async function effectsContext(sheet) {
-  return Promise.all(sheet.actor.effects.map(async effect=>{
+  return Promise.all(sheet.actor.effects.filter(effect=>!effect.disabled&&!effect.isSuppressed&&!effect.duration?.expired).map(async effect=>{
     const definition=Object.values(STATUS_DEFINITIONS).find(entry=>effect.statuses.has(entry.id));
     const rules=effectRules(effect),pending=Boolean(effect.flags?.[SYSTEM_ID]?.conditionRequest);
     const legacy=definition&&!effect.flags?.[SYSTEM_ID]?.condition;
@@ -19,7 +19,7 @@ export async function effectsContext(sheet) {
       save:rules.save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
       autoAllowed:Boolean(rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
-      durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,canEditDuration:sheet.isEditable&&canEditEffectDuration(effect),canSaveItem:sheet.isEditable&&game.user.can("ITEM_CREATE"),
+      durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,canEditDuration:sheet.isEditable&&canEditEffectDuration(effect),
       action:rules.action,canAct:sheet.isEditable&&conditionRules(sheet.actor).canAct,
       description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(text.startsWith("WITCHER.")?game.i18n.localize(text):text,{secrets:sheet.actor.isOwner,relativeTo:effect})};
   }));
@@ -27,12 +27,6 @@ export async function effectsContext(sheet) {
 const safe=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){console.error(error);ui.notifications.error(error.message);}};
 export const effectActions={
   editEffectDuration:safe(async function(_event,target){if(this.isEditable)await editEffectDuration(this.actor.effects.get(target.dataset.effectId));}),
-  saveEffectItem:safe(async function(_event,target){
-    const effect=this.actor.effects.get(target.dataset.effectId);
-    if(!effect||!this.isEditable||!game.user.can("ITEM_CREATE"))return;
-    const item=await foundry.documents.Item.create(effectItemSource(effect));
-    if(item)await item.sheet.render({force:true});
-  }),
   browseEffects:safe(async function(){
     if(!this.isEditable)return;
     const pack=game.packs.get(`${SYSTEM_ID}.effects`);
