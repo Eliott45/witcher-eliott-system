@@ -7,6 +7,7 @@ import { conditionRules } from "../combat/condition-rules.mjs";
 import { chooseReference } from "./reference-picker.mjs";
 import { editEffectDuration, canEditEffectDuration } from "./effect-duration-editor.mjs";
 import { applyEffectItem } from "../data/effect-items.mjs";
+import { effectCounter, changeEffectCounter } from "../data/effect-counters.mjs";
 
 export async function effectsContext(sheet) {
   return Promise.all(sheet.actor.effects.filter(effect=>!effect.disabled&&!effect.isSuppressed&&!effect.duration?.expired).map(async effect=>{
@@ -16,7 +17,7 @@ export async function effectsContext(sheet) {
     const text=effect.description||definition?.description||"";
     return {id:effect.id,name:legacy?game.i18n.localize(definition.name):effect.name,img:effect.img??definition?.img,inactive:effect.disabled||effect.isSuppressed,
       canRemove:sheet.isEditable&&(game.user.isGM||![DYING,DEAD,EXHAUSTED_STUN,UNCONSCIOUS].some(status=>effect.statuses.has(status))),
-      save:rules.save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
+      counter:effectCounter(effect),save:rules.save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
       autoAllowed:Boolean(rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
       durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,canEditDuration:sheet.isEditable&&canEditEffectDuration(effect),
@@ -26,11 +27,14 @@ export async function effectsContext(sheet) {
 }
 const safe=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){console.error(error);ui.notifications.error(error.message);}};
 export const effectActions={
+  changeEffectCounter:safe(async function(_event,target){if(this.isEditable)await changeEffectCounter(this.actor,target.dataset.effectId,Number(target.dataset.delta));}),
   editEffectDuration:safe(async function(_event,target){if(this.isEditable)await editEffectDuration(this.actor.effects.get(target.dataset.effectId));}),
   browseEffects:safe(async function(){
     if(!this.isEditable)return;
     const pack=game.packs.get(`${SYSTEM_ID}.effects`);
-    const effects=pack?await pack.getDocuments():EFFECT_TEMPLATES.map(entry=>conditionSource(entry,text=>game.i18n.localize(text)));
+    const effects=pack?await pack.getDocuments():[];
+    // New built-in states remain available when an installed pack predates this update.
+    for(const entry of EFFECT_TEMPLATES)if(!effects.some(effect=>(effect.id??effect._id)===entry.documentId))effects.push(conditionSource(entry,text=>game.i18n.localize(text)));
     effects.push(...game.items.filter(item=>item.type==="effect"&&item.testUserPermission(game.user,"OBSERVER")));
     const entryId=effect=>effect.uuid??effect.id??effect._id;
     const id=await chooseReference("effect","",{title:"Эффекты",hint:"Выберите состояние. Его также можно перетащить из компендиума или описания состава на лист.",groups:{},

@@ -25,7 +25,9 @@ export const CONDITION_DEFINITIONS = [
   entry("succubus-skin", "Дыхание суккуба: на коже", "aura", "+2 к Соблазнению, пока действует нанесённый на кожу аромат. Стр. 88.", {modifiers:[{target:"skills.seduction",value:2}]}),
   entry("succubus-drink", "Дыхание суккуба: выпито", "aura", "−5 к проверкам против Соблазнения. Обнаружить примесь можно Вниманием СЛ 16; чёрный шоколад скрывает вкус. Условный штраф учитывается только против Соблазнения. Стр. 88."),
   entry("quick-fire", "Быстрый огонь: горючее покрытие", "fire", "Контакт с пламенем воспламеняет покрытую поверхность с вероятностью 50%. Уже существующая вероятность воспламенения повышается на 50%. Сам по себе состав не поджигает цель. Стр. 88."),
-  entry("pantagran", "Эйфория Пантагорана", "aura", "На 1d6 / 2 часа: −2 к Сопротивлению убеждению. Стр. 88.", {secondsFormula:"1d6 * 1800",modifiers:[{target:"skills.resistCoercion",value:-2}]})
+  entry("pantagran", "Эйфория Пантагорана", "aura", "На 1d6 / 2 часа: −2 к Сопротивлению убеждению. Стр. 88.", {secondsFormula:"1d6 * 1800",modifiers:[{target:"skills.resistCoercion",value:-2}]}),
+  entry("active-dodge", "Активное уклонение", "shield", "Действие полного хода. В этом раунде противники получают −2 к атакам по вам в ближнем бою, а повторные защиты не расходуют Выносливость. Снимается в начале следующего раунда. Стр. 151; errata v4.", {rounds:1,expiry:"roundStart"}),
+  entry("aiming", "Прицеливание", "target", "За каждый полный ход прицеливания: +1 к следующей дистанционной атаке, максимум +3 за три хода подряд. Счётчик хранится в одном эффекте. После атаки или в конце следующего хода без продолжения прицеливания эффект снимается. Стр. 151.", {rounds:1,expiry:"turnEnd",counter:{initial:1,max:3}})
 ];
 export const CONDITION_BY_ID = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,entry]));
 // Variants share the status ID: poison/drunkenness cannot stack with themselves.

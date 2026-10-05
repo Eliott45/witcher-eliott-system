@@ -18,7 +18,10 @@ test("weapon checks combine base, accuracy, mode, aim and extra action; damage i
   assert.equal(gripOf(weapon),2);
   const fast=weaponAttack(actor,weapon);assert.equal(fast.total,15);assert.equal(fast.attack.count,2);assert.equal(fast.damage,"(2d6+2 + 6)");
   const strong=weaponAttack(actor,weapon,{mode:"strong",extraPenalty:-3,location:"head",modifier:2});assert.equal(strong.total,5);assert.equal(strong.damage,"(2d6+2 + 6) * 2");
-  weapon.system.grip=1;assert.match(weaponAttack(actor,weapon).blocked,/Нужно рук/);
+  weapon.system.grip=1;assert.equal(weaponAttack(actor,weapon).blocked,"");assert.equal(weaponAttack(actor,weapon).total,12);
+  assert.equal(weaponAttack(actor,weapon,{mode:"strong",extraPenalty:-3}).total,6);
+  weapon.system.equipped=false;assert.match(weaponAttack(actor,weapon).blocked,/Возьмите/);weapon.system.equipped=true;
+  weapon.system.reliability.value=0;assert.match(weaponAttack(actor,weapon).blocked,/сломано/);weapon.system.reliability.value=10;
   weapon.system.natural=true;assert.equal(weaponAttack(actor,weapon).blocked,"");
   weapon.system.damageIncludesBody=true;assert.equal(weaponAttack(actor,weapon).body,0);
   assert.deepEqual([1,3,5,7,9,11,13].map(bodyDamage),[-4,-2,0,2,4,6,8]);

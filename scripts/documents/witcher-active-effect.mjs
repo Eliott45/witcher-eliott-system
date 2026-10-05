@@ -1,6 +1,8 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { immuneToCondition } from "../data/creatures.mjs";
 import { effectRules } from "../data/condition-definitions.mjs";
+import { effectCounter, activeEffect } from "../data/effect-counters.mjs";
+import { fullTurnStart } from "../combat/full-turn-rules.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 
@@ -10,7 +12,7 @@ export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
     const actor=this.parent;
     if(actor?.documentName!=="Actor")return;
     if(immuneToCondition(actor,this.statuses)){ui.notifications.info("У существа иммунитет к этому состоянию.");return false;}
-    if(actor.effects.some(effect=>!effect.disabled&&!effect.isSuppressed&&[...this.statuses].some(status=>effect.statuses.has(status)))) {
+    if(actor.effects.some(effect=>activeEffect(effect)&&[...this.statuses].some(status=>effect.statuses.has(status)))) {
       ui.notifications.info("Это состояние уже действует на персонажа."); return false;
     }
     const rules=effectRules(this);
@@ -30,8 +32,9 @@ export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
         await display.wait(message);
       }finally{display.close();}
     }
-    this.updateSource({start:this.constructor.getEffectStart(),[`flags.${SYSTEM_ID}.condition`]:structuredClone(rules),[`flags.${SYSTEM_ID}.conditionState`]:{},
+    const counter=effectCounter({statuses:this.statuses,flags:{[SYSTEM_ID]:{condition:rules}}});
+    this.updateSource({start:rules.expiry?fullTurnStart(actor):this.constructor.getEffectStart(),[`flags.${SYSTEM_ID}.condition`]:structuredClone(rules),[`flags.${SYSTEM_ID}.conditionState`]:counter?{counter:counter.value}:{},
       [`flags.${SYSTEM_ID}.conditionRequest`]:null,
-      ...(!explicitDuration&&value!==null?{duration:{value,units:rules.rounds||rules.roundsFormula?"rounds":"seconds",expiry:"turnEnd",expired:false}}:{"duration.expired":false})});
+      ...(!explicitDuration&&value!==null?{duration:{value,units:rules.rounds||rules.roundsFormula?"rounds":"seconds",expiry:rules.expiry??"turnEnd",expired:false}}:{"duration.expired":false})});
   }
 }

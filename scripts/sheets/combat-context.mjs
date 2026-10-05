@@ -6,14 +6,18 @@ import { attackModes, weaponAttack, gripOf, signed, ATTACK_LOCATIONS, RANGED_BAN
 import { rollWeaponAttack } from "../combat/weapon-rolls.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { defenseQuote, rollDefense, INCOMING_ATTACKS } from "../combat/defense-rolls.mjs";
+import { fullTurnContext, performFullTurnAction } from "../combat/full-turn-actions.mjs";
+import { recoverStamina } from "../combat/exhaustion.mjs";
+import { consumeAiming } from "../combat/full-turn-rules.mjs";
 
 export function combatContext(actor,options={}) {
   const extra=Boolean(actor.system.combatAction?.extra),key=actionRoundKey(actor),used=Boolean(key&&actor.system.combatAction?.lastExtraRound===key);
   const canAct=conditionRules(actor).canAct;
+  const fullTurn=fullTurnContext(actor);
   const defenses=[{mode:"dodge"},{mode:"reposition"},...equippedItems(actor.items).filter(item=>item.type==="weapon"&&["melee","shield"].includes(item.system.category)).flatMap(item=>[{mode:"block",itemId:item.id},{mode:"parry",itemId:item.id}])]
     .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
   return { extra,used,canAct,location:options.location??"random",range:options.range??"normal",modifier:options.modifier??0,
-    defenses,repeat:Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
+    fullTurn,defenses,repeat:!fullTurn.activeDodge&&Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
     incoming:INCOMING_ATTACKS.map(entry=>({...entry,selected:entry.id===(options.incoming??"melee")})),
     locations:ATTACK_LOCATIONS.map(entry=>({...entry,selected:entry.id===(options.location??"random")})),
     ranges:RANGED_BANDS.map(entry=>({...entry,selected:entry.id===(options.range??"normal")})),
@@ -31,6 +35,16 @@ export function combatContext(actor,options={}) {
 }
 const guard=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){ui.notifications.warn(error.message);}};
 export const combatActions={
+  fullTurnAction:guard(async function(_event,target){
+    if(!this.isEditable||target.disabled)return;
+    target.disabled=true;
+    try{await performFullTurnAction(this.actor,target.dataset.fullTurn);if(fullTurnContext(this.actor).activeDodge)this.combatOptions={...this.combatOptions,repeat:false};}
+    finally{await this.render();}
+  }),
+  fullTurnRecovery:guard(async function(_event,target){
+    if(!this.isEditable||target.disabled)return;target.disabled=true;
+    try{await this.submit();await recoverStamina(this.actor);}finally{await this.render();}
+  }),
   defend:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollDefense(this.actor,{...this.combatOptions,mode:target.dataset.mode,itemId:target.dataset.itemId});}finally{await this.render();}}),
   toggleExtraAction:guard(async function(){if(!this.isEditable)return;await inventoryWrite(this.actor,()=>this.actor.update({"system.combatAction.extra":!this.actor.system.combatAction.extra}));}),
   attackWeapon:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollWeaponAttack(this.actor,target.dataset.itemId,{...this.combatOptions,mode:target.dataset.mode});}finally{await this.render();}}),
@@ -41,7 +55,7 @@ export const combatActions={
       const quote=actionQuote(this.actor);
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor:this.actor}),
         content:`<p>Арбалет перезаряжен — действие${quote.extra?"; дополнительно, 3 ВЫН":""}. Болты учитываются в инвентаре вручную.</p>`,flags:{[SYSTEM_ID]:{skipLuck:true}}},game.settings.get("core","messageMode")));
-      if(message)await this.actor.update({...actionUpdate(this.actor,quote),items:[{_id:item.id,"system.loaded":true}]});
+      if(message){await this.actor.update({...actionUpdate(this.actor,quote),items:[{_id:item.id,"system.loaded":true}]});await consumeAiming(this.actor);}
     });
   }),
   spendExtraAction:guard(async function(){
@@ -49,6 +63,7 @@ export const combatActions={
     await inventoryWrite(this.actor,async()=>{
       const quote=actionQuote(this.actor);if(!quote.extra)return;
       await this.actor.update(actionUpdate(this.actor,quote));
+      await consumeAiming(this.actor);
       ui.notifications.info("Дополнительное действие без проверки: потрачено 3 ВЫН.");
     });
   })

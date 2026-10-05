@@ -2,6 +2,7 @@ import { SYSTEM_ID } from "../config.mjs";
 import { conditionRules } from "./condition-rules.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
+import { consumeAiming } from "./full-turn-rules.mjs";
 
 export function actionFields() {
   const { SchemaField, BooleanField, StringField } = foundry.data.fields;
@@ -39,6 +40,7 @@ export function rollActionCheck(actor, { formula, flavor, flags = {} }, options 
       if (!message) return;
       await display.wait(message);
       if (quote.extra) await actor.update(actionUpdate(actor,quote));
+      await consumeAiming(actor);
       return message;
     } finally { display.close(); }
   }).catch(error=>{ui.notifications.warn(error.message);});

@@ -1,6 +1,8 @@
 import { COMBAT_ACTOR_TYPES } from "../config.mjs";
 import { conditionRules } from "./condition-rules.mjs";
 import { hasStatus, setStatus, setStunned, EXHAUSTED_STUN, UNCONSCIOUS, DEAD } from "./status-effects.mjs";
+import { inventoryWrite } from "../data/inventory-writes.mjs";
+import { consumeAiming } from "./full-turn-rules.mjs";
 
 export async function applyExhaustion(actor) {
   if (!actor.isOwner || hasStatus(actor, DEAD)) return;
@@ -35,7 +37,7 @@ const recovering = new Map();
 export function recoverStamina(actor) {
   if (!actor.isOwner) return Promise.resolve();
   if (recovering.has(actor.uuid)) return recovering.get(actor.uuid);
-  const work = Promise.resolve().then(async () => {
+  const work = inventoryWrite(actor, async () => {
     if (!conditionRules(actor).canRecover) {
       ui.notifications.warn(game.i18n.localize("WITCHER.Conditions.CannotRecover"));
       return;
@@ -48,6 +50,7 @@ export function recoverStamina(actor) {
     const { value, max } = actor.system.stamina;
     const restored = Math.min(max, value + recovery);
     if (restored > value) await actor.update({ "system.stamina.value": restored });
+    await consumeAiming(actor);
   });
   recovering.set(actor.uuid, work);
   const clear = () => { if (recovering.get(actor.uuid) === work) recovering.delete(actor.uuid); };

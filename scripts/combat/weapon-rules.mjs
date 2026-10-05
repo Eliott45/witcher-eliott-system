@@ -2,14 +2,15 @@ import { skillValue } from "../data/skills.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { shieldClass } from "../data/shields.mjs";
+import { aimingBonus } from "./full-turn-rules.mjs";
 
 export const gripOf = item => item.system.natural ? 0 : item.system.grip || item.system.hands || 1;
 export const signed = value => value >= 0 ? `+${value}` : `−${Math.abs(value)}`;
 // Core p.48 only tabulates BODY 1–13. Do not extrapolate beyond that table.
 export const bodyDamage = body => body == null ? 0 : 2 * Math.ceil(Math.min(13, Math.max(1, body)) / 2) - 6;
-export function weaponReadiness(actor,item,weapon=effectiveItem(item)) {
+export function weaponReadiness(actor,item,weapon=effectiveItem(item),{allowOneHand=false}={}) {
   if(!equippedItems(actor.items).some(entry=>entry.id===item.id))return "Возьмите оружие в руки";
-  if(!weapon.natural&&gripOf(item)<(weapon.hands??1))return `Нужно рук: ${weapon.hands}`;
+  if(!allowOneHand&&!weapon.natural&&gripOf(item)<(weapon.hands??1))return `Нужно рук: ${weapon.hands}`;
   if(!weapon.natural&&weapon.reliability?.max&&weapon.reliability.value<=0)return "Оружие сломано";
   return "";
 }
@@ -55,6 +56,10 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   const ranged=["ranged","thrown"].includes(weapon.category),band=ranged?RANGED_BANDS.find(entry=>entry.id===range):RANGED_BANDS[0];
   if(!band)throw new Error("Неверная дистанция.");
   const parts=[{label:"Основа навыка",value:skill.total},{label:"Точность оружия",value:weapon.accuracy??0},
+    {label:"Двуручное оружие одной рукой",value:!weapon.natural&&gripOf(item)<(weapon.hands??1)?-3:0},
+    // TODO(p.151): no explicit multi-projectile Aim example in core/errata or Sage's Answers found.
+    // Keep one base for the existing attack action (including an NPC's printed rate of fire).
+    {label:"Прицеливание",value:ranged?aimingBonus(actor):0},
     {label:attack.name,value:attack.penalty},{label:"Дополнительное действие",value:extraPenalty},
     {label:aim.name,value:aim.penalty},{label:band.name,value:band.penalty},{label:"Ситуация",value:Number(modifier)}];
   const total=skill.total===null?null:parts.reduce((sum,part)=>sum+part.value,0);
@@ -64,6 +69,6 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   const bonus=melee?actor.system.statistics.meleeDamageBonus??0:0;
   const unarmedBonus=weapon.ruleId==="weapon.brass-knuckles"&&!weapon.damageIncludesBody?" + 1d6":"";
   const damage=`(${shield?"1d6":weapon.damage}${unarmedBonus}${body+bonus?` + ${body+bonus}`:""})${attack.multiplier===2?" * 2":""}`;
-  const blocked=shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon)|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":"");
+  const blocked=shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":"");
   return {weapon,attack,skill,parts,total,damage,body,bonus,aim,band,ranged,blocked,range:weapon.rangeBodyMultiplier?weapon.rangeBodyMultiplier*actor.system.statistics.effective.body:weapon.range};
 }

@@ -443,6 +443,20 @@ const timedEffect = new foundry.documents.BaseActiveEffect({...conditionSource(E
   duration:{value:7,units:"rounds",expiry:"turnEnd",expired:false}});
 assert.deepEqual(new foundry.documents.BaseActiveEffect(timedEffect.toObject()).toObject().duration,
   {value:7,units:"rounds",expiry:"turnEnd",expired:false});
+// Existing Actor/ActiveEffect models persist counters and native round boundaries without a new schema.
+const {effectCounter}=await import("../scripts/data/effect-counters.mjs");
+for(const type of ["character","npc"]){
+  const counterSource=conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="aiming"));
+  counterSource.flags[game.system.id].conditionState={counter:2,lastAimRound:"test:4"};
+  counterSource.duration={value:1,units:"rounds",expiry:"turnEnd",expired:false};
+  const dodgeSource=conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="active-dodge"));
+  dodgeSource.duration={value:1,units:"rounds",expiry:"roundStart",expired:false};
+  const actor=new foundry.documents.BaseActor({name:"Full-turn persistence",type,effects:[counterSource,dodgeSource]});
+  const restored=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(actor.toObject())));
+  const aim=restored.effects.find(effect=>effect.statuses.has("aiming"));
+  assert.deepEqual(effectCounter(aim),{value:2,max:3});assert.equal(aim.flags[game.system.id].conditionState.lastAimRound,"test:4");
+  assert.equal(restored.effects.find(effect=>effect.statuses.has("active-dodge")).duration.expiry,"roundStart");
+}
 // Real embedded Items feed ability rules; only the base skill level is persisted.
 const skillsActor = new foundry.documents.BaseActor({ name: "Skill check", type: "character",
   system: { attributes: { intelligence: 8, dexterity: 8, empathy: 8 }, details: { race: "elf", origin: "redania", familyStatus: "elder.scribes" },
@@ -519,6 +533,22 @@ sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/s
 sheet.token = null;
 sheet.isEditable = true;
 const html = template(await sheet._prepareContext({}));
+assert.ok(!html.includes("witcher-sidebar-extra"),"Extra action is only offered inside Actions");
+assert.ok(!html.includes("СТАЛЬ И РЕАКЦИЯ"));
+assert.ok(html.includes("Перемещение"));
+const {combatContext:fullTurnCombatContext}=await import("../scripts/sheets/combat-context.mjs");
+const combatTemplate=handlebars.compile(await readFile(new URL("../templates/combat-actions.hbs",import.meta.url),"utf8"),{strict:true});
+const dodgeForRender={...conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="active-dodge")),statuses:new Set(["active-dodge"])};
+const aimForRender={...conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="aiming")),statuses:new Set(["aiming"])};
+aimForRender.flags[game.system.id].conditionState={counter:2};
+const fullTurnActor={...sheet.actor,items:[],effects:[dodgeForRender,aimForRender]};
+const fullTurnCombat=fullTurnCombatContext(fullTurnActor,{repeat:true});
+assert.equal(fullTurnCombat.repeat,false);assert.equal(fullTurnCombat.defenses[0].cost,0);
+const fullTurnHTML=combatTemplate({combat:fullTurnCombat,editable:true});
+assert.match(fullTurnHTML,/<h3>.*Атака<\/h3>/);
+assert.match(fullTurnHTML,/data-combat-option="repeat"\s+disabled/);
+assert.ok(fullTurnHTML.includes("+2 / +3"));assert.ok(fullTurnHTML.includes("Действия полного хода"));
+assert.ok(combatTemplate({combat:fullTurnCombat,editable:false}).includes('data-full-turn="aiming" disabled'));
 // A new optional magic state round-trips on old/new actors without touching old resources.
 assert.equal(legacyActorData.magic.spent,0);
 assert.equal(legacyActorData.magic.improvementPoints,0);

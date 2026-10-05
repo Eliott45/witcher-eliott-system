@@ -1,7 +1,6 @@
 <div class="witcher-character-layout{{#if stats.death.dead}} is-dead{{else if stats.death.active}} is-dying{{/if}}">
   <aside class="witcher-character-sidebar">
     <div class="witcher-brand">THE WITCHER</div>
-    <button type="button" class="witcher-sidebar-extra" data-action="toggleExtraAction" aria-pressed="{{combat.extra}}" {{disabled (not editable)}} data-tooltip="Дополнительное действие: 3 ВЫН и −3 к его проверкам; переключатель сбрасывается после действия."><i class="fa-solid fa-bolt"></i> Второе действие{{#if combat.extra}} · −3{{/if}}</button>
     <section class="witcher-resources" aria-label="{{localize 'WITCHER.Sheet.Resources'}}">
     <fieldset class="witcher-resource health">
       <legend><span data-tooltip="{{stats.healthTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Sheet.Health"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></legend>
@@ -460,6 +459,7 @@
         </header>
         <div class="witcher-effect-description">{{{effect.description}}}</div>
         <footer class="witcher-effect-controls">
+          {{#if effect.counter}}<span class="witcher-effect-counter"><button type="button" data-action="changeEffectCounter" data-effect-id="{{effect.id}}" data-delta="-1" aria-label="Уменьшить счётчик" {{disabled (not ../editable)}}>−</button><b>{{effect.counter.value}} / {{effect.counter.max}}</b><button type="button" data-action="changeEffectCounter" data-effect-id="{{effect.id}}" data-delta="1" aria-label="Увеличить счётчик" {{disabled (or (not ../editable) (eq effect.counter.value effect.counter.max))}}>+</button></span>{{/if}}
           {{#if effect.save}}<span class="witcher-effect-rule">{{effect.saveHint}}</span>{{/if}}
           {{#if effect.durationLabel}}<button type="button" data-action="editEffectDuration" data-effect-id="{{effect.id}}" data-tooltip="Изменить оставшееся время" {{disabled (not effect.canEditDuration)}}><i class="fa-solid fa-clock"></i> {{effect.durationLabel}}</button>{{/if}}
           {{#if effect.pending}}<span>Проверка…</span>{{/if}}

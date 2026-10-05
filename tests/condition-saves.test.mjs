@@ -27,7 +27,7 @@ function fixture(key="black-venom",total=4){
   const effect={...conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key===key)),id:"ef",uuid:"Actor.test.ActiveEffect.ef",parent:actor,
     async update(changes){patch(this,changes);},async delete(){updates.push("deleted");actor.effects=actor.effects.filter(entry=>entry.id!==this.id);}};
   effect.statuses=new Set(effect.statuses);actor.effects=[effect];
-  const combatant={id:"c",actor},combat={uuid:"Combat.test",started:true,round:1,turn:1,combatants:[combatant]};game.combat=combat;
+  const combatant={id:"c",actor},combat={uuid:"Combat.test",started:true,round:1,turn:1,combatants:[combatant],turns:[combatant]};game.combat=combat;
   return{actor,effect,messages,updates,combat,combatant,gm,player};
 }
 
@@ -109,6 +109,14 @@ test("native effect creation deduplicates all poisons and resets per-turn state 
   edited.duration.value=null;edited.flags[SYSTEM_ID].conditionDurationOverride=true;
   await edited._preCreate({duration:edited.duration},{},{});
   assert.equal(edited.duration.value,null);assert.equal(f.messages.length,count);
+  const aim=Object.assign(new WitcherActiveEffect(),conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="aiming")),{parent:f.actor,statuses:new Set(["aiming"])});
+  aim.flags[SYSTEM_ID].conditionState={counter:3,lastAimRound:"old-combat:4"};
+  await aim._preCreate({}, {}, {});
+  assert.deepEqual(aim.flags[SYSTEM_ID].conditionState,{counter:1},"Dropping a template never copies another actor's accumulated turns");
+  assert.deepEqual(aim.duration,{value:1,units:"rounds",expiry:"turnEnd",expired:false});
+  const dodge=Object.assign(new WitcherActiveEffect(),conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="active-dodge")),{parent:f.actor,statuses:new Set(["active-dodge"])});
+  await dodge._preCreate({}, {}, {});
+  assert.deepEqual(dodge.duration,{value:1,units:"rounds",expiry:"roundStart",expired:false});
 });
 test("alchemy gains real descriptions and resolvable effect links, while migration preserves player notes",()=>{
   for(const entry of ALCHEMY){assert.match(entry.system.description,/<h3>Действие состава/);for(const [,id]of entry.system.description.matchAll(/ActiveEffect\.([^\]]+)/g))assert(EFFECT_TEMPLATES.some(effect=>effect.documentId===id));}

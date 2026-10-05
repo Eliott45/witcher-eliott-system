@@ -777,6 +777,74 @@
     }
   },
   {
+    "_id": "efct000000000023",
+    "name": "Активное уклонение",
+    "img": "icons/svg/shield.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Действие полного хода. В этом раунде противники получают −2 к атакам по вам в ближнем бою, а повторные защиты не расходуют Выносливость. Снимается в начале следующего раунда. Стр. 151; errata v4.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "active-dodge"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "active-dodge",
+          "rounds": 1,
+          "expiry": "roundStart"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000024",
+    "name": "Прицеливание",
+    "img": "icons/svg/target.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>За каждый полный ход прицеливания: +1 к следующей дистанционной атаке, максимум +3 за три хода подряд. Счётчик хранится в одном эффекте. После атаки или в конце следующего хода без продолжения прицеливания эффект снимается. Стр. 151.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "aiming"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "aiming",
+          "rounds": 1,
+          "expiry": "turnEnd",
+          "counter": {
+            "initial": 1,
+            "max": 3
+          }
+        }
+      }
+    }
+  },
+  {
     "_id": "efct000000000101",
     "name": "Чёрный яд",
     "img": "icons/svg/poison.svg",

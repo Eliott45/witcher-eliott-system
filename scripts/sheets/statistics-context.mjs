@@ -58,6 +58,7 @@ export function statisticsContext(system, { localize, format }) {
     woundThreshold: row("WoundThreshold", statistics.woundThreshold, "WoundThreshold"),
     movementRows: [
       row("Initiative", statistics.initiative === null ? null : `+${statistics.initiative}`, "Initiative"),
+      row("Movement", statistics.effective.speed, "Movement", "Meters"),
       row("Run", statistics.run, "Run", "Meters"), row("Leap", statistics.leap, "Leap", "Meters")
     ],
     carryMax: value(statistics.carryMax), carryTooltip: [description("Carry"),

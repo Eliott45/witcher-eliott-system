@@ -4,6 +4,7 @@ import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { actionQuote, actionNote, actionUpdate } from "./action-economy.mjs";
 import { weaponAttack, signed, hitLocation } from "./weapon-rules.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { consumeAiming } from "./full-turn-rules.mjs";
 
 const pending = new WeakMap();
 export function rollWeaponAttack(actor,itemId,options={}) {
@@ -29,6 +30,7 @@ export function rollWeaponAttack(actor,itemId,options={}) {
       const update=actionUpdate(actor,action);
       if(item.system.skill==="crossbow")update.items=[{_id:item.id,"system.loaded":false}];
       if(Object.keys(update).length)await actor.update(update);
+      await consumeAiming(actor);
       return message;
     } finally {display.close();}
   });

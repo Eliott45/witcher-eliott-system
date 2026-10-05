@@ -118,7 +118,8 @@ test("localized tooltips contain resolved formulas and distinguish resource name
       assert.ok(stat.tooltip.length > 40);
     }
     assert.match(context.healthTooltip, /10.*10.*50/);
-    assert.match(context.movementRows[2].tooltip, /27.*5/);
+    assert.match(context.movementRows.find(row=>row.key==="Leap").tooltip, /27.*5/);
+    assert.equal(context.movementRows.find(row=>row.key==="Movement").value,9);
     assert.equal(context.carriedWeight, 100.5, "Sheet displays the derived inventory weight");
     assert.ok(!JSON.stringify(context).includes("undefined"));
     data.vigor = 2;

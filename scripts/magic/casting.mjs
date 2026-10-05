@@ -1,5 +1,6 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { actionQuote, actionNote, actionUpdate } from "../combat/action-economy.mjs";
+import { consumeAiming } from "../combat/full-turn-rules.mjs";
 import { powerBonus } from "./power-place-rules.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
@@ -120,6 +121,7 @@ function performCast(actor,itemId,options) {
         const status={earth:"stunned",fire:"burning",water:"frozen"}[element];
         if(status)await setStatus(actor,status,true);
       }
+      if(!options.maintenance)await consumeAiming(actor);
       return posted;
     } catch(error) {
       if(posted)ui.notifications.error("Результат уже в чате, но расход магии не завершён. Проверьте ПЗ, Выносливость и состояния перед повторным броском.");
