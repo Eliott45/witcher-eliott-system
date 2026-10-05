@@ -210,6 +210,17 @@
       }
     },
     {
+      "name": "pregens",
+      "label": "Готовые персонажи",
+      "path": "packs/pregens",
+      "type": "Actor",
+      "system": "witcher-eliott-system",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
       "name": "bestiary",
       "label": "Бестиарий",
       "path": "packs/bestiary",
@@ -237,7 +248,8 @@
         "languages",
         "professions",
         "spells",
-        "bestiary"
+        "bestiary",
+        "pregens"
       ]
     }
   ],

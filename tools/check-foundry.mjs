@@ -39,7 +39,7 @@ assert.equal(game.system.grid.distance, 2);
 assert.equal(game.system.grid.units, "m");
 const [packFolder] = game.system.packFolders;
 assert.equal(packFolder.name, "Witcher");
-assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "spells", "bestiary"]);
+assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "spells", "bestiary", "pregens"]);
 game.model = { ...game.system.documentTypes, ActiveEffect:{base:{}}, Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type, folders: new Map() }]));
 game.user = { id: "testuser00000001", isGM: true, can:()=>true };
@@ -300,6 +300,7 @@ for (const source of await readJSON("../pack-sources/equipment.folders.json")) {
   game.packs.get(equipmentPack).folders.set(folder.id, folder);
 }
 CONFIG.Actor.dataModels.npc = WitcherActorData;
+CONFIG.Actor.dataModels.character = WitcherActorData;
 foundry.data.PrototypeTokenOverrides.overrides = { base: {} };
 const assertSubset=(actual,expected)=>{for(const [key,value] of Object.entries(expected))if(value&&typeof value==="object")assertSubset(actual[key],value);else assert.deepEqual(actual[key],value);};
 const documents = new Map();
@@ -320,6 +321,23 @@ for (const pack of game.system.packs) {
   }
 }
 assert.equal(documents.size, Object.values((await import("./compendium-data.mjs")).compendiumData(await readJSON("../lang/ru.json"))).flat().length);
+const geraltSource = documents.get(`Compendium.${game.system.id}.pregens.Actor.pregenGeralt0001`);
+for (const geralt of [geraltSource, new foundry.documents.BaseActor(JSON.parse(JSON.stringify(geraltSource.toObject())))]) {
+  geralt.system.prepareDerivedData();
+  assert.deepEqual(Object.values(geralt.system.statistics.effective), [6,14,10,8,9,3,5,8,3]);
+  assert.equal(geralt.system.health.value, 55);
+  assert.equal(geralt.system.health.max, 55);
+  assert.equal(geralt.system.stamina.max, 40);
+  assert.equal(geralt.items.size, 41);
+  const patch = { "system.biography.sessionNotes": "Updated notes" };
+  prepareResourceUpdate(geralt, patch, {});
+  assert.equal(patch.system.health, undefined, "An unrelated edit must not discard Raven's +15 HP");
+  const armor = geralt.items.find(item => item.system.ruleId === "armor.raven");
+  assert.equal(armor.system.zone, "torso-legs");
+  assert.equal(armor.system.wearerBonuses.length, 2);
+  armor.updateSource({ "system.equipped": false });
+  assert.equal(geralt.system.statistics.healthMax, 40);
+}
 CONFIG.Actor.dataModels.character = WitcherActorData;
 const armored = new foundry.documents.BaseActor({ name: "Inventory round trip", type: "character", system: { attributes: { reflex: 5, dexterity: 4 }, health: { value: 20, max: 20 } }, items: [
   { name: "Бригантина", type: "armor", system: { weight: 7, equipped: true, zone: "torso", encumbrance: 1, stoppingPower: { value: 8, max: 12 } } },

@@ -1,6 +1,7 @@
 import { isPhysical } from "./physical-items.mjs";
 import { isContainer, canContain } from "./containers.mjs";
 import { effectiveItem } from "./workshop.mjs";
+import { hasMarketPrice } from "./equipment-price.mjs";
 import { inventoryWrite } from "./inventory-writes.mjs";
 import { copyPhysical, inventoryTransaction } from "../workshop/transaction.mjs";
 
@@ -9,7 +10,7 @@ export function equipmentQuote(actor, item, quantity = 1) {
   const purchaseQuantity = Number(item.system.purchaseQuantity ?? 1);
   const units = quantity * purchaseQuantity;
   const crowns = Number(actor?.system.crowns ?? 0);
-  const cost = Math.round(price * units * 100) / 100;
+  const cost = hasMarketPrice(item) ? Math.round(price * units * 100) / 100 : NaN;
   let addReason = "";
   if (!actor?.isOwner) addReason = "Нет доступа к инвентарю.";
   else if (!isPhysical(item) || !item.testUserPermission(game.user, "OBSERVER")) addReason = "Предмет недоступен.";
@@ -17,6 +18,7 @@ export function equipmentQuote(actor, item, quantity = 1) {
   else if (!Number.isSafeInteger(purchaseQuantity) || purchaseQuantity < 1 || !Number.isSafeInteger(units)) addReason = "Некорректное количество предметов в пачке.";
   else if (isContainer(item) && units !== 1) addReason = "Контейнеры добавляются по одному.";
   let buyReason = addReason;
+  if (!buyReason && !hasMarketPrice(item)) buyReason = "Рыночная цена не указана. Предмет можно добавить; цену продажи назначает ведущий.";
   if (!buyReason && (!Number.isFinite(cost) || !Number.isFinite(price) || price < 0)) buyReason = "У предмета некорректная цена.";
   if (!buyReason && (!Number.isFinite(crowns) || Math.round(crowns * 100) < Math.round(cost * 100))) buyReason = `Недостаточно крон. Нужно ${cost}.`;
   return { cost, units, addReason, buyReason, canAdd: !addReason, canBuy: !buyReason };

@@ -1,5 +1,6 @@
 import { spellSources, spellFolders } from "../scripts/data/spells.mjs";
 import { bestiarySources } from "../scripts/data/bestiary.mjs";
+import { pregenSources } from "../scripts/data/pregens.mjs";
 import { MATERIALS } from "../scripts/data/workshop-materials.mjs";
 import { ALCHEMY, MUTAGENS } from "../scripts/data/workshop-alchemy.mjs";
 import { UPGRADES } from "../scripts/data/workshop-upgrades.mjs";
@@ -13,6 +14,7 @@ import { EQUIPMENT, EQUIPMENT_FOLDERS, getEquipment } from "../scripts/data/equi
 import { INFLUENTIAL_FRIENDS } from "../scripts/data/influential-friends.mjs";
 import { LANGUAGES } from "../scripts/data/languages.mjs";
 import { CORE_EQUIPMENT, LEGACY_GEAR_STATS } from "../scripts/data/core-equipment.mjs";
+import { WITCHER_SPECIAL_EQUIPMENT } from "../scripts/data/witcher-special-equipment.mjs";
 import { generalGearContent } from "../scripts/data/general-gear.mjs";
 import { defaultItemIcon } from "../scripts/data/item-icons.mjs";
 import { EFFECT_TEMPLATES, conditionSource } from "../scripts/data/condition-definitions.mjs";
@@ -39,7 +41,7 @@ export function compendiumData(translations) {
     flags: entry.flags ?? {}
   });
   const professionAbility = entry => ({...item(entry.documentId, "ability", entry, { description: '<p>' + escapeHTML(entry.description) + '</p><p>Базовая книга, дерево профессии.</p>', level: 0, attribute: entry.attribute }), folder: getProfessionFolder(entry.profession)});
-  return {
+  const packs = {
     bestiary: bestiarySources(),
     effects: EFFECT_TEMPLATES.map(entry=>conditionSource(entry,text=>text.startsWith("WITCHER.")?localize(text):text)),
     professions: PROFESSIONS.map(entry => item(entry.documentId, "profession", entry, { description: '<p>Базовая книга: стр. ' + entry.page + ', дерево: стр. ' + entry.treePage + '.</p><p>Предел магии: ' + entry.vigor + '. ' + escapeHTML(entry.magic) + '</p><p>' + entry.skills.map(key => localize('WITCHER.Skills.Entries.' + key + '.Label')).join(', ') + '</p><p>Языков на выбор: ' + entry.languageChoices + '. Снаряжение — выберите ' + entry.equipmentChoices + ': ' + escapeHTML(entry.equipment) + '</p><p>' + entry.abilities.map(ability => '@UUID[Compendium.witcher-eliott-system.abilities.Item.' + ability.documentId + ']{' + ability.name + '}').join('<br>') + '</p>' })),
@@ -72,7 +74,7 @@ export function compendiumData(translations) {
       const content = generalGearContent(entry.id);
       return item(entry.documentId, "equipment", entry, { ...LEGACY_GEAR_STATS[entry.id], ...content, description: paragraph(entry.description) + (content?.description ?? "") });
     }),
-      ...[...CORE_EQUIPMENT, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: entry.system.description ?? `<p>${escapeHTML(entry.system.source)}</p>` }),
+      ...[...CORE_EQUIPMENT, ...WITCHER_SPECIAL_EQUIPMENT, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: entry.system.description ?? `<p>${escapeHTML(entry.system.source)}</p>` }),
         img: entry.img ?? defaultItemIcon(entry) }))],
     "influential-friends": INFLUENTIAL_FRIENDS.map(entry => item(entry.documentId, "influence", entry, {
       region: entry.group, roll: entry.roll,
@@ -84,6 +86,7 @@ export function compendiumData(translations) {
           .join(` ${escapeHTML(localize("WITCHER.Friends.Or"))} `) + "</p>"
     }))
   };
+  return { ...packs, pregens: pregenSources(packs) };
 }
 
 /** Folders inside a compendium, distinct from the world sidebar's Witcher pack folder. */

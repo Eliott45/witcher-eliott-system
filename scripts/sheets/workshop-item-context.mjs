@@ -14,8 +14,9 @@ export async function workshopItemContext(item) {
     components, resultName:recipe?(await foundry.utils.fromUuid(recipe.resultUuid))?.name??"Выберите результат":"", time:recipe?durationLabel(recipe.time):"",
     tools:recipe?recipe.tools.join(", "):"", upgradeable:Boolean(item.actor&&conditionKey(item)), slots:freeSlots(item),
     installations:item.system.installations.map(entry=>({...entry,zoneLabel:({head:"Голова",torso:"Корпус / руки",legs:"Ноги"})[entry.zone],removable:entry.category==="armor"})), oil:oil?{...oil,targetLabel:MONSTER_CATEGORIES.find(c=>c.id===oil.target)?.name??oil.target}:null, effective,
-    bonusPath:["mutagen","upgrade"].includes(item.system.kind)?item.system.kind:"",
-    bonuses:["mutagen","upgrade"].includes(item.system.kind)?item.system[item.system.kind].bonuses.map((b,index)=>({...b,index,label:WORKSHOP_BONUS_LABELS[b.target]??b.target})):[],
+    bonusPath:bonusPath(item),
+    bonusHeading:["mutagen","upgrade"].includes(item.system.kind)?"Бонусы":"Бонусы владельцу, пока предмет экипирован",
+    bonuses:(foundry.utils.getProperty(item.system,bonusPath(item))??[]).map((b,index)=>({...b,index,label:WORKSHOP_BONUS_LABELS[b.target]??b.target})),
     canOil:Boolean(item.actor&&item.type==="weapon"&&item.system.category!=="shield"),
     canPrepare:Boolean(item.actor&&available(item)&&!item.system.mutagen.prepared),
     canApply:Boolean(item.actor?.system.details.race==="witcher"&&available(item)&&item.system.mutagen.prepared&&item.actor.system.mutations.length<2),
@@ -27,15 +28,16 @@ export async function selectCatalogItem(title, predicate = ()=>true) {
   return documents.find(item=>item.uuid===id);
 }
 const safe = fn => async function(...args) { try { return await fn.apply(this,args); } catch(error) { console.error(error); ui.notifications.error(error.message); } };
+const bonusPath = item => ["mutagen","upgrade"].includes(item.system.kind)?`${item.system.kind}.bonuses`:item.type!=="recipe"?"wearerBonuses":"";
 export const workshopItemActions = {
  addWorkshopBonus:safe(async function(){
-   if(!this.isEditable||!["mutagen","upgrade"].includes(this.item.system.kind))return;
+   if(!this.isEditable||!isPhysical(this.item)||!bonusPath(this.item))return;
    const kind=this.item.system.kind;
-   const choices=kind==="mutagen"?{"meleeDamage":"Урон в ближнем бою","attributes.body":"Телосложение","attributes.reflex":"Реакция","healthMax":"Максимум ПЗ","vigor":"Предел магии"}:{reliability:"Надёжность",stoppingPower:"ПБ",accuracy:"Точность",weight:"Вес","skills.stealth":"Скрытность"};
+   const choices=kind==="mutagen"?{"meleeDamage":"Урон в ближнем бою","attributes.body":"Телосложение","attributes.reflex":"Реакция","healthMax":"Максимум ПЗ","vigor":"Предел магии"}:kind==="upgrade"?{reliability:"Надёжность",stoppingPower:"ПБ",accuracy:"Точность",weight:"Вес","skills.stealth":"Скрытность"}:{healthMax:"Максимум ПЗ",staminaMax:"Максимум Выносливости",vigor:"Предел магии",meleeDamage:"Урон в ближнем бою","skills.courage":"Храбрость","skills.stealth":"Скрытность"};
    const answer=await foundry.applications.api.DialogV2.prompt({window:{title:"Бонус предмета"},content:`<label>Показатель<select name="target">${Object.entries(choices).map(([id,name])=>`<option value="${id}">${name}</option>`).join("")}</select></label><label>Значение<input type="number" name="value" step="0.1" value="1"></label>`,ok:{label:"Добавить",callback:(_e,b)=>Object.fromEntries(new FormData(b.form))},rejectClose:false});
-   if(answer)await this.item.update({[`system.${kind}.bonuses`]:[...this.item.system[kind].bonuses,{target:answer.target,value:Number(answer.value)||0}]});
+   if(answer&&Object.hasOwn(choices,answer.target))await this.item.update({[`system.${bonusPath(this.item)}`]:[...(foundry.utils.getProperty(this.item.system,bonusPath(this.item))??[]),{target:answer.target,value:Number(answer.value)||0}]});
  }),
- removeWorkshopBonus:safe(async function(_event,target){const kind=this.item.system.kind;if(this.isEditable&&["mutagen","upgrade"].includes(kind))await this.item.update({[`system.${kind}.bonuses`]:this.item.system[kind].bonuses.filter((_entry,i)=>i!==Number(target.dataset.index))});}),
+ removeWorkshopBonus:safe(async function(_event,target){const path=bonusPath(this.item);if(this.isEditable&&isPhysical(this.item)&&path)await this.item.update({[`system.${path}`]:(foundry.utils.getProperty(this.item.system,path)??[]).filter((_entry,i)=>i!==Number(target.dataset.index))});}),
  craftRecipe:safe(async function(){if(this.isEditable)await craftDialog(this.item.actor,this.item);}),
  repairItem:safe(async function(){if(this.isEditable&&this.item.actor)await craftDialog(this.item.actor,await findRepairDiagram(this.item),this.item);}),
  chooseRecipeResult:safe(async function(){if(!this.isEditable)return;const selected=await selectCatalogItem("Результат рецепта",item=>item.type!=="recipe");if(selected)await this.item.update({"system.recipe.resultUuid":selected.uuid});}),

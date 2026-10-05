@@ -1,0 +1,1407 @@
+[
+  {
+    "_id": "pregenGeralt0001",
+    "name": "Геральт из Ривии",
+    "type": "character",
+    "img": "icons/svg/mystery-man.svg",
+    "ownership": {
+      "default": 2
+    },
+    "prototypeToken": {
+      "name": "Геральт из Ривии",
+      "actorLink": true,
+      "disposition": 1,
+      "texture": {
+        "src": "icons/svg/mystery-man.svg"
+      },
+      "sight": {
+        "enabled": true,
+        "angle": 180
+      },
+      "bar1": {
+        "attribute": "health"
+      },
+      "bar2": {
+        "attribute": "stamina"
+      }
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "pregen": {
+          "id": "geralt-of-rivia",
+          "source": "Базовая книга, стр. 12",
+          "revision": 1
+        }
+      }
+    },
+    "system": {
+      "details": {
+        "race": "witcher",
+        "profession": "witcher",
+        "gender": "Мужской"
+      },
+      "attributes": {
+        "intelligence": 6,
+        "reflex": 13,
+        "dexterity": 9,
+        "body": 8,
+        "speed": 9,
+        "empathy": 7,
+        "craft": 5,
+        "will": 8,
+        "luck": 3
+      },
+      "health": {
+        "value": 55,
+        "max": 55
+      },
+      "stamina": {
+        "value": 40,
+        "max": 40
+      },
+      "vigor": 7,
+      "skills": {
+        "awareness": 8,
+        "riding": 4,
+        "spellCasting": 8,
+        "alchemy": 5,
+        "brawling": 6,
+        "dodgeEscape": 10,
+        "wildernessSurvival": 9,
+        "swordsmanship": 11,
+        "athletics": 10,
+        "smallBlades": 9,
+        "melee": 7,
+        "deduction": 8,
+        "crossbow": 6,
+        "stealth": 8,
+        "intimidation": 9,
+        "physique": 6,
+        "resistCoercion": 8,
+        "resistMagic": 6,
+        "endurance": 10
+      },
+      "languages": [
+        {
+          "id": "language.common",
+          "name": "Всеобщий",
+          "level": 8
+        }
+      ],
+      "lifepath": {
+        "witcher": {
+          "school": "wolf",
+          "notes": "Ведьмак школы Волка, воспитанный в Каэр Морхене. Отдельные броски тренировок и десятилетий на стр. 12 не заданы и оставлены незаполненными."
+        }
+      },
+      "biography": {
+        "appearance": "Белые волосы, ведьмачьи глаза, шрамы. За спиной стальной и серебряный мечи; на шее медальон школы Волка.",
+        "backstory": "Геральт из Ривии, Белый Волк — знаменитый ведьмак и охотник на чудовищ. Участник событий в Вызиме и Лок Муинне. В момент, описанный базовой книгой, путешествует по Северу в поисках Йеннифэр и Цири.",
+        "allies": "Йеннифэр из Венгерберга; Цири; ведьмаки Каэр Морхена.",
+        "sessionNotes": "Преген из базовой книги, стр. 12. Максимум ПЗ 55 = 40 от ТЕЛ/ВОЛИ + 15 от надетых доспехов Ворона. Предел магии 7 записан по блоку персонажа (Магический источник 10). Возраст, кроны, опыт и репутация в блоке не указаны. Всеобщий 8 — родной язык по общему правилу стр. 49. Портрет можно заменить в листе."
+      },
+      "notes": "Источник: базовая книга, стр. 12. Снаряжение: стр. 247–248, 254–255, 258, 263–264; официальная errata R. Talsorian v4."
+    },
+    "items": [
+      {
+        "_id": "prab000000000011",
+        "name": "Подготовка ведьмака",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.witcher.training",
+          "description": "<p>Заменяет Монстрологию. Штрафы опасной среды и пересечённой местности уменьшаются на половину уровня навыка (минимум 1).</p><p>Базовая книга, дерево профессии.</p>",
+          "level": 10,
+          "attribute": "intelligence"
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000011"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000012",
+        "name": "Медитация",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.witcher.meditation",
+          "description": "<p>Транс даёт преимущества сна при сохранении сознания. Ведьмак может очнуться, чтобы заметить происходящее в радиусе, равном удвоенному уровню в метрах.</p><p>Базовая книга, дерево профессии.</p>",
+          "level": 10,
+          "attribute": ""
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000012"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000013",
+        "name": "Магический источник",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.witcher.source",
+          "description": "<p>Каждые 2 уровня увеличивают предел магии на 1; при уровне 10 базовый предел ведьмака достигает 7.</p><p>Базовая книга, дерево профессии.</p>",
+          "level": 10,
+          "attribute": ""
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000013"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000014",
+        "name": "Гелиотроп",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.witcher.heliotrope",
+          "description": "<p>Защита против заклинания, инвокации или порчи: результат не ниже броска мага отменяет эффект. Стоимость — половина STA, затраченной на магию.</p><p>Базовая книга, дерево профессии.</p>",
+          "level": 6,
+          "attribute": "will"
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000014"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000015",
+        "name": "Крепкий желудок",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.witcher.iron-stomach",
+          "description": "<p>Уровень 1 даёт +5% допустимой токсичности; затем ещё +5% каждые 2 уровня. На уровне 10 предел последний раз повышается до 150% (errata).</p><p>Базовая книга, дерево профессии.</p>",
+          "level": 8,
+          "attribute": ""
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000015"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000016",
+        "name": "Ярость",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.witcher.frenzy",
+          "description": "<p>Пока ведьмак отравлен, +1 к урону в ближнем бою за уровень. Он стремится спастись или убить отравителя. Заканчивается с ядом либо проверкой Стойкости СЛ 15.</p><p>Базовая книга, дерево профессии.</p>",
+          "level": 8,
+          "attribute": ""
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000016"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000017",
+        "name": "Трансмутация",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.witcher.transmutation",
+          "description": "<p>При приёме отвара проверка СЛ 18 даёт дополнительную мутацию из таблицы на стр. 63, но вдвое сокращает длительность отвара.</p><p>Базовая книга, дерево профессии.</p>",
+          "level": 6,
+          "attribute": "body"
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000017"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000018",
+        "name": "Отбивание стрел",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.witcher.deflect",
+          "description": "<p>Проверка со штрафом −3 отбивает физический снаряд. Можно направить его в цель в 10 м: она защищается от этого результата, иначе ошеломлена (Staggered, не Stunned). Бомба взрывается после отражения; при уклонении второй цели определите разброс (errata).</p><p>Базовая книга, дерево профессии.</p>",
+          "level": 10,
+          "attribute": "dexterity"
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000018"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000019",
+        "name": "Быстрый удар",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.witcher.quick-strike",
+          "description": "<p>После своего хода: 5 STA и проверка против РЕА × 3 противника дают дополнительную атаку по нему; допустимы специальные атаки.</p><p>Базовая книга, дерево профессии.</p>",
+          "level": 8,
+          "attribute": "reflex"
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000019"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000020",
+        "name": "Вихрь",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.witcher.whirl",
+          "description": "<p>5 STA за раунд: одна атака против каждого в пределах меча. Проверка способности заменяет атаку; можно лишь поддерживать Вихрь, уклоняться и идти на 2 м. Иное действие или попадание прерывает Вихрь.</p><p>Базовая книга, дерево профессии.</p>",
+          "level": 8,
+          "attribute": "reflex"
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000020"
+          }
+        }
+      },
+      {
+        "_id": "sign000000000001",
+        "name": "Ирден",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "ruleId": "sign.yrden",
+          "kind": "sign",
+          "tradition": "mage",
+          "deity": "",
+          "costStep": 1,
+          "costMax": 7,
+          "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+          "description": "<p>Круг замедляет любого, кто в него входит: −1 к СКОР и РЕА за первую ВЫН и ещё −1 за каждые 2 ВЫН сверх первой, максимум −4. Штраф действует только внутри круга. Бестелесные существа в круге становятся материальными.</p>",
+          "grade": "novice",
+          "element": "mixed",
+          "cost": 1,
+          "variableCost": true,
+          "range": {
+            "kind": "radius",
+            "value": 3
+          },
+          "duration": {
+            "kind": "rounds",
+            "formula": "5",
+            "maintenance": 0,
+            "text": ""
+          },
+          "defense": [
+            "none"
+          ],
+          "damage": "",
+          "source": "Базовая книга, стр. 114; официальная errata",
+          "page": 114
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.spells.Item.sign000000000001"
+          }
+        }
+      },
+      {
+        "_id": "sign000000000005",
+        "name": "Квен",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "ruleId": "sign.quen",
+          "kind": "sign",
+          "tradition": "mage",
+          "deity": "",
+          "costStep": 1,
+          "costMax": 7,
+          "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+          "description": "<p>Щит получает 5 ПЗ за каждую вложенную ВЫН. Если персонаж не защитился, входящий смертельный или несмертельный урон сначала снимает ПЗ щита; остаток проходит обычную броню и сопротивления. Не защищает от неблокируемой магии и уже действующих яда, болезни или удушья. Повторный Квен возможен только после окончания предыдущего.</p>",
+          "grade": "novice",
+          "element": "earth",
+          "cost": 1,
+          "variableCost": true,
+          "range": {
+            "kind": "self",
+            "value": 0
+          },
+          "duration": {
+            "kind": "special",
+            "formula": "",
+            "maintenance": 0,
+            "text": "10 раундов или до разрушения щита"
+          },
+          "defense": [
+            "none"
+          ],
+          "damage": "",
+          "source": "Базовая книга, стр. 114; официальная errata",
+          "page": 114
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.spells.Item.sign000000000005"
+          }
+        }
+      },
+      {
+        "_id": "sign000000000002",
+        "name": "Аард",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "ruleId": "sign.aard",
+          "kind": "sign",
+          "tradition": "mage",
+          "deity": "",
+          "costStep": 1,
+          "costMax": 7,
+          "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+          "description": "<p>Телекинетическая волна ошеломляет цели. Вероятность сбить с ног — 10% за каждую вложенную ВЫН.</p>",
+          "grade": "novice",
+          "element": "air",
+          "cost": 1,
+          "variableCost": true,
+          "range": {
+            "kind": "cone",
+            "value": 2
+          },
+          "duration": {
+            "kind": "instant",
+            "formula": "",
+            "maintenance": 0,
+            "text": ""
+          },
+          "defense": [
+            "dodge"
+          ],
+          "damage": "",
+          "source": "Базовая книга, стр. 114; официальная errata",
+          "page": 114
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.spells.Item.sign000000000002"
+          }
+        }
+      },
+      {
+        "_id": "sign000000000003",
+        "name": "Игни",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "ruleId": "sign.igni",
+          "kind": "sign",
+          "tradition": "mage",
+          "deity": "",
+          "costStep": 1,
+          "costMax": 7,
+          "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+          "description": "<p>Пламя наносит 1d6 урона за каждую вложенную ВЫН и поджигает с вероятностью 50%. Обычно поражает торс; в упор можно прицелиться в другую часть тела.</p>",
+          "grade": "novice",
+          "element": "fire",
+          "cost": 1,
+          "variableCost": true,
+          "range": {
+            "kind": "cone",
+            "value": 2
+          },
+          "duration": {
+            "kind": "instant",
+            "formula": "",
+            "maintenance": 0,
+            "text": ""
+          },
+          "defense": [
+            "dodge",
+            "block"
+          ],
+          "damage": "1d6",
+          "source": "Базовая книга, стр. 114; официальная errata",
+          "page": 114
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.spells.Item.sign000000000003"
+          }
+        }
+      },
+      {
+        "_id": "sign000000000004",
+        "name": "Аксий",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "ruleId": "sign.axii",
+          "kind": "sign",
+          "tradition": "mage",
+          "deity": "",
+          "costStep": 1,
+          "costMax": 7,
+          "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+          "description": "<p>Дезориентирует цель. Испытание УСТ получает штраф −1 за первую ВЫН и ещё −1 за каждые 2 ВЫН сверх первой. Для убеждения можно противопоставить Сотворение заклинаний Сопротивлению магии; белое свечение руки и головы цели заметно окружающим.</p>",
+          "grade": "novice",
+          "element": "water",
+          "cost": 1,
+          "variableCost": true,
+          "range": {
+            "kind": "distance",
+            "value": 8
+          },
+          "duration": {
+            "kind": "special",
+            "formula": "",
+            "maintenance": 0,
+            "text": "До успешного испытания УСТ"
+          },
+          "defense": [
+            "resistMagic"
+          ],
+          "damage": "",
+          "source": "Базовая книга, стр. 114; официальная errata",
+          "page": 114
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.spells.Item.sign000000000004"
+          }
+        }
+      },
+      {
+        "_id": "sign000000000006",
+        "name": "Магическая ловушка",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "ruleId": "sign.magic-trap",
+          "kind": "sign",
+          "tradition": "mage",
+          "deity": "",
+          "costStep": 1,
+          "costMax": 7,
+          "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+          "description": "<p>Подготовка занимает 1 раунд. Каждый раунд ловушка атакует ближайшего врага проверкой ВОЛЯ + Сотворение заклинаний и наносит 3d6 урона. Союзников не атакует.</p>",
+          "grade": "journeyman",
+          "element": "mixed",
+          "cost": 1,
+          "variableCost": true,
+          "range": {
+            "kind": "radius",
+            "value": 3
+          },
+          "duration": {
+            "kind": "special",
+            "formula": "",
+            "maintenance": 0,
+            "text": "По 1 раунду за вложенную ВЫН"
+          },
+          "defense": [
+            "dodge",
+            "block"
+          ],
+          "damage": "3d6",
+          "source": "Базовая книга, стр. 115; официальная errata",
+          "page": 115
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.spells.Item.sign000000000006"
+          }
+        }
+      },
+      {
+        "_id": "sign000000000009",
+        "name": "Активный щит",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "ruleId": "sign.active-shield",
+          "kind": "sign",
+          "tradition": "mage",
+          "deity": "",
+          "costStep": 1,
+          "costMax": 7,
+          "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+          "description": "<p>Щит имеет 10 ПЗ за вложенную ВЫН и защищает заклинателя и ещё одну тесно прижавшуюся цель. Не пропускает материальные объекты, пока цел; бегать нельзя. При прекращении отталкивает всё рядом, включая союзников, на 2 м и наносит 1d6 урона в торс. Закреплённые объекты и цели тяжелее 226 кг не отлетают, но получают урон.</p>",
+          "grade": "journeyman",
+          "element": "earth",
+          "cost": 1,
+          "variableCost": true,
+          "range": {
+            "kind": "self",
+            "value": 0
+          },
+          "duration": {
+            "kind": "sustained",
+            "formula": "",
+            "maintenance": 0,
+            "maintenanceMode": "fullCost",
+            "text": ""
+          },
+          "defense": [
+            "none"
+          ],
+          "damage": "1d6",
+          "source": "Базовая книга, стр. 115; официальная errata",
+          "page": 115
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.spells.Item.sign000000000009"
+          }
+        }
+      },
+      {
+        "_id": "sign000000000007",
+        "name": "Сметающий Аард",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "ruleId": "sign.aard-sweep",
+          "kind": "sign",
+          "tradition": "mage",
+          "deity": "",
+          "costStep": 1,
+          "costMax": 7,
+          "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+          "description": "<p>Сферическая волна ошеломляет всё в зоне и с вероятностью 10% за каждую вложенную ВЫН сбивает с ног. Попавшие под знак летающие существа падают на землю.</p>",
+          "grade": "journeyman",
+          "element": "air",
+          "cost": 1,
+          "variableCost": true,
+          "range": {
+            "kind": "radius",
+            "value": 4
+          },
+          "duration": {
+            "kind": "instant",
+            "formula": "",
+            "maintenance": 0,
+            "text": ""
+          },
+          "defense": [
+            "dodge"
+          ],
+          "damage": "",
+          "source": "Базовая книга, стр. 115; официальная errata",
+          "page": 115
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.spells.Item.sign000000000007"
+          }
+        }
+      },
+      {
+        "_id": "sign000000000010",
+        "name": "Огненный поток",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "ruleId": "sign.firestream",
+          "kind": "sign",
+          "tradition": "mage",
+          "deity": "",
+          "costStep": 1,
+          "costMax": 7,
+          "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+          "description": "<p>Постоянная струя пламени наносит 1d6 урона за вложенную ВЫН; вероятность поджечь — 75%. В свой ход можно сменить цель или прицелиться в часть тела. Каждый следующий раунд требует половины исходной стоимости.</p>",
+          "grade": "journeyman",
+          "element": "fire",
+          "cost": 1,
+          "variableCost": true,
+          "range": {
+            "kind": "distance",
+            "value": 3
+          },
+          "duration": {
+            "kind": "sustained",
+            "formula": "",
+            "maintenance": 0,
+            "maintenanceMode": "halfCost",
+            "text": ""
+          },
+          "defense": [
+            "dodge",
+            "block"
+          ],
+          "damage": "1d6",
+          "source": "Базовая книга, стр. 115; официальная errata",
+          "page": 115
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.spells.Item.sign000000000010"
+          }
+        }
+      },
+      {
+        "_id": "sign000000000008",
+        "name": "Марионетка",
+        "type": "spell",
+        "img": "icons/svg/book.svg",
+        "system": {
+          "ruleId": "sign.puppet",
+          "kind": "sign",
+          "tradition": "mage",
+          "deity": "",
+          "costStep": 1,
+          "costMax": 7,
+          "costHint": "От 1 до 7 ВЫН. Превышение предела магии вызывает перегрузку (Sage’s Answers 20). Сила знака зависит от выбранной стоимости до скидки фокуса.",
+          "description": "<p>Заставляет противника сражаться за заклинателя. Каждый раунд цель может повторять Сопротивление магии против результата сотворения, чтобы освободиться.</p>",
+          "grade": "journeyman",
+          "element": "water",
+          "cost": 1,
+          "variableCost": true,
+          "range": {
+            "kind": "distance",
+            "value": 8
+          },
+          "duration": {
+            "kind": "special",
+            "formula": "",
+            "maintenance": 0,
+            "text": "По 1 раунду за вложенную ВЫН или до освобождения"
+          },
+          "defense": [
+            "resistMagic"
+          ],
+          "damage": "",
+          "source": "Базовая книга, стр. 115; официальная errata",
+          "page": 115
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.spells.Item.sign000000000008"
+          }
+        }
+      },
+      {
+        "_id": "relicWolf0000001",
+        "name": "Волк",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "ruleId": "weapon.wolf",
+          "skill": "swordsmanship",
+          "damageType": "Р/К",
+          "accuracy": 2,
+          "rarity": "unique",
+          "damage": "7d6",
+          "reliability": {
+            "value": 15,
+            "max": 15
+          },
+          "hands": 2,
+          "range": 0,
+          "rangeBodyMultiplier": 0,
+          "concealment": "none",
+          "enhancementSlots": 3,
+          "weight": 4,
+          "price": 0,
+          "properties": "Реликвия; Пробивающее броню; Кровопускающее (75%)",
+          "category": "melee",
+          "encumbrance": 0,
+          "source": "Базовая книга, стр. 258; официальная errata v4",
+          "description": "<p>Стальной полуторный меч с островов Скеллиге, связанный с легендой об Уффе Кровавобородом. Историю можно вспомнить Образованием СЛ 16. Игнорирует сопротивление брони типу урона; при нанесении урона вызывает кровотечение с вероятностью 75%.</p><p>Реликвия: рыночная цена не установлена.</p><p><a href=\"https://rtalsoriangames.com/wp-content/uploads/2022/03/RTG-WI-WitcherCoreErratav4.pdf\">Официальная errata</a>: тип оружия уточнён издателем.</p>",
+          "quantity": 1,
+          "equipped": true,
+          "grip": 2
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "witcher-eliott-system": {
+            "priceUnavailable": true
+          },
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.relicWolf0000001"
+          }
+        }
+      },
+      {
+        "_id": "relicMoonBlade01",
+        "name": "Лунный клинок",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "ruleId": "weapon.moon-blade",
+          "skill": "swordsmanship",
+          "damageType": "Р/К",
+          "accuracy": 1,
+          "rarity": "unique",
+          "damage": "3d6",
+          "reliability": {
+            "value": 10,
+            "max": 10
+          },
+          "hands": 2,
+          "range": 0,
+          "rangeBodyMultiplier": 0,
+          "concealment": "none",
+          "enhancementSlots": 3,
+          "weight": 4,
+          "price": 0,
+          "properties": "Реликвия; Серебряное (7d6+4); Улучшенное фокусирующее",
+          "category": "melee",
+          "encumbrance": 0,
+          "source": "Базовая книга, стр. 263; официальная errata v4",
+          "description": "<p>Серебряный полуторный меч из легенды о ведьмаке Олеке и демоне из Элландера. История: Образование СЛ 18. По уязвимым к серебру чудовищам дополнительно наносит [[/r 7d6+4]] серебряного урона. Улучшенное фокусирующее повышает на 2 СЛ проверок против заклинаний, сотворённых с этим оружием (стр. 72). Серебряный урон применяется отдельно от обычного.</p><p>Реликвия: рыночная цена не установлена.</p><p><a href=\"https://rtalsoriangames.com/wp-content/uploads/2022/03/RTG-WI-WitcherCoreErratav4.pdf\">Официальная errata</a>: тип оружия уточнён издателем.</p>",
+          "quantity": 1,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "witcher-eliott-system": {
+            "priceUnavailable": true
+          },
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.relicMoonBlade01"
+          }
+        }
+      },
+      {
+        "_id": "weap000000000012",
+        "name": "Короткий кинжал",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "ruleId": "weapon.short-dagger",
+          "skill": "smallBlades",
+          "damageType": "Р/К",
+          "accuracy": 1,
+          "rarity": "rare",
+          "damage": "2d6+2",
+          "reliability": {
+            "value": 10,
+            "max": 10
+          },
+          "hands": 1,
+          "range": 0,
+          "rangeBodyMultiplier": 0,
+          "concealment": "small",
+          "enhancementSlots": 1,
+          "weight": 1,
+          "price": 350,
+          "properties": "Кровопускающее (25%)",
+          "category": "melee",
+          "encumbrance": 0,
+          "source": "Базовая книга, стр. 73–74 / 80",
+          "description": "<p>Базовая книга, стр. 73–74 / 80</p>",
+          "quantity": 1,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.weap000000000012"
+          }
+        }
+      },
+      {
+        "_id": "relicRavenArmor1",
+        "name": "Доспехи Ворона",
+        "type": "armor",
+        "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+        "system": {
+          "ruleId": "armor.raven",
+          "zone": "torso-legs",
+          "armorClass": "light",
+          "stoppingPower": {
+            "value": 12,
+            "max": 12
+          },
+          "enhancementSlots": 3,
+          "encumbrance": 0,
+          "weight": 12,
+          "price": 0,
+          "rarity": "unique",
+          "resistances": "Яд; Кровотечение",
+          "wearerBonuses": [
+            {
+              "target": "healthMax",
+              "value": 15
+            },
+            {
+              "target": "skills.courage",
+              "value": 3
+            }
+          ],
+          "properties": "Реликвия; +15 ПЗ; +3 к Храбрости; Сопротивление яду; Сопротивление кровотечению",
+          "source": "Базовая книга, стр. 264; официальная errata v4",
+          "description": "<p>Лёгкий комплект из легенды о ведьмаке Вороне и Чёрном Драконе. Историю можно вспомнить Образованием СЛ 14.</p><p>Защищает корпус, руки и ноги: ПБ 12, скованность 0, три слота усилений на комплект. Голова остаётся открытой. Пока броня надета, максимум ПЗ увеличен на 15, а Храбрость получает +3.</p><p>Сопротивления яду и кровотечению уменьшают соответствующий урон вдвое с округлением вниз; не дают иммунитета. Периодический урон учитывается вручную. Рыночная цена не установлена.</p><p><a href=\"https://rtalsoriangames.com/wp-content/uploads/2022/03/RTG-WI-WitcherCoreErratav4.pdf\">Официальная errata</a>: лёгкая броня; сопротивление кровотечению.</p>",
+          "quantity": 1,
+          "equipped": true
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "witcher-eliott-system": {
+            "priceUnavailable": true
+          },
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.relicRavenArmor1"
+          }
+        }
+      },
+      {
+        "_id": "weap000000000027",
+        "name": "Метательный нож",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "ruleId": "weapon.throwing-knife",
+          "skill": "athletics",
+          "damageType": "К",
+          "accuracy": 0,
+          "rarity": "everywhere",
+          "damage": "1d6",
+          "reliability": {
+            "value": 5,
+            "max": 5
+          },
+          "hands": 1,
+          "range": 0,
+          "rangeBodyMultiplier": 4,
+          "concealment": "tiny",
+          "enhancementSlots": 0,
+          "weight": 0.5,
+          "price": 50,
+          "properties": "",
+          "category": "thrown",
+          "encumbrance": 0,
+          "source": "Базовая книга, стр. 73–74 / 80",
+          "description": "<p>Базовая книга, стр. 73–74 / 80</p>",
+          "quantity": 5,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.weap000000000027"
+          }
+        }
+      },
+      {
+        "_id": "weap000000000033",
+        "name": "Ручной арбалет",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "ruleId": "weapon.hand-crossbow",
+          "skill": "crossbow",
+          "damageType": "К",
+          "accuracy": 1,
+          "rarity": "everywhere",
+          "damage": "2d6+2",
+          "reliability": {
+            "value": 5,
+            "max": 5
+          },
+          "hands": 1,
+          "range": 50,
+          "rangeBodyMultiplier": 0,
+          "concealment": "large",
+          "enhancementSlots": 1,
+          "weight": 0.5,
+          "price": 285,
+          "properties": "Медленно перезаряжающееся",
+          "category": "ranged",
+          "encumbrance": 0,
+          "source": "Базовая книга, стр. 73–74 / 80",
+          "description": "<p>Базовая книга, стр. 73–74 / 80</p>",
+          "quantity": 1,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.weap000000000033"
+          }
+        }
+      },
+      {
+        "_id": "ammo000000000001",
+        "name": "Арбалетные болты",
+        "type": "equipment",
+        "img": "icons/weapons/ammunition/arrow-simple.webp",
+        "system": {
+          "ruleId": "ammunition.standard",
+          "kind": "ammunition",
+          "quantity": 20,
+          "purchaseQuantity": 10,
+          "weight": 0.05,
+          "price": 1,
+          "rarity": "everywhere",
+          "damageType": "К",
+          "reliability": {
+            "value": 10,
+            "max": 10
+          },
+          "concealment": "large",
+          "properties": "",
+          "description": "<p>Стандартные боеприпасы продаются пачками по 10 штук за 10 крон (0,5 кг). В инвентаре учитываются отдельные боеприпасы: 1 штука весит 0,05 кг и стоит 1 крону.</p><p>Базовая книга, стр. 74.</p>",
+          "source": "Базовая книга, стр. 74",
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "witcher-eliott-system": {
+            "ammunitionUnits": true
+          },
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.ammo000000000001"
+          }
+        }
+      },
+      {
+        "_id": "ammoExplosive001",
+        "name": "Взрывные арбалетные болты",
+        "type": "equipment",
+        "img": "icons/weapons/ammunition/arrow-simple.webp",
+        "system": {
+          "ruleId": "ammunition.explosive",
+          "kind": "ammunition",
+          "quantity": 5,
+          "purchaseQuantity": 1,
+          "weight": 0.1,
+          "price": 108,
+          "damageType": "С",
+          "properties": "Взрыв; Радиус 2 м; Урон 4d6 по всем частям тела",
+          "source": "Базовая книга, стр. 254–255; параметры за один снаряд",
+          "description": "<p>Стрела или арбалетный болт с сосудом реактивной смеси. При ударе сосуд разбивается и взрывается: [[/r 4d6]] урона по всем частям тела каждого существа в пределах 2 м.</p><p>Цена 108 крон и масса 0,1 кг — за один снаряд. После выстрела уменьшите количество на 1; взрыв и урон по зонам учитываются вручную. Надёжность в таблице экспериментальных боеприпасов не указана.</p>",
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.ammoExplosive001"
+          }
+        }
+      },
+      {
+        "_id": "eqip000000000044",
+        "name": "Поясная сумка",
+        "type": "equipment",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "ruleId": "gear.belt-pouch",
+          "weight": 0.1,
+          "price": 7,
+          "rarity": "",
+          "kind": "container",
+          "properties": "Для маленьких предметов",
+          "source": "Базовая книга, стр. 93, 95",
+          "capacity": 5,
+          "description": "<p>Небольшая поясная сумка для денег, мелких принадлежностей и других маленьких предметов.</p><h3>Применение и правила</h3><ul><li>Вместимость: 5 кг. Для маленьких предметов.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>",
+          "quantity": 1,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.eqip000000000044"
+          }
+        }
+      },
+      {
+        "_id": "bombGrapeshot001",
+        "name": "Бомба «Картечь»",
+        "type": "equipment",
+        "img": "icons/svg/explosion.svg",
+        "system": {
+          "ruleId": "bomb.grapeshot",
+          "kind": "gear",
+          "weight": 1,
+          "price": 159,
+          "damageType": "К",
+          "properties": "Бомба; Радиус 4 м; Урон 7d6; Горение (25%)",
+          "source": "Базовая книга, стр. 254–255",
+          "description": "<p>Осколочная бомба с поражающими элементами. Бросок — Атлетика; дальность ТЕЛ × 4 м. Взрыв поражает область радиусом 4 м и наносит [[/r 7d6]] колющего урона. Вероятность горения — 25%.</p><p>После броска уменьшите количество на 1. Область, урон целям и горение ведущий применяет вручную.</p>",
+          "quantity": 3,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.bombGrapeshot001"
+          }
+        }
+      },
+      {
+        "_id": "bombSamum0000001",
+        "name": "Бомба «Самум»",
+        "type": "equipment",
+        "img": "icons/svg/explosion.svg",
+        "system": {
+          "ruleId": "bomb.samum",
+          "kind": "gear",
+          "weight": 1,
+          "price": 147,
+          "damageType": "Д",
+          "properties": "Бомба; Радиус 4 м; Испытание УСТ −2; Слепота — 6 раундов",
+          "source": "Базовая книга, стр. 254–255",
+          "description": "<p>Светошумовая бомба. Бросок — Атлетика; дальность ТЕЛ × 4 м. Все в радиусе 4 м проходят испытание УСТ со штрафом −2 и получают слепоту на 6 раундов (18 секунд). При провале испытания УСТ наступает дезориентация. Прямого урона нет.</p><p>После броска уменьшите количество на 1. Испытания и состояния целей ведущий применяет вручную.</p>",
+          "quantity": 3,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.bombSamum0000001"
+          }
+        }
+      },
+      {
+        "_id": "alch000000000111",
+        "name": "Эликсир «Гром»",
+        "type": "equipment",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "ruleId": "potion.thunderbolt",
+          "kind": "alchemy",
+          "weight": 0.5,
+          "properties": "+3 к урону физическими атаками.",
+          "alchemy": {
+            "category": "potion",
+            "duration": 45,
+            "toxicity": 75
+          },
+          "source": "Базовая книга, стр. 247 / 249; цена не указана",
+          "description": "<p>Ведьмачий эликсир. Длительность и токсичность указаны в параметрах состава.</p><h3>Действие состава</h3><p>+3 к урону физическими атаками.</p><p><small>Базовая книга, стр. 247 / 249; цена не указана</small></p>",
+          "quantity": 3,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.alch000000000111"
+          }
+        }
+      },
+      {
+        "_id": "alch000000000109",
+        "name": "Эликсир «Ласточка»",
+        "type": "equipment",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "ruleId": "potion.swallow",
+          "kind": "alchemy",
+          "weight": 0.5,
+          "properties": "Восстанавливает 3 ПЗ/раунд, кроме раунда, в котором по вам попали. Не суммируется.",
+          "alchemy": {
+            "category": "potion",
+            "duration": 60,
+            "toxicity": 50
+          },
+          "source": "Базовая книга, стр. 247 / 249; цена не указана",
+          "description": "<p>Ведьмачий эликсир. Длительность и токсичность указаны в параметрах состава.</p><h3>Действие состава</h3><p>Восстанавливает 3 ПЗ/раунд, кроме раунда, в котором по вам попали. Не суммируется.</p><p><small>Базовая книга, стр. 247 / 249; цена не указана</small></p>",
+          "quantity": 3,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.alch000000000109"
+          }
+        }
+      },
+      {
+        "_id": "alch000000000310",
+        "name": "Отвар: Виверна",
+        "type": "equipment",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "ruleId": "decoction.wyvern",
+          "kind": "alchemy",
+          "weight": 0.5,
+          "properties": "Успешное попадание даёт +1 к урону следующего удара; суммируется до конца боя или получения урона.",
+          "alchemy": {
+            "category": "decoction",
+            "duration": 1800,
+            "toxicity": 75
+          },
+          "source": "Базовая книга, стр. 248 / 250; цена не указана",
+          "description": "<p>Ведьмачий отвар на основе мутагена.</p><h3>Действие состава</h3><p>Успешное попадание даёт +1 к урону следующего удара; суммируется до конца боя или получения урона.</p><p><small>Базовая книга, стр. 248 / 250; цена не указана</small></p>",
+          "quantity": 1,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.alch000000000310"
+          }
+        }
+      },
+      {
+        "_id": "alch000000000305",
+        "name": "Отвар: Катакан",
+        "type": "equipment",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "ruleId": "decoction.katakan",
+          "kind": "alchemy",
+          "weight": 0.5,
+          "properties": "+3 к броску определения места критического ранения.",
+          "alchemy": {
+            "category": "decoction",
+            "duration": 1800,
+            "toxicity": 75
+          },
+          "source": "Базовая книга, стр. 248 / 250; цена не указана",
+          "description": "<p>Ведьмачий отвар на основе мутагена.</p><h3>Действие состава</h3><p>+3 к броску определения места критического ранения.</p><p><small>Базовая книга, стр. 248 / 250; цена не указана</small></p>",
+          "quantity": 1,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.alch000000000305"
+          }
+        }
+      },
+      {
+        "_id": "alch000000000205",
+        "name": "Яд повешенного",
+        "type": "equipment",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "ruleId": "oil.humanoid",
+          "kind": "alchemy",
+          "weight": 0.5,
+          "properties": "+5 урона только против категории «Гуманоиды». Действует на конкретном оружии 30 минут.",
+          "alchemy": {
+            "category": "oil",
+            "target": "humanoid",
+            "bonus": 5,
+            "duration": 1800
+          },
+          "source": "Базовая книга, стр. 248 / 250; цена не указана",
+          "description": "<p>Покрытие для оружия против определённой категории противников.</p><h3>Действие состава</h3><p>+5 урона только против категории «Гуманоиды». Действует на конкретном оружии 30 минут.</p><p><small>Базовая книга, стр. 248 / 250; цена не указана</small></p>",
+          "quantity": 1,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.alch000000000205"
+          }
+        }
+      },
+      {
+        "_id": "eqip000000000001",
+        "name": "Инструменты алхимика",
+        "type": "equipment",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "ruleId": "gear.alchemy-tools",
+          "weight": 3,
+          "price": 80,
+          "rarity": "rare",
+          "kind": "tool",
+          "properties": "Изготовление алхимических составов",
+          "source": "Базовая книга, стр. 92",
+          "description": "<p>Переносной набор для приготовления алхимических составов. В комплект входят десять сосудов для готовых зелий.</p><h3>Применение и правила</h3><ul><li>Изготовление алхимических составов.</li><li>Для соответствующей работы без инструментов книга указывает штраф -4. Если действие требует оборудования, само наличие штрафа не даёт возможности обойти это требование.</li></ul><p><small>Базовая книга, стр. 92</small></p>",
+          "concealment": "large",
+          "quantity": 1,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.eqip000000000001"
+          }
+        }
+      },
+      {
+        "_id": "trns000000000004",
+        "name": "Плотва — осёдланная лошадь",
+        "type": "equipment",
+        "img": "systems/witcher-eliott-system/assets/icons/horse.svg",
+        "system": {
+          "ruleId": "transport.horse",
+          "kind": "transport",
+          "quantity": 1,
+          "weight": 0,
+          "capacity": 100,
+          "price": 520,
+          "transport": {
+            "type": "mount",
+            "athletics": 11,
+            "handling": 2,
+            "speed": 12,
+            "speedModifier": 0,
+            "health": {
+              "value": 40,
+              "max": 40
+            },
+            "mountId": ""
+          },
+          "source": "Базовая книга, стр. 91",
+          "description": "<p>Верховое или вьючное животное. Грузоподъёмность — 100 кг.</p>",
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.trns000000000004"
+          }
+        }
+      },
+      {
+        "_id": "tack000000000001",
+        "name": "Седло",
+        "type": "equipment",
+        "img": "systems/witcher-eliott-system/assets/icons/saddle.svg",
+        "system": {
+          "ruleId": "tack.saddle",
+          "kind": "tack",
+          "quantity": 1,
+          "weight": 5,
+          "price": 100,
+          "rarity": "everywhere",
+          "capacity": 0,
+          "tack": {
+            "slot": "saddle"
+          },
+          "properties": "Нет штрафа за езду без седла.",
+          "source": "Базовая книга, стр. 91",
+          "description": "<p>Нет штрафа за езду без седла.</p>",
+          "equipped": true,
+          "containerId": "trns000000000004"
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.tack000000000001"
+          }
+        }
+      },
+      {
+        "_id": "eqip000000000045",
+        "name": "Бандольера",
+        "type": "equipment",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "ruleId": "gear.bandolier",
+          "weight": 1,
+          "price": 19,
+          "rarity": "",
+          "kind": "container",
+          "properties": "Для маленьких предметов; крупные предметы крепятся снаружи",
+          "source": "Базовая книга, стр. 93, 95",
+          "capacity": 25,
+          "description": "<p>Наплечная перевязь с карманами для мелочей. Более крупные вещи можно закрепить снаружи.</p><h3>Применение и правила</h3><ul><li>Вместимость: 25 кг. Для маленьких предметов; крупные предметы крепятся снаружи.</li></ul><p><small>Базовая книга, стр. 93, 95</small></p>",
+          "quantity": 1,
+          "equipped": false
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.eqip000000000045"
+          }
+        }
+      },
+      {
+        "_id": "witchMedallion01",
+        "name": "Ведьмачий медальон",
+        "type": "equipment",
+        "img": "icons/svg/sun.svg",
+        "system": {
+          "ruleId": "gear.witcher-medallion",
+          "kind": "gear",
+          "weight": 0,
+          "price": 0,
+          "rarity": "unique",
+          "concealment": "tiny",
+          "properties": "Ведьмачье снаряжение; Чувствительность к магии — 20 м",
+          "source": "Базовая книга, стр. 247; вес и цена не указаны",
+          "description": "<p>Небольшая серебряная подвеска, которую ведьмак носит на шее. У Геральта — медальон школы Волка.</p><p>Начинает едва заметно вибрировать в пределах 20 м от чудовища, проклятия или творимого заклинания, предупреждая владельца. Правило не даёт точного направления, вида источника или его местоположения.</p><p>Срабатывание сообщает ведущий: обнаружение скрытых существ и магии на сцене не автоматизировано. Цена и масса в книге не приведены; нулевая масса в листе означает отсутствие указанного значения.</p>",
+          "quantity": 1,
+          "equipped": true
+        },
+        "effects": [],
+        "sort": 0,
+        "flags": {
+          "witcher-eliott-system": {
+            "priceUnavailable": true
+          },
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.witchMedallion01"
+          }
+        }
+      }
+    ],
+    "effects": []
+  }
+]

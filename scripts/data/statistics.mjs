@@ -1,4 +1,4 @@
-import { mutationModifiers, installationBonuses } from "./workshop.mjs";
+import { mutationModifiers, wearerBonuses } from "./workshop.mjs";
 import { equippedItems } from "./physical-items.mjs";
 import { backgroundModifiers, modifierTotal } from "./background-modifiers.mjs";
 import { dyingHealth } from "./death.mjs";
@@ -17,7 +17,7 @@ const WOUNDED_ATTRIBUTES = new Set(["intelligence", "reflex", "dexterity", "will
 export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, mutations = [], vigor = 0, reputation = {} }, { dying = false, dead = false, abilityIds = [], items = [], effects = [] } = {}) {
   const background = backgroundModifiers(details, abilityIds).filter(modifier =>
     modifier.source !== ENHANCED_SENSES || !witcherSensesSuppressed(details, items));
-  const modifiers = [...background, ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(installationBonuses), ...conditionModifiers(effects)];
+  const modifiers = [...background, ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(wearerBonuses), ...conditionModifiers(effects)];
   const reputationBonus = modifierTotal(modifiers, "reputation");
   const reputationTotal = reputationLevel(reputation.value, reputationBonus);
   modifiers.push(...reputationModifiers(reputation, reputationTotal));

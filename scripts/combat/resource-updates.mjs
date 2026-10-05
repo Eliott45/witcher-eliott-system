@@ -10,7 +10,8 @@ export function prepareResourceUpdate(actor, changes, options) {
   foundry.utils.expandObjectInPlace(changes);
   const patch = changes;
   const source = foundry.utils.mergeObject(actor.system.toObject(), patch.system ?? {}, { inplace: false });
-  const projected = new WitcherActorData(source);
+  // Caps include worn gear and effects even during unrelated Actor edits.
+  const projected = new WitcherActorData(source, { parent: actor.system.parent });
   const enteredHealth = patch.system?.health?.value;
   projected.prepareDerivedData();
   for (const key of ["health", "stamina"]) {

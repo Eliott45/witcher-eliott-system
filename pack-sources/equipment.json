@@ -6511,6 +6511,232 @@
     "flags": {}
   },
   {
+    "_id": "relicWolf0000001",
+    "name": "Волк",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.wolf",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "7d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 4,
+      "price": 0,
+      "properties": "Реликвия; Пробивающее броню; Кровопускающее (75%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 258; официальная errata v4",
+      "description": "<p>Стальной полуторный меч с островов Скеллиге, связанный с легендой об Уффе Кровавобородом. Историю можно вспомнить Образованием СЛ 16. Игнорирует сопротивление брони типу урона; при нанесении урона вызывает кровотечение с вероятностью 75%.</p><p>Реликвия: рыночная цена не установлена.</p><p><a href=\"https://rtalsoriangames.com/wp-content/uploads/2022/03/RTG-WI-WitcherCoreErratav4.pdf\">Официальная errata</a>: тип оружия уточнён издателем.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicMoonBlade01",
+    "name": "Лунный клинок",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.moon-blade",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 1,
+      "rarity": "unique",
+      "damage": "3d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 4,
+      "price": 0,
+      "properties": "Реликвия; Серебряное (7d6+4); Улучшенное фокусирующее",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 263; официальная errata v4",
+      "description": "<p>Серебряный полуторный меч из легенды о ведьмаке Олеке и демоне из Элландера. История: Образование СЛ 18. По уязвимым к серебру чудовищам дополнительно наносит [[/r 7d6+4]] серебряного урона. Улучшенное фокусирующее повышает на 2 СЛ проверок против заклинаний, сотворённых с этим оружием (стр. 72). Серебряный урон применяется отдельно от обычного.</p><p>Реликвия: рыночная цена не установлена.</p><p><a href=\"https://rtalsoriangames.com/wp-content/uploads/2022/03/RTG-WI-WitcherCoreErratav4.pdf\">Официальная errata</a>: тип оружия уточнён издателем.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicRavenArmor1",
+    "name": "Доспехи Ворона",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.raven",
+      "zone": "torso-legs",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 12,
+        "max": 12
+      },
+      "enhancementSlots": 3,
+      "encumbrance": 0,
+      "weight": 12,
+      "price": 0,
+      "rarity": "unique",
+      "resistances": "Яд; Кровотечение",
+      "wearerBonuses": [
+        {
+          "target": "healthMax",
+          "value": 15
+        },
+        {
+          "target": "skills.courage",
+          "value": 3
+        }
+      ],
+      "properties": "Реликвия; +15 ПЗ; +3 к Храбрости; Сопротивление яду; Сопротивление кровотечению",
+      "source": "Базовая книга, стр. 264; официальная errata v4",
+      "description": "<p>Лёгкий комплект из легенды о ведьмаке Вороне и Чёрном Драконе. Историю можно вспомнить Образованием СЛ 14.</p><p>Защищает корпус, руки и ноги: ПБ 12, скованность 0, три слота усилений на комплект. Голова остаётся открытой. Пока броня надета, максимум ПЗ увеличен на 15, а Храбрость получает +3.</p><p>Сопротивления яду и кровотечению уменьшают соответствующий урон вдвое с округлением вниз; не дают иммунитета. Периодический урон учитывается вручную. Рыночная цена не установлена.</p><p><a href=\"https://rtalsoriangames.com/wp-content/uploads/2022/03/RTG-WI-WitcherCoreErratav4.pdf\">Официальная errata</a>: лёгкая броня; сопротивление кровотечению.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderArmors",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "witchMedallion01",
+    "name": "Ведьмачий медальон",
+    "type": "equipment",
+    "img": "icons/svg/sun.svg",
+    "system": {
+      "ruleId": "gear.witcher-medallion",
+      "kind": "gear",
+      "weight": 0,
+      "price": 0,
+      "rarity": "unique",
+      "concealment": "tiny",
+      "properties": "Ведьмачье снаряжение; Чувствительность к магии — 20 м",
+      "source": "Базовая книга, стр. 247; вес и цена не указаны",
+      "description": "<p>Небольшая серебряная подвеска, которую ведьмак носит на шее. У Геральта — медальон школы Волка.</p><p>Начинает едва заметно вибрировать в пределах 20 м от чудовища, проклятия или творимого заклинания, предупреждая владельца. Правило не даёт точного направления, вида источника или его местоположения.</p><p>Срабатывание сообщает ведущий: обнаружение скрытых существ и магии на сцене не автоматизировано. Цена и масса в книге не приведены; нулевая масса в листе означает отсутствие указанного значения.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderCore01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "bombGrapeshot001",
+    "name": "Бомба «Картечь»",
+    "type": "equipment",
+    "img": "icons/svg/explosion.svg",
+    "system": {
+      "ruleId": "bomb.grapeshot",
+      "kind": "gear",
+      "weight": 1,
+      "price": 159,
+      "damageType": "К",
+      "properties": "Бомба; Радиус 4 м; Урон 7d6; Горение (25%)",
+      "source": "Базовая книга, стр. 254–255",
+      "description": "<p>Осколочная бомба с поражающими элементами. Бросок — Атлетика; дальность ТЕЛ × 4 м. Взрыв поражает область радиусом 4 м и наносит [[/r 7d6]] колющего урона. Вероятность горения — 25%.</p><p>После броска уменьшите количество на 1. Область, урон целям и горение ведущий применяет вручную.</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "bombSamum0000001",
+    "name": "Бомба «Самум»",
+    "type": "equipment",
+    "img": "icons/svg/explosion.svg",
+    "system": {
+      "ruleId": "bomb.samum",
+      "kind": "gear",
+      "weight": 1,
+      "price": 147,
+      "damageType": "Д",
+      "properties": "Бомба; Радиус 4 м; Испытание УСТ −2; Слепота — 6 раундов",
+      "source": "Базовая книга, стр. 254–255",
+      "description": "<p>Светошумовая бомба. Бросок — Атлетика; дальность ТЕЛ × 4 м. Все в радиусе 4 м проходят испытание УСТ со штрафом −2 и получают слепоту на 6 раундов (18 секунд). При провале испытания УСТ наступает дезориентация. Прямого урона нет.</p><p>После броска уменьшите количество на 1. Испытания и состояния целей ведущий применяет вручную.</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "ammoExplosive001",
+    "name": "Взрывные боеприпасы",
+    "type": "equipment",
+    "img": "icons/weapons/ammunition/arrow-simple.webp",
+    "system": {
+      "ruleId": "ammunition.explosive",
+      "kind": "ammunition",
+      "quantity": 1,
+      "purchaseQuantity": 1,
+      "weight": 0.1,
+      "price": 108,
+      "damageType": "С",
+      "properties": "Взрыв; Радиус 2 м; Урон 4d6 по всем частям тела",
+      "source": "Базовая книга, стр. 254–255; параметры за один снаряд",
+      "description": "<p>Стрела или арбалетный болт с сосудом реактивной смеси. При ударе сосуд разбивается и взрывается: [[/r 4d6]] урона по всем частям тела каждого существа в пределах 2 м.</p><p>Цена 108 крон и масса 0,1 кг — за один снаряд. После выстрела уменьшите количество на 1; взрыв и урон по зонам учитываются вручную. Надёжность в таблице экспериментальных боеприпасов не указана.</p>"
+    },
+    "effects": [],
+    "folder": "gearAmmo00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "matr000000000001",
     "name": "Пепел",
     "type": "equipment",

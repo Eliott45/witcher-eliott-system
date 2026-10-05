@@ -6,7 +6,7 @@ export const equipmentUuid = id => `Compendium.witcher-eliott-system.equipment.I
 export const WORKSHOP_BONUS_LABELS = {
   meleeDamage: "Урон в ближнем бою", "attributes.body": "Телосложение", "attributes.reflex": "Реакция",
   healthMax: "Максимум ПЗ", vigor: "Предел магии", reliability: "Надёжность", stoppingPower: "ПБ",
-  accuracy: "Точность", weight: "Вес", "skills.stealth": "Скрытность"
+  accuracy: "Точность", weight: "Вес", "skills.stealth": "Скрытность", "skills.courage": "Храбрость", staminaMax: "Максимум Выносливости"
 };
 export const available = item => isCarried(item) && item.system.quantity > 0;
 export const sameItem = (item, reference) => Boolean(reference && (item.uuid === reference.uuid || (reference.system.ruleId && item.system.ruleId === reference.system.ruleId) || item._stats?.compendiumSource === reference.uuid));
@@ -38,6 +38,10 @@ export function repairRecipe(recipe, item) {
 }
 export function installationBonuses(item) {
   return (item.system.installations ?? []).flatMap(entry => entry.bonuses.map(bonus => ({ ...bonus, source: entry.sourceUuid, label: entry.name, category: "equipment" })));
+}
+/** Intrinsic bonuses belong to the worn item, independently of its upgrade slots. */
+export function wearerBonuses(item) {
+  return [...(item.system.wearerBonuses ?? []).map(bonus => ({ ...bonus, source: item.uuid ?? item.system.ruleId, label: item.name, category: "equipment" })), ...installationBonuses(item)];
 }
 export function effectiveItem(item) {
   const data = structuredClone(item.system.toObject ? item.system.toObject() : item.system);
