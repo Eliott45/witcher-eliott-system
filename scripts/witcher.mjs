@@ -5,6 +5,8 @@ import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from 
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
 import { migrateBestiaryContent,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
 import { registerWeaponChat } from "./combat/weapon-rolls.mjs";
+import { registerGroupAmbush } from "./chat/group-ambush.mjs";
+import { migrateMacroContent } from "./migrations/macro-content.mjs";
 import { registerCombatTactics } from "./combat/combat-tactics.mjs";
 import { WitcherPowerPlaceData } from "./data/witcher-power-place-data.mjs";
 import { WitcherPowerPlaceSheet } from "./sheets/witcher-power-place-sheet.mjs";
@@ -57,7 +59,7 @@ import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
 Hooks.once("init", async () => {
   registerSystemSettings();
   registerManualCriticalChat();
-  const templatesReady = foundry.applications.handlebars.loadTemplates(["combat-actions", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
+  const templatesReady = foundry.applications.handlebars.loadTemplates(["ambush-card", "combat-actions", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Actor.documentClass = WitcherActor;
   CONFIG.ActiveEffect.documentClass = WitcherActiveEffect;
@@ -67,6 +69,7 @@ Hooks.once("init", async () => {
   registerCriticalDice();
   registerWeaponChat();
   registerCombatTactics();
+  registerGroupAmbush();
   CONFIG.Combat.initiative.formula = INITIATIVE_FORMULA;
   registerStatusEffects();
   registerConditionSaves();
@@ -152,6 +155,7 @@ Hooks.on("updateCombat", (_combat,changes) => {
 });
 Hooks.once("ready", async () => {
   await ensureSystemLanguage();localizeStatusEffects();
+  await migrateMacroContent().catch(error=>console.error(`${SYSTEM_ID} | Macro content`,error));
   await migratePoisonEffects().catch(error=>{console.error(`${SYSTEM_ID} | Poison effects`,error);ui.notifications.error("Не удалось обновить эффекты отравления. Подробности в консоли.");});
   // Vision and equipment migrations both repair the pregen pack; do not race its lock.
   await migrateVisionDefaults().catch(error => {

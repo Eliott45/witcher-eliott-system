@@ -1,0 +1,16 @@
+<header class="witcher-group-title"><h3>Групповая засада</h3>{{#if available}}<b>{{progress}}</b>{{/if}}</header>
+<p class="witcher-group-phase">{{phase}}</p>
+{{#if available}}
+<div class="witcher-group-rolls">
+  {{#each rows}}<div class="witcher-group-participant">
+    <img src="{{img}}" alt=""><span><b>{{name}}</b><small>{{label}}</small></span>
+    {{#if rolled}}<strong class="witcher-group-total">{{totalLabel}}</strong>
+    {{else}}{{#if canRoll}}<button type="button" data-ambush-roll="{{id}}"><i class="fa-solid fa-dice-d10"></i> Бросить</button>
+    {{else}}<small>{{#if pending}}Бросает…{{else}}{{#if participant}}В бою{{else}}Ожидание{{/if}}{{/if}}</small>{{/if}}{{/if}}
+    {{#if canUnlock}}<button type="button" data-ambush-unlock="{{id}}" class="witcher-group-unlock" data-tooltip="Прервать незавершённый бросок и разрешить повторить" aria-label="Разблокировать бросок"><i class="fa-solid fa-unlock"></i></button>{{/if}}
+  </div>{{/each}}
+</div>
+{{#if hasMatrix}}<div class="witcher-group-table"><table><caption>Кто остался незамеченным</caption><thead><tr><th>Скрывается ↓ / Наблюдает →</th>{{#each observers}}<th>{{name}}</th>{{/each}}</tr></thead>
+  <tbody>{{#each matrix}}<tr><th>{{name}}</th>{{#each cells}}<td class="{{#if unseen}}is-unseen{{else}}{{#unless pending}}is-seen{{/unless}}{{/if}}" data-tooltip="{{hint}}" aria-label="{{hint}}">{{label}}</td>{{/each}}</tr>{{/each}}</tbody>
+</table></div><small class="witcher-group-legend">+5 — не заметил · — заметил · … ждём бросок. При равенстве наблюдатель замечает скрывающегося.</small>{{/if}}
+{{/if}}

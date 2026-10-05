@@ -1,102 +1,82 @@
 import { SYSTEM_ID } from "../config.mjs";
-import { attackerToken } from "../combat/attack-target.mjs";
-import { combatantForToken } from "../combat/tactics-rules.mjs";
-import { prepareAmbush, requestTactic } from "../combat/combat-tactics.mjs";
-import { rollWeaponAttack } from "../combat/weapon-rolls.mjs";
-import { ambushCandidates, ambushWindowContext, defaultAmbushSelection } from "./ambush-context.mjs";
+import { createGroupAmbush, cancelGroupAmbush, groupAmbush, publishGroupCard, openingGroupAttack, startGroupCombat } from "../combat/group-ambush.mjs";
+import { tacticsWrite } from "../combat/combat-tactics.mjs";
+import { ambushCandidates, ambushWindowContext } from "./ambush-context.mjs";
+import { bindGroupCard } from "../chat/group-ambush.mjs";
 
-const windows=new Map();
+const windows = new Map();
 export class AmbushWindow extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
-  static DEFAULT_OPTIONS={
-    classes:["witcher-ambush-window"],position:{width:800,height:700},
-    window:{title:"Засада",icon:"fa-solid fa-user-ninja",resizable:true},
-    actions:{selectEnemies:AmbushWindow.#select,selectAll:AmbushWindow.#select,clearSelection:AmbushWindow.#select,
-      checkAmbush:AmbushWindow.#check,ambushStrike:AmbushWindow.#attack,revealTarget:AmbushWindow.#reveal,refreshAmbush:AmbushWindow.#refresh}
+  static DEFAULT_OPTIONS = {
+    classes:["witcher-ambush-window"],position:{width:830,height:730},
+    window:{title:"Групповая засада",icon:"fa-solid fa-user-ninja",resizable:true},
+    actions:{publishAmbush:AmbushWindow.#publish,cancelAmbush:AmbushWindow.#cancel,repeatCard:AmbushWindow.#card,
+      openingAttack:AmbushWindow.#attack,startBattle:AmbushWindow.#start,defaultRoles:AmbushWindow.#defaults}
   };
-  static PARTS={content:{template:`systems/${SYSTEM_ID}/templates/ambush-window.hbs`,scrollable:[".witcher-ambush-roster"]}};
-
-  constructor(actor,attacker){
-    super();this.actor=actor;this.attacker=attacker;
-    this.selection=defaultAmbushSelection(attacker,ambushCandidates(attacker));
-    this.query="";this.weaponId="";this.mode="";this.busy=false;this.notice="";
-    const refresh=()=>{if(!this.busy)this.render({force:true});};
-    this.visibleTokens=ambushCandidates(attacker).map(row=>row.uuid).join("|");
-    this.hooks=[
-      ...["createCombatant","updateCombatant","deleteCombatant","updateCombat","deleteCombat","canvasReady"].map(event=>[event,Hooks.on(event,refresh)]),
-      ["sightRefresh",Hooks.on("sightRefresh",()=>{const visible=ambushCandidates(attacker).map(row=>row.uuid).join("|");if(visible!==this.visibleTokens){this.visibleTokens=visible;refresh();}})],
-      ...["createToken","updateToken","deleteToken"].map(event=>[event,Hooks.on(event,token=>{if(token.parent.id===attacker.parent.id)refresh();})]),
-      ...["updateActor","createItem","updateItem","deleteItem","createActiveEffect","updateActiveEffect","deleteActiveEffect"].map(event=>[event,Hooks.on(event,doc=>{
-        if(doc.uuid===actor.uuid||doc.parent?.uuid===actor.uuid)refresh();
-      })])
-    ];
+  static PARTS = {content:{template:`systems/${SYSTEM_ID}/templates/ambush-window.hbs`,scrollable:[".witcher-ambush-body"]}};
+  constructor(scene) {
+    super(); this.scene = scene; this.roles = new Map(); this.busy = false; this.notice = "";
+    this.attacker = ""; this.choice = ""; this.target = ""; this.query = "";
+    const existing = game.combats.find(combat => combat.scene?.id === scene.id && groupAmbush(combat));
+    for (const row of groupAmbush(existing)?.entries ?? []) {
+      const token = scene.tokens.find(token => token.uuid === row.token); if (token) this.roles.set(token.id,row.role);
+    }
+    if (!this.roles.size) this.setDefaults();
+    this.hooks = ["updateCombat","createCombatant","updateCombatant","deleteCombatant","deleteCombat","createToken","updateToken","deleteToken","updateItem"].map(event =>
+      [event,Hooks.on(event,() => {if (!this.busy) this.render({force:true});})]);
   }
-
-  async _prepareContext(){
-    const view=ambushWindowContext(this.actor,this.attacker,this);
-    this.weaponId=view.weaponId;this.mode=view.mode;
+  setDefaults() {
+    this.roles = new Map(ambushCandidates(this.scene).map(token => [token.id,token.disposition === 1 ? "stealth" : token.disposition === -1 ? "awareness" : "none"]));
+  }
+  async _prepareContext() {
+    const view = ambushWindowContext(this.scene,this);
+    for (const key of ["attacker","choice","target"]) this[key] = view[key];
     return {...view,query:this.query,notice:this.notice};
   }
-  async _onRender(context,options){
+  async _onRender(context, options) {
     await super._onRender(context,options);
-    const search=this.element.querySelector("[data-ambush-search]");
-    const filter=()=>{
-      this.query=search.value;let count=0;
-      for(const row of this.element.querySelectorAll("[data-ambush-row]")){
-        row.hidden=!row.dataset.search.includes(this.query.trim().toLocaleLowerCase());if(!row.hidden)count++;
-      }
-      this.element.querySelector("[data-ambush-empty]").hidden=count>0;
-    };
-    search.addEventListener("input",filter);filter();
-    for(const checkbox of this.element.querySelectorAll("[data-ambush-select]"))checkbox.addEventListener("change",()=>{
-      if(!context.canSelect)return;
-      if(checkbox.checked)this.selection.add(checkbox.value);else this.selection.delete(checkbox.value);
-      this.render({force:true});
+    for (const select of this.element.querySelectorAll("[data-ambush-role]")) select.addEventListener("change",() => {
+      this.roles.set(select.dataset.ambushRole,select.value); this.render({force:true});
     });
-    this.element.querySelector("[data-ambush-weapon]").addEventListener("change",event=>{
-      [this.weaponId,this.mode]=event.target.value.split(":");this.render({force:true});
+    for (const select of this.element.querySelectorAll("[data-opening-option]")) select.addEventListener("change",() => {
+      this[select.dataset.openingOption] = select.value; this.render({force:true});
     });
+    const search = this.element.querySelector("[data-ambush-search]");
+    if (search) {
+      const filter = () => {
+        this.query = search.value;
+        for (const row of this.element.querySelectorAll("[data-search]")) row.hidden = !row.dataset.search.includes(this.query.trim().toLocaleLowerCase());
+      };
+      search.addEventListener("input",filter); filter();
+    }
+    if (context.locked) bindGroupCard(this.element,game.combats.get(context.combatId),context.sessionId);
   }
-
-  async runWrite(work){
-    if(this.busy||!this.actor.isOwner)return;
-    this.busy=true;this.notice="";await this.render({force:true});
-    try{await work();}catch(error){this.notice=error.message;ui.notifications.warn(error.message);}
-    finally{this.busy=false;await this.render({force:true});}
+  async runWrite(work) {
+    if (this.busy || !game.user.isGM) return;
+    this.busy = true; this.notice = ""; await this.render({force:true});
+    try { await work(); } catch (error) { this.notice = error.message; ui.notifications.warn(error.message); }
+    finally { this.busy = false; await this.render({force:true}); }
   }
-  async close(options){
-    if(this.busy)return this;
-    for(const [event,id] of this.hooks)Hooks.off(event,id);
-    windows.delete(this.attacker.uuid);
-    return super.close(options);
+  async close(options) {
+    if (this.busy) return this;
+    for (const [event,id] of this.hooks) Hooks.off(event,id);
+    windows.delete(this.scene.id); return super.close(options);
   }
-
-  static #select(_event,button){
-    const view=ambushWindowContext(this.actor,this.attacker,this);if(!view.canSelect)return;
-    this.selection=new Set(view.rows.filter(row=>button.dataset.action==="selectAll"||(button.dataset.action==="selectEnemies"&&row.enemy)).map(row=>row.uuid));
-    return this.render({force:true});
-  }
-  static #refresh(){return this.render({force:true});}
-  static #check(){
-    const view=ambushWindowContext(this.actor,this.attacker,this);if(!view.canCheck)return;
-    const targets=view.rows.filter(row=>row.selected).map(row=>row.uuid);
-    return this.runWrite(()=>prepareAmbush(this.actor,{attackerUuid:this.attacker.uuid,targetUuids:targets}));
-  }
-  static #attack(_event,button){
-    const view=ambushWindowContext(this.actor,this.attacker,this),row=view.rows.find(row=>row.uuid===button.dataset.targetUuid);
-    if(!row||row.attackDisabled)return;
-    return this.runWrite(()=>rollWeaponAttack(this.actor,view.weaponId,{mode:view.mode,attackerUuid:this.attacker.uuid,targetUuid:row.uuid}));
-  }
-  static #reveal(_event,button){
-    const row=ambushWindowContext(this.actor,this.attacker,this).rows.find(row=>row.uuid===button.dataset.targetUuid);
-    if(!row?.canReveal)return;
-    return this.runWrite(()=>requestTactic(combatantForToken(game.combat,this.attacker),"reveal",{target:row.uuid}));
+  static #defaults() {this.setDefaults();return this.render({force:true});}
+  static #publish() {return this.runWrite(() => createGroupAmbush(this.scene,[...this.roles].filter(([,role]) => role !== "none").map(([tokenId,role]) => ({tokenId,role}))));}
+  static #cancel() {const view = ambushWindowContext(this.scene,this), combat = game.combats.get(view.combatId); if(view.canCancel) return this.runWrite(() => tacticsWrite(combat,() => cancelGroupAmbush(combat)));}
+  static #card() {const view = ambushWindowContext(this.scene,this); return this.runWrite(() => publishGroupCard(game.combats.get(view.combatId)));}
+  static #start() {const view = ambushWindowContext(this.scene,this), combat = game.combats.get(view.combatId); if(view.canStart) return this.runWrite(() => tacticsWrite(combat,() => startGroupCombat(combat)));}
+  static #attack() {
+    const view = ambushWindowContext(this.scene,this); if (!view.canAttack) return;
+    const [weapon,mode] = view.choice.split(":");
+    return this.runWrite(() => openingGroupAttack(game.combats.get(view.combatId),{attacker:view.attacker,target:view.target,weapon,mode}));
   }
 }
-
-export async function openAmbushWindow(actor){
-  if(!actor.isOwner)return;
-  const attacker=attackerToken(actor);
-  let app=windows.get(attacker.uuid);
-  if(!app){app=new AmbushWindow(actor,attacker);windows.set(attacker.uuid,app);}
+export async function openAmbushWindow(sceneId = globalThis.canvas?.scene?.id) {
+  if (!game.user.isGM) throw new Error("Настраивать засаду может только мастер.");
+  const scene = game.scenes.get(sceneId);
+  if (!scene || canvas.scene?.id !== sceneId) throw new Error("Откройте сцену, на которой готовится засада.");
+  let app = windows.get(scene.id);
+  if (!app) {app = new AmbushWindow(scene);windows.set(scene.id,app);}
   await app.render({force:true});app.bringToFront();return app;
 }

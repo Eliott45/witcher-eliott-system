@@ -1,6 +1,6 @@
 // Foundry LevelDB stores embedded Documents separately, referenced by ID on their parent.
 // EmbeddedData (for example prototypeToken) remains inline.
-const collections={Actor:"actors",Item:"items",ActiveEffect:"effects"};
+const collections={Actor:"actors",Item:"items",Macro:"macros",ActiveEffect:"effects"};
 const embedded={Actor:{items:"Item",effects:"ActiveEffect"},Item:{effects:"ActiveEffect"}};
 export function packRecords(type,documents,sublevel=collections[type],prefix="") {
   const records=[];

@@ -43,7 +43,7 @@ const guard=fn=>async function(...args){try{return await fn.apply(this,args);}ca
 export const combatActions={
   openAmbush:guard(async function(_event,target){
     if(!this.isEditable||target.disabled)return;target.disabled=true;
-    try{const {openAmbushWindow}=await import("./ambush-window.mjs");await openAmbushWindow(this.actor);}finally{await this.render();}
+    try{const {requestAmbush}=await import("../combat/group-ambush.mjs");await requestAmbush(this.actor);}finally{await this.render();}
   }),
   fullTurnAction:guard(async function(_event,target){
     if(!this.isEditable||target.disabled)return;

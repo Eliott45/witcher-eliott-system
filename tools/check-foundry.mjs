@@ -39,8 +39,8 @@ assert.equal(game.system.grid.distance, 2);
 assert.equal(game.system.grid.units, "m");
 const [packFolder] = game.system.packFolders;
 assert.equal(packFolder.name, "Witcher");
-assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "spells", "bestiary", "pregens"]);
-game.model = { ...game.system.documentTypes, ActiveEffect:{base:{}}, Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
+assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities", "origins", "family-statuses", "equipment", "influential-friends", "languages", "professions", "spells", "bestiary", "pregens", "macros"]);
+game.model = { ...game.system.documentTypes, ActiveEffect:{base:{}}, Macro:Object.fromEntries(Object.values(CONST.MACRO_TYPES).map(type => [type,{}])), Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type, folders: new Map() }]));
 game.user = { id: "testuser00000001", isGM: true, can:()=>true };
 let preferences = {};
@@ -311,9 +311,9 @@ for (const pack of game.system.packs) {
       ? new URL(`../${source.img.slice(`systems/${game.system.id}/`.length)}`, import.meta.url)
       : new URL(`public/${source.img}`, app));
     assert.equal(document.type, source.type);
-    const modeled = document.system.toObject?.() ?? document.system;
+    const modeled = document.system?.toObject?.() ?? document.system;
     if(pack.type === "Actor") assertSubset(modeled,source.system);
-    else assert.deepEqual(Object.fromEntries(Object.keys(source.system).map(key => [key, modeled[key]])), source.system);
+    else if (source.system) assert.deepEqual(Object.fromEntries(Object.keys(source.system).map(key => [key, modeled[key]])), source.system);
     if (pack.type === "Item") assert.equal(document.effects.size, 0, "Reference items must not contain automated effects");
     else if(pack.type === "ActiveEffect") assert.deepEqual(document.toObject().flags,source.flags,"Effect rules survive native serialization");
     const uuid = `Compendium.${game.system.id}.${pack.name}.${pack.type}.${document.id}`;
@@ -650,9 +650,9 @@ for(const item of expandedMagic){
   if(context.isRitual){assert.match(rendered,/Подготовка/);assert.ok(context.groups[0].fields.some(f=>f.key==="ritual.dc"));}
   if(context.isHex)assert.match(rendered,/Снятие порчи/);
 }
-const shield=expandedMagic.find(item=>item.system.ruleId==="sign.active-shield");
+const shield=expandedMagic.find(item=>item.system?.ruleId==="sign.active-shield");
 assert.equal(shield.system.duration.maintenanceMode,"fullCost");
-const communicator=expandedMagic.find(item=>item.system.ruleId==="ritual.telecommunication");
+const communicator=expandedMagic.find(item=>item.system?.ruleId==="ritual.telecommunication");
 assert.equal(communicator.system.ritual.components[0].consumed,false);
 // Render both permission levels with real service schema; native browser host is stubbed above.
 const { WitcherServicesSheet } = await import("../scripts/sheets/witcher-services-sheet.mjs");
@@ -753,7 +753,7 @@ const inventoryHTML = handlebars.compile(await readFile(new URL("../templates/in
 // Old catalog imports default to a raised visor; PC/NPC save/reopen uses one native Boolean.
 const { abilitiesContext } = await import("../scripts/sheets/abilities-context.mjs");
 const { physicalItemContext } = await import("../scripts/sheets/physical-item-context.mjs");
-const legacyVisorSource = await readJSON("../pack-sources/equipment.json").then(entries => entries.find(entry => entry.system.ruleId === "armor.head.6"));
+const legacyVisorSource = await readJSON("../pack-sources/equipment.json").then(entries => entries.find(entry => entry.system?.ruleId === "armor.head.6"));
 for (const type of ["character", "npc"]) {
   const wearer = new foundry.documents.BaseActor({name: "Visor round trip", type, system: {details: {race: "witcher"}, notes: "Existing notes"},
     items: [{...legacyVisorSource, system: {...legacyVisorSource.system, equipped: true}}]});
@@ -1096,6 +1096,7 @@ sheet.isEditable = originalEditable;
 sheet.tabGroups.character = "main";
 for (const uuid of documents.keys()) {
   referenceSheet.item = await foundry.utils.fromUuid(uuid);
+  if (documents.get(uuid).documentName === "Macro") continue;
   const context = await referenceSheet._prepareContext({});
   const rendered = itemTemplate(context);
   if (referenceSheet.item.system.ruleId === "potion.swallow") {
@@ -1116,7 +1117,7 @@ for (const uuid of documents.keys()) {
 const { selectionEntries } = await import("../scripts/sheets/selection-data.mjs");
 // Tool rules resolve from the existing canonical ID after native Actor/Item persistence.
 const { getToolRules } = await import("../scripts/data/tool-rules.mjs");
-const toolSource = [...documents.values()].find(item=>item.system.ruleId==="gear.fishing-tools");
+const toolSource = [...documents.values()].find(item=>item.system?.ruleId==="gear.fishing-tools");
 const toolActor = new foundry.documents.BaseActor({name:"Tool persistence",type:"character",items:[toolSource.toObject ? toolSource.toObject() : toolSource]});
 const reopenedTools = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(toolActor.toObject())));
 reopenedTools.system.prepareDerivedData();
@@ -1126,7 +1127,7 @@ assert.equal(getToolRules(persistedTool).modifiers[0].condition,"fishing");
 assert.ok(!reopenedTools.system.statistics.modifiers.some(modifier=>modifier.source==="gear.fishing-tools"),"Carrying fishing gear alone grants no passive Survival bonus");
 const { getGeneralGearRules } = await import("../scripts/data/general-gear.mjs");
 const generalSource = id => {
-  const item = [...documents.values()].find(entry => entry.system.ruleId === id);
+  const item = [...documents.values()].find(entry => entry.system?.ruleId === id);
   return item.toObject ? item.toObject() : structuredClone(item);
 };
 const generalBasket = generalSource("gear.basket"), generalDice = generalSource("gear.loaded-dice"), generalCoat = generalSource("gear.warm-clothing");
@@ -1523,24 +1524,39 @@ assert.ok(!tacticsHTML.match(/data-action="openAmbush"[^>]*disabled/));
 assert.ok(tacticsHTML.includes('Первая атака — вне инициативы'));
 console.log('Combat tactics: native effects, core icons and active ambush controls OK');
 
-const {ambushWindowContext}=await import('../scripts/sheets/ambush-context.mjs');
+const {ambushWindowContext,groupCardContext}=await import('../scripts/sheets/ambush-context.mjs');
 const ambushTemplate=handlebars.compile(await readFile(new URL('../templates/ambush-window.hbs',import.meta.url),'utf8'),{strict:true});
-const ambushGlobals={canvas:globalThis.canvas,combat:game.combat,user:game.user,users:game.users};
+
+const ambushGlobals={canvas:globalThis.canvas,combat:game.combat,combats:game.combats,user:game.user,users:game.users};
 const nativeAmbusher=creatureViews[0].actor;
 const ambushToken=(id,name,x)=>({id,uuid:`Scene.ambush.Token.${id}`,parent:{id:'ambush'},actor:nativeAmbusher,name,x,y:0,rotation:90,disposition:-1,getSize:()=>({width:100,height:100}),texture:{src:'icons/svg/mystery-man.svg'}});
 const ambushTokens=[ambushToken('attacker','Засадчик',0),ambushToken('enemyOne','Противник <1>',100),ambushToken('enemyTwo','Противник <2>',200)];
-globalThis.canvas={scene:{id:'ambush',tokens:ambushTokens}};
-game.user={isGM:true,targets:new Set()};game.users={activeGM:game.user};
-game.combat={id:'ambushCombat',round:0,started:false,combatants:[{tokenId:'attacker',sceneId:'ambush',flags:{[game.system.id]:{
-  ambush:{targets:[ambushTokens[1].uuid],opening:true},ambushReport:{targets:ambushTokens.slice(1).map(token=>token.uuid)}
-}}}]};
-const ambushView=ambushWindowContext(nativeAmbusher,ambushTokens[0],{selection:new Set(ambushTokens.slice(1).map(token=>token.uuid))});
+const nativeCollection=rows=>Object.assign(rows,{get(id){return this.find(row=>row.id===id);}});
+globalThis.canvas={scene:{id:'ambush',tokens:nativeCollection(ambushTokens)}};
+game.user={isGM:true,targets:new Set()};game.users={activeGM:game.user};game.combats=[];
+const cardTemplate=handlebars.compile(await readFile(new URL('../templates/ambush-card.hbs',import.meta.url),'utf8'),{strict:true});
+handlebars.registerPartial('systems/'+game.system.id+'/templates/ambush-card.hbs',cardTemplate);
+const setupView=ambushWindowContext(canvas.scene,{roles:new Map([['attacker','stealth'],['enemyOne','awareness'],['enemyTwo','participant']])});
+const setupHTML=ambushTemplate({...setupView,query:'',notice:''});
+assert.ok(setupHTML.includes('Противник &lt;1&gt;'));assert.ok(setupHTML.includes('Без проверки'));
+assert.ok(!setupHTML.match(/data-action="publishAmbush"[^>]*disabled/));
+game.combat={id:'ambushCombat',scene:canvas.scene,round:0,started:false,flags:{[game.system.id]:{groupAmbush:{id:'group',status:'ready',entries:ambushTokens.map((token,i)=>({id:token.id,token:token.uuid,role:i?'awareness':'stealth',total:[18,14,18][i],claim:null,message:null}))}}},
+ combatants:nativeCollection(ambushTokens.map((token,i)=>({id:token.id,tokenId:token.id,token,actor:nativeAmbusher,name:token.name,sceneId:'ambush',testUserPermission:()=>true,flags:{[game.system.id]:i?{}:{ambush:{group:'group',targets:[ambushTokens[1].uuid],opening:false}}}})))};
+game.combats=[game.combat];
+const ambushView=ambushWindowContext(canvas.scene);
 const ambushHTML=ambushTemplate({...ambushView,query:'',notice:''});
-assert.equal(ambushView.selectedCount,2);assert.equal(ambushView.unnoticedCount,1);assert.equal(ambushView.noticedCount,1);
+assert.equal(ambushView.attackers.length,1);assert.equal(ambushView.targets.length,1);
 assert.ok(ambushHTML.includes('Противник &lt;1&gt;'));assert.ok(ambushHTML.includes('Противник &lt;2&gt;'));
-assert.equal((ambushHTML.match(/data-action="ambushStrike"/g)||[]).length,2);
-assert.ok(!ambushHTML.match(/data-action="ambushStrike"[^>]*disabled/));
-assert.ok(ambushHTML.includes('data-action="revealTarget"'));
-assert.ok(ambushHTML.includes('Не заметил'));assert.ok(ambushHTML.includes('Заметил'));
-globalThis.canvas=ambushGlobals.canvas;game.combat=ambushGlobals.combat;game.user=ambushGlobals.user;game.users=ambushGlobals.users;
-console.log('Ambush window: native creature attack data and strict multi-opponent template OK');
+assert.ok(ambushHTML.includes('data-action="openingAttack"'));assert.ok(!ambushHTML.match(/data-action="openingAttack"[^>]*disabled/));
+assert.ok(ambushHTML.includes('is-unseen'));assert.ok(ambushHTML.includes('is-seen'));
+game.combat.flags[game.system.id].groupAmbush.status='checks';
+game.combat.flags[game.system.id].groupAmbush.entries[0].total=null;
+const waiting=cardTemplate(groupCardContext(game.combat,'group'));
+assert.ok(waiting.includes('data-ambush-roll="attacker"'));
+assert.ok(cardTemplate(groupCardContext(null,'deleted')).includes('завершена'));
+const macroSource=(await import('../scripts/data/macros.mjs')).MACRO_SOURCES[0];
+const nativeMacro=new foundry.documents.BaseMacro(macroSource);
+assert.equal(nativeMacro.validationFailures.fields,null);
+assert.equal(nativeMacro.command,'await game.system.api.ambush();');
+globalThis.canvas=ambushGlobals.canvas;game.combat=ambushGlobals.combat;game.combats=ambushGlobals.combats;game.user=ambushGlobals.user;game.users=ambushGlobals.users;
+console.log('Group ambush: native Macro, role selection, shared roll matrix and strict templates OK');

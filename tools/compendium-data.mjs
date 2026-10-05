@@ -1,3 +1,4 @@
+import { MACRO_SOURCES } from "../scripts/data/macros.mjs";
 import { spellSources, spellFolders } from "../scripts/data/spells.mjs";
 import { bestiarySources } from "../scripts/data/bestiary.mjs";
 import { pregenSources } from "../scripts/data/pregens.mjs";
@@ -86,7 +87,7 @@ export function compendiumData(translations) {
           .join(` ${escapeHTML(localize("WITCHER.Friends.Or"))} `) + "</p>"
     }))
   };
-  return { ...packs, pregens: pregenSources(packs) };
+  return { ...packs, macros:structuredClone(MACRO_SOURCES), pregens: pregenSources(packs) };
 }
 
 /** Folders inside a compendium, distinct from the world sidebar's Witcher pack folder. */

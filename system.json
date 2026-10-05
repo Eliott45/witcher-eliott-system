@@ -230,6 +230,17 @@
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
       }
+    },
+    {
+      "name": "macros",
+      "label": "Макросы",
+      "path": "packs/macros",
+      "type": "Macro",
+      "system": "witcher-eliott-system",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     }
   ],
   "packFolders": [
@@ -249,7 +260,8 @@
         "professions",
         "spells",
         "bestiary",
-        "pregens"
+        "pregens",
+        "macros"
       ]
     }
   ],

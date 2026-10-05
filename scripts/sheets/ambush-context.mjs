@@ -1,68 +1,72 @@
 import { COMBAT_ACTOR_TYPES } from "../config.mjs";
+import { groupAmbush, ambushMatrix } from "../combat/group-ambush.mjs";
+import { tacticsFlags } from "../combat/tactics-rules.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
-import { conditionRules } from "../combat/condition-rules.mjs";
-import { ambushAttack, ambushState, combatantForToken, tacticsFlags } from "../combat/tactics-rules.mjs";
-import { attackModes, weaponAttack, signed } from "../combat/weapon-rules.mjs";
-import { facingModifiers } from "../combat/attack-target.mjs";
-import { actionQuote } from "../combat/action-economy.mjs";
+import { attackModes } from "../combat/weapon-rules.mjs";
 
-export function ambushCandidates(attacker, scene = globalThis.canvas?.scene, user = game.user) {
-  if(scene?.id!==attacker.parent.id)return [];
-  return Array.from(scene.tokens).filter(token => token.uuid!==attacker.uuid && COMBAT_ACTOR_TYPES.includes(token.actor?.type)
-    && (user.isGM || (!token.hidden && token.object?.isVisible))).map(token => ({
-      token,uuid:token.uuid,name:token.name,img:token.texture?.src||"icons/svg/mystery-man.svg",
-      enemy:attacker.disposition===-1?token.disposition===1:token.disposition===-1,
-      relation:token.disposition===1?"Дружественный":token.disposition===-1?"Враждебный":"Нейтральный"
-    })).sort((a,b)=>Number(b.enemy)-Number(a.enemy)||a.name.localeCompare(b.name,"ru")||a.uuid.localeCompare(b.uuid));
+export const AMBUSH_ROLES = [{id:"none",name:"Не участвует"},{id:"stealth",name:"Скрывается"},
+  {id:"awareness",name:"Наблюдает"},{id:"participant",name:"Без проверки"}];
+export function ambushCandidates(scene = globalThis.canvas?.scene) {
+  return Array.from(scene?.tokens ?? []).filter(token => COMBAT_ACTOR_TYPES.includes(token.actor?.type))
+    .sort((a,b) => b.disposition-a.disposition || a.name.localeCompare(b.name,"ru") || a.id.localeCompare(b.id));
 }
 
-export function defaultAmbushSelection(attacker, candidates, combat=game.combat) {
-  const combatant=combatantForToken(combat,attacker);
-  const stored=tacticsFlags(combatant).ambushReport?.targets ?? ambushState(combat,combatant)?.targets;
-  const targeted=Array.from(game.user.targets??[],token=>(token.document??token).uuid);
-  const ids=new Set(stored??(candidates.some(row=>targeted.includes(row.uuid))?targeted:candidates.filter(row=>row.enemy).map(row=>row.uuid)));
-  return new Set(candidates.filter(row=>ids.has(row.uuid)).map(row=>row.uuid));
-}
-
-export function ambushWindowContext(actor, attacker, {selection=new Set(),weaponId="",mode="",busy=false}={}) {
-  const combat=game.combat,combatant=combatantForToken(combat,attacker),flags=tacticsFlags(combatant);
-  const state=ambushState(combat,combatant),checked=new Set(flags.ambushReport?.targets??state?.targets??[]);
-  const pending=busy||Boolean(flags.tacticRequest),candidates=ambushCandidates(attacker);
-  const ended=Boolean(combat?.round>1),opening=Boolean(state?.opening&&!combat?.started);
-  const choices=equippedItems(actor.items).filter(item=>item.type==="weapon").flatMap(item=>attackModes(actor,item).map(attack=>({
-    item,weaponId:item.id,mode:attack.id,value:`${item.id}:${attack.id}`,label:`${item.name} · ${opening&&attack.id==="fast"?"Быстрая атака":attack.name}`
-  })));
-  const selected=choices.find(choice=>choice.weaponId===weaponId&&choice.mode===mode)??choices[0];
-  let action,attackReason="";
-  try{action=actionQuote(actor,{ignoreExtra:opening});}catch(error){attackReason=error.message;}
-  const rows=candidates.map(row=>{
-    const tested=checked.has(row.uuid),unnoticed=Boolean(state?.targets.includes(row.uuid)),facing=facingModifiers(attacker,row.token);
-    const quote=selected?weaponAttack(actor,selected.item,{mode:selected.mode,targetContext:facing,
-      ambushBonus:ambushAttack(combat,attacker,row.token).bonus,opening,extraPenalty:action?.penalty??0}):null;
-    const reason=attackReason||quote?.blocked||(!selected?"Возьмите оружие в руки":"");
-    return {uuid:row.uuid,name:row.name,img:row.img,enemy:row.enemy,relation:row.relation,search:row.name.toLocaleLowerCase(),
-      selected:selection.has(row.uuid),tested,unnoticed,noticed:tested&&!unnoticed,
-      status:ended?"Засада завершена":tested?(unnoticed?"Не заметил":"Заметил"):"Не проверен",bonus:unnoticed&&!ended?"+5":"—",
-      disabled:pending||Boolean(combat?.started)||!actor.isOwner,
-      canReveal:unnoticed&&!pending&&!ended&&actor.isOwner,
-      attackDisabled:pending||ended||!tested||!state||Boolean(reason),attackReason:reason,
-      attackBase:quote?.total==null?"—":signed(quote.total),damage:quote?.damage??"",
-      attackHint:reason||quote?.parts.filter(part=>part.value).map(part=>`${part.label}: ${signed(part.value)}`).join("; ")||"",
-      rollCount:quote?.attack.count??0};
+export function groupCardContext(combat, sessionId, user = game.user) {
+  const session = groupAmbush(combat), current = session?.id === sessionId;
+  if (!current) return {available:false,rows:[],matrix:[],observers:[],canManage:false,hasMatrix:false,phase:"Эта засада уже завершена.",progress:""};
+  const active = session.status === "checks" && !combat.started;
+  const visible = row => {
+    const entry = combat.combatants.get(row.id);
+    return entry && (user.isGM || (!entry.hidden && !entry.token?.hidden) || entry.testUserPermission(user,"OWNER"));
+  };
+  const rows = session.entries.filter(visible).map(row => {
+    const entry = combat.combatants.get(row.id), owned = entry.testUserPermission(user,"OWNER");
+    return {...row,name:entry.name,img:entry.token?.texture?.src || "icons/svg/mystery-man.svg",
+      label:row.role === "stealth" ? "Скрытность" : row.role === "awareness" ? "Внимание" : "Без проверки",
+      rolled:Number.isFinite(row.total),totalLabel:Number.isFinite(row.total) ? row.total : "—",
+      canRoll:active && owned && row.role !== "participant" && !Number.isFinite(row.total) && !row.claim,
+      pending:!!row.claim,canUnlock:user.isGM && active && !!row.claim,participant:row.role === "participant"};
   });
-  let reason="";
-  if(canvas.scene?.id!==attacker.parent.id)reason="Вернитесь на сцену атакующего.";
-  else if(!actor.isOwner||!conditionRules(actor).canAct)reason="Персонаж сейчас не может действовать.";
-  else if(combat?.started)reason=ended?"Первый раунд завершён — бонусы засады сняты.":"Первый раунд: +5 сохраняется против незаметивших вас противников.";
-  else if(combat?.scene&&combat.scene.id!==attacker.parent.id)reason="Откройте бой для этой сцены.";
-  else if(!combat&&!game.user.isGM)reason="Мастер должен создать бой в трекере, не начиная первый раунд.";
-  else if(!game.users.activeGM)reason="Нужен подключённый мастер.";
-  const count=rows.filter(row=>row.selected).length;
-  return {actorName:actor.name,attackerName:attacker.name,attackerImg:attacker.texture?.src||"icons/svg/mystery-man.svg",
-    rows,selectedCount:count,unnoticedCount:rows.filter(row=>row.unnoticed&&!ended).length,noticedCount:rows.filter(row=>row.noticed).length,
-    choices:choices.map(choice=>({value:choice.value,label:choice.label,selected:choice===selected})),
-    weaponId:selected?.weaponId??"",mode:selected?.mode??"",pending,ended,opening,hasReport:checked.size>0,
-    canSelect:!pending&&!combat?.started&&actor.isOwner,canCheck:!reason&&!pending&&count>0,
-    checkLabel:checked.size?"Проверить выбранных заново":"Проверить засаду",reason,
-    phase:pending?"Проверяем противников…":ended?"Засада завершена":opening?"Выберите цель первой атаки":checked.size?"Результаты засады":"Отметьте противников"};
+  const observers = rows.filter(row => row.role === "awareness");
+  const matrix = ambushMatrix(session).filter(row => visible(row)).map(row => ({name:rows.find(entry => entry.id === row.id).name,
+    cells:row.cells.filter(cell => observers.some(observer => observer.id === cell.observer)).map(cell => ({
+      ...cell,pending:cell.unseen === null,label:cell.unseen === null ? "…" : cell.unseen ? "+5" : "—",
+      hint:cell.unseen === null ? "Ожидается проверка" : cell.unseen ? "Не заметил · +5 к атакам" : "Заметил · без бонуса"
+    }))}));
+  const phase = combat.round > 1 ? "Первый раунд завершён" : combat.started ? "Бой начался · бонусы до конца первого раунда"
+    : ({checks:"Участники выполняют проверки",ready:"Проверки завершены · мастер выбирает первую атаку",opening:"Первая атака",initiative:"Бросаем инициативу",cancelled:"Засада отменена"})[session.status];
+  return {available:true,rows,observers,matrix,canManage:Boolean(user.isGM),phase,hasMatrix:matrix.length>0 && observers.length>0,
+    progress:`${rows.filter(row => row.rolled).length} / ${rows.filter(row => !row.participant).length}`};
+}
+
+export function ambushWindowContext(scene, {roles = new Map(),busy = false,attacker = "",choice = "",target = ""} = {}) {
+  const encounters = [game.combat,...game.combats].filter(Boolean);
+  const combat = encounters.find(entry => entry.scene?.id === scene?.id && groupAmbush(entry) && groupAmbush(entry).status !== "cancelled" && (entry === game.combat || !entry.started));
+  const session = groupAmbush(combat), locked = !!session, rows = ambushCandidates(scene).map(token => {
+    const role = roles.get(token.id) ?? "none";
+    return {id:token.id,name:token.name,img:token.texture?.src || "icons/svg/mystery-man.svg",hidden:!!token.hidden,
+      search:token.name.toLocaleLowerCase(),roles:AMBUSH_ROLES.map(entry => ({...entry,selected:entry.id === role}))};
+  });
+  const attackers = (session?.entries ?? []).filter(row => tacticsFlags(combat.combatants.get(row.id)).ambush?.targets.length)
+    .map(row => ({id:row.id,name:combat.combatants.get(row.id).name}));
+  attacker = attackers.some(row => row.id === attacker) ? attacker : attackers[0]?.id ?? "";
+  const entry = combat?.combatants.get(attacker);
+  const weapons = entry ? equippedItems(entry.actor.items).filter(item => item.type === "weapon").flatMap(item => attackModes(entry.actor,item).map(mode => ({
+    value:`${item.id}:${mode.id}`,name:`${item.name} · ${mode.id === "fast" ? "Быстрая атака" : mode.name}`
+  }))) : [];
+  choice = weapons.some(row => row.value === choice) ? choice : weapons[0]?.value ?? "";
+  const targets = (tacticsFlags(entry).ambush?.targets ?? []).map(uuid => {
+    const token = scene?.tokens.find(token => token.uuid === uuid);
+    return token ? {uuid,name:token.name} : null;
+  }).filter(Boolean);
+  target = targets.some(row => row.uuid === target) ? target : targets[0]?.uuid ?? "";
+  const ready = session?.status === "ready" && !combat.started;
+  return {sceneName:scene?.name ?? "Сцена",rows,locked,busy,combatId:combat?.id ?? "",sessionId:session?.id ?? "",
+    card:locked ? groupCardContext(combat,session.id) : null,
+    canPublish:!busy && !locked && [...roles.values()].includes("stealth") && [...roles.values()].includes("awareness"),
+    canCancel:locked && !busy && !combat.started && session.status !== "opening",
+    canStart:!busy && !combat?.started && ["ready","initiative"].includes(session?.status),
+    canAttack:!busy && ready && !!choice && !!target,
+    ready,attacker,choice,target,attackers:attackers.map(row => ({...row,selected:row.id === attacker})),
+    weapons:weapons.map(row => ({...row,selected:row.value === choice})),targets:targets.map(row => ({...row,selected:row.uuid === target}))};
 }

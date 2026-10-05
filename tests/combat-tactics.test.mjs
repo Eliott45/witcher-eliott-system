@@ -5,8 +5,9 @@ import { withinFacing, facingModifiers, selectedAttackTarget } from "../scripts/
 import { weaponAttack } from "../scripts/combat/weapon-rules.mjs";
 import { attackModifierMarkup, rollWeaponAttack } from "../scripts/combat/weapon-rolls.mjs";
 import { ambushAttack, delayedOrder, tacticsFlags, tacticalEffect } from "../scripts/combat/tactics-rules.mjs";
-import { delayTurn, resumeDelayedTurn, cleanupTactics, processTacticRequest, requestTactic, resetTacticalOrder, renderTacticalTracker, prepareAmbush } from "../scripts/combat/combat-tactics.mjs";
-import { ambushCandidates, ambushWindowContext, defaultAmbushSelection } from "../scripts/sheets/ambush-context.mjs";
+import { delayTurn, resumeDelayedTurn, cleanupTactics, processTacticRequest, requestTactic, resetTacticalOrder, renderTacticalTracker } from "../scripts/combat/combat-tactics.mjs";
+import { ambushCandidates, ambushWindowContext, groupCardContext } from "../scripts/sheets/ambush-context.mjs";
+import { createGroupAmbush, groupAmbush, ambushMatrix, claimAmbushRoll, acceptAmbushRoll, releaseAmbushRoll, cancelGroupAmbush, startGroupCombat, requestAmbush, rollGroupParticipant, openingGroupAttack } from "../scripts/combat/group-ambush.mjs";
 import { startTurnPoison } from "../scripts/combat/poison-damage.mjs";
 
 function patch(target, changes) {
@@ -31,9 +32,10 @@ function token(id,x=0,y=0,rotation=0) {
     sight:{angle:360},getSize:()=>({width:100,height:100})};
 }
 function fixture() {
-  const gm={id:"gm",isSelf:true,isActiveGM:true,isGM:true},player={id:"player"},messages=collection([]),operations=[];
+  const gm={id:"gm",isSelf:true,isActiveGM:true,isGM:true},player={id:"player",isGM:false},messages=collection([]),operations=[];
   globalThis.game={user:gm,users:Object.assign(collection([gm,player]),{activeGM:gm}),messages,settings:{get:()=>"public"}};
-  const combat={id:"combat",uuid:"Combat.combat",round:1,turn:0,started:true,previous:{round:0,turn:0},
+  const combat={id:"combat",uuid:"Combat.combat",round:1,turn:0,started:true,previous:{round:0,turn:0},flags:{},scene:{id:"scene"},
+    async update(changes){patch(this,changes);globalThis.Hooks?.callAll?.("updateCombat",this,changes);},
     get combatant(){return this.turns[this.turn]??null;},
     async updateEmbeddedDocuments(type,changes,options={}){assert.equal(type,"Combatant");operations.push({changes,options});for(const update of changes)patch(this.combatants.get(update._id),update);
       this.turns=[...this.combatants].sort((a,b)=>((tacticsFlags(b).turnOrder??b.initiative)-(tacticsFlags(a).turnOrder??a.initiative))||a.id.localeCompare(b.id));
@@ -50,7 +52,7 @@ function fixture() {
   globalThis.canvas={tokens:{controlled:[]},scene:{id:"scene",tokens:collection(tokens)}};
   let counter=0,totals=[];
   const chat={getSpeaker:({actor,token})=>({actor:actor.id,token:token?.id}),applyMode:data=>data,
-    async create(data){const message={id:`message${++counter}`,whisper:[],blind:false,...data};message.speakerActor=tokens.find(token=>token.actor.id===message.speaker?.actor)?.actor;messages.push(message);return message;}};
+    async create(data){const message={id:`message${++counter}`,author:game.user,whisper:[],blind:false,...data};message.speakerActor=tokens.find(token=>token.actor.id===message.speaker?.actor)?.actor;messages.push(message);return message;}};
   globalThis.foundry={utils:{randomID:()=>`request${++counter}`},documents:{ChatMessage:chat,ActiveEffect:{registry:{refresh:async()=>{}}}},
     dice:{Roll:class{constructor(formula){this.formula=formula;}async evaluate(){this.total=totals.shift()??15;return this;}async toMessage(data,{messageMode}){return chat.create({...data,rolls:[this],blind:messageMode==="blind",whisper:messageMode==="blind"?["gm"]:data.whisper??[]});}}}};
   globalThis.fromUuid=async uuid=>tokens.find(token=>token.uuid===uuid);
@@ -155,21 +157,6 @@ test("owned native flag requests are resolved only by GM, reject stale turns and
   f.a.testUserPermission=()=>false;await processTacticRequest(f.a,{...request,id:"forged",current:f.b.id});assert.match(f.messages.at(-1).content,/Нет прав/);
 });
 
-test("ambush compares each defender, ties notice, hidden rolls stay private, expires after round one",async()=>{
-  const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;f.b.token.hidden=true;
-  f.messages.push({id:"stealth",speakerActor:f.a.actor,speaker:{actor:"a"},rolls:[{total:18}],whisper:["player"],blind:false,
-    flags:{[SYSTEM_ID]:{ambushStealth:{combat:f.combat.id,token:f.a.token.uuid,targets:[f.b.token.uuid,f.c.token.uuid]}}}});
-  f.totals.push(12,18);
-  const request={id:"ambush",kind:"ambush",round:0,current:null,requester:"player",message:"stealth"};
-  await processTacticRequest(f.a,request);
-  assert.deepEqual(tacticsFlags(f.a).ambush.targets,[f.b.token.uuid]);assert.equal(f.a.actor.effects[0].name,"Засада");
-  assert.equal(f.messages[1].blind,true);assert.deepEqual(f.messages[1].whisper,["gm"]);
-  assert.deepEqual(f.messages[2].whisper,["player"]);assert.deepEqual(f.messages[3].whisper,["player"]);
-  assert.equal(ambushAttack(f.combat,f.a.token,f.b.token).bonus,5);assert.equal(ambushAttack(f.combat,f.a.token,f.c.token).bonus,0);
-  assert.equal(ambushAttack(f.combat,f.a.token,f.b.token).opening,true);
-  f.combat.round=1;f.combat.started=true;await cleanupTactics(f.combat);assert.equal(f.a.actor.effects.length,1);
-  f.combat.round=2;await cleanupTactics(f.combat);assert.equal(f.a.actor.effects.length,0);assert.equal(tacticsFlags(f.a).ambush,null);
-});
 
 test("first ambush attack triggers ordinary initiative once, retaining +5 for round one",async()=>{
   const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
@@ -224,35 +211,7 @@ test("tracker puts a toggle after initiative only for an owned current or delaye
   assert.equal(rows[1].children[0].disabled,false);
 });
 
-test("ambush roster selects several enemies, preserves separate copies and hides concealed tokens from players",()=>{
-  const f=fixture();f.a.token.disposition=1;f.b.token.disposition=-1;f.c.token.disposition=-1;
-  f.c.token.actor=f.b.token.actor;f.c.token.name=f.b.token.name;
-  const rows=ambushCandidates(f.a.token);
-  assert.equal(rows.length,2);assert.notEqual(rows[0].uuid,rows[1].uuid);
-  assert.deepEqual([...defaultAmbushSelection(f.a.token,rows)],[f.b.token.uuid,f.c.token.uuid]);
-  game.user=f.player;f.player.targets=new Set();f.b.token.object={isVisible:true};f.c.token.object={isVisible:false};
-  assert.deepEqual(ambushCandidates(f.a.token).map(row=>row.uuid),[f.b.token.uuid]);
-  f.b.token.hidden=true;assert.equal(ambushCandidates(f.a.token).length,0);
-  game.user=f.gm;assert.equal(ambushCandidates(f.a.token).length,2);
-  canvas.scene.id="other";assert.equal(ambushCandidates(f.a.token).length,0);
-});
 
-test("reopening ambush restores every checked enemy, including those who noticed, and keeps each result independent",()=>{
-  const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
-  f.a.flags[SYSTEM_ID]={ambush:{targets:[f.b.token.uuid],opening:true},ambushReport:{targets:[f.b.token.uuid,f.c.token.uuid],message:"test"}};
-  const selection=defaultAmbushSelection(f.a.token,ambushCandidates(f.a.token));
-  assert.equal(selection.size,2);
-  const view=ambushWindowContext(f.a.actor,f.a.token,{selection});
-  assert.equal(view.selectedCount,2);assert.equal(view.unnoticedCount,1);assert.equal(view.noticedCount,1);
-  assert.equal(view.rows.find(row=>row.uuid===f.b.token.uuid).status,"Не заметил");
-  assert.equal(view.rows.find(row=>row.uuid===f.b.token.uuid).bonus,"+5");
-  assert.equal(view.rows.find(row=>row.uuid===f.c.token.uuid).status,"Заметил");
-  assert.equal(view.rows.find(row=>row.uuid===f.c.token.uuid).bonus,"—");
-  assert.ok(view.rows.every(row=>!row.attackDisabled&&row.rollCount===1));
-  f.combat.round=2;f.combat.started=true;
-  const ended=ambushWindowContext(f.a.actor,f.a.token,{selection});
-  assert.equal(ended.unnoticedCount,0);assert.ok(ended.rows.every(row=>row.attackDisabled));assert.equal(ended.canCheck,false);
-});
 
 test("one explicit target attacks without clearing the scene's several selected enemies or changing source token",async()=>{
   const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
@@ -268,38 +227,147 @@ test("one explicit target attacks without clearing the scene's several selected 
   assert.throws(()=>selectedAttackTarget(f.a.actor,{attackerUuid:f.a.token.uuid,targetUuid:f.b.token.uuid}),/не виден/);
 });
 
-test("roster checks roll Stealth once against all explicit opponents without modifying scene targets",async()=>{
+
+
+
+async function groupFixture(roles=["stealth","stealth","awareness"]) {
   const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
-  game.user.targets=new Set([f.c.token]);
-  await prepareAmbush(f.a.actor,{attackerUuid:f.a.token.uuid,targetUuids:[f.b.token.uuid,f.c.token.uuid,f.b.token.uuid]});
-  assert.equal(f.messages.length,1);assert.equal(f.messages[0].rolls.length,1);
-  assert.deepEqual(tacticsFlags(f.messages[0]).ambushStealth.targets,[f.b.token.uuid,f.c.token.uuid]);
-  assert.deepEqual([...game.user.targets],[f.c.token]);
-  assert.equal(tacticsFlags(f.a).tacticRequest.kind,"ambush");
-  f.totals.push(10,15);
-  await processTacticRequest(f.a,tacticsFlags(f.a).tacticRequest);
-  assert.deepEqual(tacticsFlags(f.a).ambushReport.targets,[f.b.token.uuid,f.c.token.uuid]);
-  assert.deepEqual(tacticsFlags(f.a).ambush.targets,[f.b.token.uuid]);
+  for (const entry of f.combat.combatants) entry.initiative=null;
+  await createGroupAmbush(canvas.scene,f.tokens.map((token,i)=>({tokenId:token.id,role:roles[i]})));
+  return f;
+}
+async function submitGroup(f,entry,total,{user=f.gm,nonce=entry.id}={}) {
+  const session=groupAmbush(f.combat);
+  await claimAmbushRoll(entry,{session:session.id,nonce,requester:user.id});
+  const message={id:`result-${nonce}`,author:user,speakerActor:entry.actor,rolls:[{total}],flags:{[SYSTEM_ID]:{
+    groupAmbushRoll:{combat:f.combat.id,session:session.id,combatant:entry.id,nonce}}}};
+  f.messages.push(message);await acceptAmbushRoll(message);return message;
+}
+
+test("group comparison uses one shared Awareness for all sneaking participants and notices ties",()=>{
+  const entries=[18,15,11].map((total,i)=>({id:`s${i}`,role:"stealth",total})).concat([14,17,10].map((total,i)=>({id:`a${i}`,role:"awareness",total})));
+  assert.deepEqual(ambushMatrix({entries}).map(row=>row.cells.map(cell=>cell.unseen)),[[true,true,true],[true,false,true],[false,false,true]]);
+  entries[0].total=14;assert.equal(ambushMatrix({entries})[0].cells[0].unseen,false);
+  entries[0].total=null;assert.equal(ambushMatrix({entries})[0].cells[0].unseen,null);
 });
 
-test("preparing from the roster enlists the owned attacker and rejects stale or invisible selection before rolling",async()=>{
-  const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
-  f.combat.combatants=collection([f.b,f.c]);let enrolled=0;
-  f.a.token.toggleCombatant=async options=>{assert.equal(options.active,true);assert.equal(options.combat,f.combat);enrolled++;f.combat.combatants.push(f.a);};
-  await prepareAmbush(f.a.actor,{attackerUuid:f.a.token.uuid,targetUuids:[f.b.token.uuid]});
-  assert.equal(enrolled,1);assert.equal(f.messages.length,1);
-  tacticsFlags(f.a).tacticRequest=null;
-  await assert.rejects(()=>prepareAmbush(f.a.actor,{attackerUuid:f.a.token.uuid,targetUuids:["deleted"]}),/Отметьте/);
-  game.user=f.player;f.b.token.object={isVisible:false};
-  await assert.rejects(()=>prepareAmbush(f.a.actor,{attackerUuid:f.a.token.uuid,targetUuids:[f.b.token.uuid]}),/не видна/);
-  assert.equal(f.messages.length,1);
+test("only GM configures group; players post a request and non-rolling participants enter combat",async()=>{
+  const f=fixture();game.user=f.player;
+  await assert.rejects(()=>createGroupAmbush(canvas.scene,[]),/только мастер/);
+  await requestAmbush(f.a.actor);assert.equal(tacticsFlags(f.messages[0]).ambushRequest.scene,"scene");
+  assert.equal(f.messages[0].rolls,undefined);
+  game.user=f.gm;f.combat.started=false;f.combat.round=0;f.combat.turn=null;
+  f.combat.combatants=collection([f.a]);
+  f.combat.createEmbeddedDocuments=async(type,sources,options)=>{assert.equal(type,"Combatant");assert.equal(options.turnEvents,false);
+    assert.deepEqual(sources.map(s=>s.tokenId),["b","c"]);f.combat.combatants.push(f.b,f.c);};
+  await createGroupAmbush(canvas.scene,[{tokenId:"a",role:"stealth"},{tokenId:"b",role:"awareness"},{tokenId:"c",role:"participant"}]);
+  assert.equal(groupAmbush(f.combat).entries.length,3);assert.equal(f.combat.started,false);
+  await assert.rejects(()=>createGroupAmbush(canvas.scene,[{tokenId:"a",role:"stealth"},{tokenId:"b",role:"awareness"}]),/текущую засаду/);
+  await submitGroup(f,f.a,18);await submitGroup(f,f.b,14);
+  assert.equal(groupAmbush(f.combat).status,"ready");assert.equal(groupAmbush(f.combat).entries[2].total,null);
 });
 
-test("revealing one opponent updates the roster but retains all checked opponents and other bonuses",async()=>{
-  const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
-  f.a.flags[SYSTEM_ID]={ambush:{targets:[f.b.token.uuid,f.c.token.uuid],opening:true},ambushReport:{targets:[f.b.token.uuid,f.c.token.uuid]}};
-  await processTacticRequest(f.a,{id:"reveal",kind:"reveal",target:f.b.token.uuid,round:0,current:null,requester:"player"});
-  const view=ambushWindowContext(f.a.actor,f.a.token);
-  assert.equal(view.unnoticedCount,1);assert.equal(view.noticedCount,1);assert.equal(view.hasReport,true);
-  assert.deepEqual(tacticsFlags(f.a).ambushReport.targets,[f.b.token.uuid,f.c.token.uuid]);
+test("a group rolls each participant once and applies independent bonuses after all results",async()=>{
+  const f=await groupFixture();await submitGroup(f,f.a,18);
+  assert.equal(tacticsFlags(f.a).ambush,null);await submitGroup(f,f.b,14);
+  await submitGroup(f,f.c,14);
+  assert.equal(groupAmbush(f.combat).status,"ready");assert.deepEqual(tacticsFlags(f.a).ambush.targets,[f.c.token.uuid]);
+  assert.equal(tacticsFlags(f.b).ambush,null);assert.equal(f.a.actor.effects.length,1);assert.equal(f.b.actor.effects.length,0);
+  assert.equal(ambushAttack(f.combat,f.a.token,f.c.token).bonus,5);
+  await assert.rejects(()=>claimAmbushRoll(f.c,{session:groupAmbush(f.combat).id,nonce:"again",requester:"gm"}),/завершена/);
+  f.combat.round=1;f.combat.started=true;await cleanupTactics(f.combat);assert.equal(f.a.actor.effects.length,1);
+  f.combat.round=2;await cleanupTactics(f.combat);assert.equal(f.a.actor.effects.length,0);
+});
+
+test("roll slots prevent two owners from rerolling, validate author and survive duplicate messages",async()=>{
+  const f=await groupFixture();const session=groupAmbush(f.combat).id;
+  await claimAmbushRoll(f.a,{session,nonce:"one",requester:"player"});
+  await assert.rejects(()=>claimAmbushRoll(f.a,{session,nonce:"two",requester:"gm"}),/уже выполняется/);
+  const message={id:"roll",author:f.gm,speakerActor:f.a.actor,rolls:[{total:18}],flags:{[SYSTEM_ID]:{groupAmbushRoll:{combat:f.combat.id,session,combatant:"a",nonce:"one"}}}};
+  await acceptAmbushRoll(message);assert.equal(groupAmbush(f.combat).entries[0].total,null);
+  message.author=f.player;await acceptAmbushRoll(message);assert.equal(groupAmbush(f.combat).entries[0].total,18);
+  message.rolls[0].total=99;await acceptAmbushRoll(message);assert.equal(groupAmbush(f.combat).entries[0].total,18);
+  f.b.testUserPermission=user=>user.isGM;
+  await processTacticRequest(f.b,{kind:"ambush-claim",id:"forged",requester:"player",session,nonce:"forged",round:0,current:null});
+  assert.equal(groupAmbush(f.combat).entries[1].claim,null);assert.match(f.messages.at(-1).content,/Нет прав/);
+});
+
+test("GM can release an interrupted check but accepts an already posted result instead of rerolling",async()=>{
+  const f=await groupFixture(),session=groupAmbush(f.combat).id;
+  await claimAmbushRoll(f.a,{session,nonce:"one",requester:"gm"});
+  await releaseAmbushRoll(f.combat,session,"a","wrong");assert.ok(groupAmbush(f.combat).entries[0].claim);
+  await releaseAmbushRoll(f.combat,session,"a","one");assert.equal(groupAmbush(f.combat).entries[0].claim,null);
+  await claimAmbushRoll(f.a,{session,nonce:"two",requester:"gm"});
+  f.messages.push({id:"saved",author:f.gm,speakerActor:f.a.actor,rolls:[{total:19}],flags:{[SYSTEM_ID]:{groupAmbushRoll:{combat:f.combat.id,session,combatant:"a",nonce:"two"}}}});
+  await releaseAmbushRoll(f.combat,session,"a");assert.equal(groupAmbush(f.combat).entries[0].total,19);
+});
+
+test("chat offers only owned checks, keeps hidden NPCs private, and shows a shared matrix",async()=>{
+  const f=await groupFixture();f.c.hidden=true;f.c.testUserPermission=user=>user.isGM;
+  const session=groupAmbush(f.combat).id;
+  let view=groupCardContext(f.combat,session,f.player);
+  assert.deepEqual(view.rows.map(row=>row.id),["a","b"]);assert.equal(view.canManage,false);assert.ok(view.rows.every(row=>row.canRoll));
+  view=groupCardContext(f.combat,session,f.gm);assert.equal(view.rows.length,3);assert.equal(view.observers.length,1);
+  await submitGroup(f,f.c,14);view=groupCardContext(f.combat,session,f.gm);assert.equal(view.rows[2].canRoll,false);
+  assert.ok(view.matrix.every(row=>row.cells[0].pending));
+  f.c.hidden=false;assert.equal(groupCardContext(f.combat,session,f.player).rows[2].canRoll,false);
+  await cancelGroupAmbush(f.combat);assert.ok(groupCardContext(f.combat,session,f.player).rows.every(row=>!row.canRoll));
+});
+
+test("first group attack is GM-controlled; one attack starts initiative once for the entire group",async()=>{
+  const f=await groupFixture();await submitGroup(f,f.a,18);await submitGroup(f,f.b,17);await submitGroup(f,f.c,14);
+  const opts={attackerUuid:f.a.token.uuid,targetUuid:f.c.token.uuid};
+  await assert.rejects(()=>rollWeaponAttack(f.a.actor,"sword",opts),/мастер/);
+  game.user=f.player;await assert.rejects(()=>openingGroupAttack(f.combat,{attacker:"a",target:f.c.token.uuid,weapon:"sword",mode:"fast"}),/только мастер/);
+  game.user=f.gm;
+  const message=await openingGroupAttack(f.combat,{attacker:"a",target:f.c.token.uuid,weapon:"sword",mode:"fast"});
+  assert.equal(message.rolls.length,1);assert.equal(tacticsFlags(message).weaponAttack.groupOpening,groupAmbush(f.combat).id);
+  assert.equal(groupAmbush(f.combat).status,"opening");
+  const request=tacticsFlags(f.a).tacticRequest;await processTacticRequest(f.a,request);await processTacticRequest(f.a,request);
+  assert.equal(f.combat.round,1);assert.equal(groupAmbush(f.combat).status,"started");assert.equal(f.operations.filter(op=>op.initiative).length,1);
+  assert.equal(tacticsFlags(f.a).ambush.opening,false);
+  assert.deepEqual(f.operations.find(op=>op.initiative).initiative,["a","b","c"]);
+  assert.equal(ambushAttack(f.combat,f.b.token,f.c.token).bonus,5);
+});
+
+test("cancelled opening returns to ready and cancelling preparation clears bonuses without removing combatants",async()=>{
+  const f=await groupFixture();await submitGroup(f,f.a,18);await submitGroup(f,f.b,17);await submitGroup(f,f.c,14);
+  foundry.documents.ChatMessage.create=async()=>null;
+  await openingGroupAttack(f.combat,{attacker:"a",target:f.c.token.uuid,weapon:"sword",mode:"fast"});
+  assert.equal(groupAmbush(f.combat).status,"ready");assert.equal(tacticsFlags(f.a).ambush.opening,false);
+  await cancelGroupAmbush(f.combat);assert.equal(groupAmbush(f.combat).status,"cancelled");
+  assert.equal(f.combat.combatants.length,3);assert.equal(f.a.actor.effects.length,0);assert.equal(tacticsFlags(f.a).ambush,null);
+});
+
+test("GM may start normally when no one remained hidden; interrupted initiative resumes remaining rolls",async()=>{
+  const f=await groupFixture();await submitGroup(f,f.a,10);await submitGroup(f,f.b,10);await submitGroup(f,f.c,14);
+  assert.equal(tacticsFlags(f.a).ambush,null);f.a.initiative=20;
+  await startGroupCombat(f.combat);assert.deepEqual(f.operations.find(op=>op.initiative).initiative,["b","c"]);
+  await startGroupCombat(f.combat);assert.equal(f.operations.filter(op=>op.initiative).length,1);
+});
+
+test("GM role window retains separate NPC copies and recovers selections and opening options",async()=>{
+  const f=await groupFixture();f.b.token.actor=f.a.actor;f.b.token.name=f.a.token.name;
+  assert.equal(ambushCandidates(canvas.scene).length,3);
+  let view=ambushWindowContext(canvas.scene);assert.equal(view.locked,true);assert.equal(view.canPublish,false);
+  await submitGroup(f,f.a,18);await submitGroup(f,f.b,17);await submitGroup(f,f.c,14);
+  view=ambushWindowContext(canvas.scene);assert.equal(view.attackers.length,2);assert.equal(view.targets.length,1);
+  assert.equal(view.canAttack,true);assert.equal(view.canStart,true);
+});
+
+test("owner rolls on their own client after GM grants the slot and sends one native check",async()=>{
+  const f=await groupFixture(),listeners=new Map();let sequence=0;
+  globalThis.Hooks={on(event,fn){const id=++sequence;listeners.set(id,{event,fn});return id;},off(event,id){listeners.delete(id);},callAll(event,...args){for(const entry of [...listeners.values()])if(entry.event===event)entry.fn(...args);}};
+  globalThis.ui={};globalThis.requestAnimationFrame=fn=>fn();
+  const update=f.a.update.bind(f.a);
+  f.a.update=async changes=>{await update(changes);const request=changes[`flags.${SYSTEM_ID}.tacticRequest`];if(request?.kind==="ambush-claim")await claimAmbushRoll(f.a,request);};
+  game.user=f.player;f.totals.push(18);
+  try {
+    const session=groupAmbush(f.combat).id;
+    const [message,duplicate]=await Promise.all([rollGroupParticipant(f.a,session),rollGroupParticipant(f.a,session)]);
+    assert.equal(duplicate,undefined);assert.equal(message.author,f.player);assert.equal(message.rolls[0].total,18);
+    assert.equal(message.rolls[0].formula,"1d10wc + 10");assert.equal(tacticsFlags(message).groupAmbushRoll.combatant,"a");
+    assert.equal(f.messages.filter(message=>tacticsFlags(message).groupAmbushRoll).length,1);
+    game.user=f.gm;await acceptAmbushRoll(message);assert.equal(groupAmbush(f.combat).entries[0].total,18);
+  } finally {delete globalThis.Hooks;delete globalThis.requestAnimationFrame;delete globalThis.ui;}
 });

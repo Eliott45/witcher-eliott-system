@@ -18,7 +18,12 @@ const pending = new WeakMap();
 export function rollWeaponAttack(actor,itemId,options={}) {
   if(pending.has(actor))return pending.get(actor);
   const work=inventoryWrite(actor,async()=>{
-    const targetContext=selectedAttackTarget(actor,options),combat=globalThis.game?.combat;
+    const targetContext=selectedAttackTarget(actor,options),combat=options.combatId?game.combats.get(options.combatId):globalThis.game?.combat;
+    const group=tacticsFlags(combat).groupAmbush;
+    if(group&&!combat.started&&!["cancelled","started"].includes(group.status)
+      && (!game.user.isGM||group.status!=="opening"||options.groupOpening!==group.id||group.attacker!==combat.combatants.find(entry=>entry.token?.uuid===targetContext?.attacker.uuid)?.id)) {
+      throw new Error("Дождитесь проверок засады. Первую атаку запускает мастер в окне засады.");
+    }
     const actorCombatants=Array.from(combat?.combatants??[]).filter(entry=>entry.actor?.uuid===actor.uuid);
     if(actorCombatants.some(entry=>tacticsFlags(entry).tacticRequest))throw new Error("Дождитесь завершения запроса в трекере боя.");
     if(!targetContext&&actorCombatants.some(entry=>ambushState(combat,entry)))throw new Error("Выберите цель атаки, чтобы учесть засаду.");
@@ -44,7 +49,7 @@ export function rollWeaponAttack(actor,itemId,options={}) {
         flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId,name:item.name,mode:quote.attack.id,base:quote.total,count:quote.attack.count,
           damage:quote.damage,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
           target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,
-          opening:ambush.opening,ambushCombatant:ambush.combatant?.id??null}}}},messageMode));
+          groupOpening:options.groupOpening??null,opening:ambush.opening,ambushCombatant:ambush.combatant?.id??null}}}},messageMode));
       if(!message)return;
       await display.wait(message);
       const update=actionUpdate(actor,action);

@@ -1,10 +1,6 @@
-import { SYSTEM_ID, COMBAT_ACTOR_TYPES } from "../config.mjs";
-import { skillValue } from "../data/skills.mjs";
+import { SYSTEM_ID } from "../config.mjs";
 import { conditionRules } from "./condition-rules.mjs";
-import { rollActionCheck } from "./action-economy.mjs";
-import { trackRollDisplay } from "../chat/roll-display.mjs";
-import { attackerToken, tokenDocument } from "./attack-target.mjs";
-import { ambushState, combatantForToken, delayedOrder, isDelayed, tacticsFlags, tacticalEffect } from "./tactics-rules.mjs";
+import { ambushState, delayedOrder, isDelayed, tacticsFlags, tacticalEffect } from "./tactics-rules.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 
 const queues = new Map();
@@ -37,90 +33,6 @@ export async function requestTactic(combatant, kind, data = {}) {
   }}, {turnEvents:false});
 }
 
-export async function prepareAmbush(actor, {attackerUuid, targetUuids} = {}) {
-  if (!actor.isOwner || !conditionRules(actor).canAct) return;
-  const token = attackerUuid ? canvas.scene?.tokens.find(token=>token.uuid===attackerUuid) : attackerToken(actor);
-  if(!token||token.actor?.uuid!==actor.uuid)throw new Error("Токен атакующего больше не доступен.");
-  let combat = game.combat, combatant = combatantForToken(combat, token);
-  if (combat?.started) throw new Error("Подготовьте засаду до начала первого раунда.");
-  if(combat?.scene&&combat.scene.id!==token.parent.id)throw new Error("Откройте бой для этой сцены.");
-  if (!game.users.activeGM) throw new Error("Для проверки засады нужен подключённый мастер.");
-  if (tacticsFlags(combatant).tacticRequest) throw new Error("Проверка засады ещё обрабатывается.");
-  const targets = targetUuids ? [...new Set(targetUuids)].map(uuid=>canvas.scene?.tokens.find(token=>token.uuid===uuid))
-    : Array.from(game.user.targets, tokenDocument).filter(target => target.uuid !== token.uuid);
-  if (!targets.length || targets.some(target => !target || target.uuid===token.uuid || target.parent.id !== token.parent.id || !COMBAT_ACTOR_TYPES.includes(target.actor?.type))) {
-    throw new Error("Отметьте противников, от которых хотите скрыться.");
-  }
-  if(targetUuids&&!game.user.isGM&&targets.some(target=>target.hidden||!target.object?.isVisible))throw new Error("Одна из отмеченных целей больше не видна. Обновите список.");
-  const skill = skillValue(actor.system, "stealth");
-  if (skill.total === null) throw new Error("Заполните Ловкость и Скрытность.");
-  // Use Foundry's ordinary owned-token combat entry; no manual targeting or enrolment is required.
-  if(!combatant){
-    if(!combat&&!game.user.isGM)throw new Error("Мастер должен создать бой в трекере. Запускать первый раунд пока не нужно.");
-    await token.toggleCombatant({active:true,...(combat?{combat}:{})});
-    combat=game.combat;combatant=combatantForToken(combat,token);
-    if(!combatant||combat.started)throw new Error("Не удалось подготовить участника до начала боя.");
-  }
-  const message = await rollActionCheck(actor, {formula:`1d10wc + ${skill.total}`,
-    flavor:"<h3>Засада · Скрытность</h3><p>Против Внимания выбранных целей.</p>",
-    flags:{[SYSTEM_ID]:{ambushStealth:{combat:combat.id, token:token.uuid, targets:targets.map(target => target.uuid)}}}
-  }, {ignoreExtra:true});
-  if (message) await requestTactic(combatant, "ambush", {message:message.id});
-}
-
-async function awarenessCheck(target, source) {
-  // Resume a GM reload without rolling a defender twice or spending Luck a second time.
-  const previous=game.messages.find(message=>tacticsFlags(message).ambushAwareness?.source===source.id
-    && tacticsFlags(message).ambushAwareness.target===target.uuid);
-  if(previous)return previous.rolls[0].total;
-  const actor = target.actor, skill = skillValue(actor.system, "awareness");
-  if (skill.total === null) throw new Error(`Заполните Внимание: ${target.name}.`);
-  const mode = target.hidden || source.blind ? "blind" : source.whisper.length ? "gm" : "public";
-  const display = trackRollDisplay();
-  try {
-    const roll = await new foundry.dice.Roll(`1d10wc + ${skill.total}`).evaluate({allowInteractive:mode !== "blind"});
-    const message = await roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor, token:target}),
-      ...(mode === "gm" ? {whisper:[...source.whisper]} : {}),
-      flavor:`<h3>${esc(target.name)} · Внимание против засады</h3>`,
-      flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],ambushAwareness:{source:source.id, target:target.uuid}}}
-    }, {messageMode:mode});
-    if (!message) throw new Error("Проверка Внимания отменена.");
-    await display.wait(message);
-    return message.rolls[0].total;
-  } finally { display.close(); }
-}
-
-async function resolveAmbush(combat, combatant, request) {
-  if (combat.started) throw new Error("Засада готовится до начала боя.");
-  const source = game.messages.get(request.message), check = tacticsFlags(source).ambushStealth;
-  if (!source || source.speakerActor?.uuid !== combatant.actor.uuid || check?.combat !== combat.id || check.token !== combatant.token.uuid) throw new Error("Не найдена проверка Скрытности для этой засады.");
-  if(tacticsFlags(combatant).lastAmbushMessage===source.id)throw new Error("Эта проверка засады уже применена.");
-  const targets = await Promise.all(check.targets.map(uuid => fromUuid(uuid)));
-  if (!targets.length || targets.some(token => !token || token.documentName !== "Token" || !COMBAT_ACTOR_TYPES.includes(token.actor?.type) || token.parent.id !== combatant.sceneId)) throw new Error("Цели засады больше не доступны.");
-  // Validate every defender before rolling, so an unfilled character does not consume half the checks.
-  if (targets.some(token => skillValue(token.actor.system, "awareness").total === null)) throw new Error("Заполните Внимание всех целей засады.");
-  const missing = targets.filter(token => !combatantForToken(combat, token));
-  if (missing.length) await combat.createEmbeddedDocuments("Combatant", missing.map(token => ({tokenId:token.id, actorId:token.actorId, sceneId:token.parent.id, hidden:token.hidden})), {turnEvents:false});
-  const unseen = [], results = [], checked = [];
-  for (const target of targets) {
-    const awareness = await awarenessCheck(target, source), success = source.rolls[0].total > awareness;
-    if (success) unseen.push(target.uuid);
-    checked.push(target.uuid);
-    results.push(`<li>${esc(target.name)}: ${success ? "не заметил · +5 к атакам" : "заметил · без бонуса засады"}</li>`);
-  }
-  if (combat.started) throw new Error("Бой начался во время проверки; засада не применена.");
-  await removeTacticEffect(combat, combatant, "ambush");
-  await combatant.update({[`flags.${SYSTEM_ID}.ambush`]:unseen.length ? {targets:unseen, opening:true} : null,
-    [`flags.${SYSTEM_ID}.ambushReport`]:{targets:checked, message:source.id},
-    [`flags.${SYSTEM_ID}.lastAmbushMessage`]:source.id}, {turnEvents:false});
-  if (unseen.length) await combatant.actor.createEmbeddedDocuments("ActiveEffect", [tacticalEffect("ambush", combat, combatant,
-    "+5 к атакам против не заметивших вас целей до конца первого раунда. Первая атака проходит до броска инициативы.")]);
-  const whisper=source.whisper.length?[...source.whisper]:targets.some(target=>target.hidden)||combatant.hidden
-    ? game.users.filter(user=>user.isGM).map(user=>user.id) : [];
-  await foundry.documents.ChatMessage.create({speaker:source.speaker, whisper, blind:source.blind,
-    content:`<section class="witcher-attack-chat"><h3>Засада</h3><ul>${results.join("")}</ul><p>${unseen.length ? "В окне засады выберите оружие и нажмите «Атаковать» у нужного противника. Затем участники автоматически бросят инициативу." : "Засада не удалась. Можно бросать обычную инициативу."}</p></section>`, flags:{[SYSTEM_ID]:{skipLuck:true}}});
-}
-
 export async function delayTurn(combat, combatant) {
   if (!combat.started || combat.combatant?.id !== combatant.id || combatant.isDefeated || !conditionRules(combatant.actor).canAct) throw new Error("Отложить ход можно только во время своего хода.");
   await combatant.update({[`flags.${SYSTEM_ID}.delay`]:{round:combat.round}}, {turnEvents:false});
@@ -145,6 +57,10 @@ export async function resumeDelayedTurn(combat, combatant) {
 async function startAfterAmbush(combat, combatant, request) {
   const message = game.messages.get(request.message), attack = tacticsFlags(message).weaponAttack;
   if (!ambushState(combat, combatant)?.opening || combat.started || attack?.ambushCombatant !== combatant.id || !attack.opening || message.speakerActor?.uuid !== combatant.actor.uuid) return;
+  if (tacticsFlags(combat).groupAmbush?.id === attack.groupOpening) {
+    const {startGroupCombat} = await import("./group-ambush.mjs");
+    return startGroupCombat(combat);
+  }
   await combatant.update({[`flags.${SYSTEM_ID}.ambush.opening`]:false}, {turnEvents:false});
   await combat.rollInitiative(combat.combatants.map(entry => entry.id), {updateTurn:false});
   if (!combat.started && combat.combatants.every(entry => Number.isFinite(entry.initiative))) await combat.startCombat();
@@ -159,7 +75,13 @@ export async function processTacticRequest(combatant, request) {
     if (request.round !== combat.round || request.current !== (combat.combatant?.id ?? null)) throw new Error("Ход уже сменился. Нажмите кнопку ещё раз.");
     if (request.kind === "delay") await delayTurn(combat, combatant);
     else if (request.kind === "resume") await resumeDelayedTurn(combat, combatant);
-    else if (request.kind === "ambush") await resolveAmbush(combat, combatant, request);
+    else if (request.kind === "ambush-claim") {
+      const {claimAmbushRoll} = await import("./group-ambush.mjs");
+      await claimAmbushRoll(combatant,request);
+    } else if (request.kind === "ambush-release") {
+      const {releaseAmbushRoll} = await import("./group-ambush.mjs");
+      await releaseAmbushRoll(combat,request.session,combatant.id,request.nonce);
+    }
     else if (request.kind === "initiative") await startAfterAmbush(combat, combatant, request);
     else if (request.kind === "reveal") {
       const state=ambushState(combat,combatant);
