@@ -434,11 +434,40 @@
 .witcher-chat-stubbornness button { margin-top:7px; width:100%; min-height:30px; white-space:normal; background:#553330; color:#fff0d8; border:1px solid #9b8058; font-size:12px; }
 .witcher-item-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:12px 0; }
 
-.witcher-lifepath-heading, .witcher-lifepath-entry header { display: flex; align-items: center; gap: .6rem; }
-.witcher-lifepath-heading h3, .witcher-lifepath-entry h3 { flex: 1; margin: .5rem 0; }
-.witcher-lifepath-heading button, .witcher-lifepath-entry header button { width: auto; flex: 0 0 auto; }
-.witcher-lifepath-entry { border: 1px solid #b8a58a; padding: .7rem; margin: .8rem 0; border-radius: 4px; }
-.witcher-lifepath-summary { display: grid; grid-template-columns: minmax(130px, 1fr) 2fr; gap: .4rem .7rem; margin: .8rem 0; }
+.witcher-lifepath-heading { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.witcher-lifepath-heading h3 { flex: 1; margin: .5rem 0; }
+.witcher-lifepath-heading button { width: auto; flex: 0 0 auto; }
+.witcher-lifepath-entry { border: 1px solid #c9b99e; margin: 10px 0; border-radius: 6px; overflow: hidden; background: #faf6ed; color: #342d26; }
+.witcher-lifepath-entry > summary { display: flex; align-items: center; gap: 12px; padding: 12px; cursor: pointer; list-style: none; background: #e9e0d0; }
+.witcher-lifepath-entry > summary::-webkit-details-marker { display: none; }
+.witcher-lifepath-entry > summary:hover { background: #e2d6c0; }
+.witcher-lifepath-entry > summary:focus-visible { outline: 2px solid #8b6540; outline-offset: -3px; }
+.witcher-lifepath-age { display: flex; flex-direction: column; align-items: center; flex: 0 0 72px; padding: 6px; border-radius: 4px; color: #f6ead0; background: #633b31; font-variant-numeric: tabular-nums; }
+.witcher-lifepath-age b { font: 700 18px Georgia,serif; }
+.witcher-lifepath-age small { font-size: 10px; }
+.witcher-lifepath-entry-title { display: flex; flex: 1; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.witcher-lifepath-entry-title strong { color: #633b31; font: 700 17px Georgia,serif; }
+.witcher-lifepath-entry-title small,.witcher-lifepath-order { color: #685940; font-size: 12px; }
+.witcher-lifepath-entry-actions { display: flex; gap: 5px; flex: none; }
+.witcher-lifepath .witcher-lifepath-entry-actions button { width: 28px; height: 28px; padding: 0; }
+.witcher-lifepath-quiet { color: #526146; font-size: 11px; }
+.witcher-lifepath-chevron { flex: none; color: #81663f; font-size: 12px; transform: rotate(-90deg); }
+.witcher-lifepath-entry[open] > summary .witcher-lifepath-chevron { transform: none; }
+.witcher-lifepath-entry-body { padding: 12px; border-top: 1px solid #c9b99e; }
+.witcher-lifepath-story { margin: 0 0 12px; padding-left: 10px; border-left: 2px solid #ad8b53; white-space: pre-line; overflow-wrap: anywhere; font-size: 13px; line-height: 1.6; }
+.witcher-lifepath-story:last-child { margin-bottom: 0; }
+.witcher-lifepath-groups { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,280px),1fr)); gap: 12px; }
+.witcher-lifepath-group { min-width: 0; }
+.witcher-lifepath-group h4 { margin: 0 0 9px; padding-bottom: 6px; border-bottom: 1px solid #d3c6ae; color: #42584d; font-size: 13px; font-weight: 700; }
+.witcher-lifepath-group.is-danger h4 { color: #813d31; }
+.witcher-lifepath-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 16px; margin: 0; }
+.witcher-lifepath-fields > div { min-width: 0; }
+.witcher-lifepath-fields > .is-wide { grid-column: 1 / -1; }
+.witcher-lifepath-fields dt { margin-bottom: 3px; color: #776149; font-size: 11px; line-height: 1.35; }
+.witcher-lifepath-fields dd { margin: 0; color: #342d26; font-size: 13px; line-height: 1.5; white-space: pre-line; overflow-wrap: anywhere; }
+.witcher-lifepath-fields dd small { display: block; margin-top: 4px; color: #675744; font-size: 12px; line-height: 1.5; }
+.witcher-lifepath-summary { display: grid; grid-template-columns: minmax(120px,180px) minmax(0,1fr); gap: .4rem .7rem; margin: .8rem 0; }
+@container witcher-sheet (max-width:740px) { .witcher-lifepath-entry > summary { gap: 8px; flex-wrap: wrap; } .witcher-lifepath-quiet { display: none; } .witcher-lifepath-age { flex-basis: 62px; } .witcher-lifepath-entry-title strong { font-size: 15px; } }
 .witcher-lifepath-summary dt { color: #793a36; font-weight: 600; }
 .witcher-lifepath-summary dd { margin: 0; overflow-wrap: anywhere; }
 .witcher-lifepath-summary small { display: block; font-size: .85em; opacity: .8; }

@@ -94,7 +94,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static PARTS = {
     content: {
       template: `systems/${SYSTEM_ID}/templates/actor-sheet.hbs`,
-      scrollable: [".witcher-character-content[data-tab=magic]", ".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=profession]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=transport]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
+      scrollable: [".witcher-character-content[data-tab=magic]", ".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=profession]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=transport]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-character-content[data-tab=lifepath]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
     }
   };
 
@@ -134,7 +134,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     return Object.assign(context, {
       combat: combatContext(this.actor,this.combatOptions),
       conditions,
-      lifepath: lifepathContext(this.actor),
+      lifepath: lifepathContext(this.actor, preferences),
       profession: professionContext(this.actor),
       editingProfession: this.isEditable && this.#editingProfession,
       skills: skillsContext(this.actor, {

@@ -1,0 +1,21 @@
+<details class="witcher-lifepath-entry" data-biography-section="{{entry.preferenceKey}}" {{#if entry.open}}open{{/if}}>
+  <summary>
+    <span class="witcher-lifepath-age"><b>{{entry.ageLabel}}</b><small>лет</small></span>
+    <span class="witcher-lifepath-entry-title"><strong>{{entry.title}}</strong>{{#if entry.subtitle}}<small>{{entry.subtitle}}</small>{{/if}}</span>
+    {{#if entry.quiet}}<span class="witcher-lifepath-quiet">{{entry.quiet}}</span>{{/if}}
+    <span class="witcher-lifepath-entry-actions">
+      <button type="button" data-action="{{entry.editAction}}" data-entry-id="{{entry.id}}" aria-label="Изменить событие" data-tooltip="Изменить событие" {{disabled (not editable)}}><i class="fa-solid fa-pen"></i></button>
+      <button type="button" data-action="{{entry.removeAction}}" data-entry-id="{{entry.id}}" aria-label="Удалить событие" data-tooltip="Удалить событие" {{disabled (not editable)}}><i class="fa-solid fa-trash"></i></button>
+    </span>
+    <i class="fa-solid fa-chevron-down witcher-lifepath-chevron" aria-hidden="true"></i>
+  </summary>
+  {{#if (or entry.notes entry.groups.length)}}<div class="witcher-lifepath-entry-body">
+    {{#if entry.notes}}<p class="witcher-lifepath-story">{{entry.notes}}</p>{{/if}}
+    <div class="witcher-lifepath-groups">
+      {{#each entry.groups as |group|}}<section class="witcher-lifepath-group {{#if (eq group.key 'danger')}}is-danger{{/if}}">
+        {{#if group.showTitle}}<h4>{{group.title}}</h4>{{/if}}
+        <dl class="witcher-lifepath-fields">{{#each group.fields as |field|}}<div {{#if field.wide}}class="is-wide"{{/if}}><dt>{{field.label}}</dt><dd>{{field.value}}{{#if field.description}}<small>{{field.description}}</small>{{/if}}</dd></div>{{/each}}</dl>
+      </section>{{/each}}
+    </div>
+  </div>{{/if}}
+</details>

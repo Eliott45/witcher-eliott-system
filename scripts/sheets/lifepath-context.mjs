@@ -11,19 +11,42 @@ import { addLanguageFromItem, getLanguage } from "../data/languages.mjs";
 const valueAt = (data, key) => key.split(".").reduce((value, part) => value?.[part], data);
 const visible = (group, data) => !group.when || [group.when[1]].flat().includes(valueAt(data, group.when[0]));
 export const summarizeFields = (fields, data) => formFields(fields, data).filter(field => visible(field, data) && field.value !== "" && field.value !== 0)
-  .map(field => ({ label: field.label, value: field.isChoice ? game.i18n.localize(field.choices.find(option => option.selected)?.name ?? "—") : field.value, description: field.description }));
-export function lifepathContext(actor) {
+  .map(field => ({ label: field.label, value: field.isChoice ? game.i18n.localize(field.choices.find(option => option.selected)?.name ?? "—") : field.value, description: field.description,
+    wide: ["notes", "details", "detail", "circumstances"].includes(field.key) || Boolean(field.description) }));
+const chronological = entries => entries.toSorted((a, b) => a.age - b.age);
+export const nextRecordAge = (entries, firstAge = 10) => entries.reduce((age, entry) => Math.max(age, Number(entry.age) + 10), firstAge);
+const choiceName = (fields, key, value) => fields.find(field => field.key === key)?.choices?.find(choice => choice.id === value)?.name ?? "";
+const groupedFields = (groups, entry) => groups.filter(group => visible(group, entry)).map(group => ({
+  key: group.key, title: group.title, fields: summarizeFields(group.fields, entry[group.key])
+})).filter(group => group.fields.length);
+const recordCard = (entry, kind, title, subtitle, groups, preferences) => ({
+  id: entry.id, ageLabel: kind === "decade" ? `${entry.age}–${Number(entry.age) + 9}` : String(entry.age), title, subtitle,
+  notes: entry.notes, groups: groups.map(group => ({ ...group, showTitle: groups.length > 1 || group.key === "danger" })),
+  preferenceKey: `lifepath-${kind}-${entry.id}`, open: !preferences.collapsed?.[`lifepath-${kind}-${entry.id}`],
+  editAction: kind === "decade" ? "editDecade" : "editLifeEvent", removeAction: kind === "decade" ? "removeDecade" : "removeLifeEvent"
+});
+function decadeCard(entry, preferences) {
+  const groups = groupedFields(DECADE_GROUPS.filter(group => !["danger", "enemy"].includes(group.key)), entry);
+  const danger = DECADE_GROUPS.find(group => group.key === "danger"), kind = entry.danger?.kind;
+  const dangerFields = summarizeFields(danger.fields.filter(field => field.key !== "kind"), entry.danger);
+  if (kind === "enemy") dangerFields.push(...summarizeFields(DECADE_GROUPS.find(group => group.key === "enemy").fields, entry.enemy));
+  const dangerName = choiceName(danger.fields, "kind", kind);
+  if (dangerFields.length || (kind && kind !== "none")) groups.push({key: "danger", title: `Опасность${dangerName ? ` · ${dangerName}` : ""}`, fields: dangerFields});
+  const title = choiceName(DECADE_FIELDS, "outcome", entry.outcome) || "Десятилетие на Пути";
+  const detail = entry.outcome === "hunt" ? entry.hunt?.monster || entry.hunt?.category : entry.outcome === "ally" ? entry.ally?.name : "";
+  const risk = WITCHER_RISKS.find(risk => risk.id === entry.risk)?.name;
+  return { ...recordCard(entry, "decade", [title, detail].filter(Boolean).join(" · "), risk ? `Образ жизни: ${risk}` : "", groups, preferences),
+    quiet: kind === "none" ? "Без опасностей" : "" };
+}
+export function lifepathContext(actor, preferences = {}) {
   const path = actor.system.lifepath.witcher;
   return { isWitcher: actor.system.details.race === "witcher", eventCount: actor.system.lifepath.events.length,
     expectedEvents: Math.floor((Number(actor.system.details.age) || 0) / 10),
-    events: actor.system.lifepath.events.map(entry => ({ id: entry.id, title: `${entry.age} лет · ${LIFE_KINDS.find(kind => kind.id === entry.kind)?.name ?? "—"}`,
-      summary: [...summarizeFields(LIFE_EVENT_FIELDS.filter(field => !["age", "kind"].includes(field.key)), entry),
-        ...LIFE_EVENT_GROUPS.filter(group => visible(group, entry)).flatMap(group => summarizeFields(group.fields, entry[group.key]))] })),
+    events: chronological(actor.system.lifepath.events).map(entry => ({...recordCard(entry, "event",
+      [LIFE_KINDS.find(kind => kind.id === entry.kind)?.name ?? "Событие", entry[entry.kind]?.name].filter(Boolean).join(" · "), "",
+      groupedFields(LIFE_EVENT_GROUPS, entry), preferences), quiet: ""})),
     creation: summarizeFields(WITCHER_CREATION_FIELDS, path),
-    trialModifier: witcherTrialModifier(path), decades: path.decades.map(entry => ({ id: entry.id,
-      title: `${entry.age}–${entry.age + 9} · ${WITCHER_RISKS.find(risk => risk.id === entry.risk)?.name ?? "—"}`,
-      summary: [...summarizeFields(DECADE_FIELDS.filter(field => field.key !== "age"), entry),
-        ...DECADE_GROUPS.filter(group => visible(group, entry)).flatMap(group => summarizeFields(group.fields, entry[group.key]))] })) };
+    trialModifier: witcherTrialModifier(path), decades: chronological(path.decades).map(entry => decadeCard(entry, preferences)) };
 }
 
 /** Reused by both Lifepaths; forms persist typed fields, never a display summary. */
@@ -76,7 +99,7 @@ export async function editDecade(_event, target) {
   const previous = path.decades.find(entry => entry.id === target.dataset.entryId);
   const id = previous?.id ?? foundry.utils.randomID();
   const value = await editStructuredRecord("Десятилетие на Пути", DECADE_FIELDS, DECADE_GROUPS, previous ?? {
-    age: (path.pathStartAge || 20) + path.decades.length * 10, risk: "normal", outcome: "nothing", danger: { kind: "none" }
+    age: nextRecordAge(path.decades, path.pathStartAge || 20), risk: "normal", outcome: "nothing", danger: { kind: "none" }
   });
   if (!value || !this.isEditable) return;
   await updatePathRecords(this.actor, "lifepath.witcher.decades", entries => previous
@@ -91,7 +114,7 @@ export async function removeDecade(_event, target) {
 export async function rollDecade() {
   if (!this.isEditable || this.actor.system.details.race !== "witcher") return;
   const path = this.actor.system.lifepath.witcher;
-  const choice = await editStructuredRecord("Риск десятилетия", DECADE_FIELDS.slice(0, 2), [], { age: (path.pathStartAge || 20) + path.decades.length * 10, risk: "normal" });
+  const choice = await editStructuredRecord("Риск десятилетия", DECADE_FIELDS.slice(0, 2), [], { age: nextRecordAge(path.decades, path.pathStartAge || 20), risk: "normal" });
   if (!choice) return;
   const rolls = [];
   const entry = await generateDecade(choice.age, choice.risk, async faces => {
@@ -123,7 +146,7 @@ export async function editLifeEvent(_event, target) {
   if (!this.isEditable || this.actor.system.details.race === "witcher") return;
   const events = this.actor.system.lifepath.events;
   const previous = events.find(entry => entry.id === target.dataset.entryId);
-  await saveLifeEvent(this, previous, previous ?? { age: (events.length + 1) * 10, kind: "fortune" });
+  await saveLifeEvent(this, previous, previous ?? { age: nextRecordAge(events), kind: "fortune" });
 }
 export async function removeLifeEvent(_event, target) {
   if (!this.isEditable) return;
@@ -133,7 +156,7 @@ export async function removeLifeEvent(_event, target) {
 export async function rollLifeEvent() {
   if (!this.isEditable || this.actor.system.details.race === "witcher") return;
   const rolls = [];
-  const data = await generateLifeEvent((this.actor.system.lifepath.events.length + 1) * 10, async faces => {
+  const data = await generateLifeEvent(nextRecordAge(this.actor.system.lifepath.events), async faces => {
     const roll = await new foundry.dice.Roll(`1d${faces}`).evaluate({ allowInteractive: false });
     rolls.push(roll); return roll.total;
   });

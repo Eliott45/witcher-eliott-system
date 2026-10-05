@@ -499,7 +499,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["combat-actions", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["combat-actions", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -533,6 +533,29 @@ sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/s
 sheet.token = null;
 sheet.isEditable = true;
 const html = template(await sheet._prepareContext({}));
+// Real old/new record schemas, chronological presentation, escaping and native disclosure preferences.
+const {lifepathContext:timelineContext}=await import("../scripts/sheets/lifepath-context.mjs");
+const timelineSource=new WitcherActorData({details:{race:"witcher",age:110},lifepath:{witcher:{decades:[
+  {id:"d30",age:30,risk:"normal",outcome:"hunt",hunt:{category:"Вампиры"},danger:{kind:"none"}},
+  {id:"d40",age:40,risk:"risky",outcome:"ally",ally:{name:"Настя"},danger:{kind:"enemy"},enemy:{name:"Другой человек"}},
+  {id:"d20",age:20,risk:"cautious",outcome:"nothing",notes:"<script>user text</script>"},
+  {id:"d100",age:100,risk:"normal",outcome:"nothing"}
+]},events:[{id:"e40",age:40,kind:"ally",ally:{name:"Союзник"}},{id:"e20",age:20,kind:"fortune",fortune:{result:"money",amount:500}}]}});
+const timelineRestored=new WitcherActorData(JSON.parse(JSON.stringify(timelineSource.toObject())));
+const timelineActor={system:timelineRestored};
+const timelineTemplate=handlebars.compile(await readFile(new URL("../templates/lifepath.hbs",import.meta.url),"utf8"),{strict:true});
+const timelineHTML=timelineTemplate({lifepath:timelineContext(timelineActor,{collapsed:{"lifepath-decade-d20":true}}),editable:true});
+assert.ok(timelineHTML.indexOf("20–29")<timelineHTML.indexOf("30–39"));
+assert.ok(timelineHTML.indexOf("40–49")<timelineHTML.indexOf("100–109"));
+assert.ok(timelineHTML.includes('data-action="editDecade" data-entry-id="d20"'));
+assert.ok(timelineHTML.includes("Опасность · Враг"));assert.ok(timelineHTML.includes("Другой человек"));
+assert.ok(!timelineHTML.includes("<script>user text</script>"));assert.ok(timelineHTML.includes("&lt;script&gt;user text&lt;/script&gt;"));
+assert.match(timelineHTML,/data-biography-section="lifepath-decade-d20"\s*>/);
+assert.deepEqual(timelineRestored.lifepath.witcher.decades.map(entry=>entry.id),["d30","d40","d20","d100"]);
+timelineRestored.updateSource({"details.race":"human"});
+const eventsHTML=timelineTemplate({lifepath:timelineContext(timelineActor),editable:false});
+assert.ok(eventsHTML.indexOf('<b>20</b>')<eventsHTML.indexOf('<b>40</b>'));
+assert.match(eventsHTML,/data-action="editLifeEvent" data-entry-id="e20"[^>]*disabled/);
 assert.ok(!html.includes("witcher-sidebar-extra"),"Extra action is only offered inside Actions");
 assert.ok(!html.includes("СТАЛЬ И РЕАКЦИЯ"));
 assert.ok(html.includes("Перемещение"));
