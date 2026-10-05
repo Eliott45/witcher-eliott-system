@@ -4,7 +4,7 @@ import { restrictedVision } from "../data/visor.mjs";
 
 export class WitcherToken extends foundry.canvas.placeables.Token {
   #facingMarker;
-  #markerSize = "";
+  #markerGeometry = "";
   #visionPreview = false;
 
   get hasFacing() {
@@ -17,11 +17,16 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
   }
 
   get hasLimitedSourceAngle() {
-    return super.hasLimitedSourceAngle || (this.hasSight && (this.visionPreviewActive || this.hasRestrictedVision));
+    return super.hasLimitedSourceAngle || (this.hasSight && this.visionPreviewActive);
   }
 
   get hasRestrictedVision() {
     return this._original?.hasRestrictedVision ?? (this.hasFacing && restrictedVision(this.actor.items));
+  }
+
+  /** One angle for the blind-zone marker and the optional local sight preview. */
+  get facingVisionAngle() {
+    return Math.min(this.document.sight.angle, this.hasRestrictedVision ? RESTRICTED_VISION_ANGLE : PREVIEW_VISION_ANGLE);
   }
 
   _getVisionSourceData() {
@@ -29,8 +34,7 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
     if (!this.hasFacing) return data;
     // Foundry's zero faces south. Keep artwork upright and align sight with our north-facing arrow.
     data.rotation = (data.rotation + 180) % 360;
-    if (this.visionPreviewActive) data.angle = Math.min(data.angle, PREVIEW_VISION_ANGLE);
-    if (this.hasRestrictedVision) data.angle = Math.min(data.angle, RESTRICTED_VISION_ANGLE);
+    if (this.visionPreviewActive) data.angle = this.facingVisionAngle;
     return data;
   }
 
@@ -41,6 +45,11 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
     // Only rebuild this client's vision source. No document update or socket message.
     this.initializeVisionSource();
     return true;
+  }
+
+  refreshFacingVision() {
+    this.#refreshFacingMarker();
+    this.initializeVisionSource();
   }
 
   _onRelease(options) {
@@ -88,10 +97,11 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
     marker.visible = this.hasFacing && !this.document.isSecret;
     marker.alpha = this.document.alpha;
     const { width, height } = this.document.getSize();
-    const size = `${width}:${height}`;
-    if (size !== this.#markerSize) {
-      drawFacingMarker(marker, width, height);
-      this.#markerSize = size;
+    const angle = this.facingVisionAngle;
+    const geometry = `${width}:${height}:${angle}`;
+    if (geometry !== this.#markerGeometry) {
+      drawFacingMarker(marker, width, height, angle);
+      this.#markerGeometry = geometry;
     }
     marker.position.set(width / 2, height / 2);
     marker.angle = this.document.rotation;
@@ -102,6 +112,6 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
     // Core destroys all token children, including our non-interactive marker.
     super._destroy(options);
     this.#facingMarker = undefined;
-    this.#markerSize = "";
+    this.#markerGeometry = "";
   }
 }

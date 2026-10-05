@@ -63,7 +63,7 @@ test("vision hooks immediately refresh matching linked and unlinked scene tokens
   const calls = [], hooks = new Map();
   const linked = {uuid: "Actor.a", documentName: "Actor"};
   const unlinked = {uuid: "Scene.s.Token.t.Actor.a", documentName: "Actor"};
-  const tokens = [linked, linked, unlinked].map((actor, id) => ({actor, initializeVisionSource: () => calls.push(id)}));
+  const tokens = [linked, linked, unlinked].map((actor, id) => ({actor, refreshFacingVision: () => calls.push(id)}));
   globalThis.canvas = {ready: true, tokens: {placeables: tokens}};
   globalThis.Hooks = {on: (event, fn) => hooks.set(event, fn)};
   registerVisorVision();

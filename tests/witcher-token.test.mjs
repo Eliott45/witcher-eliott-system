@@ -40,6 +40,11 @@ globalThis.foundry = { canvas: { placeables: { Token: TokenHarness } } };
 globalThis.PIXI = { Graphics: GraphicsHarness };
 globalThis.canvas = { visibility: { tokenVision: true } };
 const { WitcherToken } = await import("../scripts/canvas/witcher-token.mjs");
+const { renderTokenVisionToggle } = await import("../scripts/combat/token-hud.mjs");
+const { refreshActorVision } = await import("../scripts/canvas/visor-vision.mjs");
+const { hasAbility } = await import("../scripts/data/abilities.mjs");
+
+const helmet = () => ({id: "helm", type: "armor", system: {ruleId: "armor.head.7", zone: "head", equipped: true, quantity: 1, visorDown: true}});
 
 test("preview is local, reversible, preserves lighting and resets on deselection", () => {
   const token = new WitcherToken();
@@ -141,11 +146,14 @@ test("unrelated actor types keep native sight and no decoration", async () => {
   assert.equal(token.toggleVisionPreview(), false);
 });
 
-test("lowered visor restricts vision to the forward 90° and raising or removing the helmet restores the prior view", () => {
-  const helmet = {id: "helm", type: "armor", system: {ruleId: "armor.head.7", zone: "head", equipped: true, quantity: 1, visorDown: true}};
+test("lowered visor previews the forward 90° and the player can turn that preview off", () => {
+  const helm = helmet();
   for (const angle of [360, 180, 60]) {
     const token = new WitcherToken({angle});
-    token.actor.items = [helmet];
+    token.actor.items = [helm];
+    assert.equal(token._getVisionSourceData().angle, angle, "Preview starts off, even with a lowered visor");
+    assert.equal(token.hasLimitedSourceAngle, angle !== 360);
+    token.toggleVisionPreview();
     for (const rotation of [0, 90, 180, 270]) {
       token.document.rotation = rotation;
       const data = token._getVisionSourceData();
@@ -155,17 +163,20 @@ test("lowered visor restricts vision to the forward 90° and raising or removing
       assert.equal(data.lightRadius, 2000);
     }
     token.toggleVisionPreview();
+    assert.equal(token._getVisionSourceData().angle, angle, "Turning the preview off restores the stored angle");
+    token.toggleVisionPreview();
     assert.equal(token._getVisionSourceData().angle, Math.min(angle, 90));
     token._onRelease({});
-    assert.equal(token._getVisionSourceData().angle, Math.min(angle, 90), "Deselecting cannot bypass the visor");
-    helmet.system.visorDown = false;
-    assert.equal(token._getVisionSourceData().angle, angle);
-    helmet.system.visorDown = true;
-    helmet.system.equipped = false;
-    assert.equal(token._getVisionSourceData().angle, angle);
-    helmet.system.equipped = true;
+    assert.equal(token._getVisionSourceData().angle, angle, "Deselecting ends the temporary preview");
+    token.toggleVisionPreview();
+    helm.system.visorDown = false;
+    assert.equal(token._getVisionSourceData().angle, Math.min(angle, 180));
+    helm.system.visorDown = true;
+    helm.system.equipped = false;
+    assert.equal(token._getVisionSourceData().angle, Math.min(angle, 180));
+    helm.system.equipped = true;
     token.actor.items = [];
-    assert.equal(token._getVisionSourceData().angle, angle);
+    assert.equal(token._getVisionSourceData().angle, Math.min(angle, 180));
     assert.equal(token.document.sight.angle, angle, "Never overwrite stored vision or require restoring a saved angle");
   }
 });
@@ -175,8 +186,100 @@ test("token drag/config clone inherits visor state and north-facing cone from or
   original.actor.items = [{type: "armor", system: {zone: "head", ruleId: "armor.head.6", equipped: true, quantity: 1, visorDown: true}}];
   const clone = new WitcherToken({rotation: 90});
   clone._original = original;
+  assert.equal(clone._getVisionSourceData().angle, 360);
+  original.toggleVisionPreview();
   assert.equal(clone._getVisionSourceData().angle, 90);
   assert.equal(clone._getVisionSourceData().rotation, 270);
   original.actor.items[0].system.visorDown = false;
+  assert.equal(clone._getVisionSourceData().angle, 180);
+  original.toggleVisionPreview();
   assert.equal(clone._getVisionSourceData().angle, 360);
+});
+
+// Ray casting tests points on the rendered ring, independently of its arc construction.
+function containsPoint(polygon, x, y) {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 2; i < polygon.length; j = i, i += 2) {
+    const xi = polygon[i], yi = polygon[i + 1], xj = polygon[j], yj = polygon[j + 1];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+const shaded = (marker, degrees) => containsPoint(marker.polygons[0], Math.cos(degrees * Math.PI / 180) * 60, Math.sin(degrees * Math.PI / 180) * 60);
+
+test("blind-zone ring changes from 180° to 270° immediately on the same token when the visor changes", async () => {
+  const token = new WitcherToken();
+  const helm = helmet(); helm.system.visorDown = false;
+  Object.assign(token.actor, {uuid: "Actor.wearer", documentName: "Actor", items: [helm]});
+  await token._draw({});
+  const marker = token.children[0], oldRing = marker.polygons[0], arrow = [...marker.polygons[1]];
+  for (const degree of [-150, -90, -30]) assert.equal(shaded(marker, degree), false);
+  for (const degree of [30, 90, 150]) assert.equal(shaded(marker, degree), true);
+  canvas.ready = true; canvas.tokens = {placeables: [token]};
+  helm.system.visorDown = true;
+  refreshActorVision(token.actor);
+  assert.equal(token.sourceUpdates, 1);
+  assert.equal(token.children[0], marker, "Rebuild geometry without adding a second overlay");
+  assert.notDeepEqual(marker.polygons[0], oldRing);
+  assert.deepEqual(marker.polygons[1], arrow, "Arrow position and shape stay unchanged");
+  for (const degree of [-150, -30, 0, 90, 180]) assert.equal(shaded(marker, degree), true);
+  for (const degree of [-120, -90, -60]) assert.equal(shaded(marker, degree), false);
+  assert.equal(token._getVisionSourceData().angle, 360, "Marker reflects the visor even while preview is off");
+  token.toggleVisionPreview();
+  assert.equal(token._getVisionSourceData().angle, 90);
+  helm.system.visorDown = false;
+  refreshActorVision(token.actor);
+  assert.deepEqual(marker.polygons[0], oldRing);
+  assert.equal(token._getVisionSourceData().angle, 180);
+  helm.system.visorDown = true;
+  refreshActorVision(token.actor);
+  helm.system.equipped = false;
+  refreshActorVision(token.actor);
+  assert.deepEqual(marker.polygons[0], oldRing);
+  assert.equal(token._getVisionSourceData().angle, 180);
+  token._destroy({});
+  await token._draw({});
+  assert.deepEqual(token.children[0].polygons[0], oldRing, "Destroyed tokens do not retain a stale marker cache");
+  canvas.ready = false;
+});
+
+test("HUD button shows the current cone and toggles its preview without lifting the visor or restoring witcher senses", () => {
+  const token = new WitcherToken();
+  const helm = helmet();
+  Object.assign(token.actor, {items: [helm], system: {details: {race: "witcher"}}});
+  const buttons = [];
+  globalThis.document = {createElement: () => ({
+    dataset: {}, attributes: {}, listeners: {},
+    classList: {toggle(name, value) { this[name] = value; }},
+    setAttribute(name, value) { this.attributes[name] = value; },
+    addEventListener(event, listener) { this.listeners[event] = listener; },
+    remove() { buttons.splice(buttons.indexOf(this), 1); }
+  })};
+  globalThis.game = {i18n: {
+    localize: () => "Вернуть обычный обзор",
+    format: (_key, {angle}) => `Проверить обзор ${angle}° (только у тебя)`
+  }};
+  const element = {querySelector: selector => selector === ".col.right" ? {append: button => buttons.push(button)} : buttons[0]};
+  let prevented = 0, stopped = 0;
+  const click = () => buttons[0].listeners.click({preventDefault: () => prevented++, stopPropagation: () => stopped++});
+  renderTokenVisionToggle({object: token}, element);
+  assert.equal(buttons[0].attributes["aria-label"], "Проверить обзор 90° (только у тебя)");
+  assert.equal(buttons[0].dataset.tooltip, buttons[0].attributes["aria-label"]);
+  click();
+  assert.equal(buttons[0].attributes["aria-pressed"], "true");
+  assert.equal(buttons[0].classList.active, true);
+  assert.equal(token._getVisionSourceData().angle, 90);
+  click();
+  assert.equal(buttons[0].attributes["aria-pressed"], "false");
+  assert.equal(buttons[0].classList.active, false);
+  assert.equal(token._getVisionSourceData().angle, 360);
+  assert.equal(helm.system.visorDown, true);
+  assert.equal(hasAbility(token.actor, "witcher.enhanced-senses"), false);
+  assert.equal(prevented, 2); assert.equal(stopped, 2);
+  helm.system.visorDown = false;
+  renderTokenVisionToggle({object: token}, element);
+  assert.equal(buttons.length, 1);
+  assert.equal(buttons[0].attributes["aria-label"], "Проверить обзор 180° (только у тебя)");
+  click();
+  assert.equal(token._getVisionSourceData().angle, 180);
 });

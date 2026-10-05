@@ -169,7 +169,7 @@
       "StunNoLuck": "This save does not spend Luck. STUN ignores serious-wound and dying penalties."
     },
     "Token": {
-      "PreviewVision": "Preview 180° vision (only for you)",
+      "PreviewVision": "Preview {angle}° vision (only for you)",
       "RestoreVision": "Restore normal vision",
       "MigrationFailed": "Could not update old vision settings. Reload the world as GM; see the console for details."
     },

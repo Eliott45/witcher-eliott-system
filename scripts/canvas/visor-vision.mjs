@@ -2,7 +2,7 @@
 export function refreshActorVision(actor) {
   if (actor?.documentName !== "Actor" || !globalThis.canvas?.ready) return;
   for (const token of canvas.tokens.placeables) {
-    if (token.actor?.uuid === actor.uuid) token.initializeVisionSource();
+    if (token.actor?.uuid === actor.uuid) token.refreshFacingVision();
   }
 }
 

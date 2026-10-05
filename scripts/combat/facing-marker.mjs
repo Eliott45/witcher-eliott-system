@@ -1,24 +1,28 @@
+import { PREVIEW_VISION_ANGLE } from "../config.mjs";
+
 /** Draw in token-local coordinates: zero rotation faces north (screen up). */
-export function drawFacingMarker(graphics, width, height) {
+export function drawFacingMarker(graphics, width, height, visionAngle = PREVIEW_VISION_ANGLE) {
   const radius = Math.max(width, height) / 2;
   const gap = Math.max(2, radius * 0.05);
   const inner = radius + gap;
   const outer = inner + radius * 0.35;
-  const rear = [];
-  const steps = 32;
+  const blindZone = [];
+  const start = (-90 + visionAngle / 2) * Math.PI / 180;
+  const blindArc = (360 - visionAngle) * Math.PI / 180;
+  const steps = Math.max(1, Math.ceil(blindArc / (Math.PI / 32)));
   for (let i = 0; i <= steps; i++) {
-    const angle = Math.PI * i / steps;
-    rear.push(Math.cos(angle) * outer, Math.sin(angle) * outer);
+    const angle = start + blindArc * i / steps;
+    blindZone.push(Math.cos(angle) * outer, Math.sin(angle) * outer);
   }
   for (let i = steps; i >= 0; i--) {
-    const angle = Math.PI * i / steps;
-    rear.push(Math.cos(angle) * inner, Math.sin(angle) * inner);
+    const angle = start + blindArc * i / steps;
+    blindZone.push(Math.cos(angle) * inner, Math.sin(angle) * inner);
   }
 
   graphics.clear();
   graphics.lineStyle(Math.max(1, radius * 0.025), 0x363a38, 0.8);
   graphics.beginFill(0x858b87, 0.35);
-  graphics.drawPolygon(rear);
+  graphics.drawPolygon(blindZone);
   graphics.endFill();
 
   const tip = -inner - radius * 0.38;

@@ -9,16 +9,16 @@ export function renderTokenVisionToggle(hud, element) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "control-icon witcher-vision-toggle";
-  button.dataset.tooltip = "";
   button.innerHTML = '<i class="fa-solid fa-street-view" inert></i>';
 
   const refresh = () => {
     const active = token.visionPreviewActive;
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
-    button.setAttribute("aria-label", game.i18n.localize(
-      active ? "WITCHER.Token.RestoreVision" : "WITCHER.Token.PreviewVision"
-    ));
+    const label = active ? game.i18n.localize("WITCHER.Token.RestoreVision")
+      : game.i18n.format("WITCHER.Token.PreviewVision", { angle: token.facingVisionAngle });
+    button.setAttribute("aria-label", label);
+    button.dataset.tooltip = label;
     button.disabled = !token.hasSight || !canvas.visibility.tokenVision;
   };
   button.addEventListener("click", event => {
