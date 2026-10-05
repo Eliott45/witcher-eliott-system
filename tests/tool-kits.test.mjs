@@ -50,7 +50,13 @@ test("inventory descriptions avoid repeating canonical tool bonuses while preser
   const item={type:"equipment",name:"Снасти",system:{ruleId:"gear.fishing-tools",kind:"tool",...toolContent("gear.fishing-tools")}};
   assert.equal((await itemPresentation(item)).properties,"");
   item.system.properties="Собственный бонус +5";
-  assert.equal((await itemPresentation(item)).properties,item.system.properties);
+  const custom = await itemPresentation(item);
+  assert.equal(custom.properties, "");
+  assert.ok(custom.traits.includes(item.system.properties));
+  item.system.properties = "Собственный бонус +5; Дополнительное правило ведущего, достаточно длинное для отдельной строки под свойствами предмета.";
+  const detailed = await itemPresentation(item);
+  assert.ok(detailed.traits.includes("Собственный бонус +5"));
+  assert.equal(detailed.properties, item.system.properties.split("; ")[1]);
 });
 
 test("dragging a legacy tool into a new inventory enriches its description without resetting its fields",async()=>{

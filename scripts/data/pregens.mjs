@@ -1,4 +1,4 @@
-import { SYSTEM_ID } from "../config.mjs";
+import { SYSTEM_ID, VISION_ANGLE } from "../config.mjs";
 
 /** Embed canonical catalogue records, retaining their IDs and import provenance. */
 export function pregenSources(packs) {
@@ -21,7 +21,7 @@ export function pregenSources(packs) {
   const name = "Геральт из Ривии";
   return [{ _id: "pregenGeralt0001", name, type: "character", img: "icons/svg/mystery-man.svg", ownership: { default: 2 },
     prototypeToken: { name, actorLink: true, disposition: 1, texture: { src: "icons/svg/mystery-man.svg" },
-      sight: { enabled: true, angle: 180 }, bar1: { attribute: "health" }, bar2: { attribute: "stamina" } },
+      sight: { enabled: true, angle: VISION_ANGLE }, bar1: { attribute: "health" }, bar2: { attribute: "stamina" } },
     flags: { [SYSTEM_ID]: { pregen: { id: "geralt-of-rivia", source: "Базовая книга, стр. 12", revision: 1 } } },
     system: {
       details: { race: "witcher", profession: "witcher", gender: "Мужской" },

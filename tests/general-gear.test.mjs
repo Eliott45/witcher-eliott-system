@@ -89,7 +89,9 @@ test("properties have explanatory tooltips, no duplicate rules in inventory, old
   const item = all.find(item => item.system.ruleId === "gear.loaded-dice");
   assert.match(equipmentEntry(item).traitDetails.find(trait => trait.label.startsWith("+3")).description, /СЛ 16/);
   assert.equal((await itemPresentation(item)).properties, "");
-  assert.equal((await itemPresentation({...item,system:{...item.system,properties:"+7 от мастера"}})).properties, "+7 от мастера");
+  const custom = await itemPresentation({...item,system:{...item.system,properties:"+7 от мастера"}});
+  assert.equal(custom.properties, "");
+  assert.ok(custom.traits.includes("+7 от мастера"));
   globalThis.game = {user:{}};
   for (const [id,price] of [["gear.candles",5],["gear.stakes",10]]) {
     const source = CORE_GEAR.find(item => item.id === id);

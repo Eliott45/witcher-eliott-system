@@ -10,10 +10,14 @@ export async function itemPresentation(item, { secrets = false } = {}) {
   const description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description ?? "", { secrets, relativeTo: item });
   const canonical = toolContent(item.system.ruleId) ?? generalGearContent(item.system.ruleId);
   const rulesInDescription = canonical && item.system.description?.endsWith(canonical.description) && properties === canonical.properties;
-  return { ...equipmentEntry(item), name: item.name,
-    // Full alchemy descriptions already include the rules paragraph. Keep the separate
-    // properties line only when it adds information, including for older/custom items.
-    properties: properties && !description.includes(properties) && !rulesInDescription ? properties : "",
+  const entry = equipmentEntry(item);
+  // Short properties already have chips. Preserve longer/custom rules not shown elsewhere.
+  const extraProperties = properties.split(/[;\n]+/).map(property => property.trim()).filter(property => {
+    const plain = property.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    return plain && !entry.traits.includes(plain) && !description.includes(property);
+  });
+  return { ...entry, name: item.name,
+    properties: rulesInDescription ? "" : extraProperties.join("; "),
     description };
 }
 export async function toggleItemDescription(_event, target) {

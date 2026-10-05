@@ -16,6 +16,7 @@ const actorData = () => structuredClone(source);
 
 test("Geralt's pregen preserves the printed final statistics without double racial bonuses", () => {
   const actor = actorData();
+  assert.equal(actor.prototypeToken.sight.angle, 360);
   const stats = deriveStatistics(actor.system, { items: actor.items });
   assert.deepEqual(Object.values(stats.effective), [6,14,10,8,9,3,5,8,3]);
   assert.deepEqual([stats.healthMax, stats.staminaMax, stats.stun, stats.recovery, stats.run, stats.leap, stats.carryMax, stats.vigor], [55,40,8,8,27,5,80,7]);

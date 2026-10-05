@@ -147,6 +147,11 @@ Hooks.on("updateCombat", (_combat,changes) => {
 });
 Hooks.once("ready", async () => {
   await ensureSystemLanguage();localizeStatusEffects();
+  // Vision and equipment migrations both repair the pregen pack; do not race its lock.
+  await migrateVisionDefaults().catch(error => {
+    console.error(`${SYSTEM_ID} | Could not update vision defaults`, error);
+    ui.notifications.error(game.i18n.localize("WITCHER.Token.MigrationFailed"));
+  });
   migrateBestiaryContent().catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось восстановить предметы бестиария. Подробности в консоли.");});
   migrateSpellContent().catch(error=>{
     console.error(`${SYSTEM_ID} | Could not update magic content`,error);
@@ -158,10 +163,6 @@ Hooks.once("ready", async () => {
   });
   syncExistingDeathStates().catch(reportEffectError);
   syncExistingExhaustion().catch(reportEffectError);
-  migrateVisionDefaults().catch(error => {
-    console.error(`${SYSTEM_ID} | Could not update vision defaults`, error);
-    ui.notifications.error(game.i18n.localize("WITCHER.Token.MigrationFailed"));
-  });
   migrateCompendiumFolders().catch(error => {
     console.error(`${SYSTEM_ID} | Could not organize compendiums`, error);
     ui.notifications.error(game.i18n.localize("WITCHER.Compendiums.FolderError"));

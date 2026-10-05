@@ -256,17 +256,18 @@ test("HUD button shows the current cone and toggles its preview without lifting 
     remove() { buttons.splice(buttons.indexOf(this), 1); }
   })};
   globalThis.game = {i18n: {
-    localize: () => "Вернуть обычный обзор",
-    format: (_key, {angle}) => `Проверить обзор ${angle}° (только у тебя)`
+    localize: () => "Скрыть конус зрения",
+    format: (_key, {angle}) => `Показать конус зрения (${angle}°)`
   }};
   const element = {querySelector: selector => selector === ".col.right" ? {append: button => buttons.push(button)} : buttons[0]};
   let prevented = 0, stopped = 0;
   const click = () => buttons[0].listeners.click({preventDefault: () => prevented++, stopPropagation: () => stopped++});
   renderTokenVisionToggle({object: token}, element);
-  assert.equal(buttons[0].attributes["aria-label"], "Проверить обзор 90° (только у тебя)");
+  assert.equal(buttons[0].attributes["aria-label"], "Показать конус зрения (90°)");
   assert.equal(buttons[0].dataset.tooltip, buttons[0].attributes["aria-label"]);
   click();
   assert.equal(buttons[0].attributes["aria-pressed"], "true");
+  assert.equal(buttons[0].attributes["aria-label"], "Скрыть конус зрения");
   assert.equal(buttons[0].classList.active, true);
   assert.equal(token._getVisionSourceData().angle, 90);
   click();
@@ -279,7 +280,7 @@ test("HUD button shows the current cone and toggles its preview without lifting 
   helm.system.visorDown = false;
   renderTokenVisionToggle({object: token}, element);
   assert.equal(buttons.length, 1);
-  assert.equal(buttons[0].attributes["aria-label"], "Проверить обзор 180° (только у тебя)");
+  assert.equal(buttons[0].attributes["aria-label"], "Показать конус зрения (180°)");
   click();
   assert.equal(token._getVisionSourceData().angle, 180);
 });

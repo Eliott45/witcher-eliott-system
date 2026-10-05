@@ -128,6 +128,33 @@ test("version-eight worlds append missing pregen gear once and preserve a custom
   assert.equal(state.writes.length, writes);
 });
 
+test("version-nine cleans stock editorial text in catalog, world, actors, tokens and pregen without resetting custom notes", async () => {
+  const state = migrationFixture({ startVersion: 9 });
+  for (const item of sources.filter(item => CORE_AMMUNITION.some(entry => entry.id === item.system.ruleId))) state.index.set(item._id, structuredClone(item));
+  const medallion = state.index.get("witchMedallion01");
+  const original = medallion.system.description;
+  const notes = "<p>Подарок Весемира. Заметка игрока.</p>";
+  medallion.system.description += "<p>Срабатывание сообщает ведущий: обнаружение скрытых существ и магии на сцене не автоматизировано. Цена и масса в книге не приведены; нулевая масса в листе означает отсутствие указанного значения.</p>" + notes;
+  medallion.name = "Личный медальон";
+  medallion.system.price = 777;
+  const makeActor = uuid => ({ uuid, isOwner: true, items: [structuredClone(medallion)],
+    async updateEmbeddedDocuments(_type, updates) { updates.forEach(update => applyUpdate(this.items[0], update)); } });
+  game.items = [structuredClone(medallion)];
+  const hero = makeActor("Actor.geralt"), token = makeActor("Scene.one.Token.two.Actor.geralt"), pregen = makeActor("Compendium.pregens.geralt");
+  game.actors = [hero]; game.scenes = [{ tokens: [{ actorLink: false, actor: token }] }];
+  const pack = { locked: true, getDocuments: async () => [pregen], async configure({ locked }) { this.locked = locked; } };
+  game.packs.set("witcher-eliott-system.pregens", pack);
+  await migrateEquipmentContent();
+  for (const item of [medallion, ...game.items, ...hero.items, ...token.items, ...pregen.items]) {
+    assert.equal(item.system.description, original + notes);
+    assert.equal(item.name, "Личный медальон"); assert.equal(item.system.price, 777);
+  }
+  assert.equal(pack.locked, true); assert.equal(state.pack.locked, true);
+  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
+  const writes = state.writes.length;
+  await migrateEquipmentContent(); assert.equal(state.writes.length, writes);
+});
+
 test("version-seven worlds append only missing general gear and enrich stock owned copies once", async () => {
   const state = migrationFixture({ startVersion: 7, general: false });
   for (const source of sources.filter(item => CORE_AMMUNITION.some(entry => entry.id === item.system.ruleId))) state.index.set(source._id, structuredClone(source));

@@ -6,20 +6,36 @@ export function registerVisionMigration() {
   });
 }
 
-/** Retire the mandatory 180° default from v0.1, including tokens already on maps. */
+/** Retire old mandatory angles, including the first Geralt pregen and placed copies. */
 export async function migrateVisionDefaults() {
-  if (game.user !== game.users.activeGM || game.settings.get(SYSTEM_ID, "visionDefaultsVersion") >= 1) return;
+  const version = game.settings.get(SYSTEM_ID, "visionDefaultsVersion");
+  if (game.user !== game.users.activeGM || version >= 2) return;
+  const geralt = actor => actor?.flags?.[SYSTEM_ID]?.pregen?.id === "geralt-of-rivia";
+  const affected = actor => COMBAT_ACTOR_TYPES.includes(actor?.type) && (version < 1 || geralt(actor));
 
-  const actors = game.actors.filter(actor => COMBAT_ACTOR_TYPES.includes(actor.type) && actor.prototypeToken.sight.angle === 180);
+  const actors = game.actors.filter(actor => affected(actor) && actor.prototypeToken.sight.angle === 180);
   if (actors.length) await foundry.documents.Actor.updateDocuments(actors.map(actor => ({
     _id: actor.id, "prototypeToken.sight.angle": VISION_ANGLE
   })));
 
   for (const scene of game.scenes) {
-    const tokens = scene.tokens.filter(token => COMBAT_ACTOR_TYPES.includes(token.actor?.type) && token.sight.angle === 180);
+    const tokens = scene.tokens.filter(token => affected(token.actor) && token.sight.angle === 180);
     if (tokens.length) await scene.updateEmbeddedDocuments("Token", tokens.map(token => ({
       _id: token.id, "sight.angle": VISION_ANGLE
     })));
   }
-  await game.settings.set(SYSTEM_ID, "visionDefaultsVersion", 1);
+  const pack = game.packs?.get(`${SYSTEM_ID}.pregens`);
+  if (pack) {
+    const documents = await pack.getDocuments();
+    const updates = documents.filter(actor => geralt(actor) && actor.prototypeToken.sight.angle === 180)
+      .map(actor => ({ _id: actor.id, "prototypeToken.sight.angle": VISION_ANGLE }));
+    if (updates.length) {
+      const locked = pack.locked;
+      try {
+        if (locked) await pack.configure({ locked: false });
+        await foundry.documents.Actor.updateDocuments(updates, { pack: pack.collection, broadcast: false });
+      } finally { if (locked) await pack.configure({ locked: true }); }
+    }
+  }
+  await game.settings.set(SYSTEM_ID, "visionDefaultsVersion", 2);
 }

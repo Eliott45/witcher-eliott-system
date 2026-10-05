@@ -323,6 +323,7 @@ for (const pack of game.system.packs) {
 assert.equal(documents.size, Object.values((await import("./compendium-data.mjs")).compendiumData(await readJSON("../lang/ru.json"))).flat().length);
 const geraltSource = documents.get(`Compendium.${game.system.id}.pregens.Actor.pregenGeralt0001`);
 for (const geralt of [geraltSource, new foundry.documents.BaseActor(JSON.parse(JSON.stringify(geraltSource.toObject())))]) {
+  assert.equal(geralt.prototypeToken.sight.angle, 360);
   geralt.system.prepareDerivedData();
   assert.deepEqual(Object.values(geralt.system.statistics.effective), [6,14,10,8,9,3,5,8,3]);
   assert.equal(geralt.system.health.value, 55);
