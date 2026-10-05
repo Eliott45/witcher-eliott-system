@@ -35,11 +35,15 @@ export function attackerToken(actor) {
   throw new Error("Выделите один токен атакующего на сцене.");
 }
 
-export function selectedAttackTarget(actor) {
-  const targets = Array.from(globalThis.game?.user?.targets ?? []);
+export function selectedAttackTarget(actor, {attackerUuid, targetUuid} = {}) {
+  const explicitTarget = targetUuid ? globalThis.canvas?.scene?.tokens.find(token=>token.uuid===targetUuid) : null;
+  if(targetUuid&&!explicitTarget)throw new Error("Цель больше не находится на открытой сцене.");
+  if(explicitTarget&&!game.user.isGM&&(explicitTarget.hidden||!explicitTarget.object?.isVisible))throw new Error("Этот токен сейчас не виден.");
+  const targets = explicitTarget ? [explicitTarget] : Array.from(globalThis.game?.user?.targets ?? []);
   if (!targets.length) return null;
   if (targets.length > 1) throw new Error("Для атаки оставьте одну выбранную цель.");
-  const attacker = attackerToken(actor), target = tokenDocument(targets[0]);
+  const attacker = attackerUuid ? globalThis.canvas?.scene?.tokens.find(token=>token.uuid===attackerUuid) : attackerToken(actor), target = tokenDocument(targets[0]);
+  if(!attacker||attacker.actor?.uuid!==actor.uuid)throw new Error("Токен атакующего больше не доступен.");
   if (!COMBAT_ACTOR_TYPES.includes(target.actor?.type) || target.uuid === attacker.uuid || attacker.parent?.id !== target.parent?.id) throw new Error("Выберите другое существо на той же сцене.");
   return {attacker, target, ...facingModifiers(attacker, target)};
 }

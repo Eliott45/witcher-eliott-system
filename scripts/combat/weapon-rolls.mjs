@@ -18,7 +18,7 @@ const pending = new WeakMap();
 export function rollWeaponAttack(actor,itemId,options={}) {
   if(pending.has(actor))return pending.get(actor);
   const work=inventoryWrite(actor,async()=>{
-    const targetContext=selectedAttackTarget(actor),combat=globalThis.game?.combat;
+    const targetContext=selectedAttackTarget(actor,options),combat=globalThis.game?.combat;
     const actorCombatants=Array.from(combat?.combatants??[]).filter(entry=>entry.actor?.uuid===actor.uuid);
     if(actorCombatants.some(entry=>tacticsFlags(entry).tacticRequest))throw new Error("Дождитесь завершения запроса в трекере боя.");
     if(!targetContext&&actorCombatants.some(entry=>ambushState(combat,entry)))throw new Error("Выберите цель атаки, чтобы учесть засаду.");

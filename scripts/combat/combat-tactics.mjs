@@ -37,18 +37,30 @@ export async function requestTactic(combatant, kind, data = {}) {
   }}, {turnEvents:false});
 }
 
-export async function prepareAmbush(actor) {
+export async function prepareAmbush(actor, {attackerUuid, targetUuids} = {}) {
   if (!actor.isOwner || !conditionRules(actor).canAct) return;
-  const token = attackerToken(actor), combat = game.combat, combatant = combatantForToken(combat, token);
-  if (!combatant || combat.started) throw new Error("Добавьте токен в трекер и подготовьте засаду до начала первого раунда.");
+  const token = attackerUuid ? canvas.scene?.tokens.find(token=>token.uuid===attackerUuid) : attackerToken(actor);
+  if(!token||token.actor?.uuid!==actor.uuid)throw new Error("Токен атакующего больше не доступен.");
+  let combat = game.combat, combatant = combatantForToken(combat, token);
+  if (combat?.started) throw new Error("Подготовьте засаду до начала первого раунда.");
+  if(combat?.scene&&combat.scene.id!==token.parent.id)throw new Error("Откройте бой для этой сцены.");
   if (!game.users.activeGM) throw new Error("Для проверки засады нужен подключённый мастер.");
   if (tacticsFlags(combatant).tacticRequest) throw new Error("Проверка засады ещё обрабатывается.");
-  const targets = Array.from(game.user.targets, tokenDocument).filter(target => target.uuid !== token.uuid);
-  if (!targets.length || targets.some(target => target.parent.id !== token.parent.id || !COMBAT_ACTOR_TYPES.includes(target.actor?.type))) {
-    throw new Error("Выберите целями существ, от которых хотите скрыться, на той же сцене.");
+  const targets = targetUuids ? [...new Set(targetUuids)].map(uuid=>canvas.scene?.tokens.find(token=>token.uuid===uuid))
+    : Array.from(game.user.targets, tokenDocument).filter(target => target.uuid !== token.uuid);
+  if (!targets.length || targets.some(target => !target || target.uuid===token.uuid || target.parent.id !== token.parent.id || !COMBAT_ACTOR_TYPES.includes(target.actor?.type))) {
+    throw new Error("Отметьте противников, от которых хотите скрыться.");
   }
+  if(targetUuids&&!game.user.isGM&&targets.some(target=>target.hidden||!target.object?.isVisible))throw new Error("Одна из отмеченных целей больше не видна. Обновите список.");
   const skill = skillValue(actor.system, "stealth");
   if (skill.total === null) throw new Error("Заполните Ловкость и Скрытность.");
+  // Use Foundry's ordinary owned-token combat entry; no manual targeting or enrolment is required.
+  if(!combatant){
+    if(!combat&&!game.user.isGM)throw new Error("Мастер должен создать бой в трекере. Запускать первый раунд пока не нужно.");
+    await token.toggleCombatant({active:true,...(combat?{combat}:{})});
+    combat=game.combat;combatant=combatantForToken(combat,token);
+    if(!combatant||combat.started)throw new Error("Не удалось подготовить участника до начала боя.");
+  }
   const message = await rollActionCheck(actor, {formula:`1d10wc + ${skill.total}`,
     flavor:"<h3>Засада · Скрытность</h3><p>Против Внимания выбранных целей.</p>",
     flags:{[SYSTEM_ID]:{ambushStealth:{combat:combat.id, token:token.uuid, targets:targets.map(target => target.uuid)}}}
@@ -89,22 +101,24 @@ async function resolveAmbush(combat, combatant, request) {
   if (targets.some(token => skillValue(token.actor.system, "awareness").total === null)) throw new Error("Заполните Внимание всех целей засады.");
   const missing = targets.filter(token => !combatantForToken(combat, token));
   if (missing.length) await combat.createEmbeddedDocuments("Combatant", missing.map(token => ({tokenId:token.id, actorId:token.actorId, sceneId:token.parent.id, hidden:token.hidden})), {turnEvents:false});
-  const unseen = [], results = [];
+  const unseen = [], results = [], checked = [];
   for (const target of targets) {
     const awareness = await awarenessCheck(target, source), success = source.rolls[0].total > awareness;
     if (success) unseen.push(target.uuid);
+    checked.push(target.uuid);
     results.push(`<li>${esc(target.name)}: ${success ? "не заметил · +5 к атакам" : "заметил · без бонуса засады"}</li>`);
   }
   if (combat.started) throw new Error("Бой начался во время проверки; засада не применена.");
   await removeTacticEffect(combat, combatant, "ambush");
   await combatant.update({[`flags.${SYSTEM_ID}.ambush`]:unseen.length ? {targets:unseen, opening:true} : null,
+    [`flags.${SYSTEM_ID}.ambushReport`]:{targets:checked, message:source.id},
     [`flags.${SYSTEM_ID}.lastAmbushMessage`]:source.id}, {turnEvents:false});
   if (unseen.length) await combatant.actor.createEmbeddedDocuments("ActiveEffect", [tacticalEffect("ambush", combat, combatant,
     "+5 к атакам против не заметивших вас целей до конца первого раунда. Первая атака проходит до броска инициативы.")]);
   const whisper=source.whisper.length?[...source.whisper]:targets.some(target=>target.hidden)||combatant.hidden
     ? game.users.filter(user=>user.isGM).map(user=>user.id) : [];
   await foundry.documents.ChatMessage.create({speaker:source.speaker, whisper, blind:source.blind,
-    content:`<section class="witcher-attack-chat"><h3>Засада</h3><ul>${results.join("")}</ul><p>${unseen.length ? "Выберите одну цель и совершите первую атаку. Затем участники автоматически бросят инициативу." : "Засада не удалась. Можно бросать обычную инициативу."}</p></section>`, flags:{[SYSTEM_ID]:{skipLuck:true}}});
+    content:`<section class="witcher-attack-chat"><h3>Засада</h3><ul>${results.join("")}</ul><p>${unseen.length ? "В окне засады выберите оружие и нажмите «Атаковать» у нужного противника. Затем участники автоматически бросят инициативу." : "Засада не удалась. Можно бросать обычную инициативу."}</p></section>`, flags:{[SYSTEM_ID]:{skipLuck:true}}});
 }
 
 export async function delayTurn(combat, combatant) {
@@ -175,6 +189,7 @@ export async function cleanupTactics(combat, {deleted = false} = {}) {
     if (deleted || combat.round > 1) {
       await removeTacticEffect(combat, combatant, "ambush");
       if (flags.ambush) update[`flags.${SYSTEM_ID}.ambush`] = null;
+      if (flags.ambushReport) update[`flags.${SYSTEM_ID}.ambushReport`] = null;
     }
     if (Object.keys(update).length > 1) updates.push(update);
   }

@@ -5,7 +5,8 @@ import { withinFacing, facingModifiers, selectedAttackTarget } from "../scripts/
 import { weaponAttack } from "../scripts/combat/weapon-rules.mjs";
 import { attackModifierMarkup, rollWeaponAttack } from "../scripts/combat/weapon-rolls.mjs";
 import { ambushAttack, delayedOrder, tacticsFlags, tacticalEffect } from "../scripts/combat/tactics-rules.mjs";
-import { delayTurn, resumeDelayedTurn, cleanupTactics, processTacticRequest, requestTactic, resetTacticalOrder, renderTacticalTracker } from "../scripts/combat/combat-tactics.mjs";
+import { delayTurn, resumeDelayedTurn, cleanupTactics, processTacticRequest, requestTactic, resetTacticalOrder, renderTacticalTracker, prepareAmbush } from "../scripts/combat/combat-tactics.mjs";
+import { ambushCandidates, ambushWindowContext, defaultAmbushSelection } from "../scripts/sheets/ambush-context.mjs";
 import { startTurnPoison } from "../scripts/combat/poison-damage.mjs";
 
 function patch(target, changes) {
@@ -46,7 +47,7 @@ function fixture() {
     async update(changes,options={}){operations.push({id:this.id,changes,options});patch(this,changes);}})));
   combat.turns=[...combat.combatants];game.combat=combat;game.combats=collection([combat]);
   game.user.targets=new Set();
-  globalThis.canvas={tokens:{controlled:[]},scene:{tokens:collection(tokens)}};
+  globalThis.canvas={tokens:{controlled:[]},scene:{id:"scene",tokens:collection(tokens)}};
   let counter=0,totals=[];
   const chat={getSpeaker:({actor,token})=>({actor:actor.id,token:token?.id}),applyMode:data=>data,
     async create(data){const message={id:`message${++counter}`,whisper:[],blind:false,...data};message.speakerActor=tokens.find(token=>token.actor.id===message.speaker?.actor)?.actor;messages.push(message);return message;}};
@@ -221,4 +222,84 @@ test("tracker puts a toggle after initiative only for an owned current or delaye
   assert.equal(rows[0].children.length,0);assert.equal(rows[1].children.length,1);assert.equal(rows[2].children.length,0);
   assert.equal(rows[1].children[0].dataset.tooltip,"Действовать после текущего существа");
   assert.equal(rows[1].children[0].disabled,false);
+});
+
+test("ambush roster selects several enemies, preserves separate copies and hides concealed tokens from players",()=>{
+  const f=fixture();f.a.token.disposition=1;f.b.token.disposition=-1;f.c.token.disposition=-1;
+  f.c.token.actor=f.b.token.actor;f.c.token.name=f.b.token.name;
+  const rows=ambushCandidates(f.a.token);
+  assert.equal(rows.length,2);assert.notEqual(rows[0].uuid,rows[1].uuid);
+  assert.deepEqual([...defaultAmbushSelection(f.a.token,rows)],[f.b.token.uuid,f.c.token.uuid]);
+  game.user=f.player;f.player.targets=new Set();f.b.token.object={isVisible:true};f.c.token.object={isVisible:false};
+  assert.deepEqual(ambushCandidates(f.a.token).map(row=>row.uuid),[f.b.token.uuid]);
+  f.b.token.hidden=true;assert.equal(ambushCandidates(f.a.token).length,0);
+  game.user=f.gm;assert.equal(ambushCandidates(f.a.token).length,2);
+  canvas.scene.id="other";assert.equal(ambushCandidates(f.a.token).length,0);
+});
+
+test("reopening ambush restores every checked enemy, including those who noticed, and keeps each result independent",()=>{
+  const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
+  f.a.flags[SYSTEM_ID]={ambush:{targets:[f.b.token.uuid],opening:true},ambushReport:{targets:[f.b.token.uuid,f.c.token.uuid],message:"test"}};
+  const selection=defaultAmbushSelection(f.a.token,ambushCandidates(f.a.token));
+  assert.equal(selection.size,2);
+  const view=ambushWindowContext(f.a.actor,f.a.token,{selection});
+  assert.equal(view.selectedCount,2);assert.equal(view.unnoticedCount,1);assert.equal(view.noticedCount,1);
+  assert.equal(view.rows.find(row=>row.uuid===f.b.token.uuid).status,"Не заметил");
+  assert.equal(view.rows.find(row=>row.uuid===f.b.token.uuid).bonus,"+5");
+  assert.equal(view.rows.find(row=>row.uuid===f.c.token.uuid).status,"Заметил");
+  assert.equal(view.rows.find(row=>row.uuid===f.c.token.uuid).bonus,"—");
+  assert.ok(view.rows.every(row=>!row.attackDisabled&&row.rollCount===1));
+  f.combat.round=2;f.combat.started=true;
+  const ended=ambushWindowContext(f.a.actor,f.a.token,{selection});
+  assert.equal(ended.unnoticedCount,0);assert.ok(ended.rows.every(row=>row.attackDisabled));assert.equal(ended.canCheck,false);
+});
+
+test("one explicit target attacks without clearing the scene's several selected enemies or changing source token",async()=>{
+  const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
+  f.a.flags[SYSTEM_ID]={ambush:{targets:[f.b.token.uuid],opening:true}};
+  game.user.targets=new Set([f.b.token,f.c.token]);
+  await rollWeaponAttack(f.a.actor,"sword",{attackerUuid:f.a.token.uuid,targetUuid:f.b.token.uuid});
+  assert.equal(game.user.targets.size,2);assert.ok(game.user.targets.has(f.c.token));
+  assert.equal(f.messages[0].rolls.length,1);
+  assert.equal(tacticsFlags(f.messages[0]).weaponAttack.target,f.b.token.uuid);
+  assert.equal(tacticsFlags(f.messages[0]).weaponAttack.base,18);
+  assert.throws(()=>selectedAttackTarget(f.a.actor,{attackerUuid:f.c.token.uuid,targetUuid:f.b.token.uuid}),/атакующего/);
+  game.user=f.player;f.b.token.object={isVisible:true};f.b.token.hidden=true;
+  assert.throws(()=>selectedAttackTarget(f.a.actor,{attackerUuid:f.a.token.uuid,targetUuid:f.b.token.uuid}),/не виден/);
+});
+
+test("roster checks roll Stealth once against all explicit opponents without modifying scene targets",async()=>{
+  const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
+  game.user.targets=new Set([f.c.token]);
+  await prepareAmbush(f.a.actor,{attackerUuid:f.a.token.uuid,targetUuids:[f.b.token.uuid,f.c.token.uuid,f.b.token.uuid]});
+  assert.equal(f.messages.length,1);assert.equal(f.messages[0].rolls.length,1);
+  assert.deepEqual(tacticsFlags(f.messages[0]).ambushStealth.targets,[f.b.token.uuid,f.c.token.uuid]);
+  assert.deepEqual([...game.user.targets],[f.c.token]);
+  assert.equal(tacticsFlags(f.a).tacticRequest.kind,"ambush");
+  f.totals.push(10,15);
+  await processTacticRequest(f.a,tacticsFlags(f.a).tacticRequest);
+  assert.deepEqual(tacticsFlags(f.a).ambushReport.targets,[f.b.token.uuid,f.c.token.uuid]);
+  assert.deepEqual(tacticsFlags(f.a).ambush.targets,[f.b.token.uuid]);
+});
+
+test("preparing from the roster enlists the owned attacker and rejects stale or invisible selection before rolling",async()=>{
+  const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
+  f.combat.combatants=collection([f.b,f.c]);let enrolled=0;
+  f.a.token.toggleCombatant=async options=>{assert.equal(options.active,true);assert.equal(options.combat,f.combat);enrolled++;f.combat.combatants.push(f.a);};
+  await prepareAmbush(f.a.actor,{attackerUuid:f.a.token.uuid,targetUuids:[f.b.token.uuid]});
+  assert.equal(enrolled,1);assert.equal(f.messages.length,1);
+  tacticsFlags(f.a).tacticRequest=null;
+  await assert.rejects(()=>prepareAmbush(f.a.actor,{attackerUuid:f.a.token.uuid,targetUuids:["deleted"]}),/Отметьте/);
+  game.user=f.player;f.b.token.object={isVisible:false};
+  await assert.rejects(()=>prepareAmbush(f.a.actor,{attackerUuid:f.a.token.uuid,targetUuids:[f.b.token.uuid]}),/не видна/);
+  assert.equal(f.messages.length,1);
+});
+
+test("revealing one opponent updates the roster but retains all checked opponents and other bonuses",async()=>{
+  const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
+  f.a.flags[SYSTEM_ID]={ambush:{targets:[f.b.token.uuid,f.c.token.uuid],opening:true},ambushReport:{targets:[f.b.token.uuid,f.c.token.uuid]}};
+  await processTacticRequest(f.a,{id:"reveal",kind:"reveal",target:f.b.token.uuid,round:0,current:null,requester:"player"});
+  const view=ambushWindowContext(f.a.actor,f.a.token);
+  assert.equal(view.unnoticedCount,1);assert.equal(view.noticedCount,1);assert.equal(view.hasReport,true);
+  assert.deepEqual(tacticsFlags(f.a).ambushReport.targets,[f.b.token.uuid,f.c.token.uuid]);
 });

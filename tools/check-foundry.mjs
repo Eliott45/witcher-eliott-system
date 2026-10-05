@@ -1516,10 +1516,31 @@ for(const kind of ['delay','ambush']) {
 const tacticsTemplate=handlebars.compile(await readFile(new URL('../templates/combat-actions.hbs',import.meta.url),'utf8'),{strict:true});
 const {combatContext:prepareTacticsContext}=await import('../scripts/sheets/combat-context.mjs');
 const tacticsView=prepareTacticsContext(doseActor);
-tacticsView.ambush={active:true,opening:true,pending:false,canPrepare:true,targets:[{uuid:'Scene.scene.Token.enemy',name:'Цель <1>'}]};
+tacticsView.ambush={active:true,opening:true,pending:false,canPrepare:true,count:1,targets:[{uuid:'Scene.scene.Token.enemy',name:'Цель <1>'}]};
 const tacticsHTML=tacticsTemplate({combat:tacticsView,editable:true});
-assert.ok(tacticsHTML.includes('Цель &lt;1&gt;'));
-assert.match(tacticsHTML,/data-action="revealAmbushTarget"[^>]*>/);
-assert.ok(!tacticsHTML.match(/data-action="revealAmbushTarget"[^>]*disabled/));
+assert.match(tacticsHTML,/data-action="openAmbush"[^>]*>/);
+assert.ok(!tacticsHTML.match(/data-action="openAmbush"[^>]*disabled/));
 assert.ok(tacticsHTML.includes('Первая атака — вне инициативы'));
 console.log('Combat tactics: native effects, core icons and active ambush controls OK');
+
+const {ambushWindowContext}=await import('../scripts/sheets/ambush-context.mjs');
+const ambushTemplate=handlebars.compile(await readFile(new URL('../templates/ambush-window.hbs',import.meta.url),'utf8'),{strict:true});
+const ambushGlobals={canvas:globalThis.canvas,combat:game.combat,user:game.user,users:game.users};
+const nativeAmbusher=creatureViews[0].actor;
+const ambushToken=(id,name,x)=>({id,uuid:`Scene.ambush.Token.${id}`,parent:{id:'ambush'},actor:nativeAmbusher,name,x,y:0,rotation:90,disposition:-1,getSize:()=>({width:100,height:100}),texture:{src:'icons/svg/mystery-man.svg'}});
+const ambushTokens=[ambushToken('attacker','Засадчик',0),ambushToken('enemyOne','Противник <1>',100),ambushToken('enemyTwo','Противник <2>',200)];
+globalThis.canvas={scene:{id:'ambush',tokens:ambushTokens}};
+game.user={isGM:true,targets:new Set()};game.users={activeGM:game.user};
+game.combat={id:'ambushCombat',round:0,started:false,combatants:[{tokenId:'attacker',sceneId:'ambush',flags:{[game.system.id]:{
+  ambush:{targets:[ambushTokens[1].uuid],opening:true},ambushReport:{targets:ambushTokens.slice(1).map(token=>token.uuid)}
+}}}]};
+const ambushView=ambushWindowContext(nativeAmbusher,ambushTokens[0],{selection:new Set(ambushTokens.slice(1).map(token=>token.uuid))});
+const ambushHTML=ambushTemplate({...ambushView,query:'',notice:''});
+assert.equal(ambushView.selectedCount,2);assert.equal(ambushView.unnoticedCount,1);assert.equal(ambushView.noticedCount,1);
+assert.ok(ambushHTML.includes('Противник &lt;1&gt;'));assert.ok(ambushHTML.includes('Противник &lt;2&gt;'));
+assert.equal((ambushHTML.match(/data-action="ambushStrike"/g)||[]).length,2);
+assert.ok(!ambushHTML.match(/data-action="ambushStrike"[^>]*disabled/));
+assert.ok(ambushHTML.includes('data-action="revealTarget"'));
+assert.ok(ambushHTML.includes('Не заметил'));assert.ok(ambushHTML.includes('Заметил'));
+globalThis.canvas=ambushGlobals.canvas;game.combat=ambushGlobals.combat;game.user=ambushGlobals.user;game.users=ambushGlobals.users;
+console.log('Ambush window: native creature attack data and strict multi-opponent template OK');

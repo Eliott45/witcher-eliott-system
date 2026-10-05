@@ -44,6 +44,52 @@
 .witcher-ambush-panel ul { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
 .witcher-ambush-panel li b { color:#365943; margin-inline-start:8px; }
 .witcher-ambush-panel button { flex:0 1 auto; width:auto; }
+.witcher-ambush-window { min-width:540px; min-height:500px; }
+.witcher-ambush-window .window-content { padding:0; background:#eee9df; color:#443e35; overflow:hidden; container:witcher-ambush / inline-size; }
+.witcher-ambush-content { display:grid; grid-template-rows:auto auto auto auto minmax(120px,1fr) auto; min-height:0; height:100%; }
+.witcher-ambush-content button,.witcher-ambush-content input,.witcher-ambush-content select { color:#443e35; border:1px solid #c7b69a; background:#fbf7ee; box-shadow:none; }
+.witcher-ambush-content button { width:auto; height:auto; min-height:30px; padding:6px 10px; font:13px/1.3 var(--font-primary,sans-serif); }
+.witcher-ambush-content button:hover { background:#e9dfca; border-color:#9b7d49; }
+.witcher-ambush-content button:disabled { opacity:.5; cursor:default; }
+.witcher-ambush-content :is(button,input,select):focus-visible { outline:2px solid #9b7d49; outline-offset:2px; }
+.witcher-ambush-hero { display:flex; align-items:center; gap:14px; padding:18px 20px; background:#303f42; color:#f1e7d3; }
+.witcher-ambush-hero>img { width:62px; height:62px; object-fit:cover; border:1px solid #aa8b54; border-radius:7px; }
+.witcher-ambush-hero>div { flex:1; min-width:0; }
+.witcher-ambush-hero h2 { color:#f1e7d3; text-shadow:none; border:0; margin:4px 0; font:700 23px Georgia,serif; overflow-wrap:anywhere; }
+.witcher-ambush-hero p { margin:0; font-size:13px; color:#e0d3bc; }
+.witcher-ambush-hero small { font-size:10px; letter-spacing:.12em; color:#d8bd86; }
+.witcher-ambush-hero>button { color:#ead9b8; background:transparent; border-color:#81908b; }
+.witcher-ambush-counts { display:grid; grid-template-columns:repeat(3,1fr); border-bottom:1px solid #cebea5; background:#e6dfd1; }
+.witcher-ambush-counts>div { display:flex; align-items:center; gap:9px; padding:12px 18px; }
+.witcher-ambush-counts strong { font-size:24px; font-variant-numeric:tabular-nums; }
+.witcher-ambush-counts span { font-size:12px; }
+.witcher-ambush-counts .is-unnoticed { color:#365943; }.witcher-ambush-counts .is-noticed { color:#7b3b36; }
+.witcher-ambush-tools { display:flex; align-items:center; gap:10px; padding:14px 16px 10px; }
+.witcher-ambush-search { display:flex; align-items:center; gap:8px; flex:1; min-width:0; background:#fbf7ee; border:1px solid #c7b69a; padding:0 10px; border-radius:5px; }
+.witcher-ambush-search input { width:100%; min-width:0; border:0; height:34px; background:transparent; }
+.witcher-ambush-tools>div { display:flex; gap:5px; }
+.witcher-ambush-loadout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:center; gap:16px; padding:0 16px 12px; }
+.witcher-ambush-loadout label { display:grid; gap:4px; font-size:12px; color:#716044; }.witcher-ambush-loadout select { width:100%; height:34px; }
+.witcher-ambush-loadout p { font-size:12px; line-height:1.45; margin:0; color:#716044; }
+.witcher-ambush-roster { overflow:auto; min-height:0; padding:0 16px 14px; }
+.witcher-ambush-enemy { display:grid; grid-template-columns:minmax(150px,1fr) 152px 155px; align-items:center; gap:10px; padding:10px; border:1px solid #cdbda4; border-radius:6px; background:#faf7ef; margin-bottom:7px; }
+.witcher-ambush-enemy[hidden] { display:none; }.witcher-ambush-enemy.is-unnoticed { border-left:3px solid #67886b; }.witcher-ambush-enemy.is-noticed { border-left:3px solid #a27668; }
+.witcher-ambush-enemy-select { display:flex; align-items:center; gap:9px; min-width:0; cursor:pointer; min-height:48px; }
+.witcher-ambush-enemy-select>input { flex:none; margin:0; }.witcher-ambush-enemy-select>img { width:42px; height:42px; border:0; border-radius:4px; object-fit:cover; }
+.witcher-ambush-enemy-select>span { min-width:0; }.witcher-ambush-enemy-select b { display:block; font-size:14px; overflow-wrap:anywhere; color:#443e35; text-shadow:none; }
+.witcher-ambush-enemy-select small { display:block; font-size:11px; color:#796a54; margin-top:4px; }
+.witcher-ambush-result { display:flex; flex-wrap:wrap; align-items:center; gap:5px; font-size:12px; color:#796a54; }
+.is-unnoticed .witcher-ambush-result { color:#365943; }.is-noticed .witcher-ambush-result { color:#7b3b36; }
+.witcher-ambush-result>strong { font-size:17px; }.witcher-ambush-result>button { padding:2px 7px; min-height:25px; font-size:11px; }
+.witcher-ambush-content .witcher-ambush-strike { display:flex; flex-direction:column; gap:4px; align-items:stretch; background:#ece3d2; text-align:left; }
+.witcher-ambush-strike>span { display:flex; align-items:center; gap:6px; }.witcher-ambush-strike b { margin-left:auto; color:#743e33; font-size:17px; }
+.witcher-ambush-strike small { font-size:10px; line-height:1.3; color:#716044; }
+.witcher-ambush-empty { padding:20px; margin:0; text-align:center; font-size:13px; color:#716044; }
+.witcher-ambush-footer { display:flex; align-items:center; gap:16px; padding:14px 16px; background:#e6dfd1; border-top:1px solid #c7b69a; }
+.witcher-ambush-footer>div { flex:1; }.witcher-ambush-footer p { margin:0; font-size:12px; line-height:1.4; }.witcher-ambush-footer small { display:block; margin-top:5px; color:#716044; font-size:11px; }
+.witcher-ambush-footer .witcher-ambush-error { color:#843e35; margin-bottom:5px; }
+.witcher-ambush-content .witcher-ambush-check { background:#425b55; color:#fff5e2; border-color:#425b55; padding:11px 14px; max-width:245px; }
+@container witcher-ambush (max-width:650px) { .witcher-ambush-enemy { grid-template-columns:minmax(150px,1fr) 140px; }.witcher-ambush-enemy-select { grid-column:1/-1; }.witcher-ambush-tools { flex-wrap:wrap; }.witcher-ambush-search { flex-basis:100%; }.witcher-ambush-counts>div { padding:10px; }.witcher-ambush-footer { align-items:stretch; flex-direction:column; }.witcher-ambush-content .witcher-ambush-check { max-width:none; } }
 .witcher-extra-note { border-left:3px solid #a67943; padding-left:7px; font-size:12px; }
 .witcher-inventory-row-actions [data-action=changeGrip] { position:relative; }
 .witcher-inventory-row-actions [data-action=changeGrip] small { position:absolute; right:0; bottom:0; background:#eae2d2; border-radius:3px; font-size:9px; padding:0 2px; color:#573927; }
