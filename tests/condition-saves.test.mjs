@@ -27,12 +27,12 @@ function fixture(key="black-venom",total=4){
   const effect={...conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key===key)),id:"ef",uuid:"Actor.test.ActiveEffect.ef",parent:actor,
     async update(changes){patch(this,changes);},async delete(){updates.push("deleted");actor.effects=actor.effects.filter(entry=>entry.id!==this.id);}};
   effect.statuses=new Set(effect.statuses);actor.effects=[effect];
-  const combatant={id:"c",actor},combat={uuid:"Combat.test",started:true,round:1,turn:1,combatants:[combatant],turns:[combatant]};game.combat=combat;
+  const combatant={id:"c",actor},combat={uuid:"Combat.test",started:true,round:1,turn:1,combatant,combatants:[combatant],turns:[combatant]};game.combat=combat;
   return{actor,effect,messages,updates,combat,combatant,gm,player};
 }
 
 test("manual and end-turn saves share a persisted turn marker, survive reopening and respect privacy",async()=>{
-  const f=fixture();
+  const f=fixture("frozen");
   const turn="Combat.test:1:c";
   await performEffectSave(f.actor,f.effect,{turn,messageMode:"blind"});
   assert.equal(f.messages.length,1);assert.equal(f.messages[0].options.messageMode,"blind");
@@ -168,4 +168,31 @@ test("delegated private saves preserve the player author and self-only recipient
   f=fixture();await performEffectSave(f.actor,f.effect,{messageMode:"gm",requesterId:f.player.id});
   assert.equal(f.messages[0].options.messageMode,"gm");
   assert.equal(f.messages[0].whisper,undefined,"Native gm mode chooses actual GM recipients");
+});
+
+test("toxicity has no automatic save, requires the actor's turn, and success spends an action and ends the last dose",async()=>{
+  const f=fixture("poisoned",18);
+  f.actor.system.details={race:"witcher"};
+  f.effect.flags[SYSTEM_ID].toxicity=true;
+  f.effect.flags[SYSTEM_ID].condition.autoSave=true; // Old saved effect.
+  const dose=(id,consumedAt)=>({id,sort:consumedAt,statuses:new Set(),flags:{[SYSTEM_ID]:{consumable:{ruleId:`potion.${id}`,category:"potion",toxicity:75,consumedAt}}},async update(changes){patch(this,changes);}});
+  f.actor.effects.push(dose("first",1),dose("last",2));
+  await endTurnConditions(f.combat,f.combatant,{round:1,turn:0,skipped:false});
+  await performEffectSave(f.actor,f.effect,{automatic:true});assert.equal(f.messages.length,0);
+  f.combat.combatant={actor:{uuid:"Actor.other"}};assert.equal(canSaveEffect(f.actor,f.effect),false);
+  f.combat.combatant=f.combatant;
+  await performEffectSave(f.actor,f.effect,{turn:"Combat.test:1:c"});
+  assert.equal(f.messages.length,1);assert.equal(f.messages[0].flags[SYSTEM_ID].conditionSave.target,18);
+  assert.match(f.messages[0].flavor,/Обычное действие/);
+  assert.equal(f.actor.flags[SYSTEM_ID].conditionActionTurn,"Combat.test:1:c");
+  assert.deepEqual(f.actor.effects.map(effect=>effect.id),["first"]);
+});
+
+test("a failed toxicity action retains poison and doses, cannot be repeated that turn, and permits the next turn",async()=>{
+  const f=fixture("poisoned",17);f.effect.flags[SYSTEM_ID].toxicity=true;
+  const turn="Combat.test:1:c";
+  await performEffectSave(f.actor,f.effect,{turn});
+  assert.equal(f.actor.effects.length,1);assert.equal(canSaveEffect(f.actor,f.effect),false);
+  await performEffectSave(f.actor,f.effect,{turn});assert.equal(f.messages.length,1);
+  f.combat.round=2;assert.equal(canSaveEffect(f.actor,f.effect),true);
 });

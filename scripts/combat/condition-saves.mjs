@@ -10,14 +10,14 @@ import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 
 const queues=new Map();
 const pendingRequests=new Set();
-function enqueue(actor, work) {
+export function conditionWrite(actor, work) {
   const job=(queues.get(actor.uuid)??Promise.resolve()).catch(()=>{}).then(work);
   queues.set(actor.uuid,job);
   const clean=()=>{if(queues.get(actor.uuid)===job)queues.delete(actor.uuid);};
   job.then(clean,clean);return job;
 }
 const state = effect => effect.flags?.[SYSTEM_ID]?.conditionState??{};
-const present = (actor,effect) => actor.effects.some(entry=>entry.id===effect.id&&!entry.disabled&&!entry.isSuppressed);
+const present = (actor,effect) => actor.effects.some(entry=>entry.id===effect.id&&!entry.disabled&&!entry.isSuppressed&&!entry.duration?.expired);
 export const conditionTurn = (combat,combatant,round=combat?.round) => combat?.started&&combatant ? `${combat.uuid}:${round}:${combatant.id}` : "";
 export function currentConditionTurn(actor) {
   const combat=game.combat, combatant=combat?.combatants.find(entry=>entry.actor?.uuid===actor.uuid);
@@ -29,6 +29,13 @@ function authority(actor) {
 export function canSaveEffect(actor,effect) {
   const rules=effectRules(effect), conditions=conditionRules(actor);
   if(!present(actor,effect)||!rules.save||conditions.dead)return false;
+  if(rules.manualOnly) {
+    const combat=game.combat;
+    if(combat?.started&&combat.combatants.some(entry=>entry.actor?.uuid===actor.uuid)) {
+      const turn=currentConditionTurn(actor);
+      if(combat.combatant?.actor?.uuid!==actor.uuid||state(effect).lastSaveTurn===turn||actor.flags?.[SYSTEM_ID]?.conditionActionTurn===turn)return false;
+    }
+  }
   if(rules.delayTurns&&(state(effect).elapsedTurns??0)<rules.delayTurns
     && (game.time?.worldTime??0)-(effect.start?.time??0)<rules.delayTurns*ROUND_SECONDS)return false;
   if(rules.save.kind==="death")return true;
@@ -54,6 +61,7 @@ export async function requestEffectSave(actor,effect,{action=false}={}) {
 export async function performEffectSave(actor,effect,{turn="",automatic=false,messageMode,requesterId,action=false}={}) {
   if(!actor.isOwner||!present(actor,effect))return;
   const rules=effectRules(effect);
+  if(automatic&&rules.manualOnly)return;
   if(action&&rules.action){
     if(conditionRules(actor).canAct){
       if(turn)await actor.update({[`flags.${SYSTEM_ID}.conditionActionTurn`]:turn});
@@ -117,7 +125,7 @@ export async function endTurnConditions(combat,combatant,context) {
   if(!actor||!actor.isOwner||context.skipped||context.round<1)return;
   // Native Foundry also calls _onEndTurn when initiative is reordered in place.
   if(combat.round===context.round&&combat.turn===context.turn)return;
-  return enqueue(actor,async()=>{
+  return conditionWrite(actor,async()=>{
     const turn=conditionTurn(combat,combatant,context.round);
     for(const effect of [...actor.effects]){
       if(!present(actor,effect)||state(effect).lastEndTurn===turn)continue;
@@ -132,7 +140,7 @@ export function registerConditionSaves() {
   const dispatch=(effect,changes)=>{
     const actor=effect.parent, request=changes.flags?.[SYSTEM_ID]?.conditionRequest??changes[`flags.${SYSTEM_ID}.conditionRequest`];
     if(actor?.documentName!=="Actor"||!request?.id||authority(actor)!==game.user)return;
-    enqueue(actor,async()=>{
+    conditionWrite(actor,async()=>{
       if(!present(actor,effect)||state(effect).lastRequest===request.id)return;
       try{await performEffectSave(actor,effect,request);}
       catch(error){console.error(`${SYSTEM_ID} | Condition save`,error);ui.notifications.error(error.message);}

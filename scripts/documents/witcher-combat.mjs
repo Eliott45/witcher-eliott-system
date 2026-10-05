@@ -1,7 +1,13 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { endTurnConditions } from "../combat/condition-saves.mjs";
+import { startTurnPoison } from "../combat/poison-damage.mjs";
 
 export class WitcherCombat extends foundry.documents.Combat {
+  async _onStartTurn(combatant, context) {
+    await super._onStartTurn(combatant,context);
+    try { await startTurnPoison(this,combatant,context); }
+    catch(error) { console.error(`${SYSTEM_ID} | Start-turn poison`,error); ui.notifications.error("Не удалось завершить обработку отравления. Проверьте ПЗ и сообщение в чате; подробности в консоли."); }
+  }
   async _onEndTurn(combatant, context) {
     await super._onEndTurn(combatant,context);
     try { await endTurnConditions(this,combatant,context); }

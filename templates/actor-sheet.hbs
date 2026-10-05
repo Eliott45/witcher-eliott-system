@@ -95,6 +95,10 @@
       <div class="witcher-toxicity-heading"><span data-tooltip="{{localize 'WITCHER.Toxicity.Hint'}}" data-tooltip-direction="RIGHT" tabindex="0"><i class="fa-solid fa-flask" aria-hidden="true"></i> {{localize "WITCHER.Toxicity.Title"}}</span><output>{{inventory.toxicity.value}}<small>%</small></output></div>
       <progress value="{{inventory.toxicity.value}}" max="{{inventory.toxicity.limit}}" aria-label="{{localize 'WITCHER.Toxicity.Title'}}"></progress>
       <div class="witcher-toxicity-caption"><span>{{localize "WITCHER.Toxicity.Limit"}} {{inventory.toxicity.limit}}%</span>{{#if inventory.toxicity.poisoned}}<strong>{{localize "WITCHER.Toxicity.Poisoned"}}</strong>{{/if}}</div>
+      {{#if toxicitySave}}
+      <button type="button" class="witcher-stun-roll witcher-toxicity-save" data-action="rollEffectSave" data-effect-id="{{toxicitySave.id}}" data-tooltip="{{localize 'WITCHER.Toxicity.SaveHint'}}" {{disabled (not toxicitySave.available)}}><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> {{localize "WITCHER.Toxicity.Save"}}</button>
+      <small class="witcher-toxicity-save-hint">{{localize "WITCHER.Toxicity.SaveHint"}}</small>
+      {{/if}}
     </section>
     {{/if}}
     <section class="witcher-derived" aria-label="{{localize 'WITCHER.Statistics.Combat'}}">

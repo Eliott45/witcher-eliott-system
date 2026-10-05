@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { poisonSaveRules, poisonDescription } from "./poison-rules.mjs";
 
 const skillSave = (skill, dc, action = "Одно действие") => ({ kind: "skill", skill, dc, action, ends: true });
 const entry = (id, name, icon, description, rules = {}) => ({ id, name, img: `icons/svg/${icon}.svg`, description, rules });
@@ -10,7 +11,7 @@ export const CONDITION_DEFINITIONS = [
   entry("dying", "WITCHER.Effects.Dying", "blood", "WITCHER.Effects.DyingDescription", {save:{kind:"death",action:"Испытание смерти",ends:false}}),
   entry("dead", "WITCHER.Effects.Dead", "skull", "WITCHER.Effects.DeadDescription"),
   entry("burning", "Горение", "fire", "Каждый ход: 5 урона каждой части тела, который поглощается бронёй; огонь также повреждает броню и оружие на 1. Чтобы потушить пламя, потратьте ход на воду или перекатывание по земле. Урон и повреждение снаряжения учитываются вручную. Стр. 161.", {action:"Потушить пламя — полный ход"}),
-  entry("poisoned", "Отравление", "poison", "Каждый ход: 3 урона, игнорирующего броню. Стойкость СЛ 15 прекращает отравление и занимает действие. Урон учитывается вручную. Стр. 161.", {save:skillSave("endurance",15),autoSave:true}),
+  entry("poisoned", "Отравление", "poison", "В начале своего хода: 3 урона, игнорирующего броню. Стойкость СЛ 15 прекращает отравление и занимает обычное действие. Стр. 161.", {save:skillSave("endurance",15),autoSave:false,manualOnly:true}),
   entry("bleeding", "Кровотечение", "blood", "Каждый ход: 2 урона, пока рана не обработана. Первая помощь СЛ 15 за действие или исцеляющая магия останавливает кровотечение. Урон учитывается вручную. Стр. 161.", {save:skillSave("firstAid",15),autoSave:true}),
   entry("frozen", "Замораживание", "ice-aura", "Лёд мешает движениям: −3 СКОР, −1 РЕА. Сила СЛ 16 позволяет разбить лёд за действие. Стр. 161.", {save:skillSave("physique",16),autoSave:true,modifiers:[{target:"attributes.speed",value:-3},{target:"attributes.reflex",value:-1}]}),
   entry("intoxicated", "Опьянение", "tankard", "−2 к РЕА, ЛВК и ИНТ; −3 в словесной дуэли. Вероятность плохо помнить произошедшее — 25%. Обычного повторного спасброска нет. Стр. 161.", {modifiers:[{target:"attributes.reflex",value:-2},{target:"attributes.dexterity",value:-2},{target:"attributes.intelligence",value:-2}]}),
@@ -32,7 +33,7 @@ export const CONDITION_DEFINITIONS = [
 export const CONDITION_BY_ID = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,entry]));
 // Variants share the status ID: poison/drunkenness cannot stack with themselves.
 export const EFFECT_TEMPLATES = [...CONDITION_DEFINITIONS.map((entry,i)=>({...entry,key:entry.id,documentId:`efct${String(i+1).padStart(12,"0")}`})),
-  {...CONDITION_BY_ID.poisoned,key:"black-venom",name:"Чёрный яд",documentId:"efct000000000101",description:"Яд причиняет 3 урона за ход, игнорируя броню. Стойкость СЛ 16 прекращает отравление за действие. Урон учитывается вручную. Стр. 87.",rules:{save:skillSave("endurance",16),autoSave:true}},
+  {...CONDITION_BY_ID.poisoned,key:"black-venom",name:"Чёрный яд",documentId:"efct000000000101",description:"В начале своего хода яд причиняет 3 урона, игнорируя броню. Стойкость СЛ 16 прекращает отравление за обычное действие. Стр. 87.",rules:{save:skillSave("endurance",16),autoSave:false,manualOnly:true}},
   {...CONDITION_BY_ID.hallucinating,key:"hallucinogen",name:"Галлюциноген",documentId:"efct000000000102",description:"После провала первоначальной Стойкости СЛ 15 возникают галлюцинации на 1d10 раундов. Дедукция различает одну иллюзию и не снимает эффект. Стр. 87, 161.",rules:{...CONDITION_BY_ID.hallucinating.rules,roundsFormula:"1d10"}},
   {...CONDITION_BY_ID.intoxicated,key:"perfume",name:"Ароматное зелье: опьянение",documentId:"efct000000000103",description:"После провала первоначальной Стойкости СЛ 16: опьянение на 1d10 часов. −2 РЕА, ЛВК и ИНТ; −3 в словесной дуэли. Снять можно магией или Слезами жён, повторного спасброска нет. Токсичность 25%. Стр. 88.",rules:{...CONDITION_BY_ID.intoxicated.rules,secondsFormula:"1d10 * 3600"}},
   {...CONDITION_BY_ID.bleeding,key:"burrowing",name:"Ввинчивающийся наконечник",documentId:"efct000000000104",description:"Кровотечение от эльфского наконечника: 2 урона за ход. Для прекращения нужно извлечь наконечник: Первая помощь СЛ 16. Урон учитывается вручную. Стр. 84.",rules:{save:skillSave("firstAid",16),autoSave:true}}
@@ -41,12 +42,16 @@ export const ALCHEMY_EFFECT_KEYS = {clotting:["clotting"],hallucinogen:["halluci
 export const effectUuid = key => `Compendium.${SYSTEM_ID}.effects.ActiveEffect.${EFFECT_TEMPLATES.find(entry=>entry.key===key).documentId}`;
 export function conditionSource(entry, localize = text=>text) {
   const name=localize(entry.name), description=localize(entry.description);
-  return {_id:entry.documentId,name,img:entry.img,type:"base",system:{},description:`<p>${description}</p>`,disabled:false,transfer:false,statuses:[entry.id],showIcon:2,
+  const source = {_id:entry.documentId,name,img:entry.img,type:"base",system:{},description:`<p>${description}</p>`,disabled:false,transfer:false,statuses:[entry.id],showIcon:2,
     start:null,duration:{value:null,units:"seconds",expiry:null,expired:false},folder:null,sort:0,
     flags:{[SYSTEM_ID]:{condition:{key:entry.key??entry.id,...structuredClone(entry.rules)}}}};
+  source.description = poisonDescription(source);
+  source.flags[SYSTEM_ID].condition = poisonSaveRules(source, source.flags[SYSTEM_ID].condition);
+  return source;
 }
 export function effectRules(effect) {
-  return effect.flags?.[SYSTEM_ID]?.condition ?? CONDITION_DEFINITIONS.find(entry=>effect.statuses.has(entry.id))?.rules ?? {};
+  const rules = effect.flags?.[SYSTEM_ID]?.condition ?? CONDITION_DEFINITIONS.find(entry=>effect.statuses.has(entry.id))?.rules ?? {};
+  return poisonSaveRules(effect, rules);
 }
 export function conditionModifiers(effects = []) {
   const doses = new Set();

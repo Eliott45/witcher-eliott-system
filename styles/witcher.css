@@ -55,6 +55,8 @@
 .witcher-sidebar-toxicity.is-overloaded { color: #ffbf9e; }
 .witcher-sidebar-toxicity.is-overloaded progress { accent-color: #ee9f74; }
 .witcher-toxicity-caption strong { color: #ffbf9e; font-weight: 600; }
+.witcher-toxicity-save { margin-top: 9px; }
+.witcher-toxicity-save-hint { display: block; margin-top: 4px; color: #cebc9a; font-size: 10px; line-height: 1.4; text-align: center; }
 .witcher-effect-toxicity { color: #354b28; background: #e4e8d5; border: 1px solid #adb898; border-radius: 4px; padding: 5px 8px; }
 .witcher-character-sidebar .witcher-resources { display: flex; flex-direction: column; gap: 12px; }
 .witcher-character-sidebar .witcher-resource { border: 0; margin: 0; padding: 5px 0 0; min-width: 0; border-top: 1px solid #b39a6770; }

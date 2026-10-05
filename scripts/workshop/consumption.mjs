@@ -2,6 +2,7 @@ import { SYSTEM_ID } from "../config.mjs";
 import { consumableContext, consumptionPlan, potionEffectSource, activeDoses, consumedDose, toxicityState } from "../data/consumables.mjs";
 import { conditionSource, CONDITION_BY_ID, EFFECT_TEMPLATES, ALCHEMY_EFFECT_KEYS } from "../data/condition-definitions.mjs";
 import { activeEffect } from "../data/effect-counters.mjs";
+import { isToxicityPoison, TOXICITY_POISON_DESCRIPTION } from "../data/poison-rules.mjs";
 import { immuneToCondition } from "../data/creatures.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { inventoryTransaction } from "./transaction.mjs";
@@ -14,7 +15,7 @@ import { itemPresentation } from "../sheets/item-presentation.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 
 const pending = new WeakMap();
-const poisonFromToxicity = effect => Boolean(effect.flags?.[SYSTEM_ID]?.toxicity);
+const poisonFromToxicity = isToxicityPoison;
 const activeStatus = (actor, status) => actor.effects.filter(effect => activeEffect(effect) && effect.statuses.has(status));
 const initialDC = { hallucinogen: 15, "black-venom": 16, fisstech: 16, perfume: 16 };
 const standardEffect = key => {
@@ -44,9 +45,11 @@ function poisonSource(actor, toxicity = false) {
   const source = standardEffect("poisoned");
   if (toxicity) {
     source.name = "Отравление: токсичность";
-    source.description = "<p>3 урона за ход, игнорируя броню. Стойкость СЛ 18 снимает отравление и эффект последней выпитой дозы. Отравление также прекращается, когда токсичность опускается ниже допустимого предела.</p>";
+    source.description = TOXICITY_POISON_DESCRIPTION;
     source.flags[SYSTEM_ID].toxicity = true;
     source.flags[SYSTEM_ID].condition.save.dc = 18;
+    source.flags[SYSTEM_ID].condition.save.action = "Обычное действие";
+    source.flags[SYSTEM_ID].condition.autoSave = false;
   }
   return source;
 }

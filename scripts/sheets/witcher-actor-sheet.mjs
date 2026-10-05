@@ -27,7 +27,7 @@ import { chooseReference } from "./reference-picker.mjs";
 import { statisticsContext } from "./statistics-context.mjs";
 import { rollStun } from "../combat/stun-roll.mjs";
 import { requestEffectSave } from "../combat/condition-saves.mjs";
-import { effectsContext, effectActions } from "./effects-context.mjs";
+import { effectsContext, effectActions, toxicitySaveContext } from "./effects-context.mjs";
 import { rollAttribute } from "../combat/attribute-roll.mjs";
 import { selectLuckPoints } from "../data/luck.mjs";
 import { hasPendingCritical } from "../chat/manual-critical.mjs";
@@ -154,6 +154,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
         localize: key => game.i18n.localize(key), format: (key, values) => game.i18n.format(key, values)
       }), rollUnavailable: !conditions.canAct || this.actor.system.statistics.effective.will === null || this.#rollingReputation },
       effects: await effectsContext(this),
+      toxicitySave: toxicitySaveContext(this),
       stats,
       visibleTabs: visible.map(tab => context.tabs[tab.id]),
       actor: this.actor,

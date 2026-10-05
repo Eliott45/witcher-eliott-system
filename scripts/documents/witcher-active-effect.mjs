@@ -1,6 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { immuneToCondition } from "../data/creatures.mjs";
 import { effectRules } from "../data/condition-definitions.mjs";
+import { poisonDescription } from "../data/poison-rules.mjs";
 import { effectCounter, activeEffect } from "../data/effect-counters.mjs";
 import { fullTurnStart } from "../combat/full-turn-rules.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
@@ -18,6 +19,7 @@ export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
       ui.notifications.info("Это состояние уже действует на персонажа."); return false;
     }
     const rules=effectRules(this);
+    if(this.statuses.has("poisoned"))this.updateSource({description:poisonDescription(this)});
     if(!Object.keys(rules).length){this.updateSource({start:this.constructor.getEffectStart(),"duration.expired":false});return;}
     const explicitDuration=this.flags?.[SYSTEM_ID]?.conditionDurationOverride||Number.isFinite(data.duration?.value);
     let value=rules.rounds??rules.seconds??null;

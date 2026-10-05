@@ -10,6 +10,7 @@ import { WitcherPowerPlaceSheet } from "./sheets/witcher-power-place-sheet.mjs";
 import { registerSpellContentMigration,migrateSpellContent } from "./migrations/spell-content.mjs";
 import { registerOilExpiry } from "./workshop/upgrades.mjs";
 import { registerConsumption } from "./workshop/consumption.mjs";
+import { migratePoisonEffects } from "./migrations/poison-effects.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
 import { WitcherRecipeData } from "./data/witcher-recipe-data.mjs";
@@ -140,15 +141,16 @@ Hooks.on("preUpdateToken", preventIncapacitatedPositionUpdate);
 Hooks.once("i18nInit", () => {applyLoadedLanguage();localizeStatusEffects();});
 Hooks.on("renderTokenHUD", renderTokenVisionToggle);
 Hooks.on("renderChatInput", renderDiceTray);
-// Round usage is derived from the combat key. Refresh open sheets without writing Actor data.
+// Action availability and per-round usage follow the tracker. Refresh without Actor writes.
 Hooks.on("updateCombat", (_combat,changes) => {
-  if (!("round" in changes)) return;
+  if (!("round" in changes) && !("turn" in changes)) return;
   for (const app of foundry.applications.instances.values()) {
     if ((app instanceof WitcherActorSheet || app instanceof WitcherNPCSheet) && app.rendered) app.render({force:false});
   }
 });
 Hooks.once("ready", async () => {
   await ensureSystemLanguage();localizeStatusEffects();
+  await migratePoisonEffects().catch(error=>{console.error(`${SYSTEM_ID} | Poison effects`,error);ui.notifications.error("Не удалось обновить эффекты отравления. Подробности в консоли.");});
   // Vision and equipment migrations both repair the pregen pack; do not race its lock.
   await migrateVisionDefaults().catch(error => {
     console.error(`${SYSTEM_ID} | Could not update vision defaults`, error);

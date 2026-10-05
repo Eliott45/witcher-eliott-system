@@ -7,20 +7,26 @@ import { conditionRules } from "../combat/condition-rules.mjs";
 import { chooseReference } from "./reference-picker.mjs";
 import { editEffectDuration, canEditEffectDuration } from "./effect-duration-editor.mjs";
 import { applyEffectItem } from "../data/effect-items.mjs";
-import { effectCounter, changeEffectCounter } from "../data/effect-counters.mjs";
+import { effectCounter, changeEffectCounter, activeEffect } from "../data/effect-counters.mjs";
 import { doseToxicity } from "../data/consumables.mjs";
+import { isToxicityPoison, poisonDescription } from "../data/poison-rules.mjs";
+
+export function toxicitySaveContext(sheet) {
+  const effect = sheet.actor.effects.find(effect => activeEffect(effect) && isToxicityPoison(effect));
+  return effect ? {id:effect.id, available:sheet.isEditable&&!effect.flags?.[SYSTEM_ID]?.conditionRequest&&canSaveEffect(sheet.actor,effect)} : null;
+}
 
 export async function effectsContext(sheet) {
   return Promise.all(sheet.actor.effects.filter(effect=>!effect.disabled&&!effect.isSuppressed&&!effect.duration?.expired).map(async effect=>{
     const definition=Object.values(STATUS_DEFINITIONS).find(entry=>effect.statuses.has(entry.id));
     const rules=effectRules(effect),pending=Boolean(effect.flags?.[SYSTEM_ID]?.conditionRequest);
     const legacy=definition&&!effect.flags?.[SYSTEM_ID]?.condition;
-    const text=effect.description||definition?.description||"";
+    const text=poisonDescription(effect,effect.description||definition?.description||"");
     return {id:effect.id,name:legacy?game.i18n.localize(definition.name):effect.name,img:effect.img??definition?.img,inactive:effect.disabled||effect.isSuppressed,
       canRemove:sheet.isEditable&&(game.user.isGM||![DYING,DEAD,EXHAUSTED_STUN,UNCONSCIOUS].some(status=>effect.statuses.has(status))),
       toxicity:sheet.actor.system.details?.race==="witcher"?doseToxicity(effect):0,counter:effectCounter(effect),save:rules.save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
-      autoAllowed:Boolean(rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
+      autoAllowed:Boolean(!rules.manualOnly&&rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
       durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,canEditDuration:sheet.isEditable&&canEditEffectDuration(effect),
       action:rules.action,canAct:sheet.isEditable&&conditionRules(sheet.actor).canAct,
       description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(text.startsWith("WITCHER.")?game.i18n.localize(text):text,{secrets:sheet.actor.isOwner,relativeTo:effect})};
@@ -58,6 +64,7 @@ export const effectActions={
     if(!this.isEditable)return;
     const effect=this.actor.effects.get(target.dataset.effectId);if(!effect)return;
     const rules=effectRules(effect);
+    if(rules.manualOnly)return;
     await effect.update({[`flags.${SYSTEM_ID}.condition`]:{...structuredClone(rules),autoSave:!rules.autoSave}});
   })
 };
