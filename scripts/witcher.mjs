@@ -1,4 +1,5 @@
 import { WitcherSpellData } from "./data/witcher-spell-data.mjs";
+import { migrateBestiaryContent,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
 import { registerWeaponChat } from "./combat/weapon-rolls.mjs";
 import { WitcherPowerPlaceData } from "./data/witcher-power-place-data.mjs";
 import { WitcherPowerPlaceSheet } from "./sheets/witcher-power-place-sheet.mjs";
@@ -67,6 +68,7 @@ Hooks.once("init", async () => {
   registerCompendiumFolderMigration();
   registerEquipmentContentMigration();
   registerSpellContentMigration();
+  registerBestiaryMigration();
   registerSheetPreferences();
   for (const type of COMBAT_ACTOR_TYPES) {
     CONFIG.Actor.dataModels[type] = WitcherActorData;
@@ -134,6 +136,7 @@ Hooks.on("updateCombat", (_combat,changes) => {
   }
 });
 Hooks.once("ready", () => {
+  migrateBestiaryContent().catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось восстановить предметы бестиария. Подробности в консоли.");});
   migrateSpellContent().catch(error=>{
     console.error(`${SYSTEM_ID} | Could not update magic content`,error);
     ui.notifications.error("Не удалось обновить каталог магии. Подробности в консоли.");

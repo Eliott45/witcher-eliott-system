@@ -40,6 +40,13 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     creatureDeath:guard(async function(){if(this.isEditable)await rollDeath(this.actor);}),
     creatureRecover:guard(async function(){if(this.isEditable)await recoverStamina(this.actor);}),
     creatureLoot:guard(async function(){await generateCreatureLoot(this.actor);}),
+    restoreCreatureItems:guard(async function(){
+      if(!this.isEditable)return;
+      await inventoryWrite(this.actor,async()=>{
+        const preset=bestiarySources().find(entry=>entry.system.creature.source===this.actor.system.creature.source);
+        if(preset&&!this.actor.items.size)await this.actor.createEmbeddedDocuments("Item",preset.items,{keepId:true});
+      });
+    }),
     creaturePreset:guard(async function(_e,target){
       if(!this.isEditable||this.actor.items.size||ATTRIBUTE_KEYS.some(key=>this.actor.system.attributes[key]!==null))return;
       const preset=bestiarySources().find(entry=>entry._id===target.dataset.preset);if(!preset)return;
@@ -59,6 +66,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     const abilities=await Promise.all(actor.items.filter(item=>item.type==="ability").map(async item=>({id:item.id,name:item.name,img:item.img,description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:actor.isOwner,relativeTo:item})})));
     return {...context,actor,system,stats,editing,inventory,abilities,workshop:await workshopActorContext(actor),isGM:game.user.isGM,conditions:conditionRules(actor),combat:combatContext(actor,this.combatOptions),effects:await effectsContext(this),
       empty:!actor.items.size&&ATTRIBUTE_KEYS.every(key=>system.attributes[key]===null),
+      canRestoreItems:!actor.items.size&&bestiarySources().some(entry=>entry.system.creature.source===system.creature.source),
       categories:MONSTER_CATEGORIES.map(entry=>({...entry,selected:entry.id===system.creature.category})),category:MONSTER_CATEGORIES.find(c=>c.id===system.creature.category)?.name,
       attributes:ATTRIBUTE_KEYS.filter(key=>key!=="luck").map(key=>({key,name:i18n.localize(`WITCHER.Attributes.${key}.Short`),label:i18n.localize(`WITCHER.Attributes.${key}.Label`),base:system.attributes[key],value:stats.effective[key]??"—"})),
       skills:SKILLS.filter(skill=>skill.key!=="language"&&(editing||system.skills[skill.key]>0)).map(skill=>{const value=skillValue(system,skill.key);return {...value,name:i18n.localize(skill.label),calculation:skillCalculationTooltip(system,value,i18n)};}),

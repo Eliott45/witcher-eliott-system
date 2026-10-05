@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { resolve, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { compendiumData, compendiumFolders } from "./compendium-data.mjs";
+import { packRecords, expandPackRecord } from "./pack-records.mjs";
 
 // Use the installed core's LevelDB runtime; no Foundry code is copied into this system.
 // Close the world before rebuilding packs. LevelDB refuses to open a locked live pack.
@@ -41,9 +42,11 @@ for (const [name, documents] of Object.entries(packs)) {
       const type = manifest.packs.find(pack=>pack.name===name).type;
       const items = db.sublevel(({ActiveEffect:"effects",Actor:"actors",Item:"items"})[type], { valueEncoding: "json" });
       // Upsert only our stable IDs; never delete unrelated/user-added records.
-      await items.batch(documents.map(document => ({ type: "put", key: document._id, value: document })));
+      const records=packRecords(type,documents);
+      await db.batch(records.map(record=>({type:"put",key:record.key,value:record.value,sublevel:db.sublevel(record.sublevel,{valueEncoding:"json"})})));
       const stored = await items.getMany(documents.map(document => document._id));
-      assert.deepEqual(stored, documents);
+      const expanded=await Promise.all(stored.map(document=>expandPackRecord(type,document,(collection,key)=>db.sublevel(collection,{valueEncoding:"json"}).get(key))));
+      assert.deepEqual(expanded, documents);
       const keys = await db.keys().all();
       await db.compactRange(keys[0], keys.at(-1));
     } finally {

@@ -7,6 +7,7 @@
   </header>
   <nav class="witcher-npc-tabs" aria-label="Разделы существа">{{#each tabs}}<button type="button" data-action="tab" data-group="creature" data-tab="{{id}}" class="{{cssClass}}"><i class="{{icon}}"></i> {{label}}</button>{{/each}}</nav>
   <div class="witcher-npc-body">
+    {{#if canRestoreItems}}<div class="witcher-npc-presets"><p>У этого профиля нет снаряжения и способностей из бестиария.</p><button type="button" data-action="restoreCreatureItems" {{disabled (not editable)}}>Восстановить предметы профиля</button></div>{{/if}}
     {{#if empty}}<div class="witcher-npc-presets"><strong>С чего начнём?</strong><p>Заполните существо вручную или возьмите готовый профиль.</p><button type="button" data-action="creaturePreset" data-preset="bestiaryBandit01" {{disabled (not editable)}}>Бандит</button><button type="button" data-action="creaturePreset" data-preset="bestiaryDrowner1" {{disabled (not editable)}}>Утопец</button></div>{{/if}}
     <section class="tab {{tabs.combat.cssClass}}" data-group="creature" data-tab="combat">
       <div class="witcher-npc-resources">
