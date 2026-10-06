@@ -42,7 +42,7 @@ export function rollDefense(actor,options={}) {
       const roll=await new foundry.dice.Roll(`1d10wc + ${quote.total}`).evaluate({allowInteractive:messageMode!=="blind"});
       const message=await roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),
         flavor:`<section class="witcher-attack-chat"><h3>${esc(quote.name)}${quote.weaponName?` · ${esc(quote.weaponName)}`:""}</h3><p data-tooltip="${esc(quote.math)}">База проверки <b>${signed(quote.total)}</b> · ${quote.cost} ВЫН</p><p>${esc(quote.note)}</p></section>`,
-        flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],defense:quote,skillCheck:{key:quote.skillKey,base:quote.total,label:quote.name}}}},{messageMode});
+        flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],defense:quote,skillCheck:{key:quote.skillKey,base:quote.total,label:quote.name},...(options.exchange?{exchange:options.exchange}:{})}}},{messageMode});
       if(!message)return;
       await display.wait(message);
       if(quote.cost)await actor.update({"system.stamina.value":actor.system.stamina.value-quote.cost});

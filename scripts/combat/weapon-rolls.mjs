@@ -45,7 +45,7 @@ export function rollWeaponAttack(actor,itemId,options={}) {
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls,flavor,
         flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId,name:item.name,mode:quote.attack.id,base:quote.total,count:quote.attack.count,
           damage:quote.damage,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
-          target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts}}}},messageMode));
+          target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,ranged:quote.ranged,thrown:quote.weapon.category==="thrown"}}}},messageMode));
       if(!message)return;
       await display.wait(message);
       const update=actionUpdate(actor,action);
