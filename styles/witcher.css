@@ -1099,6 +1099,7 @@
 .witcher-armor-layering p { margin:4px 0; }
 .witcher-armor-layering > small { display:block; color:#7a6a52; line-height:1.4; }
 .witcher-broken { color:#a3302a; font-weight:700; }
+small.witcher-fitted { display:inline-flex; align-items:center; gap:3px; margin-left:4px; padding:0 6px; border-radius:8px; background:#dfe7d4; color:#3f5a3b; font-weight:700; }
 small.witcher-broken { display:inline-flex; align-items:center; gap:3px; margin-left:4px; padding:0 6px; border-radius:8px; background:#f0d4cc; }
 .witcher-npc-armor button.is-broken b { color:#a3302a; text-decoration:line-through; }
 .witcher-npc-armor button.is-broken i { color:#a3302a; font-size:10px; margin-left:2px; }

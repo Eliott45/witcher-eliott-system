@@ -1,3 +1,4 @@
+import { SYSTEM_ID } from "../config.mjs";
 import { usableHands } from "../combat/critical-wound-effects.mjs";
 import { dropItemToGround } from "../loot/loot.mjs";
 import { layeringPlan, zoneStoppingPower, layeringDetails } from "../data/armor-layers.mjs";
@@ -42,6 +43,12 @@ function layeringSummary(actor, items) {
   return { extra, ev, pieces: pieces.map(piece => ({ ...piece, classLabel: CLASS_LABELS[piece.armorClass] ?? piece.armorClass })) };
 }
 
+/** Limbs a prosthesis replaces, read from the healed lost-limb wounds it is fitted to. */
+function fittedLimbs(actor, itemId) {
+  return Array.from(actor.effects ?? []).map(effect => effect.flags?.[SYSTEM_ID]?.criticalWound)
+    .filter(wound => wound?.prosthesis?.itemId === itemId).map(wound => wound.locationName || "конечность");
+}
+
 export function inventoryContext(actor, preferences = {}) {
   const items = Array.from(actor.items ?? []).filter(isPhysical);
   const rows = items.map(item => ({ id: item.id, name: item.name, img: item.img, ...item.system, ...visorContext(item), sort: item.sort ?? 0,
@@ -51,7 +58,7 @@ export function inventoryContext(actor, preferences = {}) {
     isWeapon: item.type === "weapon" && !item.system.natural, grip: gripOf(item),
     category: equipmentCategory(item), search: equipmentEntry(item).search, canEquip: ["weapon", "armor"].includes(item.type),
     condition: conditionKey(item) ? effectiveItem(item)[conditionKey(item)] : null, conditionLabel: item.type === "armor" ? "ПБ" : "Н",
-    broken: isBroken(item),
+    broken: isBroken(item), fittedOn: fittedLimbs(actor, item.id).join(", "),
     totalWeight: Math.round(itemWeight(item) * 1000) / 1000 }));
   for (const row of rows) {
     let ancestor=containerParent(items.find(item=>item.id===row.id),items);

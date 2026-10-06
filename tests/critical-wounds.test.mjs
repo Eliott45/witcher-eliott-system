@@ -164,3 +164,12 @@ test("prostheses replace the penalties of a healed lost limb, per core p.160", a
   assert.equal(wound.flags[ID].criticalWound.prosthesis, null);
   assert.equal(items[0].system.equipped, false);
 });
+
+test("the inventory marks a prosthesis with the limb it replaces", async () => {
+  const { inventoryContext } = await import("../scripts/sheets/inventory-context.mjs");
+  const item = { id: "p", name: "Простой протез", type: "equipment", img: "", system: { ruleId: "gear.simple-prosthesis", kind: "gear", quantity: 1, carried: true, equipped: true, weight: 1 } };
+  const effects = [{ flags: { [ID]: { criticalWound: { id: "dismembered-leg", locationName: "Правая нога", prosthesis: { itemId: "p", quality: "simple" } } } } }];
+  const row = inventoryContext({ items: [item], effects, system: {} }).items.find(entry => entry.id === "p");
+  assert.equal(row.fittedOn, "Правая нога");
+  assert.equal(inventoryContext({ items: [item], effects: [], system: {} }).items.find(entry => entry.id === "p").fittedOn, "");
+});
