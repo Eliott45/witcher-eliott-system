@@ -262,3 +262,12 @@ test("a stuck, jammed or knocked-away weapon cannot be used while its effect las
   actor.effects.push({ disabled: false, isSuppressed: false, name: "Оружие застряло: Меч", flags: { "witcher-eliott-system": { weaponBlock: { itemId: "sword", reason: "stuck" } } } });
   assert.equal(weaponReadiness(actor, sword), "Оружие застряло");
 });
+
+test("scatter cells turn with the token: the book diagram faces south, any angle works", async () => {
+  const { scatterOffset } = await import("../scripts/canvas/scatter-overlay.mjs");
+  const round = ({ x, y }) => ({ x: Math.round(x), y: Math.round(y) });
+  assert.deepEqual(round(scatterOffset(1, 180, 100)), { x: 0, y: 200 }, "facing south: 1 is two steps below");
+  assert.deepEqual(round(scatterOffset(5, 180, 100)), { x: -100, y: 0 }, "facing south: 5 is on the token's right = screen left");
+  assert.deepEqual(round(scatterOffset(10, 0, 100)), { x: 0, y: 200 }, "facing north: 10 is behind");
+  assert.deepEqual(round(scatterOffset(3, 135, 100)), { x: 71, y: 71 }, "facing south-east: 3 is one step that way");
+});

@@ -1,10 +1,17 @@
 import { COMBAT_ACTOR_TYPES, PREVIEW_VISION_ANGLE, RESTRICTED_VISION_ANGLE } from "../config.mjs";
 import { drawFacingMarker } from "../combat/facing-marker.mjs";
+import { drawScatter } from "./scatter-overlay.mjs";
 import { restrictedVision } from "../data/visor.mjs";
 
 export class WitcherToken extends foundry.canvas.placeables.Token {
   #facingMarker;
   #markerGeometry = "";
+  /** Tokens whose scatter overlay this client toggled on (client-only, no document data). */
+  static scatterTokens = new Set();
+  #scatter;
+  #scatterGeometry = "";
+  #scatterHighlight = null;
+  #scatterTimer;
   #visionPreview = false;
 
   get hasFacing() {
@@ -45,6 +52,42 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
     // Only rebuild this client's vision source. No document update or socket message.
     this.initializeVisionSource();
     return true;
+  }
+
+  get scatterVisible() {
+    return WitcherToken.scatterTokens.has(this.id) || this.#scatterHighlight !== null;
+  }
+
+  toggleScatter() {
+    if (WitcherToken.scatterTokens.has(this.id)) WitcherToken.scatterTokens.delete(this.id);
+    else WitcherToken.scatterTokens.add(this.id);
+    this.#refreshScatter();
+    return WitcherToken.scatterTokens.has(this.id);
+  }
+
+  /** Briefly show where a scatter roll landed (every client that renders the chat result). */
+  showScatterResult(result, duration = 10000) {
+    this.#scatterHighlight = result;
+    this.#scatterGeometry = "";
+    this.#refreshScatter();
+    clearTimeout(this.#scatterTimer);
+    this.#scatterTimer = setTimeout(() => { this.#scatterHighlight = null; this.#scatterGeometry = ""; this.#refreshScatter(); }, duration);
+  }
+
+  #refreshScatter() {
+    if (!this.scatterVisible && !this.#scatter) return;
+    this.#scatter ??= this.addChild(new PIXI.Graphics());
+    const overlay = this.#scatter;
+    overlay.eventMode = "none";
+    overlay.zIndex = -1;
+    overlay.visible = this.scatterVisible && !this.document.isSecret;
+    if (!overlay.visible) return;
+    const { width, height } = this.document.getSize(), size = Math.max(width, height);
+    const geometry = `${size}:${this.#scatterHighlight}`;
+    if (geometry !== this.#scatterGeometry) { drawScatter(overlay, size, this.#scatterHighlight); this.#scatterGeometry = geometry; }
+    overlay.position.set(width / 2, height / 2);
+    overlay.angle = this.document.rotation;
+    for (const label of overlay.children) if (label.witcherUpright) label.angle = -this.document.rotation;
   }
 
   refreshFacingVision() {
@@ -105,6 +148,7 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
     }
     marker.position.set(width / 2, height / 2);
     marker.angle = this.document.rotation;
+    this.#refreshScatter();
   }
 
   _destroy(options) {
@@ -113,5 +157,8 @@ export class WitcherToken extends foundry.canvas.placeables.Token {
     super._destroy(options);
     this.#facingMarker = undefined;
     this.#markerGeometry = "";
+    clearTimeout(this.#scatterTimer);
+    this.#scatter = undefined;
+    this.#scatterGeometry = "";
   }
 }

@@ -56,7 +56,7 @@ import { registerSheetPreferences } from "./sheets/sheet-preferences.mjs";
 import { WitcherItemSheet } from "./sheets/witcher-item-sheet.mjs";
 import { WitcherToken } from "./canvas/witcher-token.mjs";
 import { registerVisorVision } from "./canvas/visor-vision.mjs";
-import { renderTokenVisionToggle } from "./combat/token-hud.mjs";
+import { renderTokenVisionToggle, renderScatterToggle } from "./combat/token-hud.mjs";
 import { migrateVisionDefaults, registerVisionMigration } from "./migrations/vision-defaults.mjs";
 import { migrateCompendiumFolders, registerCompendiumFolderMigration } from "./migrations/compendium-folders.mjs";
 import { migrateEquipmentContent, registerEquipmentContentMigration } from "./migrations/equipment-content.mjs";
@@ -167,6 +167,7 @@ Hooks.on("preMoveToken", preventIncapacitatedMovement);
 Hooks.on("preUpdateToken", preventIncapacitatedPositionUpdate);
 Hooks.once("i18nInit", () => {applyLoadedLanguage();localizeStatusEffects();});
 Hooks.on("renderTokenHUD", renderTokenVisionToggle);
+Hooks.on("renderTokenHUD", renderScatterToggle);
 Hooks.on("renderChatInput", renderDiceTray);
 // Action availability and per-round usage follow the tracker. Refresh without Actor writes.
 Hooks.on("updateCombat", (_combat,changes) => {

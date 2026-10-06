@@ -348,6 +348,8 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
     if (step.id === "disarm") {
       const direction = await roll("1d10"), distance = await roll("1d6");
       if (item?.system.equipped) await item.update({ "system.equipped": false });
+      const wielder = actor.token?.uuid ?? actor.getActiveTokens?.()[0]?.document?.uuid;
+      if (wielder) extra.scatter = { token: wielder, result: direction.total, meters: distance.total };
       if (item) await blockWeapon(actor, item, "disarmed", `Оружие выбито: ${item.name}`, `${item.name} отлетело на ${distance.total} м (направление ${direction.total} по таблице разброса). Подберите его, чтобы снова взять в руки.`, null);
       notes.push(`${item?.name ?? "Оружие"} выбито: направление ${direction.total} по таблице разброса, ${distance.total} м`);
     }
@@ -647,6 +649,11 @@ export function registerAttackExchange() {
   Hooks.on("renderChatMessageHTML", renderExchange);
   Hooks.on("createChatMessage", message => { try { settleThenRefresh(message); } catch (error) { console.error(error); } });
   Hooks.on("createChatMessage", message => { applyShieldShare(message).catch(console.error); applyDeferredShare(message).catch(console.error); });
+  // Every client sees where a scatter roll sent the weapon, on the wielder's token.
+  Hooks.on("createChatMessage", message => {
+    const scatter = exchangeOf(message)?.scatter;
+    if (scatter) fromUuidSync(scatter.token)?.object?.showScatterResult?.(scatter.result);
+  });
   Hooks.on("updateChatMessage", refreshAttack);
   Hooks.on("deleteChatMessage", refreshAttack);
   // Armor, health and equipment changes alter the live damage preview on open cards.
