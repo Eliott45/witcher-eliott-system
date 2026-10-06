@@ -18,6 +18,7 @@
           {{/if}}
         </label>
       </div>
+    <div class="witcher-meter is-health {{#if meters.health.low}}is-low{{/if}}" aria-hidden="true"><span style="width:{{meters.health.percent}}%"></span></div>
     </fieldset>
     <div class="witcher-stat-row witcher-resource-detail">
       <span data-tooltip="{{stats.woundThreshold.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize stats.woundThreshold.label}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
@@ -65,6 +66,7 @@
           {{/if}}
         </label>
       </div>
+    <div class="witcher-meter is-stamina {{#if meters.stamina.low}}is-low{{/if}}" aria-hidden="true"><span style="width:{{meters.stamina.percent}}%"></span></div>
     </fieldset>
     <div class="witcher-stat-row witcher-resource-detail">
       <span data-tooltip="{{stats.recovery.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize stats.recovery.label}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
@@ -122,8 +124,21 @@
   </aside>
   <div class="witcher-character-main">
     <header class="witcher-character-name">
+      <div class="witcher-portrait-frame">
+          <button type="button" class="witcher-portrait-button" data-action="showPortraitArtwork"
+                  aria-label="{{localize 'WITCHER.Sheet.ViewPortrait'}}" title="{{localize 'WITCHER.Sheet.ViewPortrait'}}">
+            <img class="witcher-portrait" src="{{actor.img}}" alt="{{actor.name}}">
+          </button>
+          {{#if editable}}
+          <button type="button" class="witcher-edit-portrait" data-action="editPortrait"
+                  aria-label="{{localize 'WITCHER.Sheet.Portrait'}}" title="{{localize 'WITCHER.Sheet.Portrait'}}">
+            <i class="fa-solid fa-pen" aria-hidden="true"></i>
+          </button>
+          {{/if}}
+        </div>
       <label class="witcher-sr-only" for="{{rootId}}-name">{{localize "WITCHER.Sheet.Name"}}</label>
       <input id="{{rootId}}-name" name="name" type="text" value="{{actor.name}}" required {{disabled (not editable)}}>
+      <p class="witcher-character-subtitle">{{#if selectedRace}}<span>{{localize selectedRace.label}}</span>{{/if}}{{#if profession}}<span>{{profession.name}}</span>{{/if}}{{#if system.details.age}}<span>{{system.details.age}} лет</span>{{/if}}</p>
       <div class="witcher-character-counters">
       <div class="witcher-header-counter witcher-experience">
         <div class="witcher-experience-heading"><span>{{localize "WITCHER.Advancement.Experience"}}</span><button type="button" data-action="toggleExperience" role="switch" aria-checked="{{editingExperience}}" aria-label="{{localize 'WITCHER.Advancement.Adjust'}}" data-tooltip="{{localize 'WITCHER.Advancement.Adjust'}}" {{disabled (not editable)}}><i class="fa-regular {{#if editingExperience}}fa-square-check{{else}}fa-square{{/if}}" aria-hidden="true"></i></button></div>
@@ -180,18 +195,6 @@
     <section id="{{rootId}}-main" class="witcher-character-content tab {{tabs.main.cssClass}}" data-group="character" data-tab="main"
              aria-label="{{localize 'WITCHER.Sheet.Main'}}">
       <div class="witcher-character-hero">
-        <div class="witcher-portrait-frame">
-          <button type="button" class="witcher-portrait-button" data-action="showPortraitArtwork"
-                  aria-label="{{localize 'WITCHER.Sheet.ViewPortrait'}}" title="{{localize 'WITCHER.Sheet.ViewPortrait'}}">
-            <img class="witcher-portrait" src="{{actor.img}}" alt="{{actor.name}}">
-          </button>
-          {{#if editable}}
-          <button type="button" class="witcher-edit-portrait" data-action="editPortrait"
-                  aria-label="{{localize 'WITCHER.Sheet.Portrait'}}" title="{{localize 'WITCHER.Sheet.Portrait'}}">
-            <i class="fa-solid fa-pen" aria-hidden="true"></i>
-          </button>
-          {{/if}}
-        </div>
         <div class="witcher-character-references">
           <div class="witcher-reference-field">
             <span class="witcher-field-label">{{localize "WITCHER.Sheet.Race"}}</span>

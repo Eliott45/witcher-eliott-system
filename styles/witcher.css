@@ -837,3 +837,48 @@
 .witcher-equipment-browser .witcher-picker-content { display:flex; flex-direction:column; flex:1; min-height:0; }
 .witcher-equipment-browser .witcher-picker-columns { flex:1; min-height:0; }
 .witcher-equipment-browser .witcher-picker-results { display:flex; flex-direction:column; min-height:0; }
+
+/* ── Character sheet refresh: portrait in the header, resource bars, labelled tabs ── */
+.witcher-character-name { grid-template-columns:auto minmax(0,1fr) auto; align-items:center; column-gap:16px; padding:14px 20px 12px; background:radial-gradient(ellipse at 15% 0%,#7a332f88,transparent 60%),linear-gradient(100deg,#3f1c1d,#66292a); box-shadow:inset 0 -1px #b39a6766; }
+.witcher-character-name > .witcher-portrait-frame { grid-column:1; grid-row:1 / 4; align-self:center; width:86px; }
+.witcher-character-name .witcher-portrait-button { border:2px solid #c9a96a; border-radius:8px; background:#2a1a1a; box-shadow:0 3px 10px #0006, inset 0 0 0 1px #00000040; overflow:hidden; }
+.witcher-eliott .witcher-character-name .witcher-portrait { width:100%; height:96px; border:0; object-fit:cover; object-position:center top; }
+.witcher-character-name .witcher-edit-portrait { position:absolute; right:-6px; bottom:-6px; width:24px; height:24px; min-height:0; padding:0; border-radius:50%; border:1px solid #c9a96a; background:#3f1c1d; color:#f3e3c3; font-size:10px; box-shadow:0 1px 4px #0007; }
+.witcher-character-name > input { grid-column:2; grid-row:1; height:34px; text-shadow:0 1px 2px #0006; }
+.witcher-character-subtitle { grid-column:2; grid-row:2; display:flex; flex-wrap:wrap; gap:4px 0; margin:0; font-size:12px; letter-spacing:.04em; color:#d9c39b; }
+.witcher-character-subtitle span+span::before { content:"·"; margin:0 7px; color:#a8875a; }
+.witcher-character-subtitle:empty { display:none; }
+.witcher-character-name > .witcher-luck { grid-column:2; grid-row:3; margin-top:6px; }
+.witcher-character-name > .witcher-character-counters { grid-column:3; grid-row:1 / 4; }
+.witcher-character-hero { grid-template-columns:minmax(0,1fr) !important; }
+@container witcher-sheet (max-width:690px) {
+  .witcher-character-name { column-gap:10px; padding:10px 12px; }
+  .witcher-character-name > .witcher-portrait-frame { width:54px; }
+  .witcher-eliott .witcher-character-name .witcher-portrait { height:62px; }
+  .witcher-character-name > input { font-size:19px; }
+}
+
+/* Resource bars under HP and Stamina. */
+.witcher-meter { position:relative; height:7px; margin:7px 0 2px; border-radius:4px; background:#00000059; box-shadow:inset 0 1px 2px #0008; overflow:hidden; }
+.witcher-meter>span { display:block; height:100%; border-radius:4px; transition:width .35s ease; }
+.witcher-meter.is-health>span { background:linear-gradient(90deg,#8e2a26,#c8483d); box-shadow:0 0 6px #c8483d88; }
+.witcher-meter.is-health.is-low>span { background:linear-gradient(90deg,#6d1515,#b3261e); animation:witcher-meter-pulse 2.4s ease-in-out infinite; }
+.witcher-meter.is-stamina>span { background:linear-gradient(90deg,#3f6c5e,#6fa38d); box-shadow:0 0 6px #6fa38d66; }
+.witcher-meter.is-stamina.is-low>span { background:linear-gradient(90deg,#7a5a2a,#b98a3e); }
+@keyframes witcher-meter-pulse { 50% { filter:brightness(1.35); } }
+@media (prefers-reduced-motion:reduce) { .witcher-meter>span { transition:none; animation:none !important; } }
+
+/* Sidebar: clearer section rhythm. */
+.witcher-character-sidebar .witcher-resource legend { font-family:Georgia,serif; letter-spacing:.02em; }
+.witcher-character-sidebar .witcher-derived { padding-top:8px; margin-top:8px; border-top:1px solid #b39a6740; }
+.witcher-character-sidebar .witcher-stat-row strong { font-variant-numeric:tabular-nums; }
+
+/* Tabs: icon over label, every label visible when the sheet is wide enough. */
+@container witcher-sheet (min-width:900px) {
+  .witcher-character-tabs.tabs { gap:0; padding:0 6px; }
+  .witcher-character-tabs button:not(.witcher-manage-tabs), .witcher-character-tabs button:not(.active):not(.witcher-manage-tabs) { flex:1 1 0; min-width:0; width:auto; height:48px; flex-direction:column; justify-content:center; gap:3px; padding:5px 2px; }
+  .witcher-character-tabs button:not(.active) .witcher-tab-label, .witcher-character-tabs .witcher-tab-label { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:600 10.5px/1.1 Arial,sans-serif; letter-spacing:.02em; }
+  .witcher-character-tabs i { font-size:15px; }
+  .witcher-character-tabs button:not(.active) { color:#b9bdb5; }
+  .witcher-character-tabs .witcher-manage-tabs { flex:0 0 30px; height:48px; margin-left:0; }
+}

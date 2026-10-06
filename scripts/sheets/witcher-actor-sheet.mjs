@@ -46,6 +46,12 @@ import { SHEET_TABS, sheetPreferences, visibleSheetTabs, updateSheetPreferences,
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 
+/** Fill of a resource bar; "low" marks the last third so the bar can warn before zero. */
+const meter = ({ value, max } = {}) => {
+  const percent = max > 0 ? Math.max(0, Math.min(100, Math.round(value / max * 100))) : 0;
+  return { percent, low: max > 0 && value / max <= 1 / 3 };
+};
+
 export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
   static DEFAULT_OPTIONS = {
     classes: ["witcher-eliott", "actor-sheet"],
@@ -155,6 +161,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       }), rollUnavailable: !conditions.canAct || this.actor.system.statistics.effective.will === null || this.#rollingReputation },
       effects: await effectsContext(this),
       toxicitySave: toxicitySaveContext(this),
+      meters: { health: meter(this.actor.system.health), stamina: meter(this.actor.system.stamina) },
       stats,
       visibleTabs: visible.map(tab => context.tabs[tab.id]),
       actor: this.actor,
