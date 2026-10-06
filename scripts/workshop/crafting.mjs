@@ -29,8 +29,8 @@ function requireRecipe(actor, item, repair) {
   const recipe = item.system.recipe;
   const access = recipeAccess(actor, item);
   if (!repair && (!actor.items.get(item.id) || !(access.physical || access.memorized))) throw new Error("Нужен физический или запомненный рецепт в инвентаре персонажа.");
-  if (!repair && recipe.category === "diagram" && recipe.grade === "master" && workshopBase(actor, "profession.craftsman.master-crafting") === null)
-    throw new Error("Для чертежа мастера нужна изученная способность «Мастерская работа».");
+  if (!repair && recipe.category === "diagram" && ["master", "grandmaster"].includes(recipe.grade) && workshopBase(actor, "profession.craftsman.master-crafting") === null)
+    throw new Error("Для чертежа мастера или великого мастера нужна изученная способность «Мастерская работа».");
   if (!recipe.resultUuid || !recipe.components.length || recipe.dc <= 0 || recipe.time <= 0) throw new Error("Заполните результат, компоненты, сложность и время рецепта.");
   if (recipe.category === "diagram" && recipe.components.some(row => !row.uuid || row.substance)) throw new Error("Для чертежа нужны конкретные материалы, а не алхимические субстанции.");
 }

@@ -1,7 +1,7 @@
 import { isPhysical, RARITIES } from "../data/physical-items.mjs";
 import { traitTone } from "../data/equipment-traits.mjs";
 import { recipeRelations } from "../data/recipe-links.mjs";
-import { craftingDuration } from "../data/crafting.mjs";
+import { craftingDuration, RECIPE_GRADES } from "../data/crafting.mjs";
 import { SUBSTANCES } from "../data/workshop.mjs";
 
 const substanceName = id => SUBSTANCES.find(entry => entry.id === id)?.name ?? id;
@@ -73,7 +73,7 @@ export async function recipeDetailsContext(item) {
   })).sort(byName);
   return {
     isRecipe: Boolean(recipe), isDiagram: recipe?.category === "diagram", title: recipe?.category === "formula" ? "Алхимическая формула" : "Ремесленный чертёж",
-    grade: ({ novice: "Новичок", journeyman: "Подмастерье", master: "Мастер" })[recipe?.grade] ?? "",
+    grade: RECIPE_GRADES[recipe?.grade] ?? "",
     result: reference(recipe ? await resolve(recipe.resultUuid) : null, "Выберите результат"),
     quantity: recipe?.quantity ?? 1, time: craftingDuration(recipe?.time), dc: recipe?.dc ?? 0,
     investment: recipe?.investment ?? 0, components, recipes, uses, incomplete,

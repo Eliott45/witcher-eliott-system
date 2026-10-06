@@ -5,6 +5,10 @@ import { memorizeRecipe } from "../scripts/workshop/recipe-memory.mjs";
 import { craftDialog } from "../scripts/workshop/crafting.mjs";
 import { inventoryTransaction, copyPhysical } from "../scripts/workshop/transaction.mjs";
 import { craftingContext } from "../scripts/sheets/crafting-context.mjs";
+import { RECIPES } from "../scripts/data/workshop-recipes.mjs";
+import { CORE_EQUIPMENT } from "../scripts/data/core-equipment.mjs";
+import { MATERIALS } from "../scripts/data/workshop-materials.mjs";
+import { equipmentUuid } from "../scripts/data/workshop.mjs";
 
 function fixture() {
   const notices = [], rolls = [], dialogs = [], totals = [20], references = new Map();
@@ -35,6 +39,49 @@ function fixture() {
   };
   return { actor, recipe, iron, wood, result, tools, totals, notices, rolls, dialogs, references, item };
 }
+
+test("printed ammunition recipes consume one set of materials and create ten/five individual projectiles", async () => {
+  for (const [id, quantity] of [["armor-piercing", 10], ["broadhead", 10], ["dwarven-impact", 5], ["elven-burrowing", 5]]) {
+    const f = fixture();
+    const source = RECIPES.find(item => item.id === `diagram.ammunition.${id}`);
+    const result = CORE_EQUIPMENT.find(item => item.id === `ammunition.${id}`);
+    f.recipe.system.ruleId = source.id;
+    f.recipe.system.recipe = structuredClone(source.system.recipe);
+    Object.assign(f.result, { type: result.type, name: result.name, system: structuredClone(result.system) });
+    f.result.system.ruleId = result.id;
+    f.references.set(source.system.recipe.resultUuid, f.result);
+    f.actor.system.details.profession = "craftsman";
+    f.actor.items.push(f.item("profession.craftsman.master-crafting", "ability", { level: 1 }));
+    const stocks = source.system.recipe.components.map(component => {
+      const material = MATERIALS.find(item => equipmentUuid(item.documentId) === component.uuid);
+      const stock = f.item(material.id, "equipment", { quantity: component.quantity + 1 });
+      f.references.set(component.uuid, stock);
+      f.actor.items.push(stock);
+      return stock;
+    });
+    f.totals[0] = 50;
+    await craftDialog(f.actor, f.recipe);
+    const created = f.actor.items.filter(item => item.id.startsWith("created"));
+    assert.equal(created.length, 1, id);
+    assert.equal(created[0].system.ruleId, result.id);
+    assert.equal(created[0].system.quantity, quantity);
+    assert.ok(stocks.every(item => item.system.quantity === 1), id);
+  }
+});
+
+test("master and grandmaster diagrams require Master Crafting, and allow a trained craftsman", async () => {
+  for (const grade of ["master", "grandmaster"]) {
+    const f = fixture();
+    f.recipe.system.recipe.grade = grade;
+    await assert.rejects(craftDialog(f.actor, f.recipe), /Мастерская работа/);
+    assert.equal(f.dialogs.length, 0);
+    assert.equal(f.iron.system.quantity, 8);
+    f.actor.system.details.profession = "craftsman";
+    f.actor.items.push(f.item("profession.craftsman.master-crafting", "ability", { level: 1 }));
+    await craftDialog(f.actor, f.recipe);
+    assert.equal(f.actor.items.filter(item => item.id.startsWith("created")).length, 1);
+  }
+});
 
 test("memory uses one INT pool across formulas and diagrams, deduplicates copies and survives losing the paper", async () => {
   const {actor,recipe,item}=fixture();

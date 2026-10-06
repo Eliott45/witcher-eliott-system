@@ -1,5 +1,7 @@
 import { available } from "./workshop.mjs";
 
+export const RECIPE_GRADES = { novice: "Новичок", journeyman: "Подмастерье", master: "Мастер", grandmaster: "Великий мастер" };
+
 export const recipeKey = item => item.system.ruleId || item.flags?.["witcher-eliott-system"]?.recipeSource || item._stats?.compendiumSource || item.uuid || item.id;
 export function recipeGroups(actor) {
   const groups = new Map();

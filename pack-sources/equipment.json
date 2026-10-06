@@ -16100,7 +16100,7 @@
     "system": {
       "ruleId": "diagram.armor.head.9",
       "price": 1200,
-      "source": "Базовая книга, стр. 130–135 / 139; errata v4",
+      "source": "Базовая книга, стр. 135",
       "recipe": {
         "category": "diagram",
         "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.armo000000000009",
@@ -16117,7 +16117,12 @@
           {
             "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
             "substance": "",
-            "quantity": 4
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000008",
+            "substance": "",
+            "quantity": 5
           },
           {
             "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
@@ -16127,15 +16132,10 @@
           {
             "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000023",
             "substance": "",
-            "quantity": 2
+            "quantity": 1
           },
           {
             "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000024",
-            "substance": "",
-            "quantity": 2
-          },
-          {
-            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
             "substance": "",
             "quantity": 1
           },
@@ -16143,11 +16143,6 @@
             "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000001",
             "substance": "",
             "quantity": 10
-          },
-          {
-            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000008",
-            "substance": "",
-            "quantity": 1
           }
         ]
       },
@@ -17989,6 +17984,2169 @@
         ]
       },
       "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Усиление брони: Краснолюдское».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000092",
+    "name": "Чертёж: Бронебойные",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.ammunition.armor-piercing",
+      "price": 224,
+      "source": "Базовая книга, стр. 132",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.ammo000000000004",
+        "quantity": 10,
+        "dc": 16,
+        "time": 3600,
+        "investment": 110,
+        "grade": "journeyman",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Бронебойные».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000093",
+    "name": "Чертёж: С широким наконечником",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.ammunition.broadhead",
+      "price": 125,
+      "source": "Базовая книга, стр. 132",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.ammo000000000003",
+        "quantity": 10,
+        "dc": 15,
+        "time": 3600,
+        "investment": 69,
+        "grade": "journeyman",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000037",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «С широким наконечником».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000094",
+    "name": "Чертёж: Краснолюдский топор",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.dwarven-axe",
+      "price": 1110,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000008",
+        "quantity": 1,
+        "dc": 24,
+        "time": 43200,
+        "investment": 555,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000039",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000002",
+            "substance": "",
+            "quantity": 3
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Краснолюдский топор».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000095",
+    "name": "Чертёж: Краснолюдский секач",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.dwarven-cleaver",
+      "price": 750,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000007",
+        "quantity": 1,
+        "dc": 19,
+        "time": 36000,
+        "investment": 374,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000039",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000024",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 5
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Краснолюдский секач».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000096",
+    "name": "Чертёж: Краснолюдский тяжёлый арбалет",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.dwarven-heavy-crossbow",
+      "price": 1274,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000019",
+        "quantity": 1,
+        "dc": 24,
+        "time": 43200,
+        "investment": 632,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000039",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000031",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Краснолюдский тяжёлый арбалет».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000097",
+    "name": "Чертёж: Эльфская глефа",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.elven-glaive",
+      "price": 1386,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000013",
+        "quantity": 1,
+        "dc": 19,
+        "time": 36000,
+        "investment": 692,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 6
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 4
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Эльфская глефа».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000098",
+    "name": "Чертёж: Эльфский мессер",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.elven-messer",
+      "price": 892,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000001",
+        "quantity": 1,
+        "dc": 19,
+        "time": 36000,
+        "investment": 446,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000010",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Эльфский мессер».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000099",
+    "name": "Чертёж: Эльфский походный лук",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.elven-travel-bow",
+      "price": 862,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000016",
+        "quantity": 1,
+        "dc": 22,
+        "time": 39600,
+        "investment": 432,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000027",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 3
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Эльфский походный лук».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000100",
+    "name": "Чертёж: Гномий посох",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.gnomish-staff",
+      "price": 1364,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000014",
+        "quantity": 1,
+        "dc": 22,
+        "time": 39600,
+        "investment": 682,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 6
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000027",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000023",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000004",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Гномий посох».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000101",
+    "name": "Чертёж: Низушечий рондель",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.halfling-rondel",
+      "price": 726,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000006",
+        "quantity": 1,
+        "dc": 19,
+        "time": 36000,
+        "investment": 364,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000023",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Низушечий рондель».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000102",
+    "name": "Чертёж: Махакамский мартель",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.mahakam-martell",
+      "price": 1350,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000010",
+        "quantity": 1,
+        "dc": 22,
+        "time": 39600,
+        "investment": 675,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000039",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000022",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000024",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Махакамский мартель».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000103",
+    "name": "Чертёж: Меч из метеоритной стали",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.meteorite-sword",
+      "price": 1312,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000003",
+        "quantity": 1,
+        "dc": 20,
+        "time": 36000,
+        "investment": 650,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 5
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Меч из метеоритной стали».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000104",
+    "name": "Чертёж: Клинок бригады «Врихедд»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.vrihedd-blade",
+      "price": 1117,
+      "source": "Базовая книга, стр. 136",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000002",
+        "quantity": 1,
+        "dc": 24,
+        "time": 43200,
+        "investment": 558,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000010",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 4
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Клинок бригады «Врихедд»».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000105",
+    "name": "Чертёж: Краснолюдский боевой молот",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.dwarven-pole-hammer",
+      "price": 1248,
+      "source": "Базовая книга, стр. 137",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000012",
+        "quantity": 1,
+        "dc": 25,
+        "time": 46800,
+        "investment": 624,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 6
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000039",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Краснолюдский боевой молот».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000106",
+    "name": "Чертёж: Эльфский дорожный посох",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.elven-travel-staff",
+      "price": 1470,
+      "source": "Базовая книга, стр. 137",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000015",
+        "quantity": 1,
+        "dc": 25,
+        "time": 46800,
+        "investment": 735,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 6
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000036",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 6
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000010",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000022",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000027",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000034",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Эльфский дорожный посох».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000107",
+    "name": "Чертёж: Эльфский зефар",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.elven-zefar",
+      "price": 1660,
+      "source": "Базовая книга, стр. 137",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000017",
+        "quantity": 1,
+        "dc": 25,
+        "time": 46800,
+        "investment": 830,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 8
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 8
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 8
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000027",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 9
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 6
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Эльфский зефар».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000108",
+    "name": "Чертёж: Гномий чёрный топор",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.gnomish-black-axe",
+      "price": 1376,
+      "source": "Базовая книга, стр. 137",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000009",
+        "quantity": 1,
+        "dc": 25,
+        "time": 46800,
+        "investment": 688,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000033",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Гномий чёрный топор».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000109",
+    "name": "Чертёж: Гномий гвихир",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.gnomish-gwyhyr",
+      "price": 1628,
+      "source": "Базовая книга, стр. 137",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000004",
+        "quantity": 1,
+        "dc": 25,
+        "time": 46800,
+        "investment": 818,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000033",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000023",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Гномий гвихир».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000110",
+    "name": "Чертёж: Гномий ручной арбалет",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.gnomish-hand-crossbow",
+      "price": 634,
+      "source": "Базовая книга, стр. 137",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000018",
+        "quantity": 1,
+        "dc": 25,
+        "time": 46800,
+        "investment": 317,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000023",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000009",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000024",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Гномий ручной арбалет».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000111",
+    "name": "Чертёж: Кистень из метеоритной стали",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.meteorite-flail",
+      "price": 1352,
+      "source": "Базовая книга, стр. 137",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000011",
+        "quantity": 1,
+        "dc": 25,
+        "time": 46800,
+        "investment": 676,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Кистень из метеоритной стали».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000112",
+    "name": "Чертёж: Клинок из Тир Тохаира",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.tir-tochair-blade",
+      "price": 1776,
+      "source": "Базовая книга, стр. 137",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000005",
+        "quantity": 1,
+        "dc": 26,
+        "time": 46800,
+        "investment": 888,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000001",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000038",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000016",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Клинок из Тир Тохаира».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000113",
+    "name": "Чертёж: Краснолюдские пробивные",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.ammunition.dwarven-impact",
+      "price": 100,
+      "source": "Базовая книга, стр. 137",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elde000000000002",
+        "quantity": 5,
+        "dc": 20,
+        "time": 1800,
+        "investment": 184,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000039",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000037",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Краснолюдские пробивные».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000114",
+    "name": "Чертёж: Эльфские ввинчивающиеся",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.ammunition.elven-burrowing",
+      "price": 100,
+      "source": "Базовая книга, стр. 137",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elde000000000001",
+        "quantity": 5,
+        "dc": 20,
+        "time": 1800,
+        "investment": 185,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000009",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Эльфские ввинчивающиеся».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000115",
+    "name": "Чертёж: Краснолюдский плащ",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.dwarven-cloak",
+      "price": 2100,
+      "source": "Базовая книга, стр. 138",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elda000000000003",
+        "quantity": 1,
+        "dc": 18,
+        "time": 32400,
+        "investment": 1050,
+        "grade": "master",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 12
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000009",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000024",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 6
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 7
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000015",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Краснолюдский плащ».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000116",
+    "name": "Чертёж: Эльфский щит",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.elven-shield",
+      "price": 1050,
+      "source": "Базовая книга, стр. 138",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elds000000000002",
+        "quantity": 1,
+        "dc": 20,
+        "time": 18000,
+        "investment": 528,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Эльфский щит».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000117",
+    "name": "Чертёж: Гномий баклер",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.gnomish-buckler",
+      "price": 674,
+      "source": "Базовая книга, стр. 138",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elds000000000001",
+        "quantity": 1,
+        "dc": 22,
+        "time": 21600,
+        "investment": 335,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000024",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Гномий баклер».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000118",
+    "name": "Чертёж: Низушечий защитный дублет",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.halfling-doublet",
+      "price": 562,
+      "source": "Базовая книга, стр. 138",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elda000000000001",
+        "quantity": 1,
+        "dc": 18,
+        "time": 32400,
+        "investment": 281,
+        "grade": "master",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000010",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000003",
+            "substance": "",
+            "quantity": 7
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000004",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Низушечий защитный дублет».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000119",
+    "name": "Чертёж: Броня скоя’таэля",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.scoiatael-armor",
+      "price": 3486,
+      "source": "Базовая книга, стр. 138",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elda000000000004",
+        "quantity": 1,
+        "dc": 20,
+        "time": 72000,
+        "investment": 1738,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 12
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000022",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 12
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000001",
+            "substance": "",
+            "quantity": 11
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000004",
+            "substance": "",
+            "quantity": 8
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000023",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 13
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000024",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 9
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Броня скоя’таэля».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000120",
+    "name": "Чертёж: Кольчуга гномьей работы",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.gnomish-chain",
+      "price": 1462,
+      "source": "Базовая книга, стр. 138",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elda000000000002",
+        "quantity": 1,
+        "dc": 24,
+        "time": 86400,
+        "investment": 736,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 8
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000023",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Кольчуга гномьей работы».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000121",
+    "name": "Чертёж: Драгунская броня гномьей работы",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.gnomish-dragoon",
+      "price": 4274,
+      "source": "Базовая книга, стр. 138",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elda000000000005",
+        "quantity": 1,
+        "dc": 25,
+        "time": 90000,
+        "investment": 2131,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 12
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000038",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 14
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000004",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000023",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000024",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 15
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Драгунская броня гномьей работы».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000122",
+    "name": "Чертёж: Махакамская павеза",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.mahakam-pavise",
+      "price": 1574,
+      "source": "Базовая книга, стр. 138",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elds000000000003",
+        "quantity": 1,
+        "dc": 26,
+        "time": 25200,
+        "investment": 788,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 11
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000039",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 4
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Махакамская павеза».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "recp000000000123",
+    "name": "Чертёж: Махакамские латы",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.mahakam-plate",
+      "price": 5286,
+      "source": "Базовая книга, стр. 138",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.elda000000000006",
+        "quantity": 1,
+        "dc": 28,
+        "time": 100800,
+        "investment": 2645,
+        "grade": "grandmaster",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000039",
+            "substance": "",
+            "quantity": 12
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000038",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 8
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 12
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000023",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000024",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 10
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Махакамские латы».</p>"
     },
     "effects": [],
     "folder": "gearRecipes00001",

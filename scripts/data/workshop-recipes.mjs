@@ -5,7 +5,8 @@ import { UPGRADES } from "./workshop-upgrades.mjs";
 import { equipmentUuid } from "./workshop.mjs";
 import { DIAGRAM_INVESTMENTS } from "./diagram-investments.mjs";
 
-// Core pp. 130–135, 139. Result references point to existing canonical equipment.
+// Core pp. 130–139. Result references point to existing canonical equipment.
+// Append new rows: the array positions form persistent compendium document IDs.
 const diagrams = [
  ["material.double-linen",14,30,30,"linen:1 thread:2"], ["material.hardened-timber",12,30,21,"timber:2 resin:4"],
  // Follow the supplied Russian book, p. 130: leather and wax, not the ambiguous errata label.
@@ -54,7 +55,7 @@ const diagrams = [
  ["armor.head.6",18,300,712,"steel:4 leather:2 hardened-leather:2 ester-grease:1","journeyman"],
  ["armor.head.7",19,300,862,"steel:5 hardened-leather:3 thread:6 ogre-wax:2 linen:1","master"],
  ["armor.head.8",22,360,1050,"dark-steel:4 thread:6 hardened-leather:2 beast-bones:5 drake-oil:1","master"],
- ["armor.head.9",24,360,1200,"dark-steel:4 hardened-leather:1 darkening-oil:2 drake-oil:2 linen:1 ashes:10 oil:1","master"],
+ ["armor.head.9",24,360,1200,"dark-steel:5 oil:5 hardened-leather:1 darkening-oil:1 drake-oil:1 ashes:10","master",1,135],
  ["armor.torso.1",10,300,150,"linen:6 thread:7"], ["armor.torso.2",12,360,362,"linen:6 thread:6 leather:2 oil:1"],
  ["armor.torso.3",15,480,374,"double-linen:5 thread:6 tanning-herbs:4 linen:4 cotton:11"],
  ["armor.torso.4",16,480,450,"leather:3 hardened-leather:3","journeyman"], ["armor.torso.5",17,540,600,"thread:5 leather:2 steel:2 tretogor-steel:2","journeyman"],
@@ -78,14 +79,50 @@ const diagrams = [
  ["armor-upgrade.cloth",14,180,60,"double-linen:1 thread:2"], ["armor-upgrade.studded-leather",14,180,120,"leather:1 iron:1 thread:1"],
  ["armor-upgrade.mail",17,300,187,"steel:2","journeyman"], ["armor-upgrade.hardened-leather",16,240,195,"hardened-leather:1 leather:1 thread:5 wax:3","journeyman"],
  ["armor-upgrade.steel",18,300,217,"steel:2 thread:3 etching-acid:2","journeyman"], ["armor-upgrade.elven",24,360,300,"dark-steel:1 thread:5 hardened-leather:1 feathers:1","master"],
- ["armor-upgrade.dwarven",24,360,292,"mahakaman-steel:1 wolf-hide:1 thread:5 coal:1","master"]
+ ["armor-upgrade.dwarven",24,360,292,"mahakaman-steel:1 wolf-hide:1 thread:5 coal:1","master"],
+ // Ammunition, p. 132: one attempt produces the complete printed batch.
+ ["ammunition.armor-piercing",16,60,224,"hardened-timber:1 steel:1 feathers:1 sharpening-grit:1 ogre-wax:1","journeyman",10,132],
+ ["ammunition.broadhead",15,60,125,"timber:1 iron:1 feathers:1 sharpening-grit:1","journeyman",10,132],
+ // Elder Folk weapons, p. 136.
+ ["weapon.dwarven-axe",24,720,1110,"mahakaman-steel:3 hardened-timber:4 hardened-leather:2 etching-acid:4 sharpening-grit:1 river-clay:2 coal:3","master",1,136],
+ ["weapon.dwarven-cleaver",19,600,750,"mahakaman-steel:2 hardened-timber:1 leather:1 sharpening-grit:1 drake-oil:1 river-clay:5","master",1,136],
+ ["weapon.dwarven-heavy-crossbow",24,720,1274,"hardened-timber:5 mahakaman-steel:3 hardened-leather:2 thread:4 ogre-wax:5 dark-iron:1","master",1,136],
+ ["weapon.elven-glaive",19,600,1386,"hardened-timber:6 dark-steel:4 steel:1 leather:4 feathers:3 sharpening-grit:2 ester-grease:4","master",1,136],
+ ["weapon.elven-messer",19,600,892,"hardened-timber:2 leather:3 dark-steel:3 silk:1 sharpening-grit:1 etching-acid:1","master",1,136],
+ ["weapon.elven-travel-bow",22,660,862,"hardened-timber:4 thread:4 wax:4 fifth-essence:1 leather:1 dark-steel:2 feathers:3 beast-bones:2 ester-grease:5 etching-acid:3","master",1,136],
+ ["weapon.gnomish-staff",22,660,1364,"hardened-timber:6 fifth-essence:5 dark-steel:1 darkening-oil:3 double-linen:1","master",1,136],
+ ["weapon.halfling-rondel",19,600,726,"dark-steel:2 hardened-timber:1 hardened-leather:1 sharpening-grit:3 darkening-oil:1 ester-grease:2","master",1,136],
+ ["weapon.mahakam-martell",22,660,1350,"mahakaman-steel:3 hardened-timber:3 hardened-leather:2 wolf-hide:1 sharpening-grit:1 ester-grease:3 drake-oil:2 river-clay:4 linen:1","master",1,136],
+ ["weapon.meteorite-sword",20,600,1312,"hardened-timber:2 leather:2 sharpening-grit:1 etching-acid:4 ester-grease:4 meteorite:5","master",1,136],
+ ["weapon.vrihedd-blade",24,720,1117,"hardened-timber:2 silk:1 dark-steel:4 sharpening-grit:3 ester-grease:4 river-clay:4","master",1,136],
+ // Grandmaster weapons and master ammunition, p. 137.
+ ["weapon.dwarven-pole-hammer",25,780,1248,"hardened-timber:6 mahakaman-steel:3 hardened-leather:3 ogre-wax:1 sharpening-grit:1","grandmaster",1,137],
+ ["weapon.elven-travel-staff",25,780,1470,"hardened-timber:6 gold:1 ester-grease:6 silk:1 wolf-hide:2 dark-steel:1 fifth-essence:3 gemstone:1","grandmaster",1,137],
+ ["weapon.elven-zefar",25,780,1660,"hardened-timber:8 thread:8 ogre-wax:8 fifth-essence:2 beast-bones:4 feathers:4 dark-steel:3 leather:2 ester-grease:9 etching-acid:6","grandmaster",1,137],
+ ["weapon.gnomish-black-axe",25,780,1376,"hardened-timber:4 hardened-leather:2 dimeritium:1 dark-steel:3 ogre-wax:1 sharpening-grit:1","grandmaster",1,137],
+ ["weapon.gnomish-gwyhyr",25,780,1628,"hardened-timber:2 hardened-leather:1 dimeritium:2 dark-steel:1 ester-grease:3 sharpening-grit:4 darkening-oil:1","grandmaster",1,137],
+ ["weapon.gnomish-hand-crossbow",25,780,634,"hardened-timber:2 thread:4 dark-steel:2 ester-grease:1 darkening-oil:2 resin:2 drake-oil:1 wax:2","grandmaster",1,137],
+ ["weapon.meteorite-flail",25,780,1352,"meteorite:5 ester-grease:1 hardened-timber:1 hardened-leather:1 dark-steel:1 sharpening-grit:1","grandmaster",1,137],
+ ["weapon.tir-tochair-blade",26,780,1776,"hardened-timber:2 ashes:4 hardened-leather:1 mahakaman-dimeritium:2 dark-steel:1 ester-grease:4 sharpening-grit:1 draconid-leather:1","grandmaster",1,137],
+ ["ammunition.dwarven-impact",20,30,100,"mahakaman-steel:1 hardened-timber:1 feathers:1 ogre-wax:2 iron:1","master",5,137],
+ ["ammunition.elven-burrowing",20,30,100,"dark-steel:1 resin:1 hardened-timber:1 feathers:2 sharpening-grit:2 ogre-wax:1 thread:1","master",5,137],
+ // Elder Folk armor and shields, p. 138.
+ ["armor.dwarven-cloak",18,540,2100,"hardened-leather:12 ogre-wax:10 resin:10 drake-oil:2 leather:6 ester-grease:7 thread:10 cow-hide:1","master",1,138],
+ ["weapon.elven-shield",20,300,1050,"hardened-timber:5 hardened-leather:5 dark-steel:2 ester-grease:2 etching-acid:4 ogre-wax:2","master",1,138],
+ ["weapon.gnomish-buckler",22,360,674,"dark-steel:3 leather:1 ester-grease:1 etching-acid:4 drake-oil:1","master",1,138],
+ ["armor.halfling-doublet",18,540,562,"silk:4 thread:10 cotton:7 double-linen:2","master",1,138],
+ ["armor.scoiatael-armor",20,1200,3486,"dark-steel:12 wolf-hide:3 ester-grease:10 etching-acid:12 ashes:11 double-linen:8 darkening-oil:4 hardened-timber:13 drake-oil:2 thread:9","master",1,138],
+ ["armor.gnomish-chain",24,1440,1462,"dark-steel:8 leather:2 darkening-oil:1","grandmaster",1,138],
+ ["armor.gnomish-dragoon",25,1500,4274,"dark-steel:12 meteorite:1 mahakaman-dimeritium:2 ester-grease:10 etching-acid:14 double-linen:5 darkening-oil:4 drake-oil:2 thread:15","grandmaster",1,138],
+ ["weapon.mahakam-pavise",26,420,1574,"hardened-timber:10 hardened-leather:5 ogre-wax:11 ester-grease:2 mahakaman-steel:2 etching-acid:3 leather:4","grandmaster",1,138],
+ ["armor.mahakam-plate",28,1680,5286,"mahakaman-steel:12 mahakaman-dimeritium:2 ester-grease:8 etching-acid:12 hardened-leather:5 darkening-oil:2 drake-oil:1 meteorite:2 ogre-wax:3 thread:10","grandmaster",1,138]
 ];
 const catalog = [...CORE_EQUIPMENT,...MATERIALS,...UPGRADES];
-export const RECIPES = diagrams.map(([id,dc,minutes,price,components,grade="novice",quantity=1],i)=>{
+export const RECIPES = diagrams.map(([id,dc,minutes,price,components,grade="novice",quantity=1,page],i)=>{
  const result = catalog.find(item=>item.id===id);
  const materials = components.split(" ").map(token=>{const [material,q]=token.split(":"); return {uuid:materialUuid(material),substance:"",quantity:Number(q)};});
  const forge = components.split(" ").some(token=>/^(iron|steel|dark-iron|dark-steel|silver|gold|dimeritium|mahakaman-steel|mahakaman-dimeritium|tretogor-steel|meteorite):/.test(token));
- return {id:`diagram.${id}`,documentId:`recp${String(i+1).padStart(12,"0")}`,name:`Чертёж: ${result.name}`,type:"recipe",source:"recipes",system:{price,source:"Базовая книга, стр. 130–135 / 139; errata v4",recipe:{category:"diagram",resultUuid:equipmentUuid(result.documentId),quantity,dc,time:minutes*60,investment:DIAGRAM_INVESTMENTS[id],grade,forge,tools:["gear.crafting-tools"],components:materials}}};
+ return {id:`diagram.${id}`,documentId:`recp${String(i+1).padStart(12,"0")}`,name:`Чертёж: ${result.name}`,type:"recipe",source:"recipes",system:{price,source:page?`Базовая книга, стр. ${page}`:"Базовая книга, стр. 130–135 / 139; errata v4",recipe:{category:"diagram",resultUuid:equipmentUuid(result.documentId),quantity,dc,time:minutes*60,investment:DIAGRAM_INVESTMENTS[id],grade,forge,tools:["gear.crafting-tools"],components:materials}}};
 });
 RECIPES.push(...ALCHEMY.map((result,i)=>{
  const recipe = result.formula;

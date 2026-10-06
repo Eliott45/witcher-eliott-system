@@ -14,7 +14,8 @@ import { generalGearDescriptionUpdate } from "./general-gear-descriptions.mjs";
 import { specialEquipmentDescriptionUpdate } from "./special-equipment-descriptions.mjs";
 import { materialDescriptionUpdate } from "./material-descriptions.mjs";
 import { recipeDetailsUpdate } from "./recipe-details.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 16;
+import { RECIPES } from "../data/workshop-recipes.mjs";
+export const EQUIPMENT_CONTENT_VERSION = 17;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {
@@ -33,7 +34,8 @@ export async function migrateEquipmentContent() {
   if (!pack) return;
   const index = await pack.getIndex({ fields: ["system.ruleId"] });
   const existing = new Set(Array.from(index.values(), entry => entry.system?.ruleId));
-  const missing = [...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS, ...WITCHER_SPECIAL_EQUIPMENT].filter(entry => !existing.has(entry.id));
+  const diagrams = RECIPES.filter(entry => entry.system.recipe.category === "diagram");
+  const missing = [...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS, ...WITCHER_SPECIAL_EQUIPMENT, ...diagrams].filter(entry => !existing.has(entry.id));
   const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry =>
     specialRuleIds.has(entry.system?.ruleId) || TOOL_RULES[entry.system?.ruleId] || GENERAL_GEAR_RULES[entry.system?.ruleId] || /^(material|ammunition|alchemy|potion|oil|decoction|mutagen|formula|diagram)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
   const updates = updatesFor(oldDocuments);

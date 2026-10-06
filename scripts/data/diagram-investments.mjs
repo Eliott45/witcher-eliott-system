@@ -1,4 +1,4 @@
-// Printed supplement column in the supplied Russian core book, pp. 130–135, 139.
+// Printed supplement column in the supplied Russian core book, pp. 130–139.
 // These amounts are independent of the price of the diagram.
 export const DIAGRAM_INVESTMENTS = {
   "material.double-linen": 15, "material.hardened-timber": 11, "material.hardened-leather": 32,
@@ -32,5 +32,18 @@ export const DIAGRAM_INVESTMENTS = {
   "weapon.pavise": 378, "weapon.nilfgaard-pavise": 450,
   "armor-upgrade.cloth": 28, "armor-upgrade.studded-leather": 61,
   "armor-upgrade.mail": 96, "armor-upgrade.hardened-leather": 97, "armor-upgrade.steel": 109,
-  "armor-upgrade.elven": 149, "armor-upgrade.dwarven": 144
+  "armor-upgrade.elven": 149, "armor-upgrade.dwarven": 144,
+  "ammunition.armor-piercing": 110, "ammunition.broadhead": 69,
+  "weapon.dwarven-axe": 555, "weapon.dwarven-cleaver": 374, "weapon.dwarven-heavy-crossbow": 632,
+  "weapon.elven-glaive": 692, "weapon.elven-messer": 446, "weapon.elven-travel-bow": 432,
+  "weapon.gnomish-staff": 682, "weapon.halfling-rondel": 364, "weapon.mahakam-martell": 675,
+  "weapon.meteorite-sword": 650, "weapon.vrihedd-blade": 558,
+  "weapon.dwarven-pole-hammer": 624, "weapon.elven-travel-staff": 735, "weapon.elven-zefar": 830,
+  "weapon.gnomish-black-axe": 688, "weapon.gnomish-gwyhyr": 818, "weapon.gnomish-hand-crossbow": 317,
+  "weapon.meteorite-flail": 676, "weapon.tir-tochair-blade": 888,
+  "ammunition.dwarven-impact": 184, "ammunition.elven-burrowing": 185,
+  "armor.dwarven-cloak": 1050, "weapon.elven-shield": 528, "weapon.gnomish-buckler": 335,
+  "armor.halfling-doublet": 281, "armor.scoiatael-armor": 1738,
+  "armor.gnomish-chain": 736, "armor.gnomish-dragoon": 2131,
+  "weapon.mahakam-pavise": 788, "armor.mahakam-plate": 2645
 };

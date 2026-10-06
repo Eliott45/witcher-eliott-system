@@ -4,6 +4,7 @@ import { isPhysical, isAmmunition, ARMOR_COVERAGE, RARITIES, EQUIPMENT_KINDS, CO
 import { SUBSTANCES, MONSTER_CATEGORIES } from "../data/workshop.mjs";
 import { SHIELD_CLASSES } from "../data/shields.mjs";
 import { supportsVisor } from "../data/visor.mjs";
+import { RECIPE_GRADES } from "../data/crafting.mjs";
 const decimal = (key, label) => ({ ...number(key, label), step: "0.001" });
 const bool = (key, label) => ({ key, label, type: "boolean" });
 const COMMON = [number("quantity", "Количество"), decimal("weight", "Вес единицы, кг"), decimal("price", "Цена единицы, кроны"),
@@ -39,7 +40,7 @@ export function physicalItemContext(item, editable) {
   if(item.type==="recipe") groups.push({title:"Чертёж / формула",fields:[
     choice("recipe.category","Вид",[{id:"diagram",name:"Чертёж"},{id:"formula",name:"Формула"}]),
     number("recipe.dc","Сложность (СЛ)"),number("recipe.time","Время, секунды"),decimal("recipe.investment","Доплата за материалы, кроны"),number("recipe.quantity","Результат, штук",1),
-    choice("recipe.grade","Уровень",[{id:"novice",name:"Новичок"},{id:"journeyman",name:"Подмастерье"},{id:"master",name:"Мастер"}]),
+    choice("recipe.grade","Уровень",Object.entries(RECIPE_GRADES).map(([id,name])=>({id,name}))),
     bool("recipe.memorized","Запомнен (не требует физической копии)"),bool("recipe.forge","Нужна кузница"),text("recipe.resultUuid","UUID результата")
   ]});
   if(item.system.kind==="material") groups.push({title:"Материал / ингредиент",fields:[choice("material.substance","Субстанция",SUBSTANCES),text("material.location","Где найти"),number("material.forageDC","СЛ сбора (0 — не указана)"),text("material.quantityFormula","Количество при сборе, формула")]});
