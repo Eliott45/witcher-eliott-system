@@ -52,11 +52,17 @@ export function attackModes(actor,item) {
   return [{id:"fast",name:item.system.skill==="archery"?"Быстрый выстрел":"Быстрая",count:1,penalty:0,multiplier:1,pair:item.system.skill!=="archery"},
     {id:"strong",name:"Сильная",count:1,penalty:-3,multiplier:2}];
 }
-export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="normal",modifier=0,targetContext=null,ambushBonus=0}={}) {
+/** Humanoid or monster hit-location table for a target actor (core p.152). */
+export const bodyPlanOf = actor => actor?.type === "npc" && actor.system.creature?.category !== "humanoid" ? "monster" : "humanoid";
+
+export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="normal",modifier=0,targetContext=null,ambushBonus=0,rolledLocation=null}={}) {
   if(item?.type!=="weapon")throw new Error("Выберите оружие.");
   const weapon=effectiveItem(item),attack=attackModes(actor,item).find(entry=>entry.id===mode);
   if(!attack)throw new Error("Этот режим недоступен для данного оружия.");
-  const skill=skillValue(actor.system,weapon.skill),aim=ATTACK_LOCATIONS.find(entry=>entry.id===location);
+  const skill=skillValue(actor.system,weapon.skill);
+  // A location rolled before the attack is still random: no aiming penalty, and the crit uses the 2d6 table.
+  const rolled=location==="random"&&rolledLocation?ATTACK_LOCATIONS.find(entry=>entry.id===rolledLocation.id):null;
+  const aim=rolled?{...rolled,penalty:0,rolled:rolledLocation.roll,name:`${rolled.name} (1d10: ${rolledLocation.roll})`}:ATTACK_LOCATIONS.find(entry=>entry.id===location);
   if(!aim||!Number.isFinite(Number(modifier))||Math.abs(Number(modifier))>100)throw new Error("Неверный модификатор атаки.");
   const ranged=["ranged","thrown"].includes(weapon.category),band=ranged?RANGED_BANDS.find(entry=>entry.id===range):RANGED_BANDS[0];
   if(!band)throw new Error("Неверная дистанция.");

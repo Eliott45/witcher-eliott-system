@@ -129,3 +129,14 @@ test("a player's group initiative: allies without initiative or own combatants o
   await assert.rejects(applyGroupInitiativeRequest(combat, list[0], { message: "m", requester: "p" }), /не найден/);
   delete globalThis.game;
 });
+
+test("a pre-rolled location sets the zone without an aiming penalty", async () => {
+  const { weaponAttack } = await import("../scripts/combat/weapon-rules.mjs");
+  const weapon = { id: "sword", type: "weapon", name: "Sword", system: { hands: 1, grip: 1, category: "melee", skill: "swordsmanship", damage: "2d6", accuracy: 0, quantity: 1, carried: true, equipped: true, reliability: { value: 10, max: 10 } } };
+  const items = [weapon]; items.get = id => items.find(entry => entry.id === id);
+  const actor = { type: "character", items, effects: [], system: { attributes: {}, skills: { swordsmanship: 5 }, abilityState: {}, statistics: { effective: { reflex: 6, body: 6 }, modifiers: [] }, combatAction: {} } };
+  const plain = weaponAttack(actor, weapon), rolled = weaponAttack(actor, weapon, { rolledLocation: { id: "head", roll: 1 } });
+  assert.equal(rolled.total, plain.total, "no −6 for a rolled head");
+  assert.equal(rolled.aim.id, "head"); assert.equal(rolled.aim.multiplier, 3); assert.equal(rolled.aim.rolled, 1);
+  assert.equal(weaponAttack(actor, weapon, { location: "head" }).total, plain.total - 6, "aiming still costs −6");
+});

@@ -131,7 +131,7 @@ export async function rollExchangeDamage(message, index) {
   }
   let critical = null;
   if (outcome.critical) {
-    const aimed = attack.location !== "random";
+    const aimed = attack.location !== "random" && !attack.locationRoll;
     const critRoll = await new foundry.dice.Roll(aimed && ["head", "torso"].includes(location.id) ? "1d6" : aimed ? "0" : "2d6").evaluate();
     if (critRoll.dice.length) rolls.push(critRoll);
     const tableRoll = aimed ? aimedCriticalRoll(location.id, critRoll.total) : critRoll.total;

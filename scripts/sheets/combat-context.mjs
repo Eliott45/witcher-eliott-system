@@ -2,7 +2,7 @@ import { equippedItems } from "../data/physical-items.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { actionRoundKey, actionQuote, actionUpdate } from "../combat/action-economy.mjs";
-import { attackModes, weaponAttack, gripOf, signed, ATTACK_LOCATIONS, RANGED_BANDS } from "../combat/weapon-rules.mjs";
+import { attackModes, weaponAttack, gripOf, signed, ATTACK_LOCATIONS, RANGED_BANDS, hitLocation, bodyPlanOf } from "../combat/weapon-rules.mjs";
 import { rollWeaponAttack } from "../combat/weapon-rolls.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { defenseQuote, rollDefense, INCOMING_ATTACKS } from "../combat/defense-rolls.mjs";
@@ -12,6 +12,7 @@ import { consumeAiming } from "../combat/full-turn-rules.mjs";
 import { ambushState, tacticsFlags } from "../combat/tactics-rules.mjs";
 import { damageTypeLabel } from "../combat/damage-rules.mjs";
 import { toggleQuickDraw } from "../combat/quick-draw.mjs";
+import { escapeTooltip } from "./statistics-tooltips.mjs";
 import { statusEffect } from "../data/effect-counters.mjs";
 
 export function combatContext(actor,options={}) {
@@ -25,7 +26,7 @@ export function combatContext(actor,options={}) {
   const ambushTargets=(ambush?.targets??[]).map(uuid=>({uuid,name:encounter.combatants.find(entry=>entry.token?.uuid===uuid)?.name??"Цель"}));
   const defenses=[{mode:"dodge"},{mode:"reposition"},...equippedItems(actor.items).filter(item=>item.type==="weapon"&&["melee","shield"].includes(item.system.category)).flatMap(item=>[{mode:"block",itemId:item.id},{mode:"parry",itemId:item.id}])]
     .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
-  return { extra,used,canAct,location:options.location??"random",range:options.range??"normal",modifier:options.modifier??0,
+  return { extra,used,canAct,rolledLocation:(options.location??"random")==="random"?options.rolledLocation??null:null,location:options.location??"random",range:options.range??"normal",modifier:options.modifier??0,
     fullTurn,defenses,quickDraw,canQuickDraw:canAct&&Boolean(globalThis.game?.combat?.started&&Array.from(globalThis.game.combat.combatants).some(entry=>entry.actor?.uuid===actor.uuid)),ambush:{active:Boolean(ambush),targets:ambushTargets,count:ambushTargets.length,
       canPrepare:Boolean(canAct&&ambusher&&!encounter.started&&!tacticsFlags(ambusher).tacticRequest),pending:Boolean(tacticsFlags(ambusher).tacticRequest)},
     repeat:!fullTurn.activeDodge&&Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
@@ -66,7 +67,20 @@ export const combatActions={
   }),
   defend:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollDefense(this.actor,{...this.combatOptions,mode:target.dataset.mode,itemId:target.dataset.itemId});}finally{await this.render();}}),
   toggleExtraAction:guard(async function(){if(!this.isEditable)return;await inventoryWrite(this.actor,()=>this.actor.update({"system.combatAction.extra":!this.actor.system.combatAction.extra}));}),
-  attackWeapon:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollWeaponAttack(this.actor,target.dataset.itemId,{...this.combatOptions,mode:target.dataset.mode});}finally{await this.render();}}),
+  attackWeapon:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{const message=await rollWeaponAttack(this.actor,target.dataset.itemId,{...this.combatOptions,mode:target.dataset.mode});if(message)this.combatOptions={...this.combatOptions,rolledLocation:null};}finally{await this.render();}}),
+  rollLocation:guard(async function(_event,target){
+    if(!this.isEditable||target.disabled)return;target.disabled=true;
+    try{
+      const targetToken=Array.from(game.user.targets??[])[0],plan=bodyPlanOf(targetToken?.actor);
+      if(!targetToken)ui.notifications.info("Цель не выбрана — используется таблица гуманоида.");
+      const roll=await new foundry.dice.Roll("1d10").evaluate(),location=hitLocation(roll.total,plan);
+      await roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor:this.actor}),
+        flavor:`<section class="witcher-attack-chat"><h3>Место попадания · ${location.name}</h3><p>${plan==="humanoid"?"Гуманоид":"Чудовище"}${targetToken?` · ${escapeTooltip(targetToken.name)}`:""}: ${roll.total} на 1d10 → урон ×${location.multiplier} после брони. Следующая атака пойдёт в эту зону без штрафа прицеливания.</p></section>`,
+        flags:{[SYSTEM_ID]:{skipLuck:true,locationRoll:{id:location.id,roll:roll.total,plan}}}});
+      this.combatOptions={...this.combatOptions,location:"random",rolledLocation:{id:location.id,roll:roll.total,plan,name:location.name,multiplier:location.multiplier}};
+    }finally{await this.render();}
+  }),
+  clearRolledLocation:guard(async function(){this.combatOptions={...this.combatOptions,rolledLocation:null};await this.render();}),
   reloadWeapon:guard(async function(_event,target){
     if(!this.isEditable)return;
     await inventoryWrite(this.actor,async()=>{
