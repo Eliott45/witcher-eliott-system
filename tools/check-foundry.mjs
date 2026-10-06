@@ -561,6 +561,7 @@ foundry.applications = {
     }
   }, ItemSheetV2: class {
     tabGroups = {};
+    async _onRender() {}
     _processFormData(_event,_form,formData){return foundry.utils.expandObject(formData.object);}
     async _prepareContext() { return foundry.applications.sheets.ActorSheetV2.prototype._prepareContext.call(this); }
   } },
@@ -1079,6 +1080,26 @@ assert.match(nativeRecipeHTML, /15 мин\./);
 assert.match(nativeRecipeHTML, /Доплата/);
 assert.ok(nativeRecipeHTML.includes(`data-uuid="${nativeLinenDiagram.system.recipe.resultUuid}"`));
 assert.ok(nativeRecipeHTML.includes(`data-uuid="${nativeLinenDiagram.system.recipe.components[0].uuid}"`));
+const recipeLinkTags = [...nativeRecipeHTML.matchAll(/<a\b[^>]*class="content-link witcher-recipe-link"[^>]*>/g)].map(match => match[0]);
+assert.ok(recipeLinkTags.length >= 3);
+for (const tag of recipeLinkTags) {
+  assert.doesNotMatch(tag, /\bhref=/, "Foundry opens every a[href] in an external browser window");
+  assert.match(tag, /\bdata-link\b/);
+  assert.match(tag, /role="link"/);
+  assert.match(tag, /tabindex="0"/);
+}
+assert.match(nativeRecipeHTML, /witcher-recipe-rarity/);
+assert.match(nativeRecipeHTML, /is-common">Обычное/);
+let keyboardLinkClicks = 0, preventedLinkSubmit = false;
+const keyboardLink = { click: () => keyboardLinkClicks++ };
+referenceSheet.element = { querySelectorAll: () => [keyboardLink] };
+await referenceSheet._onRender({}, {});
+await referenceSheet._onRender({}, {});
+keyboardLink.onkeydown({ key: "Tab" });
+assert.equal(keyboardLinkClicks, 0);
+keyboardLink.onkeydown({ key: "Enter", preventDefault: () => { preventedLinkSubmit = true; }, stopPropagation() {} });
+assert.equal(keyboardLinkClicks, 1, "Enter activates exactly one native UUID link even after rerendering");
+assert.equal(preventedLinkSubmit, true);
 assert.match(nativeRecipeHTML, /name="system.recipe.investment"[^>]*value="6"[^>]*disabled/);
 const nativeThread = [...documents.values()].find(item => item.system?.ruleId === "material.thread");
 referenceSheet.item = nativeThread;

@@ -723,8 +723,8 @@
 /* Headline numbers of a physical item. */
 .witcher-item-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(84px,1fr)); gap:1px; margin:0; background:#cdbd9f; border-bottom:1px solid #c1ad89; flex-shrink:0; }
 .witcher-item-stats>div { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:7px 6px 6px; background:#f6f0e4; min-width:0; }
-.witcher-item-stats dt { font:600 9.5px/1.2 sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#8a7356; }
-.witcher-item-stats dd { margin:2px 0 0; font:700 18px/1.15 Georgia,serif; color:#3a3027; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.witcher-item-stats dt { font:600 9.5px/1.2 sans-serif; letter-spacing:.08em; text-transform:uppercase; color:#8a7356; text-shadow:none; }
+.witcher-item-stats dd { margin:2px 0 0; font:700 18px/1.15 Georgia,serif; color:#3a3027; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; text-shadow:none; }
 .witcher-item-stats .is-damage dd { color:#8b2f26; }
 .witcher-item-stats .is-armor dd { color:#2f5a4c; }
 .witcher-item-stats .is-price dd { color:#7a5c22; font-size:15px; }
@@ -832,6 +832,8 @@
 .witcher-eliott.reference-sheet {--witcher-ink:#342d26;--witcher-muted:#77664f;--witcher-line:#cbbd9e;--witcher-gold:#997544;}
 .witcher-eliott.reference-sheet .window-content {background:#eee9df;overflow:hidden;}
 .witcher-item-layout {display:flex;flex-direction:column;height:100%;min-height:0;}
+.witcher-eliott.reference-sheet .witcher-item-layout { text-shadow:none; }
+.witcher-eliott.reference-sheet .witcher-item-layout :is(dt,dd,h2,h3) { text-shadow:none; }
 .witcher-item-layout .witcher-reference-header {margin:0;padding:16px;background:linear-gradient(115deg,#442323,#682b28);color:#f4e8ce;border:0;}
 .witcher-item-layout .witcher-reference-header img {width:68px;height:68px;object-fit:contain;border:1px solid #b5996a;background:#493c32;border-radius:4px;}
 .witcher-item-layout .witcher-reference-header :is(h1,input) {color:#f4e8ce;font:600 1.4rem Georgia,serif;text-shadow:none;}
@@ -874,6 +876,9 @@
 .witcher-recipe-row { display:flex; align-items:center; gap:10px; min-width:0; }
 .witcher-eliott a.witcher-recipe-link { display:inline-flex; align-items:center; gap:8px; min-width:0; max-width:100%; white-space:normal; padding:3px 0; color:#694331; background:none; border:0; border-radius:3px; text-shadow:none; line-height:1.4; text-decoration:none; }
 .witcher-recipe-link > span { overflow-wrap:anywhere; }
+.witcher-recipe-link-label { display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; min-width:0; }
+.witcher-recipe-rarity { margin:0; }
+.witcher-recipe-rarity > span { white-space:nowrap; }
 .witcher-recipe-link > img { flex:none; width:28px; height:28px; object-fit:contain; border:1px solid #cdbc9e; border-radius:4px; background:#766c57; }
 .witcher-recipe-link > i { flex:none; font-size:9px; color:#a08762; }
 .witcher-eliott a.witcher-recipe-link:hover { color:#923d2b; text-decoration:underline; }

@@ -109,3 +109,40 @@ test("sheet context uses indexes, respects permissions, handles missing links an
   assert.equal((await recipeDetailsContext(recipe)).components[0].available, false);
   assert.equal(reads, 5);
 });
+
+test("components sort by rarity then name, retaining their source indexes for removal", async () => {
+  const inputs = [
+    ["Редкий", "rare"], ["Ясень", "common"], ["Уникальный", "unique"],
+    ["Повсеместный", "everywhere"], ["Без редкости", ""], ["Берёза", "common"]
+  ].map(([name, rarity], index) => ({ uuid: `Item.material${index}`, name, type: "equipment", documentName: "Item",
+    system: { rarity }, testUserPermission: () => true }));
+  const recipe = { type: "recipe", uuid: "Item.recipe", system: { recipe: {
+    components: inputs.map((item, index) => ({ uuid: item.uuid, quantity: index + 1 }))
+  } } };
+  const original = structuredClone(recipe.system.recipe.components);
+  globalThis.game = { user: {}, packs: new Map(), items: inputs };
+  globalThis.foundry = { utils: { fromUuid: async uuid => inputs.find(item => item.uuid === uuid) } };
+  const { components } = await recipeDetailsContext(recipe);
+  assert.deepEqual(components.map(row => row.name), ["Повсеместный", "Берёза", "Ясень", "Редкий", "Уникальный", "Без редкости"]);
+  assert.deepEqual(components.map(row => row.index), [3, 5, 1, 0, 2, 4]);
+  assert.equal(components.find(row => row.rarity === "rare").rarityTone, "rare");
+  assert.equal(components.find(row => row.rarity === "unique").rarityLabel, "Уникальное");
+  assert.deepEqual(recipe.system.recipe.components, original, "Sorting the view must not rewrite the recipe");
+  const { workshopItemActions } = await import("../scripts/sheets/workshop-item-context.mjs");
+  let update;
+  recipe.update = async changes => { update = changes; };
+  await workshopItemActions.removeRecipeComponent.call({ item: recipe, isEditable: true }, null, { dataset: { index: String(components[0].index) } });
+  assert.deepEqual(update["system.recipe.components"], original.filter(row => row.uuid !== inputs[3].uuid));
+});
+
+test("substance ingredient choices use indexed rarity, with unknown rarities last", async () => {
+  const ingredients = [["Перо", "unique"], ["Трава", "everywhere"], ["Корень", "rare"], ["Неизвестный", ""]]
+    .map(([name, rarity], index) => ({ _id: String(index), type: "equipment", name, system: { rarity, material: { substance: "vitriol" } } }));
+  const pack = { collection: "world.ingredients", documentName: "Item", testUserPermission: () => true,
+    getIndex: async ({ fields }) => { assert.ok(fields.includes("system.rarity")); return new Map(ingredients.map(row => [row._id, row])); } };
+  globalThis.game = { user: {}, packs: new Map([[pack.collection, pack]]), items: [] };
+  const formula = { uuid: "Item.formula", type: "recipe", system: { recipe: { category: "formula", components: [{ substance: "vitriol", quantity: 1 }] } } };
+  const choices = (await recipeDetailsContext(formula)).components[0].alternatives;
+  assert.deepEqual(choices.map(row => row.rarity), ["everywhere", "rare", "unique", ""]);
+  assert.deepEqual(choices.map(row => row.rarityTone), ["common", "rare", "unique", "kind"]);
+});

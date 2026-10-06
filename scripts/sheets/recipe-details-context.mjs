@@ -1,20 +1,27 @@
-import { isPhysical } from "../data/physical-items.mjs";
+import { isPhysical, RARITIES } from "../data/physical-items.mjs";
+import { traitTone } from "../data/equipment-traits.mjs";
 import { recipeRelations } from "../data/recipe-links.mjs";
 import { craftingDuration } from "../data/crafting.mjs";
 import { SUBSTANCES } from "../data/workshop.mjs";
 
 const substanceName = id => SUBSTANCES.find(entry => entry.id === id)?.name ?? id;
 const readable = item => item.testUserPermission(game.user, "OBSERVER");
-const reference = (item, fallback = "Предмет недоступен") => ({
-  uuid: item?.uuid ?? "", name: item?.name ?? fallback, img: item?.img ?? "icons/svg/item-bag.svg", available: Boolean(item)
-});
+const reference = (item, fallback = "Предмет недоступен") => {
+  const rarity = RARITIES.find(entry => entry.id === item?.system?.rarity);
+  return {
+    uuid: item?.uuid ?? "", name: item?.name ?? fallback, img: item?.img ?? "icons/svg/item-bag.svg", available: Boolean(item),
+    rarity: rarity?.id ?? "", rarityLabel: rarity?.name ?? "", rarityTone: traitTone(rarity?.name ?? ""), showRarity: false
+  };
+};
 const byName = (a, b) => a.name.localeCompare(b.name, "ru");
+const rarityOrder = new Map(RARITIES.map((entry, index) => [entry.id, index]));
+const byRarity = (a, b) => (rarityOrder.get(a.rarity) ?? RARITIES.length) - (rarityOrder.get(b.rarity) ?? RARITIES.length) || byName(a, b);
 
 /** Index fields are cached by Foundry; opening a sheet never loads every catalogue document. */
 async function referenceCatalog(item) {
   const packs = Array.from(game.packs.values()).filter(pack => pack.documentName === "Item" && pack.testUserPermission(game.user, "OBSERVER"));
   const results = await Promise.allSettled(packs.map(async pack => {
-    const index = await pack.getIndex({ fields: ["system.ruleId", "system.recipe", "system.material.substance"] });
+    const index = await pack.getIndex({ fields: ["system.ruleId", "system.recipe", "system.material.substance", "system.rarity"] });
     return Array.from(index.values(), entry => ({ ...entry, uuid: `Compendium.${pack.collection}.Item.${entry._id}` }));
   }));
   const indexed = results.flatMap((result, i) => {
@@ -49,13 +56,13 @@ export async function recipeDetailsContext(item) {
     return resolved.get(uuid);
   };
   const recipe = item.type === "recipe" ? item.system.recipe : null;
-  const components = recipe ? await Promise.all(recipe.components.map(async (entry, index) => ({
+  const components = recipe ? (await Promise.all(recipe.components.map(async (entry, index) => ({
     ...reference(entry.substance ? null : await resolve(entry.uuid), entry.substance ? substanceName(entry.substance) : "Компонент недоступен"),
     index, quantity: entry.quantity, substance: entry.substance,
     alternatives: entry.substance ? documents.filter(document => document.type === "equipment" && document.system?.material?.substance === entry.substance)
       .filter((document, i, list) => list.findIndex(other => (other.system.ruleId || other.uuid) === (document.system.ruleId || document.uuid)) === i)
-      .map(document => reference(document)).sort(byName) : []
-  }))) : [];
+      .map(document => reference(document)).sort(byRarity) : []
+  })))).sort(byRarity) : [];
   const relations = recipeRelations(item, documents);
   const recipes = relations.recipes.map(document => ({ ...reference(document),
     time: craftingDuration(document.system.recipe.time), dc: document.system.recipe.dc

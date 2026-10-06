@@ -50,6 +50,20 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     for (const button of this.element.querySelectorAll('[data-action="tab"]')) button.disabled = false;
   }
 
+  async _onRender(context, options) {
+    await super._onRender(context, options);
+    // Foundry treats every href as an external browser link. Use its native UUID link,
+    // with Enter support for keyboard navigation instead of adding a placeholder href.
+    for (const link of this.element.querySelectorAll("a.witcher-recipe-link[data-link]")) {
+      link.onkeydown = event => {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        event.stopPropagation();
+        link.click();
+      };
+    }
+  }
+
   async _prepareContext(options) {
     const recipeDetails=await recipeDetailsContext(this.item);
     const workshop=await workshopItemContext(this.item,recipeDetails);

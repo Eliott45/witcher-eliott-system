@@ -12,9 +12,9 @@
     <div class="witcher-diagram-components"><h3>Компоненты <span>{{recipeDetails.components.length}}</span></h3>
       <ul class="witcher-recipe-list">{{#each recipeDetails.components}}
         <li><div class="witcher-recipe-row">
-          {{#if substance}}<strong>{{name}}</strong>{{else}}{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this}}{{/if}}
+          {{#if substance}}<strong>{{name}}</strong>{{else}}{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this showRarity=true}}{{/if}}
           <b class="witcher-recipe-quantity">×{{quantity}}</b>
-        </div>{{#if substance}}<details class="witcher-substance-alternatives"><summary>Подходящие ингредиенты · {{alternatives.length}}</summary><ul>{{#each alternatives}}<li>{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this}}</li>{{else}}<li>В доступном каталоге нет ингредиентов этой субстанции.</li>{{/each}}</ul></details>{{/if}}</li>
+        </div>{{#if substance}}<details class="witcher-substance-alternatives"><summary>Подходящие ингредиенты · {{alternatives.length}}</summary><ul>{{#each alternatives}}<li>{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this showRarity=true}}</li>{{else}}<li>В доступном каталоге нет ингредиентов этой субстанции.</li>{{/each}}</ul></details>{{/if}}</li>
       {{else}}<li class="witcher-recipe-empty">Компоненты пока не заданы.</li>{{/each}}</ul>
     </div>
     {{#if recipeDetails.isDiagram}}<p class="witcher-diagram-note"><i class="fa-solid fa-coins" aria-hidden="true"></i><span>В городе или посёлке с разрешения ведущего доплата позволяет сразу получить необходимые материалы. Цена самого чертежа указана отдельно.</span></p>{{/if}}
