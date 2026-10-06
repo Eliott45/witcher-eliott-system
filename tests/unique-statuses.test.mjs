@@ -23,3 +23,23 @@ test("a second identical status is refused before creation; disabled copies and 
   assert.equal(pre({ statuses: ["stunned"] }), undefined, "A disabled copy is re-enabled elsewhere, not blocking");
   delete globalThis.Hooks;
 });
+
+test("an unconscious or dead creature is put on the ground once («Ничком»)", async () => {
+  const { CONDITION_BY_ID } = await import("../scripts/data/condition-definitions.mjs");
+  assert.equal(CONDITION_BY_ID.prone.name, "Ничком");
+  const hooks = [];
+  globalThis.Hooks = { on: (name, fn) => { if (name === "createActiveEffect") hooks.push(fn); } };
+  const gm = { isSelf: true };
+  globalThis.game = { users: { activeGM: gm } };
+  registerUniqueStatuses();
+  const toggled = [];
+  const actor = { documentName: "Actor", isOwner: true, uuid: "Actor.b", effects: [], toggleStatusEffect: async (id, { active }) => { toggled.push([id, active]); actor.effects.push(effect("p", id, 9)); } };
+  actor.effects.has = id => actor.effects.some(entry => entry.id === id);
+  for (const hook of hooks) hook({ parent: actor, statuses: new Set(["unconscious"]) });
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.deepEqual(toggled, [["prone", true]]);
+  for (const hook of hooks) hook({ parent: actor, statuses: new Set(["dead"]) });
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.equal(toggled.length, 1, "Already lying");
+  delete globalThis.Hooks;
+});

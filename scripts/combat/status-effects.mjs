@@ -87,6 +87,13 @@ export function registerUniqueStatuses() {
     if (data.disabled) return;
     if (statuses.some(status => UNIQUE_STATUSES.has(status) && activeWith(actor, status).length)) return false;
   });
+  // An unconscious or dead body lies on the ground (core p.163: «Ничком»).
+  Hooks.on("createActiveEffect", effect => {
+    const actor = effect.parent;
+    if (actor?.documentName !== "Actor" || !game.users.activeGM?.isSelf || ![UNCONSCIOUS, DEAD].some(status => effect.statuses.has(status))) return;
+    if (activeWith(actor, "prone").length) return;
+    setStatus(actor, "prone", true).catch(reportEffectError);
+  });
   // Two clients may create the same status at once; the active GM keeps the first one.
   Hooks.on("createActiveEffect", effect => {
     const actor = effect.parent;

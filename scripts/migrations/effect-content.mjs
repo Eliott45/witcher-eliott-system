@@ -7,7 +7,10 @@ import { CRITICAL_WOUND_SOURCES } from "../combat/critical-wound-effects.mjs";
 // 4: p.161 conditions now automated (Vomiting added; Intoxication, Blindness, Nausea, bleeding/burning texts).
 // 5: Dying explains stabilisation by First Aid (core p.162).
 // 6: Prone — stand up by spending movement (core p.163).
-export const EFFECT_CONTENT_VERSION = 6;
+// 7: Prone is called «Ничком».
+export const EFFECT_CONTENT_VERSION = 7;
+// Earlier shipped names still count as unedited entries.
+const PREVIOUS_NAMES = { prone: ["Сбит с ног"] };
 const REFRESHED_CONDITIONS = new Set(["burning", "bleeding", "burrowing", "intoxicated", "blinded", "nauseated", "dying", "prone"]);
 export function registerEffectContentMigration() {
   game.settings.register(SYSTEM_ID, "effectContentVersion", { scope: "world", config: false, type: Number, default: 0 });
@@ -27,9 +30,9 @@ export async function migrateEffectContent() {
   const sources = effectCompendiumSources(key => game.i18n.localize(key));
   const missing = sources.filter(source => !index.has(source._id));
   // A wound entry still carrying its shipped name is treated as unedited and follows the current rules.
-  const refresh = sources.filter(source => (source.flags[SYSTEM_ID]?.criticalWound || REFRESHED_CONDITIONS.has(source.flags[SYSTEM_ID]?.condition?.key))
-    && index.get(source._id)?.name === source.name)
-    .map(source => ({ _id: source._id, description: source.description, [`flags.${SYSTEM_ID}`]: source.flags[SYSTEM_ID] }));
+  const unedited = source => [source.name, ...(PREVIOUS_NAMES[source.flags[SYSTEM_ID]?.condition?.key] ?? [])].includes(index.get(source._id)?.name);
+  const refresh = sources.filter(source => (source.flags[SYSTEM_ID]?.criticalWound || REFRESHED_CONDITIONS.has(source.flags[SYSTEM_ID]?.condition?.key)) && unedited(source))
+    .map(source => ({ _id: source._id, name: source.name, description: source.description, [`flags.${SYSTEM_ID}`]: source.flags[SYSTEM_ID] }));
   if (missing.length || refresh.length) {
     const locked = pack.locked;
     try {
