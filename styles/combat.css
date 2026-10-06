@@ -253,3 +253,8 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-exchange-shield summary { cursor:pointer; color:#4f6a5c; }
 .witcher-exchange-actions [data-exchange-apply-shield] { color:#fff4e2; background:#3f6c5e; border-color:#2f5240; }
 .witcher-exchange-applied.is-shield { color:#2f5240; }
+.witcher-fumble-steps { margin:5px 0 0; padding:0; list-style:none; display:grid; gap:3px; }
+.witcher-fumble-steps button { width:100%; height:auto; min-height:26px; padding:3px 8px; font-size:11.5px; text-align:left; color:#5e2a24; background:#fbf0ec; border:1px solid #d9b3a8; }
+.witcher-fumble-steps button:hover:not(:disabled) { background:#f3dcd4; }
+.witcher-fumble-steps .is-done { color:#2f5240; }
+.witcher-fumble-steps .is-pending { color:#8a7356; font-style:italic; }

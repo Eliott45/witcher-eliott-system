@@ -6,6 +6,10 @@ export function registerSystemSettings() {
     name:"WITCHER.Settings.AutomaticCriticalDice",hint:"WITCHER.Settings.AutomaticCriticalDiceHint",
     scope:"world",config:true,type:Boolean,default:true
   });
+  game.settings.register(SYSTEM_ID,"automaticFumbleRolls",{
+    name:"WITCHER.Settings.AutomaticFumbleRolls",hint:"WITCHER.Settings.AutomaticFumbleRollsHint",
+    scope:"world",config:true,type:Boolean,default:false
+  });
   game.settings.register(SYSTEM_ID,"systemLanguage",{
     name:"WITCHER.Settings.Language",hint:"WITCHER.Settings.LanguageHint",scope:"client",config:true,
     type:String,default:"",choices:{"":"WITCHER.Settings.FoundryLanguage",ru:"Русский",en:"English"},requiresReload:true

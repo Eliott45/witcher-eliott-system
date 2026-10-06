@@ -10,7 +10,7 @@ import { woundEffectData } from "./critical-wound-effects.mjs";
 import { GRAPPLE_ACTIONS, applyGrappleSuccess, grappleState } from "./grapple.mjs";
 import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
-import { hitLocation, bodyPlanOf, ATTACK_LOCATIONS } from "./weapon-rules.mjs";
+import { hitLocation, bodyPlanOf, ATTACK_LOCATIONS, weaponAttack, attackModes } from "./weapon-rules.mjs";
 import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
 import { criticalWoundByRoll, aimedCriticalRoll, ORGAN_WOUNDS, ANATOMY_FREE_BONUS } from "../data/critical-wounds.mjs";
 
@@ -282,37 +282,99 @@ async function applyStatus(actor, status) {
   await actor.createEmbeddedDocuments("ActiveEffect", [{ ...source, ...timed }]);
 }
 
-/** Applies what can be automated and records it, so a second click does nothing. */
-export async function applyFumble({ message, index, role, actor, itemId, outcome }) {
-  if (!actor?.isOwner || !outcome || linkedAny(message.id, index, `fumble-${role}`)) return;
-  const notes = [], rolls = [], apply = outcome.apply;
-  if (apply.status) { await applyStatus(actor, apply.status); notes.push(CONDITION_BY_ID[apply.status].name); }
-  if (apply.reliability && itemId) {
-    const item = actor.items.get(itemId);
-    if (item?.system.reliability?.max) {
-      const roll = await new foundry.dice.Roll(apply.reliability).evaluate(); rolls.push(roll);
-      const to = Math.max(0, item.system.reliability.value - roll.total);
-      await item.update({ "system.reliability.value": to });
-      notes.push(`${item.name}: надёжность −${roll.total} (${to})`);
-    }
-  }
-  if (apply.headDamage) {
-    const roll = await new foundry.dice.Roll(apply.headDamage).evaluate(); rolls.push(roll);
-    const key = apply.nonLethal ? "stamina" : "health";
-    await actor.update({ [`system.${key}.value`]: actor.system[key].value - roll.total });
-    notes.push(`${roll.total} ${apply.nonLethal ? "несмертельного" : "смертельного"} урона в голову`);
-  }
-  await post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls, content: `<p>Провал: ${esc(notes.join("; ") || outcome.text)}</p>`,
-    flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: `fumble-${role}`, notes } } } }, "public");
-  if (apply.stun) await rollStun(actor);
+// Each consequence is its own step with its own dice button (or rolled automatically when the world
+// setting asks for it). A step is recorded as a linked message, so it never runs twice.
+export function fumbleSteps(outcome, actor, itemId) {
+  if (!outcome) return [];
+  const apply = outcome.apply, item = itemId ? actor?.items.get(itemId) : null, steps = [];
+  if (apply.status) steps.push({ id: "status", label: CONDITION_BY_ID[apply.status].name, hint: "Наложить состояние" });
+  if (apply.reliability) steps.push({ id: "reliability", dice: apply.reliability, label: `Урон надёжности ${apply.reliability}`, hint: item ? `Оружие: ${item.name}` : "" });
+  if (apply.headDamage) steps.push({ id: "head", dice: apply.headDamage, label: `${apply.headDamage} ${apply.nonLethal ? "несмертельного" : "смертельного"} урона в голову` });
+  if (apply.selfHit) steps.push({ id: "self", dice: "1d10", label: "Ранил себя: место (1d10) и урон оружия", hint: "Урон по себе с учётом своей брони" });
+  if (apply.allyHit) steps.push({ id: "ally", dice: "1d10", label: "Попал в союзника: место (1d10) и урон", hint: "Броски для ведущего; урон применяется к выбранному союзнику вручную" });
+  if (apply.disarm) steps.push({ id: "disarm", dice: "1d10", label: "Куда отлетело оружие: направление 1d10, дистанция 1d6 м", hint: "Оружие будет убрано из рук" });
+  if (apply.jam) steps.push({ id: "jam", label: "Заклинило: 1 раунд на исправление", hint: "Арбалет придётся перезарядить" });
+  if (apply.stuck) steps.push({ id: "stuck", label: "Оружие застряло: 1 раунд, чтобы достать" });
+  if (apply.stun) steps.push({ id: "stun", dice: "1d10", label: "Испытание Устойчивости" });
+  return steps;
 }
 
-function fumbleHTML(message, index, role, outcome, owner) {
+const stepKind = (role, id) => `fumble-${role}-${id}`;
+const stepDone = (message, index, role, id) => linkedAny(message.id, index, stepKind(role, id)) ?? linkedAny(message.id, index, `fumble-${role}`);
+
+function weaponDamageFormula(actor, item, attack, role) {
+  if (role === "attack" && attack?.damage) return attack.damage;
+  if (!item) return "1d6";
+  try { return weaponAttack(actor, item, { mode: attackModes(actor, item)[0]?.id }).damage || "1d6"; } catch { return item.system.damage || "1d6"; }
+}
+
+/** Runs one consequence for the owner of the fumbling actor. */
+export async function runFumbleStep({ message, index, role, actor, itemId, outcome, step }) {
+  if (!actor?.isOwner || !outcome || stepDone(message, index, role, step.id)) return;
+  const key = `${message.id}:${index}:${role}:${step.id}`;
+  if (pendingRolls.has(key)) return;
+  pendingRolls.add(key);
+  try {
+    const notes = [], rolls = [], item = itemId ? actor.items.get(itemId) : null, attack = flagsOf(message).weaponAttack;
+    const roll = async formula => { const result = await new foundry.dice.Roll(formula).evaluate(); rolls.push(result); return result; };
+    if (step.id === "status") { await applyStatus(actor, outcome.apply.status); notes.push(`${CONDITION_BY_ID[outcome.apply.status].name}`); }
+    if (step.id === "reliability") {
+      const result = await roll(step.dice);
+      if (item?.system.reliability?.max) {
+        const to = Math.max(0, item.system.reliability.value - result.total);
+        await item.update({ "system.reliability.value": to });
+        notes.push(`${item.name}: надёжность −${result.total} (${to}${to === 0 ? ", сломано" : ""})`);
+      } else notes.push(`урон надёжности ${result.total}`);
+    }
+    if (step.id === "head") {
+      const result = await roll(step.dice), key = outcome.apply.nonLethal ? "stamina" : "health";
+      await actor.update({ [`system.${key}.value`]: actor.system[key].value - result.total });
+      notes.push(`${result.total} ${outcome.apply.nonLethal ? "несмертельного" : "смертельного"} урона в голову`);
+    }
+    if (step.id === "self" || step.id === "ally") {
+      const plan = step.id === "self" ? bodyPlanOf(actor) : "humanoid";
+      const where = hitLocation((await roll("1d10")).total, plan), damage = await roll(weaponDamageFormula(actor, item, attack, role));
+      if (step.id === "self") {
+        const armor = armorAt(actor, where.id), traits = weaponDamageTraits(item ? effectiveItem(item) : {});
+        const result = resolveDamage({ base: damage.total, location: where.id, multiplier: where.multiplier, traits, armor, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor) });
+        const worn = await sufferDamage(actor, result);
+        notes.push(`${where.name}: урон ${damage.total} → −${result.total} ПЗ${worn.length ? `; ПБ −1: ${worn.join(", ")}` : ""}`);
+      } else notes.push(`союзнику: ${where.name} (×${where.multiplier}), урон ${damage.total} до брони — примените вручную`);
+    }
+    if (step.id === "disarm") {
+      const direction = await roll("1d10"), distance = await roll("1d6");
+      if (item?.system.equipped) await item.update({ "system.equipped": false });
+      notes.push(`${item?.name ?? "Оружие"} выбито: направление ${direction.total} по таблице разброса, ${distance.total} м`);
+    }
+    if (step.id === "jam") {
+      if (item?.system.skill === "crossbow" && item.system.loaded !== false) await item.update({ "system.loaded": false });
+      notes.push(item?.system.skill === "crossbow" ? `${item.name}: заклинило, нужна перезарядка` : "1 раунд на исправление");
+    }
+    if (step.id === "stuck") notes.push(`${item?.name ?? "Оружие"} застряло: 1 раунд, чтобы достать`);
+    if (step.id === "stun") { await rollStun(actor); notes.push("испытание Устойчивости брошено"); }
+    return await post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls, content: `<p>Провал: ${esc(notes.join("; "))}</p>`,
+      flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: stepKind(role, step.id), notes } } } }, "public");
+  } finally { pendingRolls.delete(key); }
+}
+
+/** Optional world setting: the player who rolled the fumble resolves every step at once. */
+async function autoResolveFumble(context) {
+  const { message, index, role, actor, itemId, outcome, author } = context;
+  if (!outcome || author !== game.user.id || !game.settings.get(SYSTEM_ID, "automaticFumbleRolls")) return;
+  for (const step of fumbleSteps(outcome, actor, itemId)) await runFumbleStep({ ...context, step });
+}
+
+function fumbleHTML(message, index, role, outcome, owner, actor, itemId) {
   if (!outcome) return "";
-  const done = linkedAny(message.id, index, `fumble-${role}`), automatable = Object.keys(outcome.apply).length > 0;
-  const action = done ? `<small>Применено: ${esc(exchangeOf(done).notes?.join("; ") || "—")}</small>`
-    : owner && automatable ? button(`data-exchange-fumble="${role}" data-index="${index}"`, '<i class="fa-solid fa-person-falling-burst"></i> Применить последствия', true) : "";
-  return `<div class="witcher-exchange-fumble"><b>Критический провал −${outcome.magnitude}</b> · ${esc(outcome.tableName)}: ${esc(outcome.text)}${action ? `<div class="witcher-exchange-actions">${action}</div>` : ""}</div>`;
+  const steps = fumbleSteps(outcome, actor, itemId);
+  const rows = steps.map(step => {
+    const done = stepDone(message, index, role, step.id);
+    const result = done ? `<span class="is-done"><i class="fa-solid fa-check"></i> ${esc(exchangeOf(done).notes?.join("; ") || "применено")}</span>`
+      : owner ? button(`data-fumble-step="${role}:${step.id}" data-index="${index}"`, `<i class="fa-solid ${step.dice ? "fa-dice-d10" : "fa-check"}"></i> ${esc(step.label)}`, true, step.hint)
+      : `<span class="is-pending">${esc(step.label)} — ждём бросок</span>`;
+    return `<li>${result}</li>`;
+  }).join("");
+  return `<div class="witcher-exchange-fumble"><b>Критический провал −${outcome.magnitude}</b> · ${esc(outcome.tableName)}: ${esc(outcome.text)}${rows ? `<ul class="witcher-fumble-steps">${rows}</ul>` : ""}</div>`;
 }
 
 // ── Rendering ────────────────────────────────────────────────────────────────
@@ -323,7 +385,7 @@ const button = (attrs, label, enabled, hint = "") => `<button type="button" ${at
 export function exchangeRowHTML(message, index, attack = flagsOf(message).weaponAttack) {
   const total = message.rolls[index]?.total, target = targetActor(attack), outcome = exchangeOutcome(message, index);
   const head = `<header><span>Атака ${attack.count > 1 ? `${index + 1} ` : ""}<b>${total}</b></span>`;
-  const ownFumble = fumbleHTML(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner);
+  const ownFumble = fumbleHTML(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner, message.speakerActor, attack.itemId);
   if (!outcome) {
     if (!target?.isOwner) return `<li class="is-waiting">${head}<em>${linkedAny(message.id, index, "defense") ? "защита бросается…" : "ждём защиту"}</em></header>${ownFumble}</li>`;
     if (linkedAny(message.id, index, "defense")) return `<li class="is-waiting">${head}<em><i class="fa-solid fa-dice-d10 fa-spin"></i> защита бросается…</em></header>${ownFumble}</li>`;
@@ -339,7 +401,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
     : `<strong class="is-miss">${outcome.mode === "parry" ? "Парировано" : outcome.mode === "block" ? "Заблокировано" : "Промах"}</strong>`;
   const gang = exchangeOf(outcome.defense).gang;
   const defenseLine = `${esc(outcome.name)} <b>${outcome.defenseTotal}</b>${gang ? ` <small data-tooltip="Объединение сил: нападающих в этом раунде ${gang + 1}">(объединение сил −${gang})</small>` : ""}`;
-  let body = ownFumble + fumbleHTML(message, index, "defense", outcome.none ? null : defenseFumble(outcome.defense), target?.isOwner);
+  let body = ownFumble + fumbleHTML(message, index, "defense", outcome.none ? null : defenseFumble(outcome.defense), target?.isOwner, target, flagsOf(outcome.defense)?.defense?.itemId);
   if (outcome.critical) body += `<p class="witcher-exchange-crit"><i class="fa-solid fa-burst"></i> Критическое ранение: ${esc(outcome.critical.name.toLocaleLowerCase("ru"))} (+${outcome.critical.bonus} урона)</p>`;
   if (!outcome.hit && outcome.mode === "parry") body += `<p class="witcher-exchange-note"><i class="fa-solid fa-person-falling"></i> ${esc(message.speakerActor?.name ?? "Атакующий")} ошеломлён: −2 к атаке и защите до начала своего хода.</p>`;
   const wear = exchangeOf(outcome.defense).wear;
@@ -422,26 +484,36 @@ export function renderExchange(message, html) {
     run("[data-exchange-apply]", () => applyExchangeDamage(message, index));
     run("[data-exchange-apply-shield]", () => applyExchangeDamage(message, index, { useShield: true }));
     run("[data-exchange-stun]", () => rollStun(targetActor(attack)));
-    run('[data-exchange-fumble="attack"]', () => applyFumble({ message, index, role: "attack", actor: message.speakerActor, itemId: attack.itemId, outcome: attackFumble(message, index) }));
-    run('[data-exchange-fumble="defense"]', () => {
+    const fumbleContext = role => {
+      if (role === "attack") return { message, index, role, actor: message.speakerActor, itemId: attack.itemId, outcome: attackFumble(message, index), author: message.author?.id };
       const defense = linked(message.id, index, "defense");
-      return applyFumble({ message, index, role: "defense", actor: targetActor(attack), itemId: flagsOf(defense)?.defense?.itemId, outcome: defenseFumble(defense) });
-    });
+      return { message, index, role, actor: targetActor(attack), itemId: flagsOf(defense)?.defense?.itemId, outcome: defense ? defenseFumble(defense) : null, author: defense?.author?.id };
+    };
+    row.querySelectorAll("[data-fumble-step]").forEach(control => control.addEventListener("click", async event => {
+      event.stopPropagation(); control.disabled = true;
+      const [role, id] = control.dataset.fumbleStep.split(":"), context = fumbleContext(role);
+      const step = fumbleSteps(context.outcome, context.actor, context.itemId).find(entry => entry.id === id);
+      try { if (step) await runFumbleStep({ ...context, step }); } catch (error) { ui.notifications.warn(error.message); }
+    }));
+    for (const role of ["attack", "defense"]) autoResolveFumble(fumbleContext(role)).catch(console.error);
   });
 }
 
 function renderUntargetedFumbles(message, html, attack) {
-  const blocks = message.rolls.map((_roll, index) => fumbleHTML(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner)).filter(Boolean);
+  const blocks = message.rolls.map((_roll, index) => fumbleHTML(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner, message.speakerActor, attack.itemId)).filter(Boolean);
   if (!blocks.length) return;
   const box = document.createElement("div");
   box.className = "witcher-exchange";
   box.innerHTML = blocks.join("");
   (html.querySelector(".message-content") ?? html).append(box);
-  box.querySelectorAll('[data-exchange-fumble="attack"]').forEach(control => control.addEventListener("click", async event => {
+  const context = index => ({ message, index, role: "attack", actor: message.speakerActor, itemId: attack.itemId, outcome: attackFumble(message, index), author: message.author?.id });
+  box.querySelectorAll("[data-fumble-step]").forEach(control => control.addEventListener("click", async event => {
     event.stopPropagation(); control.disabled = true;
-    const index = Number(control.dataset.index);
-    try { await applyFumble({ message, index, role: "attack", actor: message.speakerActor, itemId: attack.itemId, outcome: attackFumble(message, index) }); } catch (error) { ui.notifications.warn(error.message); }
+    const index = Number(control.dataset.index), id = control.dataset.fumbleStep.split(":")[1], ctx = context(index);
+    const step = fumbleSteps(ctx.outcome, ctx.actor, ctx.itemId).find(entry => entry.id === id);
+    try { if (step) await runFumbleStep({ ...ctx, step }); } catch (error) { ui.notifications.warn(error.message); }
   }));
+  message.rolls.forEach((_roll, index) => autoResolveFumble(context(index)).catch(console.error));
 }
 
 function refreshAttack(message) {

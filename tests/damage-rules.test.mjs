@@ -211,3 +211,19 @@ test("grapple options follow who holds whom; a pinned creature may still try to 
   assert.equal(punchFormula({ system: { statistics: { effective: { body: 7 } } } }), "1d6+2");
   delete globalThis.fromUuidSync;
 });
+
+test("each fumble row becomes the right set of steps with their own dice", async () => {
+  const { fumbleOutcome } = await import("../scripts/data/fumbles.mjs");
+  const { fumbleSteps } = await import("../scripts/combat/attack-exchange.mjs");
+  const ids = (table, magnitude) => fumbleSteps(fumbleOutcome(table, magnitude), null, "").map(step => step.id);
+  assert.deepEqual(ids("melee", 6), ["status"]);
+  assert.deepEqual(ids("melee", 7), ["stuck"]);
+  assert.deepEqual(ids("melee", 8), ["reliability"]);
+  assert.deepEqual(ids("melee", 9), ["self"]);
+  assert.deepEqual(ids("melee", 12), ["ally"]);
+  assert.deepEqual(ids("armedDefense", 7), ["disarm"]);
+  assert.deepEqual(ids("armedDefense", 8), ["status", "stun"]);
+  assert.deepEqual(ids("ranged", 8), ["jam"]);
+  assert.deepEqual(ids("unarmed", 9), ["status", "head", "stun"]);
+  assert.deepEqual(ids("melee", 3), []);
+});
