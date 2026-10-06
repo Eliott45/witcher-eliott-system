@@ -11,7 +11,7 @@ import { fullTurnStart } from "./full-turn-rules.mjs";
 import { woundEffectData } from "./critical-wound-effects.mjs";
 import { GRAPPLE_ACTIONS, applyGrappleSuccess, grappleState } from "./grapple.mjs";
 import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
-import { attackConcealed, creatureDetailsHidden, concealSetting, creatureDetailsSecret } from "../chat/concealment.mjs";
+import { attackConcealed, creatureDetailsHidden, enemyAttackHidden, creatureDetailsSecret } from "../chat/concealment.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
 import { hitLocation, bodyPlanOf, ATTACK_LOCATIONS, weaponAttack, attackModes } from "./weapon-rules.mjs";
 import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
@@ -448,7 +448,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
   // Until the defense is chosen (and its dice landed) the defender does not learn the total or a fumble.
   const concealed = attackConcealed(message) && !linked(message.id, index, "defense");
   // The GM and the attacker's owners see it, marked like pf2e's GM-only info.
-  const secret = !concealed && concealSetting() && !linked(message.id, index, "defense");
+  const secret = !concealed && enemyAttackHidden(message) && !linked(message.id, index, "defense");
   const head = `<header><span>Атака ${attack.count > 1 ? `${index + 1} ` : ""}<b class="${secret ? "witcher-gm-only" : ""}" ${secret ? 'data-tooltip="Игроки не видят до выбора защиты"' : ""}>${concealed ? '<i class="fa-solid fa-eye-slash" data-tooltip="Итог атаки откроется после выбора защиты"></i>' : total}</b></span>`;
   const ownFumble = concealed ? "" : (secret ? fumbleHTMLSecret : fumbleHTML)(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner, message.speakerActor, attack.itemId);
   const hideTargetNumbers = creatureDetailsHidden(target);
@@ -585,10 +585,10 @@ function concealAttackCard(message, html, attack) {
     html.querySelectorAll(".witcher-attack-chat > p[data-tooltip], .witcher-attack-modifiers").forEach(element => element.remove());
   } else if (creatureDetailsSecret(message.speakerActor)) html.querySelectorAll(".witcher-attack-chat > p[data-tooltip], .witcher-attack-modifiers").forEach(element => element.classList.add("witcher-gm-only"));
   // The viewer who may see a still-concealed attack gets it highlighted as hidden from players.
-  if (!attackConcealed(message) && concealSetting()) html.querySelectorAll(".dice-roll").forEach((element, index) => {
+  if (!attackConcealed(message) && enemyAttackHidden(message)) html.querySelectorAll(".dice-roll").forEach((element, index) => {
     if (!linked(message.id, index, "defense")) { element.classList.add("witcher-gm-only"); element.dataset.tooltip ??= "Игроки не видят до выбора защиты"; }
   });
-  if (!attackConcealed(message) && concealSetting() && message.rolls.some((_roll, index) => !linked(message.id, index, "defense")))
+  if (!attackConcealed(message) && enemyAttackHidden(message) && message.rolls.some((_roll, index) => !linked(message.id, index, "defense")))
     html.querySelectorAll(".witcher-critical-result").forEach(element => element.classList.add("witcher-gm-only"));
 }
 

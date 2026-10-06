@@ -294,3 +294,19 @@ test("loot: taking moves an item to the character, emptied piles disappear; drop
   assert.equal(deleted, true, "an emptied pile is removed");
   delete globalThis.fromUuidSync;
 });
+
+test("only enemies are concealed: allies and player characters rolled by the GM stay visible", async () => {
+  const { attackConcealed, creatureDetailsHidden, isEnemy } = await import("../scripts/chat/concealment.mjs");
+  const settings = { concealAttackRolls: true, concealCreatureDetails: true };
+  globalThis.game = { user: { isGM: false }, settings: { get: (_scope, key) => settings[key] } };
+  globalThis.CONST = { TOKEN_DISPOSITIONS: { HOSTILE: -1, NEUTRAL: 0, FRIENDLY: 1, SECRET: -2 } };
+  const npc = disposition => ({ type: "npc", isOwner: false, hasPlayerOwner: false, prototypeToken: { disposition } });
+  assert.equal(isEnemy(npc(-1)), true);
+  assert.equal(isEnemy(npc(1)), false, "a friendly NPC rolled by the GM");
+  assert.equal(isEnemy({ type: "character", hasPlayerOwner: true }), false, "a player's character rolled by the GM");
+  assert.equal(attackConcealed({ speakerActor: npc(1), flags: {} }), false);
+  assert.equal(attackConcealed({ speakerActor: npc(-1), flags: {} }), true);
+  assert.equal(creatureDetailsHidden(npc(1)), false);
+  assert.equal(creatureDetailsHidden(npc(-1)), true);
+  delete globalThis.game; delete globalThis.CONST;
+});

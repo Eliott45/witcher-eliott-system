@@ -1,4 +1,4 @@
-import { concealSetting } from "./concealment.mjs";
+import { enemyRoller } from "./concealment.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { trackRollDisplay } from "./roll-display.mjs";
@@ -26,7 +26,7 @@ export async function beginManualCritical(first,chain) {
   const record={id:foundry.utils.randomID(),chain,busy:true,message:null,waiter:null};
   pending.set(record.id,record);
   // With concealed attacks a public chain prompt would reveal a crit or fumble before the defense: keep it to the roller and GM.
-  const display=trackRollDisplay(),coreMode=game.settings.get("core","messageMode"),mode=coreMode==="public"&&concealSetting()?"gm":coreMode;
+  const display=trackRollDisplay(),coreMode=game.settings.get("core","messageMode"),mode=coreMode==="public"&&enemyRoller()?"gm":coreMode;
   try {
     record.message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({
       speaker:{alias:game.user.name},rolls:[faceRoll(first.result)],content:content(record,"pending"),
