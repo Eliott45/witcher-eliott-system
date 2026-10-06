@@ -197,15 +197,23 @@ export async function applyExchangeDamage(message, index) {
   if (!preview?.target.isOwner || linkedAny(message.id, index, "applied")) return;
   const { target, result, data } = preview, health = target.system.health.value;
   await target.update({ "system.health.value": health - result.total });
-  if (result.ablate) {
-    const item = target.items.get(result.ablate);
-    if (item) await item.update({ "system.stoppingPower.value": Math.max(0, item.system.stoppingPower.value - 1) });
+  const worn = [];
+  for (const id of result.ablate) {
+    if (id === "natural") {
+      const value = target.system.creature?.naturalArmor ?? 0;
+      if (value > 0) { await target.update({ "system.creature.naturalArmor": value - 1 }); worn.push(`естественная броня ${value} → ${value - 1}`); }
+      continue;
+    }
+    const item = target.items.get(id), from = item?.system.stoppingPower?.value;
+    if (!item || !(from > 0)) continue;
+    await item.update({ "system.stoppingPower.value": from - 1 });
+    worn.push(`${item.name} ${from} → ${from - 1}`);
   }
   if (data.critical?.wound) await target.createEmbeddedDocuments("ActiveEffect", [woundEffectData(data.critical.wound.id, data.critical.level,
     { location: data.location.id, locationName: data.location.name })]);
   return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${result.total} ПЗ</p>`,
     flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: "applied", total: result.total, steps: result.steps, from: health,
-      ablated: result.ablate ? target.items.get(result.ablate)?.name ?? "" : "" } } } }, "public");
+      ablated: worn.join(", "), armorHeld: !result.penetrated && preview.armor.sp > 0 } } } }, "public");
 }
 
 // ── Fumbles (core p.157, errata v4) ─────────────────────────────────────────
@@ -312,7 +320,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
       if (wound) body += `<details class="witcher-exchange-wound"><summary>${esc(wound.name)}</summary><p>${esc(wound.effect)}</p></details>`;
       if (applied) {
         const result = exchangeOf(applied);
-        body += `<p class="witcher-exchange-applied" data-tooltip="${esc(stepsHTML(result.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-heart-crack"></i> −${result.total} ПЗ${result.ablated ? ` <small>· ${esc(result.ablated)}: ПБ −1</small>` : ""}</p>`;
+        body += `<p class="witcher-exchange-applied" data-tooltip="${esc(stepsHTML(result.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-heart-crack"></i> −${result.total} ПЗ</p>${result.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ −1: ${esc(result.ablated)}</p>` : result.armorHeld ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield"></i> Броня выдержала удар — ПБ не снижается</p>` : ""}`;
         // Core p.158: every critical wound also forces a Stun save.
         if (data.critical && target?.isOwner) body += `<div class="witcher-exchange-actions">${button("data-exchange-stun", '<i class="fa-solid fa-dice-d10"></i> Испытание Устойчивости', true, "Критическое ранение требует испытания УСТ")}</div>`;
       } else if (target?.isOwner) {

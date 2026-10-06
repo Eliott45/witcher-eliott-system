@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { parseDamageTypes, weaponDamageTraits, layeredStoppingPower, criticalLevel, resolveDamage } from "../scripts/combat/damage-rules.mjs";
 import { criticalWoundByRoll, aimedCriticalRoll } from "../scripts/data/critical-wounds.mjs";
 
-const armor = (sp, resistances = []) => ({ sp, resistances, layers: sp ? [{ name: "Броня", sp }] : [], ablate: sp ? "armor" : null });
+const armor = (sp, resistances = []) => ({ sp, resistances, layers: sp ? [{ name: "Броня", sp }] : [], ablate: sp ? ["armor"] : [] });
 const traits = (properties = "", damageType = "Р/К") => weaponDamageTraits({ properties, damageType });
 const hit = options => resolveDamage({ location: "torso", multiplier: 1, traits: traits(), armor: armor(0), ...options });
 
@@ -34,9 +34,11 @@ test("SP first, resistance halves what is left, then the location multiplier", (
 
 test("armor ablates only when the weapon damage penetrates; critical bonus ignores armor", () => {
   const blocked = hit({ base: 6, armor: armor(10), critical: { name: "Лёгкое", bonus: 3 } });
-  assert.equal(blocked.total, 3); assert.equal(blocked.penetrated, false); assert.equal(blocked.ablate, null);
+  assert.equal(blocked.total, 3); assert.equal(blocked.penetrated, false); assert.deepEqual(blocked.ablate, []);
   const through = hit({ base: 12, armor: armor(10) });
-  assert.equal(through.total, 2); assert.equal(through.ablate, "armor");
+  assert.equal(through.total, 2); assert.deepEqual(through.ablate, ["armor"]);
+  const layered = hit({ base: 30, armor: { sp: 24, resistances: [], layers: [{ name: "Гамбезон", sp: 3 }, { name: "Бригантина", sp: 12 }, { name: "Латы", sp: 20 }], ablate: ["g", "b", "p"] } });
+  assert.deepEqual(layered.ablate, ["g", "b", "p"], "a penetrating hit wears every layer by 1");
 });
 
 test("monsters halve non-silver damage; silver dice count only against them; fire is exempt", () => {

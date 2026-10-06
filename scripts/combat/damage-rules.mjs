@@ -58,10 +58,10 @@ export function armorAt(actor, location) {
   if (worn.length) {
     const top = worn.reduce((best, layer) => layer.sp > best.sp ? layer : best, worn[0]);
     return { zone, sp: layeredStoppingPower(worn.map(layer => layer.sp)), resistances: [...new Set([...worn.flatMap(layer => layer.resistances), ...innate])],
-      layers: worn.map(layer => ({ id: layer.item.id, name: layer.item.name, sp: layer.sp })), ablate: top.sp > 0 ? top.item.id : null, natural: false };
+      layers: worn.map(layer => ({ id: layer.item.id, name: layer.item.name, sp: layer.sp })), ablate: worn.filter(layer => layer.sp > 0).map(layer => layer.item.id), natural: false };
   }
   const natural = actor.type === "npc" ? Math.max(0, actor.system.creature?.naturalArmor ?? 0) : 0;
-  return { zone, sp: natural, resistances: innate, layers: natural ? [{ id: "", name: "Естественная броня", sp: natural }] : [], ablate: null, natural: Boolean(natural) };
+  return { zone, sp: natural, resistances: innate, layers: natural ? [{ id: "", name: "Естественная броня", sp: natural }] : [], ablate: natural ? ["natural"] : [], natural: Boolean(natural) };
 }
 
 const hasAbility = (actor, ruleId) => (actor.items ?? []).some(item => item.type === "ability" && item.system.ruleId === ruleId);
@@ -97,6 +97,8 @@ export function resolveDamage({ base, silver = 0, location, multiplier, traits, 
   if (armor.sp) note(traits.piercing === "improved" ? "ПБ (улучшенное пробивание: ½)" : "ПБ брони", `−${sp}`, armor.layers.map(layer => `${layer.name} ${layer.sp}`).join(", "));
   damage = Math.max(0, damage - sp);
   const penetrated = damage > 0;
+  // Core p.155 (errata «Staged Penetration»): only a hit that gets through wears the armor, every layer by 1.
+  if (armor.sp) note(penetrated ? "Броня пробита: ПБ −1" : "Броня выдержала: ПБ не снижается", "", penetrated ? armor.layers.map(layer => layer.name).join(", ") : "");
   const resisted = penetrated && traits.types.length > 0 && traits.types.every(type => armor.resistances.includes(type));
   if (resisted && traits.piercing === "none") { damage = Math.floor(damage / 2); note("Сопротивление урону", "½", traits.types.map(type => DAMAGE_TYPE_NAMES[type]).join("/")); }
   else if (resisted) note("Сопротивление урону", "игнорируется", "пробивающее броню");
@@ -104,5 +106,5 @@ export function resolveDamage({ base, silver = 0, location, multiplier, traits, 
   if (monster && !traits.silver && !fire && damage > 0) { damage = Math.floor(damage / 2); note("Чудовище: не серебро", "½"); }
   if (vulnerableToFire && fire && damage > 0) { damage *= 2; note("Уязвимость к огню", "×2"); }
   if (critical) { damage += critical.bonus; note(`Критическое ранение: ${critical.name.toLocaleLowerCase("ru")}`, `+${critical.bonus}`, "броня не блокирует"); }
-  return { total: damage, steps, penetrated, ablate: penetrated ? armor.ablate : null, location };
+  return { total: damage, steps, penetrated, ablate: penetrated ? [armor.ablate ?? []].flat() : [], location };
 }
