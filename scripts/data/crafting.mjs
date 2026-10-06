@@ -10,7 +10,7 @@ export function recipeGroups(actor) {
     groups.get(key).push(item);
   }
   return [...groups.values()].map(copies => ({
-    item: copies.find(available) ?? copies.find(item => item.system.recipe.memorized) ?? copies[0], copies,
+    item: copies.find(available) ?? copies.find(item => item.system.recipe.memorized) ?? copies.find(item => item.system.quantity > 0) ?? copies[0], copies,
     physical: copies.some(available), memorized: copies.some(item => item.system.recipe.memorized)
   }));
 }

@@ -9,6 +9,15 @@ export function memorizeRecipe(actor, source, memorize = true) {
     if (!source.testUserPermission(game.user, "LIMITED")) throw new Error("Рецепт недоступен.");
     const access = recipeAccess(actor, source);
     if (memorize) requireMemorySlot(actor, source);
+    if (!memorize) {
+      const paper = access.copies.filter(item => item.system.quantity > 0);
+      const memoryOnly = access.copies.filter(item => item.system.quantity === 0);
+      if (paper.length) await actor.updateEmbeddedDocuments("Item", paper.map(item => ({
+        _id: item.id, "system.recipe.memorized": false
+      })));
+      if (memoryOnly.length) await actor.deleteEmbeddedDocuments("Item", memoryOnly.map(item => item.id));
+      return;
+    }
     if (access.copies.length) {
       const chosen = access.copies[0];
       await actor.updateEmbeddedDocuments("Item", access.copies.map(item => ({

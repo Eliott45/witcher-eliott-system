@@ -51,6 +51,9 @@ test("memory uses one INT pool across formulas and diagrams, deduplicates copies
   assert.equal(recipeAccess(actor,recipe).memorized,true);
   await memorizeRecipe(actor,recipe,false);
   assert.equal(recipeMemory(actor).used,0);
+  assert.equal(actor.items.get(recipe.id),undefined,"Forgotten record without paper is removed");
+  assert.equal(actor.items.get(copy.id),copy,"Paper left elsewhere must not be deleted");
+  assert.equal(copy.system.recipe.memorized,false);
   await memorizeRecipe(actor,formula);
   assert.equal(recipeMemory(actor).used,1);
 });
@@ -68,6 +71,29 @@ test("catalog memorization creates knowledge with no weight/copy and racing addi
 test("salvage rounds up per component, never per stack or repeated row; durations stay readable",()=>{
   assert.deepEqual(salvagedComponents([{uuid:"iron",quantity:1},{uuid:"iron",quantity:2},{uuid:"wood",quantity:1}]),[{uuid:"iron",quantity:2},{uuid:"wood",quantity:1}]);
   assert.equal(craftingDuration(5400),"1 ч. 30 мин.");assert.equal(craftingDuration(90000),"1 дн. 1 ч.");assert.equal(craftingDuration(27),"9 раунд.");
+});
+
+test("forgetting a catalog-only recipe removes its record and frees memory without leaving a recipe group",async()=>{
+  const f=fixture();
+  const source=f.item('known-only','recipe',{recipe:{...f.recipe.system.recipe}});
+  await memorizeRecipe(f.actor,source);
+  const learned=f.actor.items.find(item=>item.system.recipe?.memorized);
+  assert.equal(learned.system.quantity,0);
+  await memorizeRecipe(f.actor,learned,false);
+  assert.equal(f.actor.items.get(learned.id),undefined);
+  assert.equal(recipeMemory(f.actor).used,0);
+  assert.equal((await craftingContext(f.actor)).groups.some(group=>group.id==='unavailable'),false);
+});
+
+test("legacy forgotten records stay hidden, but stored physical copies still appear under their own ID",async()=>{
+  const f=fixture();f.recipe.system.quantity=0;
+  assert.equal((await craftingContext(f.actor)).empty,true);
+  const stored=f.item('stored','recipe',{ruleId:f.recipe.system.ruleId,carried:false,quantity:1,recipe:{...f.recipe.system.recipe}});
+  f.actor.items.push(stored);
+  const view=await craftingContext(f.actor);
+  assert.equal(view.groups.length,1);
+  assert.equal(view.groups[0].id,'unavailable');
+  assert.equal(view.groups[0].recipes[0].id,stored.id);
 });
 
 test("custom world recipes keep identity without a ruleId and transferring paper cannot transfer memory",async()=>{

@@ -15,7 +15,9 @@ export async function craftingContext(actor) {
     { id: "unavailable", label: "Рецепты не при себе", icon: "fa-box-archive", recipes: [] }
   ];
   const canAct = conditionRules(actor).canAct;
-  const rows = await Promise.all(recipeGroups(actor).map(async ({ item, physical, memorized }) => {
+  // Older forgotten memory records have zero copies; they are not recipes stored elsewhere.
+  const recipes = recipeGroups(actor).filter(group => group.memorized || group.copies.some(item => item.system.quantity > 0));
+  const rows = await Promise.all(recipes.map(async ({ item, physical, memorized }) => {
     const recipe = item.system.recipe;
     let preview, error = "";
     try { preview = await craftingPreview(actor, item); } catch (reason) { error = reason.message; }
