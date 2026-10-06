@@ -19,7 +19,7 @@ test("page 247 swords use one-handed attacks, printed reliability and existing p
     const actor = {type:"character",isOwner:true,items:[item],effects:[],
       system:{crowns:1000,skills:{swordsmanship:6},statistics:{effective:{reflex:8,body:7},modifiers:[]}}};
     const fast = weaponAttack(actor,item), strong = weaponAttack(actor,item,{mode:"strong"});
-    assert.equal(fast.blocked, ""); assert.equal(fast.total, 14); assert.equal(fast.attack.count, 2);
+    assert.equal(fast.blocked, ""); assert.equal(fast.total, 14); assert.equal(fast.attack.count, 1);
     assert.equal(strong.total, 11); assert.equal(strong.attack.count, 1);
     assert.equal(equipmentQuote(actor,item).canAdd, true);
     assert.equal(equipmentQuote(actor,item).canBuy, false);

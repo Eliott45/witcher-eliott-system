@@ -97,7 +97,7 @@ test("blind attacks lose Aim and forbid aimed locations without changing the att
   assert.equal(weaponAttack(a,weapon,{targetContext:blind,ambushBonus:5}).total,15);
   assert.match(weaponAttack(a,weapon,{targetContext:blind,location:"head"}).blocked,/Нельзя/);
   weapon.system.skill="swordsmanship";weapon.system.category="melee";
-  assert.equal(weaponAttack(a,weapon).attack.count,2);
+  assert.equal(weaponAttack(a,weapon).attack.count,1);
 });
 
 test("a targeted weapon roll snapshots cone and ambush modifiers and posts muted signed rows",async()=>{
@@ -162,7 +162,7 @@ test("legacy opening flags no longer restrict attack count or trigger initiative
   f.a.flags[SYSTEM_ID]={ambush:{targets:[f.b.token.uuid],opening:true}};
   game.user.targets.add(f.b.token);
   await rollWeaponAttack(f.a.actor,"sword");
-  assert.equal(f.messages[0].rolls.length,2);assert.equal(f.combat.round,0);
+  assert.equal(f.messages[0].rolls.length,1);assert.equal(f.combat.round,0);
   assert.equal(tacticsFlags(f.a).tacticRequest,undefined);
   assert.equal(f.operations.filter(entry=>entry.initiative).length,0);
   assert.equal(ambushAttack(f.combat,f.a.token,f.b.token).bonus,5);
@@ -218,7 +218,7 @@ test("one explicit target attacks without clearing the scene's several selected 
   game.user.targets=new Set([f.b.token,f.c.token]);
   await rollWeaponAttack(f.a.actor,"sword",{attackerUuid:f.a.token.uuid,targetUuid:f.b.token.uuid});
   assert.equal(game.user.targets.size,2);assert.ok(game.user.targets.has(f.c.token));
-  assert.equal(f.messages[0].rolls.length,2);
+  assert.equal(f.messages[0].rolls.length,1);
   assert.equal(tacticsFlags(f.messages[0]).weaponAttack.target,f.b.token.uuid);
   assert.equal(tacticsFlags(f.messages[0]).weaponAttack.base,18);
   assert.throws(()=>selectedAttackTarget(f.a.actor,{attackerUuid:f.c.token.uuid,targetUuid:f.b.token.uuid}),/атакующего/);
@@ -317,7 +317,7 @@ test("players use ordinary attacks after group checks; only Start Battle begins 
   const f=await groupFixture();await submitGroup(f,f.a,18);await submitGroup(f,f.b,17);await submitGroup(f,f.c,14);
   game.user=f.player;f.c.token.object={isVisible:true};
   const message=await rollWeaponAttack(f.a.actor,"sword",{attackerUuid:f.a.token.uuid,targetUuid:f.c.token.uuid});
-  assert.equal(message.rolls.length,2);assert.equal(tacticsFlags(message).weaponAttack.parts.find(part=>part.label==="Засада").value,5);
+  assert.equal(message.rolls.length,1);assert.equal(tacticsFlags(message).weaponAttack.parts.find(part=>part.label==="Засада").value,5);
   assert.equal(groupAmbush(f.combat).status,"ready");assert.equal(f.combat.started,false);
   assert.equal(tacticsFlags(f.a).tacticRequest,undefined);assert.equal(f.operations.filter(op=>op.initiative).length,0);
   await assert.rejects(()=>startGroupCombat(f.combat),/только мастер/);

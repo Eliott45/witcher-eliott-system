@@ -3,6 +3,7 @@ import { effectiveItem } from "../data/workshop.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { shieldClass } from "../data/shields.mjs";
 import { aimingBonus } from "./full-turn-rules.mjs";
+import { statusEffect } from "../data/effect-counters.mjs";
 
 export const gripOf = item => item.system.natural ? 0 : item.system.grip || item.system.hands || 1;
 /** Effect penalties such as Staggered or Prone, targeted at "combat.attack" / "combat.defense". */
@@ -47,7 +48,8 @@ export function hitLocation(result,bodyPlan="humanoid") {
 export function attackModes(actor,item) {
   if (actor.type === "npc") return [{id:"npc",name:`Атака ×${item.system.attackRate??1}`,count:item.system.attackRate??1,penalty:0,multiplier:1}];
   if (item.system.skill === "crossbow") return [{id:"shot",name:"Выстрел",count:1,penalty:0,multiplier:1}];
-  return [{id:"fast",name:item.system.skill==="archery"?"Быстрый выстрел":"Две быстрые",count:item.system.skill==="archery"?1:2,penalty:0,multiplier:1},
+  // Core p.153: a fast attack is two strikes for one action. Each click rolls one strike, so the two may hit different targets.
+  return [{id:"fast",name:item.system.skill==="archery"?"Быстрый выстрел":"Быстрая",count:1,penalty:0,multiplier:1,pair:item.system.skill!=="archery"},
     {id:"strong",name:"Сильная",count:1,penalty:-3,multiplier:2}];
 }
 export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="normal",modifier=0,targetContext=null,ambushBonus=0}={}) {
@@ -62,7 +64,7 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
     {label:"Двуручное оружие одной рукой",value:!weapon.natural&&gripOf(item)<(weapon.hands??1)?-3:0},
     // TODO(p.151): no explicit multi-projectile Aim example in core/errata or Sage's Answers found.
     // Keep one base for the existing attack action (including an NPC's printed rate of fire).
-    {label:"Прицеливание",value:ranged&&!targetContext?.blind?aimingBonus(actor):0},
+    {label:"Прицеливание",value:ranged&&!targetContext?.blind&&!statusEffect(actor,"quick-draw")?aimingBonus(actor):0},
     {label:attack.name,value:attack.penalty},{label:"Дополнительное действие",value:extraPenalty},
     {label:aim.name,value:aim.penalty},{label:band.name.replace(/ · [−+]?\d+$/u,""),value:band.penalty},{label:"Ситуация",value:Number(modifier)},
     ...(targetContext?.parts??[]), ...(ambushBonus?[{label:"Засада",value:ambushBonus}]:[]), ...combatModifierParts(actor,"combat.attack"), ...(targetContext?.target?.actor?combatModifierParts(targetContext.target.actor,"combat.targeted"):[])];

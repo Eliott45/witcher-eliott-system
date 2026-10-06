@@ -16,7 +16,7 @@ function fixture() {
 test("weapon checks combine base, accuracy, mode, aim and extra action; damage includes BODY once",()=>{
   const actor=fixture(),weapon=actor.items[0];
   assert.equal(gripOf(weapon),2);
-  const fast=weaponAttack(actor,weapon);assert.equal(fast.total,15);assert.equal(fast.attack.count,2);assert.equal(fast.damage,"(2d6+2 + 6)");
+  const fast=weaponAttack(actor,weapon);assert.equal(fast.total,15);assert.equal(fast.attack.count,1);assert.equal(fast.damage,"(2d6+2 + 6)");
   const strong=weaponAttack(actor,weapon,{mode:"strong",extraPenalty:-3,location:"head",modifier:2});assert.equal(strong.total,5);assert.equal(strong.damage,"(2d6+2 + 6) * 2");
   weapon.system.grip=1;assert.equal(weaponAttack(actor,weapon).blocked,"");assert.equal(weaponAttack(actor,weapon).total,12);
   assert.equal(weaponAttack(actor,weapon,{mode:"strong",extraPenalty:-3}).total,6);
@@ -45,14 +45,19 @@ test("extra action costs three once and cannot be repeated in the same combat ro
   actor.system.stamina.value=2;assert.throws(()=>actionQuote(actor),/Недостаточно/);
   delete game.combat;
 });
-test("two quick attacks share one message and STA payment, repeat clicks share the pending action",async()=>{
-  const actor=fixture();actor.system.combatAction.extra=true;let writes=0,sent;
-  const update=actor.update.bind(actor);actor.update=async changes=>{writes++;return update(changes);};
+test("a fast attack is two single strikes for one action; an extra action is paid once for the pair",async()=>{
+  const actor=fixture();actor.system.combatAction.extra=true;actor.flags={};let sent=[];
+  const update=actor.update.bind(actor);actor.update=async changes=>{for(const [path,value] of Object.entries(changes))if(path.startsWith(`flags.${SYSTEM_ID}.`))(actor.flags[SYSTEM_ID]??={})[path.split(".").at(-1)]=value;return update(changes);};
   globalThis.game={settings:{get:()=>"blind"}};
-  globalThis.foundry={dice:{Roll:class{constructor(formula){this.formula=formula;}async evaluate(opts){assert.equal(opts.allowInteractive,false);return this;}}},documents:{ChatMessage:{getSpeaker:()=>({actor:"fighter"}),applyMode:data=>data,async create(data){sent=data;assert.equal(actor.system.stamina.value,20);return data;}}}};
-  const first=rollWeaponAttack(actor,"sword"),second=rollWeaponAttack(actor,"sword");assert.equal(first,second);await first;
-  assert.equal(sent.rolls.length,2);assert.equal(sent.rolls[0].formula,"1d10wc + 12");assert.equal(writes,1);assert.equal(actor.system.stamina.value,17);assert.equal(actor.system.combatAction.extra,false);
-  assert.equal(sent.flags[SYSTEM_ID].weaponAttack.damage,"(2d6+2 + 6)");
+  globalThis.foundry={dice:{Roll:class{constructor(formula){this.formula=formula;}async evaluate(opts){assert.equal(opts.allowInteractive,false);return this;}}},documents:{ChatMessage:{getSpeaker:()=>({actor:"fighter"}),applyMode:data=>data,async create(data){sent.push(data);return data;}}}};
+  await rollWeaponAttack(actor,"sword");
+  assert.equal(sent[0].rolls.length,1);assert.equal(sent[0].rolls[0].formula,"1d10wc + 12");assert.equal(sent[0].flags[SYSTEM_ID].weaponAttack.strike,1);
+  assert.equal(actor.system.stamina.value,17);assert.equal(actor.system.combatAction.extra,true,"the extra action stays open for strike 2");
+  await rollWeaponAttack(actor,"sword");
+  assert.equal(sent[1].rolls[0].formula,"1d10wc + 12","strike 2 keeps the −3");assert.equal(sent[1].flags[SYSTEM_ID].weaponAttack.strike,2);
+  assert.equal(actor.system.stamina.value,17,"no second payment");assert.equal(actor.system.combatAction.extra,false);
+  assert.equal(actor.flags[SYSTEM_ID].fastStrike,null);
+  assert.equal(sent[0].flags[SYSTEM_ID].weaponAttack.damage,"(2d6+2 + 6)");
 });
 test("generic extra action preserves privacy and costs nothing on canceled chat",async()=>{
   const actor=fixture();actor.system.combatAction.extra=true;let formula,accepted=false;

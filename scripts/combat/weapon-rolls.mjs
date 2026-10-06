@@ -3,10 +3,18 @@ import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { actionQuote, actionNote, actionUpdate } from "./action-economy.mjs";
 import { weaponAttack, signed, hitLocation } from "./weapon-rules.mjs";
+import { damageTypeLabel } from "./damage-rules.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { consumeAiming } from "./full-turn-rules.mjs";
 import { selectedAttackTarget } from "./attack-target.mjs";
 import { ambushAttack, ambushState, tacticsFlags } from "./tactics-rules.mjs";
+
+/** Pair state of a fast attack: the second click in the same round (and extra-action status) is strike 2/2. */
+export function fastPair(actor,attack,action) {
+  if(!attack?.pair)return null;
+  const key=action.roundKey||"free",pending=actor.flags?.[SYSTEM_ID]?.fastStrike;
+  return {key,second:Boolean(pending&&pending.round===key&&pending.extra===action.extra)};
+}
 
 export function attackModifierMarkup(parts) {
   return `<ul class="witcher-attack-modifiers">${parts.filter(part=>part.value&&part.label!=="Основа навыка").map(part=>
@@ -29,12 +37,16 @@ export function rollWeaponAttack(actor,itemId,options={}) {
     const item=actor.items.get(itemId),action=actionQuote(actor),quote=weaponAttack(actor,item,{...options,
       extraPenalty:action.penalty,targetContext,ambushBonus:ambush.bonus});
     if(quote.blocked)throw new Error(quote.blocked);
+    // The second strike of a fast attack belongs to the same action: no new STA for an extra action.
+    const pair=fastPair(actor,quote.attack,action),strike=pair?(pair.second?2:1):0;
+    if(pair?.second)action.stamina=0;
     const display=trackRollDisplay(),messageMode=game.settings.get("core","messageMode");
     try {
       const rolls=[];
       for(let i=0;i<quote.attack.count;i++)rolls.push(await new foundry.dice.Roll(`1d10wc + ${quote.total}`,{}, {flavor:`${item.name} · ${i+1}/${quote.attack.count}`}).evaluate({allowInteractive:messageMode!=="blind"}));
       const math=quote.parts.filter(part=>part.value||part.label==="Основа навыка").map(part=>`${part.label}: ${signed(part.value)}`).join("; ");
-      const flavor=`<section class="witcher-attack-chat"><h3>${esc(item.name)} · ${esc(quote.attack.name)}</h3><p data-tooltip="${esc(math)}">База проверки <b>${signed(quote.total)}</b> · ${quote.attack.count} ${quote.attack.count===1?"бросок":"броска"}</p>`
+      const types=damageTypeLabel(quote.weapon.damageType);
+      const flavor=`<section class="witcher-attack-chat"><h3>${esc(item.name)} · ${esc(quote.attack.name)}${strike?` ${strike}/2`:""}</h3>${types?`<p class="witcher-damage-type">Урон: ${esc(types)}</p>`:""}<p data-tooltip="${esc(math)}">База проверки <b>${signed(quote.total)}</b> · ${quote.attack.count} ${quote.attack.count===1?"бросок":"броска"}</p>`
         +(targetContext?`<p>Цель: <b>${esc(targetContext.target.name)}</b></p>`:"<small>Цель не выбрана — направление взгляда не учтено.</small>")
         +attackModifierMarkup(quote.parts)
         +(targetContext?.blind?"<small>Вне конуса зрения: бонус прицеливания не применяется.</small>":"")
@@ -45,10 +57,12 @@ export function rollWeaponAttack(actor,itemId,options={}) {
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls,flavor,
         flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId,name:item.name,mode:quote.attack.id,base:quote.total,count:quote.attack.count,
           damage:quote.damage,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
-          target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,ranged:quote.ranged,thrown:quote.weapon.category==="thrown",combat:combat?.started?{id:combat.id,round:combat.round}:null}}}},messageMode));
+          target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,ranged:quote.ranged,thrown:quote.weapon.category==="thrown",combat:combat?.started?{id:combat.id,round:combat.round}:null,strike,damageTypes:damageTypeLabel(quote.weapon.damageType)}}}},messageMode));
       if(!message)return;
       await display.wait(message);
       const update=actionUpdate(actor,action);
+      if(pair&&!pair.second){delete update["system.combatAction.extra"];delete update["system.combatAction.lastExtraRound"];}
+      update[`flags.${SYSTEM_ID}.fastStrike`]=pair&&!pair.second?{round:pair.key,extra:action.extra,itemId}:null;
       if(item.system.skill==="crossbow")update.items=[{_id:item.id,"system.loaded":false}];
       if(Object.keys(update).length)await actor.update(update);
       await consumeAiming(actor);

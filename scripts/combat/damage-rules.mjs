@@ -6,6 +6,7 @@ import { equippedItems, armorZones } from "../data/physical-items.mjs";
 
 const TYPE_CODES = { "К": "piercing", "Р": "slashing", "Д": "bludgeoning", "С": "elemental" };
 export const DAMAGE_TYPE_NAMES = { piercing: "колющий", slashing: "режущий", bludgeoning: "дробящий", elemental: "стихийный" };
+export const damageTypeLabel = text => parseDamageTypes(text).map(type => DAMAGE_TYPE_NAMES[type]).join(" / ");
 export const parseDamageTypes = text => [...new Set(String(text ?? "").toUpperCase().split(/[^А-ЯЁ]+/u).map(code => TYPE_CODES[code]).filter(Boolean))];
 
 /** Weapon properties that change how damage meets armor. */
@@ -72,7 +73,7 @@ export function resolveDamage({ base, silver = 0, location, multiplier, traits, 
   const fire = traits.types.includes("elemental");
   const silverApplies = monster && silver > 0;
   let damage = base + (silverApplies ? silver : 0);
-  note("Бросок урона", base);
+  note("Бросок урона", base, traits.types.map(type => DAMAGE_TYPE_NAMES[type]).join(" / "));
   if (silverApplies) note("Серебро против чудовища", `+${silver}`);
   const sp = traits.piercing === "improved" ? Math.floor(armor.sp / 2) : armor.sp;
   if (armor.sp) note(traits.piercing === "improved" ? "ПБ (улучшенное пробивание: ½)" : "ПБ брони", `−${sp}`, armor.layers.map(layer => `${layer.name} ${layer.sp}`).join(", "));

@@ -94,3 +94,6 @@
 
 .npc-sheet .witcher-npc-effects-tab .witcher-effects-heading h2 { color:#713f31; font:700 21px Georgia,serif; border:0; text-shadow:none; }
 .npc-sheet .witcher-npc-effects-tab .witcher-effects-hint { color:#7a6a52; }
+.witcher-npc-body .witcher-npc-abilities summary .witcher-npc-ability-remove { color:#a3302a; opacity:0; transition:opacity .15s; }
+.witcher-npc-abilities details:hover .witcher-npc-ability-remove, .witcher-npc-abilities .witcher-npc-ability-remove:focus-visible { opacity:1; }
+.witcher-npc-resources .npc-max { width:56px; height:32px; font:700 20px Georgia,serif; text-align:center; border:0; border-bottom:1px dashed #b39a67; background:transparent; }

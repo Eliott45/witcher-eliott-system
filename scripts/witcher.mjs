@@ -20,6 +20,7 @@ import { registerRollBreakdown } from "./chat/roll-breakdown.mjs";
 import { registerAttackExchange } from "./combat/attack-exchange.mjs";
 import { registerTokenEffectsPanel } from "./canvas/token-effects-panel.mjs";
 import { registerMovementEffects } from "./combat/movement-effects.mjs";
+import { registerQuickDraw } from "./combat/quick-draw.mjs";
 import { WitcherRecipeData } from "./data/witcher-recipe-data.mjs";
 import { COMBAT_ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID, ROUND_SECONDS, INITIATIVE_FORMULA } from "./config.mjs";
 import { WitcherServicesData } from "./data/witcher-services-data.mjs";
@@ -85,6 +86,7 @@ Hooks.once("init", async () => {
   registerAttackExchange();
   registerTokenEffectsPanel();
   registerMovementEffects();
+  registerQuickDraw();
   registerEffectDurationChat();
   registerServiceOrders();
   CONFIG.time.roundTime = ROUND_SECONDS;

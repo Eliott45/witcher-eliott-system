@@ -37,7 +37,9 @@ export const CONDITION_DEFINITIONS = [
   entry("suffocating", "Удушье", "silenced", "Каждый раунд 3 урона, не снижаемых бронёй, пока персонаж не восстановит доступ к воздуху. Стр. 161."),
   entry("nauseated", "Тошнота", "acid", "Каждые 3 раунда бросьте 1d10: результат не ниже ТЕЛ — раунд уходит на рвоту. Стр. 161."),
   // Core p.152 attack modifiers: a target that moved this round with REF > 10 is −3 to hit.
-  entry("moving", "В движении", "wingfoot", "Персонаж перемещался в этом раунде, его РЕА больше 10: атаки по нему получают −3. Проходит в начале его следующего хода.", {rounds:1,expiry:"turnStart",modifiers:[{target:"combat.targeted",value:-3}]})
+  entry("moving", "В движении", "wingfoot", "Персонаж перемещался в этом раунде, его РЕА больше 10: атаки по нему получают −3. Проходит в начале его следующего хода.", {rounds:1,expiry:"turnStart",modifiers:[{target:"combat.targeted",value:-3}]}),
+  // Core p.153: declared at the start of a round; the initiative bonus is applied to the combatant and reverted on expiry.
+  entry("quick-draw", "Быстрое выхватывание", "sword", "+3 к инициативе в этом раунде, −3 к атаке. Бонусы прицеливания не действуют. Персонаж обязан атаковать; оружие можно выхватить в рамках этого действия.", {rounds:1,expiry:"roundEnd",modifiers:[{target:"combat.attack",value:-3}]})
 ];
 export const CONDITION_BY_ID = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,entry]));
 // Variants share the status ID: poison/drunkenness cannot stack with themselves.

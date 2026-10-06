@@ -78,6 +78,15 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
   }
   async _onRender(context,options) {
     await super._onRender(context,options);bindInventory(this);bindCombat(this);
+    // The model caps HP/STA anyway; clamp the field too, otherwise an unchanged value keeps showing the typed number.
+    for(const field of this.element.querySelectorAll("[data-clamp-max]"))field.addEventListener("change",()=>{
+      const max=Number(field.dataset.clampMax);if(Number.isFinite(max)&&Number(field.value)>max)field.value=max;
+    });
+    for(const field of this.element.querySelectorAll("[data-weapon-rate]"))field.addEventListener("change",event=>{
+      event.stopPropagation();
+      const item=this.actor.items.get(field.dataset.weaponRate),value=Math.min(10,Math.max(1,Math.round(Number(field.value)||1)));
+      if(this.isEditable&&item)item.update({"system.attackRate":value}).catch(error=>ui.notifications.error(error.message));
+    });
     for(const field of this.element.querySelectorAll("[data-creature-list]"))field.addEventListener("change",()=>{
       if(!this.isEditable||!this.editing)return;
       const {creatureList:list,index,key}=field.dataset;

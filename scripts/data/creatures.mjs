@@ -7,7 +7,7 @@ export function creatureFields() {
   const {SchemaField,ArrayField,BooleanField}=foundry.data.fields;
   return new SchemaField({category:itemText("humanoid",{choices:MONSTER_CATEGORIES.map(c=>c.id)}),difficulty:itemText("Простые / обычные"),reward:itemNumber(),
     habitat:itemText(),size:itemText(),weight:itemText(),intellect:itemText(),group:itemText(),source:itemText(),
-    naturalArmor:itemNumber(),description:itemText(),tactics:itemText(),
+    naturalArmor:itemNumber(),healthMax:itemNumber(),staminaMax:itemNumber(),description:itemText(),tactics:itemText(),
     lore:new ArrayField(new SchemaField({name:itemText(),skill:itemText("education"),dc:itemNumber(),text:itemText()})),
     loot:new ArrayField(new SchemaField({name:itemText(),formula:itemText("1"),currency:new BooleanField({initial:false})})),
     lootGenerated:new BooleanField({initial:false})});
