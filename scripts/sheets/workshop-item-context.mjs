@@ -2,6 +2,7 @@ import { SUBSTANCES, MONSTER_CATEGORIES, WORKSHOP_BONUS_LABELS, available, effec
 import { conditionKey, isPhysical } from "../data/physical-items.mjs";
 import { durationLabel, craftDialog, findRepairDiagram } from "../workshop/crafting.mjs";
 import { chooseReference } from "./reference-picker.mjs";
+import { isRepairable } from "../workshop/repair.mjs";
 import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
 export async function workshopItemContext(item, recipeDetails) {
   if(!isPhysical(item)) return null;
@@ -9,7 +10,7 @@ export async function workshopItemContext(item, recipeDetails) {
   const components=recipeDetails?.components ?? [];
   const oil = activeOil(item,game.time?.worldTime??0);
   const condition=conditionKey(item), effective=effectiveItem(item);
-  return { recipe:Boolean(recipe), owned:Boolean(item.actor), repairable:Boolean(item.actor&&conditionKey(item)),
+  return { recipe:Boolean(recipe), owned:Boolean(item.actor), repairable:Boolean(item.actor&&isRepairable(item)),
     condition:condition?{...effective[condition],label:condition==="stoppingPower"?"ПБ":"Надёжность"}:null,
     components, resultName:recipeDetails?.result.name ?? "", time:recipe?durationLabel(recipe.time):"",
     tools:recipe?recipe.tools.join(", "):"", upgradeable:Boolean(item.actor&&conditionKey(item)), slots:freeSlots(item),

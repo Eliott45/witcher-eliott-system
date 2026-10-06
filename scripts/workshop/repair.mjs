@@ -29,6 +29,8 @@ export function itemCondition(item) {
     percent: condition.max > 0 ? Math.max(0, Math.min(100, Math.round(condition.value / condition.max * 100))) : 0 };
 }
 
+export const isRepairable = item => isWorkpiece(item) && available(item) && Boolean(itemCondition(item)?.broken);
+
 /**
  * Diagram index for lookups by result. The character's own diagrams win, so a custom variant is used before the catalog.
  * Uses compendium index fields only: rendering a sheet never loads every catalog document.
@@ -98,6 +100,7 @@ export async function disassembleItem(actor, item) {
   const batch = Math.max(1, recipe.quantity ?? 1);
   const returned = disassemblyYield(recipe.components);
   const references = await resolveComponents(returned);
+  const signature = JSON.stringify(item.system.toObject?.() ?? item.system);
   const lost = [
     ...(item.system.installations ?? []).map(entry => entry.name),
     ...(item.system.oil?.sourceUuid ? [item.system.oil.name] : [])
@@ -113,7 +116,9 @@ export async function disassembleItem(actor, item) {
   return inventoryWrite(actor, async () => {
     const current = actor.items.get(item.id);
     const again = current && diagramFor(current, await diagramIndex(actor));
-    if (!current || again?.uuid !== diagram.uuid || disassemblyBlocker(current, again.recipe)) throw new Error("Предмет или чертёж изменились; откройте разборку заново.");
+    if (!current || JSON.stringify(current.system.toObject?.() ?? current.system) !== signature
+      || again?.uuid !== diagram.uuid || JSON.stringify(again.recipe) !== JSON.stringify(recipe)
+      || disassemblyBlocker(current, again.recipe)) throw new Error("Предмет или чертёж изменились; откройте разборку заново.");
     const whole = current.system.quantity === batch;
     await inventoryTransaction(actor, {
       expenses: whole ? [] : [{ itemId: current.id, quantity: batch }],
@@ -135,7 +140,7 @@ export async function repairContext(actor) {
     return { item, diagram, condition, recipe };
   };
   const all = workpieces.map(describe);
-  const rows = all.filter(entry => entry.condition?.damaged).map(({ item, diagram, condition, recipe }) => ({
+  const rows = all.filter(entry => isRepairable(entry.item)).map(({ item, diagram, condition, recipe }) => ({
     id: item.id, name: item.name, img: item.img, condition, enhancements: enhancementCount(item),
     diagramName: diagram?.name ?? "", hasDiagram: Boolean(diagram), dc: recipe ? repairDC(recipe, item) : null, baseDC: recipe?.dc ?? null,
     forge: Boolean(recipe?.forge),

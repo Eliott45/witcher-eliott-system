@@ -73,7 +73,7 @@ test("declined, equipped, plated and incomplete batches are never taken apart", 
   assert.equal(disassemblyBlocker({ type: "equipment", system: { kind: "ammunition", reliability: { value: 1, max: 1 } } }, {}), "Разобрать можно только оружие, щит или часть брони.");
 });
 
-test("repair panel lists damaged weapons with their DC and one unit of each component", async () => {
+test("repair panel lists only broken carried weapons with their DC and one unit of each component", async () => {
   const f = fixture({ weapon: { installations: [{ category: "rune", name: "Руна", bonuses: [] }] } });
   const view = await repairContext(f.actor);
   assert.equal(view.rows.length, 1);
@@ -81,8 +81,27 @@ test("repair panel lists damaged weapons with their DC and one unit of each comp
   assert.equal(view.rows[0].dc, 13);
   assert.equal(view.rows[0].ready, false, "Components that only exist in the catalog are not counted as carried");
   assert.equal(view.candidates.length, 1);
+  f.sword.system.reliability.value = 1;
+  assert.equal((await repairContext(f.actor)).rows.length, 0);
+  f.sword.system.reliability.value = 0;
+  f.sword.system.carried = false;
+  assert.equal((await repairContext(f.actor)).rows.length, 0);
   f.sword.system.reliability.value = 10;
   assert.equal((await repairContext(f.actor)).rows.length, 0);
+});
+
+test("disassembly refuses changed recipe components or new enhancements after confirmation", async () => {
+  for (const mode of ["recipe", "rune"]) {
+    const f = fixture();
+    foundry.applications.api.DialogV2.confirm = async () => {
+      if (mode === "recipe") f.diagram.system.recipe.components[0].quantity = 99;
+      else f.sword.system.installations.push({ category: "rune", name: "Новая руна", bonuses: [] });
+      return true;
+    };
+    await assert.rejects(disassembleItem(f.actor, f.sword), /изменились/);
+    assert.ok(f.actor.items.get("sword"));
+    assert.equal(f.actor.items.filter(item => item.id.startsWith("created")).length, 0);
+  }
 });
 
 test("a failed write restores a deleted item with its original ID", async () => {

@@ -5,7 +5,7 @@ import { recipeAccess, salvagedComponents, craftingDuration } from "../data/craf
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { workshopCheck, workshopBase, workshopNotice } from "./check.mjs";
 import { inventoryTransaction, copyPhysical } from "./transaction.mjs";
-import { diagramIndex, diagramFor } from "./repair.mjs";
+import { diagramIndex, diagramFor, isRepairable } from "./repair.mjs";
 import { PURE_SUBSTANCES } from "../data/workshop-materials.mjs";
 
 export async function resolveRequirements(recipe) {
@@ -66,7 +66,11 @@ async function executeCraftDialog(actor, recipeItem, target) {
   const recipe = target ? repairRecipe(original, target) : original;
   const result = await foundry.utils.fromUuid(recipe.resultUuid);
   if (!result || !isPhysical(result) || result.type === "recipe" || !result.testUserPermission(game.user, "LIMITED")) throw new Error("Результат рецепта недоступен.");
-  if (target && (!conditionKey(target) || target.system[conditionKey(target)].value >= effectiveItem(target)[conditionKey(target)].max)) throw new Error("Предмет не нуждается в ремонте.");
+  const validateTarget = () => {
+    if (target && (actor.items.get(target.id) !== target || !isRepairable(target)))
+      throw new Error("Починить можно только сломанное оружие или броню при себе: ПБ или надёжность должны быть 0.");
+  };
+  validateTarget();
   const references = await resolveRequirements(recipe);
   const plan = materialPlan(actor.items, recipe.components, references);
   const { tools, needsTools, needsForge } = craftingFacilities(actor, recipe);
@@ -88,6 +92,7 @@ async function executeCraftDialog(actor, recipeItem, target) {
   if(!answer.time || (needsTools&&!answer.borrowTools) || (needsForge&&!answer.forge)) throw new Error("Подтвердите доступ к инструментам/кузнице и затраченное время.");
   return inventoryWrite(actor,async()=>{
     const validate = () => {
+      validateTarget();
       requireRecipe(actor, recipeItem, target);
       const current = recipeItem.system.recipe.toObject?.() ?? recipeItem.system.recipe;
       const facilities = craftingFacilities(actor, recipe);
@@ -112,19 +117,25 @@ async function executeCraftDialog(actor, recipeItem, target) {
 async function salvage(actor,recipe,plan,references) {
   const alchemy=recipe.category==="formula";
   const returned = alchemy ? [] : salvagedComponents(plan.rows);
-  const consent=await foundry.applications.api.DialogV2.confirm({classes:["witcher-crafting-dialog"],window:{title:alchemy?"Спасти компоненты?":"Переработка материалов"},content:`<div class="witcher-workshop-dialog"><h3>Неудачную работу ещё можно спасти</h3><p>Одна немедленная повторная проверка, СЛ ${recipe.dc}. ${alchemy?"При успехе можно вернуть одну использованную субстанцию в чистом виде.":"При успехе возвращается половина каждого потраченного компонента, округляя вверх."}</p>${returned.length?`<ul>${returned.map(row=>`<li>${esc(references.get(row.uuid).name)} ×${row.quantity}</li>`).join("")}</ul>`:""}</div>`,yes:{label:"Переработать"},no:{label:"Отказаться"},rejectClose:false});
+  const substances = SUBSTANCES.filter(substance => plan.rows.some(row => row.substance === substance.id && row.used.some(entry => entry.quantity > 0)));
+  if (alchemy && !substances.length) return;
+  const content = `<div class="witcher-workshop-dialog"><h3>Неудачную работу ещё можно спасти</h3><p>Одна немедленная повторная проверка, СЛ ${recipe.dc}. ${alchemy?"При успехе одна выбранная субстанция сразу вернётся в инвентарь в чистом виде.":"При успехе возвращается половина каждого потраченного компонента, округляя вверх."}</p>${returned.length?`<ul>${returned.map(row=>`<li>${esc(references.get(row.uuid).name)} ×${row.quantity}</li>`).join("")}</ul>`:""}${alchemy?`<label>Спасти субстанцию<select name="substance">${substances.map(substance=>`<option value="${substance.id}">${esc(substance.name)}</option>`).join("")}</select></label>`:""}</div>`;
+  // Choose before rolling: closing a second dialog after success must not discard the reward.
+  const options = {classes:["witcher-crafting-dialog"],window:{title:alchemy?"Спасти компоненты?":"Переработка материалов"},content,rejectClose:false};
+  const consent = alchemy
+    ? await foundry.applications.api.DialogV2.prompt({...options,ok:{label:"Спасти субстанцию",callback:(_e,b)=>new FormData(b.form).get("substance")}})
+    : await foundry.applications.api.DialogV2.confirm({...options,yes:{label:"Переработать"},no:{label:"Отказаться"}});
   if(!consent) return;
+  if (alchemy && !substances.some(substance => substance.id === consent)) throw new Error("Выберите одну из затраченных субстанций.");
   const check=await workshopCheck(actor,{name:alchemy?"Спасение компонентов":"Переработка материалов",skill:alchemy?"alchemy":"crafting",dc:recipe.dc});
   if(!check.success){await workshopNotice(actor,"<p>Переработка не удалась. Материалы утрачены.</p>");return;}
   if(alchemy){
-    const substances=[...new Set(recipe.components.filter(c=>c.substance).map(c=>c.substance))];
-    if(!substances.length)return;
-    const substance=await foundry.applications.api.DialogV2.prompt({window:{title:"Сохранённая субстанция"},content:`<label>Субстанция<select name="substance">${substances.map(s=>`<option value="${s}">${esc(SUBSTANCES.find(x=>x.id===s)?.name??s)}</option>`).join("")}</select></label>`,ok:{label:"Сохранить",callback:(_e,b)=>new FormData(b.form).get("substance")},rejectClose:false});
-    if(!substances.includes(substance))return;
-    // Prefer the catalog entry (sign icon, links); a missing catalog falls back to a plain item without invented price or weight.
+    const substance = consent;
     const entry=PURE_SUBSTANCES.find(row=>row.id===`substance.${substance}`);
     const source=await foundry.utils.fromUuid(equipmentUuid(entry.documentId)).catch(()=>null);
-    await inventoryTransaction(actor,{creates:[source?copyPhysical(source,1):{name:entry.name,type:"equipment",img:entry.img,system:{ruleId:entry.id,kind:"material",quantity:1,material:{substance},source:entry.system.source}}]});
+    const accessible = source?.type === "equipment" && source.system.material?.substance === substance && source.testUserPermission(game.user,"LIMITED");
+    const fallback = {name:entry.name,type:entry.type,img:entry.img,flags:structuredClone(entry.flags),system:{...structuredClone(entry.system),ruleId:entry.id,quantity:1,carried:true}};
+    await inventoryTransaction(actor,{creates:[accessible?copyPhysical(source,1):fallback]});
     await workshopNotice(actor,`<p>Сохранена субстанция: ${esc(SUBSTANCES.find(s=>s.id===substance).name)} ×1.</p>`);
   } else {
     const creates=returned.map(row=>copyPhysical(references.get(row.uuid),row.quantity));

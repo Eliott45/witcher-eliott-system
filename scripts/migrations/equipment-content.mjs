@@ -16,7 +16,7 @@ import { materialDescriptionUpdate } from "./material-descriptions.mjs";
 import { recipeDetailsUpdate } from "./recipe-details.mjs";
 import { RECIPES } from "../data/workshop-recipes.mjs";
 import { PURE_SUBSTANCES } from "../data/workshop-materials.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 18;
+export const EQUIPMENT_CONTENT_VERSION = 19;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {

@@ -2420,7 +2420,7 @@
         "_id": "matr000000000182",
         "name": "Дымная пыль",
         "type": "equipment",
-        "img": "icons/svg/item-bag.svg",
+        "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
         "system": {
           "ruleId": "material.infused-dust",
           "kind": "material",
@@ -5588,7 +5588,7 @@
         "_id": "matr000000000108",
         "name": "Лепестки белого мирта",
         "type": "equipment",
-        "img": "icons/svg/item-bag.svg",
+        "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
         "system": {
           "ruleId": "material.white-myrtle",
           "kind": "material",
@@ -5619,7 +5619,7 @@
         "_id": "matr000000000145",
         "name": "Жемчуг",
         "type": "equipment",
-        "img": "icons/svg/item-bag.svg",
+        "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
         "system": {
           "ruleId": "material.pearl",
           "kind": "material",
@@ -5650,7 +5650,7 @@
         "_id": "matr000000000124",
         "name": "Лунная крошка",
         "type": "equipment",
-        "img": "icons/svg/item-bag.svg",
+        "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
         "system": {
           "ruleId": "material.lunar-shards",
           "kind": "material",
@@ -5681,7 +5681,7 @@
         "_id": "matr000000000141",
         "name": "Плод берберки",
         "type": "equipment",
-        "img": "icons/svg/item-bag.svg",
+        "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
         "system": {
           "ruleId": "material.berbercane",
           "kind": "material",

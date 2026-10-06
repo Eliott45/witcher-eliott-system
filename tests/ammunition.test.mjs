@@ -173,6 +173,34 @@ test("version-sixteen worlds append the missing p. 132–138 diagrams once and r
   await migrateEquipmentContent(); assert.equal(state.writes.length, writes);
 });
 
+test("version-eighteen updates ingredient signs and water essence rarity across owned copies without resetting custom art", async () => {
+  const state = migrationFixture({ startVersion: 18 });
+  const old = id => {
+    const item = structuredClone(sources.find(item => item.system.ruleId === "material.water-essence"));
+    item._id = id; item.system.rarity = "rare"; item.img = "icons/svg/item-bag.svg";
+    item.system.quantity = 7; item.system.description = "Заметки игрока";
+    return item;
+  };
+  const stock = old("stockEssence"), world = old("worldEssence"), customized = old("customEssence");
+  customized.img = "my-art.webp"; customized.system.rarity = "common";
+  const actor = uuid => ({ uuid, isOwner: true, items: [old("ownedEssence")], async updateEmbeddedDocuments(_type, updates) {
+    for (const update of updates) applyUpdate(this.items[0], update);
+  } });
+  const owned = actor("Actor.alchemist"), token = actor("Scene.s.Token.t.Actor.alchemist"), pregen = actor("Compendium.pregens.alchemist");
+  state.index.set(stock._id, stock); game.items = [world, customized]; game.actors = [owned];
+  game.scenes = [{ tokens: [{ actorLink: false, actor: token }] }];
+  game.packs.set("witcher-eliott-system.pregens", { locked: false, getDocuments: async () => [pregen] });
+  await migrateEquipmentContent();
+  for (const item of [stock, world, owned.items[0], token.items[0], pregen.items[0]]) {
+    assert.equal(item.img, "systems/witcher-eliott-system/assets/substances/hydragenum.svg");
+    assert.equal(item.system.rarity, "unique");
+    assert.equal(item.system.quantity, 7);
+    assert.equal(item.system.description, "Заметки игрока");
+  }
+  assert.equal(customized.img, "my-art.webp"); assert.equal(customized.system.rarity, "common");
+  const writes = state.writes.length; await migrateEquipmentContent(); assert.equal(state.writes.length, writes);
+});
+
 test("version-eight worlds append missing pregen gear once and preserve a custom medallion", async () => {
   const state = migrationFixture({ startVersion: 8, special: false });
   for (const item of sources.filter(item => CORE_AMMUNITION.some(entry => entry.id === item.system.ruleId))) state.index.set(item._id, structuredClone(item));

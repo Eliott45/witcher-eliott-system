@@ -42,7 +42,7 @@
     <button type="button" data-action="disassembleWorkpiece" {{disabled (or (not editable) (not crafting.repair.candidates.length))}}><i class="fa-solid fa-gears" aria-hidden="true"></i> Разобрать предмет…</button>
   </header>
   <ol class="witcher-repair-steps">
-    <li><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i><div><strong>Собрать обломки</strong><span>Чинится только то, что у вас есть — хотя бы основа.</span></div></li>
+    <li><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i><div><strong>Собрать обломки</strong><span>Сломанный предмет при себе: ПБ или надёжность 0. Нужна хотя бы основа.</span></div></li>
     <li><i class="fa-solid fa-cubes-stacked" aria-hidden="true"></i><div><strong>Достать материалы</strong><span>По 1 единице каждого компонента из чертежа.</span></div></li>
     <li><i class="fa-solid fa-toolbox" aria-hidden="true"></i><div><strong>Найти инструменты</strong><span>Те же, что для изготовления.</span></div></li>
     <li><i class="fa-solid fa-dice-d10" aria-hidden="true"></i><div><strong>Проверка Изготовления</strong><span>СЛ чертежа − 5, +2 за каждую руну, глиф или усиление.</span></div></li>
@@ -61,6 +61,6 @@
       {{#if row.disassemble}}<button type="button" data-action="disassembleWorkpiece" data-item-id="{{row.id}}" {{disabled (not @root.editable)}}><i class="fa-solid fa-gears" aria-hidden="true"></i> Разобрать</button>{{/if}}
     </footer>
   </article>
-  {{else}}<p class="witcher-repair-empty"><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> Оружие и броня в порядке — чинить нечего.</p>{{/each}}
+  {{else}}<p class="witcher-repair-empty"><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> Сломанного оружия и брони при себе нет. Починка доступна при ПБ или надёжности 0.</p>{{/each}}
   <p class="witcher-repair-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> При провале предмет остаётся сломанным, потраченные компоненты не возвращаются; сразу можно попробовать переработку с той же СЛ. Разборка не требует проверки: из-за повреждений возвращается половина компонентов чертежа, минимум по 1 каждого.</p>
 </section>

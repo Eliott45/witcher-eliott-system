@@ -31,6 +31,16 @@ test("exact components reserve before substances and cannot be double-spent; spl
  const stored={...heart,system:{...heart.system,carried:false}};
  assert(!materialPlan([tallow,stored],requirements,new Map([[reference.uuid,reference]])).complete);
 });
+
+test("alchemy spends ordinary ingredients before free pure substances and reuses saved substances", () => {
+ const pure=physical("pure","substance.rebis",1,{price:0,material:{substance:"rebis"}});
+ const herb=physical("herb","material.celandine",1,{price:8,material:{substance:"rebis"}});
+ const first=materialPlan([pure,herb],[{substance:"rebis",quantity:1}]);
+ assert.deepEqual(first.expenses,[{itemId:"herb",quantity:1}]);
+ herb.system.quantity=0;
+ const next=materialPlan([pure,herb],[{substance:"rebis",quantity:1}]);
+ assert.deepEqual(next.expenses,[{itemId:"pure",quantity:1}]);assert.equal(next.complete,true);
+});
 test("repair needs one each and DC includes runes/glyphs/armor enhancements, not independent craftsman augmentations",()=>{
  const result=repairRecipe({dc:18,components:[{uuid:"iron",quantity:5},{uuid:"wood",quantity:4}]},{system:{installations:[{category:"rune"},{category:"craftsman"},{category:"glyph"}]}});
  assert.equal(result.dc,17);assert.deepEqual(result.components.map(c=>c.quantity),[1,1]);assert.equal(result.physicalBonus,0);

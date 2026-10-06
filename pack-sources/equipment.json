@@ -8184,7 +8184,7 @@
     "_id": "matr000000000100",
     "name": "Плод балиссы",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
     "system": {
       "ruleId": "material.balisse-fruit",
       "kind": "material",
@@ -8212,7 +8212,7 @@
     "_id": "matr000000000101",
     "name": "Ячмень",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
     "system": {
       "ruleId": "material.barley",
       "kind": "material",
@@ -8240,7 +8240,7 @@
     "_id": "matr000000000102",
     "name": "Calcium equum",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
     "system": {
       "ruleId": "material.calcium-equum",
       "kind": "material",
@@ -8268,7 +8268,7 @@
     "_id": "matr000000000103",
     "name": "Вороний глаз",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
     "system": {
       "ruleId": "material.crows-eye",
       "kind": "material",
@@ -8296,7 +8296,7 @@
     "_id": "matr000000000104",
     "name": "Коготь гуля",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
     "system": {
       "ruleId": "material.ghoul-claw",
       "kind": "material",
@@ -8324,7 +8324,7 @@
     "_id": "matr000000000105",
     "name": "Зубы накера",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
     "system": {
       "ruleId": "material.nekker-teeth",
       "kind": "material",
@@ -8352,7 +8352,7 @@
     "_id": "matr000000000106",
     "name": "Грибы-шибальцы",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
     "system": {
       "ruleId": "material.sewant",
       "kind": "material",
@@ -8380,7 +8380,7 @@
     "_id": "matr000000000107",
     "name": "Шкура тролля",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
     "system": {
       "ruleId": "material.troll-hide",
       "kind": "material",
@@ -8408,7 +8408,7 @@
     "_id": "matr000000000108",
     "name": "Лепестки белого мирта",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
     "system": {
       "ruleId": "material.white-myrtle",
       "kind": "material",
@@ -8436,7 +8436,7 @@
     "_id": "matr000000000120",
     "name": "Ласточкина трава",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
     "system": {
       "ruleId": "material.celandine",
       "kind": "material",
@@ -8464,7 +8464,7 @@
     "_id": "matr000000000121",
     "name": "Мозг утопца",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
     "system": {
       "ruleId": "material.drowner-brain",
       "kind": "material",
@@ -8492,7 +8492,7 @@
     "_id": "matr000000000122",
     "name": "Волокна хана",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
     "system": {
       "ruleId": "material.han-fiber",
       "kind": "material",
@@ -8520,7 +8520,7 @@
     "_id": "matr000000000123",
     "name": "Зубы кладбищенской бабы",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
     "system": {
       "ruleId": "material.hag-teeth",
       "kind": "material",
@@ -8548,7 +8548,7 @@
     "_id": "matr000000000124",
     "name": "Лунная крошка",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
     "system": {
       "ruleId": "material.lunar-shards",
       "kind": "material",
@@ -8576,7 +8576,7 @@
     "_id": "matr000000000125",
     "name": "Сердце накера",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
     "system": {
       "ruleId": "material.nekker-heart",
       "kind": "material",
@@ -8604,7 +8604,7 @@
     "_id": "matr000000000126",
     "name": "Винный камень",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
     "system": {
       "ruleId": "material.wine-stone",
       "kind": "material",
@@ -8632,7 +8632,7 @@
     "_id": "matr000000000140",
     "name": "Корень зарника",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
     "system": {
       "ruleId": "material.allspice",
       "kind": "material",
@@ -8660,7 +8660,7 @@
     "_id": "matr000000000141",
     "name": "Плод берберки",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
     "system": {
       "ruleId": "material.berbercane",
       "kind": "material",
@@ -8688,7 +8688,7 @@
     "_id": "matr000000000142",
     "name": "Эссенция призрака",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
     "system": {
       "ruleId": "material.wraith-essence",
       "kind": "material",
@@ -8716,7 +8716,7 @@
     "_id": "matr000000000143",
     "name": "Лепестки гинации",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
     "system": {
       "ruleId": "material.ginatia",
       "kind": "material",
@@ -8744,7 +8744,7 @@
     "_id": "matr000000000144",
     "name": "Лепестки морозника",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
     "system": {
       "ruleId": "material.hellebore",
       "kind": "material",
@@ -8772,7 +8772,7 @@
     "_id": "matr000000000145",
     "name": "Жемчуг",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
     "system": {
       "ruleId": "material.pearl",
       "kind": "material",
@@ -8800,7 +8800,7 @@
     "_id": "matr000000000146",
     "name": "Ртутный раствор",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
     "system": {
       "ruleId": "material.quicksilver",
       "kind": "material",
@@ -8828,7 +8828,7 @@
     "_id": "matr000000000147",
     "name": "Склеродерм",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
     "system": {
       "ruleId": "material.scleroderm",
       "kind": "material",
@@ -8856,7 +8856,7 @@
     "_id": "matr000000000160",
     "name": "Листья балиссы",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/quebrith.svg",
     "system": {
       "ruleId": "material.balisse-leaves",
       "kind": "material",
@@ -8884,7 +8884,7 @@
     "_id": "matr000000000161",
     "name": "Царская водка",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/quebrith.svg",
     "system": {
       "ruleId": "material.aqua-regia",
       "kind": "material",
@@ -8912,7 +8912,7 @@
     "_id": "matr000000000162",
     "name": "Собачья петрушка",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/quebrith.svg",
     "system": {
       "ruleId": "material.fools-parsley",
       "kind": "material",
@@ -8940,7 +8940,7 @@
     "_id": "matr000000000163",
     "name": "Костный мозг гуля",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/quebrith.svg",
     "system": {
       "ruleId": "material.ghoul-marrow",
       "kind": "material",
@@ -8968,7 +8968,7 @@
     "_id": "matr000000000164",
     "name": "Жимолость",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/quebrith.svg",
     "system": {
       "ruleId": "material.honeysuckle",
       "kind": "material",
@@ -8996,7 +8996,7 @@
     "_id": "matr000000000165",
     "name": "Optima mater",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/quebrith.svg",
     "system": {
       "ruleId": "material.optima-mater",
       "kind": "material",
@@ -9024,7 +9024,7 @@
     "_id": "matr000000000166",
     "name": "Сера",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/quebrith.svg",
     "system": {
       "ruleId": "material.sulphur",
       "kind": "material",
@@ -9052,7 +9052,7 @@
     "_id": "matr000000000180",
     "name": "Паутинник",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
     "system": {
       "ruleId": "material.cortinarius",
       "kind": "material",
@@ -9080,13 +9080,13 @@
     "_id": "matr000000000181",
     "name": "Эссенция воды",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
     "system": {
       "ruleId": "material.water-essence",
       "kind": "material",
       "weight": 0.1,
       "price": 46,
-      "rarity": "rare",
+      "rarity": "unique",
       "material": {
         "substance": "hydragenum",
         "forageDC": 0,
@@ -9108,7 +9108,7 @@
     "_id": "matr000000000182",
     "name": "Дымная пыль",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
     "system": {
       "ruleId": "material.infused-dust",
       "kind": "material",
@@ -9136,7 +9136,7 @@
     "_id": "matr000000000183",
     "name": "Омела",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
     "system": {
       "ruleId": "material.mistletoe",
       "kind": "material",
@@ -9164,7 +9164,7 @@
     "_id": "matr000000000184",
     "name": "Коготь накера",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
     "system": {
       "ruleId": "material.nekker-claw",
       "kind": "material",
@@ -9192,7 +9192,7 @@
     "_id": "matr000000000185",
     "name": "Печень тролля",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
     "system": {
       "ruleId": "material.troll-liver",
       "kind": "material",
@@ -9220,7 +9220,7 @@
     "_id": "matr000000000186",
     "name": "Слюна волколака",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
     "system": {
       "ruleId": "material.werewolf-saliva",
       "kind": "material",
@@ -9248,7 +9248,7 @@
     "_id": "matr000000000200",
     "name": "Хитин",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vermilion.svg",
     "system": {
       "ruleId": "material.chitin",
       "kind": "material",
@@ -9276,7 +9276,7 @@
     "_id": "matr000000000201",
     "name": "Слюна эндриаги",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vermilion.svg",
     "system": {
       "ruleId": "material.endrega-saliva",
       "kind": "material",
@@ -9304,7 +9304,7 @@
     "_id": "matr000000000202",
     "name": "Яйцо грифона",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vermilion.svg",
     "system": {
       "ruleId": "material.griffin-egg",
       "kind": "material",
@@ -9332,7 +9332,7 @@
     "_id": "matr000000000203",
     "name": "Перья грифона",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vermilion.svg",
     "system": {
       "ruleId": "material.griffin-feathers",
       "kind": "material",
@@ -9360,7 +9360,7 @@
     "_id": "matr000000000204",
     "name": "Корень мандрагоры",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vermilion.svg",
     "system": {
       "ruleId": "material.mandrake",
       "kind": "material",
@@ -9388,7 +9388,7 @@
     "_id": "matr000000000205",
     "name": "Фосфор",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vermilion.svg",
     "system": {
       "ruleId": "material.phosphorus",
       "kind": "material",
@@ -9416,7 +9416,7 @@
     "_id": "matr000000000206",
     "name": "Аконит",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vermilion.svg",
     "system": {
       "ruleId": "material.wolfsbane",
       "kind": "material",
@@ -9444,7 +9444,7 @@
     "_id": "matr000000000220",
     "name": "Глаз беса",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/sol.svg",
     "system": {
       "ruleId": "material.fiend-eye",
       "kind": "material",
@@ -9472,7 +9472,7 @@
     "_id": "matr000000000221",
     "name": "Эссенция света",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/sol.svg",
     "system": {
       "ruleId": "material.light-essence",
       "kind": "material",
@@ -9500,7 +9500,7 @@
     "_id": "matr000000000222",
     "name": "Голосовые связки сирены",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/sol.svg",
     "system": {
       "ruleId": "material.siren-vocal-cords",
       "kind": "material",
@@ -9528,7 +9528,7 @@
     "_id": "matr000000000223",
     "name": "Слюна вампира",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/sol.svg",
     "system": {
       "ruleId": "material.vampire-saliva",
       "kind": "material",
@@ -9556,7 +9556,7 @@
     "_id": "matr000000000224",
     "name": "Вербена",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/sol.svg",
     "system": {
       "ruleId": "material.verbena",
       "kind": "material",
@@ -9584,7 +9584,7 @@
     "_id": "matr000000000225",
     "name": "Листья волчьего алоэ",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/sol.svg",
     "system": {
       "ruleId": "material.wolf-aloe",
       "kind": "material",
@@ -9612,7 +9612,7 @@
     "_id": "matr000000000226",
     "name": "Глаза виверны",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/sol.svg",
     "system": {
       "ruleId": "material.wyvern-eyes",
       "kind": "material",
@@ -9640,7 +9640,7 @@
     "_id": "matr000000000240",
     "name": "Яд главоглаза",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
     "system": {
       "ruleId": "material.arachas-venom",
       "kind": "material",
@@ -9668,7 +9668,7 @@
     "_id": "matr000000000241",
     "name": "Переступень",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
     "system": {
       "ruleId": "material.bryonia",
       "kind": "material",
@@ -9696,7 +9696,7 @@
     "_id": "matr000000000242",
     "name": "Язык утопца",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
     "system": {
       "ruleId": "material.drowner-tongue",
       "kind": "material",
@@ -9724,7 +9724,7 @@
     "_id": "matr000000000243",
     "name": "Помёт беса",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
     "system": {
       "ruleId": "material.fiend-dung",
       "kind": "material",
@@ -9752,7 +9752,7 @@
     "_id": "matr000000000244",
     "name": "Язык кладбищенской бабы",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
     "system": {
       "ruleId": "material.hag-tongue",
       "kind": "material",
@@ -9780,7 +9780,7 @@
     "_id": "matr000000000245",
     "name": "Зелёная плесень",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
     "system": {
       "ruleId": "material.green-mold",
       "kind": "material",
@@ -9808,7 +9808,7 @@
     "_id": "matr000000000246",
     "name": "Зубы вампира",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
     "system": {
       "ruleId": "material.vampire-teeth",
       "kind": "material",
@@ -9836,7 +9836,7 @@
     "_id": "matr000000000247",
     "name": "Экстракт яда",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
     "system": {
       "ruleId": "material.venom-extract",
       "kind": "material",
@@ -9864,7 +9864,7 @@
     "_id": "matr000000000260",
     "name": "Глаза",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
     "system": {
       "ruleId": "material.monster-eyes",
       "kind": "material",
@@ -9892,7 +9892,7 @@
     "_id": "matr000000000261",
     "name": "Собачье сало",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
     "system": {
       "ruleId": "material.dog-tallow",
       "kind": "material",
@@ -9920,7 +9920,7 @@
     "_id": "matr000000000262",
     "name": "Краснолюдский бессмертник",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
     "system": {
       "ruleId": "material.dwarven-immortelle",
       "kind": "material",
@@ -9948,7 +9948,7 @@
     "_id": "matr000000000263",
     "name": "Эмбрион эндриаги",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
     "system": {
       "ruleId": "material.endrega-embryo",
       "kind": "material",
@@ -9976,7 +9976,7 @@
     "_id": "matr000000000264",
     "name": "Сердце голема",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
     "system": {
       "ruleId": "material.golem-heart",
       "kind": "material",
@@ -10004,7 +10004,7 @@
     "_id": "matr000000000265",
     "name": "Ухо кладбищенской бабы",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
     "system": {
       "ruleId": "material.hag-ear",
       "kind": "material",
@@ -10032,7 +10032,7 @@
     "_id": "matr000000000266",
     "name": "Призрачная пыль",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
     "system": {
       "ruleId": "material.specter-dust",
       "kind": "material",
@@ -10060,7 +10060,7 @@
     "_id": "matr000000000267",
     "name": "Яйцо виверны",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
     "system": {
       "ruleId": "material.wyvern-egg",
       "kind": "material",

@@ -41,7 +41,8 @@ export function materialPlan(items, requirements, references = new Map(), choice
 export function repairRecipe(recipe, item) {
   const enhancements = (item.system.installations ?? []).filter(entry => entry.category !== "craftsman").length;
   // Core p. 140 specifies no repair time: do not silently reuse manufacturing time.
-  return { ...recipe, time: 0, dc: Math.max(0, recipe.dc - 5 + 2 * enhancements), components: recipe.components.map(entry => ({ ...entry, quantity: 1 })), physicalBonus: 0 };
+  const components = [...new Map(recipe.components.map(entry => [entry.uuid || entry.substance, { ...entry, quantity: 1 }])).values()];
+  return { ...recipe, time: 0, dc: Math.max(0, recipe.dc - 5 + 2 * enhancements), components, physicalBonus: 0 };
 }
 export function installationBonuses(item) {
   return (item.system.installations ?? []).flatMap(entry => entry.bonuses.map(bonus => ({ ...bonus, source: entry.sourceUuid, label: entry.name, category: "equipment" })));

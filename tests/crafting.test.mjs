@@ -7,7 +7,7 @@ import { inventoryTransaction, copyPhysical } from "../scripts/workshop/transact
 import { craftingContext } from "../scripts/sheets/crafting-context.mjs";
 import { RECIPES } from "../scripts/data/workshop-recipes.mjs";
 import { CORE_EQUIPMENT } from "../scripts/data/core-equipment.mjs";
-import { MATERIALS } from "../scripts/data/workshop-materials.mjs";
+import { MATERIALS, PURE_SUBSTANCES } from "../scripts/data/workshop-materials.mjs";
 import { equipmentUuid } from "../scripts/data/workshop.mjs";
 
 function fixture() {
@@ -186,6 +186,92 @@ test("declining or failing salvage never returns materials or rolls again",async
     await craftDialog(f.actor,f.recipe);
     assert.equal(f.iron.system.quantity,5);assert.equal(f.wood.system.quantity,7);
     assert.equal(f.actor.items.length,4);assert.equal(f.rolls.length,decline?1:2);
+  }
+});
+
+function alchemyFixture({ choice = "rebis", catalog = true, permission = true } = {}) {
+  const f = fixture();
+  Object.assign(f.recipe.system.recipe, { category: "formula", tools: ["gear.alchemy-tools"], components: [
+    { substance: "vitriol", uuid: "", quantity: 2 }, { substance: "rebis", uuid: "", quantity: 1 }
+  ] });
+  f.tools.system.ruleId = "gear.alchemy-tools";
+  f.iron.system.material = { substance: "vitriol" };
+  f.wood.system.material = { substance: "rebis" };
+  f.result.type = "equipment";
+  f.result.system.kind = "alchemy";
+  foundry.applications.api.DialogV2.prompt = async config => {
+    f.dialogs.push(config);
+    return config.window.title === "Спасти компоненты?" ? choice : { time: "on" };
+  };
+  if (catalog) for (const entry of PURE_SUBSTANCES) {
+    const doc = f.item(entry.id, entry.type, structuredClone(entry.system));
+    doc.name = entry.name; doc.img = entry.img; doc.flags = structuredClone(entry.flags);
+    doc.testUserPermission = () => permission;
+    doc.toObject = () => ({ name: doc.name, img: doc.img, type: doc.type, system: structuredClone(doc.system), flags: structuredClone(doc.flags) });
+    f.references.set(equipmentUuid(entry.documentId), doc);
+  }
+  return f;
+}
+
+test("failed alchemy and successful recycling return exactly one chosen spent substance, even without catalog access", async () => {
+  for (const options of [{}, { catalog: false }, { permission: false }]) {
+    const f = alchemyFixture(options);
+    f.totals.splice(0, 1, 9, 10);
+    await craftDialog(f.actor, f.recipe);
+    assert.equal(f.rolls.length, 2);
+    assert.ok(f.rolls.every(roll => roll.flags["witcher-eliott-system"].workshop.skill === "alchemy" && roll.flags["witcher-eliott-system"].workshop.dc === 10));
+    assert.equal(f.dialogs.length, 2, "Choice precedes the recycling roll; no dismissible reward dialog");
+    assert.match(f.dialogs[1].content, /value="vitriol"/);
+    assert.match(f.dialogs[1].content, /value="rebis"/);
+    assert.doesNotMatch(f.dialogs[1].content, /value="fulgur"/);
+    const created = f.actor.items.filter(item => item.id.startsWith("created"));
+    assert.equal(created.length, 1);
+    assert.equal(created[0].system.ruleId, "substance.rebis");
+    assert.equal(created[0].system.material.substance, "rebis");
+    assert.equal(created[0].system.quantity, 1);
+    assert.equal(created[0].system.carried, true);
+    assert.equal(created[0].system.price, 0);
+    assert.equal(created[0].flags["witcher-eliott-system"].priceUnavailable, true);
+    assert.equal(f.iron.system.quantity, 6); assert.equal(f.wood.system.quantity, 7);
+    assert.match(f.notices.at(-1).content, /Ребис ×1/);
+  }
+});
+
+test("cancelled, failed and invalid alchemy recycling never awards extra material or an unused substance", async () => {
+  for (const choice of [null, "rebis", "fulgur"]) {
+    const f = alchemyFixture({ choice }); f.totals.splice(0, 1, 9, 9);
+    if (choice === "fulgur") await assert.rejects(craftDialog(f.actor, f.recipe), /затраченных/);
+    else await craftDialog(f.actor, f.recipe);
+    assert.equal(f.rolls.length, choice === "rebis" ? 2 : 1);
+    assert.equal(f.actor.items.filter(item => item.id.startsWith("created")).length, 0);
+    assert.equal(f.iron.system.quantity, 6); assert.equal(f.wood.system.quantity, 7);
+  }
+});
+
+test("repair restores a broken owned weapon using one of each material with no physical-diagram bonus", async () => {
+  const f = fixture();
+  f.result.system.reliability = { value: 0, max: 10 };
+  f.actor.items.push(f.result);
+  f.recipe.system.recipe.components.push({ ...f.recipe.system.recipe.components[0] });
+  await craftDialog(f.actor, f.recipe, f.result);
+  assert.equal(f.result.system.reliability.value, 10);
+  assert.equal(f.iron.system.quantity, 7); assert.equal(f.wood.system.quantity, 7);
+  assert.equal(f.rolls[0].flags["witcher-eliott-system"].workshop.dc, 5);
+  assert.equal(f.rolls[0].formula, "1d10wc + 10 + 0");
+  assert.equal(f.actor.items.filter(item => item.id.startsWith("created")).length, 0);
+});
+
+test("repair rejects damaged, missing and no longer carried targets without consuming components", async () => {
+  for (const mode of ["damaged", "missing", "left-during-dialog"]) {
+    const f = fixture();
+    f.result.system.reliability = { value: mode === "damaged" ? 1 : 0, max: 10 };
+    if (mode !== "missing") f.actor.items.push(f.result);
+    if (mode === "left-during-dialog") foundry.applications.api.DialogV2.prompt = async () => {
+      f.result.system.carried = false; return { time: "on" };
+    };
+    await assert.rejects(craftDialog(f.actor, f.recipe, f.result), /сломанное оружие/);
+    assert.equal(f.rolls.length, 0);
+    assert.equal(f.iron.system.quantity, 8); assert.equal(f.wood.system.quantity, 8);
   }
 });
 
