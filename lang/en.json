@@ -1378,6 +1378,10 @@
       "AutomaticCriticalDiceHint": "On: natural 1/10 chains continue automatically. Off: click + in chat for each additional d10. Ordinary dice and Stun saves are unchanged.",
       "AutomaticFumbleRolls": "Roll fumble consequences automatically",
       "AutomaticFumbleRollsHint": "When enabled, every roll a fumble calls for (reliability damage, hit location, scatter, head damage, Stun save) is made automatically by the player who fumbled. When disabled, the chat card shows a dice button for each consequence.",
+      "ConcealAttackRolls": "Hide attack rolls until a defense is chosen",
+      "ConcealAttackRollsHint": "Players who do not own the attacker cannot see the attack total, its dice (Dice So Nice shows ghost dice), criticals or fumbles until they pick a defense. The GM and the attacker's owners see everything.",
+      "ConcealCreatureDetails": "Hide creature details from players",
+      "ConcealCreatureDetailsHint": "Players do not see other creatures' roll bases and modifiers, roll breakdowns, their SP, armor, resistances or armor wear in damage results — only the outcome.",
       "Language": "System language",
       "LanguageHint": "Language of translated system labels for this user. Foundry itself is unchanged. Catalog content and untranslated sections remain in Russian. Requires reload.",
       "FoundryLanguage": "Use Foundry language"

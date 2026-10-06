@@ -9,6 +9,7 @@ import { fullTurnStart } from "./full-turn-rules.mjs";
 import { woundEffectData } from "./critical-wound-effects.mjs";
 import { GRAPPLE_ACTIONS, applyGrappleSuccess, grappleState } from "./grapple.mjs";
 import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
+import { attackConcealed, creatureDetailsHidden } from "../chat/concealment.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
 import { hitLocation, bodyPlanOf, ATTACK_LOCATIONS, weaponAttack, attackModes } from "./weapon-rules.mjs";
 import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
@@ -419,8 +420,11 @@ const button = (attrs, label, enabled, hint = "") => `<button type="button" ${at
 
 export function exchangeRowHTML(message, index, attack = flagsOf(message).weaponAttack) {
   const total = message.rolls[index]?.total, target = targetActor(attack), outcome = exchangeOutcome(message, index);
-  const head = `<header><span>Атака ${attack.count > 1 ? `${index + 1} ` : ""}<b>${total}</b></span>`;
-  const ownFumble = fumbleHTML(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner, message.speakerActor, attack.itemId);
+  // Until the defense is chosen (and its dice landed) the defender does not learn the total or a fumble.
+  const concealed = attackConcealed(message) && !linked(message.id, index, "defense");
+  const head = `<header><span>Атака ${attack.count > 1 ? `${index + 1} ` : ""}<b>${concealed ? '<i class="fa-solid fa-eye-slash" data-tooltip="Итог атаки откроется после выбора защиты"></i>' : total}</b></span>`;
+  const ownFumble = concealed ? "" : fumbleHTML(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner, message.speakerActor, attack.itemId);
+  const hideTargetNumbers = creatureDetailsHidden(target);
   if (!outcome) {
     if (!target?.isOwner) return `<li class="is-waiting">${head}<em>${linkedAny(message.id, index, "defense") ? "защита бросается…" : "ждём защиту"}</em></header>${ownFumble}</li>`;
     if (linkedAny(message.id, index, "defense")) return `<li class="is-waiting">${head}<em><i class="fa-solid fa-dice-d10 fa-spin"></i> защита бросается…</em></header>${ownFumble}</li>`;
@@ -469,7 +473,8 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
       if (applied) {
         const result = exchangeOf(applied);
         if (result.shield) body += `<p class="witcher-exchange-applied is-shield" data-tooltip="${esc(stepsHTML(result.shield.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-user-shield"></i> Живой щит ${esc(result.shield.name)}: −${result.shield.total} ПЗ${result.shield.applied ? "" : " <small>(применяет мастер)</small>"}</p>${result.shield.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ щита −1: ${esc(result.shield.ablated)}</p>` : ""}`;
-        body += `<p class="witcher-exchange-applied" data-tooltip="${esc(stepsHTML(result.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-heart-crack"></i> −${result.total} ПЗ${result.shield ? " сквозь щит" : ""}</p>${result.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ −1: ${esc(result.ablated)}</p>` : result.armorHeld ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield"></i> Броня выдержала удар — ПБ не снижается</p>` : ""}`;
+        if (hideTargetNumbers) body += `<p class="witcher-exchange-applied"><i class="fa-solid fa-heart-crack"></i> −${result.total} ПЗ</p>`;
+        else body += `<p class="witcher-exchange-applied" data-tooltip="${esc(stepsHTML(result.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-heart-crack"></i> −${result.total} ПЗ${result.shield ? " сквозь щит" : ""}</p>${result.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ −1: ${esc(result.ablated)}</p>` : result.armorHeld ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield"></i> Броня выдержала удар — ПБ не снижается</p>` : ""}`;
         // Core p.158: every critical wound also forces a Stun save.
         if (data.critical && target?.isOwner) body += `<div class="witcher-exchange-actions">${button("data-exchange-stun", '<i class="fa-solid fa-dice-d10"></i> Испытание Устойчивости', true, "Критическое ранение требует испытания УСТ")}</div>`;
       } else if (target?.isOwner) {
@@ -498,6 +503,7 @@ export function renderExchange(message, html) {
   list.className = "witcher-exchange";
   list.innerHTML = `<h4><i class="fa-solid fa-swords"></i> Против: ${esc(target?.name ?? "цель недоступна")}</h4><ol>${message.rolls.map((_roll, index) => exchangeRowHTML(message, index, attack)).join("")}</ol>`;
   (html.querySelector(".message-content") ?? section).append(list);
+  concealAttackCard(message, html, attack);
   list.querySelectorAll(":scope > ol > li").forEach((row, index) => {
     const run = (selector, work) => row.querySelector(selector)?.addEventListener("click", async event => {
       event.stopPropagation(); event.currentTarget.disabled = true;
@@ -536,6 +542,21 @@ export function renderExchange(message, html) {
     }));
     for (const role of ["attack", "defense"]) autoResolveFumble(fumbleContext(role)).catch(console.error);
   });
+}
+
+/** Hide what the defender must not know yet, and a creature's numbers from players who do not own it. */
+function concealAttackCard(message, html, attack) {
+  if (attackConcealed(message) && message.rolls.some((_roll, index) => !linked(message.id, index, "defense"))) {
+    html.querySelectorAll(".dice-roll").forEach((element, index) => {
+      if (linked(message.id, index, "defense")) return;
+      element.hidden = true;
+      element.insertAdjacentHTML("afterend", '<p class="witcher-concealed-roll"><i class="fa-solid fa-eye-slash"></i> Бросок атаки откроется после выбора защиты</p>');
+    });
+    html.querySelectorAll(".witcher-critical-result").forEach(element => { element.hidden = true; });
+  }
+  if (creatureDetailsHidden(message.speakerActor)) {
+    html.querySelectorAll(".witcher-attack-chat > p[data-tooltip], .witcher-attack-modifiers").forEach(element => element.remove());
+  }
 }
 
 function renderUntargetedFumbles(message, html, attack) {

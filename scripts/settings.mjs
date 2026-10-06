@@ -6,6 +6,14 @@ export function registerSystemSettings() {
     name:"WITCHER.Settings.AutomaticCriticalDice",hint:"WITCHER.Settings.AutomaticCriticalDiceHint",
     scope:"world",config:true,type:Boolean,default:true
   });
+  game.settings.register(SYSTEM_ID,"concealAttackRolls",{
+    name:"WITCHER.Settings.ConcealAttackRolls",hint:"WITCHER.Settings.ConcealAttackRollsHint",
+    scope:"world",config:true,type:Boolean,default:true
+  });
+  game.settings.register(SYSTEM_ID,"concealCreatureDetails",{
+    name:"WITCHER.Settings.ConcealCreatureDetails",hint:"WITCHER.Settings.ConcealCreatureDetailsHint",
+    scope:"world",config:true,type:Boolean,default:true
+  });
   game.settings.register(SYSTEM_ID,"automaticFumbleRolls",{
     name:"WITCHER.Settings.AutomaticFumbleRolls",hint:"WITCHER.Settings.AutomaticFumbleRollsHint",
     scope:"world",config:true,type:Boolean,default:false

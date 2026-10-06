@@ -1,3 +1,4 @@
+import { creatureDetailsHidden } from "./concealment.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { SKILLS } from "../data/skills.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
@@ -53,6 +54,10 @@ export function breakdownHTML({dice, parts, total}) {
 
 export function renderRollBreakdown(message, html) {
   if (!message.isContentVisible || !message.rolls?.length) return;
+  if (creatureDetailsHidden(message.speakerActor)) {
+    html.querySelectorAll(".flavor-text [data-tooltip], .message-header .flavor-text [data-tooltip]").forEach(element => element.removeAttribute("data-tooltip"));
+    return;
+  }
   html.querySelectorAll(".dice-roll").forEach((element, index) => {
     const breakdown = rollBreakdown(message, message.rolls[index], index), total = element.querySelector(".dice-total");
     if (!breakdown || !total) return;

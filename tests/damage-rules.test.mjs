@@ -227,3 +227,20 @@ test("each fumble row becomes the right set of steps with their own dice", async
   assert.deepEqual(ids("unarmed", 9), ["status", "head", "stun"]);
   assert.deepEqual(ids("melee", 3), []);
 });
+
+test("concealment: attackers' owners and the GM see everything; creature numbers stay with their owners", async () => {
+  const { attackConcealed, creatureDetailsHidden } = await import("../scripts/chat/concealment.mjs");
+  const settings = { concealAttackRolls: true, concealCreatureDetails: true };
+  globalThis.game = { user: { isGM: false }, settings: { get: (_scope, key) => settings[key] } };
+  const monster = { type: "npc", isOwner: false }, hero = { type: "character", isOwner: true };
+  assert.equal(attackConcealed({ speakerActor: monster }), true);
+  assert.equal(attackConcealed({ speakerActor: hero }), false);
+  assert.equal(creatureDetailsHidden(monster), true);
+  assert.equal(creatureDetailsHidden({ type: "character", isOwner: false }), false, "other players' characters are not creatures");
+  game.user.isGM = true;
+  assert.equal(attackConcealed({ speakerActor: monster }), false);
+  assert.equal(creatureDetailsHidden(monster), false);
+  game.user.isGM = false; settings.concealAttackRolls = false;
+  assert.equal(attackConcealed({ speakerActor: monster }), false);
+  delete globalThis.game;
+});
