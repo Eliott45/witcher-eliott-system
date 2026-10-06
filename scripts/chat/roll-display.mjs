@@ -1,5 +1,11 @@
 import { SYSTEM_ID } from "../config.mjs";
 
+/** Client setting: wait for Dice So Nice before revealing results (off = show at once). */
+export function diceSyncEnabled() {
+  try { return game.settings.get(SYSTEM_ID, "waitDiceAnimation") !== false; } catch { return true; }
+}
+export const waitsForDice = () => Boolean(globalThis.game?.dice3d) && diceSyncEnabled();
+
 const nextPaint = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
 /** Subscribe before creation so fast chat renders/DSN completions cannot be missed. */
@@ -27,7 +33,7 @@ export function trackRollDisplay() {
       // DSN's public wait method skips animations when "immediately display chat"
       // is enabled. Its completion hook handles that mode and interactive throws too.
       // A paused animation (hidden tab, minimised window) must not block the action forever.
-      if (game.dice3d && message._dice3danimating && !completed.has(message.id)) await Promise.race([animationReady, new Promise(resolve => setTimeout(resolve, 15000))]);
+      if (waitsForDice() && message._dice3danimating && !completed.has(message.id)) await Promise.race([animationReady, new Promise(resolve => setTimeout(resolve, 15000))]);
       await nextPaint();
     },
     close() {

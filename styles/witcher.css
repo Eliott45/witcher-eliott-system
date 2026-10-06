@@ -1043,3 +1043,8 @@
 small.witcher-broken { display:inline-flex; align-items:center; gap:3px; margin-left:4px; padding:0 6px; border-radius:8px; background:#f0d4cc; }
 .witcher-npc-armor button.is-broken b { color:#a3302a; text-decoration:line-through; }
 .witcher-npc-armor button.is-broken i { color:#a3302a; font-size:10px; margin-left:2px; }
+/* GM-only information (players do not see it), in the spirit of pf2e's blue highlight. */
+.witcher-gm-only { position:relative; outline:1px dashed #4a8bc2; outline-offset:1px; background-color:#d8e9f7cc !important; border-radius:3px; }
+b.witcher-gm-only, span.witcher-gm-only { padding:0 4px; color:#1f4f78; }
+.witcher-gm-only::after { content:"\f070"; position:absolute; top:2px; right:4px; font:900 9px "Font Awesome 6 Free", "Font Awesome 6 Pro"; color:#4a8bc2; pointer-events:none; }
+b.witcher-gm-only::after, span.witcher-gm-only::after { display:none; }

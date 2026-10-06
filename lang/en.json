@@ -1378,6 +1378,8 @@
       "AutomaticCriticalDiceHint": "On: natural 1/10 chains continue automatically. Off: click + in chat for each additional d10. Ordinary dice and Stun saves are unchanged.",
       "AutomaticFumbleRolls": "Roll fumble consequences automatically",
       "AutomaticFumbleRollsHint": "When enabled, every roll a fumble calls for (reliability damage, hit location, scatter, head damage, Stun save) is made automatically by the player who fumbled. When disabled, the chat card shows a dice button for each consequence.",
+      "WaitDiceAnimation": "Sync with Dice So Nice",
+      "WaitDiceAnimationHint": "On: results (defense, damage, consequences) appear after the 3D dice land. Off: results show at once while the animation plays. Per-computer setting.",
       "ConcealAttackRolls": "Hide attack rolls until a defense is chosen",
       "ConcealAttackRollsHint": "Players who do not own the attacker cannot see the attack total, its dice (Dice So Nice shows ghost dice), criticals or fumbles until they pick a defense. The GM and the attacker's owners see everything.",
       "ConcealCreatureDetails": "Hide creature details from players",

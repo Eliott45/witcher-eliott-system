@@ -16,6 +16,8 @@ export function weaponReadiness(actor,item,weapon=effectiveItem(item),{allowOneH
   if(!equippedItems(actor.items).some(entry=>entry.id===item.id))return "Возьмите оружие в руки";
   if(!allowOneHand&&!weapon.natural&&gripOf(item)<(weapon.hands??1))return `Нужно рук: ${weapon.hands}`;
   if(!weapon.natural&&weapon.reliability?.max&&weapon.reliability.value<=0)return "Оружие сломано";
+  const block=(actor.effects??[]).find(effect=>!effect.disabled&&!effect.isSuppressed&&effect.flags?.["witcher-eliott-system"]?.weaponBlock?.itemId===item.id);
+  if(block)return ({stuck:"Оружие застряло",jammed:"Оружие заклинило",disarmed:"Оружие выбито из рук"})[block.flags["witcher-eliott-system"].weaponBlock.reason]??block.name;
   return "";
 }
 export function shieldPunch(body,weightClass) {

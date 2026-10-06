@@ -3,11 +3,16 @@ import { SYSTEM_ID } from "../config.mjs";
 // What a player may see of someone else's rolls. The GM and the roller's owners always see everything.
 const setting = key => { try { return Boolean(game.settings.get(SYSTEM_ID, key)); } catch { return false; } };
 
+export const concealSetting = () => setting("concealAttackRolls");
+
 /** A targeted attack stays hidden from those who do not own the attacker until the defense is chosen. */
 export const attackConcealed = message => setting("concealAttackRolls") && !game.user.isGM && !message?.speakerActor?.isOwner;
 
 /** A creature's numbers (base, modifiers, armor, resistances) stay hidden from players who do not own it. */
 export const creatureDetailsHidden = actor => setting("concealCreatureDetails") && !game.user.isGM && actor?.type === "npc" && !actor.isOwner;
+
+/** For the GM view: a creature's numbers that players would not see. */
+export const creatureDetailsSecret = actor => setting("concealCreatureDetails") && game.user.isGM && actor?.type === "npc" && !actor.hasPlayerOwner;
 
 /** Dice So Nice: ghost dice (no faces) for viewers who must not see this attack yet. */
 export function registerConcealedDice() {

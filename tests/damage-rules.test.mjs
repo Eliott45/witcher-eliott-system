@@ -252,3 +252,13 @@ test("debug dice queue parses plain d10 lists and per-die groups", async () => {
   assert.deepEqual(parseDebugDice(""), {});
   assert.equal(formatDebugDice({ 6: [6], 10: [] }), "d6: 6");
 });
+
+test("a stuck, jammed or knocked-away weapon cannot be used while its effect lasts", async () => {
+  const { weaponReadiness } = await import("../scripts/combat/weapon-rules.mjs");
+  const sword = { id: "sword", type: "weapon", name: "Меч", system: { hands: 1, grip: 1, category: "melee", quantity: 1, carried: true, equipped: true, reliability: { value: 10, max: 10 } } };
+  const items = [sword]; items.get = id => items.find(entry => entry.id === id);
+  const actor = { items, effects: [] };
+  assert.equal(weaponReadiness(actor, sword), "");
+  actor.effects.push({ disabled: false, isSuppressed: false, name: "Оружие застряло: Меч", flags: { "witcher-eliott-system": { weaponBlock: { itemId: "sword", reason: "stuck" } } } });
+  assert.equal(weaponReadiness(actor, sword), "Оружие застряло");
+});

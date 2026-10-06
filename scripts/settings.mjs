@@ -14,6 +14,10 @@ export function registerSystemSettings() {
     name:"WITCHER.Settings.ConcealCreatureDetails",hint:"WITCHER.Settings.ConcealCreatureDetailsHint",
     scope:"world",config:true,type:Boolean,default:true
   });
+  game.settings.register(SYSTEM_ID,"waitDiceAnimation",{
+    name:"WITCHER.Settings.WaitDiceAnimation",hint:"WITCHER.Settings.WaitDiceAnimationHint",
+    scope:"client",config:true,type:Boolean,default:true
+  });
   game.settings.register(SYSTEM_ID,"automaticFumbleRolls",{
     name:"WITCHER.Settings.AutomaticFumbleRolls",hint:"WITCHER.Settings.AutomaticFumbleRollsHint",
     scope:"world",config:true,type:Boolean,default:false

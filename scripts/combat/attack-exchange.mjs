@@ -2,14 +2,14 @@ import { SYSTEM_ID } from "../config.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
-import { trackRollDisplay } from "../chat/roll-display.mjs";
+import { trackRollDisplay, waitsForDice, diceSyncEnabled } from "../chat/roll-display.mjs";
 import { rollStun } from "./stun-roll.mjs";
 import { CONDITION_BY_ID, conditionSource } from "../data/condition-definitions.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
 import { woundEffectData } from "./critical-wound-effects.mjs";
 import { GRAPPLE_ACTIONS, applyGrappleSuccess, grappleState } from "./grapple.mjs";
 import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
-import { attackConcealed, creatureDetailsHidden } from "../chat/concealment.mjs";
+import { attackConcealed, creatureDetailsHidden, concealSetting, creatureDetailsSecret } from "../chat/concealment.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
 import { hitLocation, bodyPlanOf, ATTACK_LOCATIONS, weaponAttack, attackModes } from "./weapon-rules.mjs";
 import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
@@ -27,7 +27,7 @@ const linkedAny = (attackId, index, kind) => game.messages.find(message => {
 });
 // Dice So Nice marks a message while its dice are in the air; the card waits so the result is not spoiled.
 // A stalled animation (minimised window, lost focus) must not hide the result forever.
-const rolling = message => Boolean(message?._dice3danimating) && !message._witcherSettled && Date.now() - (message.timestamp ?? 0) < 12000;
+const rolling = message => diceSyncEnabled() && Boolean(message?._dice3danimating) && !message._witcherSettled && Date.now() - (message.timestamp ?? 0) < 12000;
 const linked = (attackId, index, kind) => { const message = linkedAny(attackId, index, kind); return rolling(message) ? null : message; };
 const targetToken = attack => attack?.target ? globalThis.canvas?.scene?.tokens.find(token => token.uuid === attack.target) ?? fromUuidSync(attack.target) : null;
 const targetActor = attack => targetToken(attack)?.actor ?? null;
@@ -348,13 +348,18 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
     if (step.id === "disarm") {
       const direction = await roll("1d10"), distance = await roll("1d6");
       if (item?.system.equipped) await item.update({ "system.equipped": false });
+      if (item) await blockWeapon(actor, item, "disarmed", `Оружие выбито: ${item.name}`, `${item.name} отлетело на ${distance.total} м (направление ${direction.total} по таблице разброса). Подберите его, чтобы снова взять в руки.`, null);
       notes.push(`${item?.name ?? "Оружие"} выбито: направление ${direction.total} по таблице разброса, ${distance.total} м`);
     }
     if (step.id === "jam") {
       if (item?.system.skill === "crossbow" && item.system.loaded !== false) await item.update({ "system.loaded": false });
+      if (item) await blockWeapon(actor, item, "jammed", `Заклинило: ${item.name}`, `${item.name} нельзя использовать до конца вашего следующего хода: тетива слетела или механизм заклинило.`, 1);
       notes.push(item?.system.skill === "crossbow" ? `${item.name}: заклинило, нужна перезарядка` : "1 раунд на исправление");
     }
-    if (step.id === "stuck") notes.push(`${item?.name ?? "Оружие"} застряло: 1 раунд, чтобы достать`);
+    if (step.id === "stuck") {
+      if (item) await blockWeapon(actor, item, "stuck", `Оружие застряло: ${item.name}`, `${item.name} застряло в ближайшем предмете. Им нельзя атаковать и блокировать до конца вашего следующего хода.`, 1);
+      notes.push(`${item?.name ?? "Оружие"} застряло: 1 раунд, чтобы достать`);
+    }
     if (step.id === "stun") { await rollStun(actor); notes.push("испытание Устойчивости брошено"); }
     return await post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls, content: `<p>Провал: ${esc(notes.join("; "))}</p>`,
       flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: stepKind(role, step.id), notes, ...extra } } } }, "public");
@@ -387,12 +392,21 @@ async function applyDeferredShare(message) {
   await sufferDamage(victim, { total: share.total, ablate: share.ablate ?? [] });
 }
 
+/** A weapon made unusable by a fumble, tracked as an effect on its wielder (core p.157). */
+async function blockWeapon(actor, item, reason, name, description, rounds) {
+  const timed = rounds ? { start: fullTurnStart(actor), duration: { value: rounds, units: "rounds", expiry: "turnEnd", expired: false } } : {};
+  await actor.createEmbeddedDocuments("ActiveEffect", [{ name, img: item.img || "icons/svg/sword.svg", description: `<p>${esc(description)}</p>`, ...timed,
+    flags: { [SYSTEM_ID]: { weaponBlock: { itemId: item.id, reason } } } }]);
+}
+
 /** Optional world setting: the player who rolled the fumble resolves every step at once. */
 async function autoResolveFumble(context) {
   const { message, index, role, actor, itemId, outcome, author } = context;
   if (!outcome || author !== game.user.id || !game.settings.get(SYSTEM_ID, "automaticFumbleRolls")) return;
   for (const step of fumbleSteps(outcome, actor, itemId)) await runFumbleStep({ ...context, step });
 }
+
+const fumbleHTMLSecret = (...args) => fumbleHTML(...args).replace('class="witcher-exchange-fumble"', 'class="witcher-exchange-fumble witcher-gm-only" data-tooltip="Игроки не видят до выбора защиты"');
 
 function fumbleHTML(message, index, role, outcome, owner, actor, itemId) {
   if (!outcome) return "";
@@ -422,8 +436,10 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
   const total = message.rolls[index]?.total, target = targetActor(attack), outcome = exchangeOutcome(message, index);
   // Until the defense is chosen (and its dice landed) the defender does not learn the total or a fumble.
   const concealed = attackConcealed(message) && !linked(message.id, index, "defense");
-  const head = `<header><span>Атака ${attack.count > 1 ? `${index + 1} ` : ""}<b>${concealed ? '<i class="fa-solid fa-eye-slash" data-tooltip="Итог атаки откроется после выбора защиты"></i>' : total}</b></span>`;
-  const ownFumble = concealed ? "" : fumbleHTML(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner, message.speakerActor, attack.itemId);
+  // The GM and the attacker's owners see it, marked like pf2e's GM-only info.
+  const secret = !concealed && concealSetting() && !linked(message.id, index, "defense");
+  const head = `<header><span>Атака ${attack.count > 1 ? `${index + 1} ` : ""}<b class="${secret ? "witcher-gm-only" : ""}" ${secret ? 'data-tooltip="Игроки не видят до выбора защиты"' : ""}>${concealed ? '<i class="fa-solid fa-eye-slash" data-tooltip="Итог атаки откроется после выбора защиты"></i>' : total}</b></span>`;
+  const ownFumble = concealed ? "" : (secret ? fumbleHTMLSecret : fumbleHTML)(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner, message.speakerActor, attack.itemId);
   const hideTargetNumbers = creatureDetailsHidden(target);
   if (!outcome) {
     if (!target?.isOwner) return `<li class="is-waiting">${head}<em>${linkedAny(message.id, index, "defense") ? "защита бросается…" : "ждём защиту"}</em></header>${ownFumble}</li>`;
@@ -556,7 +572,13 @@ function concealAttackCard(message, html, attack) {
   }
   if (creatureDetailsHidden(message.speakerActor)) {
     html.querySelectorAll(".witcher-attack-chat > p[data-tooltip], .witcher-attack-modifiers").forEach(element => element.remove());
-  }
+  } else if (creatureDetailsSecret(message.speakerActor)) html.querySelectorAll(".witcher-attack-chat > p[data-tooltip], .witcher-attack-modifiers").forEach(element => element.classList.add("witcher-gm-only"));
+  // The viewer who may see a still-concealed attack gets it highlighted as hidden from players.
+  if (!attackConcealed(message) && concealSetting()) html.querySelectorAll(".dice-roll").forEach((element, index) => {
+    if (!linked(message.id, index, "defense")) { element.classList.add("witcher-gm-only"); element.dataset.tooltip ??= "Игроки не видят до выбора защиты"; }
+  });
+  if (!attackConcealed(message) && concealSetting() && message.rolls.some((_roll, index) => !linked(message.id, index, "defense")))
+    html.querySelectorAll(".witcher-critical-result").forEach(element => element.classList.add("witcher-gm-only"));
 }
 
 function renderUntargetedFumbles(message, html, attack) {
@@ -588,7 +610,7 @@ function refreshAttack(message) {
 /** Re-render once the linked dice have landed (or at once without Dice So Nice). */
 function settleThenRefresh(message) {
   if (!exchangeOf(message)) return;
-  if (!game.dice3d || !message.rolls?.length) { refreshAttack(message); return void afterSettled(message).catch(console.error); }
+  if (!waitsForDice() || !message.rolls?.length) { refreshAttack(message); return void afterSettled(message).catch(console.error); }
   let timer;
   // Dice So Nice flags the message in its own hook, after ours; check again once it had the chance.
   setTimeout(() => { if (message._dice3danimating) refreshAttack(message); else done(); }, 150);
