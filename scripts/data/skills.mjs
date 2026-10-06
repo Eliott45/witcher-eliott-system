@@ -1,4 +1,4 @@
-import { cappedSkillModifiers } from "./background-modifiers.mjs";
+import { cappedSkillModifiers, modifierFactor } from "./background-modifiers.mjs";
 import { languageForEntry } from "./languages.mjs";
 import { creatureSkillAttribute } from "./creatures.mjs";
 // Stable IDs match background-modifiers.mjs; language is a template for named entries.
@@ -32,5 +32,5 @@ export function skillValue(system, key, languageId = "") {
     && (!modifier.condition || (modifier.condition === "humanTarget" && system.abilityState.trustEnabled))));
   const bonus = modifiers.reduce((sum, modifier) => sum + modifier.value, 0);
   return { ...skill, language, level, attributeValue: attribute, attributeOverride:override, bonus, modifiers,
-    total: attribute === null ? null : attribute + level + bonus };
+    total: attribute === null ? null : Math.floor((attribute + level + bonus) * modifierFactor(statistics.modifiers, `skills.${key}`)) };
 }

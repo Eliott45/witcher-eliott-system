@@ -19,6 +19,8 @@ import { registerOilExpiry } from "./workshop/upgrades.mjs";
 import { registerConsumption } from "./workshop/consumption.mjs";
 import { registerForaging } from "./chat/foraging.mjs";
 import { migratePoisonEffects } from "./migrations/poison-effects.mjs";
+import { registerCriticalWoundHooks } from "./combat/critical-wound-effects.mjs";
+import { migrateEffectContent, registerEffectContentMigration } from "./migrations/effect-content.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
 import { registerRollBreakdown } from "./chat/roll-breakdown.mjs";
@@ -87,6 +89,7 @@ Hooks.once("init", async () => {
   registerForaging();
   CONFIG.Combat.initiative.formula = INITIATIVE_FORMULA;
   registerStatusEffects();
+  registerCriticalWoundHooks();
   registerConditionSaves();
   registerEffectExpiry();
   registerOilExpiry();
@@ -109,6 +112,7 @@ Hooks.once("init", async () => {
   registerVisorVision();
   registerCompendiumFolderMigration();
   registerEquipmentContentMigration();
+  registerEffectContentMigration();
   registerSpellContentMigration();
   registerBestiaryMigration();
   registerPregenMigration();
@@ -187,6 +191,7 @@ Hooks.on("updateCombat", (_combat,changes) => {
 Hooks.once("ready", async () => {
   await ensureSystemLanguage();localizeStatusEffects();
   await migrateMacroContent().catch(error=>console.error(`${SYSTEM_ID} | Macro content`,error));
+  await migrateEffectContent().catch(error=>{console.error(`${SYSTEM_ID} | Effect compendium`,error);ui.notifications.error("Не удалось добавить критические ранения в компендиум эффектов. Подробности в консоли.");});
   await migratePoisonEffects().catch(error=>{console.error(`${SYSTEM_ID} | Poison effects`,error);ui.notifications.error("Не удалось обновить эффекты отравления. Подробности в консоли.");});
   // Vision and equipment migrations both repair the pregen pack; do not race its lock.
   await migrateVisionDefaults().catch(error => {

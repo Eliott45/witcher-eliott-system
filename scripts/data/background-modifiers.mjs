@@ -62,5 +62,10 @@ export function cappedSkillModifiers(level, modifiers, cap = 10) {
 export function modifierTotal(modifiers, target, conditions = []) {
   return modifiers.filter(modifier => modifier.target === target
     && (!modifier.condition || conditions.includes(modifier.condition)))
-    .reduce((total, modifier) => total + modifier.value, 0);
+    .reduce((total, modifier) => total + (modifier.value ?? 0), 0);
+}
+/** Product of multiplicative modifiers (`factor`) for one target; 1 when there are none. */
+export function modifierFactor(modifiers, target) {
+  return modifiers.filter(modifier => modifier.target === target && Number.isFinite(modifier.factor))
+    .reduce((product, modifier) => product * modifier.factor, 1);
 }

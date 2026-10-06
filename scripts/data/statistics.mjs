@@ -1,6 +1,6 @@
 import { mutationModifiers, wearerBonuses } from "./workshop.mjs";
 import { equippedItems } from "./physical-items.mjs";
-import { backgroundModifiers, modifierTotal } from "./background-modifiers.mjs";
+import { backgroundModifiers, modifierTotal, modifierFactor } from "./background-modifiers.mjs";
 import { dyingHealth } from "./death.mjs";
 import { witcherModifiers } from "./witcher-lifepath.mjs";
 import { lifeEventModifiers } from "./life-events.mjs";
@@ -24,17 +24,24 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const ev = armorEncumbrance(items, modifierTotal(modifiers, "armorEncumbrance"));
   for (const target of ["attributes.reflex", "attributes.dexterity", "skills.spellCasting", "skills.hexWeaving", "skills.ritualCrafting"])
     if (ev) modifiers.push({ source: "equipment.ev", label: "Скованность брони", category: "equipment", target, value: -ev });
+  // Multipliers (critical wounds: "halved", "quartered") apply after every additive modifier.
+  const scale = (value, target) => value === null ? null : Math.floor(value * modifierFactor(modifiers, target));
   const adjusted = Object.fromEntries(ATTRIBUTE_KEYS.map(key => [key, attributes[key] === null ? null
-    : attributes[key] + modifierTotal(modifiers, `attributes.${key}`)]));
+    : scale(attributes[key] + modifierTotal(modifiers, `attributes.${key}`), `attributes.${key}`)]));
+  // Some wound penalties leave HP/STA untouched (Cracked Ribs; Heart Damage quarters STA itself): resource limits ignore them.
+  const counted = modifiers.filter(modifier => !modifier.resourceNeutral);
+  const limitValue = key => attributes[key] === null ? null
+    : Math.floor((attributes[key] + modifierTotal(counted, `attributes.${key}`)) * modifierFactor(counted, `attributes.${key}`));
   for (const key of ATTRIBUTE_KEYS) if (adjusted[key] !== null && modifiers.some(modifier=>modifier.category==="effect"&&modifier.target===`attributes.${key}`)) adjusted[key]=Math.max(0,adjusted[key]);
   for (const key of ["reflex", "dexterity"]) if (ev && adjusted[key] !== null) adjusted[key] = Math.max(1, adjusted[key]);
   if (modifiers.some(modifier => modifier.source === "witcher.dulled-emotions") && adjusted.empathy !== null) adjusted.empathy = Math.min(6, Math.max(1, adjusted.empathy));
   const { body, will } = adjusted;
-  const physical = body !== null && will !== null ? Math.floor((body + will) / 2) : null;
+  const limitBody = limitValue("body"), limitWill = limitValue("will");
+  const physical = body !== null && will !== null ? Math.floor((Math.max(0, limitBody) + Math.max(0, limitWill)) / 2) : null;
   // A creature's printed HP/STA (set by the GM) replace the BODY/WILL formula; effect modifiers still apply.
   const baseLimit = key => creature?.[key] > 0 ? creature[key] : physical === null ? null : physical * 5;
   const healthMax = baseLimit("healthMax") === null ? null : Math.max(0, baseLimit("healthMax") + modifierTotal(modifiers, "healthMax"));
-  const staminaMax = baseLimit("staminaMax") === null ? null : Math.max(0, baseLimit("staminaMax") + modifierTotal(modifiers, "staminaMax"));
+  const staminaMax = baseLimit("staminaMax") === null ? null : Math.max(0, scale(baseLimit("staminaMax") + modifierTotal(modifiers, "staminaMax"), "staminaMax"));
   const woundThreshold = Math.floor((healthMax ?? health.max) / 5);
   const wounded = woundThreshold > 0 && health.value < woundThreshold;
   dying ||= dyingHealth({ value: health.value, max: healthMax ?? health.max });
@@ -48,8 +55,8 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const run = speed === null ? null : speed * 3;
   return {
     healthMax, staminaMax, meleeDamageBonus: modifierTotal(modifiers, "meleeDamage"), physicalDamageBonus: modifierTotal(modifiers, "physicalDamage"), encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),
-    stun: physical === null ? null : Math.min(10, physical),
-    recovery: physical === null ? null : physical + modifierTotal(modifiers, "recovery"), woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
+    stun: physical === null ? null : Math.max(0, Math.min(10, physical) + modifierTotal(modifiers, "stun")),
+    recovery: physical === null ? null : Math.max(0, scale(physical + modifierTotal(modifiers, "recovery"), "recovery")), woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
     reputationBonus, reputation: reputationTotal, naturalArmor: modifierTotal(modifiers, "naturalArmor"),
     skillBonuses: Object.fromEntries([...new Set(modifiers.filter(modifier => modifier.target.startsWith("skills.")).map(modifier => modifier.target))]
       .map(target => [target.slice(7), modifierTotal(modifiers, target, abilityState.trustEnabled ? ["humanTarget"] : [])])),

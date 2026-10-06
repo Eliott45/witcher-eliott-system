@@ -9,6 +9,7 @@ import { rollStun } from "./stun-roll.mjs";
 import { CONDITION_BY_ID, conditionSource } from "../data/condition-definitions.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
 import { woundEffectData } from "./critical-wound-effects.mjs";
+import { modifierTotal } from "../data/background-modifiers.mjs";
 import { GRAPPLE_ACTIONS, applyGrappleSuccess, grappleState } from "./grapple.mjs";
 import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
 import { attackConcealed, creatureDetailsHidden, enemyAttackHidden, creatureDetailsSecret } from "../chat/concealment.mjs";
@@ -196,7 +197,9 @@ export function damagePreview(message, index) {
   if (!damage || !target) return null;
   const data = exchangeOf(damage), armor = armorAt(target, data.location.id);
   const critical = data.critical ? { name: data.critical.name, bonus: data.critical.bonus } : null;
-  const hit = (actor, armorAtZone, base, silver, crit) => resolveDamage({ base, silver, location: data.location.id, multiplier: data.location.multiplier,
+  // Cracked Skull (core p.159): later wounds to the head deal ×4 instead of ×3.
+  const multiplierFor = actor => data.location.id === "head" ? data.location.multiplier + modifierTotal(actor.system.statistics?.modifiers ?? [], "damage.headMultiplier") : data.location.multiplier;
+  const hit = (actor, armorAtZone, base, silver, crit) => resolveDamage({ base, silver, location: data.location.id, multiplier: multiplierFor(actor),
     traits: data.traits, armor: armorAtZone, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor), critical: crit });
   const preview = { data, target, armor, result: hit(target, armor, data.base, data.silver, critical), shield: null };
   // House rule on core p.155: only a held creature can be a living shield. A torso hit goes into it as if it

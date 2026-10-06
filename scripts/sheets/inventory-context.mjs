@@ -1,3 +1,4 @@
+import { usableHands } from "../combat/critical-wound-effects.mjs";
 import { dropItemToGround } from "../loot/loot.mjs";
 import { layeringPlan, zoneStoppingPower, layeringDetails } from "../data/armor-layers.mjs";
 import { isTransport, cargoSections, cargoSection } from "../data/transport.mjs";
@@ -139,11 +140,14 @@ export async function changeGrip(_event,target) {
   const grip=await foundry.applications.api.DialogV2.wait({window:{title:`Хват: ${item.name}`},content:`<p>Нужно рук для атаки: ${item.system.hands}. Выберите текущий хват. При смене оружия лишнее оружие будет убрано.</p>`,
     buttons:[{action:"stow",label:"Убрать",callback:()=>0},{action:"one",label:"1 рукой",callback:()=>1},{action:"two",label:"2 руками",callback:()=>2}],rejectClose:false});
   if(![0,1,2].includes(grip))return;
+  // A disabled arm (critical wound) leaves fewer hands to hold weapons.
+  const hands=usableHands(this.actor);
+  if(grip>hands){ui.notifications.warn(hands?"Одна рука выведена из строя: доступен только хват одной рукой.":"Обе руки выведены из строя.");return;}
   await inventoryWrite(this.actor,async()=>{
     const updates=[{_id:item.id,"system.grip":grip||gripOf(item),"system.equipped":grip>0,...(grip?{"system.carried":true,"system.containerId":""}:{})}];
     let occupied=grip;
     for(const other of equippedItems(this.actor.items).filter(other=>other.type==="weapon"&&other.id!==item.id&&!other.system.natural)) {
-      if(grip&&occupied+gripOf(other)>2)updates.push({_id:other.id,"system.equipped":false});
+      if(grip&&occupied+gripOf(other)>hands)updates.push({_id:other.id,"system.equipped":false});
       else occupied+=gripOf(other);
     }
     await this.actor.updateEmbeddedDocuments("Item",updates);

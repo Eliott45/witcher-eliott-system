@@ -1369,5 +1369,1234 @@
         }
       }
     }
+  },
+  {
+    "_id": "efct000000000201",
+    "name": "Крит: Треснувшая челюсть (лёгкое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Лёгкое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −2 к магическим навыкам и навыкам Словесной дуэли.</p><p class=\"\"><b>После стабилизации:</b> −1 к магическим навыкам и Словесной дуэли.</p><p class=\"\"><b>После лечения:</b> −1 к магическим навыкам.</p><p><small>Стабилизация: Первая помощь СЛ 12. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "cracked-jaw",
+          "level": "light",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "skills.spellCasting",
+              "value": -2
+            },
+            {
+              "target": "skills.ritualCrafting",
+              "value": -2
+            },
+            {
+              "target": "skills.hexWeaving",
+              "value": -2
+            },
+            {
+              "target": "skills.charisma",
+              "value": -2
+            },
+            {
+              "target": "skills.persuasion",
+              "value": -2
+            },
+            {
+              "target": "skills.seduction",
+              "value": -2
+            },
+            {
+              "target": "skills.leadership",
+              "value": -2
+            },
+            {
+              "target": "skills.deceit",
+              "value": -2
+            },
+            {
+              "target": "skills.socialEtiquette",
+              "value": -2
+            },
+            {
+              "target": "skills.intimidation",
+              "value": -2
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000202",
+    "name": "Крит: Уродующий шрам (лёгкое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Лёгкое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −3 к эмпатическим навыкам Словесной дуэли.</p><p class=\"\"><b>После стабилизации:</b> −1 к эмпатической Словесной дуэли.</p><p class=\"\"><b>После лечения:</b> −1 к Соблазнению.</p><p><small>Стабилизация: Первая помощь СЛ 12. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "disfiguring-scar",
+          "level": "light",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "skills.charisma",
+              "value": -3
+            },
+            {
+              "target": "skills.persuasion",
+              "value": -3
+            },
+            {
+              "target": "skills.seduction",
+              "value": -3
+            },
+            {
+              "target": "skills.leadership",
+              "value": -3
+            },
+            {
+              "target": "skills.deceit",
+              "value": -3
+            },
+            {
+              "target": "skills.socialEtiquette",
+              "value": -3
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000203",
+    "name": "Крит: Треснувшие рёбра (лёгкое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Лёгкое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −2 к ТЕЛ (не меняет ПЗ).</p><p class=\"\"><b>После стабилизации:</b> −1 к ТЕЛ.</p><p class=\"\"><b>После лечения:</b> −10 к переносимому весу.</p><p><small>Стабилизация: Первая помощь СЛ 12. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "cracked-ribs",
+          "level": "light",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "attributes.body",
+              "value": -2,
+              "resourceNeutral": true
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000204",
+    "name": "Крит: Инородный объект (лёгкое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Лёгкое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> Отдых и исцеление критических ранений снижены в четыре раза.</p><p class=\"\"><b>После стабилизации:</b> Отдых и исцеление снижены вдвое.</p><p class=\"\"><b>После лечения:</b> −2 к Отдыху, −1 к исцелению критических ранений.</p><p><small>Стабилизация: Первая помощь СЛ 12. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "foreign-object",
+          "level": "light",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "recovery",
+              "factor": 0.25,
+              "value": 0
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000205",
+    "name": "Крит: Вывих руки (лёгкое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Лёгкое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −2 к действиям этой рукой.</p><p class=\"\"><b>После стабилизации:</b> −1 к действиям этой рукой.</p><p class=\"\"><b>После лечения:</b> −1 к Силе.</p><p><small><b>Автоматически:</b> Штраф руки: к атакам и защите оружием, если оно в этой руке (правая — основная; левая — при хвате двумя руками или двух оружиях).</small></p><p><small>Стабилизация: Первая помощь СЛ 12. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "sprained-arm",
+          "level": "light",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "combat.arm",
+              "value": -2,
+              "arm": "rightArm"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000206",
+    "name": "Крит: Вывих ноги (лёгкое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Лёгкое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −2 к СКОР, Уклонению/Изворотливости и Атлетике.</p><p class=\"\"><b>После стабилизации:</b> −1 к СКОР, Уклонению и Атлетике.</p><p class=\"\"><b>После лечения:</b> −1 к СКОР.</p><p><small>Стабилизация: Первая помощь СЛ 12. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "sprained-leg",
+          "level": "light",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "attributes.speed",
+              "value": -2
+            },
+            {
+              "target": "skills.dodgeEscape",
+              "value": -2
+            },
+            {
+              "target": "skills.athletics",
+              "value": -2
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000207",
+    "name": "Крит: Небольшая травма головы (среднее)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Среднее ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −1 к ИНТ, ВОЛ и УСТ.</p><p class=\"\"><b>После стабилизации:</b> −1 к ИНТ и ВОЛ.</p><p class=\"\"><b>После лечения:</b> −1 к ВОЛ.</p><p><small>Стабилизация: Первая помощь СЛ 14. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "minor-head-wound",
+          "level": "medium",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "attributes.intelligence",
+              "value": -1
+            },
+            {
+              "target": "attributes.will",
+              "value": -1
+            },
+            {
+              "target": "stun",
+              "value": -1
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000208",
+    "name": "Крит: Выбитые зубы (среднее)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Среднее ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> Бросьте 1d10 — число выбитых зубов. −3 к магическим навыкам и Словесной дуэли.</p><p class=\"\"><b>После стабилизации:</b> −2 к магическим навыкам и Словесной дуэли.</p><p class=\"\"><b>После лечения:</b> −1 к магическим навыкам и Словесной дуэли.</p><p><small>Стабилизация: Первая помощь СЛ 14. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "lost-teeth",
+          "level": "medium",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "skills.spellCasting",
+              "value": -3
+            },
+            {
+              "target": "skills.ritualCrafting",
+              "value": -3
+            },
+            {
+              "target": "skills.hexWeaving",
+              "value": -3
+            },
+            {
+              "target": "skills.charisma",
+              "value": -3
+            },
+            {
+              "target": "skills.persuasion",
+              "value": -3
+            },
+            {
+              "target": "skills.seduction",
+              "value": -3
+            },
+            {
+              "target": "skills.leadership",
+              "value": -3
+            },
+            {
+              "target": "skills.deceit",
+              "value": -3
+            },
+            {
+              "target": "skills.socialEtiquette",
+              "value": -3
+            },
+            {
+              "target": "skills.intimidation",
+              "value": -3
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000209",
+    "name": "Крит: Разрыв селезёнки (среднее)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Среднее ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> Испытание УСТ каждые 5 раундов. Кровотечение.</p><p class=\"\"><b>После стабилизации:</b> Испытание УСТ каждые 10 раундов.</p><p class=\"\"><b>После лечения:</b> −2 к УСТ.</p><p><small><b>Автоматически:</b> Накладывает: кровотечение; снимается вместе со стабилизацией. Испытание Устойчивости в начале хода каждые 5 раундов.</small></p><p><small>Стабилизация: Первая помощь СЛ 14. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "ruptured-spleen",
+          "level": "medium",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": []
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000210",
+    "name": "Крит: Сломанные рёбра (среднее)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Среднее ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −2 к ТЕЛ, −1 к РЕА и ЛВК.</p><p class=\"\"><b>После стабилизации:</b> −1 к ТЕЛ и РЕА.</p><p class=\"\"><b>После лечения:</b> −1 к ТЕЛ.</p><p><small>Стабилизация: Первая помощь СЛ 14. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "broken-ribs",
+          "level": "medium",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "attributes.body",
+              "value": -2
+            },
+            {
+              "target": "attributes.reflex",
+              "value": -1
+            },
+            {
+              "target": "attributes.dexterity",
+              "value": -1
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000211",
+    "name": "Крит: Перелом руки (среднее)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Среднее ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −3 ко всем действиям этой рукой.</p><p class=\"\"><b>После стабилизации:</b> −2 ко всем действиям этой рукой.</p><p class=\"\"><b>После лечения:</b> −1 ко всем действиям этой рукой.</p><p><small><b>Автоматически:</b> Штраф руки: к атакам и защите оружием, если оно в этой руке (правая — основная; левая — при хвате двумя руками или двух оружиях).</small></p><p><small>Стабилизация: Первая помощь СЛ 14. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "fractured-arm",
+          "level": "medium",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "combat.arm",
+              "value": -3,
+              "arm": "rightArm"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000212",
+    "name": "Крит: Перелом ноги (среднее)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Среднее ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −3 к СКОР, Уклонению/Изворотливости и Атлетике.</p><p class=\"\"><b>После стабилизации:</b> −2 к СКОР, Уклонению и Атлетике.</p><p class=\"\"><b>После лечения:</b> −1 к СКОР, Уклонению и Атлетике.</p><p><small>Стабилизация: Первая помощь СЛ 14. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "fractured-leg",
+          "level": "medium",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "attributes.speed",
+              "value": -3
+            },
+            {
+              "target": "skills.dodgeEscape",
+              "value": -3
+            },
+            {
+              "target": "skills.athletics",
+              "value": -3
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000213",
+    "name": "Крит: Проломленный череп (тяжёлое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Тяжёлое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −1 к ИНТ и ЛВК; следующие ранения в голову наносят ×4 урона. Кровотечение.</p><p class=\"\"><b>После стабилизации:</b> −1 к ИНТ и ЛВК; ранения в голову ×4.</p><p class=\"\"><b>После лечения:</b> Ранения в голову ×4 урона.</p><p><small><b>Автоматически:</b> Накладывает: кровотечение; снимается вместе со стабилизацией.</small></p><p><small>Стабилизация: Первая помощь СЛ 16. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "cracked-skull",
+          "level": "severe",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "attributes.intelligence",
+              "value": -1
+            },
+            {
+              "target": "attributes.dexterity",
+              "value": -1
+            },
+            {
+              "target": "damage.headMultiplier",
+              "value": 1
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000214",
+    "name": "Крит: Контузия (тяжёлое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Тяжёлое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> Испытание УСТ каждые 1d6 раундов. −2 к ИНТ, РЕА и ЛВК.</p><p class=\"\"><b>После стабилизации:</b> −1 к ИНТ, РЕА и ЛВК.</p><p class=\"\"><b>После лечения:</b> −1 к ИНТ и ЛВК.</p><p><small><b>Автоматически:</b> Испытание Устойчивости в начале хода каждые 1d6 раундов.</small></p><p><small>Стабилизация: Первая помощь СЛ 16. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "concussion",
+          "level": "severe",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "attributes.intelligence",
+              "value": -2
+            },
+            {
+              "target": "attributes.reflex",
+              "value": -2
+            },
+            {
+              "target": "attributes.dexterity",
+              "value": -2
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000215",
+    "name": "Крит: Рана в живот (тяжёлое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Тяжёлое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −2 ко всем действиям и 4 урона кислотой каждый раунд.</p><p class=\"\"><b>После стабилизации:</b> −2 ко всем действиям.</p><p class=\"\"><b>После лечения:</b> −1 ко всем действиям.</p><p><small><b>Автоматически:</b> 4 урона кислотой в начале каждого хода, броня не защищает.</small></p><p><small>Стабилизация: Первая помощь СЛ 16. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "torn-stomach",
+          "level": "severe",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "combat.attack",
+              "value": -2
+            },
+            {
+              "target": "combat.defense",
+              "value": -2
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000216",
+    "name": "Крит: Сосущая рана грудной клетки (тяжёлое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Тяжёлое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −3 к ТЕЛ и СКОР. Удушье.</p><p class=\"\"><b>После стабилизации:</b> −2 к ТЕЛ и СКОР.</p><p class=\"\"><b>После лечения:</b> −1 к ТЕЛ и СКОР.</p><p><small><b>Автоматически:</b> Накладывает: удушье; снимается вместе со стабилизацией.</small></p><p><small>Стабилизация: Первая помощь СЛ 16. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "sucking-chest-wound",
+          "level": "severe",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "attributes.body",
+              "value": -3
+            },
+            {
+              "target": "attributes.speed",
+              "value": -3
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000217",
+    "name": "Крит: Открытый перелом руки (тяжёлое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Тяжёлое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> Рукой невозможно двигать. Кровотечение.</p><p class=\"\"><b>После стабилизации:</b> Рукой невозможно двигать.</p><p class=\"\"><b>После лечения:</b> Рука на перевязи, но может держать предметы.</p><p><small><b>Автоматически:</b> Накладывает: кровотечение; снимается вместе со стабилизацией. Рукой нельзя пользоваться: доступна одна рука, двуручный хват невозможен.</small></p><p><small>Стабилизация: Первая помощь СЛ 16. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "compound-arm-fracture",
+          "level": "severe",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "hands",
+              "value": -1
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000218",
+    "name": "Крит: Открытый перелом ноги (тяжёлое)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Тяжёлое ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> СКОР, Уклонение/Изворотливость и Атлетика снижены вчетверо. Кровотечение.</p><p class=\"\"><b>После стабилизации:</b> СКОР, Уклонение и Атлетика снижены вдвое.</p><p class=\"\"><b>После лечения:</b> −2 к СКОР, Уклонению и Атлетике.</p><p><small><b>Автоматически:</b> Накладывает: кровотечение; снимается вместе со стабилизацией.</small></p><p><small>Стабилизация: Первая помощь СЛ 16. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "compound-leg-fracture",
+          "level": "severe",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "attributes.speed",
+              "factor": 0.25,
+              "value": 0
+            },
+            {
+              "target": "skills.dodgeEscape",
+              "factor": 0.25,
+              "value": 0
+            },
+            {
+              "target": "skills.athletics",
+              "factor": 0.25,
+              "value": 0
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000219",
+    "name": "Крит: Сломанная шея / обезглавливание (смертельное)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Смертельное ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> Персонаж немедленно умирает.</p><p class=\"\"><b>После стабилизации:</b> Нельзя стабилизировать.</p><p class=\"\"><b>После лечения:</b> Нельзя вылечить.</p><p><small><b>Автоматически:</b> Персонаж погибает.</small></p><p><small>Стабилизация: Первая помощь СЛ 18. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "decapitation",
+          "level": "deadly",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": []
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000220",
+    "name": "Крит: Повреждение глаза (смертельное)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Смертельное ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> −5 к проверкам Внимания, связанным со зрением, −4 к ЛВК. Кровотечение.</p><p class=\"\"><b>После стабилизации:</b> −3 к зрительному Вниманию, −2 к ЛВК.</p><p class=\"\"><b>После лечения:</b> Навсегда −1 к зрительному Вниманию и ЛВК.</p><p><small><b>Автоматически:</b> Накладывает: кровотечение; снимается вместе со стабилизацией.</small></p><p><small>Стабилизация: Первая помощь СЛ 18. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "damaged-eye",
+          "level": "deadly",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "skills.awareness",
+              "value": -5
+            },
+            {
+              "target": "attributes.dexterity",
+              "value": -4
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000221",
+    "name": "Крит: Травма сердца (смертельное)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Смертельное ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> Немедленное испытание смерти. При выживании — кровотечение, ВЫН, СКОР и ТЕЛ снижены вчетверо.</p><p class=\"\"><b>После стабилизации:</b> ВЫН, СКОР и ТЕЛ снижены вдвое.</p><p class=\"\"><b>После лечения:</b> Навсегда +2 урона за раунд от кровотечения.</p><p><small><b>Автоматически:</b> Накладывает: кровотечение; снимается вместе со стабилизацией. Сразу — испытание против смерти; провал означает гибель.</small></p><p><small>Стабилизация: Первая помощь СЛ 18. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "heart-damage",
+          "level": "deadly",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "staminaMax",
+              "factor": 0.25,
+              "value": 0
+            },
+            {
+              "target": "attributes.speed",
+              "factor": 0.25,
+              "value": 0
+            },
+            {
+              "target": "attributes.body",
+              "factor": 0.25,
+              "value": 0,
+              "resourceNeutral": true
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000222",
+    "name": "Крит: Септический шок (смертельное)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Смертельное ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> ВЫН снижена вчетверо; −3 к ИНТ, ВОЛ, РЕА и ЛВК. Отравление.</p><p class=\"\"><b>После стабилизации:</b> ВЫН снижена вдвое; −1 к ИНТ, ВОЛ, РЕА и ЛВК.</p><p class=\"\"><b>После лечения:</b> Навсегда −5 к ВЫН.</p><p><small><b>Автоматически:</b> Накладывает: отравление; снимается вместе со стабилизацией.</small></p><p><small>Стабилизация: Первая помощь СЛ 18. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "septic-shock",
+          "level": "deadly",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "staminaMax",
+              "factor": 0.25,
+              "value": 0
+            },
+            {
+              "target": "attributes.intelligence",
+              "value": -3
+            },
+            {
+              "target": "attributes.will",
+              "value": -3
+            },
+            {
+              "target": "attributes.reflex",
+              "value": -3
+            },
+            {
+              "target": "attributes.dexterity",
+              "value": -3
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000223",
+    "name": "Крит: Потеря руки (смертельное)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Смертельное ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> Рукой нельзя пользоваться. Кровотечение.</p><p class=\"\"><b>После стабилизации:</b> Рукой нельзя пользоваться.</p><p class=\"\"><b>После лечения:</b> Руку можно заменить протезом.</p><p><small><b>Автоматически:</b> Накладывает: кровотечение; снимается вместе со стабилизацией. Рукой нельзя пользоваться: доступна одна рука, двуручный хват невозможен.</small></p><p><small>Стабилизация: Первая помощь СЛ 18. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "dismembered-arm",
+          "level": "deadly",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "hands",
+              "value": -1
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000224",
+    "name": "Крит: Потеря ноги (смертельное)",
+    "img": "icons/svg/blood.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p><b>Смертельное ранение</b></p><p class=\"is-current\"><b>Сейчас:</b> СКОР, Уклонение/Изворотливость и Атлетика снижены вчетверо. Кровотечение.</p><p class=\"\"><b>После стабилизации:</b> СКОР, Уклонение и Атлетика снижены вчетверо.</p><p class=\"\"><b>После лечения:</b> Ногу можно заменить протезом.</p><p><small><b>Автоматически:</b> Накладывает: кровотечение; снимается вместе со стабилизацией.</small></p><p><small>Стабилизация: Первая помощь СЛ 18. Лечение: медик, Лечащее прикосновение.</small></p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "criticalWound": {
+          "id": "dismembered-leg",
+          "level": "deadly",
+          "location": "",
+          "locationName": "",
+          "state": "fresh",
+          "arm": "",
+          "note": ""
+        },
+        "condition": {
+          "key": "critical-wound",
+          "modifiers": [
+            {
+              "target": "attributes.speed",
+              "factor": 0.25,
+              "value": 0
+            },
+            {
+              "target": "skills.dodgeEscape",
+              "factor": 0.25,
+              "value": 0
+            },
+            {
+              "target": "skills.athletics",
+              "factor": 0.25,
+              "value": 0
+            }
+          ]
+        }
+      }
+    }
   }
 ]

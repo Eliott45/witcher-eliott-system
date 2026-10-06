@@ -1,3 +1,4 @@
+import { armPenaltyParts } from "./critical-wound-effects.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
@@ -20,7 +21,7 @@ export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repe
   const skillKey=mode==="dodge"?"dodgeEscape":mode==="reposition"?"athletics":mode==="brawl"?"brawling":weapon?.category==="shield"?"melee":weapon?.skill??"brawling";
   const skill=skillValue(actor.system,skillKey),penalty=mode==="parry"?(incoming==="thrown"?-5:-3):0;
   const activeDodge=Boolean(statusEffect(actor,ACTIVE_DODGE));
-  const effects=combatModifierParts(actor,"combat.defense"),effectTotal=effects.reduce((sum,part)=>sum+part.value,0);
+  const effects=[...combatModifierParts(actor,"combat.defense"),...(item?armPenaltyParts(actor,item):[])],effectTotal=effects.reduce((sum,part)=>sum+part.value,0);
   const total=skill.total===null?null:skill.total+penalty+modifier+effectTotal,cost=repeat&&!activeDodge?1:0;
   let blocked=!actor.isOwner||!conditionRules(actor).canDefend?"Персонаж сейчас не может защищаться.":"";
   if(armed&&!unarmed)blocked ||= !weapon?"Выберите оружие для защиты.":weaponReadiness(actor,item,weapon)|| (!["melee","shield"].includes(weapon.category)?"Для этой защиты нужно оружие ближнего боя или щит.":"");

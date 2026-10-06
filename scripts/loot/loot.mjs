@@ -131,7 +131,20 @@ export async function takeLootByDrop(actor, item) {
   return true;
 }
 
+/** Active GM: the shared pile actor is only scaffolding for tokens; remove it once no pile is left on any scene. */
+export async function cleanupLootTemplate(actorId) {
+  const template = game.actors.get(actorId);
+  if (!template?.flags?.[SYSTEM_ID]?.lootTemplate) return;
+  if (game.scenes.some(scene => scene.tokens.some(token => token.actorId === template.id))) return;
+  await template.delete();
+}
+
 export function registerLoot() {
+  // Covers both an emptied pile and a pile the GM deleted by hand.
+  Hooks.on("deleteToken", token => {
+    if (!game.users.activeGM?.isSelf || token.actorLink || !token.actorId) return;
+    cleanupLootTemplate(token.actorId).catch(error => console.error(`${SYSTEM_ID} | Loot cleanup`, error));
+  });
   Hooks.on("updateActor", (actor, changes) => {
     const request = foundry.utils.getProperty(changes, `flags.${SYSTEM_ID}.${REQUEST}`);
     if (!request || !game.users.activeGM?.isSelf) return;

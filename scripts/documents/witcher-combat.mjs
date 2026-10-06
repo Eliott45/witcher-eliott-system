@@ -1,6 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { endTurnConditions } from "../combat/condition-saves.mjs";
 import { startTurnPoison } from "../combat/poison-damage.mjs";
+import { criticalWoundTurn } from "../combat/critical-wound-effects.mjs";
 import { tacticsFlags } from "../combat/tactics-rules.mjs";
 
 export class WitcherCombat extends foundry.documents.Combat {
@@ -16,6 +17,8 @@ export class WitcherCombat extends foundry.documents.Combat {
     await super._onStartTurn(combatant,context);
     try { await startTurnPoison(this,combatant,context); }
     catch(error) { console.error(`${SYSTEM_ID} | Start-turn poison`,error); ui.notifications.error("Не удалось завершить обработку отравления. Проверьте ПЗ и сообщение в чате; подробности в консоли."); }
+    try { await criticalWoundTurn(this,combatant,context); }
+    catch(error) { console.error(`${SYSTEM_ID} | Critical wound turn`,error); ui.notifications.error("Не удалось провести испытание Устойчивости от критического ранения. Бросьте его вручную."); }
   }
   async _onEndTurn(combatant, context) {
     await super._onEndTurn(combatant,context);
