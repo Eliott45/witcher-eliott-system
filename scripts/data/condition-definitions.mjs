@@ -28,7 +28,13 @@ export const CONDITION_DEFINITIONS = [
   entry("quick-fire", "Быстрый огонь: горючее покрытие", "fire", "Контакт с пламенем воспламеняет покрытую поверхность с вероятностью 50%. Уже существующая вероятность воспламенения повышается на 50%. Сам по себе состав не поджигает цель. Стр. 88."),
   entry("pantagran", "Эйфория Пантагорана", "aura", "На 1d6 / 2 часа: −2 к Сопротивлению убеждению. Стр. 88.", {secondsFormula:"1d6 * 1800",modifiers:[{target:"skills.resistCoercion",value:-2}]}),
   entry("active-dodge", "Активное уклонение", "shield", "Действие полного хода. В этом раунде противники получают −2 к атакам по вам в ближнем бою, а повторные защиты не расходуют Выносливость. Снимается в начале следующего раунда. Стр. 151; errata v4.", {rounds:1,expiry:"roundStart"}),
-  entry("aiming", "Прицеливание", "target", "За каждый полный ход прицеливания: +1 к следующей дистанционной атаке, максимум +3 за три хода подряд. Счётчик хранится в одном эффекте. После атаки или в конце следующего хода без продолжения прицеливания эффект снимается. Стр. 151.", {rounds:1,expiry:"turnEnd",counter:{initial:1,max:3}})
+  entry("aiming", "Прицеливание", "target", "За каждый полный ход прицеливания: +1 к следующей дистанционной атаке, максимум +3 за три хода подряд. Счётчик хранится в одном эффекте. После атаки или в конце следующего хода без продолжения прицеливания эффект снимается. Стр. 151.", {rounds:1,expiry:"turnEnd",counter:{initial:1,max:3}}),
+  // Core p.161 (errata: Staggered) and p.163: penalties to attack/defense are read by the attack and defense quotes.
+  entry("staggered", "Ошеломление", "daze", "Потеря равновесия: −2 к атаке и защите. Проходит в начале следующего хода персонажа. Стр. 161.", {rounds:1,expiry:"turnStart",modifiers:[{target:"combat.attack",value:-2},{target:"combat.defense",value:-2}]}),
+  entry("prone", "Сбит с ног", "falling", "−2 к атаке и защите, пока персонаж не потратит перемещение, чтобы встать. Стр. 163.", {modifiers:[{target:"combat.attack",value:-2},{target:"combat.defense",value:-2}]}),
+  entry("blinded", "Слепота", "blind", "−3 ко всем атакам и защите, −5 к Вниманию, связанному со зрением. Снимается, если потратить ход на восстановление зрения. Стр. 161.", {modifiers:[{target:"combat.attack",value:-3},{target:"combat.defense",value:-3}]}),
+  entry("suffocating", "Удушье", "silenced", "Каждый раунд 3 урона, не снижаемых бронёй, пока персонаж не восстановит доступ к воздуху. Стр. 161."),
+  entry("nauseated", "Тошнота", "acid", "Каждые 3 раунда бросьте 1d10: результат не ниже ТЕЛ — раунд уходит на рвоту. Стр. 161.")
 ];
 export const CONDITION_BY_ID = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,entry]));
 // Variants share the status ID: poison/drunkenness cannot stack with themselves.

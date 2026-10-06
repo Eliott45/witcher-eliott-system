@@ -846,6 +846,188 @@
     }
   },
   {
+    "_id": "efct000000000025",
+    "name": "Ошеломление",
+    "img": "icons/svg/daze.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Потеря равновесия: −2 к атаке и защите. Проходит в начале следующего хода персонажа. Стр. 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "staggered"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "staggered",
+          "rounds": 1,
+          "expiry": "turnStart",
+          "modifiers": [
+            {
+              "target": "combat.attack",
+              "value": -2
+            },
+            {
+              "target": "combat.defense",
+              "value": -2
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000026",
+    "name": "Сбит с ног",
+    "img": "icons/svg/falling.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>−2 к атаке и защите, пока персонаж не потратит перемещение, чтобы встать. Стр. 163.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "prone"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "prone",
+          "modifiers": [
+            {
+              "target": "combat.attack",
+              "value": -2
+            },
+            {
+              "target": "combat.defense",
+              "value": -2
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000027",
+    "name": "Слепота",
+    "img": "icons/svg/blind.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>−3 ко всем атакам и защите, −5 к Вниманию, связанному со зрением. Снимается, если потратить ход на восстановление зрения. Стр. 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "blinded"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "blinded",
+          "modifiers": [
+            {
+              "target": "combat.attack",
+              "value": -3
+            },
+            {
+              "target": "combat.defense",
+              "value": -3
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000028",
+    "name": "Удушье",
+    "img": "icons/svg/silenced.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Каждый раунд 3 урона, не снижаемых бронёй, пока персонаж не восстановит доступ к воздуху. Стр. 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "suffocating"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "suffocating"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000029",
+    "name": "Тошнота",
+    "img": "icons/svg/acid.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Каждые 3 раунда бросьте 1d10: результат не ниже ТЕЛ — раунд уходит на рвоту. Стр. 161.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "nauseated"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "nauseated"
+        }
+      }
+    }
+  },
+  {
     "_id": "efct000000000101",
     "name": "Чёрный яд",
     "img": "icons/svg/poison.svg",

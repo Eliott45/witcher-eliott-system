@@ -5,6 +5,9 @@ import { shieldClass } from "../data/shields.mjs";
 import { aimingBonus } from "./full-turn-rules.mjs";
 
 export const gripOf = item => item.system.natural ? 0 : item.system.grip || item.system.hands || 1;
+/** Effect penalties such as Staggered or Prone, targeted at "combat.attack" / "combat.defense". */
+export const combatModifierParts = (actor, target) => (actor.system.statistics?.modifiers ?? [])
+  .filter(modifier => modifier.target === target && !modifier.condition && modifier.value).map(modifier => ({ label: modifier.label, value: modifier.value }));
 export const signed = value => value >= 0 ? `+${value}` : `−${Math.abs(value)}`;
 // Core p.48 only tabulates BODY 1–13. Do not extrapolate beyond that table.
 export const bodyDamage = body => body == null ? 0 : 2 * Math.ceil(Math.min(13, Math.max(1, body)) / 2) - 6;
@@ -62,7 +65,7 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
     {label:"Прицеливание",value:ranged&&!targetContext?.blind?aimingBonus(actor):0},
     {label:attack.name,value:attack.penalty},{label:"Дополнительное действие",value:extraPenalty},
     {label:aim.name,value:aim.penalty},{label:band.name.replace(/ · [−+]?\d+$/u,""),value:band.penalty},{label:"Ситуация",value:Number(modifier)},
-    ...(targetContext?.parts??[]), ...(ambushBonus?[{label:"Засада",value:ambushBonus}]:[])];
+    ...(targetContext?.parts??[]), ...(ambushBonus?[{label:"Засада",value:ambushBonus}]:[]), ...combatModifierParts(actor,"combat.attack")];
   const total=skill.total===null?null:parts.reduce((sum,part)=>sum+part.value,0);
   const melee=["melee","thrown","shield"].includes(weapon.category);
   const shield=weapon.category==="shield"&&weapon.damage==="0";

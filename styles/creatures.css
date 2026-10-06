@@ -92,3 +92,5 @@
   .witcher-npc-stats { grid-template-columns:repeat(8,minmax(0,1fr)); } .witcher-npc-skills { grid-template-columns:1fr 1fr; column-gap:12px; }
 }
 
+.npc-sheet .witcher-npc-effects-tab .witcher-effects-heading h2 { color:#713f31; font:700 21px Georgia,serif; border:0; text-shadow:none; }
+.npc-sheet .witcher-npc-effects-tab .witcher-effects-hint { color:#7a6a52; }

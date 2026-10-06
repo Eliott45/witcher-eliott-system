@@ -55,11 +55,12 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
       const {_id,ownership,...source}=preset;await this.actor.update(source);
     }),
     removeCreatureEffect:guard(async function(_e,target){if(this.isEditable&&game.user.isGM)await this.actor.deleteEmbeddedDocuments("ActiveEffect",[target.dataset.effectId]);}),
+    removeEffect:guard(async function(_e,target){if(this.isEditable&&!target.disabled)await this.actor.effects.get(target.dataset.effectId)?.delete();}),
     addCreatureRow:guard(async function(_e,target){if(!this.isEditable)return;const key=target.dataset.list;if(!["loot","lore"].includes(key))return;await this.actor.update({[`system.creature.${key}`]:[...this.actor.system.creature[key],key==="loot"?{name:"Новая добыча",formula:"1"}:{name:"Знания",skill:"education",dc:10,text:""}]});}),
     removeCreatureRow:guard(async function(_e,target){if(!this.isEditable)return;const key=target.dataset.list;if(!["loot","lore"].includes(key))return;await this.actor.update({[`system.creature.${key}`]:this.actor.system.creature[key].filter((_r,i)=>i!==Number(target.dataset.index))});})
   }};
   static PARTS={content:{template:`systems/${SYSTEM_ID}/templates/npc-sheet.hbs`,scrollable:[".witcher-npc-body"]}};
-  static TABS={creature:{initial:"combat",tabs:[{id:"combat",label:"Бой",icon:"fa-solid fa-swords"},{id:"inventory",label:"Инвентарь",icon:"fa-solid fa-sack"},{id:"lore",label:"Сведения",icon:"fa-solid fa-book-open"}]}};
+  static TABS={creature:{initial:"combat",tabs:[{id:"combat",label:"Бой",icon:"fa-solid fa-swords"},{id:"inventory",label:"Инвентарь",icon:"fa-solid fa-sack"},{id:"lore",label:"Сведения",icon:"fa-solid fa-book-open"},{id:"effects",label:"Эффекты",icon:"fa-solid fa-person-rays"}]}};
   async _prepareContext(options) {
     const context=await super._prepareContext(options),actor=this.actor,system=actor.system,stats=system.statistics,editing=this.isEditable&&this.editing;
     const inventory=inventoryContext(actor,sheetPreferences(actor.uuid));

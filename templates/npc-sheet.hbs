@@ -38,6 +38,7 @@
       </div>
     </section>
     <section class="tab {{tabs.inventory.cssClass}}" data-group="creature" data-tab="inventory">{{> "systems/witcher-eliott-system/templates/inventory.hbs"}}</section>
+    <section class="tab witcher-npc-effects-tab {{tabs.effects.cssClass}}" data-group="creature" data-tab="effects">{{> "systems/witcher-eliott-system/templates/effects-list.hbs"}}</section>
     <section class="tab {{tabs.lore.cssClass}}" data-group="creature" data-tab="lore">
       <div class="witcher-npc-section-title"><h2>Описание и повадки</h2></div>
       {{#if editing}}<label>Категория<select name="system.creature.category">{{#each categories}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label><div class="witcher-npc-facts"><label>Сложность<input name="system.creature.difficulty" value="{{system.creature.difficulty}}"></label><label>Награда<input type="number" name="system.creature.reward" value="{{system.creature.reward}}" min="0"></label><label>Естественная броня<input type="number" name="system.creature.naturalArmor" value="{{system.creature.naturalArmor}}" min="0"></label><label>Энергия<input type="number" name="system.vigor" value="{{system.vigor}}" min="0"></label></div>{{/if}}
