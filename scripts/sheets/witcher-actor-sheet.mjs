@@ -15,7 +15,7 @@ import { itemPresentation, toggleItemDescription, postItem, searchItemTrait } fr
 import { chooseContainer, toggleContainer, dropPhysicalItem } from "./container-actions.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
 import { getProfession as selectionProfession } from "../data/professions.mjs";
-import { inventoryContext, bindInventory, equipItem, createInventoryItem, browseEquipment, addCatalogItem, changeInventoryQuantity, toggleCarried, toggleInventoryGroup } from "./inventory-context.mjs";
+import { inventoryContext, bindInventory, equipItem, dropToGround, createInventoryItem, browseEquipment, addCatalogItem, changeInventoryQuantity, toggleCarried, toggleInventoryGroup } from "./inventory-context.mjs";
 import { lifepathContext, editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent } from "./lifepath-context.mjs";
 import { professionContext, setProfessionLevel, rollProfessionAbility, professionSelectionUpdate } from "./profession-context.mjs";
 import { SYSTEM_ID } from "../config.mjs";
@@ -68,7 +68,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       rollReputation: WitcherActorSheet.#onRollReputation,
       toggleReputationBonus: configureReputationBonus,
       configureReputationBonus,
-      equipItem, toggleVisor, createInventoryItem, browseEquipment, addCatalogItem,
+      equipItem, dropToGround, toggleVisor, createInventoryItem, browseEquipment, addCatalogItem,
       changeInventoryQuantity, toggleCarried, toggleInventoryGroup,
       toggleItemDescription, postItem, searchItemTrait, chooseContainer, toggleContainer,
       editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent,

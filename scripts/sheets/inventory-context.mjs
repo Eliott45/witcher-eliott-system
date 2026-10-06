@@ -1,3 +1,4 @@
+import { dropItemToGround } from "../loot/loot.mjs";
 import { layeringPlan, zoneStoppingPower, layeringDetails } from "../data/armor-layers.mjs";
 import { isTransport, cargoSections, cargoSection } from "../data/transport.mjs";
 import { gripOf } from "../combat/weapon-rules.mjs";
@@ -96,6 +97,12 @@ export async function toggleVisor(_event, target) {
     if (!supportsVisor(item) || !equippedItems(this.actor.items).includes(item)) return;
     await item.update({ "system.visorDown": !item.system.visorDown });
   });
+}
+export async function dropToGround(_event, target) {
+  if (!this.isEditable) return;
+  const item = this.actor.items.get(target.dataset.itemId);
+  if (!item) return;
+  try { await dropItemToGround(this.actor, item); } catch (error) { ui.notifications.warn(error.message); }
 }
 export async function equipItem(_event, target) {
   if (!this.isEditable) return;

@@ -4,7 +4,8 @@
       "character": "Character",
       "npc": "NPC / opponent",
       "services": "Services / establishment",
-      "powerPlace": "Place of power"
+      "powerPlace": "Place of power",
+      "loot": "Loot"
     },
     "Item": {
       "ability": "Ability",

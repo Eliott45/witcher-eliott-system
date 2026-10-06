@@ -1048,3 +1048,28 @@ small.witcher-broken { display:inline-flex; align-items:center; gap:3px; margin-
 b.witcher-gm-only, span.witcher-gm-only { padding:0 4px; color:#1f4f78; }
 .witcher-gm-only::after { content:"\f070"; position:absolute; top:2px; right:4px; font:900 9px "Font Awesome 6 Free", "Font Awesome 6 Pro"; color:#4a8bc2; pointer-events:none; }
 b.witcher-gm-only::after, span.witcher-gm-only::after { display:none; }
+
+/* Loot: chests and piles on the ground. */
+.witcher-eliott.loot-sheet .window-content { background:#eee8dc; color:#443b30; }
+.witcher-loot { display:flex; flex-direction:column; gap:10px; padding:14px; height:100%; }
+.witcher-loot-header { display:flex; align-items:center; gap:12px; }
+.witcher-loot-header img { width:56px; height:56px; border:1px solid #b39a67; border-radius:6px; background:#2a1a1a; object-fit:contain; }
+.witcher-loot-header h1, .witcher-loot-header input { margin:0; border:0; font:700 22px Georgia,serif; color:#593b31; background:transparent; }
+.witcher-loot-header small { display:block; color:#7a6a52; font-size:12px; }
+.witcher-loot-description { margin:0; font:italic 13px/1.5 Georgia,serif; color:#5b4a37; }
+.witcher-loot textarea { width:100%; background:#faf6ed; border:1px solid #c9b99d; color:#44392b; }
+.witcher-loot-crowns { display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:5px; background:#e6dccb; color:#6b4a2a; font-weight:600; }
+.witcher-loot-crowns input { width:80px; height:28px; }
+.witcher-loot-crowns button { margin-left:auto; width:auto; height:28px; padding:0 10px; font-size:12px; }
+.witcher-loot-items { flex:1; min-height:0; overflow:auto; margin:0; padding:0; list-style:none; display:grid; gap:4px; align-content:start; }
+.witcher-loot-items li { display:grid; grid-template-columns:36px minmax(0,1fr) auto; align-items:center; gap:8px; padding:5px 6px; border:1px solid #d6c7ad; border-radius:5px; background:#faf6ee; }
+.witcher-loot-items img { width:36px; height:36px; border:0; border-radius:4px; background:#6e604f; object-fit:contain; }
+.witcher-loot-name { display:grid; width:100%; height:auto; padding:0; border:0; background:none; text-align:left; color:#3f362b; box-shadow:none; }
+.witcher-loot-name b { font:700 14px Georgia,serif; }
+.witcher-loot-name small { color:#8a7356; font-size:11px; }
+.witcher-loot-actions { display:flex; gap:4px; }
+.witcher-loot-actions button { width:auto; height:28px; padding:0 9px; font-size:12px; }
+.witcher-loot-actions [data-amount=one] { min-width:28px; padding:0 6px; }
+.witcher-loot-empty { display:block !important; text-align:center; color:#8a7356; font-style:italic; }
+.witcher-loot-option { display:flex; align-items:center; gap:6px; font-size:12px; color:#6b5c49; }
+.witcher-loot-note { margin:0; }

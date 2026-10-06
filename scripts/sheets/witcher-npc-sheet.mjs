@@ -7,7 +7,7 @@ import { SKILLS, skillValue } from "../data/skills.mjs";
 import { MONSTER_CATEGORIES } from "../data/monster-categories.mjs";
 import { bestiarySources } from "../data/bestiary.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
-import { inventoryContext,bindInventory,equipItem,toggleVisor,changeGrip,createInventoryItem,browseEquipment,addCatalogItem,changeInventoryQuantity,toggleCarried,toggleInventoryGroup,inventoryWrite } from "./inventory-context.mjs";
+import { inventoryContext,bindInventory,equipItem,dropToGround,toggleVisor,changeGrip,createInventoryItem,browseEquipment,addCatalogItem,changeInventoryQuantity,toggleCarried,toggleInventoryGroup,inventoryWrite } from "./inventory-context.mjs";
 import { itemPresentation,toggleItemDescription,postItem,searchItemTrait } from "./item-presentation.mjs";
 import { chooseContainer,toggleContainer,dropPhysicalItem } from "./container-actions.mjs";
 import { viewSheetItem,removeSheetItem,createAbility,browseAbilities } from "./sheet-items.mjs";
@@ -31,7 +31,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
   editing=false;
   static DEFAULT_OPTIONS={classes:["witcher-eliott","npc-sheet"],position:{width:820,height:820},window:{resizable:true},form:{submitOnChange:true,closeOnSubmit:false},actions:{
     ...combatActions,...effectActions,...workshopActorActions,...consumptionActions,
-    equipItem,toggleVisor,changeGrip,createInventoryItem,browseEquipment,addCatalogItem,changeInventoryQuantity,toggleCarried,toggleInventoryGroup,
+    equipItem,dropToGround,toggleVisor,changeGrip,createInventoryItem,browseEquipment,addCatalogItem,changeInventoryQuantity,toggleCarried,toggleInventoryGroup,
     toggleItemDescription,postItem,searchItemTrait,chooseContainer,toggleContainer,viewSheetItem,removeSheetItem,createAbility,browseAbilities,
     editCreature:guard(async function(){if(this.isEditable){this.editing=!this.editing;await this.render();}}),
     creaturePortrait:guard(async function(){if(this.isEditable)new foundry.applications.apps.FilePicker.implementation({type:"image",current:this.actor.img,document:this.actor,callback:path=>this.actor.update({img:path})}).browse();}),

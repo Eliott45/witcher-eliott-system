@@ -1,3 +1,5 @@
+import { dropItemToGround } from "../loot/loot.mjs";
+import { scatterOffset } from "../canvas/scatter-overlay.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
@@ -350,7 +352,14 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
       if (item?.system.equipped) await item.update({ "system.equipped": false });
       const wielder = actor.token?.uuid ?? actor.getActiveTokens?.()[0]?.document?.uuid;
       if (wielder) extra.scatter = { token: wielder, result: direction.total, meters: distance.total };
-      if (item) await blockWeapon(actor, item, "disarmed", `Оружие выбито: ${item.name}`, `${item.name} отлетело на ${distance.total} м (направление ${direction.total} по таблице разброса). Подберите его, чтобы снова взять в руки.`, null);
+      // The weapon lands on the ground at the scatter point: direction from 1d10, distance 1d6 m.
+      const wielderToken = wielder ? fromUuidSync(wielder) : null;
+      if (item && wielderToken?.parent) {
+        const offset = scatterOffset(direction.total, wielderToken.rotation, 1), length = Math.hypot(offset.x, offset.y) || 1;
+        const scene = wielderToken.parent, pixels = distance.total / scene.grid.distance * scene.grid.size, { width, height } = wielderToken.getSize();
+        const point = { x: wielderToken.x + width / 2 + offset.x / length * pixels, y: wielderToken.y + height / 2 + offset.y / length * pixels };
+        await dropItemToGround(actor, item, { quantity: 1, point, silent: true });
+      } else if (item) await blockWeapon(actor, item, "disarmed", `Оружие выбито: ${item.name}`, `${item.name} отлетело на ${distance.total} м (направление ${direction.total} по таблице разброса). Подберите его, чтобы снова взять в руки.`, null);
       notes.push(`${item?.name ?? "Оружие"} выбито: направление ${direction.total} по таблице разброса, ${distance.total} м`);
     }
     if (step.id === "jam") {

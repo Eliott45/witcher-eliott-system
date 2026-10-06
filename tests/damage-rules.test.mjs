@@ -271,3 +271,26 @@ test("scatter cells turn with the token: the book diagram faces south, any angle
   assert.deepEqual(round(scatterOffset(10, 0, 100)), { x: 0, y: 200 }, "facing north: 10 is behind");
   assert.deepEqual(round(scatterOffset(3, 135, 100)), { x: 71, y: 71 }, "facing south-east: 3 is one step that way");
 });
+
+test("loot: taking moves an item to the character, emptied piles disappear; dropping needs an empty container", async () => {
+  const { processLootRequest } = await import("../scripts/loot/loot.mjs");
+  const collection = list => Object.assign(list, { get: id => list.find(entry => entry.id === id) });
+  const makeItem = (id, quantity, parent) => ({ id, name: id, type: "equipment", parent, system: { quantity }, toObject() { return { _id: id, name: id, type: "equipment", system: { quantity: this.system.quantity } }; },
+    async delete() { parent.items.splice(parent.items.indexOf(this), 1); }, async update(data) { this.system.quantity = data["system.quantity"]; } });
+  const user = { id: "p" };
+  const hero = { items: collection([]), system: { crowns: 3 }, testUserPermission: () => true, async createEmbeddedDocuments(_t, data) { for (const entry of data) this.items.push({ ...entry, id: `n${this.items.length}` }); }, async update(data) { this.system.crowns = data["system.crowns"]; } };
+  const loot = { type: "loot", items: collection([]), system: { crowns: 10, removeWhenEmpty: true }, async update(data) { this.system.crowns = data["system.crowns"]; } };
+  loot.items.push(makeItem("sword", 1, loot), makeItem("bolts", 5, loot));
+  let deleted = false;
+  const token = { actor: loot, parent: {}, async delete() { deleted = true; } };
+  globalThis.fromUuidSync = () => token;
+  globalThis.foundry = { ...(globalThis.foundry ?? {}), documents: { ChatMessage: { create: async () => null, getSpeaker: () => ({}) } } };
+  await processLootRequest(hero, { action: "take", loot: "T", itemId: "bolts", quantity: 2 }, user);
+  assert.equal(loot.items.get("bolts").system.quantity, 3); assert.equal(hero.items.at(-1).system.quantity, 2);
+  await processLootRequest(hero, { action: "take", loot: "T", itemId: "bolts", quantity: 3 }, user);
+  await processLootRequest(hero, { action: "crowns", loot: "T" }, user);
+  assert.equal(hero.system.crowns, 13); assert.equal(deleted, false, "the sword is still there");
+  await processLootRequest(hero, { action: "take", loot: "T", itemId: "sword" }, user);
+  assert.equal(deleted, true, "an emptied pile is removed");
+  delete globalThis.fromUuidSync;
+});

@@ -36,7 +36,10 @@
       "character": {},
       "npc": {},
       "services": {},
-      "powerPlace": {}
+      "powerPlace": {},
+      "loot": {
+        "htmlFields": []
+      }
     },
     "Item": {
       "race": {

@@ -7,5 +7,5 @@ export const PREVIEW_VISION_ANGLE = 180;
 // TODO (RAW): adjust if an official clarification gives a different angle.
 export const RESTRICTED_VISION_ANGLE = 90;
 export const COMBAT_ACTOR_TYPES = ["character", "npc"];
-export const ACTOR_TYPES = [...COMBAT_ACTOR_TYPES, "services", "powerPlace"];
+export const ACTOR_TYPES = [...COMBAT_ACTOR_TYPES, "services", "powerPlace", "loot"];
 export const ITEM_TYPES = ["race", "ability", "origin", "familyStatus", "equipment", "influence", "language", "profession", "weapon", "armor", "recipe", "spell", "effect"];

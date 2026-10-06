@@ -11,6 +11,9 @@ import { migrateMacroContent } from "./migrations/macro-content.mjs";
 import { registerCombatTactics } from "./combat/combat-tactics.mjs";
 import { WitcherPowerPlaceData } from "./data/witcher-power-place-data.mjs";
 import { WitcherPowerPlaceSheet } from "./sheets/witcher-power-place-sheet.mjs";
+import { WitcherLootData } from "./data/witcher-loot-data.mjs";
+import { WitcherLootSheet } from "./sheets/witcher-loot-sheet.mjs";
+import { registerLoot } from "./loot/loot.mjs";
 import { registerSpellContentMigration,migrateSpellContent } from "./migrations/spell-content.mjs";
 import { registerOilExpiry } from "./workshop/upgrades.mjs";
 import { registerConsumption } from "./workshop/consumption.mjs";
@@ -98,6 +101,7 @@ Hooks.once("init", async () => {
   registerGrapple();
   registerConcealedDice();
   registerDebugDice();
+  registerLoot();
   registerEffectDurationChat();
   registerServiceOrders();
   CONFIG.time.roundTime = ROUND_SECONDS;
@@ -116,6 +120,8 @@ Hooks.once("init", async () => {
   CONFIG.Actor.dataModels.services = WitcherServicesData;
   CONFIG.Actor.dataModels.powerPlace = WitcherPowerPlaceData;
   CONFIG.Actor.trackableAttributes.powerPlace = { bar: [], value: [] };
+  CONFIG.Actor.dataModels.loot = WitcherLootData;
+  CONFIG.Actor.trackableAttributes.loot = { bar: [], value: [] };
   CONFIG.Actor.trackableAttributes.services = { bar: [], value: [] };
   CONFIG.Item.dataModels.race = WitcherRaceData;
   CONFIG.Item.dataModels.ability = WitcherAbilityData;
@@ -153,6 +159,8 @@ Hooks.once("init", async () => {
     {types:["npc"],makeDefault:true,label:"Лист существа"});
   foundry.applications.apps.DocumentSheetConfig.registerSheet(foundry.documents.Actor,SYSTEM_ID,WitcherPowerPlaceSheet,
     {types:["powerPlace"],makeDefault:true,label:"TYPES.Actor.powerPlace"});
+  foundry.applications.apps.DocumentSheetConfig.registerSheet(foundry.documents.Actor,SYSTEM_ID,WitcherLootSheet,
+    {types:["loot"],makeDefault:true,label:"TYPES.Actor.loot"});
   await templatesReady;
 });
 

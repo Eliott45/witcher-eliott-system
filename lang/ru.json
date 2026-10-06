@@ -4,7 +4,8 @@
       "character": "Персонаж",
       "npc": "NPC / противник",
       "services": "Услуги / заведение",
-      "powerPlace": "Место силы"
+      "powerPlace": "Место силы",
+      "loot": "Добыча"
     },
     "Item": {
       "ability": "Способность",

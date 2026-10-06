@@ -1,0 +1,15 @@
+<section class="witcher-loot">
+  <header class="witcher-loot-header">
+    <img src="{{actor.img}}" alt="" {{#if isGM}}data-action="editImage" data-edit="img"{{/if}}>
+    <div>{{#if isGM}}<input type="text" name="name" value="{{actor.name}}" aria-label="Название">{{else}}<h1>{{actor.name}}</h1>{{/if}}
+      <small>{{#if receiver}}Берёт: <b>{{receiver}}</b>{{else}}Выделите своего персонажа, чтобы забрать вещи{{/if}}</small></div>
+  </header>
+  {{#if isGM}}<textarea name="system.description" rows="2" placeholder="Описание: где лежит, что видно…">{{system.description}}</textarea>{{else}}{{#if system.description}}<p class="witcher-loot-description">{{system.description}}</p>{{/if}}{{/if}}
+  <div class="witcher-loot-crowns"><i class="fa-solid fa-coins"></i> {{#if isGM}}<input type="number" name="system.crowns" value="{{system.crowns}}" min="0" step="1" aria-label="Кроны">{{else}}<b>{{system.crowns}}</b>{{/if}} крон
+    {{#if system.crowns}}<button type="button" data-action="takeCrowns" {{disabled (not canTake)}}>Забрать кроны</button>{{/if}}</div>
+  <ol class="witcher-loot-items">{{#each items}}<li>
+    <img src="{{img}}" alt=""><button type="button" class="witcher-loot-name" data-action="viewLoot" data-item-id="{{id}}"><b>{{name}}{{#if multiple}} ×{{quantity}}{{/if}}</b><small>{{summary}}</small></button>
+    <span class="witcher-loot-actions">{{#if multiple}}<button type="button" data-action="takeLoot" data-item-id="{{id}}" data-amount="one" {{disabled (not ../canTake)}} data-tooltip="Взять одну штуку">1</button>{{/if}}<button type="button" data-action="takeLoot" data-item-id="{{id}}" {{disabled (not ../canTake)}}><i class="fa-solid fa-hand"></i> Взять</button>{{#if ../isGM}}<button type="button" data-action="removeLoot" data-item-id="{{id}}" data-tooltip="Удалить из добычи"><i class="fa-solid fa-trash"></i></button>{{/if}}</span>
+  </li>{{else}}<li class="witcher-loot-empty">Пусто.{{#if isGM}} Перетащите сюда предметы.{{/if}}</li>{{/each}}</ol>
+  {{#if isGM}}<label class="witcher-loot-option"><input type="checkbox" name="system.removeWhenEmpty" {{checked system.removeWhenEmpty}}> Убрать с карты, когда опустеет</label>{{/if}}
+</section>
