@@ -258,3 +258,6 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-fumble-steps button:hover:not(:disabled) { background:#f3dcd4; }
 .witcher-fumble-steps .is-done { color:#2f5240; }
 .witcher-fumble-steps .is-pending { color:#8a7356; font-style:italic; }
+.witcher-fumble-steps li { display:grid; gap:3px; }
+.witcher-fumble-steps [data-fumble-ally] { color:#fff4e2; background:#7a2f29; border-color:#5c211d; }
+.witcher-fumble-steps [data-fumble-ally]:hover:not(:disabled) { background:#922f27; }

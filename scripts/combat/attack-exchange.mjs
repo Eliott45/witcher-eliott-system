@@ -315,7 +315,7 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
   if (pendingRolls.has(key)) return;
   pendingRolls.add(key);
   try {
-    const notes = [], rolls = [], item = itemId ? actor.items.get(itemId) : null, attack = flagsOf(message).weaponAttack;
+    const notes = [], rolls = [], extra = {}, item = itemId ? actor.items.get(itemId) : null, attack = flagsOf(message).weaponAttack;
     const roll = async formula => { const result = await new foundry.dice.Roll(formula).evaluate(); rolls.push(result); return result; };
     if (step.id === "status") { await applyStatus(actor, outcome.apply.status); notes.push(`${CONDITION_BY_ID[outcome.apply.status].name}`); }
     if (step.id === "reliability") {
@@ -339,7 +339,10 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
         const result = resolveDamage({ base: damage.total, location: where.id, multiplier: where.multiplier, traits, armor, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor) });
         const worn = await sufferDamage(actor, result);
         notes.push(`${where.name}: урон ${damage.total} → −${result.total} ПЗ${worn.length ? `; ПБ −1: ${worn.join(", ")}` : ""}`);
-      } else notes.push(`союзнику: ${where.name} (×${where.multiplier}), урон ${damage.total} до брони — примените вручную`);
+      } else {
+        notes.push(`союзнику: ${where.name} (×${where.multiplier}), урон ${damage.total} до брони`);
+        extra.ally = { location: { id: where.id, name: where.name, multiplier: where.multiplier }, damage: damage.total, traits: weaponDamageTraits(item ? effectiveItem(item) : {}) };
+      }
     }
     if (step.id === "disarm") {
       const direction = await roll("1d10"), distance = await roll("1d6");
@@ -353,8 +356,34 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
     if (step.id === "stuck") notes.push(`${item?.name ?? "Оружие"} застряло: 1 раунд, чтобы достать`);
     if (step.id === "stun") { await rollStun(actor); notes.push("испытание Устойчивости брошено"); }
     return await post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls, content: `<p>Провал: ${esc(notes.join("; "))}</p>`,
-      flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: stepKind(role, step.id), notes } } } }, "public");
+      flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: stepKind(role, step.id), notes, ...extra } } } }, "public");
   } finally { pendingRolls.delete(key); }
+}
+
+/** The fumbler picks the struck ally with the T key; damage goes through that ally's armor in the rolled zone. */
+export async function applyFumbleToTarget({ message, index, role, actor }) {
+  const record = linkedAny(message.id, index, stepKind(role, "ally")), ally = exchangeOf(record)?.ally;
+  if (!ally || !actor?.isOwner || linkedAny(message.id, index, stepKind(role, "allyapply"))) return;
+  const token = Array.from(game.user.targets ?? []).map(entry => entry.document ?? entry).find(entry => entry.actor && entry.actor.uuid !== actor.uuid);
+  if (!token) throw new Error("Выберите цель (T): союзника, в которого попал удар.");
+  const victim = token.actor, armor = armorAt(victim, ally.location.id);
+  const result = resolveDamage({ base: ally.damage, location: ally.location.id, multiplier: ally.location.multiplier, traits: ally.traits, armor,
+    monster: monsterResistant(victim), vulnerableToFire: fireVulnerable(victim) });
+  const share = { token: token.uuid, name: token.name, total: result.total, steps: result.steps, ablate: result.ablate, applied: false };
+  if (victim.isOwner) { share.ablated = (await sufferDamage(victim, result)).join(", "); share.applied = true; }
+  return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), content: `<p>Провал: ${esc(token.name)} получает −${result.total} ПЗ (${esc(ally.location.name)})</p>`,
+    flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: stepKind(role, "allyapply"), share,
+      notes: [`${token.name}: −${result.total} ПЗ (${ally.location.name})${share.applied ? "" : " — применяет мастер"}`] } } } }, "public");
+}
+
+/** Active GM: apply a deferred share (fumbled hit on an ally the player does not own) once. */
+async function applyDeferredShare(message) {
+  const link = exchangeOf(message), share = link?.share;
+  if (!share || share.applied || !link.kind?.endsWith("allyapply") || !game.users.activeGM?.isSelf) return;
+  const victim = fromUuidSync(share.token)?.actor;
+  if (!victim) return;
+  await message.update({ [`flags.${SYSTEM_ID}.exchange.share.applied`]: true });
+  await sufferDamage(victim, { total: share.total, ablate: share.ablate ?? [] });
 }
 
 /** Optional world setting: the player who rolled the fumble resolves every step at once. */
@@ -372,7 +401,13 @@ function fumbleHTML(message, index, role, outcome, owner, actor, itemId) {
     const result = done ? `<span class="is-done"><i class="fa-solid fa-check"></i> ${esc(exchangeOf(done).notes?.join("; ") || "применено")}</span>`
       : owner ? button(`data-fumble-step="${role}:${step.id}" data-index="${index}"`, `<i class="fa-solid ${step.dice ? "fa-dice-d10" : "fa-check"}"></i> ${esc(step.label)}`, true, step.hint)
       : `<span class="is-pending">${esc(step.label)} — ждём бросок</span>`;
-    return `<li>${result}</li>`;
+    let follow = "";
+    if (step.id === "ally" && done && exchangeOf(done).ally) {
+      const applied = linkedAny(message.id, index, stepKind(role, "allyapply"));
+      follow = applied ? `<span class="is-done"><i class="fa-solid fa-crosshairs"></i> ${esc(exchangeOf(applied).notes?.join("; ") ?? "")}</span>`
+        : owner ? button(`data-fumble-ally="${role}" data-index="${index}"`, '<i class="fa-solid fa-crosshairs"></i> Применить к цели (T)', true, "Выберите токен союзника клавишей T и нажмите: урон пройдёт через его броню в выпавшей зоне") : "";
+    }
+    return `<li>${result}${follow}</li>`;
   }).join("");
   return `<div class="witcher-exchange-fumble"><b>Критический провал −${outcome.magnitude}</b> · ${esc(outcome.tableName)}: ${esc(outcome.text)}${rows ? `<ul class="witcher-fumble-steps">${rows}</ul>` : ""}</div>`;
 }
@@ -495,6 +530,10 @@ export function renderExchange(message, html) {
       const step = fumbleSteps(context.outcome, context.actor, context.itemId).find(entry => entry.id === id);
       try { if (step) await runFumbleStep({ ...context, step }); } catch (error) { ui.notifications.warn(error.message); }
     }));
+    row.querySelectorAll("[data-fumble-ally]").forEach(control => control.addEventListener("click", async event => {
+      event.stopPropagation(); control.disabled = true;
+      try { await applyFumbleToTarget(fumbleContext(control.dataset.fumbleAlly)); } catch (error) { control.disabled = false; ui.notifications.warn(error.message); }
+    }));
     for (const role of ["attack", "defense"]) autoResolveFumble(fumbleContext(role)).catch(console.error);
   });
 }
@@ -512,6 +551,10 @@ function renderUntargetedFumbles(message, html, attack) {
     const index = Number(control.dataset.index), id = control.dataset.fumbleStep.split(":")[1], ctx = context(index);
     const step = fumbleSteps(ctx.outcome, ctx.actor, ctx.itemId).find(entry => entry.id === id);
     try { if (step) await runFumbleStep({ ...ctx, step }); } catch (error) { ui.notifications.warn(error.message); }
+  }));
+  box.querySelectorAll("[data-fumble-ally]").forEach(control => control.addEventListener("click", async event => {
+    event.stopPropagation(); control.disabled = true;
+    try { await applyFumbleToTarget(context(Number(control.dataset.index))); } catch (error) { control.disabled = false; ui.notifications.warn(error.message); }
   }));
   message.rolls.forEach((_roll, index) => autoResolveFumble(context(index)).catch(console.error));
 }
@@ -560,7 +603,7 @@ async function afterSettled(message) {
 export function registerAttackExchange() {
   Hooks.on("renderChatMessageHTML", renderExchange);
   Hooks.on("createChatMessage", message => { try { settleThenRefresh(message); } catch (error) { console.error(error); } });
-  Hooks.on("createChatMessage", message => { applyShieldShare(message).catch(console.error); });
+  Hooks.on("createChatMessage", message => { applyShieldShare(message).catch(console.error); applyDeferredShare(message).catch(console.error); });
   Hooks.on("updateChatMessage", refreshAttack);
   Hooks.on("deleteChatMessage", refreshAttack);
   // Armor, health and equipment changes alter the live damage preview on open cards.
