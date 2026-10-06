@@ -38,6 +38,7 @@
     <p class="witcher-healing-skills"><span>Первая помощь <b>{{#if (eq heal.firstAid null)}}—{{else}}{{heal.firstAid}}{{/if}}</b></span><span data-tooltip="Навык медика: заменяет Первую помощь и лечит критические ранения">Лечащее прикосновение <b>{{#if (eq heal.hands null)}}нет{{else}}{{heal.hands}}{{/if}}</b></span></p>
     {{#unless ../compact}}<p class="witcher-combat-muted">{{#if heal.self}}Выберите цель (T), чтобы лечить другого персонажа.{{else}}Цель выбрана (T) — снимите выделение, чтобы лечить себя.{{/if}}</p>{{/unless}}
     {{#if heal.readable}}
+    {{#if heal.dying}}<div class="witcher-healing-wound is-dying"><div><b>При смерти</b><small>ПЗ {{heal.hp.value}} · испытания против смерти каждый раунд</small></div><button type="button" data-action="healDying" data-tooltip="{{heal.best.label}} против СЛ {{heal.dying.dc}} (насколько ПЗ ниже 0). Успех: ПЗ становятся 1, пациент выходит из состояния при смерти. Провал: остаётся при смерти." {{disabled (or (not @root.editable) (not heal.canHeal))}}><i class="fa-solid fa-heart-pulse"></i> Стабилизировать · СЛ {{heal.dying.dc}}</button></div>{{/if}}
     <div class="witcher-healing-wounds">
       {{#each heal.wounds as |wound|}}
       <article class="witcher-healing-wound is-{{wound.state}}">

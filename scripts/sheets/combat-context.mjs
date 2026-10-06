@@ -14,7 +14,7 @@ import { damageTypeLabel } from "../combat/damage-rules.mjs";
 import { toggleQuickDraw } from "../combat/quick-draw.mjs";
 import { grappleOptions, grappleState, rollGrappleAction } from "../combat/grapple.mjs";
 import { statusEffect } from "../data/effect-counters.mjs";
-import { healingContext, healingPatient, stabilizePatientWound, treatPatientWound, startNaturalHealing, restDay } from "../combat/healing.mjs";
+import { healingContext, healingPatient, stabilizePatientWound, treatPatientWound, startNaturalHealing, restDay, stabilizeDying } from "../combat/healing.mjs";
 
 export function combatContext(actor,options={}) {
   const fastPending=actor.flags?.[SYSTEM_ID]?.fastStrike?.round===(actionRoundKey(actor)||"free");
@@ -54,6 +54,7 @@ const guard=fn=>async function(...args){try{return await fn.apply(this,args);}ca
 const healingPatientOf=sheet=>healingPatient(sheet.actor);
 export const combatActions={
   healStabilize:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await stabilizePatientWound(this.actor,healingPatientOf(this),target.dataset.effectId);}finally{await this.render();}}),
+  healDying:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await stabilizeDying(this.actor,healingPatientOf(this));}finally{await this.render();}}),
   healTreat:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await treatPatientWound(this.actor,healingPatientOf(this),target.dataset.effectId);}finally{await this.render();}}),
   healStart:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await startNaturalHealing(this.actor,healingPatientOf(this));}finally{await this.render();}}),
   healRestDay:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;

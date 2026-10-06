@@ -96,3 +96,17 @@ test("nausea rolls every 3 rounds against BODY and makes the character vomit on 
   await turn(7);
   assert.deepEqual(created.map(entry => entry.statuses), [["vomiting"]]);
 });
+
+test("a dying patient is stabilised against how far HP is below 0", async () => {
+  const { dyingDC, healingContext } = await import("../scripts/combat/healing.mjs");
+  assert.deepEqual([dyingDC({ system: { health: { value: -7 } } }), dyingDC({ system: { health: { value: -0 } } })], [7, 1]);
+  globalThis.game = { user: { targets: new Set() } };
+  const healer = { uuid: "Actor.h", name: "Лекарь", isOwner: true, effects: [], flags: {}, items: [],
+    system: { health: { value: -4, max: 30 }, details: {}, skills: { firstAid: 3 }, languages: [], abilityState: {},
+      statistics: { dying: true, dead: false, recovery: 5, effective: { intelligence: 2 }, modifiers: [] } } };
+  const view = healingContext(healer);
+  assert.equal(view.self, true, "Self-treatment is allowed (core p.162 sidebar)");
+  assert.deepEqual(view.dying, { dc: 4 });
+  healer.system.statistics.dead = true;
+  assert.equal(healingContext(healer).dying, null);
+});

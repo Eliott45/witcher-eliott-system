@@ -47,6 +47,9 @@ export function healingContext(healer) {
   return {
     self, patientName: patient.name, readable, firstAid: skills.firstAid, hands: skills.hands, best: skills.best,
     hp, started: Boolean(healing?.active), handsBonus: Boolean(healing?.hands),
+    // Core p.162: First Aid against how far HP is below 0 brings a dying character back to 1 HP.
+    dying: readable && patient.system?.statistics?.dying && !patient.system.statistics.dead ? { dc: dyingDC(patient) } : null,
+    canHeal: skills.best.total !== null,
     perDay: recovery + (healing?.hands ? 3 : 0), halfDay: Math.floor(recovery / 2) + (healing?.hands ? 3 : 0),
     canRest: self && healer.isOwner,
     wounds: readable ? wounds(patient).map(effect => {
@@ -69,6 +72,10 @@ async function applyToPatient(healer, patient, change) {
   await healer.update({ [`flags.${SYSTEM_ID}.${REQUEST}`]: { ...change, patient: patient.uuid, id: foundry.utils.randomID(), requester: game.user.id } });
 }
 async function performHealing(patient, change) {
+  if (change.kind === "revive") {
+    if (patient.system.health.value <= 0 && !patient.system.statistics?.dead) await patient.update({ "system.health.value": 1 });
+    return;
+  }
   if (change.kind === "start") return patient.update({ [`flags.${SYSTEM_ID}.healing`]: { active: true, hands: Boolean(change.hands) } });
   const effect = patient.effects.get(change.effectId);
   if (!effect?.flags?.[SYSTEM_ID]?.criticalWound) return;
@@ -114,6 +121,20 @@ export async function stabilizePatientWound(healer, patient, effectId) {
   const success = message.rolls[0].total >= dc;
   if (success) await applyToPatient(healer, patient, { kind: "stabilize", effectId });
   ui.notifications[success ? "info" : "warn"](success ? "Ранение стабилизировано." : `Стабилизация не удалась (${message.rolls[0].total} < ${dc}).`);
+  return success;
+}
+
+export const dyingDC = patient => Math.max(1, -(patient.system?.health?.value ?? 0));
+/** Core p.162: stabilising a dying character — First Aid against how far HP is below 0 (at least 1, since dying starts at 0 here); success sets HP to 1. */
+export async function stabilizeDying(healer, patient) {
+  if (!patient.system?.statistics?.dying || patient.system.statistics.dead) return;
+  const { best } = healerSkills(healer), dc = dyingDC(patient);
+  if (best.total === null) throw new Error("Заполните навык «Первая помощь».");
+  const message = await check(healer, { ...best, dc, patient, title: "Стабилизация умирающего" });
+  if (!message) return;
+  const success = message.rolls[0].total >= dc;
+  if (success) await applyToPatient(healer, patient, { kind: "revive" });
+  ui.notifications[success ? "info" : "warn"](success ? `${patient.name}: стабилизирован, ПЗ 1.` : `Стабилизация не удалась (${message.rolls[0].total} < ${dc}); пациент остаётся при смерти.`);
   return success;
 }
 

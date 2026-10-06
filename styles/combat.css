@@ -278,3 +278,4 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 :is(.witcher-healing-wound, .witcher-healing-natural) small { color:#78664e; font-size:11px; }
 :is(.witcher-healing-wound, .witcher-healing-natural) button { width:auto; height:auto; min-height:28px; padding:3px 10px; font-size:12px; white-space:nowrap; }
 .witcher-healing-active { display:flex; align-items:center; gap:4px; font-size:12px; white-space:nowrap; }
+.witcher-healing-wound.is-dying { border-left-color:#7a1f1a; background:#fbeeea; margin-top:8px; }

@@ -118,7 +118,7 @@
       "Recover": "Stun save — recover",
       "UpdateError": "Could not update the character's effect.",
       "Dying": "Dying",
-      "DyingDescription": "At HP ≤ 0, the character is dying. Divide all primary attributes except Luck by 3, rounding down. Maximum HP and Stamina and base STUN are unchanged. Entering this state immediately triggers a death save with penalty 0. Further damage and each new round increase the penalty by 1 and trigger another save. Success does not stabilize the character; failure means death.",
+      "DyingDescription": "At HP ≤ 0, the character is dying. Divide all primary attributes except Luck by 3, rounding down. Maximum HP and Stamina and base STUN are unchanged. Entering this state immediately triggers a death save with penalty 0. Further damage and each new round increase the penalty by 1 and trigger another save. Success does not stabilize the character; failure means death. First Aid against a DC equal to how far HP is below 0 (at least 1) stabilizes them: on a success HP becomes 1.",
       "Dead": "Dead",
       "DeadDescription": "The character died after failing a death save. No further saves are made. Healing HP does not automatically remove death; the GM may remove this state.",
       "ExhaustedStun": "Stunned from exhaustion",
