@@ -28,7 +28,7 @@
     <header><h3><i class="fa-solid fa-user-ninja"></i> Засада</h3><button type="button" data-action="openAmbush" {{disabled (not editable)}}><i class="fa-solid fa-users"></i> Запросить засаду</button></header>
     {{#if combat.ambush.pending}}<p>Проверка обрабатывается мастером…</p>{{/if}}
     {{#if combat.ambush.active}}
-      <p>Не заметили: <b>{{combat.ambush.count}}</b> · <b>+5</b> к атакам по ним. {{#if combat.ambush.opening}}Первая атака — вне инициативы.{{else}}Бонус действует до конца первого раунда.{{/if}}</p>
+      <p>Не заметили: <b>{{combat.ambush.count}}</b> · <b>+5</b> к атакам по ним. Бонус действует до конца первого раунда.</p>
     {{else}}<p>Отправьте запрос в чат. Мастер выберет участников, затем каждый выполнит свою проверку.</p>{{/if}}
   </section>
 </section>

@@ -1,5 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
-import { groupAmbush, requestAmbush, rollGroupParticipant, releaseAmbushRoll, acceptAmbushRoll, applyGroupAmbush, startGroupCombat } from "../combat/group-ambush.mjs";
+import { groupAmbush, requestAmbush, rollGroupParticipant, releaseAmbushRoll, acceptAmbushRoll, applyGroupAmbush, startGroupCombat, restoreGroupPreparation } from "../combat/group-ambush.mjs";
 import { tacticsWrite } from "../combat/combat-tactics.mjs";
 import { tacticsFlags } from "../combat/tactics-rules.mjs";
 import { groupCardContext } from "../sheets/ambush-context.mjs";
@@ -85,11 +85,8 @@ export function registerGroupAmbush() {
         }
         await applyGroupAmbush(combat);
         const session = groupAmbush(combat);
-        if (session.status === "initiative" || (session.status === "opening" && game.messages.some(message => tacticsFlags(message).weaponAttack?.groupOpening === session.id))) await startGroupCombat(combat);
-        else if (session.status === "opening") {
-          // No attack was posted: the interrupted opening can be tried again by the GM.
-          await combat.update({[`flags.${SYSTEM_ID}.groupAmbush`]:{...session,status:"ready"}},{turnEvents:false});
-        }
+        if (session.status === "initiative") await startGroupCombat(combat);
+        else await restoreGroupPreparation(combat);
       }).catch(console.error);
     }
   });

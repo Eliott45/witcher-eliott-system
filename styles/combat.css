@@ -141,9 +141,3 @@
 .witcher-group-table td.is-unseen { background:#dce7db; color:#365943; }
 .witcher-group-table td.is-seen { background:#f0dfda; color:#7b3b36; }
 .witcher-group-legend { display:block; color:#6b5e4a; margin-top:8px; font-size:11px; }
-.witcher-group-opening { border-top:1px solid #cbb99d; padding-top:14px; margin-top:16px; }
-.witcher-group-opening h3 { color:#593b31; text-shadow:none; }
-.witcher-group-opening p { font-size:13px; }
-.witcher-group-opening-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; }
-.witcher-group-opening-fields label { display:grid; gap:5px; font-size:12px; }
-.witcher-group-opening-fields label:last-child { grid-column:1/-1; }

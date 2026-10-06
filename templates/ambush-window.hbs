@@ -3,19 +3,13 @@
   <div class="witcher-ambush-body">
     {{#if locked}}
       <section class="witcher-group-ambush">{{> "systems/witcher-eliott-system/templates/ambush-card.hbs" card}}</section>
-      {{#if ready}}<section class="witcher-group-opening"><h3>Первая атака</h3><p>Выберите засадчика и цель, которая его не заметила. После одной атаки все участники бросят инициативу.</p>
-        <div class="witcher-group-opening-fields"><label>Атакующий<select data-opening-option="attacker">{{#each attackers}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
-        <label>Оружие<select data-opening-option="choice">{{#each weapons}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
-        <label>Цель<select data-opening-option="target">{{#each targets}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label></div>
-        <button type="button" data-action="openingAttack" {{disabled (not canAttack)}}><i class="fa-solid fa-khanda"></i> Атаковать из засады</button>
-      </section>{{/if}}
     {{else}}
       <div class="witcher-ambush-tools"><label class="witcher-ambush-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" data-ambush-search value="{{query}}" placeholder="Найти участника…" aria-label="Найти участника"></label><button type="button" data-action="defaultRoles">По сторонам</button></div>
       <p class="witcher-group-help">«Без проверки» — участвует в бою, но не скрывается и не проверяет Внимание.</p>
       <div class="witcher-group-roster">{{#each rows}}<div class="witcher-group-role" data-search="{{search}}"><img src="{{img}}" alt=""><span><b>{{name}}</b>{{#if hidden}}<small>Скрытый токен</small>{{/if}}</span><select data-ambush-role="{{id}}" aria-label="Роль: {{name}}" {{disabled ../busy}}>{{#each roles}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></div>{{else}}<p>На сцене нет персонажей и существ.</p>{{/each}}</div>
     {{/if}}
   </div>
-  <footer class="witcher-ambush-footer"><div>{{#if notice}}<p class="witcher-ambush-error">{{notice}}</p>{{/if}}<small>{{#if locked}}Бонусы назначаются отдельно против каждого наблюдателя.{{else}}Участники попадут в трекер. Бой начнётся после первой атаки или по кнопке мастера.{{/if}}</small></div>
+  <footer class="witcher-ambush-footer"><div>{{#if notice}}<p class="witcher-ambush-error">{{notice}}</p>{{/if}}<small>{{#if locked}}Бонусы назначаются отдельно против каждого наблюдателя.{{else}}Участники попадут в трекер. Мастер начинает бой кнопкой «Начать бой».{{/if}}</small></div>
     {{#if locked}}<div class="witcher-group-controls"><button type="button" data-action="repeatCard" {{disabled busy}}>Карточка в чат</button><button type="button" data-action="startBattle" {{disabled (not canStart)}}>Начать бой</button><button type="button" data-action="cancelAmbush" {{disabled (not canCancel)}}>Отменить засаду</button></div>
     {{else}}<button type="button" data-action="publishAmbush" class="witcher-ambush-check" {{disabled (not canPublish)}}><i class="fa-solid fa-dice-d10"></i> Отправить проверки в чат</button>{{/if}}
   </footer>

@@ -175,7 +175,7 @@ export async function applyGroupAmbush(combat) {
     const participant = combat.combatants.get(row.id);
     if (!participant) throw new Error("Участник удалён из боя. Отмените засаду и выберите состав заново.");
     const targets = row.cells.filter(cell => cell.unseen).map(cell => session.entries.find(entry => entry.id === cell.observer).token);
-    await participant.update({[`flags.${SYSTEM_ID}.ambush`]:targets.length ? {targets,opening:false,group:session.id} : null}, {turnEvents:false});
+    await participant.update({[`flags.${SYSTEM_ID}.ambush`]:targets.length ? {targets,group:session.id} : null}, {turnEvents:false});
     const exists = participant.actor.effects.some(effect => tacticsFlags(effect).tactic?.combat === combat.id && tacticsFlags(effect).tactic?.combatant === participant.id && tacticsFlags(effect).tactic?.kind === "ambush");
     if (targets.length && !exists) await participant.actor.createEmbeddedDocuments("ActiveEffect",[tacticalEffect("ambush",combat,participant,"+5 к атакам против не заметивших вас целей до конца первого раунда.")]);
   }
@@ -204,27 +204,10 @@ export async function startGroupCombat(combat) {
   if (combat.started) await save(combat,{...groupAmbush(combat),status:"started"});
 }
 
-export async function openingGroupAttack(combat, {attacker, target, weapon, mode}) {
-  requireGM();
-  return tacticsWrite(combat,async () => {
-    const session = requireSession(combat,groupAmbush(combat)?.id,"ready");
-    const participant = combat.combatants.get(attacker), state = tacticsFlags(participant).ambush;
-    if (!state?.targets.includes(target) || state.group !== session.id) throw new Error("Цель заметила этого участника.");
-    await save(combat,{...session,status:"opening",attacker});
-    await participant.update({[`flags.${SYSTEM_ID}.ambush.opening`]:true},{turnEvents:false});
-    let message;
-    try {
-      const {rollWeaponAttack} = await import("./weapon-rolls.mjs");
-      message = await rollWeaponAttack(participant.actor,weapon,{mode,attackerUuid:participant.token.uuid,targetUuid:target,combatId:combat.id,groupOpening:session.id});
-      return message;
-    } finally {
-      if (!message) {
-        const posted = game.messages.find(entry => tacticsFlags(entry).weaponAttack?.groupOpening === session.id);
-        if (!posted) {
-          await participant.update({[`flags.${SYSTEM_ID}.ambush.opening`]:false},{turnEvents:false});
-          await save(combat,{...session,status:"ready"});
-        }
-      }
-    }
-  });
+/** Resume a preparation saved by the former opening-attack UI without starting combat. */
+export async function restoreGroupPreparation(combat) {
+  if (!game.users.activeGM?.isSelf) return;
+  const session = groupAmbush(combat);
+  if (session?.status !== "opening" || combat.started) return;
+  await save(combat,{...session,status:"ready"});
 }

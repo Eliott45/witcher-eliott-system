@@ -7,7 +7,7 @@ import { attackModifierMarkup, rollWeaponAttack } from "../scripts/combat/weapon
 import { ambushAttack, delayedOrder, tacticsFlags, tacticalEffect } from "../scripts/combat/tactics-rules.mjs";
 import { delayTurn, resumeDelayedTurn, cleanupTactics, processTacticRequest, requestTactic, resetTacticalOrder, renderTacticalTracker } from "../scripts/combat/combat-tactics.mjs";
 import { ambushCandidates, ambushWindowContext, groupCardContext } from "../scripts/sheets/ambush-context.mjs";
-import { createGroupAmbush, groupAmbush, ambushMatrix, claimAmbushRoll, acceptAmbushRoll, releaseAmbushRoll, cancelGroupAmbush, startGroupCombat, requestAmbush, rollGroupParticipant, openingGroupAttack } from "../scripts/combat/group-ambush.mjs";
+import { createGroupAmbush, groupAmbush, ambushMatrix, claimAmbushRoll, acceptAmbushRoll, releaseAmbushRoll, cancelGroupAmbush, startGroupCombat, requestAmbush, rollGroupParticipant, restoreGroupPreparation } from "../scripts/combat/group-ambush.mjs";
 import { startTurnPoison } from "../scripts/combat/poison-damage.mjs";
 
 function patch(target, changes) {
@@ -89,7 +89,7 @@ test("target resolution never guesses between several targets or several copies 
   game.user.targets=new Set([a]);assert.throws(()=>selectedAttackTarget(a.actor),/другое/);
 });
 
-test("blind attacks lose Aim, forbid aimed locations, and opening ambush fires exactly once",()=>{
+test("blind attacks lose Aim and forbid aimed locations without changing the attack mode",()=>{
   const a=actor("a"),weapon=a.items[0];weapon.system.category="ranged";weapon.system.skill="archery";
   a.effects.push({statuses:new Set(["aiming"]),flags:{[SYSTEM_ID]:{condition:{counter:{initial:3,max:3}}}}});
   const blind={blind:true,parts:[{label:"Blind",value:-3},{label:"Rear",value:3}]};
@@ -98,7 +98,6 @@ test("blind attacks lose Aim, forbid aimed locations, and opening ambush fires e
   assert.match(weaponAttack(a,weapon,{targetContext:blind,location:"head"}).blocked,/Нельзя/);
   weapon.system.skill="swordsmanship";weapon.system.category="melee";
   assert.equal(weaponAttack(a,weapon).attack.count,2);
-  assert.equal(weaponAttack(a,weapon,{opening:true}).attack.count,1);
 });
 
 test("a targeted weapon roll snapshots cone and ambush modifiers and posts muted signed rows",async()=>{
@@ -158,17 +157,17 @@ test("owned native flag requests are resolved only by GM, reject stale turns and
 });
 
 
-test("first ambush attack triggers ordinary initiative once, retaining +5 for round one",async()=>{
+test("legacy opening flags no longer restrict attack count or trigger initiative",async()=>{
   const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
   f.a.flags[SYSTEM_ID]={ambush:{targets:[f.b.token.uuid],opening:true}};
-  game.user.targets.add(f.b.token);f.a.actor.system.combatAction.extra=true;
+  game.user.targets.add(f.b.token);
   await rollWeaponAttack(f.a.actor,"sword");
-  assert.equal(f.messages[0].rolls.length,1);assert.equal(f.messages[0].flags[SYSTEM_ID].action.extra,false);
-  assert.equal(f.a.actor.system.stamina.value,30);
-  const request=tacticsFlags(f.a).tacticRequest;assert.equal(request.kind,"initiative");
-  await processTacticRequest(f.a,request);await processTacticRequest(f.a,request);
-  assert.equal(f.operations.filter(entry=>entry.initiative).length,1);assert.equal(f.combat.round,1);
-  assert.equal(tacticsFlags(f.a).ambush.opening,false);assert.equal(ambushAttack(f.combat,f.a.token,f.b.token).bonus,5);
+  assert.equal(f.messages[0].rolls.length,2);assert.equal(f.combat.round,0);
+  assert.equal(tacticsFlags(f.a).tacticRequest,undefined);
+  assert.equal(f.operations.filter(entry=>entry.initiative).length,0);
+  assert.equal(ambushAttack(f.combat,f.a.token,f.b.token).bonus,5);
+  await processTacticRequest(f.a,{id:"old-request",kind:"initiative",requester:"gm",round:0,current:null,message:f.messages[0].id});
+  assert.equal(f.combat.started,false);
 });
 
 test("reveal removes only that target; cancelled attack never requests initiative",async()=>{
@@ -219,7 +218,7 @@ test("one explicit target attacks without clearing the scene's several selected 
   game.user.targets=new Set([f.b.token,f.c.token]);
   await rollWeaponAttack(f.a.actor,"sword",{attackerUuid:f.a.token.uuid,targetUuid:f.b.token.uuid});
   assert.equal(game.user.targets.size,2);assert.ok(game.user.targets.has(f.c.token));
-  assert.equal(f.messages[0].rolls.length,1);
+  assert.equal(f.messages[0].rolls.length,2);
   assert.equal(tacticsFlags(f.messages[0]).weaponAttack.target,f.b.token.uuid);
   assert.equal(tacticsFlags(f.messages[0]).weaponAttack.base,18);
   assert.throws(()=>selectedAttackTarget(f.a.actor,{attackerUuid:f.c.token.uuid,targetUuid:f.b.token.uuid}),/атакующего/);
@@ -314,29 +313,35 @@ test("chat offers only owned checks, keeps hidden NPCs private, and shows a shar
   await cancelGroupAmbush(f.combat);assert.ok(groupCardContext(f.combat,session,f.player).rows.every(row=>!row.canRoll));
 });
 
-test("first group attack is GM-controlled; one attack starts initiative once for the entire group",async()=>{
+test("players use ordinary attacks after group checks; only Start Battle begins initiative",async()=>{
   const f=await groupFixture();await submitGroup(f,f.a,18);await submitGroup(f,f.b,17);await submitGroup(f,f.c,14);
-  const opts={attackerUuid:f.a.token.uuid,targetUuid:f.c.token.uuid};
-  await assert.rejects(()=>rollWeaponAttack(f.a.actor,"sword",opts),/мастер/);
-  game.user=f.player;await assert.rejects(()=>openingGroupAttack(f.combat,{attacker:"a",target:f.c.token.uuid,weapon:"sword",mode:"fast"}),/только мастер/);
-  game.user=f.gm;
-  const message=await openingGroupAttack(f.combat,{attacker:"a",target:f.c.token.uuid,weapon:"sword",mode:"fast"});
-  assert.equal(message.rolls.length,1);assert.equal(tacticsFlags(message).weaponAttack.groupOpening,groupAmbush(f.combat).id);
-  assert.equal(groupAmbush(f.combat).status,"opening");
-  const request=tacticsFlags(f.a).tacticRequest;await processTacticRequest(f.a,request);await processTacticRequest(f.a,request);
+  game.user=f.player;f.c.token.object={isVisible:true};
+  const message=await rollWeaponAttack(f.a.actor,"sword",{attackerUuid:f.a.token.uuid,targetUuid:f.c.token.uuid});
+  assert.equal(message.rolls.length,2);assert.equal(tacticsFlags(message).weaponAttack.parts.find(part=>part.label==="Засада").value,5);
+  assert.equal(groupAmbush(f.combat).status,"ready");assert.equal(f.combat.started,false);
+  assert.equal(tacticsFlags(f.a).tacticRequest,undefined);assert.equal(f.operations.filter(op=>op.initiative).length,0);
+  await assert.rejects(()=>startGroupCombat(f.combat),/только мастер/);
+  game.user=f.gm;await startGroupCombat(f.combat);await startGroupCombat(f.combat);
   assert.equal(f.combat.round,1);assert.equal(groupAmbush(f.combat).status,"started");assert.equal(f.operations.filter(op=>op.initiative).length,1);
-  assert.equal(tacticsFlags(f.a).ambush.opening,false);
   assert.deepEqual(f.operations.find(op=>op.initiative).initiative,["a","b","c"]);
   assert.equal(ambushAttack(f.combat,f.b.token,f.c.token).bonus,5);
 });
 
-test("cancelled opening returns to ready and cancelling preparation clears bonuses without removing combatants",async()=>{
+test("cancelling preparation clears bonuses without removing combatants",async()=>{
   const f=await groupFixture();await submitGroup(f,f.a,18);await submitGroup(f,f.b,17);await submitGroup(f,f.c,14);
-  foundry.documents.ChatMessage.create=async()=>null;
-  await openingGroupAttack(f.combat,{attacker:"a",target:f.c.token.uuid,weapon:"sword",mode:"fast"});
-  assert.equal(groupAmbush(f.combat).status,"ready");assert.equal(tacticsFlags(f.a).ambush.opening,false);
   await cancelGroupAmbush(f.combat);assert.equal(groupAmbush(f.combat).status,"cancelled");
   assert.equal(f.combat.combatants.length,3);assert.equal(f.a.actor.effects.length,0);assert.equal(tacticsFlags(f.a).ambush,null);
+});
+
+test("saved opening step returns to results without an automatic battle, even with an old attack message",async()=>{
+  const f=await groupFixture();await submitGroup(f,f.a,18);await submitGroup(f,f.b,17);await submitGroup(f,f.c,14);
+  const session=groupAmbush(f.combat);session.status="opening";tacticsFlags(f.a).ambush.opening=true;
+  f.messages.push({id:"old-attack",flags:{[SYSTEM_ID]:{weaponAttack:{groupOpening:session.id}}}});
+  await restoreGroupPreparation(f.combat);
+  assert.equal(groupAmbush(f.combat).status,"ready");assert.equal(f.combat.started,false);
+  assert.equal(f.operations.filter(op=>op.initiative).length,0);
+  assert.equal(ambushWindowContext(canvas.scene).canStart,true);
+  assert.equal(ambushAttack(f.combat,f.a.token,f.c.token).bonus,5);
 });
 
 test("GM may start normally when no one remained hidden; interrupted initiative resumes remaining rolls",async()=>{
@@ -346,13 +351,12 @@ test("GM may start normally when no one remained hidden; interrupted initiative 
   await startGroupCombat(f.combat);assert.equal(f.operations.filter(op=>op.initiative).length,1);
 });
 
-test("GM role window retains separate NPC copies and recovers selections and opening options",async()=>{
+test("GM role window retains separate NPC copies and allows starting when all checks finish",async()=>{
   const f=await groupFixture();f.b.token.actor=f.a.actor;f.b.token.name=f.a.token.name;
   assert.equal(ambushCandidates(canvas.scene).length,3);
   let view=ambushWindowContext(canvas.scene);assert.equal(view.locked,true);assert.equal(view.canPublish,false);
   await submitGroup(f,f.a,18);await submitGroup(f,f.b,17);await submitGroup(f,f.c,14);
-  view=ambushWindowContext(canvas.scene);assert.equal(view.attackers.length,2);assert.equal(view.targets.length,1);
-  assert.equal(view.canAttack,true);assert.equal(view.canStart,true);
+  view=ambushWindowContext(canvas.scene);assert.equal(view.card.rows.length,3);assert.equal(view.canStart,true);
 });
 
 test("owner rolls on their own client after GM grants the slot and sends one native check",async()=>{

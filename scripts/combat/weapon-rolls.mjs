@@ -7,7 +7,6 @@ import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { consumeAiming } from "./full-turn-rules.mjs";
 import { selectedAttackTarget } from "./attack-target.mjs";
 import { ambushAttack, ambushState, tacticsFlags } from "./tactics-rules.mjs";
-import { requestTactic } from "./combat-tactics.mjs";
 
 export function attackModifierMarkup(parts) {
   return `<ul class="witcher-attack-modifiers">${parts.filter(part=>part.value&&part.label!=="Основа навыка").map(part=>
@@ -20,17 +19,15 @@ export function rollWeaponAttack(actor,itemId,options={}) {
   const work=inventoryWrite(actor,async()=>{
     const targetContext=selectedAttackTarget(actor,options),combat=options.combatId?game.combats.get(options.combatId):globalThis.game?.combat;
     const group=tacticsFlags(combat).groupAmbush;
-    if(group&&!combat.started&&!["cancelled","started"].includes(group.status)
-      && (!game.user.isGM||group.status!=="opening"||options.groupOpening!==group.id||group.attacker!==combat.combatants.find(entry=>entry.token?.uuid===targetContext?.attacker.uuid)?.id)) {
-      throw new Error("Дождитесь проверок засады. Первую атаку запускает мастер в окне засады.");
-    }
     const actorCombatants=Array.from(combat?.combatants??[]).filter(entry=>entry.actor?.uuid===actor.uuid);
+    if(group?.status==="checks"&&!combat.started&&group.entries.some(row=>actorCombatants.some(entry=>entry.id===row.id))) {
+      throw new Error("Дождитесь завершения проверок засады.");
+    }
     if(actorCombatants.some(entry=>tacticsFlags(entry).tacticRequest))throw new Error("Дождитесь завершения запроса в трекере боя.");
     if(!targetContext&&actorCombatants.some(entry=>ambushState(combat,entry)))throw new Error("Выберите цель атаки, чтобы учесть засаду.");
-    const ambush=targetContext?ambushAttack(combat,targetContext.attacker,targetContext.target):{bonus:0,opening:false};
-    if(ambush.opening&&!game.users.activeGM)throw new Error("Для начала боя из засады нужен подключённый мастер.");
-    const item=actor.items.get(itemId),action=actionQuote(actor,{ignoreExtra:ambush.opening}),quote=weaponAttack(actor,item,{...options,
-      extraPenalty:action.penalty,targetContext,ambushBonus:ambush.bonus,opening:ambush.opening});
+    const ambush=targetContext?ambushAttack(combat,targetContext.attacker,targetContext.target):{bonus:0};
+    const item=actor.items.get(itemId),action=actionQuote(actor),quote=weaponAttack(actor,item,{...options,
+      extraPenalty:action.penalty,targetContext,ambushBonus:ambush.bonus});
     if(quote.blocked)throw new Error(quote.blocked);
     const display=trackRollDisplay(),messageMode=game.settings.get("core","messageMode");
     try {
@@ -48,15 +45,13 @@ export function rollWeaponAttack(actor,itemId,options={}) {
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls,flavor,
         flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId,name:item.name,mode:quote.attack.id,base:quote.total,count:quote.attack.count,
           damage:quote.damage,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
-          target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,
-          groupOpening:options.groupOpening??null,opening:ambush.opening,ambushCombatant:ambush.combatant?.id??null}}}},messageMode));
+          target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts}}}},messageMode));
       if(!message)return;
       await display.wait(message);
       const update=actionUpdate(actor,action);
       if(item.system.skill==="crossbow")update.items=[{_id:item.id,"system.loaded":false}];
       if(Object.keys(update).length)await actor.update(update);
       await consumeAiming(actor);
-      if(ambush.opening)await requestTactic(ambush.combatant,"initiative",{message:message.id});
       return message;
     } finally {display.close();}
   });

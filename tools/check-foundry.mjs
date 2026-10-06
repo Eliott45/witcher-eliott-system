@@ -1517,11 +1517,12 @@ for(const kind of ['delay','ambush']) {
 const tacticsTemplate=handlebars.compile(await readFile(new URL('../templates/combat-actions.hbs',import.meta.url),'utf8'),{strict:true});
 const {combatContext:prepareTacticsContext}=await import('../scripts/sheets/combat-context.mjs');
 const tacticsView=prepareTacticsContext(doseActor);
-tacticsView.ambush={active:true,opening:true,pending:false,canPrepare:true,count:1,targets:[{uuid:'Scene.scene.Token.enemy',name:'Цель <1>'}]};
+tacticsView.ambush={active:true,pending:false,canPrepare:true,count:1,targets:[{uuid:'Scene.scene.Token.enemy',name:'Цель <1>'}]};
 const tacticsHTML=tacticsTemplate({combat:tacticsView,editable:true});
 assert.match(tacticsHTML,/data-action="openAmbush"[^>]*>/);
 assert.ok(!tacticsHTML.match(/data-action="openAmbush"[^>]*disabled/));
-assert.ok(tacticsHTML.includes('Первая атака — вне инициативы'));
+assert.ok(tacticsHTML.includes('Бонус действует до конца первого раунда'));
+assert.ok(!tacticsHTML.includes('Первая атака'));
 console.log('Combat tactics: native effects, core icons and active ambush controls OK');
 
 const {ambushWindowContext,groupCardContext}=await import('../scripts/sheets/ambush-context.mjs');
@@ -1545,9 +1546,10 @@ game.combat={id:'ambushCombat',scene:canvas.scene,round:0,started:false,flags:{[
 game.combats=[game.combat];
 const ambushView=ambushWindowContext(canvas.scene);
 const ambushHTML=ambushTemplate({...ambushView,query:'',notice:''});
-assert.equal(ambushView.attackers.length,1);assert.equal(ambushView.targets.length,1);
+assert.equal(ambushView.card.rows.length,3);assert.equal(ambushView.canStart,true);
 assert.ok(ambushHTML.includes('Противник &lt;1&gt;'));assert.ok(ambushHTML.includes('Противник &lt;2&gt;'));
-assert.ok(ambushHTML.includes('data-action="openingAttack"'));assert.ok(!ambushHTML.match(/data-action="openingAttack"[^>]*disabled/));
+assert.ok(!ambushHTML.includes('data-action="openingAttack"'));assert.ok(!ambushHTML.includes('Первая атака'));
+assert.ok(!ambushHTML.match(/data-action="startBattle"[^>]*disabled/));
 assert.ok(ambushHTML.includes('is-unseen'));assert.ok(ambushHTML.includes('is-seen'));
 game.combat.flags[game.system.id].groupAmbush.status='checks';
 game.combat.flags[game.system.id].groupAmbush.entries[0].total=null;
@@ -1559,4 +1561,4 @@ const nativeMacro=new foundry.documents.BaseMacro(macroSource);
 assert.equal(nativeMacro.validationFailures.fields,null);
 assert.equal(nativeMacro.command,'await game.system.api.ambush();');
 globalThis.canvas=ambushGlobals.canvas;game.combat=ambushGlobals.combat;game.combats=ambushGlobals.combats;game.user=ambushGlobals.user;game.users=ambushGlobals.users;
-console.log('Group ambush: native Macro, role selection, shared roll matrix and strict templates OK');
+console.log('Group ambush: native Macro, role selection, shared roll matrix and manual combat start OK');

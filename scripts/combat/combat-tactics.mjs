@@ -54,18 +54,6 @@ export async function resumeDelayedTurn(combat, combatant) {
   await removeTacticEffect(combat, combatant, "delay");
 }
 
-async function startAfterAmbush(combat, combatant, request) {
-  const message = game.messages.get(request.message), attack = tacticsFlags(message).weaponAttack;
-  if (!ambushState(combat, combatant)?.opening || combat.started || attack?.ambushCombatant !== combatant.id || !attack.opening || message.speakerActor?.uuid !== combatant.actor.uuid) return;
-  if (tacticsFlags(combat).groupAmbush?.id === attack.groupOpening) {
-    const {startGroupCombat} = await import("./group-ambush.mjs");
-    return startGroupCombat(combat);
-  }
-  await combatant.update({[`flags.${SYSTEM_ID}.ambush.opening`]:false}, {turnEvents:false});
-  await combat.rollInitiative(combat.combatants.map(entry => entry.id), {updateTurn:false});
-  if (!combat.started && combat.combatants.every(entry => Number.isFinite(entry.initiative))) await combat.startCombat();
-}
-
 export async function processTacticRequest(combatant, request) {
   const combat = combatant.parent;
   if (!activeGM() || !request || tacticsFlags(combatant).lastTacticRequest === request.id) return;
@@ -82,7 +70,6 @@ export async function processTacticRequest(combatant, request) {
       const {releaseAmbushRoll} = await import("./group-ambush.mjs");
       await releaseAmbushRoll(combat,request.session,combatant.id,request.nonce);
     }
-    else if (request.kind === "initiative") await startAfterAmbush(combat, combatant, request);
     else if (request.kind === "reveal") {
       const state=ambushState(combat,combatant);
       if(state){

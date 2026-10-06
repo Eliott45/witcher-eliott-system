@@ -21,7 +21,7 @@ export function combatContext(actor,options={}) {
   const defenses=[{mode:"dodge"},{mode:"reposition"},...equippedItems(actor.items).filter(item=>item.type==="weapon"&&["melee","shield"].includes(item.system.category)).flatMap(item=>[{mode:"block",itemId:item.id},{mode:"parry",itemId:item.id}])]
     .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
   return { extra,used,canAct,location:options.location??"random",range:options.range??"normal",modifier:options.modifier??0,
-    fullTurn,defenses,ambush:{active:Boolean(ambush),opening:Boolean(ambush?.opening),targets:ambushTargets,count:ambushTargets.length,
+    fullTurn,defenses,ambush:{active:Boolean(ambush),targets:ambushTargets,count:ambushTargets.length,
       canPrepare:Boolean(canAct&&ambusher&&!encounter.started&&!tacticsFlags(ambusher).tacticRequest),pending:Boolean(tacticsFlags(ambusher).tacticRequest)},
     repeat:!fullTurn.activeDodge&&Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
     incoming:INCOMING_ATTACKS.map(entry=>({...entry,selected:entry.id===(options.incoming??"melee")})),

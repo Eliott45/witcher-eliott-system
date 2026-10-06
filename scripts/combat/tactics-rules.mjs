@@ -10,8 +10,8 @@ export function ambushState(combat, combatant) {
 }
 export function ambushAttack(combat, attacker, target) {
   const combatant = combatantForToken(combat, attacker), state = ambushState(combat, combatant);
-  if (!state) return {bonus:0, opening:false};
-  return {combatant, bonus:state.targets.includes(target.uuid) ? 5 : 0, opening:Boolean(state.opening && !combat.started)};
+  if (!state) return {bonus:0};
+  return {combatant, bonus:state.targets.includes(target.uuid) ? 5 : 0};
 }
 
 /** Persist an explicit order while retaining the initiative numbers players rolled. */

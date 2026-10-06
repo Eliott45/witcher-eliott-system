@@ -1,5 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
-import { createGroupAmbush, cancelGroupAmbush, groupAmbush, publishGroupCard, openingGroupAttack, startGroupCombat } from "../combat/group-ambush.mjs";
+import { createGroupAmbush, cancelGroupAmbush, groupAmbush, publishGroupCard, startGroupCombat } from "../combat/group-ambush.mjs";
 import { tacticsWrite } from "../combat/combat-tactics.mjs";
 import { ambushCandidates, ambushWindowContext } from "./ambush-context.mjs";
 import { bindGroupCard } from "../chat/group-ambush.mjs";
@@ -10,18 +10,18 @@ export class AmbushWindow extends foundry.applications.api.HandlebarsApplication
     classes:["witcher-ambush-window"],position:{width:830,height:730},
     window:{title:"Групповая засада",icon:"fa-solid fa-user-ninja",resizable:true},
     actions:{publishAmbush:AmbushWindow.#publish,cancelAmbush:AmbushWindow.#cancel,repeatCard:AmbushWindow.#card,
-      openingAttack:AmbushWindow.#attack,startBattle:AmbushWindow.#start,defaultRoles:AmbushWindow.#defaults}
+      startBattle:AmbushWindow.#start,defaultRoles:AmbushWindow.#defaults}
   };
   static PARTS = {content:{template:`systems/${SYSTEM_ID}/templates/ambush-window.hbs`,scrollable:[".witcher-ambush-body"]}};
   constructor(scene) {
     super(); this.scene = scene; this.roles = new Map(); this.busy = false; this.notice = "";
-    this.attacker = ""; this.choice = ""; this.target = ""; this.query = "";
+    this.query = "";
     const existing = game.combats.find(combat => combat.scene?.id === scene.id && groupAmbush(combat));
     for (const row of groupAmbush(existing)?.entries ?? []) {
       const token = scene.tokens.find(token => token.uuid === row.token); if (token) this.roles.set(token.id,row.role);
     }
     if (!this.roles.size) this.setDefaults();
-    this.hooks = ["updateCombat","createCombatant","updateCombatant","deleteCombatant","deleteCombat","createToken","updateToken","deleteToken","updateItem"].map(event =>
+    this.hooks = ["updateCombat","createCombatant","updateCombatant","deleteCombatant","deleteCombat","createToken","updateToken","deleteToken"].map(event =>
       [event,Hooks.on(event,() => {if (!this.busy) this.render({force:true});})]);
   }
   setDefaults() {
@@ -29,16 +29,12 @@ export class AmbushWindow extends foundry.applications.api.HandlebarsApplication
   }
   async _prepareContext() {
     const view = ambushWindowContext(this.scene,this);
-    for (const key of ["attacker","choice","target"]) this[key] = view[key];
     return {...view,query:this.query,notice:this.notice};
   }
   async _onRender(context, options) {
     await super._onRender(context,options);
     for (const select of this.element.querySelectorAll("[data-ambush-role]")) select.addEventListener("change",() => {
       this.roles.set(select.dataset.ambushRole,select.value); this.render({force:true});
-    });
-    for (const select of this.element.querySelectorAll("[data-opening-option]")) select.addEventListener("change",() => {
-      this[select.dataset.openingOption] = select.value; this.render({force:true});
     });
     const search = this.element.querySelector("[data-ambush-search]");
     if (search) {
@@ -66,11 +62,7 @@ export class AmbushWindow extends foundry.applications.api.HandlebarsApplication
   static #cancel() {const view = ambushWindowContext(this.scene,this), combat = game.combats.get(view.combatId); if(view.canCancel) return this.runWrite(() => tacticsWrite(combat,() => cancelGroupAmbush(combat)));}
   static #card() {const view = ambushWindowContext(this.scene,this); return this.runWrite(() => publishGroupCard(game.combats.get(view.combatId)));}
   static #start() {const view = ambushWindowContext(this.scene,this), combat = game.combats.get(view.combatId); if(view.canStart) return this.runWrite(() => tacticsWrite(combat,() => startGroupCombat(combat)));}
-  static #attack() {
-    const view = ambushWindowContext(this.scene,this); if (!view.canAttack) return;
-    const [weapon,mode] = view.choice.split(":");
-    return this.runWrite(() => openingGroupAttack(game.combats.get(view.combatId),{attacker:view.attacker,target:view.target,weapon,mode}));
-  }
+
 }
 export async function openAmbushWindow(sceneId = globalThis.canvas?.scene?.id) {
   if (!game.user.isGM) throw new Error("Настраивать засаду может только мастер.");
