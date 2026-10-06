@@ -27,5 +27,7 @@ test("a full suit occupies three zones but contributes weight and encumbrance on
   const updates=[];
   const actor={uuid:"Actor.elder-test",isOwner:true,items,updateEmbeddedDocuments:async(_type,data)=>updates.push(...data)};
   await equipItem.call({actor,isEditable:true},null,{dataset:{itemId:"helmet"}});
-  assert.ok(updates.some(update=>update._id==="suit"&&update["system.equipped"]===false));
+  // A light helmet is a second layer over the heavy suit on the head; the suit stays on.
+  assert.ok(!updates.some(update=>update._id==="suit"));
+  assert.ok(updates.some(update=>update._id==="helmet"&&update["system.equipped"]===true));
 });

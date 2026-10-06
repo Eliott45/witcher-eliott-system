@@ -17,7 +17,7 @@
   <i class="fa-solid {{#if item.visorDown}}fa-eye-slash{{else}}fa-eye{{/if}}" aria-hidden="true"></i> {{#if item.visorDown}}{{localize "WITCHER.Visor.Down"}}{{else}}{{localize "WITCHER.Visor.Up"}}{{/if}}
 </button>
 {{/if}}
-{{else}}<span>Не надето</span>{{/each}}</section>{{/each}}
+{{else}}<span>Не надето</span>{{/each}}{{#if zone.layered}}<p class="witcher-armor-layered" data-tooltip="Слои брони: ПБ не складываются — к сильнейшему слою добавляется бонус за разницу. Сопротивления сохраняются, но не суммируются.">Итого слоёв: <b>ПБ {{zone.total}}</b></p>{{/if}}</section>{{/each}}
 </div>
 <label class="witcher-inventory-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" data-inventory-search placeholder="Поиск в инвентаре…" aria-label="Поиск в инвентаре"></label>
 <div class="witcher-inventory-groups">

@@ -1,3 +1,4 @@
+import { layeringPlan, zoneStoppingPower } from "../data/armor-layers.mjs";
 import { isTransport, cargoSections, cargoSection } from "../data/transport.mjs";
 import { gripOf } from "../combat/weapon-rules.mjs";
 import { consumableContext, toxicityState } from "../data/consumables.mjs";
@@ -64,7 +65,11 @@ export function inventoryContext(actor, preferences = {}) {
     categories: EQUIPMENT_CATEGORIES, items: rows,
     groups: GROUPS.map(group => ({ ...group, open: !preferences.collapsed?.[`inventory-${group.id}`],
       items: sortRows(rows.filter(item => !item.parentId && group.categories.includes(item.category))) })),
-    zones: ARMOR_ZONES.map(zone => ({ ...zone, items: equippedItems(items).filter(item => item.type === "armor" && armorZones(item).includes(zone.id)).map(item => ({ id: item.id, name: item.name, ...visorContext(item), condition: effectiveItem(item).stoppingPower })) })),
+    zones: ARMOR_ZONES.map(zone => {
+      const worn = equippedItems(items).filter(item => item.type === "armor" && armorZones(item).includes(zone.id));
+      return { ...zone, layered: worn.length > 1, total: zoneStoppingPower(worn),
+        items: worn.map(item => ({ id: item.id, name: item.name, ...visorContext(item), condition: effectiveItem(item).stoppingPower, armorClass: item.system.armorClass })) };
+    }),
     workshopOpen: !preferences.collapsed?.["inventory-workshop"] };
 }
 export async function toggleVisor(_event, target) {
@@ -84,9 +89,11 @@ export async function equipItem(_event, target) {
     if (!item || !isPhysical(item) || item.system.quantity <= 0) return;
     const updates = [];
     if (!item.system.equipped && item.type === "armor") {
-      // Same layer only. Future layering can expose additional layers without migrating actor data.
-      for (const other of equippedItems(this.actor.items)) if (other.type === "armor" && armorZones(other).some(zone => armorZones(item).includes(zone)) && other.system.layer === item.system.layer && other.id !== item.id)
-        updates.push({ _id: other.id, "system.equipped": false });
+      // Up to three layers per zone, at most one medium and one heavy (core pp.154–155, errata).
+      const plan = layeringPlan(item, equippedItems(this.actor.items));
+      if (plan.blocked) return void ui.notifications.warn(plan.blocked);
+      for (const id of plan.replace) updates.push({ _id: id, "system.equipped": false });
+      if (plan.note) ui.notifications.info(plan.note);
     }
     updates.push({ _id: item.id, "system.equipped": !item.system.equipped, "system.carried": true, "system.containerId": "" });
     await this.actor.updateEmbeddedDocuments("Item", updates);

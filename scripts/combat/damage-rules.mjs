@@ -1,5 +1,6 @@
 import { effectiveItem } from "../data/workshop.mjs";
 import { equippedItems, armorZones } from "../data/physical-items.mjs";
+import { layeredStoppingPower } from "../data/armor-layers.mjs";
 
 // Core pp.153–162 with errata v4: SP first, then resistance, then the location multiplier.
 // Critical bonus damage ignores armor and never ablates it (Sage's Answers 2 and 20).
@@ -21,14 +22,7 @@ export function weaponDamageTraits(weapon = {}) {
   };
 }
 
-// Core p.155 «Дополнительная броня».
-const layerBonus = difference => difference <= 4 ? 5 : difference <= 8 ? 4 : difference <= 14 ? 3 : difference <= 20 ? 2 : 0;
-/** Combine layers lightest-first: 3 + 12 → 15, then 15 + 20 → 24 (errata example). */
-export function layeredStoppingPower(values) {
-  const layers = values.filter(value => value > 0).sort((a, b) => a - b);
-  if (!layers.length) return 0;
-  return layers.slice(1).reduce((total, next) => Math.max(total, next) + layerBonus(Math.abs(next - total)), layers[0]);
-}
+export { layeredStoppingPower };
 
 export const LOCATION_ZONE = { head: "head", torso: "torso", rightArm: "torso", leftArm: "torso", rightLeg: "legs", leftLeg: "legs", tail: "torso" };
 

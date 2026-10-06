@@ -15,15 +15,30 @@ test("condition changes clamp to real limits, including lowered max and negative
   assert.equal(conditionUpdate(sword, { system: { reliability: { max: 5 } } })["system.reliability.value"], 5);
   assert.equal(conditionUpdate(sword, { "system.reliability.value": -1 })["system.reliability.value"], 0);
 });
-test("equip switches only the same armor zone/layer; quantities and base SP remain untouched", async () => {
-  const pieces = [item("old", "armor", { equipped: true, zone: "torso", encumbrance: 1 }), item("new", "armor", { zone: "torso", encumbrance: 2 }), item("head", "armor", { equipped: true, zone: "head" })];
-  const actor = { isOwner: true, items: Object.assign(pieces, { get: id => pieces.find(item => item.id === id) }),
+test("armor layers: up to three per zone, one medium and one heavy; layered EV adds +1/+2", async () => {
+  globalThis.ui = { notifications: { warn: message => warnings.push(message), info: () => {} } };
+  const warnings = [];
+  const pieces = [item("gambeson", "armor", { equipped: true, zone: "torso", encumbrance: 0, armorClass: "light" }),
+    item("brigandine", "armor", { equipped: true, zone: "torso", encumbrance: 1, armorClass: "medium" }),
+    item("mail", "armor", { zone: "torso", encumbrance: 1, armorClass: "medium" }),
+    item("plate", "armor", { zone: "torso", encumbrance: 3, armorClass: "heavy" }),
+    item("shirt", "armor", { zone: "torso", encumbrance: 0, armorClass: "light" }),
+    item("head", "armor", { equipped: true, zone: "head" })];
+  const actor = { isOwner: true, items: Object.assign(pieces, { get: id => pieces.find(entry => entry.id === id) }),
     async updateEmbeddedDocuments(_type, updates) { for (const change of updates) for (const [key,value] of Object.entries(change)) if (key.startsWith("system.")) this.items.get(change._id).system[key.slice(7)] = value; } };
-  await equipItem.call({ actor, isEditable: true }, null, { dataset: { itemId: "new" } });
-  assert.equal(pieces[0].system.equipped, false); assert.equal(pieces[1].system.equipped, true); assert.equal(pieces[2].system.equipped, true);
-  assert.equal(armorEncumbrance(pieces), 2); assert.equal(armorEncumbrance(pieces, -2), 0);
-  await equipItem.call({ actor, isEditable: false }, null, { dataset: { itemId: "new" } });
-  assert.equal(pieces[1].system.equipped, true);
+  const equip = id => equipItem.call({ actor, isEditable: true }, null, { dataset: { itemId: id } });
+  const on = id => actor.items.get(id).system.equipped;
+  await equip("mail");
+  assert.deepEqual([on("brigandine"), on("mail")], [false, true], "a second medium layer replaces the first");
+  await equip("plate");
+  assert.deepEqual([on("gambeson"), on("mail"), on("plate"), on("head")], [true, true, true, true]);
+  assert.equal(armorEncumbrance(pieces), 0 + 1 + 3 + 1 + 2, "light+medium+heavy: EV 4 plus +1 medium, +2 heavy");
+  await equip("shirt");
+  assert.equal(on("shirt"), false, "a fourth layer is refused");
+  assert.match(warnings.at(-1), /3 слоя/);
+  await equipItem.call({ actor, isEditable: false }, null, { dataset: { itemId: "plate" } });
+  assert.equal(on("plate"), true);
+  delete globalThis.ui;
 });
 test("catalog identifiers are unique and shields have reliability instead of SP", () => {
   assert.equal(new Set(CORE_EQUIPMENT.map(item => item.id)).size, CORE_EQUIPMENT.length);

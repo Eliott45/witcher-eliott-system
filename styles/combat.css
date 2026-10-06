@@ -221,3 +221,17 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-attack-rate b { color:#3f362b; font-size:13px; }
 .witcher-attack-rate input { width:40px; height:22px; padding:0 2px; text-align:center; }
 .witcher-combat-panel .witcher-quick-draw[aria-pressed=true] { color:#fff4e2; background:#7a2f29; border-color:#5c211d; }
+
+/* Group initiative dialog and chat card. */
+.witcher-group-initiative-list { display:grid; gap:3px; max-height:50vh; overflow:auto; margin:6px 0; }
+.witcher-group-initiative-list label { display:grid; grid-template-columns:auto 28px minmax(0,1fr) auto auto; align-items:center; gap:8px; padding:4px 6px; border-radius:4px; }
+.witcher-group-initiative-list label:has([name=member]:checked) { background:#ffffff14; }
+.witcher-group-initiative-list img { width:28px; height:28px; border:0; border-radius:4px; object-fit:cover; }
+.witcher-group-initiative-list small { opacity:.7; }
+.witcher-group-initiative-hint { font-size:12px; opacity:.8; }
+.witcher-group-initiative ol { margin:6px 0 0; padding:0; list-style:none; display:grid; gap:2px; }
+.witcher-group-initiative li { display:grid; grid-template-columns:minmax(0,1fr) auto 32px; gap:8px; align-items:center; }
+.witcher-group-initiative li small { color:#8a7356; }
+.witcher-group-initiative li b { text-align:right; font:700 15px Georgia,serif; }
+.witcher-armor-layered { grid-column:1/-1; margin:4px 0 0; font-size:12px; color:#6b5c49; }
+.witcher-npc-armor-total { color:#2f5a4c; }

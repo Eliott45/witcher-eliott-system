@@ -97,3 +97,17 @@ test("ganging up counts distinct melee attackers on the target this round, up to
   assert.equal(gangingUp(byId("f")), 2, "a previous round does not count");
   delete globalThis.game;
 });
+
+test("group initiative: one shared d10 plus each member's own initiative", async () => {
+  const { groupInitiative } = await import("../scripts/combat/group-initiative.mjs");
+  assert.deepEqual(groupInitiative(7, [{ id: "a", bonus: 10 }, { id: "b", bonus: 8 }, { id: "c", bonus: 6 }]).map(row => row.initiative), [17, 15, 13]);
+});
+
+test("layering helpers: zone SP and the limits follow the errata", async () => {
+  const { layeringPlan, layeringEncumbrance } = await import("../scripts/data/armor-layers.mjs");
+  const armor = (id, zone, armorClass, encumbrance = 0) => ({ id, name: id, type: "armor", system: { zone, armorClass, encumbrance } });
+  const worn = [armor("gambeson", "torso", "light"), armor("brigandine", "torso", "medium", 1), armor("helmet", "head", "heavy", 1)];
+  assert.deepEqual(layeringPlan(armor("plate", "all", "heavy"), worn).replace, ["helmet"], "a full heavy suit replaces the heavy helmet");
+  assert.equal(layeringPlan(armor("cuirass", "torso", "light"), [...worn, armor("plate", "torso", "heavy")]).blocked.includes("3 слоя"), true);
+  assert.equal(layeringEncumbrance(worn), 1, "only the layered medium torso piece adds +1; the lone helmet adds nothing");
+});

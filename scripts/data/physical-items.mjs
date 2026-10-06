@@ -1,3 +1,4 @@
+import { layeringEncumbrance } from "./armor-layers.mjs";
 import { effectiveItem } from "./workshop.mjs";
 import { isCarried, containerParent } from "./containers.mjs";
 import { EQUIPMENT_ICONS } from "./item-icons.mjs";
@@ -18,7 +19,8 @@ export function carriedWeight(items = []) {
 export const conditionKey = item => (item.type === "weapon" && !item.system.natural) || isAmmunition(item) ? "reliability" : item.type === "armor" ? "stoppingPower" : null;
 export const equippedItems = items => Array.from(items ?? []).filter(item => isPhysical(item) && item.system.equipped && isCarried(item, items) && !containerParent(item, items) && item.system.quantity > 0);
 export function armorEncumbrance(items, reduction = 0) {
-  return Math.max(0, equippedItems(items).reduce((sum, item) => sum + (item.system.encumbrance ?? 0), 0) + reduction);
+  const worn = equippedItems(items);
+  return Math.max(0, worn.reduce((sum, item) => sum + (item.system.encumbrance ?? 0), 0) + layeringEncumbrance(worn) + reduction);
 }
 export function conditionUpdate(item, change) {
   const key = conditionKey(item);
