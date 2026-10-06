@@ -21,7 +21,7 @@ export function itemStats(item, data = effectiveItem(item)) {
   const signed = value => `${value >= 0 ? "+" : "−"}${Math.abs(value)}`;
   if (item.type === "weapon") stats.push({label:"Урон", value:data.damage || "—", tone:"damage"}, {label:"Точность", value:signed(data.accuracy ?? 0)},
     {label:"Надёжность", value:`${data.reliability?.value ?? 0}/${data.reliability?.max ?? 0}`});
-  if (item.type === "armor") stats.push({label:"ПБ", value:`${data.stoppingPower?.value ?? 0}/${data.stoppingPower?.max ?? 0}`, tone:"armor"}, {label:"Скованность", value:data.encumbrance ?? 0});
+  if (item.type === "armor") stats.push({label:data.stoppingPower?.max > 0 && data.stoppingPower.value <= 0 ? "ПБ · сломана" : "ПБ", value:`${data.stoppingPower?.value ?? 0}/${data.stoppingPower?.max ?? 0}`, tone:data.stoppingPower?.max > 0 && data.stoppingPower.value <= 0 ? "damage" : "armor"}, {label:"Скованность", value:data.encumbrance ?? 0});
   if (isAmmunition(item)) stats.push({label:"Надёжность", value:`${data.reliability?.value ?? 0}/${data.reliability?.max ?? 0}`});
   if (isTransport(item)) stats.push({label:"Грузоподъёмность", value:`${data.capacity} кг`});
   stats.push({label:"Вес", value:`${Math.round((data.weight ?? 0) * 1000) / 1000} кг`}, {label:"Цена", value:hasMarketPrice(item) ? `${data.price ?? 0} кр.` : "—", tone:"price"});

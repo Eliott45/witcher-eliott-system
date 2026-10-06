@@ -181,3 +181,16 @@ test("blocking: per item, bare-handed with Brawling, and only a shield stops mis
   const parry = defenseQuote(actor, { mode: "parry", itemId: "" });
   assert.equal(parry.name, "Парирование рукой"); assert.equal(parry.penalty, -3); assert.equal(parry.limb, false);
 });
+
+test("burning: 5 per body part minus that zone's SP, fire resistance halves, vulnerability doubles", async () => {
+  const { burningDamage, burningParts } = await import("../scripts/combat/burning.mjs");
+  const effect = status => ({ statuses: new Set([status]), disabled: false, isSuppressed: false, duration: {} });
+  const items = Object.assign([], { get: () => null });
+  const creature = (extra = {}) => ({ type: "npc", items, effects: [effect("burning")], system: { creature: { category: "humanoid", naturalArmor: 2, resistances: "", ...extra } } });
+  assert.equal(burningParts(creature()).length, 6);
+  assert.equal(burningDamage(creature()).total, 6 * 3, "SP 2 everywhere: 3 per part");
+  assert.equal(burningDamage(creature({ resistances: "огонь" })).total, 6 * 1, "resistance halves the 3 → 1");
+  assert.equal(burningDamage({ ...creature(), effects: [] }), null);
+  const beast = creature({ category: "beast", naturalArmor: 0, hasTailOrWings: true });
+  assert.equal(burningParts(beast).length, 5);
+});

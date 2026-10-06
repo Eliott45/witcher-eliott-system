@@ -25,6 +25,12 @@ const GROUPS = [
   { id: "container", name: "Контейнеры", icon: "fa-box-open", categories: ["container"] }
 ];
 const visorContext = item => ({ hasVisor: supportsVisor(item), visorDown: Boolean(item.system.visorDown) });
+/** Armor with 0 SP or a weapon/shield with 0 reliability (max above 0): broken until repaired by crafting. */
+export function isBroken(item) {
+  const key = conditionKey(item), value = key ? effectiveItem(item)[key] : null;
+  return Boolean(value && value.max > 0 && value.value <= 0);
+}
+
 const CLASS_LABELS = { light: "лёгкая", medium: "средняя", heavy: "тяжёлая" };
 /** What wearing several layers costs: the EV each layered piece adds and the total armor EV it feeds. */
 function layeringSummary(actor, items) {
@@ -43,6 +49,7 @@ export function inventoryContext(actor, preferences = {}) {
     isWeapon: item.type === "weapon" && !item.system.natural, grip: gripOf(item),
     category: equipmentCategory(item), search: equipmentEntry(item).search, canEquip: ["weapon", "armor"].includes(item.type),
     condition: conditionKey(item) ? effectiveItem(item)[conditionKey(item)] : null, conditionLabel: item.type === "armor" ? "ПБ" : "Н",
+    broken: isBroken(item),
     totalWeight: Math.round(itemWeight(item) * 1000) / 1000 }));
   for (const row of rows) {
     let ancestor=containerParent(items.find(item=>item.id===row.id),items);
@@ -78,7 +85,7 @@ export function inventoryContext(actor, preferences = {}) {
     zones: ARMOR_ZONES.map(zone => {
       const worn = equippedItems(items).filter(item => item.type === "armor" && armorZones(item).includes(zone.id));
       return { ...zone, layered: worn.length > 1, total: zoneStoppingPower(worn),
-        items: worn.map(item => ({ id: item.id, name: item.name, ...visorContext(item), condition: effectiveItem(item).stoppingPower, armorClass: item.system.armorClass })) };
+        items: worn.map(item => ({ id: item.id, name: item.name, ...visorContext(item), condition: effectiveItem(item).stoppingPower, armorClass: item.system.armorClass, broken: isBroken(item) })) };
     }),
     workshopOpen: !preferences.collapsed?.["inventory-workshop"] };
 }

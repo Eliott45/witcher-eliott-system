@@ -11,7 +11,7 @@
 <div class="witcher-armor-zones" aria-label="Надетая броня">
 {{#each inventory.zones as |zone|}}<section class="witcher-armor-zone"><h3><img class="witcher-zone-icon" src="{{zone.img}}" alt=""><span>{{zone.name}}</span></h3>
 {{#each zone.items as |item|}}
-<button type="button" data-action="viewSheetItem" data-item-id="{{item.id}}" data-tooltip="{{item.name}}">{{item.name}}</button><strong>ПБ {{item.condition.value}} / {{item.condition.max}}</strong>
+<button type="button" data-action="viewSheetItem" data-item-id="{{item.id}}" data-tooltip="{{item.name}}">{{item.name}}</button><strong>ПБ {{item.condition.value}} / {{item.condition.max}}{{#if item.broken}} <span class="witcher-broken" data-tooltip="Броня сломана: ПБ 0, урон не поглощает. Почините её проверкой Изготовления.">сломана</span>{{/if}}</strong>
 {{#if item.hasVisor}}
 <button type="button" class="witcher-visor-toggle" data-action="toggleVisor" data-item-id="{{item.id}}" aria-pressed="{{item.visorDown}}" data-tooltip="{{#if item.visorDown}}{{localize 'WITCHER.Visor.RaiseHint'}}{{else}}{{localize 'WITCHER.Visor.LowerHint'}}{{/if}}" {{disabled (not ../../editable)}}>
   <i class="fa-solid {{#if item.visorDown}}fa-eye-slash{{else}}fa-eye{{/if}}" aria-hidden="true"></i> {{#if item.visorDown}}{{localize "WITCHER.Visor.Down"}}{{else}}{{localize "WITCHER.Visor.Up"}}{{/if}}
