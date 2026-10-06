@@ -105,3 +105,7 @@
 .witcher-npc-body .witcher-npc-abilities summary .witcher-npc-ability-remove { color:#a3302a; opacity:0; transition:opacity .15s; }
 .witcher-npc-abilities details:hover .witcher-npc-ability-remove, .witcher-npc-abilities .witcher-npc-ability-remove:focus-visible { opacity:1; }
 .witcher-npc-resources .npc-max { width:56px; height:32px; font:700 20px Georgia,serif; text-align:center; border:0; border-bottom:1px dashed #b39a67; background:transparent; }
+.witcher-npc-resistances { display:flex; flex-wrap:wrap; gap:4px; }
+.witcher-npc-resistances:empty { display:none; }
+.witcher-npc-resistances label { display:grid; gap:3px; width:100%; font-size:11px; color:#7a5a43; }
+.witcher-npc-resistance { padding:2px 8px; border:1px solid #b3c8b1; border-radius:10px; background:#dce7db; color:#2f5240; font-size:11px; font-weight:600; }

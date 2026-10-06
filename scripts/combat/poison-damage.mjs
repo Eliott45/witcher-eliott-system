@@ -7,18 +7,21 @@ import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { reconcileToxicity } from "../workshop/consumption.mjs";
 import { conditionWrite } from "./condition-saves.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { conditionResistant } from "./damage-rules.mjs";
 
 export function poisonDamage(actor) {
   if (immuneToCondition(actor, ["poisoned"]) || actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("dead"))) return 0;
   if (!actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("poisoned"))) return 0;
-  const resistant = equippedItems(actor.items).some(item => {
-    if (item.type !== "armor") return false;
-    const armor = effectiveItem(item);
-    return (armor.resistances ?? "").split(/[;,\n]/).some(value => /^(яд|яды|poison)$/iu.test(value.trim()))
-      || /сопротивление (яду|ядам)|poison resistance/iu.test(armor.properties ?? "");
-  });
   // SP does not absorb poison; resistance halves the damage, rounded down.
-  return resistant ? 1 : 3;
+  return conditionResistant(actor, "poison") ? 1 : 3;
+}
+
+/** Core p.161: bleeding deals 2 a turn, ignoring armor; resistance halves it; a clotting powder suspends it. */
+export function bleedingDamage(actor) {
+  if (actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("dead"))) return 0;
+  if (!actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("bleeding"))) return 0;
+  if (actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("clotting"))) return 0;
+  return conditionResistant(actor, "bleeding") ? 1 : 2;
 }
 
 /** Native Combat calls this only on the elected GM. HP and the processed turn are one write. */
@@ -27,6 +30,7 @@ export function startTurnPoison(combat, combatant, context) {
   if (!actor?.isOwner || !COMBAT_ACTOR_TYPES.includes(actor.type) || game.user !== game.users.activeGM || !combat.started || context.skipped || context.round < 1) return;
   if (combat.previous?.round === context.round && combat.previous?.turn === context.turn) return;
   const poisonsAtStart = new Set(actor.effects.filter(effect => activeEffect(effect) && effect.statuses.has("poisoned")).map(effect => effect.id));
+  const bleedsAtStart = actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("bleeding"));
   return conditionWrite(actor, async () => {
     // Core normally refreshes turnStart durations after the system callback. Expire
     // this actor's doses first so a dose ending at this boundary cannot cause damage.
@@ -40,15 +44,16 @@ export function startTurnPoison(combat, combatant, context) {
       // A drink submitted while duration updates are in flight belongs to the normal
       // part of this turn, not to the poison snapshot at its beginning.
       const remainsPoisoned = actor.effects.some(effect => poisonsAtStart.has(effect.id) && activeEffect(effect));
-      const damage = remainsPoisoned ? poisonDamage(actor) : 0, before = actor.system.health.value, after = before - damage;
+      const poison = remainsPoisoned ? poisonDamage(actor) : 0, bleeding = bleedsAtStart ? bleedingDamage(actor) : 0;
+      const damage = poison + bleeding, before = actor.system.health.value, after = before - damage;
       // Record even a healthy turn: applying poison later in that turn is not a new tick.
       await actor.update({[`flags.${SYSTEM_ID}.poisonTurns`]:{combat:combat.uuid,rounds},
         ...(damage ? {"system.health.value":after} : {})});
       if (!damage) return;
       const messageMode = combatant.hidden ? "gm" : game.settings.get("core", "messageMode");
       await foundry.documents.ChatMessage.create({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),
-        content:`<section class="witcher-poison-damage"><h3>Отравление · начало хода</h3><p><strong>${esc(actor.name)}</strong>: −${damage} ПЗ (${before} → ${after}).${damage < 3 ? " Сопротивление яду: половина урона с округлением вниз." : ""}</p></section>`,
-        flags:{[SYSTEM_ID]:{skipLuck:true,poisonDamage:{combat:combat.uuid,combatant:combatant.id,round:context.round,damage,before,after}}}}, {messageMode});
+        content:`<section class="witcher-poison-damage"><h3>${[poison ? "Отравление" : "", bleeding ? "Кровотечение" : ""].filter(Boolean).join(" и ")} · начало хода</h3><p><strong>${esc(actor.name)}</strong>: −${damage} ПЗ (${before} → ${after}).</p>${poison ? `<small>Отравление: ${poison}${poison < 3 ? " (сопротивление яду: половина урона)" : ""}.</small>` : ""}${bleeding ? `<small>Кровотечение: ${bleeding}${bleeding < 2 ? " (сопротивление кровотечению: половина урона)" : ""}. Броня не защищает.</small>` : ""}</section>`,
+        flags:{[SYSTEM_ID]:{skipLuck:true,poisonDamage:{combat:combat.uuid,combatant:combatant.id,round:context.round,damage,poison,bleeding,before,after}}}}, {messageMode});
     });
   });
 }

@@ -140,3 +140,27 @@ test("random attacks leave the zone unresolved; choosing a head applies the aimi
   assert.equal(plain.aim.penalty, 0);
   assert.equal(weaponAttack(actor, weapon, { location: "head" }).total, plain.total - 6, "aiming still costs −6");
 });
+
+test("damage resistance comes from item properties (with upgrades), fire maps to elemental, creatures have their own", async () => {
+  const { resistancesFromText, creatureResistances, conditionResistant, armorAt } = await import("../scripts/combat/damage-rules.mjs");
+  assert.deepEqual(resistancesFromText("Сопротивление дробящему и колющему урону; +1 к Скрытности"), ["piercing", "bludgeoning"]);
+  assert.deepEqual(resistancesFromText("Сопротивление огню и дробящему урону"), ["bludgeoning", "elemental"]);
+  assert.deepEqual(resistancesFromText("−2 к Сопротивлению убеждению; Сопротивление яду"), [], "non-damage resistances are not damage types");
+  const items = Object.assign([], { get: () => null });
+  const npc = { type: "npc", items, system: { creature: { resistances: "Р, огонь; яд", naturalArmor: 4 } } };
+  assert.deepEqual(creatureResistances(npc).sort(), ["elemental", "slashing"]);
+  assert.equal(conditionResistant(npc, "poison"), true);
+  assert.equal(conditionResistant(npc, "bleeding"), false);
+  const armor = armorAt(npc, "torso");
+  assert.equal(armor.sp, 4); assert.deepEqual(armor.resistances.sort(), ["elemental", "slashing"]);
+});
+
+test("bleeding ticks 2, halved by resistance and suspended by a clotting powder", async () => {
+  const { bleedingDamage } = await import("../scripts/combat/poison-damage.mjs");
+  const effect = status => ({ statuses: new Set([status]), disabled: false, isSuppressed: false, duration: {} });
+  const actor = (statuses, resistances = "") => ({ type: "npc", items: Object.assign([], { get: () => null }), effects: statuses.map(effect), system: { creature: { resistances } } });
+  assert.equal(bleedingDamage(actor(["bleeding"])), 2);
+  assert.equal(bleedingDamage(actor(["bleeding"], "кровотечение")), 1);
+  assert.equal(bleedingDamage(actor(["bleeding", "clotting"])), 0);
+  assert.equal(bleedingDamage(actor([])), 0);
+});

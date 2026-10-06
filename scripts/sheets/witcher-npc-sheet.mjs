@@ -1,3 +1,4 @@
+import { creatureResistances, conditionResistant, DAMAGE_TYPE_NAMES } from "../combat/damage-rules.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { consumptionActions } from "./consumption-actions.mjs";
 import { applyEffectItem } from "../data/effect-items.mjs";
@@ -75,6 +76,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
       attributes:ATTRIBUTE_KEYS.filter(key=>key!=="luck").map(key=>({key,name:i18n.localize(`WITCHER.Attributes.${key}.Short`),label:i18n.localize(`WITCHER.Attributes.${key}.Label`),base:system.attributes[key],value:stats.effective[key]??"—"})),
       skills:SKILLS.filter(skill=>skill.key!=="language"&&(editing||system.skills[skill.key]>0)).map(skill=>{const value=skillValue(system,skill.key);return {...value,name:i18n.localize(skill.label),calculation:skillCalculationTooltip(system,value,i18n)};}),
       facts:[{key:"size",label:"Рост"},{key:"weight",label:"Вес тела"},{key:"habitat",label:"Среда обитания"},{key:"intellect",label:"Интеллект"},{key:"group",label:"Численность"}].map(entry=>({...entry,value:system.creature[entry.key]})),
+      resistanceList:[...creatureResistances(actor).map(type=>DAMAGE_TYPE_NAMES[type]),...(conditionResistant(actor,"poison")?["яд"]:[]),...(conditionResistant(actor,"bleeding")?["кровотечение"]:[])],
       defenses:["resistMagic","endurance"].map(key=>({key,name:i18n.localize(`WITCHER.Skills.Entries.${key}.Label`),total:skillValue(system,key).total??"—"}))};
   }
   async _onRender(context,options) {

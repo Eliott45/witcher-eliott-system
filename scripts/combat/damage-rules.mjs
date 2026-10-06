@@ -24,20 +24,44 @@ export function weaponDamageTraits(weapon = {}) {
 
 export { layeredStoppingPower };
 
+// Core p.154: damage resistance as written in item properties, including installed armor upgrades
+// («Сопротивление режущему и колющему урону», «Сопротивление огню и дробящему урону»).
+const RESIST_WORDS = [[/режущ/u, "slashing"], [/колющ/u, "piercing"], [/дробящ/u, "bludgeoning"], [/ого?н|пламен|стихийн/u, "elemental"]];
+export function resistancesFromText(text) {
+  const found = new Set();
+  for (const match of String(text ?? "").toLocaleLowerCase("ru").matchAll(/сопротивлени[еяю]\s+([^;.\n]+)/gu))
+    for (const [pattern, type] of RESIST_WORDS) if (pattern.test(match[1])) found.add(type);
+  return [...found];
+}
+const itemResistances = item => { const data = effectiveItem(item); return [...new Set([...parseDamageTypes(data.resistances), ...resistancesFromText(data.properties)])]; };
+/** A creature's own resistances (GM field, codes Р/К/Д/С or words). */
+export const creatureResistances = actor => actor?.type === "npc"
+  ? [...new Set([...parseDamageTypes(actor.system.creature?.resistances), ...resistancesFromText(`сопротивление ${actor.system.creature?.resistances ?? ""}`)])] : [];
+
+/** Poison/bleeding resistance (core pp.78, 264): armor fields, properties with upgrades, or the creature field. */
+export function conditionResistant(actor, kind) {
+  const words = kind === "poison" ? /^(яд|яды|poison)$/iu : /^(кровотечение|bleeding)$/iu;
+  const phrase = kind === "poison" ? /сопротивлени[еяю] (яду|ядам)|poison resistance/iu : /сопротивлени[еяю] кровотечению|bleed(ing)? resistance/iu;
+  const fields = [...equippedItems(actor.items ?? []).filter(item => item.type === "armor").map(item => effectiveItem(item)),
+    ...(actor.type === "npc" ? [{ resistances: actor.system.creature?.resistances ?? "" }] : [])];
+  return fields.some(data => String(data.resistances ?? "").split(/[;,\n/]/u).some(value => words.test(value.trim())) || phrase.test(data.properties ?? ""));
+}
+
 export const LOCATION_ZONE = { head: "head", torso: "torso", rightArm: "torso", leftArm: "torso", rightLeg: "legs", leftLeg: "legs", tail: "torso" };
 
 /** Armor protecting one hit location: worn layers, or a creature's natural armor when nothing is worn there. */
 export function armorAt(actor, location) {
   const zone = LOCATION_ZONE[location] ?? "torso";
   const items = equippedItems(actor.items).filter(item => item.type === "armor" && armorZones(item).includes(zone));
-  const worn = items.map(item => ({ item, sp: Math.max(0, effectiveItem(item).stoppingPower?.value ?? 0), resistances: parseDamageTypes(effectiveItem(item).resistances) }));
+  const worn = items.map(item => ({ item, sp: Math.max(0, effectiveItem(item).stoppingPower?.value ?? 0), resistances: itemResistances(item) }));
+  const innate = creatureResistances(actor);
   if (worn.length) {
     const top = worn.reduce((best, layer) => layer.sp > best.sp ? layer : best, worn[0]);
-    return { zone, sp: layeredStoppingPower(worn.map(layer => layer.sp)), resistances: [...new Set(worn.flatMap(layer => layer.resistances))],
+    return { zone, sp: layeredStoppingPower(worn.map(layer => layer.sp)), resistances: [...new Set([...worn.flatMap(layer => layer.resistances), ...innate])],
       layers: worn.map(layer => ({ id: layer.item.id, name: layer.item.name, sp: layer.sp })), ablate: top.sp > 0 ? top.item.id : null, natural: false };
   }
   const natural = actor.type === "npc" ? Math.max(0, actor.system.creature?.naturalArmor ?? 0) : 0;
-  return { zone, sp: natural, resistances: [], layers: natural ? [{ id: "", name: "Естественная броня", sp: natural }] : [], ablate: null, natural: Boolean(natural) };
+  return { zone, sp: natural, resistances: innate, layers: natural ? [{ id: "", name: "Естественная броня", sp: natural }] : [], ablate: null, natural: Boolean(natural) };
 }
 
 const hasAbility = (actor, ruleId) => (actor.items ?? []).some(item => item.type === "ability" && item.system.ruleId === ruleId);
@@ -74,8 +98,8 @@ export function resolveDamage({ base, silver = 0, location, multiplier, traits, 
   damage = Math.max(0, damage - sp);
   const penetrated = damage > 0;
   const resisted = penetrated && traits.types.length > 0 && traits.types.every(type => armor.resistances.includes(type));
-  if (resisted && traits.piercing === "none") { damage = Math.floor(damage / 2); note("Сопротивление брони", "½", traits.types.map(type => DAMAGE_TYPE_NAMES[type]).join("/")); }
-  else if (resisted) note("Сопротивление брони", "игнорируется", "пробивающее броню");
+  if (resisted && traits.piercing === "none") { damage = Math.floor(damage / 2); note("Сопротивление урону", "½", traits.types.map(type => DAMAGE_TYPE_NAMES[type]).join("/")); }
+  else if (resisted) note("Сопротивление урону", "игнорируется", "пробивающее броню");
   if (multiplier !== 1) { damage = Math.floor(damage * multiplier); note("Зона попадания", `×${multiplier === 0.5 ? "½" : multiplier}`); }
   if (monster && !traits.silver && !fire && damage > 0) { damage = Math.floor(damage / 2); note("Чудовище: не серебро", "½"); }
   if (vulnerableToFire && fire && damage > 0) { damage *= 2; note("Уязвимость к огню", "×2"); }
