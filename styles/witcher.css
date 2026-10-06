@@ -882,3 +882,9 @@
   .witcher-character-tabs button:not(.active) { color:#b9bdb5; }
   .witcher-character-tabs .witcher-manage-tabs { flex:0 0 30px; height:48px; margin-left:0; }
 }
+/* Critical wound state on the effects list. */
+.witcher-wound-state { padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
+.witcher-wound-state.is-fresh { background:#f0d4cc; color:#8b2f26; }
+.witcher-wound-state.is-stabilized { background:#f3e6c4; color:#7a5a12; }
+.witcher-wound-state.is-treated { background:#d9e7d8; color:#2f5a3c; }
+.witcher-effect-description p.is-current { font-weight:600; }

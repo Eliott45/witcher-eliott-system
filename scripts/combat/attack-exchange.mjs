@@ -6,10 +6,12 @@ import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { rollStun } from "./stun-roll.mjs";
 import { CONDITION_BY_ID, conditionSource } from "../data/condition-definitions.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
+import { woundEffectData } from "./critical-wound-effects.mjs";
+import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
 import { hitLocation, ATTACK_LOCATIONS } from "./weapon-rules.mjs";
 import { tokenCenter } from "./attack-target.mjs";
-import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage, CRITICAL_LEVELS } from "./damage-rules.mjs";
+import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
 import { criticalWoundByRoll, aimedCriticalRoll, ORGAN_WOUNDS, ANATOMY_FREE_BONUS } from "../data/critical-wounds.mjs";
 
 // One weapon attack card hosts the whole exchange: each attack roll gets its own defense, damage and
@@ -163,15 +165,68 @@ export async function applyExchangeDamage(message, index) {
     const item = target.items.get(result.ablate);
     if (item) await item.update({ "system.stoppingPower.value": Math.max(0, item.system.stoppingPower.value - 1) });
   }
-  if (data.critical?.wound) {
-    const wound = data.critical.wound;
-    await target.createEmbeddedDocuments("ActiveEffect", [{ name: `Крит: ${wound.name}`, img: "icons/svg/blood.svg",
-      description: `<p><b>${esc(data.critical.name)} ранение · ${esc(data.location.name)}</b></p><p>${esc(wound.effect)}</p><p><i>После стабилизации:</i> ${esc(wound.stabilized)}</p><p><i>После лечения:</i> ${esc(wound.treated)}</p><p>Стабилизация: Первая помощь СЛ ${CRITICAL_LEVELS.find(level => level.id === data.critical.level).stabilize}.</p>`,
-      flags: { [SYSTEM_ID]: { criticalWound: { id: wound.id, level: data.critical.level, location: data.location.id, state: "fresh" } } } }]);
-  }
+  if (data.critical?.wound) await target.createEmbeddedDocuments("ActiveEffect", [woundEffectData(data.critical.wound.id, data.critical.level,
+    { location: data.location.id, locationName: data.location.name })]);
   return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${result.total} ПЗ</p>`,
     flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: "applied", total: result.total, steps: result.steps, from: health,
       ablated: result.ablate ? target.items.get(result.ablate)?.name ?? "" : "" } } } }, "public");
+}
+
+// ── Fumbles (core p.157, errata v4) ─────────────────────────────────────────
+
+function attackFumbleTable(message, attack) {
+  const item = message.speakerActor?.items.get(attack.itemId);
+  if (attack.ranged) return "ranged";
+  return item?.system.skill === "brawling" ? "unarmed" : "melee";
+}
+export function attackFumble(message, index) {
+  const attack = flagsOf(message).weaponAttack;
+  return fumbleOutcome(attackFumbleTable(message, attack), fumbleMagnitude(message.rolls[index]));
+}
+export function defenseFumble(defense) {
+  const quote = flagsOf(defense).defense;
+  if (!quote || rolling(defense)) return null;
+  return fumbleOutcome(["block", "parry"].includes(quote.mode) && quote.itemId ? "armedDefense" : "unarmed", fumbleMagnitude(defense.rolls[0]));
+}
+
+async function applyStatus(actor, status) {
+  const source = conditionSource(CONDITION_BY_ID[status]); delete source._id;
+  if (actor.effects.some(effect => effect.statuses.has(status))) return;
+  const timed = status === "staggered" ? { start: fullTurnStart(actor), duration: { value: 1, units: "rounds", expiry: "turnStart", expired: false } } : {};
+  await actor.createEmbeddedDocuments("ActiveEffect", [{ ...source, ...timed }]);
+}
+
+/** Applies what can be automated and records it, so a second click does nothing. */
+export async function applyFumble({ message, index, role, actor, itemId, outcome }) {
+  if (!actor?.isOwner || !outcome || linkedAny(message.id, index, `fumble-${role}`)) return;
+  const notes = [], rolls = [], apply = outcome.apply;
+  if (apply.status) { await applyStatus(actor, apply.status); notes.push(CONDITION_BY_ID[apply.status].name); }
+  if (apply.reliability && itemId) {
+    const item = actor.items.get(itemId);
+    if (item?.system.reliability?.max) {
+      const roll = await new foundry.dice.Roll(apply.reliability).evaluate(); rolls.push(roll);
+      const to = Math.max(0, item.system.reliability.value - roll.total);
+      await item.update({ "system.reliability.value": to });
+      notes.push(`${item.name}: надёжность −${roll.total} (${to})`);
+    }
+  }
+  if (apply.headDamage) {
+    const roll = await new foundry.dice.Roll(apply.headDamage).evaluate(); rolls.push(roll);
+    const key = apply.nonLethal ? "stamina" : "health";
+    await actor.update({ [`system.${key}.value`]: actor.system[key].value - roll.total });
+    notes.push(`${roll.total} ${apply.nonLethal ? "несмертельного" : "смертельного"} урона в голову`);
+  }
+  await post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls, content: `<p>Провал: ${esc(notes.join("; ") || outcome.text)}</p>`,
+    flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: `fumble-${role}`, notes } } } }, "public");
+  if (apply.stun) await rollStun(actor);
+}
+
+function fumbleHTML(message, index, role, outcome, owner) {
+  if (!outcome) return "";
+  const done = linkedAny(message.id, index, `fumble-${role}`), automatable = Object.keys(outcome.apply).length > 0;
+  const action = done ? `<small>Применено: ${esc(exchangeOf(done).notes?.join("; ") || "—")}</small>`
+    : owner && automatable ? button(`data-exchange-fumble="${role}" data-index="${index}"`, '<i class="fa-solid fa-person-falling-burst"></i> Применить последствия', true) : "";
+  return `<div class="witcher-exchange-fumble"><b>Критический провал −${outcome.magnitude}</b> · ${esc(outcome.tableName)}: ${esc(outcome.text)}${action ? `<div class="witcher-exchange-actions">${action}</div>` : ""}</div>`;
 }
 
 // ── Rendering ────────────────────────────────────────────────────────────────
@@ -182,19 +237,20 @@ const button = (attrs, label, enabled, hint = "") => `<button type="button" ${at
 function rowHTML(message, index, attack) {
   const total = message.rolls[index]?.total, target = targetActor(attack), outcome = exchangeOutcome(message, index);
   const head = `<header><span>Атака ${attack.count > 1 ? `${index + 1} ` : ""}<b>${total}</b></span>`;
+  const ownFumble = fumbleHTML(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner);
   if (!outcome) {
-    if (!target?.isOwner) return `<li class="is-waiting">${head}<em>${linkedAny(message.id, index, "defense") ? "защита бросается…" : "ждём защиту"}</em></header></li>`;
-    if (linkedAny(message.id, index, "defense")) return `<li class="is-waiting">${head}<em><i class="fa-solid fa-dice-d10 fa-spin"></i> защита бросается…</em></header></li>`;
+    if (!target?.isOwner) return `<li class="is-waiting">${head}<em>${linkedAny(message.id, index, "defense") ? "защита бросается…" : "ждём защиту"}</em></header>${ownFumble}</li>`;
+    if (linkedAny(message.id, index, "defense")) return `<li class="is-waiting">${head}<em><i class="fa-solid fa-dice-d10 fa-spin"></i> защита бросается…</em></header>${ownFumble}</li>`;
     const choices = defenseChoices(target, incomingOf(attack)).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
       `${esc(choice.name)}${choice.total != null && !choice.blocked ? ` <b>+${choice.total}</b>` : ""}`, !choice.blocked, choice.blocked || choice.note));
     const free = defenseChoices(target, incomingOf(attack))[0]?.activeDodge;
     const repeatBox = `<label class="witcher-exchange-repeat" data-tooltip="${free ? "Активное уклонение: повторные защиты бесплатны" : "Вторая и следующие защиты за раунд стоят 1 ВЫН"}"><input type="checkbox" data-exchange-repeat ${repeatDefense(target) ? "checked" : ""} ${free ? "disabled" : ""}> Повторная · ${free ? 0 : 1} ВЫН</label>`;
-    return `<li class="is-waiting">${head}<em>защита ${esc(target.name)}</em>${repeatBox}</header><div class="witcher-exchange-actions">${choices.join("")}${button('data-exchange-defend="none"', "Не защищается", true, `Атака сравнивается со СЛ ${DC_UNAWARE}`)}</div></li>`;
+    return `<li class="is-waiting">${head}<em>защита ${esc(target.name)}</em>${repeatBox}</header><div class="witcher-exchange-actions">${choices.join("")}${button('data-exchange-defend="none"', "Не защищается", true, `Атака сравнивается со СЛ ${DC_UNAWARE}`)}</div>${ownFumble}</li>`;
   }
   const verdict = outcome.hit ? `<strong class="is-hit">Попадание +${outcome.margin}</strong>` : `<strong class="is-miss">${outcome.mode === "parry" ? "Парировано" : "Промах"}</strong>`;
   const gang = exchangeOf(outcome.defense).gang;
   const defenseLine = `${esc(outcome.name)} <b>${outcome.defenseTotal}</b>${gang ? ` <small>(окружение −${gang})</small>` : ""}`;
-  let body = "";
+  let body = ownFumble + fumbleHTML(message, index, "defense", outcome.none ? null : defenseFumble(outcome.defense), target?.isOwner);
   if (outcome.critical) body += `<p class="witcher-exchange-crit"><i class="fa-solid fa-burst"></i> Критическое ранение: ${esc(outcome.critical.name.toLocaleLowerCase("ru"))} (+${outcome.critical.bonus} урона)</p>`;
   if (!outcome.hit && outcome.mode === "parry") body += `<p class="witcher-exchange-note"><i class="fa-solid fa-person-falling"></i> ${esc(message.speakerActor?.name ?? "Атакующий")} ошеломлён: −2 к атаке и защите до начала своего хода.</p>`;
   const wear = exchangeOf(outcome.defense).wear;
@@ -225,7 +281,8 @@ export function renderExchange(message, html) {
   const flags = flagsOf(message);
   if (exchangeOf(message) && game.messages.has(exchangeOf(message).attack)) { html.classList.add("witcher-ambush-folded"); html.hidden = true; return; }
   const attack = flags.weaponAttack;
-  if (!attack?.target || !message.isContentVisible || !message.rolls?.length) return;
+  if (!attack || !message.isContentVisible || !message.rolls?.length) return;
+  if (!attack.target) return renderUntargetedFumbles(message, html, attack);
   const section = html.querySelector(".witcher-attack-chat");
   if (!section) return;
   for (const legacy of section.querySelectorAll("[data-weapon-damage], .witcher-location-buttons")) legacy.remove();
@@ -248,7 +305,26 @@ export function renderExchange(message, html) {
     run("[data-exchange-damage]", () => rollExchangeDamage(message, index));
     run("[data-exchange-apply]", () => applyExchangeDamage(message, index));
     run("[data-exchange-stun]", () => rollStun(targetActor(attack)));
+    run('[data-exchange-fumble="attack"]', () => applyFumble({ message, index, role: "attack", actor: message.speakerActor, itemId: attack.itemId, outcome: attackFumble(message, index) }));
+    run('[data-exchange-fumble="defense"]', () => {
+      const defense = linked(message.id, index, "defense");
+      return applyFumble({ message, index, role: "defense", actor: targetActor(attack), itemId: flagsOf(defense)?.defense?.itemId, outcome: defenseFumble(defense) });
+    });
   });
+}
+
+function renderUntargetedFumbles(message, html, attack) {
+  const blocks = message.rolls.map((_roll, index) => fumbleHTML(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner)).filter(Boolean);
+  if (!blocks.length) return;
+  const box = document.createElement("div");
+  box.className = "witcher-exchange";
+  box.innerHTML = blocks.join("");
+  (html.querySelector(".message-content") ?? html).append(box);
+  box.querySelectorAll('[data-exchange-fumble="attack"]').forEach(control => control.addEventListener("click", async event => {
+    event.stopPropagation(); control.disabled = true;
+    const index = Number(control.dataset.index);
+    try { await applyFumble({ message, index, role: "attack", actor: message.speakerActor, itemId: attack.itemId, outcome: attackFumble(message, index) }); } catch (error) { ui.notifications.warn(error.message); }
+  }));
 }
 
 function refreshAttack(message) {

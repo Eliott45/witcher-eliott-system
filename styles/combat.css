@@ -213,3 +213,6 @@
 .witcher-token-effects-menu button { display:flex; align-items:center; gap:7px; width:100%; height:26px; min-height:0; padding:0 8px; border:0; background:none; color:#ece2cf; font-size:12px; text-align:left; white-space:nowrap; }
 .witcher-token-effects-menu button:hover { background:#ffffff1a; }
 .witcher-token-effects-menu [data-menu=delete] { color:#f0a08f; }
+.witcher-exchange-fumble { margin:6px 0 0; padding:5px 7px; border:1px solid #d9b3a8; border-radius:3px; background:#f6e3dd; color:#5e2a24; font-size:11.5px; }
+.witcher-exchange-fumble b { color:#8b2f26; }
+.witcher-exchange-fumble small { display:block; margin-top:3px; color:#7a5a4a; }

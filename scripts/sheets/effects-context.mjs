@@ -10,6 +10,7 @@ import { applyEffectItem } from "../data/effect-items.mjs";
 import { effectCounter, changeEffectCounter, activeEffect } from "../data/effect-counters.mjs";
 import { doseToxicity } from "../data/consumables.mjs";
 import { isToxicityPoison, poisonDescription } from "../data/poison-rules.mjs";
+import { woundContext, stabilizeWound, setWoundState } from "../combat/critical-wound-effects.mjs";
 
 export function toxicitySaveContext(sheet) {
   const effect = sheet.actor.effects.find(effect => activeEffect(effect) && isToxicityPoison(effect));
@@ -28,7 +29,7 @@ export async function effectsContext(sheet) {
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
       autoAllowed:Boolean(!rules.manualOnly&&rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
       durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,canEditDuration:sheet.isEditable&&canEditEffectDuration(effect),
-      action:rules.action,canAct:sheet.isEditable&&conditionRules(sheet.actor).canAct,
+      action:rules.action,canAct:sheet.isEditable&&conditionRules(sheet.actor).canAct,critical:woundContext(effect,sheet.isEditable),
       description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(text.startsWith("WITCHER.")?game.i18n.localize(text):text,{secrets:sheet.actor.isOwner,relativeTo:effect})};
   }));
 }
@@ -59,6 +60,14 @@ export const effectActions={
   effectAction:safe(async function(_event,target){
     if(!this.isEditable)return;
     const effect=this.actor.effects.get(target.dataset.effectId);if(effect)await requestEffectSave(this.actor,effect,{action:true});
+  }),
+  stabilizeWound:safe(async function(_event,target){
+    if(!this.isEditable||target.disabled)return;target.disabled=true;
+    const effect=this.actor.effects.get(target.dataset.effectId);if(effect)await stabilizeWound(this.actor,effect);
+  }),
+  treatWound:safe(async function(_event,target){
+    if(!this.isEditable)return;
+    const effect=this.actor.effects.get(target.dataset.effectId);if(effect)await setWoundState(effect,"treated");
   }),
   toggleEffectSave:safe(async function(_event,target){
     if(!this.isEditable)return;

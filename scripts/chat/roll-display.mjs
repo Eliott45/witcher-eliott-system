@@ -26,7 +26,8 @@ export function trackRollDisplay() {
       if (ui.chat?.rendered && message.visible) await renderReady;
       // DSN's public wait method skips animations when "immediately display chat"
       // is enabled. Its completion hook handles that mode and interactive throws too.
-      if (game.dice3d && message._dice3danimating && !completed.has(message.id)) await animationReady;
+      // A paused animation (hidden tab, minimised window) must not block the action forever.
+      if (game.dice3d && message._dice3danimating && !completed.has(message.id)) await Promise.race([animationReady, new Promise(resolve => setTimeout(resolve, 15000))]);
       await nextPaint();
     },
     close() {

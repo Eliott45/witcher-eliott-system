@@ -54,3 +54,30 @@ test("critical levels by margin and the aimed critical rule", () => {
   assert.equal(criticalWoundByRoll("deadly", 12).id, "decapitation");
   assert.deepEqual([aimedCriticalRoll("head", 4), aimedCriticalRoll("head", 5), aimedCriticalRoll("torso", 2), aimedCriticalRoll("torso", 6), aimedCriticalRoll("leftArm", 1), aimedCriticalRoll("rightLeg", 1)], [11, 12, 6, 9, 4, 2]);
 });
+
+test("critical wound effects carry state-dependent modifiers", async () => {
+  globalThis.foundry ??= { utils: {} };
+  const { woundModifiers, woundEffectData, stabilizeDC } = await import("../scripts/combat/critical-wound-effects.mjs");
+  assert.deepEqual(woundModifiers("broken-ribs", "fresh").map(m => [m.target, m.value]), [["attributes.body", -2], ["attributes.reflex", -1], ["attributes.dexterity", -1]]);
+  assert.deepEqual(woundModifiers("broken-ribs", "treated").map(m => [m.target, m.value]), [["attributes.body", -1]]);
+  assert.deepEqual(woundModifiers("torn-stomach", "fresh").map(m => m.target), ["combat.attack", "combat.defense"]);
+  const effect = woundEffectData("fractured-leg", "medium", { locationName: "Левая нога" });
+  assert.equal(effect.name, "Крит: Перелом ноги");
+  assert.equal(effect.flags["witcher-eliott-system"].condition.modifiers.length, 3);
+  assert.deepEqual(["light", "medium", "severe", "deadly"].map(stabilizeDC), [12, 14, 16, 18]);
+});
+
+test("fumble consequences follow the subtracted amount and the errata unarmed column", async () => {
+  const { fumbleOutcome, fumbleMagnitude } = await import("../scripts/data/fumbles.mjs");
+  assert.equal(fumbleOutcome("melee", 4).harmless, true);
+  assert.equal(fumbleOutcome("melee", 6).apply.status, "staggered");
+  assert.equal(fumbleOutcome("melee", 8).apply.reliability, "1d10");
+  assert.equal(fumbleOutcome("armedDefense", 8).apply.stun, true);
+  assert.equal(fumbleOutcome("ranged", 12).text.includes("союзника"), true);
+  assert.deepEqual(fumbleOutcome("unarmed", 9).apply, { status: "prone", stun: true, headDamage: "1d6", nonLethal: true });
+  assert.equal(fumbleOutcome("unarmed", 11).apply.nonLethal, undefined);
+  assert.equal(fumbleOutcome("melee", 0), null);
+  const roll = { dice: [{ options: { "witcher-eliott-system": { criticalChains: [{ kind: "fumble", total: -7 }] } } }] };
+  assert.equal(fumbleMagnitude(roll), 7);
+  assert.equal(fumbleMagnitude({ dice: [{ options: {} }] }), 0);
+});
