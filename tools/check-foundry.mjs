@@ -1393,6 +1393,7 @@ if (process.argv[3]) {
 // Creature presets use native NPC schemas and the same embedded Items as characters.
 const {bestiarySources}=await import('../scripts/data/bestiary.mjs');
 const {WitcherNPCSheet}=await import('../scripts/sheets/witcher-npc-sheet.mjs');
+const {MONSTER_CATEGORIES}=await import('../scripts/data/monster-categories.mjs');
 const {weaponAttack}=await import('../scripts/combat/weapon-rules.mjs');
 const npcTemplate=handlebars.compile(await readFile(new URL('../templates/npc-sheet.hbs',import.meta.url),'utf8'),{strict:true});
 const creatureTestGlobals={user:game.user,fromUuid:foundry.utils.fromUuid};
@@ -1411,6 +1412,8 @@ for(const source of bestiarySources()) {
     assert.ok(rendered.includes('data-combat-option="location"'));
     assert.ok(!rendered.includes('data-action="rollLocation"'));
     assert.equal(rendered.includes('name="system.creature.hasTailOrWings"'),editing);
+    assert.equal((rendered.match(/name="system\.creature\.category"/g)??[]).length,editing?1:0);
+    assert.ok(rendered.includes(view.creatureClass.description));
     assert.ok(rendered.includes(source.name));assert.ok(rendered.includes('data-action="attackWeapon"'));assert.ok(!rendered.includes('data-mode="strong"'));
     assert.match(rendered,/<nav class="[^\"]*\btabs\b[^\"]*"/,"Foundry changeTab requires a .tabs navigation container");
     if(!editing)creatureViews.push({actor,sheet:npcSheet,view,html:rendered});
@@ -1428,6 +1431,19 @@ for(const source of bestiarySources()) {
 const emptyCreature=new foundry.documents.BaseActor({name:'New creature',type:'npc'});
 const emptySheet=new WitcherNPCSheet();emptySheet.actor=emptyCreature;emptySheet.isEditable=true;
 assert.match(npcTemplate(await emptySheet._prepareContext({})),/Бандит/);
+for(const category of MONSTER_CATEGORIES) {
+  emptyCreature.updateSource({'system.creature.category':category.id});
+  emptySheet.actor=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(emptyCreature.toObject())));
+  for(const editable of [true,false]) {
+    emptySheet.isEditable=editable;emptySheet.editing=true;
+    const view=await emptySheet._prepareContext({}),html=npcTemplate(view);
+    assert.equal(emptySheet.actor.system.creature.category,category.id);
+    assert.equal(view.creatureClass.name,category.name);
+    assert.ok(html.includes(category.description));
+    assert.equal(html.includes('name="system.creature.category"'),editable);
+    if(editable)assert.ok(html.includes(`value="${category.id}" selected`));
+  }
+}
 assert.equal(new WitcherActorData(legacyActorData.toObject()).creature.category,'humanoid');
 const tailData=new WitcherActorData(legacyActorData.toObject());
 assert.equal(tailData.creature.hasTailOrWings,false);

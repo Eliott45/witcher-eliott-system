@@ -6,8 +6,16 @@
 .witcher-npc-identity { flex:1; min-width:0; align-self:center; }
 .witcher-npc-identity>small { font-size:10px; letter-spacing:.18em; color:#bfa77e; }
 .witcher-npc-identity h1 { color:#f7edd7; font:700 28px/1.15 Georgia,serif; margin:3px 0 8px; border:0; }
-.witcher-npc-traits { display:flex; flex-wrap:wrap; gap:5px; }
+.witcher-npc-traits { display:flex; align-items:center; flex-wrap:wrap; gap:5px; }
 .witcher-npc-traits span { border:1px solid #6a797066; background:#14282866; border-radius:3px; padding:2px 7px; font-size:10px; letter-spacing:.03em; }
+.witcher-npc-traits .witcher-npc-category { color:#f1e6cb; cursor:help; }
+.witcher-npc-category i { margin-left:4px; color:#d6bd87; }
+.witcher-npc-category-select { display:flex; align-items:center; gap:7px; color:#e4d5b6; font-size:12px; }
+.witcher-npc-header .witcher-npc-category-select select { width:auto; max-width:100%; height:30px; border:1px solid #a88955; border-radius:4px; background:#faf6ed; color:#44392b; font:14px var(--font-primary,sans-serif); }
+.witcher-npc-class-description { padding:14px 16px; border:1px solid #c9b99d; border-left:3px solid #71826e; border-radius:5px; background:#faf6ed; color:#443b30; }
+.witcher-npc-class-description small { color:#655640; font-size:11px; text-transform:uppercase; letter-spacing:.08em; }
+.witcher-npc-class-description h3 { margin:3px 0 8px; border:0; color:#425b55; font:700 21px/1.2 Georgia,serif; text-shadow:none; }
+.witcher-npc-class-description p { margin:0; color:#443b30; font:14px/1.6 var(--font-primary,sans-serif); text-shadow:none; }
 .witcher-npc-edit { align-self:start; background:transparent; color:#cfba91; border-color:#7d8c7944; width:30px; height:30px; }
 .witcher-npc-tabs { display:flex; gap:2px; padding:0 22px; background:#dcd2c0; border-bottom:1px solid #c0ac8a; }
 .witcher-npc-tabs>button { border:0; border-radius:0; background:none; color:#655640; font-size:13px; height:38px; padding:0 18px; box-shadow:none; }

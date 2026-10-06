@@ -3,6 +3,20 @@ import assert from "node:assert/strict";
 import {packRecords,expandPackRecord} from "../tools/pack-records.mjs";
 import {bestiarySources} from "../scripts/data/bestiary.mjs";
 import {migrateBestiaryContent} from "../scripts/migrations/bestiary-content.mjs";
+import { MONSTER_CATEGORIES } from "../scripts/data/monster-categories.mjs";
+import { ALCHEMY } from "../scripts/data/workshop-alchemy.mjs";
+import { monsterResistant } from "../scripts/combat/damage-rules.mjs";
+
+test("all twelve core classes retain persisted oil IDs and the beast/humanoid resistance exceptions", () => {
+  const ids = ["beast","cursed","draconid","elemental","humanoid","hybrid","insectoid","necrophage","ogroid","relict","specter","vampire"];
+  assert.deepEqual(MONSTER_CATEGORIES.map(entry => entry.id), ids);
+  for (const [index, id] of ids.entries()) {
+    const oil = ALCHEMY.find(item => item.id === `oil.${id}`);
+    assert.equal(oil.documentId, `alch${String(index + 201).padStart(12,"0")}`);
+    assert.equal(oil.system.alchemy.target, id);
+    assert.equal(monsterResistant({type:"npc",items:[],system:{creature:{category:id}}}), !["beast","humanoid"].includes(id));
+  }
+});
 
 test("bestiary LevelDB records round-trip embedded weapons, armor and abilities by ID",async()=>{
   const sources=bestiarySources(),records=packRecords("Actor",sources),stored=new Map(records.map(row=>[`${row.sublevel}:${row.key}`,row.value]));

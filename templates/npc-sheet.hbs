@@ -2,7 +2,11 @@
   <header class="witcher-npc-header">
     <img class="witcher-npc-portrait" src="{{actor.img}}" data-action="creaturePortrait" alt="{{actor.name}}" data-tooltip="Изменить портрет">
     <div class="witcher-npc-identity"><small>БЕСТИАРИЙ · THE WITCHER</small>{{#if editing}}<input type="text" name="name" value="{{actor.name}}" aria-label="Имя существа">{{else}}<h1>{{actor.name}}</h1>{{/if}}
-      <div class="witcher-npc-traits"><span>{{category}}</span><span>{{system.creature.difficulty}}</span><span data-tooltip="Награда за победу по бестиарию">Награда {{system.creature.reward}}</span></div>
+      <div class="witcher-npc-traits">
+        {{#if editing}}<label class="witcher-npc-category-select">Класс<select name="system.creature.category" aria-label="Класс чудовища">{{#each categories}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+        {{else}}<span class="witcher-npc-category" tabindex="0" data-tooltip="{{creatureClass.description}}" aria-label="Класс чудовища: {{category}}">{{category}} <i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>{{/if}}
+        <span>{{system.creature.difficulty}}</span><span data-tooltip="Награда за победу по бестиарию">Награда {{system.creature.reward}}</span>
+      </div>
     </div><button type="button" data-action="editCreature" class="witcher-npc-edit" aria-pressed="{{editing}}" aria-label="Редактировать существо" {{disabled (not editable)}}><i class="fa-solid fa-sliders"></i></button>
   </header>
   <nav class="witcher-npc-tabs tabs" aria-label="Разделы существа">{{#each tabs}}<button type="button" data-action="tab" data-group="creature" data-tab="{{id}}" class="{{cssClass}}"><i class="{{icon}}"></i> {{label}}</button>{{/each}}</nav>
@@ -40,8 +44,11 @@
     <section class="tab {{tabs.inventory.cssClass}}" data-group="creature" data-tab="inventory">{{> "systems/witcher-eliott-system/templates/inventory.hbs"}}</section>
     <section class="tab witcher-npc-effects-tab {{tabs.effects.cssClass}}" data-group="creature" data-tab="effects">{{> "systems/witcher-eliott-system/templates/effects-list.hbs"}}</section>
     <section class="tab {{tabs.lore.cssClass}}" data-group="creature" data-tab="lore">
+      <section class="witcher-npc-class-description" aria-label="Класс чудовища">
+        <small>Класс чудовища</small><h3>{{creatureClass.name}}</h3><p>{{creatureClass.description}}</p>
+      </section>
       <div class="witcher-npc-section-title"><h2>Описание и повадки</h2></div>
-      {{#if editing}}<label>Категория<select name="system.creature.category">{{#each categories}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label><div class="witcher-npc-facts"><label>Сложность<input name="system.creature.difficulty" value="{{system.creature.difficulty}}"></label><label>Награда<input type="number" name="system.creature.reward" value="{{system.creature.reward}}" min="0"></label><label>Естественная броня<input type="number" name="system.creature.naturalArmor" value="{{system.creature.naturalArmor}}" min="0"></label><label>Энергия<input type="number" name="system.vigor" value="{{system.vigor}}" min="0"></label></div>{{/if}}
+      {{#if editing}}<div class="witcher-npc-facts"><label>Сложность<input name="system.creature.difficulty" value="{{system.creature.difficulty}}"></label><label>Награда<input type="number" name="system.creature.reward" value="{{system.creature.reward}}" min="0"></label><label>Естественная броня<input type="number" name="system.creature.naturalArmor" value="{{system.creature.naturalArmor}}" min="0"></label><label>Энергия<input type="number" name="system.vigor" value="{{system.vigor}}" min="0"></label></div>{{/if}}
       <div class="witcher-npc-facts">{{#each facts}}<label><span>{{label}}</span>{{#if ../editing}}<input name="system.creature.{{key}}" value="{{value}}">{{else}}<b>{{value}}</b>{{/if}}</label>{{/each}}</div>
       {{#if editing}}<label><input type="checkbox" name="system.creature.hasTailOrWings" {{checked system.creature.hasTailOrWings}}> Есть хвост или крылья</label><p class="witcher-combat-muted">Для чудовищ: при выпадении 10 удар приходится в хвост или крыло; если их нет — в левую конечность. Урон ×½ после брони.</p>{{else}}{{#if system.creature.hasTailOrWings}}<p>Есть хвост или крылья</p>{{/if}}{{/if}}
       {{#if editing}}<label>Описание<textarea name="system.creature.description" rows="4">{{system.creature.description}}</textarea></label><label>Тактика<textarea name="system.creature.tactics" rows="4">{{system.creature.tactics}}</textarea></label>{{else}}<p>{{system.creature.description}}</p><blockquote>{{system.creature.tactics}}</blockquote>{{/if}}

@@ -1,5 +1,5 @@
 import { itemText, itemNumber } from "./item-fields.mjs";
-import { MONSTER_CATEGORIES } from "./workshop.mjs";
+import { MONSTER_CATEGORIES } from "./monster-categories.mjs";
 import { potionImmunity } from "./consumables.mjs";
 
 /** NPC metadata only. Statistics, attacks, skills, abilities and equipment keep their existing models. */

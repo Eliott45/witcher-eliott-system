@@ -1,7 +1,7 @@
 import { isCarried } from "./containers.mjs";
 /** Shared, document-independent workshop rules. Catalog entries use the same Items as inventory. */
 export const SUBSTANCES = Object.entries({ vitriol: "Купорос", rebis: "Ребис", aether: "Эфир", quebrith: "Квебрит", hydragenum: "Гидраген", vermilion: "Киноварь", sol: "Солнце", caelum: "Аер", fulgur: "Фульгор" }).map(([id, name]) => ({ id, name }));
-export const MONSTER_CATEGORIES = Object.entries({ beast: "Звери", cursed: "Проклятые", draconid: "Дракониды", elemental: "Духи стихий", humanoid: "Гуманоиды", hybrid: "Гибриды", insectoid: "Инсектоиды", necrophage: "Трупоеды", ogroid: "Огры", relict: "Реликты", specter: "Духи", vampire: "Вампиры" }).map(([id, name]) => ({ id, name }));
+export { MONSTER_CATEGORIES } from "./monster-categories.mjs";
 export const equipmentUuid = id => `Compendium.witcher-eliott-system.equipment.Item.${id}`;
 export const WORKSHOP_BONUS_LABELS = {
   meleeDamage: "Урон в ближнем бою", "attributes.body": "Телосложение", "attributes.reflex": "Реакция",

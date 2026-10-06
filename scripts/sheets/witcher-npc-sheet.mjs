@@ -3,7 +3,7 @@ import { consumptionActions } from "./consumption-actions.mjs";
 import { applyEffectItem } from "../data/effect-items.mjs";
 import { ATTRIBUTE_KEYS } from "../data/statistics.mjs";
 import { SKILLS, skillValue } from "../data/skills.mjs";
-import { MONSTER_CATEGORIES } from "../data/workshop.mjs";
+import { MONSTER_CATEGORIES } from "../data/monster-categories.mjs";
 import { bestiarySources } from "../data/bestiary.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
 import { inventoryContext,bindInventory,equipItem,toggleVisor,changeGrip,createInventoryItem,browseEquipment,addCatalogItem,changeInventoryQuantity,toggleCarried,toggleInventoryGroup,inventoryWrite } from "./inventory-context.mjs";
@@ -71,6 +71,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
       empty:!actor.items.size&&ATTRIBUTE_KEYS.every(key=>system.attributes[key]===null),
       canRestoreItems:!actor.items.size&&bestiarySources().some(entry=>entry.system.creature.source===system.creature.source),
       categories:MONSTER_CATEGORIES.map(entry=>({...entry,selected:entry.id===system.creature.category})),category:MONSTER_CATEGORIES.find(c=>c.id===system.creature.category)?.name,
+      creatureClass:MONSTER_CATEGORIES.find(entry=>entry.id===system.creature.category),
       attributes:ATTRIBUTE_KEYS.filter(key=>key!=="luck").map(key=>({key,name:i18n.localize(`WITCHER.Attributes.${key}.Short`),label:i18n.localize(`WITCHER.Attributes.${key}.Label`),base:system.attributes[key],value:stats.effective[key]??"—"})),
       skills:SKILLS.filter(skill=>skill.key!=="language"&&(editing||system.skills[skill.key]>0)).map(skill=>{const value=skillValue(system,skill.key);return {...value,name:i18n.localize(skill.label),calculation:skillCalculationTooltip(system,value,i18n)};}),
       facts:[{key:"size",label:"Рост"},{key:"weight",label:"Вес тела"},{key:"habitat",label:"Среда обитания"},{key:"intellect",label:"Интеллект"},{key:"group",label:"Численность"}].map(entry=>({...entry,value:system.creature[entry.key]})),
