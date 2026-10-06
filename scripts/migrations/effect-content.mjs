@@ -3,7 +3,8 @@ import { EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions
 import { CRITICAL_WOUND_SOURCES } from "../combat/critical-wound-effects.mjs";
 
 // 2: also append conditions added to the system after a world's compendium was created (Staggered, Grappled…).
-export const EFFECT_CONTENT_VERSION = 2;
+// 3: refresh untouched critical wound entries (prostheses on lost limbs).
+export const EFFECT_CONTENT_VERSION = 3;
 export function registerEffectContentMigration() {
   game.settings.register(SYSTEM_ID, "effectContentVersion", { scope: "world", config: false, type: Number, default: 0 });
 }
@@ -19,13 +20,18 @@ export async function migrateEffectContent() {
   const pack = game.packs.get(`${SYSTEM_ID}.effects`);
   if (!pack) return;
   const index = await pack.getIndex();
-  const missing = effectCompendiumSources(key => game.i18n.localize(key)).filter(source => !index.has(source._id));
-  if (missing.length) {
+  const sources = effectCompendiumSources(key => game.i18n.localize(key));
+  const missing = sources.filter(source => !index.has(source._id));
+  // A wound entry still carrying its shipped name is treated as unedited and follows the current rules.
+  const refresh = sources.filter(source => source.flags[SYSTEM_ID]?.criticalWound && index.get(source._id)?.name === source.name)
+    .map(source => ({ _id: source._id, description: source.description, [`flags.${SYSTEM_ID}`]: source.flags[SYSTEM_ID] }));
+  if (missing.length || refresh.length) {
     const locked = pack.locked;
     try {
       if (locked) await pack.configure({ locked: false });
       const created = await foundry.documents.ActiveEffect.implementation.createDocuments(missing, { pack: pack.collection, keepId: true });
       if (created.length !== missing.length) throw new Error("Добавлены не все эффекты. Обновление будет повторено при следующем входе мастера.");
+      if (refresh.length) await foundry.documents.ActiveEffect.implementation.updateDocuments(refresh, { pack: pack.collection, broadcast: false });
     } finally { if (locked) await pack.configure({ locked: true }); }
   }
   await game.settings.set(SYSTEM_ID, "effectContentVersion", EFFECT_CONTENT_VERSION);

@@ -167,3 +167,17 @@ test("older chat damage and pre-rolled location snapshots remain usable", async 
   assert.doesNotMatch(exchangeRowHTML(f.message, 0), /data-exchange-location/);
   assert.equal(await rollExchangeLocation(f.message, 0), undefined);
 });
+
+test("a hit on a fitted prosthesis deals no damage to its owner", async t => {
+  const f = fixture(t, { category: "necrophage", results: [10, 8] });
+  await rollExchangeLocation(f.message, 0);
+  await rollExchangeDamage(f.message, 0);
+  assert.ok(damagePreview(f.message, 0).result.total > 0);
+  const prosthesis = { id: "leg", name: "Качественный протез", system: { ruleId: "gear.quality-prosthesis", quantity: 1, equipped: true } };
+  f.target.items = Object.assign([prosthesis], { get: id => id === "leg" ? prosthesis : undefined });
+  f.target.effects = [{ id: "wound", disabled: false, flags: { [SYSTEM_ID]: { criticalWound: { id: "dismembered-arm", arm: "leftArm", prosthesis: { itemId: "leg", quality: "quality" } } } } }];
+  const preview = damagePreview(f.message, 0);
+  assert.equal(preview.result.total, 0);
+  assert.deepEqual(preview.prosthesis, { effectId: "wound", itemId: "leg", name: "Качественный протез" });
+  assert.match(preview.result.steps.at(-1).label, /протез/);
+});

@@ -54,41 +54,54 @@ export const WOUND_RULES = {
     mods: [[factor("staminaMax", 0.25), factor("attributes.speed", 0.25), factor("attributes.body", 0.25, { resourceNeutral: true })], [factor("staminaMax", 0.5), factor("attributes.speed", 0.5), factor("attributes.body", 0.5, { resourceNeutral: true })], [{ target: "bleedingDamage", value: 2 }]] },
   "septic-shock": { conditions: { fresh: ["poisoned"] },
     mods: [[factor("staminaMax", 0.25), ...attrs(["intelligence", "will", "reflex", "dexterity"], -3)], [factor("staminaMax", 0.5), ...attrs(["intelligence", "will", "reflex", "dexterity"], -1)], [{ target: "staminaMax", value: -5 }]] },
-  "dismembered-arm": { arm: true, conditions: { fresh: ["bleeding"] }, mods: [disabledArm, disabledArm, disabledArm] },
-  "dismembered-leg": { conditions: { fresh: ["bleeding"] }, mods: [mobilityFactor(0.25), mobilityFactor(0.25), []] }
+  // A healed stump is still a lost limb until a prosthesis replaces it (core p.160).
+  "dismembered-arm": { arm: true, limb: "arm", conditions: { fresh: ["bleeding"] }, mods: [disabledArm, disabledArm, disabledArm] },
+  "dismembered-leg": { leg: true, limb: "leg", conditions: { fresh: ["bleeding"] }, mods: [mobilityFactor(0.25), mobilityFactor(0.25), mobilityFactor(0.25)] }
 };
+// Core p.160 «Протезы». A simple arm does simple tasks but holds no weapon; a quality arm holds one at −5.
+// A simple leg moves at ¾ SPD with −5 to Dodge/Escape and Athletics; a quality leg keeps SPD with −3.
+export const PROSTHESES = { "gear.simple-prosthesis": "simple", "gear.quality-prosthesis": "quality" };
+const PROSTHESIS_MODS = {
+  arm: { simple: () => disabledArm, quality: () => arm(-5) },
+  leg: { simple: () => [factor("attributes.speed", 0.75), ...skills(["dodgeEscape", "athletics"], -5)], quality: () => skills(["dodgeEscape", "athletics"], -3) }
+};
+export const PROSTHESIS_NAMES = { simple: "простой", quality: "качественный" };
 export const WOUND_STATES = { fresh: "Не обработано", stabilized: "Стабилизировано", treated: "Вылечено" };
 const STATE_INDEX = { fresh: 0, stabilized: 1, treated: 2 };
 const ARMS = { rightArm: "Правая рука", leftArm: "Левая рука" };
+const LEGS = { rightLeg: "Правая нога", leftLeg: "Левая нога" };
 const CONDITION_NAMES = { bleeding: "кровотечение", suffocating: "удушье", poisoned: "отравление" };
 
 export const findWound = id => Object.entries(CRITICAL_WOUNDS).flatMap(([level, list]) => list.map(entry => ({ ...entry, level }))).find(entry => entry.id === id);
-export function woundModifiers(id, state, { arm: side = "" } = {}) {
-  const list = structuredClone(WOUND_RULES[id]?.mods[STATE_INDEX[state] ?? 0] ?? []);
+export function woundModifiers(id, state, { arm: side = "", prosthesis = null } = {}) {
+  const limb = WOUND_RULES[id]?.limb, fitted = limb && prosthesis?.quality ? PROSTHESIS_MODS[limb][prosthesis.quality] : null;
+  const list = structuredClone(fitted ? fitted() : WOUND_RULES[id]?.mods[STATE_INDEX[state] ?? 0] ?? []);
   return list.map(modifier => modifier.target === "combat.arm" ? { ...modifier, arm: side || "rightArm" } : modifier);
 }
 export const stabilizeDC = level => CRITICAL_LEVELS.find(entry => entry.id === level)?.stabilize ?? 12;
 export const linkedConditions = (id, state) => WOUND_RULES[id]?.conditions?.[state] ?? [];
 
 /** Mechanics in plain words, so the sheet and the compendium say exactly what is automated. */
-function automationNotes(id, state) {
+function automationNotes(id, state, prosthesis = null) {
   const rules = WOUND_RULES[id] ?? {}, notes = [];
+  if (prosthesis?.quality) notes.push(`Протез (${PROSTHESIS_NAMES[prosthesis.quality]}) заменяет утраченную конечность. Удар в неё не наносит урона, но протез отваливается.`);
+  else if (rules.limb && state === "treated") notes.push("Можно надеть протез из инвентаря.");
   const conditions = linkedConditions(id, state);
   if (conditions.length) notes.push(`Накладывает: ${conditions.map(key => CONDITION_NAMES[key]).join(", ")}; снимается вместе со стабилизацией.`);
   if (rules.stunEvery?.[state]) notes.push(`Испытание Устойчивости в начале хода каждые ${rules.stunEvery[state] === "1d6" ? "1d6" : rules.stunEvery[state]} раундов.`);
   if (rules.acid?.[state]) notes.push(`${rules.acid[state]} урона кислотой в начале каждого хода, броня не защищает.`);
   if (state === "fresh" && rules.dead) notes.push("Персонаж погибает.");
   if (state === "fresh" && rules.deathSave) notes.push("Сразу — испытание против смерти; провал означает гибель.");
-  if (rules.arm && woundModifiers(id, state).some(modifier => modifier.target === "combat.arm"))
+  if (rules.arm && woundModifiers(id, state, { prosthesis }).some(modifier => modifier.target === "combat.arm"))
     notes.push("Штраф руки: к атакам и защите оружием, если оно в этой руке (правая — основная; левая — при хвате двумя руками или двух оружиях).");
-  if (woundModifiers(id, state).some(modifier => modifier.target === "hands")) notes.push("Рукой нельзя пользоваться: доступна одна рука, двуручный хват невозможен.");
+  if (woundModifiers(id, state, { prosthesis }).some(modifier => modifier.target === "hands")) notes.push("Рукой нельзя пользоваться: доступна одна рука, двуручный хват невозможен.");
   return notes;
 }
 
-function woundDescription(wound, level, locationName, state, note = "") {
+function woundDescription(wound, level, locationName, state, note = "", prosthesis = null) {
   const levelName = CRITICAL_LEVELS.find(entry => entry.id === level)?.name ?? "";
   const line = (key, label, text) => `<p class="${state === key ? "is-current" : ""}"><b>${label}:</b> ${esc(text)}</p>`;
-  const notes = automationNotes(wound.id, state);
+  const notes = automationNotes(wound.id, state, prosthesis);
   return `<p><b>${esc(levelName)} ранение${locationName ? ` · ${esc(locationName)}` : ""}</b></p>`
     + line("fresh", "Сейчас", wound.effect) + line("stabilized", "После стабилизации", wound.stabilized) + line("treated", "После лечения", wound.treated)
     + (note ? `<p>${esc(note)}</p>` : "")
@@ -97,14 +110,17 @@ function woundDescription(wound, level, locationName, state, note = "") {
 }
 
 /** ActiveEffect source for a wound; its modifiers follow the wound state. */
-export function woundEffectData(woundId, level, { location = "", locationName = "", state = "fresh", arm = "", note = "" } = {}) {
+export function woundEffectData(woundId, level, { location = "", locationName = "", state = "fresh", arm = "", note = "", prosthesis = null } = {}) {
   const wound = findWound(woundId);
   if (!wound) throw new Error("Неизвестное критическое ранение.");
-  const side = WOUND_RULES[woundId]?.arm ? arm || (ARMS[location] ? location : "") : "";
-  const place = side && !ARMS[location] ? ARMS[side] : locationName;
-  return { name: `Крит: ${wound.name}`, img: "icons/svg/blood.svg", description: woundDescription(wound, level, place, state, note),
-    flags: { [SYSTEM_ID]: { criticalWound: { id: woundId, level, location, locationName: place, state, arm: side, note },
-      condition: { key: "critical-wound", modifiers: woundModifiers(woundId, state, { arm: side }) } } } };
+  const rules = WOUND_RULES[woundId] ?? {}, limbs = rules.arm ? ARMS : rules.leg ? LEGS : null;
+  // `arm` stores the struck limb's side: an arm, or a leg for a lost leg.
+  const side = limbs ? arm || (limbs[location] ? location : "") : "";
+  const place = side && !limbs[location] ? limbs[side] : locationName;
+  const fitted = rules.limb && prosthesis?.quality ? { itemId: prosthesis.itemId ?? "", quality: prosthesis.quality } : null;
+  return { name: `Крит: ${wound.name}`, img: "icons/svg/blood.svg", description: woundDescription(wound, level, place, state, note, fitted),
+    flags: { [SYSTEM_ID]: { criticalWound: { id: woundId, level, location, locationName: place, state, arm: side, note, prosthesis: fitted },
+      condition: { key: "critical-wound", modifiers: woundModifiers(woundId, state, { arm: side, prosthesis: fitted }) } } } };
 }
 
 const conditionData = (key, source) => {
@@ -156,7 +172,10 @@ export async function onWoundCreated(effect, _options, userId) {
   if (!data || data.applied || userId !== game.user.id || actor?.documentName !== "Actor" || !actor.isOwner) return;
   const rules = WOUND_RULES[data.id] ?? {}, wound = findWound(data.id);
   let { arm: side = "", note = "" } = data;
-  if (rules.arm && !side) side = (await new foundry.dice.Roll("1d2").evaluate()).total === 1 ? "rightArm" : "leftArm";
+  if ((rules.arm || rules.leg) && !side) {
+    const first = (await new foundry.dice.Roll("1d2").evaluate()).total === 1;
+    side = rules.arm ? (first ? "rightArm" : "leftArm") : (first ? "rightLeg" : "leftLeg");
+  }
   if (rules.teeth && !note) note = `Выбито зубов: ${(await new foundry.dice.Roll("1d10").evaluate()).total}.`;
   const source = woundEffectData(data.id, data.level, { ...data, arm: side, note });
   const linked = data.state === "fresh" ? await linkConditions(actor, effect, "fresh") : [];
@@ -183,6 +202,9 @@ export function registerCriticalWoundHooks() {
   const report = error => console.error(`${SYSTEM_ID} | Critical wound`, error);
   Hooks.on("createActiveEffect", (...args) => { if (args[0].flags?.[SYSTEM_ID]?.criticalWound) queued(args[0], () => onWoundCreated(...args)).catch(report); });
   Hooks.on("deleteActiveEffect", (...args) => { if (args[0].flags?.[SYSTEM_ID]?.criticalWound) queued(args[0], () => onWoundDeleted(...args)).catch(report); });
+  const prosthesisChanged = (item, userId) => { if (PROSTHESES[item.system?.ruleId]) queued(item, () => releaseProsthesis(item, userId)).catch(report); };
+  Hooks.on("updateItem", (item, _changes, _options, userId) => prosthesisChanged(item, userId));
+  Hooks.on("deleteItem", (item, _options, userId) => prosthesisChanged(item, userId));
 }
 
 export async function setWoundState(effect, state) {
@@ -194,6 +216,47 @@ export async function setWoundState(effect, state) {
   await effect.update({ description: source.description, [`flags.${SYSTEM_ID}.criticalWound.state`]: state,
     [`flags.${SYSTEM_ID}.criticalWound.nextStun`]: null,
     [`flags.${SYSTEM_ID}.condition.modifiers`]: source.flags[SYSTEM_ID].condition.modifiers });
+}
+
+/** Fit or take off a prosthesis on a healed lost limb; the wound's penalties follow the prosthesis. */
+export async function setProsthesis(effect, item = null) {
+  const data = effect.flags?.[SYSTEM_ID]?.criticalWound, actor = effect.parent;
+  if (!data || !WOUND_RULES[data.id]?.limb || actor?.documentName !== "Actor") return;
+  const previous = data.prosthesis?.itemId ? actor.items.get(data.prosthesis.itemId) : null;
+  let prosthesis = null;
+  if (item) {
+    const quality = PROSTHESES[item.system?.ruleId];
+    if (!quality || item.parent !== actor) throw new Error("Выберите протез из инвентаря этого персонажа.");
+    if ((data.state ?? "fresh") !== "treated") throw new Error("Протез надевают на вылеченную рану: сначала отметьте лечение.");
+    if (!(item.system.quantity > 0) || item.system.containerId || item.system.carried === false) throw new Error("Протез должен быть при персонаже.");
+    const used = actor.effects.filter(other => other.id !== effect.id && other.flags?.[SYSTEM_ID]?.criticalWound?.prosthesis?.itemId === item.id).length;
+    if (used >= item.system.quantity) throw new Error("Этот протез уже надет на другую конечность.");
+    prosthesis = { itemId: item.id, quality };
+  }
+  const source = woundEffectData(data.id, data.level, { ...data, prosthesis });
+  await effect.update({ description: source.description, [`flags.${SYSTEM_ID}.criticalWound.prosthesis`]: prosthesis,
+    [`flags.${SYSTEM_ID}.condition.modifiers`]: source.flags[SYSTEM_ID].condition.modifiers });
+  if (item && !item.system.equipped) await item.update({ "system.equipped": true });
+  if (previous && previous.id !== item?.id && previous.system.equipped
+    && !actor.effects.some(other => other.flags?.[SYSTEM_ID]?.criticalWound?.prosthesis?.itemId === previous.id)) await previous.update({ "system.equipped": false });
+}
+/** The wound whose prosthesis replaces the limb at this hit location, if any. */
+export function prosthesisAt(actor, location) {
+  for (const effect of actor?.effects ?? []) {
+    const data = effect.flags?.[SYSTEM_ID]?.criticalWound;
+    if (effect.disabled || !data?.prosthesis?.itemId || data.arm !== location) continue;
+    const item = actor.items.get(data.prosthesis.itemId);
+    if (item) return { effect, item };
+  }
+  return null;
+}
+/** A prosthesis taken off the body (unequipped, dropped, deleted) no longer replaces the limb. */
+async function releaseProsthesis(item, userId) {
+  const actor = item.parent;
+  if (userId !== game.user.id || actor?.documentName !== "Actor") return;
+  const worn = actor.items.get(item.id)?.system.equipped && actor.items.get(item.id).system.quantity > 0;
+  for (const effect of actor.effects.filter(other => other.flags?.[SYSTEM_ID]?.criticalWound?.prosthesis?.itemId === item.id))
+    if (!worn) await setProsthesis(effect, null);
 }
 
 const activeWounds = actor => actor.effects.filter(effect => !effect.disabled && !effect.isSuppressed && effect.flags?.[SYSTEM_ID]?.criticalWound);
@@ -252,9 +315,12 @@ export async function stabilizeWound(actor, effect) {
 export function woundContext(effect, editable) {
   const data = effect.flags?.[SYSTEM_ID]?.criticalWound;
   if (!data) return null;
-  const fatal = data.id === "decapitation";
+  const fatal = data.id === "decapitation", limb = WOUND_RULES[data.id]?.limb;
   return { state: data.state ?? "fresh", stateLabel: WOUND_STATES[data.state ?? "fresh"], dc: stabilizeDC(data.level),
-    canStabilize: editable && !fatal && (data.state ?? "fresh") === "fresh", canTreat: editable && !fatal && data.state !== "treated" };
+    canStabilize: editable && !fatal && (data.state ?? "fresh") === "fresh", canTreat: editable && !fatal && data.state !== "treated",
+    prosthesis: data.prosthesis?.quality ? PROSTHESIS_NAMES[data.prosthesis.quality] : "",
+    canFitProsthesis: editable && Boolean(limb) && data.state === "treated" && !data.prosthesis?.quality,
+    canRemoveProsthesis: editable && Boolean(data.prosthesis?.quality) };
 }
 
 /** Compendium entries: one per wound, untreated, with the arm resolved when it is applied to a character. */

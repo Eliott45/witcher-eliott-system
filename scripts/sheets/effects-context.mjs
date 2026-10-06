@@ -11,7 +11,8 @@ import { applyEffectItem } from "../data/effect-items.mjs";
 import { effectCounter, changeEffectCounter, activeEffect } from "../data/effect-counters.mjs";
 import { doseToxicity } from "../data/consumables.mjs";
 import { isToxicityPoison, poisonDescription } from "../data/poison-rules.mjs";
-import { woundContext, stabilizeWound, setWoundState } from "../combat/critical-wound-effects.mjs";
+import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
+import { woundContext, stabilizeWound, setWoundState, setProsthesis, PROSTHESES } from "../combat/critical-wound-effects.mjs";
 import { stripPageReferences } from "../data/item-lore.mjs";
 
 export function toxicitySaveContext(sheet) {
@@ -71,6 +72,20 @@ export const effectActions={
   stabilizeWound:safe(async function(_event,target){
     if(!this.isEditable||target.disabled)return;target.disabled=true;
     const effect=this.actor.effects.get(target.dataset.effectId);if(effect)await stabilizeWound(this.actor,effect);
+  }),
+  fitProsthesis:safe(async function(_event,target){
+    if(!this.isEditable)return;
+    const effect=this.actor.effects.get(target.dataset.effectId);if(!effect)return;
+    const items=this.actor.items.filter(item=>PROSTHESES[item.system.ruleId]&&item.system.quantity>0&&item.system.carried!==false&&!item.system.containerId);
+    if(!items.length)throw new Error("В инвентаре нет протеза. Простой и качественный протезы есть в каталоге снаряжения.");
+    const id=items.length===1?items[0].id:await foundry.applications.api.DialogV2.prompt({window:{title:"Надеть протез"},
+      content:`<label>Протез<select name="item">${items.map(item=>`<option value="${item.id}">${esc(item.name)}</option>`).join("")}</select></label>`,
+      ok:{label:"Надеть",callback:(_e,button)=>new FormData(button.form).get("item")},rejectClose:false});
+    const item=id&&this.actor.items.get(id);if(item)await setProsthesis(effect,item);
+  }),
+  removeProsthesis:safe(async function(_event,target){
+    if(!this.isEditable)return;
+    const effect=this.actor.effects.get(target.dataset.effectId);if(effect)await setProsthesis(effect,null);
   }),
   treatWound:safe(async function(_event,target){
     if(!this.isEditable)return;

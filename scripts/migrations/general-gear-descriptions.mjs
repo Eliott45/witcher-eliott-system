@@ -8,6 +8,12 @@ const LEGACY_PROSE = {
   "sacred-symbol": ["Символ веры Великого Солнца, полученный благодаря воспитанию среди высшего духовенства.", "A symbol of the Great Sun faith, received through an upbringing among the high clergy."]
 };
 
+// Shipped prosthesis prose before their rules (core p.160) were added; replaced only when unedited.
+const PREVIOUS_DESCRIPTIONS = {
+  "gear.simple-prosthesis": "<p>Простая замена утраченной руки или ноги с ограниченной подвижностью: деревянная кисть для простого удержания вещей или опора для ходьбы.</p><p><small>Базовая книга, стр. 93, 94</small></p>",
+  "gear.quality-prosthesis": "<p>Более сложный протез с деревянными и металлическими деталями, шарнирами и тягами. Обеспечивает большую подвижность по сравнению с простым протезом.</p><p><small>Базовая книга, стр. 93, 95</small></p>"
+};
+
 /** Only stock content is enriched. Inventory state, prices, IDs and custom writing are untouched. */
 export function generalGearDescriptionUpdate(item) {
   if (item.type !== "equipment") return {};
@@ -15,7 +21,7 @@ export function generalGearDescriptionUpdate(item) {
   if (!content) return {};
   const update = {}, description = String(item.system.description ?? "");
   const plain = description.replace(/<[^>]*>/g, "").trim();
-  if (!plain || STOCK_SOURCES.includes(plain)) update["system.description"] = content.description;
+  if (!plain || STOCK_SOURCES.includes(plain) || (PREVIOUS_DESCRIPTIONS[id] === description && description !== content.description)) update["system.description"] = content.description;
   else if (LEGACY_PROSE[id]?.includes(plain)) update["system.description"] = description + content.description;
   const oldProperties = id === "gear.bag" ? "Для небольших предметов" : CORE_CONTAINERS[id]?.properties;
   if ((!item.system.properties || item.system.properties === oldProperties) && item.system.properties !== content.properties) update["system.properties"] = content.properties;

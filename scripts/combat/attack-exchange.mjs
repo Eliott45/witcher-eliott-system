@@ -8,7 +8,7 @@ import { trackRollDisplay, waitsForDice, diceSyncEnabled } from "../chat/roll-di
 import { rollStun } from "./stun-roll.mjs";
 import { CONDITION_BY_ID, conditionSource } from "../data/condition-definitions.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
-import { woundEffectData } from "./critical-wound-effects.mjs";
+import { woundEffectData, prosthesisAt, setProsthesis } from "./critical-wound-effects.mjs";
 import { modifierTotal } from "../data/background-modifiers.mjs";
 import { GRAPPLE_ACTIONS, applyGrappleSuccess, grappleState } from "./grapple.mjs";
 import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
@@ -201,7 +201,15 @@ export function damagePreview(message, index) {
   const multiplierFor = actor => data.location.id === "head" ? data.location.multiplier + modifierTotal(actor.system.statistics?.modifiers ?? [], "damage.headMultiplier") : data.location.multiplier;
   const hit = (actor, armorAtZone, base, silver, crit) => resolveDamage({ base, silver, location: data.location.id, multiplier: multiplierFor(actor),
     traits: data.traits, armor: armorAtZone, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor), critical: crit });
-  const preview = { data, target, armor, result: hit(target, armor, data.base, data.silver, critical), shield: null };
+  const preview = { data, target, armor, result: hit(target, armor, data.base, data.silver, critical), shield: null, prosthesis: null };
+  // Core p.160: a blow to a prosthesis does not hurt its owner, but knocks the prosthesis off.
+  const fitted = prosthesisAt(target, data.location.id);
+  if (fitted) {
+    preview.prosthesis = { effectId: fitted.effect.id, itemId: fitted.item.id, name: fitted.item.name };
+    preview.result = { ...preview.result, total: 0, ablate: [], penetrated: false,
+      steps: [...preview.result.steps, { label: "Удар пришёлся в протез", value: 0, detail: `${fitted.item.name} отваливается, владелец урона не получает` }] };
+    return preview;
+  }
   // House rule on core p.155: only a held creature can be a living shield. A torso hit goes into it as if it
   // were the target; whatever exceeds its BODY + torso SP gets through to the grappler's torso.
   const holding = data.location.id === "torso" ? grappleState(target).holding : null;
@@ -212,6 +220,16 @@ export function damagePreview(message, index) {
       result: hit(holding.actor, shieldArmor, data.base, data.silver, critical), through: hit(target, armor, overflow, 0, null) };
   }
   return preview;
+}
+
+/** The prosthesis comes off and lands in front of its owner; without a scene it is simply taken off. */
+async function knockOffProsthesis(actor, { effectId, itemId }) {
+  const effect = actor.effects.get(effectId), item = actor.items.get(itemId);
+  if (effect) await setProsthesis(effect, null);
+  if (!item) return;
+  if (item.system.equipped) await item.update({ "system.equipped": false });
+  const token = actor.token ?? actor.getActiveTokens?.()[0]?.document;
+  if (token?.parent) await dropItemToGround(actor, item, { quantity: 1, silent: true }).catch(error => ui.notifications.warn(error.message));
 }
 
 /** HP loss, armor wear and a critical wound on one actor; returns what wore down. */
@@ -238,7 +256,8 @@ export async function applyExchangeDamage(message, index, { useShield = false } 
   if (!preview?.target.isOwner || linkedAny(message.id, index, "applied")) return;
   const { target, data } = preview, health = target.system.health.value, shield = useShield ? preview.shield : null;
   const own = shield ? shield.through : preview.result;
-  const worn = await sufferDamage(target, own, shield ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location });
+  const worn = await sufferDamage(target, own, shield || preview.prosthesis ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location });
+  if (preview.prosthesis) await knockOffProsthesis(target, preview.prosthesis);
   const exchange = { attack: message.id, index, kind: "applied", total: own.total, steps: own.steps, from: health,
     ablated: worn.join(", "), armorHeld: !own.penetrated && preview.armor.sp > 0 && !shield };
   if (shield) {
@@ -248,7 +267,7 @@ export async function applyExchangeDamage(message, index, { useShield = false } 
     if (shield.actor.isOwner) { shieldData.ablated = (await sufferDamage(shield.actor, shield.result, shieldData)).join(", "); shieldData.applied = true; }
     exchange.shield = shieldData;
   }
-  return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${own.total} ПЗ${shield ? ` · живой щит ${esc(shield.name)}: −${shield.result.total} ПЗ` : ""}</p>`,
+  return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${own.total} ПЗ${shield ? ` · живой щит ${esc(shield.name)}: −${shield.result.total} ПЗ` : ""}${preview.prosthesis ? ` · ${esc(preview.prosthesis.name)} отвалился` : ""}</p>`,
     flags: { [SYSTEM_ID]: { skipLuck: true, exchange } } }, "public");
 }
 
