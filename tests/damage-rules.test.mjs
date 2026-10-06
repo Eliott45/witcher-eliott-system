@@ -111,3 +111,21 @@ test("layering helpers: zone SP and the limits follow the errata", async () => {
   assert.equal(layeringPlan(armor("cuirass", "torso", "light"), [...worn, armor("plate", "torso", "heavy")]).blocked.includes("3 слоя"), true);
   assert.equal(layeringEncumbrance(worn), 1, "only the layered medium torso piece adds +1; the lone helmet adds nothing");
 });
+
+test("a player's group initiative: allies without initiative or own combatants only; the GM re-checks the posted roll", async () => {
+  const { eligibleMembers, applyGroupInitiativeRequest } = await import("../scripts/combat/group-initiative.mjs");
+  const player = { id: "p", isGM: false };
+  const member = (id, disposition, { initiative = null, owned = false, ref = 5 } = {}) => ({ id, name: id, initiative, actor: { system: { statistics: { initiative: ref } } },
+    token: { disposition }, testUserPermission: user => owned && user.id === "p" });
+  const list = [member("hero", 1, { owned: true, ref: 10 }), member("ally", 1, { ref: 8 }), member("rolled", 1, { initiative: 12 }), member("foe", -1)];
+  let written;
+  const combat = { id: "c", combatants: Object.assign(list, { get: id => list.find(entry => entry.id === id) }), updateEmbeddedDocuments: async (_type, rows) => { written = rows; } };
+  assert.deepEqual(eligibleMembers(combat, list[0], player).map(entry => entry.id), ["hero", "ally"]);
+  const message = { author: { id: "p" }, rolls: [{ total: 7 }], flags: { "witcher-eliott-system": { groupInitiative: { combat: "c", leader: "hero", members: ["hero", "ally", "rolled", "foe"], die: 7 } } } };
+  globalThis.game = { messages: { get: () => message }, users: { get: () => player } };
+  await applyGroupInitiativeRequest(combat, list[0], { message: "m", requester: "p" });
+  assert.deepEqual(written, [{ _id: "hero", initiative: 17 }, { _id: "ally", initiative: 15 }], "foes and already-rolled allies are ignored");
+  message.flags["witcher-eliott-system"].groupInitiative.die = 10;
+  await assert.rejects(applyGroupInitiativeRequest(combat, list[0], { message: "m", requester: "p" }), /не найден/);
+  delete globalThis.game;
+});

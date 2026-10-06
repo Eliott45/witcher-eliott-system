@@ -21,14 +21,14 @@ export function layeringPlan(item, worn) {
   return { replace: replace.map(other => other.id), blocked: "", note: replace.length ? `Можно носить только один слой ${CLASS_NAMES[cls]} брони на зоне.` : "" };
 }
 
-/** Extra EV of layering: a medium/heavy piece that shares a zone with another worn piece. */
-export function layeringEncumbrance(worn) {
+/** Layered pieces and the EV each adds: +1 for a medium, +2 for a heavy piece sharing a zone with another worn piece. */
+export function layeringDetails(worn) {
   const armor = worn.filter(isArmor);
-  return armor.reduce((sum, item) => {
-    const layered = armor.some(other => other.id !== item.id && ZONES(other).some(zone => ZONES(item).includes(zone)));
-    return sum + (!layered ? 0 : item.system.armorClass === "heavy" ? 2 : item.system.armorClass === "medium" ? 1 : 0);
-  }, 0);
+  return armor.filter(item => armor.some(other => other.id !== item.id && ZONES(other).some(zone => ZONES(item).includes(zone))))
+    .map(item => ({ id: item.id, name: item.name, armorClass: item.system.armorClass ?? "light",
+      extra: item.system.armorClass === "heavy" ? 2 : item.system.armorClass === "medium" ? 1 : 0 }));
 }
+export const layeringEncumbrance = worn => layeringDetails(worn).reduce((sum, piece) => sum + piece.extra, 0);
 
 const layerBonus = difference => difference <= 4 ? 5 : difference <= 8 ? 4 : difference <= 14 ? 3 : difference <= 20 ? 2 : 0;
 /** Combine layers lightest-first: 3 + 12 → 15, then 15 + 20 → 24 (errata example). */

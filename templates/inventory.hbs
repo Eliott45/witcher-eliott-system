@@ -19,6 +19,7 @@
 {{/if}}
 {{else}}<span>Не надето</span>{{/each}}{{#if zone.layered}}<p class="witcher-armor-layered" data-tooltip="Слои брони: ПБ не складываются — к сильнейшему слою добавляется бонус за разницу. Сопротивления сохраняются, но не суммируются.">Итого слоёв: <b>ПБ {{zone.total}}</b></p>{{/if}}</section>{{/each}}
 </div>
+{{#if inventory.layering}}<div class="witcher-armor-layering"><strong><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Слои брони: штрафы</strong><ul>{{#each inventory.layering.pieces as |piece|}}<li><span>{{piece.name}} <small>{{piece.classLabel}}</small></span><b>{{#if piece.extra}}СД +{{piece.extra}}{{else}}без надбавки{{/if}}</b></li>{{/each}}</ul><p>Надбавка за слои: <b>СД +{{inventory.layering.extra}}</b>{{#if inventory.layering.ev}} · итоговая скованность брони <b>{{inventory.layering.ev}}</b>: −{{inventory.layering.ev}} к РЕА, ЛВК, Сотворению заклинаний, Наведению порчи и Проведению ритуалов{{/if}}.</p><small>ПБ слоёв не складывается: к сильнейшему слою добавляется бонус за разницу (0–4: +5, 5–8: +4, 9–14: +3, 15–20: +2). Сопротивления слоёв сохраняются, одинаковые не суммируются. Не больше 3 слоёв на зоне, из них один средний и один тяжёлый.</small></div>{{/if}}
 <label class="witcher-inventory-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" data-inventory-search placeholder="Поиск в инвентаре…" aria-label="Поиск в инвентаре"></label>
 <div class="witcher-inventory-groups">
 {{#each inventory.groups as |group|}}

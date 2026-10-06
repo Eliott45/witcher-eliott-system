@@ -888,3 +888,12 @@
 .witcher-wound-state.is-stabilized { background:#f3e6c4; color:#7a5a12; }
 .witcher-wound-state.is-treated { background:#d9e7d8; color:#2f5a3c; }
 .witcher-effect-description p.is-current { font-weight:600; }
+/* Armor layering penalties under the armor slots. */
+.witcher-armor-layering { margin:8px 0 4px; padding:8px 10px; border:1px solid #c9a96a88; border-left:3px solid #8b4a38; border-radius:4px; background:#f6ead9; color:#4a3c2d; font-size:12px; }
+.witcher-armor-layering strong { display:flex; align-items:center; gap:6px; color:#7b3b2e; }
+.witcher-armor-layering ul { margin:5px 0; padding:0; list-style:none; display:grid; gap:2px; }
+.witcher-armor-layering li { display:flex; justify-content:space-between; gap:10px; }
+.witcher-armor-layering li small { color:#8a7356; }
+.witcher-armor-layering li b { color:#8b2f26; white-space:nowrap; }
+.witcher-armor-layering p { margin:4px 0; }
+.witcher-armor-layering > small { display:block; color:#7a6a52; line-height:1.4; }

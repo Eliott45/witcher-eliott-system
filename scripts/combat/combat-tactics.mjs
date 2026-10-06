@@ -61,7 +61,11 @@ export async function processTacticRequest(combatant, request) {
   try {
     if (!user || !combatant.testUserPermission(user, "OWNER")) throw new Error("Нет прав управлять этим участником боя.");
     if (request.round !== combat.round || request.current !== (combat.combatant?.id ?? null)) throw new Error("Ход уже сменился. Нажмите кнопку ещё раз.");
-    if (request.kind === "delay") await delayTurn(combat, combatant);
+    if (request.kind === "group-initiative") {
+      const { applyGroupInitiativeRequest } = await import("./group-initiative.mjs");
+      await applyGroupInitiativeRequest(combat, combatant, request);
+    }
+    else if (request.kind === "delay") await delayTurn(combat, combatant);
     else if (request.kind === "resume") await resumeDelayedTurn(combat, combatant);
     else if (request.kind === "ambush-claim") {
       const {claimAmbushRoll} = await import("./group-ambush.mjs");

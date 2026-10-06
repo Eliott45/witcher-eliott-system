@@ -1,4 +1,4 @@
-import { layeringPlan, zoneStoppingPower } from "../data/armor-layers.mjs";
+import { layeringPlan, zoneStoppingPower, layeringDetails } from "../data/armor-layers.mjs";
 import { isTransport, cargoSections, cargoSection } from "../data/transport.mjs";
 import { gripOf } from "../combat/weapon-rules.mjs";
 import { consumableContext, toxicityState } from "../data/consumables.mjs";
@@ -25,6 +25,15 @@ const GROUPS = [
   { id: "container", name: "Контейнеры", icon: "fa-box-open", categories: ["container"] }
 ];
 const visorContext = item => ({ hasVisor: supportsVisor(item), visorDown: Boolean(item.system.visorDown) });
+const CLASS_LABELS = { light: "лёгкая", medium: "средняя", heavy: "тяжёлая" };
+/** What wearing several layers costs: the EV each layered piece adds and the total armor EV it feeds. */
+function layeringSummary(actor, items) {
+  const pieces = layeringDetails(equippedItems(items));
+  if (!pieces.length) return null;
+  const extra = pieces.reduce((sum, piece) => sum + piece.extra, 0), ev = actor.system?.statistics?.encumbrance ?? null;
+  return { extra, ev, pieces: pieces.map(piece => ({ ...piece, classLabel: CLASS_LABELS[piece.armorClass] ?? piece.armorClass })) };
+}
+
 export function inventoryContext(actor, preferences = {}) {
   const items = Array.from(actor.items ?? []).filter(isPhysical);
   const rows = items.map(item => ({ id: item.id, name: item.name, img: item.img, ...item.system, ...visorContext(item), sort: item.sort ?? 0,
@@ -65,6 +74,7 @@ export function inventoryContext(actor, preferences = {}) {
     categories: EQUIPMENT_CATEGORIES, items: rows,
     groups: GROUPS.map(group => ({ ...group, open: !preferences.collapsed?.[`inventory-${group.id}`],
       items: sortRows(rows.filter(item => !item.parentId && group.categories.includes(item.category))) })),
+    layering: layeringSummary(actor, items),
     zones: ARMOR_ZONES.map(zone => {
       const worn = equippedItems(items).filter(item => item.type === "armor" && armorZones(item).includes(zone.id));
       return { ...zone, layered: worn.length > 1, total: zoneStoppingPower(worn),
