@@ -1,4 +1,4 @@
-import { SUBSTANCES } from "./workshop.mjs";
+import { materialProse } from "./material-descriptions.mjs";
 
 // Short in-world descriptions for catalog items whose rules entry has no prose.
 // Original wording; mechanics stay in the item fields and trait chips.
@@ -175,22 +175,17 @@ const LORE = {
   "Усиление брони: Клёпаная кожа": "Кожаные накладки с металлическими заклёпками для брони."
 };
 
-const substanceName = id => SUBSTANCES.find(entry => entry.id === id)?.name ?? id;
 const paragraph = text => `<p>${text}</p>`;
 
 /** Prose for a catalog entry, or "" when nothing fitting is known. */
-export function itemLore({ name, type, system = {} }) {
+export function itemLore({ id, name, type, system = {} }) {
+  if (system.kind === "material") return materialProse({ id, name, type, system });
   if (LORE[name]) return paragraph(LORE[name]);
   if (type === "recipe") {
     const result = name.replace(/^(Чертёж|Формула):\s*/, "");
     return paragraph(system.recipe?.category === "formula"
       ? `Алхимическая формула с пропорциями, порядком смешивания и временем выдержки. По ней готовят «${result}».`
       : `Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «${result}».`);
-  }
-  if (system.kind === "material") {
-    const { substance, location } = system.material ?? {};
-    const lead = substance ? `Алхимический ингредиент, содержащий субстанцию «${substanceName(substance)}».` : "Сырьё для ремесленников: кузнецов, портных и оружейников.";
-    return paragraph(location ? `${lead} Где искать: ${location.toLocaleLowerCase("ru")}.` : lead);
   }
   return "";
 }

@@ -14,6 +14,7 @@ import { conditionUpdate, carriedWeight } from "../scripts/data/physical-items.m
 import { equipmentQuote, acquireEquipment } from "../scripts/data/equipment-purchase.mjs";
 import { migrateEquipmentContent, EQUIPMENT_CONTENT_VERSION } from "../scripts/migrations/equipment-content.mjs";
 import { ammunitionUpdate } from "../scripts/migrations/ammunition-data.mjs";
+import { legacyMaterialProse } from "../scripts/data/material-descriptions.mjs";
 
 const translations = JSON.parse(await readFile(new URL("../lang/ru.json", import.meta.url), "utf8"));
 const sources = compendiumData(translations).equipment;
@@ -99,7 +100,10 @@ test("content update appends only missing ammunition, keeps edited entries and r
 
 function applyUpdate(item, update) {
   for (const [key, value] of Object.entries(update)) {
-    if (key.startsWith("system.")) item.system[key.slice(7)] = value;
+    if (key.startsWith("system.")) {
+      const parts = key.split("."), last = parts.pop();
+      parts.reduce((target, part) => target[part] ??= {}, item)[last] = value;
+    }
     else if (key.startsWith("flags.")) {
       const [, scope, flag] = key.split(".");
       item.flags ??= {}; item.flags[scope] ??= {}; item.flags[scope][flag] = value;
@@ -284,4 +288,24 @@ test("version-five worlds append transport and tack once with their own folders"
  assert.equal(state.writes.find(([key])=>key==="items")[1],18);
  assert.equal(state.writes.find(([key])=>key==="folders")[1],2);
  const count=state.writes.length;await migrateEquipmentContent();assert.equal(state.writes.length,count);
+});
+
+test("version-fourteen material update reaches pack, world, owned items and unlinked tokens without replacing custom notes",async()=>{
+  const state=migrationFixture({startVersion:14});
+  for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
+  const oldMaterial=id=>{
+    const item=structuredClone(sources.find(item=>item.system.ruleId==='material.beast-bones'));
+    item._id=id;item.system.material.location='Покупается или изготавливается';
+    item.system.description=legacyMaterialProse(item.system);item.system.quantity=7;return item;
+  };
+  const stock=oldMaterial('stock'),world=oldMaterial('world'),owned=oldMaterial('owned'),token=oldMaterial('token'),custom=oldMaterial('custom');
+  custom.system.description='<p>Заметки игрока</p>';custom.system.material.location='Мой тайник';
+  state.index.set(stock._id,stock);game.items=[world,custom];
+  const actor=(uuid,item)=>({uuid,isOwner:true,items:[item],updateEmbeddedDocuments:async(_type,updates)=>{for(const update of updates)applyUpdate(item,update);}});
+  game.actors=[actor('Actor.a',owned)];game.scenes=[{tokens:[{actorLink:false,actor:actor('Scene.s.Token.t.Actor.t',token)}]}];
+  await migrateEquipmentContent();
+  for(const item of [stock,world,owned,token]){assert.equal(item.system.material.location,'Чудовища и животные');assert.match(item.system.description,/Кости, полученные/);assert.equal(item.system.quantity,7);assert.equal(item.system.price,8);}
+  assert.equal(custom.system.description,'<p>Заметки игрока</p>');assert.equal(custom.system.material.location,'Мой тайник');
+  assert.equal(state.version,EQUIPMENT_CONTENT_VERSION);assert.equal(state.pack.locked,true);
+  const writes=state.writes.length;await migrateEquipmentContent();assert.equal(state.writes.length,writes);
 });

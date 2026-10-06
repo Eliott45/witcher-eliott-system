@@ -12,6 +12,7 @@ import { editEffectDuration } from "./effect-duration-editor.mjs";
 import { effectDurationLabel } from "../data/effect-duration.mjs";
 import { initialEffectTemplate } from "../data/effect-items.mjs";
 import { alchemyDescriptionDetails } from "../data/alchemy-descriptions.mjs";
+import { materialDescriptionDetails } from "../data/material-descriptions.mjs";
 import { itemDescriptionSource } from "../data/item-lore.mjs";
 import { consumptionActions } from "./consumption-actions.mjs";
 import { consumableContext } from "../data/consumables.mjs";
@@ -83,6 +84,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
       typeLabel: `TYPES.Item.${this.item.type}`,
       description: await enrich(itemDescriptionSource(this.item)),descriptionSource:itemDescriptionSource(this.item),
       alchemyDetails: alchemyDescriptionDetails(this.item.system),
+      materialDetails: materialDescriptionDetails(this.item.system),
       abilities: abilities.filter(Boolean)
     });
   }

@@ -1,4 +1,5 @@
 import { equipmentUuid } from "./workshop.mjs";
+import { MATERIAL_LOCATION_CORRECTIONS } from "./material-descriptions.mjs";
 const rarity = { e: "everywhere", c: "common", r: "rare", u: "unique" };
 // Core pp. 128–129 and 143–145. Weight and price are for ONE unit, not the foraging yield.
 const rows = [
@@ -37,7 +38,7 @@ const ingredients = {
 };
 function material(row, n, substance = "") {
   const [id,name,rare,weight,price,forageDC=0,quantityFormula="",location="Покупается или изготавливается"] = row;
-  return { id:`material.${id}`, documentId:`matr${String(n).padStart(12,"0")}`, name, type:"equipment", source:"materials", system:{ kind:"material", weight, price, rarity:rarity[rare], material:{substance,forageDC,quantityFormula,location}, source:`Базовая книга, стр. ${substance ? "143–145" : "128–129"}` } };
+  return { id:`material.${id}`, documentId:`matr${String(n).padStart(12,"0")}`, name, type:"equipment", source:"materials", system:{ kind:"material", weight, price, rarity:rarity[rare], material:{substance,forageDC,quantityFormula,location:MATERIAL_LOCATION_CORRECTIONS[`material.${id}`] ?? location}, source:`Базовая книга, стр. ${substance ? "143–145" : "128–129"}` } };
 }
 export const MATERIALS = [...rows.map((row,i)=>material(row,i+1)), ...Object.entries(ingredients).flatMap(([substance,entries],group)=>entries.map((row,i)=>material(row,100+group*20+i,substance)))];
 export const materialUuid = id => equipmentUuid(MATERIALS.find(entry=>entry.id===`material.${id}`).documentId);
