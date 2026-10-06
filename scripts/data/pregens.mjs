@@ -1,4 +1,5 @@
 import { SYSTEM_ID, VISION_ANGLE } from "../config.mjs";
+import { additionalPregenSources } from "./core-pregens.mjs";
 
 /** Embed canonical catalogue records, retaining their IDs and import provenance. */
 export function pregenSources(packs) {
@@ -51,5 +52,5 @@ export function pregenSources(packs) {
       gear("gear.alchemy-tools"), horse, gear("tack.saddle", 1, { containerId: horse._id, equipped: true }),
       gear("gear.bandolier"), gear("gear.witcher-medallion", 1, { equipped: true })
     ], effects: []
-  }];
+  }, ...additionalPregenSources({ take, gear })];
 }

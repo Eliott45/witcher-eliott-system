@@ -322,6 +322,25 @@ for (const pack of game.system.packs) {
 }
 assert.equal(documents.size, Object.values((await import("./compendium-data.mjs")).compendiumData(await readJSON("../lang/ru.json"))).flat().length);
 const geraltSource = documents.get(`Compendium.${game.system.id}.pregens.Actor.pregenGeralt0001`);
+const pregenSources = await readJSON("../pack-sources/pregens.json");
+assert.equal(pregenSources.length,8);
+for(const source of pregenSources) {
+  const initial=documents.get(`Compendium.${game.system.id}.pregens.Actor.${source._id}`);
+  const restored=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(initial.toObject())));
+  restored.system.prepareDerivedData();
+  assert.equal(restored.items.size,source.items.length,source.name);
+  assert.equal(restored.system.health.value,source.system.health.value,source.name);
+  assert.equal(restored.system.health.max,source.system.health.max,source.name);
+  assert.equal(restored.system.stamina.max,source.system.stamina.max,source.name);
+  assert.equal(restored.prototypeToken.sight.angle,360);
+  assert.deepEqual(restored.flags[game.system.id].pregen,source.flags[game.system.id].pregen);
+  assert.deepEqual(restored.system.languages,source.system.languages);
+  for(const item of restored.items) {
+    assert.equal(item.flags.core.sourceId,source.items.find(entry=>entry._id===item.id).flags.core.sourceId);
+    if(item.system.containerId)assert.ok(restored.items.has(item.system.containerId));
+    if(item.system.transport?.mountId)assert.ok(restored.items.has(item.system.transport.mountId));
+  }
+}
 for (const geralt of [geraltSource, new foundry.documents.BaseActor(JSON.parse(JSON.stringify(geraltSource.toObject())))]) {
   assert.equal(geralt.prototypeToken.sight.angle, 360);
   geralt.system.prepareDerivedData();

@@ -4,6 +4,7 @@ import { registerEffectExpiry } from "./combat/effect-expiry.mjs";
 import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from "./settings.mjs";
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
 import { migrateBestiaryContent,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
+import { migratePregenContent,registerPregenMigration } from "./migrations/pregen-content.mjs";
 import { registerWeaponChat } from "./combat/weapon-rolls.mjs";
 import { registerGroupAmbush } from "./chat/group-ambush.mjs";
 import { migrateMacroContent } from "./migrations/macro-content.mjs";
@@ -98,6 +99,7 @@ Hooks.once("init", async () => {
   registerEquipmentContentMigration();
   registerSpellContentMigration();
   registerBestiaryMigration();
+  registerPregenMigration();
   registerSheetPreferences();
   for (const type of COMBAT_ACTOR_TYPES) {
     CONFIG.Actor.dataModels[type] = WitcherActorData;
@@ -179,9 +181,13 @@ Hooks.once("ready", async () => {
     console.error(`${SYSTEM_ID} | Could not update magic content`,error);
     ui.notifications.error("Не удалось обновить каталог магии. Подробности в консоли.");
   });
-  migrateEquipmentContent().catch(error => {
+  await migrateEquipmentContent().catch(error => {
     console.error(`${SYSTEM_ID} | Could not update equipment content`, error);
     ui.notifications.error("Не удалось обновить каталог предметов. Подробности в консоли.");
+  });
+  await migratePregenContent().catch(error => {
+    console.error(`${SYSTEM_ID} | Could not update pregens`, error);
+    ui.notifications.error("Не удалось добавить прегены. Подробности в консоли.");
   });
   syncExistingDeathStates().catch(reportEffectError);
   syncExistingExhaustion().catch(reportEffectError);
