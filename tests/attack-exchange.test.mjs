@@ -69,6 +69,7 @@ test("a hit asks for its location first, then damage uses the saved zone without
 test("each NPC strike has an independent location using the target's body plan", async t => {
   const f = fixture(t, { totals: [12, 13], category: "necrophage", results: [5, 10, 8, 8] });
   f.actor.type = "npc";
+  f.target.system.creature.hasTailOrWings = true;
   const first = await rollExchangeLocation(f.message, 0);
   const second = await rollExchangeLocation(f.message, 1);
   assert.equal(exchange(first).location.id, "torso", "5 is torso on the monster table");
@@ -76,6 +77,19 @@ test("each NPC strike has an independent location using the target's body plan",
   assert.equal(exchange(second).bodyPlan, "monster");
   assert.equal(exchange(await rollExchangeDamage(f.message, 0)).location.id, "torso");
   assert.equal(exchange(await rollExchangeDamage(f.message, 1)).location.id, "tail");
+});
+
+test("a monster without tail or wings takes a ten in its left limb, persisted through damage", async t => {
+  const f = fixture(t, { category: "necrophage", results: [10, 8] });
+  const location = await rollExchangeLocation(f.message, 0);
+  assert.equal(exchange(location).location.id, "leftArm");
+  assert.equal(exchange(location).location.multiplier, 0.5);
+  assert.match(exchangeRowHTML(f.message, 0), /Левая рука \/ конечность/);
+  f.target.system.creature.hasTailOrWings = true;
+  const damage = await rollExchangeDamage(f.message, 0);
+  assert.equal(exchange(damage).location.id, "leftArm", "anatomy edits cannot change an already rolled location");
+  assert.equal(damagePreview(f.message, 0).armor.zone, "torso");
+  assert.equal(damagePreview(f.message, 0).result.total, 2, "steel is halved against this monster, then halved for the limb");
 });
 
 test("aimed attacks skip the random location step and keep their critical table", async t => {

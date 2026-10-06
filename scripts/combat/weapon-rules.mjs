@@ -39,10 +39,10 @@ export const RANGED_BANDS = [{id:"normal",name:"Дистанция: без по�
   {id:"point",name:"В упор (≤ 0,5 м) · +5",penalty:5},{id:"short",name:"Ближняя (¼ дальности) · 0",penalty:0},
   {id:"medium",name:"Средняя (½ дальности) · −2",penalty:-2},{id:"long",name:"Дальняя · −4",penalty:-4},
   {id:"extreme",name:"Предельная (×2) · −6",penalty:-6}];
-export function hitLocation(result,bodyPlan="humanoid") {
+export function hitLocation(result,bodyPlan="humanoid",{hasTailOrWings=true}={}) {
   if(!Number.isInteger(result)||result<1||result>10||!["humanoid","monster"].includes(bodyPlan))throw new Error("Неизвестная зона попадания.");
   const table=bodyPlan==="humanoid"?["head","torso","torso","torso","rightArm","leftArm","rightLeg","rightLeg","leftLeg","leftLeg"]:
-    ["head","torso","torso","torso","torso","rightArm","rightArm","leftArm","leftArm","tail"];
+    ["head","torso","torso","torso","torso","rightArm","rightArm","leftArm","leftArm",hasTailOrWings?"tail":"leftArm"];
   return ATTACK_LOCATIONS.find(entry=>entry.id===table[result-1]);
 }
 export function attackModes(actor,item) {

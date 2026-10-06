@@ -147,9 +147,9 @@ function exchangeLocation(message, index) {
 export function rollExchangeLocation(message, index) {
   return rollAttackStep(message, index, "location", async attack => {
     if (attack.location !== "random") return;
-    const plan = bodyPlanOf(targetActor(attack));
+    const target = targetActor(attack), plan = bodyPlanOf(target);
     const roll = await new foundry.dice.Roll("1d10").evaluate({ allowInteractive: !message.blind });
-    const { id, name, multiplier } = hitLocation(roll.total, plan);
+    const { id, name, multiplier } = hitLocation(roll.total, plan, { hasTailOrWings: target?.system.creature?.hasTailOrWings ?? false });
     return { rolls: [roll], flavor: `<h3>${esc(attack.name)} · место попадания</h3><p>${esc(name)} · ×${multiplier} после брони</p>`,
       exchange: { location: { id, name, multiplier }, result: roll.total, bodyPlan: plan } };
   });

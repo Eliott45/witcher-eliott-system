@@ -90,7 +90,7 @@ export async function rollHitLocation(message,bodyPlan) {
   const roll=await new foundry.dice.Roll("1d10").evaluate({allowInteractive:!message.blind});
   const location=hitLocation(roll.total,bodyPlan);
   return roll.toMessage({speaker:{...message.speaker},whisper:[...message.whisper],blind:message.blind,
-    flavor:`<section class="witcher-attack-chat"><h3>${esc(message.flags[SYSTEM_ID].weaponAttack.name)} · ${location.name}</h3><p>${bodyPlan==="humanoid"?"Гуманоид":"Чудовище"}: ${roll.total} на 1d10 → урон ×${location.multiplier} после брони.</p></section>`,
+    flavor:`<section class="witcher-attack-chat"><h3>${esc(message.flags[SYSTEM_ID].weaponAttack.name)} · ${location.name}</h3><p>${bodyPlan==="humanoid"?"Гуманоид":"Чудовище"}: ${roll.total} на 1d10 → урон ×${location.multiplier} после брони.</p>${location.id==="tail"?"<p>Если у чудовища нет хвоста и крыльев, попадание приходится в левую конечность (×½).</p>":""}</section>`,
     flags:{[SYSTEM_ID]:{skipLuck:true,hitLocation:{sourceId:message.id,bodyPlan,id:location.id,multiplier:location.multiplier}}}},
     {messageMode:message.blind?"blind":message.whisper?.length?"gm":"public"});
 }

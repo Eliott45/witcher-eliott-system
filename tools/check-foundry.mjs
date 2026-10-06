@@ -1391,6 +1391,7 @@ for(const source of bestiarySources()) {
     const view=await npcSheet._prepareContext({});const rendered=npcTemplate(view);
     assert.ok(rendered.includes('data-combat-option="location"'));
     assert.ok(!rendered.includes('data-action="rollLocation"'));
+    assert.equal(rendered.includes('name="system.creature.hasTailOrWings"'),editing);
     assert.ok(rendered.includes(source.name));assert.ok(rendered.includes('data-action="attackWeapon"'));assert.ok(!rendered.includes('data-mode="strong"'));
     assert.match(rendered,/<nav class="[^\"]*\btabs\b[^\"]*"/,"Foundry changeTab requires a .tabs navigation container");
     if(!editing)creatureViews.push({actor,sheet:npcSheet,view,html:rendered});
@@ -1409,6 +1410,10 @@ const emptyCreature=new foundry.documents.BaseActor({name:'New creature',type:'n
 const emptySheet=new WitcherNPCSheet();emptySheet.actor=emptyCreature;emptySheet.isEditable=true;
 assert.match(npcTemplate(await emptySheet._prepareContext({})),/Бандит/);
 assert.equal(new WitcherActorData(legacyActorData.toObject()).creature.category,'humanoid');
+const tailData=new WitcherActorData(legacyActorData.toObject());
+assert.equal(tailData.creature.hasTailOrWings,false);
+tailData.updateSource({'creature.hasTailOrWings':true});
+assert.equal(new WitcherActorData(JSON.parse(JSON.stringify(tailData.toObject()))).creature.hasTailOrWings,true);
 // Exercise NPC drop through native Item/Actor schemas; pointer delivery is outside this harness.
 const priorWorldItems=game.items;
 game.items={fromCompendium:item=>item.toObject()};
