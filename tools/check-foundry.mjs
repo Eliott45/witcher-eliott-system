@@ -589,6 +589,8 @@ const fullTurnActor={...sheet.actor,items:[],effects:[dodgeForRender,aimForRende
 const fullTurnCombat=fullTurnCombatContext(fullTurnActor,{repeat:true});
 assert.equal(fullTurnCombat.repeat,false);assert.equal(fullTurnCombat.defenses[0].cost,0);
 const fullTurnHTML=combatTemplate({combat:fullTurnCombat,editable:true});
+assert.ok(fullTurnHTML.includes('data-combat-option="location"'));
+assert.ok(!fullTurnHTML.includes('data-action="rollLocation"'));
 assert.match(fullTurnHTML,/<h3>.*Атака<\/h3>/);
 assert.match(fullTurnHTML,/data-combat-option="repeat"\s+disabled/);
 assert.ok(fullTurnHTML.includes("+2 / +3"));assert.ok(fullTurnHTML.includes("Действия полного хода"));
@@ -1387,6 +1389,8 @@ for(const source of bestiarySources()) {
   for(const editing of [false,true]) {
     npcSheet.editing=editing;
     const view=await npcSheet._prepareContext({});const rendered=npcTemplate(view);
+    assert.ok(rendered.includes('data-combat-option="location"'));
+    assert.ok(!rendered.includes('data-action="rollLocation"'));
     assert.ok(rendered.includes(source.name));assert.ok(rendered.includes('data-action="attackWeapon"'));assert.ok(!rendered.includes('data-mode="strong"'));
     assert.match(rendered,/<nav class="[^\"]*\btabs\b[^\"]*"/,"Foundry changeTab requires a .tabs navigation container");
     if(!editing)creatureViews.push({actor,sheet:npcSheet,view,html:rendered});

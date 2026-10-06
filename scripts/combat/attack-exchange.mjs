@@ -9,11 +9,11 @@ import { fullTurnStart } from "./full-turn-rules.mjs";
 import { woundEffectData } from "./critical-wound-effects.mjs";
 import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
-import { hitLocation, ATTACK_LOCATIONS } from "./weapon-rules.mjs";
+import { hitLocation, bodyPlanOf, ATTACK_LOCATIONS } from "./weapon-rules.mjs";
 import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
 import { criticalWoundByRoll, aimedCriticalRoll, ORGAN_WOUNDS, ANATOMY_FREE_BONUS } from "../data/critical-wounds.mjs";
 
-// One weapon attack card hosts the whole exchange: each attack roll gets its own defense, damage and
+// One weapon attack card hosts the whole exchange: each attack roll gets its own defense, location, damage and
 // application. Those are separate messages written by whoever owns that step (no cross-owner edits);
 // they link back to the attack and are folded out of the log once the card can show them.
 
@@ -29,7 +29,6 @@ const rolling = message => Boolean(message?._dice3danimating) && !message._witch
 const linked = (attackId, index, kind) => { const message = linkedAny(attackId, index, kind); return rolling(message) ? null : message; };
 const targetToken = attack => attack?.target ? globalThis.canvas?.scene?.tokens.find(token => token.uuid === attack.target) ?? fromUuidSync(attack.target) : null;
 const targetActor = attack => targetToken(attack)?.actor ?? null;
-const bodyPlan = actor => actor?.type === "npc" && actor.system.creature?.category !== "humanoid" ? "monster" : "humanoid";
 const anatomyFree = actor => ["specter", "elemental"].includes(actor?.system.creature?.category);
 const DC_UNAWARE = 10;
 
@@ -116,39 +115,71 @@ export function exchangeOutcome(message, index) {
     mode: flagsOf(defense).defense?.mode ?? "", name: none ? "Без защиты" : flagsOf(defense).defense?.name ?? "Защита" };
 }
 
-export async function rollExchangeDamage(message, index) {
+const pendingRolls = new Set();
+
+/** Record one attacker's step once, with the original attack's audience and dice animation. */
+async function rollAttackStep(message, index, kind, prepare) {
   const attack = flagsOf(message).weaponAttack, outcome = exchangeOutcome(message, index), actor = message.speakerActor;
-  if (!actor?.isOwner || !outcome?.hit || linkedAny(message.id, index, "damage")) return;
-  const target = targetActor(attack), item = actor.items.get(attack.itemId), weapon = item ? effectiveItem(item) : {};
-  const traits = weaponDamageTraits(weapon), monster = target ? monsterResistant(target) : false;
-  const rolls = [await new foundry.dice.Roll(attack.damage).evaluate()];
-  const silver = traits.silverDice && monster ? await new foundry.dice.Roll(traits.silverDice).evaluate() : null;
-  if (silver) rolls.push(silver);
-  let location = ATTACK_LOCATIONS.find(entry => entry.id === attack.location), locationRoll = null;
-  if (attack.location === "random") {
-    locationRoll = await new foundry.dice.Roll("1d10").evaluate(); rolls.push(locationRoll);
-    location = hitLocation(locationRoll.total, bodyPlan(target));
-  }
-  let critical = null;
-  if (outcome.critical) {
-    const aimed = attack.location !== "random" && !attack.locationRoll;
-    const critRoll = await new foundry.dice.Roll(aimed && ["head", "torso"].includes(location.id) ? "1d6" : aimed ? "0" : "2d6").evaluate();
-    if (critRoll.dice.length) rolls.push(critRoll);
-    const tableRoll = aimed ? aimedCriticalRoll(location.id, critRoll.total) : critRoll.total;
-    let wound = criticalWoundByRoll(outcome.critical.id, tableRoll), bonus = outcome.critical.bonus;
-    if (wound && anatomyFree(target) && ORGAN_WOUNDS.has(wound.id)) { bonus += ANATOMY_FREE_BONUS[outcome.critical.id]; wound = null; }
-    critical = { level: outcome.critical.id, name: outcome.critical.name, bonus, roll: tableRoll, aimed, wound };
-  }
+  const key = `${message.id}:${index}:${kind}`;
+  if (!attack || !actor?.isOwner || !message.isContentVisible || !outcome?.hit || pendingRolls.has(key)
+    || linkedAny(message.id, index, kind) || linkedAny(message.id, index, "damage")) return;
+  pendingRolls.add(key);
   const display = trackRollDisplay();
   try {
-    const created = await post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls,
-      flavor: `<h3>${esc(attack.name)} · урон</h3>`,
-      flags: { [SYSTEM_ID]: { ...display.flags[SYSTEM_ID], skipLuck: true, exchange: { attack: message.id, index, kind: "damage",
-        base: rolls[0].total, silver: silver?.total ?? 0, location: { id: location.id, name: location.name, multiplier: location.multiplier },
-        traits, critical } } } });
+    const data = await prepare(attack, outcome, actor);
+    if (!data) return;
+    const { exchange, ...content } = data;
+    const created = await foundry.documents.ChatMessage.implementation.create({ ...content,
+      speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), blind: message.blind, whisper: [...message.whisper],
+      flags: { [SYSTEM_ID]: { ...display.flags[SYSTEM_ID], skipLuck: true,
+        exchange: { ...exchange, attack: message.id, index, kind } } } });
     await display.wait(created);
     return created;
-  } finally { display.close(); }
+  } finally { display.close(); pendingRolls.delete(key); }
+}
+
+function exchangeLocation(message, index) {
+  const attack = flagsOf(message).weaponAttack;
+  return attack.location === "random" ? exchangeOf(linked(message.id, index, "location"))?.location
+    : ATTACK_LOCATIONS.find(entry => entry.id === attack.location);
+}
+
+export function rollExchangeLocation(message, index) {
+  return rollAttackStep(message, index, "location", async attack => {
+    if (attack.location !== "random") return;
+    const plan = bodyPlanOf(targetActor(attack));
+    const roll = await new foundry.dice.Roll("1d10").evaluate({ allowInteractive: !message.blind });
+    const { id, name, multiplier } = hitLocation(roll.total, plan);
+    return { rolls: [roll], flavor: `<h3>${esc(attack.name)} · место попадания</h3><p>${esc(name)} · ×${multiplier} после брони</p>`,
+      exchange: { location: { id, name, multiplier }, result: roll.total, bodyPlan: plan } };
+  });
+}
+
+export function rollExchangeDamage(message, index) {
+  return rollAttackStep(message, index, "damage", async (attack, outcome, actor) => {
+    const location = exchangeLocation(message, index);
+    if (!location) return;
+    const target = targetActor(attack), item = actor.items.get(attack.itemId), weapon = item ? effectiveItem(item) : {};
+    const traits = weaponDamageTraits(weapon), monster = target ? monsterResistant(target) : false;
+    const options = { allowInteractive: !message.blind };
+    const rolls = [await new foundry.dice.Roll(attack.damage).evaluate(options)];
+    const silver = traits.silverDice && monster ? await new foundry.dice.Roll(traits.silverDice).evaluate(options) : null;
+    if (silver) rolls.push(silver);
+    let critical = null;
+    if (outcome.critical) {
+      // Older cards may contain a random location rolled before the attack, not an aimed strike.
+      const aimed = attack.location !== "random" && !attack.locationRoll;
+      const critRoll = await new foundry.dice.Roll(aimed && ["head", "torso"].includes(location.id) ? "1d6" : aimed ? "0" : "2d6").evaluate(options);
+      if (critRoll.dice.length) rolls.push(critRoll);
+      const tableRoll = aimed ? aimedCriticalRoll(location.id, critRoll.total) : critRoll.total;
+      let wound = criticalWoundByRoll(outcome.critical.id, tableRoll), bonus = outcome.critical.bonus;
+      if (wound && anatomyFree(target) && ORGAN_WOUNDS.has(wound.id)) { bonus += ANATOMY_FREE_BONUS[outcome.critical.id]; wound = null; }
+      critical = { level: outcome.critical.id, name: outcome.critical.name, bonus, roll: tableRoll, aimed, wound };
+    }
+    return { rolls, flavor: `<h3>${esc(attack.name)} · урон</h3>`,
+      exchange: { base: rolls[0].total, silver: silver?.total ?? 0,
+        location: { id: location.id, name: location.name, multiplier: location.multiplier }, traits, critical } };
+  });
 }
 
 /** Live preview of the damage against the target's current armor; the same function applies it. */
@@ -239,7 +270,7 @@ function fumbleHTML(message, index, role, outcome, owner) {
 const stepsHTML = steps => `<ul class="witcher-roll-breakdown">${steps.map(step => `<li><span>${esc(step.label)}${step.detail ? ` <small>${esc(step.detail)}</small>` : ""}</span><b>${esc(step.value)}</b></li>`).join("")}</ul>`;
 const button = (attrs, label, enabled, hint = "") => `<button type="button" ${attrs} ${enabled ? "" : "disabled"} ${hint ? `data-tooltip="${esc(hint)}"` : ""}>${label}</button>`;
 
-function rowHTML(message, index, attack) {
+export function exchangeRowHTML(message, index, attack = flagsOf(message).weaponAttack) {
   const total = message.rolls[index]?.total, target = targetActor(attack), outcome = exchangeOutcome(message, index);
   const head = `<header><span>Атака ${attack.count > 1 ? `${index + 1} ` : ""}<b>${total}</b></span>`;
   const ownFumble = fumbleHTML(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner);
@@ -265,7 +296,16 @@ function rowHTML(message, index, attack) {
   if (outcome.hit) {
     const damage = linked(message.id, index, "damage"), applied = linked(message.id, index, "applied");
     if (!damage && linkedAny(message.id, index, "damage")) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-dice-d6 fa-spin"></i> Урон бросается…</p>`;
-    else if (!damage) body += message.speakerActor?.isOwner ? `<div class="witcher-exchange-actions">${button("data-exchange-damage", `<i class="fa-solid fa-dice-d6"></i> Урон ${esc(attack.damage)}`, true)}</div>` : `<p class="witcher-exchange-note">Ждём бросок урона.</p>`;
+    else if (!damage) {
+      const location = exchangeLocation(message, index), locationMessage = linkedAny(message.id, index, "location");
+      if (!location) {
+        if (locationMessage) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-dice-d10 fa-spin"></i> Бросается место попадания…</p>`;
+        else body += message.speakerActor?.isOwner ? `<div class="witcher-exchange-actions">${button("data-exchange-location", '<i class="fa-solid fa-dice-d10"></i> Место попадания · 1d10', true)}</div>` : `<p class="witcher-exchange-note">Ждём бросок места попадания.</p>`;
+      } else {
+        body += `<p class="witcher-exchange-location">${locationMessage ? `1d10: <b>${exchangeOf(locationMessage).result}</b> → ` : "Место попадания: "}<b>${esc(location.name)}</b> · ×${location.multiplier === 0.5 ? "½" : location.multiplier} после брони</p>`;
+        body += message.speakerActor?.isOwner ? `<div class="witcher-exchange-actions">${button("data-exchange-damage", `<i class="fa-solid fa-dice-d6"></i> Урон ${esc(attack.damage)}`, true)}</div>` : `<p class="witcher-exchange-note">Ждём бросок урона.</p>`;
+      }
+    }
     else {
       const data = exchangeOf(damage), wound = data.critical?.wound;
       body += `<p class="witcher-exchange-damage">Урон <b>${data.base}</b>${data.silver ? ` + серебро <b>${data.silver}</b>` : ""} → ${esc(data.location.name)}${data.location.multiplier !== 1 ? ` (×${data.location.multiplier === 0.5 ? "½" : data.location.multiplier})` : ""}</p>`;
@@ -296,12 +336,13 @@ export function renderExchange(message, html) {
   const target = targetActor(attack);
   const list = document.createElement("div");
   list.className = "witcher-exchange";
-  list.innerHTML = `<h4><i class="fa-solid fa-swords"></i> Против: ${esc(target?.name ?? "цель недоступна")}</h4><ol>${message.rolls.map((_roll, index) => rowHTML(message, index, attack)).join("")}</ol>`;
+  list.innerHTML = `<h4><i class="fa-solid fa-swords"></i> Против: ${esc(target?.name ?? "цель недоступна")}</h4><ol>${message.rolls.map((_roll, index) => exchangeRowHTML(message, index, attack)).join("")}</ol>`;
   (html.querySelector(".message-content") ?? section).append(list);
   list.querySelectorAll(":scope > ol > li").forEach((row, index) => {
     const run = (selector, work) => row.querySelector(selector)?.addEventListener("click", async event => {
       event.stopPropagation(); event.currentTarget.disabled = true;
       try { await work(event.currentTarget); } catch (error) { ui.notifications.warn(error.message); }
+      finally { ui.chat?.updateMessage(message, { notify: false }); }
     });
     row.querySelector("[data-exchange-repeat]")?.addEventListener("click", event => {
       event.stopPropagation();
@@ -313,6 +354,7 @@ export function renderExchange(message, html) {
       const repeatBox = row.querySelector("[data-exchange-repeat]");
       try { await defendAttack(message, index, choice.dataset.exchangeDefend, choice.dataset.itemId, repeatBox && !repeatBox.disabled ? repeatBox.getAttribute("aria-pressed") === "true" : null); } catch (error) { ui.notifications.warn(error.message); }
     }));
+    run("[data-exchange-location]", () => rollExchangeLocation(message, index));
     run("[data-exchange-damage]", () => rollExchangeDamage(message, index));
     run("[data-exchange-apply]", () => applyExchangeDamage(message, index));
     run("[data-exchange-stun]", () => rollStun(targetActor(attack)));

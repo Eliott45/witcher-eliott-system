@@ -179,11 +179,12 @@
 .witcher-exchange-actions button { flex:1 1 auto; width:auto; height:auto; min-height:28px; padding:3px 8px; font-size:11.5px; line-height:1.2; color:#4a3c2d; background:#efe6d4; border:1px solid #bba57f; border-radius:3px; }
 .witcher-exchange-actions button:hover:not(:disabled) { background:#e3d4b6; }
 .witcher-exchange-actions button:disabled { opacity:.45; }
-.witcher-exchange-actions [data-exchange-apply], .witcher-exchange-actions [data-exchange-damage] { color:#fff4e2; background:#7a2f29; border-color:#5c211d; }
-.witcher-exchange-actions [data-exchange-apply]:hover:not(:disabled), .witcher-exchange-actions [data-exchange-damage]:hover:not(:disabled) { background:#922f27; }
+.witcher-exchange-actions [data-exchange-apply], .witcher-exchange-actions [data-exchange-damage], .witcher-exchange-actions [data-exchange-location] { color:#fff4e2; background:#7a2f29; border-color:#5c211d; }
+.witcher-exchange-actions [data-exchange-apply]:hover:not(:disabled), .witcher-exchange-actions [data-exchange-damage]:hover:not(:disabled), .witcher-exchange-actions [data-exchange-location]:hover:not(:disabled) { background:#922f27; }
 .witcher-exchange-crit { margin:6px 0 0; color:#8b2f26; font-weight:700; }
 .witcher-exchange-note { margin:6px 0 0; color:#7a6a52; font-style:italic; }
 .witcher-exchange-damage { margin:6px 0 0; }
+.witcher-exchange-location { margin:6px 0 0; color:#4a3c2d; }
 .witcher-exchange-applied { margin:6px 0 0; color:#8b2f26; font-weight:700; cursor:help; }
 .witcher-exchange-wound { margin-top:5px; padding:4px 7px; border:1px solid #d9b3a8; border-radius:3px; background:#f6e3dd; }
 .witcher-exchange-wound summary { cursor:pointer; font-weight:700; color:#7b2a24; }
@@ -235,10 +236,3 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-group-initiative li b { text-align:right; font:700 15px Georgia,serif; }
 .witcher-armor-layered { grid-column:1/-1; margin:4px 0 0; font-size:12px; color:#6b5c49; }
 .witcher-npc-armor-total { color:#2f5a4c; }
-/* Pre-rolled hit location next to the location select. */
-.witcher-location-picker { display:flex; align-items:stretch; gap:4px; }
-.witcher-location-picker select { flex:1; min-width:0; }
-.witcher-combat-panel .witcher-location-roll { flex:none; width:34px; padding:0; }
-.witcher-location-rolled { flex:1; display:flex; align-items:center; gap:6px; min-width:0; padding:0 4px 0 9px; border:1px solid #7a2f29; border-radius:4px; background:#f6e3dd; color:#7a2f29; font-weight:600; font-size:12px; white-space:nowrap; }
-.witcher-location-rolled small { color:#8a7356; }
-.witcher-combat-panel .witcher-location-rolled button { margin-left:auto; width:22px; height:22px; min-height:0; padding:0; border:0; background:none; color:#7a2f29; }
