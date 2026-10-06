@@ -1,0 +1,13 @@
+<article class="witcher-recipe-card" data-recipe-card data-kind="{{recipe.kind}}" data-search="{{recipe.search}}">
+  <header><button type="button" class="witcher-recipe-name" data-action="viewSheetItem" data-item-id="{{recipe.id}}">{{recipe.name}}</button><span>{{recipe.subtitle}}</span></header>
+  <div class="witcher-recipe-needs" role="list" aria-label="{{#if recipe.signs.length}}Субстанции формулы{{else}}Компоненты чертежа{{/if}}">
+    {{#each recipe.signs}}<img role="listitem" class="{{#if missing}}is-missing{{/if}}" src="{{img}}" alt="{{name}}{{#if missing}} — не хватает{{/if}}" title="{{name}}{{#if missing}} — не хватает{{/if}}" width="24" height="24">{{/each}}
+    {{#each recipe.extras}}<span role="listitem" class="witcher-recipe-chip {{#if missing}}is-missing{{/if}}">{{#if ../recipe.signs.length}}+ {{/if}}{{name}}{{#if many}} ×{{quantity}}{{/if}}</span>{{/each}}
+  </div>
+  <dl><div><dt>Сложность</dt><dd>{{recipe.dc}}</dd></div><div><dt>Время</dt><dd>{{recipe.time}}</dd></div><div><dt>Результат</dt><dd>×{{recipe.quantity}}</dd></div><div><dt>Проверка{{#if recipe.bonus}} · {{recipe.bonusLabel}}{{/if}}</dt><dd>1d10 {{recipe.total}}</dd></div></dl>
+  <details><summary class="{{#if recipe.unavailable}}is-missing{{else}}is-ready{{/if}}"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> {{recipe.status}}</summary>
+    {{#unless recipe.error}}<ul class="witcher-recipe-materials">{{#each recipe.materials}}<li class="{{#if missing}}is-missing{{/if}}"><span>{{name}}</span><strong>{{supplied}} / {{quantity}}</strong></li>{{/each}}</ul>{{/unless}}
+    <ul class="witcher-recipe-facilities">{{#each recipe.facilities}}<li><i class="fa-solid {{#if present}}fa-check{{else}}fa-screwdriver-wrench{{/if}}" aria-hidden="true"></i> {{name}}{{#unless present}} — нужны в мастерской{{/unless}}</li>{{/each}}{{#if recipe.forge}}<li><i class="fa-solid fa-fire" aria-hidden="true"></i> Кузница{{#if recipe.needsForge}} — нужен доступ{{else}} — есть{{/if}}</li>{{/if}}</ul>
+  </details>
+  <footer><button type="button" data-action="toggleRecipeMemory" data-item-id="{{recipe.id}}" {{disabled (or (not editable) recipe.rememberDisabled)}} aria-pressed="{{recipe.memorized}}"><i class="fa-solid {{#if recipe.memorized}}fa-brain{{else}}fa-book-open{{/if}}" aria-hidden="true"></i> {{#if recipe.memorized}}Забыть{{else}}Запомнить{{/if}}</button><button type="button" class="witcher-craft-primary" data-action="craftInventory" data-item-id="{{recipe.id}}" {{disabled (or (not editable) recipe.unavailable)}}><i class="fa-solid {{recipe.actionIcon}}" aria-hidden="true"></i> {{recipe.actionLabel}}</button></footer>
+</article>

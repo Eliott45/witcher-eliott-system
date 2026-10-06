@@ -15,6 +15,7 @@ const RECIPE_SECTIONS = category => [
   { id: "physical", label: category === "formula" ? "Формулы при себе" : "Чертежи при себе", icon: "fa-scroll", recipes: [] },
   { id: "unavailable", label: category === "formula" ? "Формулы не при себе" : "Чертежи не при себе", icon: "fa-box-archive", recipes: [] }
 ];
+const hasTool = (actor, id) => actor.items.some(item => available(item) && item.system.ruleId === id);
 const ALCHEMY_KINDS = { substance: "Алхимия", potion: "Эликсир", oil: "Масло", decoction: "Отвар" };
 
 /** Substance units of a formula as signs; the first carried units are lit, the missing ones are hollow. */
@@ -41,15 +42,18 @@ export async function recipeCards(actor, category) {
     if (category === "formula") result = await foundry.utils.fromUuid(recipe.resultUuid).catch(() => null);
     const bonus = physical ? 2 : 0;
     const ready = preview?.plan.complete && total !== null && canAct && !preview.needsTools;
-    const kind = result?.system?.alchemy?.category ?? "";
+    const formula = category === "formula";
+    // Formulas filter by what they brew, diagrams by grade; both reuse one card and one filter.
+    const kind = formula ? result?.system?.alchemy?.category ?? "" : recipe.grade ?? "";
+    const typeLabel = formula ? ALCHEMY_KINDS[kind] ?? "Формула" : "Чертёж";
     return {
       id: item.id, name: item.name.replace(/^(Формула|Чертёж):\s*/, ""), search: item.name.toLocaleLowerCase("ru"), physical, memorized, category, kind,
-      kindLabel: ALCHEMY_KINDS[kind] ?? "", grade: RECIPE_GRADES[recipe.grade] ?? "",
-      typeLabel: category === "formula" ? "Формула" : "Чертёж",
+      subtitle: [typeLabel, RECIPE_GRADES[recipe.grade], physical && "при себе"].filter(Boolean).join(" · "),
+      bonusLabel: formula ? "формула +2" : "чертёж +2", actionLabel: formula ? "Приготовить" : "Изготовить", actionIcon: formula ? "fa-flask" : "fa-hammer",
       dc: recipe.dc, time: durationLabel(recipe.time), quantity: recipe.quantity,
       bonus, total: total === null ? "—" : `${total + bonus >= 0 ? "+" : ""}${total + bonus}`,
       materials: preview?.materials ?? [], facilities: preview?.tools ?? [], forge: recipe.forge, needsForge: preview?.needsForge,
-      signs: substanceSigns(preview), extras: (preview?.materials ?? []).filter((_row, i) => !preview.plan.rows[i].substance),
+      signs: substanceSigns(preview), extras: (preview?.materials ?? []).filter((_row, i) => !preview.plan.rows[i].substance).map(row => ({ ...row, many: row.quantity > 1 })),
       status: error || (total === null ? "Укажите РЕМ и навык" : !canAct ? "Персонаж не может действовать" : !preview.plan.complete
         ? (category === "formula" ? "Не хватает субстанций" : "Не хватает материалов")
         : preview.needsTools ? "Материалы собраны · нужны инструменты" : (category === "formula" ? "Ингредиенты собраны" : "Материалы собраны")),
@@ -66,12 +70,21 @@ export async function recipeCards(actor, category) {
 export async function craftingContext(actor) {
   const cards = await recipeCards(actor, "diagram");
   const repair = await repairContext(actor);
-  return { ...cards, memory: recipeMemory(actor), repair, crafting: workshopBase(actor, "crafting") ?? "—" };
+  // Stacks of the same material are shown once, like substances on the alchemy tab.
+  const materials = new Map();
+  for (const item of actor.items) {
+    if (!available(item) || item.system.kind !== "material" || item.system.material?.substance) continue;
+    const key = item.system.ruleId || item.name;
+    const entry = materials.get(key) ?? { id: item.id, name: item.name, img: item.img, quantity: 0 };
+    entry.quantity += item.system.quantity;
+    materials.set(key, entry);
+  }
+  return { ...cards, memory: recipeMemory(actor), repair, crafting: workshopBase(actor, "crafting") ?? "—",
+    tools: hasTool(actor, "gear.crafting-tools"), materials: [...materials.values()].sort((a, b) => a.name.localeCompare(b.name, "ru")) };
 }
 
 export async function alchemyContext(actor) {
   const cards = await recipeCards(actor, "formula");
-  const has = id => actor.items.some(item => available(item) && item.system.ruleId === id);
   const substances = SUBSTANCES.map(substance => {
     const ingredients = actor.items.filter(item => available(item) && item.system.material?.substance === substance.id)
       .map(item => ({ id: item.id, name: item.name, img: item.img, quantity: item.system.quantity, pure: item.system.ruleId?.startsWith("substance.") }))
@@ -79,7 +92,7 @@ export async function alchemyContext(actor) {
     return { ...substance, ingredients, count: ingredients.reduce((sum, item) => sum + item.quantity, 0) };
   });
   return { ...cards, memory: recipeMemory(actor), substances, total: substances.reduce((sum, entry) => sum + entry.count, 0),
-    alchemy: workshopBase(actor, "alchemy") ?? "—", tools: has("gear.alchemy-tools") };
+    alchemy: workshopBase(actor, "alchemy") ?? "—", tools: hasTool(actor, "gear.alchemy-tools") };
 }
 
 const recipeFilter = category => item => item.type === "recipe" && (!category || item.system.recipe?.category === category);

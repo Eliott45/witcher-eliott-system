@@ -585,9 +585,6 @@
 .witcher-crafting-metrics span { color:#e8d1a4; font-size:14px; }
 .witcher-eliott .witcher-crafting-metrics strong { font:700 28px var(--witcher-font-heading,Georgia,serif); color:#fff5e0; }
 .witcher-eliott .witcher-crafting-metrics small { font:12px/1.4 var(--font-body,Arial,sans-serif); color:#e0d5c1; }
-.witcher-crafting-rule { display:flex; align-items:center; gap:12px; color:#68543e; margin:14px 0 18px; }
-.witcher-crafting-rule > i { font-size:22px; }
-.witcher-crafting-rule p { margin:0; line-height:1.5; font-size:13px; }
 .witcher-crafting-filters { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
 .witcher-crafting-filters label { display:flex; align-items:center; gap:8px; flex:1 1 180px; border:1px solid #c3ab88; border-radius:5px; padding:0 10px; background:#fbf8ef; color:#7e694d; }
 .witcher-crafting-filters input { border:0; background:transparent; box-shadow:none; width:100%; color:#3d342c; }
@@ -634,15 +631,43 @@
 .witcher-crafting-dialog .witcher-workshop-dialog label { background:#e8e0d1; border:1px solid #cdbd9f; border-radius:4px; padding:10px; cursor:pointer; }
 @container (max-width:620px) { .witcher-crafting-recipes { grid-template-columns:1fr; } .witcher-crafting-metrics > div { padding:10px; } }
 @media (prefers-reduced-motion:reduce) { .witcher-recipe-card summary i { transition:none; } }
+/* Shared by the crafting and alchemy tabs: steps, stock panel, requirement strip. */
+.witcher-workshop-steps { list-style:none; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:14px 0 18px; padding:0; }
+.witcher-workshop-steps.is-four { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.witcher-workshop-steps li { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:6px; background:#fbf8ef; border:1px solid #e0d2b8; color:#5e4f3d; }
+.witcher-workshop-steps b { flex:none; display:grid; place-items:center; width:26px; height:26px; border-radius:50%; background:#65483c; color:#fff2db; font:700 14px Georgia,serif; }
+.witcher-workshop-steps strong { display:block; font-size:13px; color:#5b3d31; }
+.witcher-workshop-steps span { display:block; font-size:12px; line-height:1.45; margin-top:2px; }
+.witcher-workshop-steps em { font-style:normal; font-weight:700; color:#713f35; }
+.witcher-stock-panel { margin-bottom:18px; }
+.witcher-stock-panel > header { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.witcher-eliott .witcher-stock-panel h3, .witcher-eliott .witcher-repair-title { display:flex; align-items:center; gap:8px; color:#634336; border:0; font-size:19px; margin:4px 0 10px; }
+:is(.witcher-stock-panel h3, .witcher-repair-title) small { font:12px var(--font-body,Arial,sans-serif); border:1px solid #c3ab88; border-radius:12px; padding:2px 7px; color:#705b43; }
+.witcher-stock-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; align-items:start; }
+.witcher-stock-tile { --stock-color:#9b885e; border:1px solid color-mix(in srgb, var(--stock-color) 45%, #d8ccb4); border-radius:8px; background:linear-gradient(135deg, color-mix(in srgb, var(--stock-color) 16%, #fffaf0), #fffaf0 70%); color:#3d352b; overflow:hidden; min-width:0; }
+.witcher-stock-tile.is-empty { filter:saturate(.35); opacity:.75; }
+.witcher-eliott .witcher-crafting-page .witcher-stock-head { display:grid; grid-template-columns:34px minmax(0,1fr) auto; align-items:center; gap:10px; box-sizing:border-box; width:100%; min-height:0; padding:8px 10px; margin:0; list-style:none; cursor:pointer; background:none; border:0; box-shadow:none; text-align:left; }
+.witcher-stock-head::marker { content:""; }
+.witcher-stock-head img { border:0; object-fit:contain; filter:drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
+.witcher-stock-head span { font:600 15px Georgia,serif; color:#3d352b; text-shadow:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.witcher-eliott .witcher-stock-head strong { font:700 20px Georgia,serif; color:color-mix(in srgb, var(--stock-color) 65%, #2c2620); }
+.witcher-stock-tile ul { list-style:none; margin:0; padding:4px 10px 8px; border-top:1px dashed color-mix(in srgb, var(--stock-color) 45%, #d8ccb4); }
+.witcher-stock-tile li { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:12px; padding:2px 0; }
+.witcher-eliott .witcher-crafting-page .witcher-stock-link { min-height:0; padding:0; border:0; background:none; text-align:left; color:#4a3a2d; font-size:12px; }
+.witcher-stock-link:hover { text-decoration:underline; }
+.witcher-stock-none { color:#7d6d58; font-style:italic; }
+.witcher-stock-empty { grid-column:1 / -1; display:flex; gap:9px; align-items:center; margin:0; padding:12px; border:1px dashed #c3ad89; border-radius:8px; font-size:13px; color:#6f5c46; }
+.witcher-recipe-needs { display:flex; flex-wrap:wrap; align-items:center; gap:4px; padding:0 14px 12px; }
+.witcher-repair-main .witcher-recipe-needs { padding:8px 0 0; }
+.witcher-recipe-needs:empty { display:none; }
+.witcher-recipe-needs img { border:0; filter:drop-shadow(0 1px 1px rgba(0,0,0,.2)); }
+.witcher-recipe-needs img.is-missing { opacity:.3; filter:grayscale(.6); }
+.witcher-recipe-chip { font-size:11px; padding:2px 7px; border-radius:10px; background:#ece4d3; color:#4f4636; }
+.witcher-crafting-page .witcher-recipe-chip.is-missing { background:#f3dcd4; color:#924b3e; }
+.witcher-crafting-metrics strong i { font-size:20px; }
+
 /* Repair and disassembly, core p. 140 */
 .witcher-repair { margin-top:26px; padding:18px; border:1px solid #c3ab88; border-radius:8px; background:#f4eee2; }
-.witcher-repair-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
-.witcher-eliott .witcher-repair-heading h2 { color:#713f35; border:0; font-size:23px; margin:3px 0 0; }
-.witcher-repair-steps { list-style:none; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:0 0 16px; padding:0; }
-.witcher-repair-steps li { display:flex; gap:9px; align-items:flex-start; padding:10px; border-radius:6px; background:#fbf8ef; border:1px solid #e0d2b8; color:#5e4f3d; }
-.witcher-repair-steps li > i { color:#9b7b4b; font-size:16px; margin-top:2px; }
-.witcher-repair-steps strong { display:block; font-size:13px; color:#5b3d31; }
-.witcher-repair-steps span { display:block; font-size:12px; line-height:1.45; margin-top:3px; }
 .witcher-repair-card { display:grid; grid-template-columns:44px minmax(0,1fr) auto; gap:12px; align-items:center; padding:12px; margin-bottom:8px; border:1px solid #d3c19f; border-left:4px solid #b08a43; border-radius:6px; background:#fffcf5; color:#41392f; }
 .witcher-repair-card.is-broken { border-left-color:#a13d2f; background:#fbf1ec; }
 .witcher-repair-card > img { border:0; border-radius:5px; background:#3b342e; object-fit:contain; }
@@ -654,48 +679,14 @@
 .witcher-repair-meter span { display:block; height:100%; background:linear-gradient(90deg,#a13d2f,#c99a3c); }
 .witcher-repair-facts { display:flex; flex-wrap:wrap; gap:4px 14px; margin:0; font-size:12px; color:#6e5c45; }
 .witcher-repair-facts b { color:#3c423c; font-size:13px; }
-.witcher-repair-components { list-style:none; display:flex; flex-wrap:wrap; gap:5px; margin:8px 0 0; padding:0; }
-.witcher-repair-components li { font-size:11px; padding:2px 7px; border-radius:10px; background:#ece4d3; color:#4f5a46; }
-.witcher-repair-components li.is-missing { background:#f3dcd4; }
 .witcher-repair-card footer { display:flex; flex-direction:column; gap:6px; }
-.witcher-repair-empty, .witcher-repair-note { display:flex; gap:9px; align-items:flex-start; margin:10px 0 0; font-size:13px; line-height:1.55; color:#5d6b52; }
-.witcher-repair-note { color:#6f5d47; font-size:12px; }
-@container (max-width:620px) { .witcher-repair-steps { grid-template-columns:repeat(2,minmax(0,1fr)); } .witcher-repair-card { grid-template-columns:44px minmax(0,1fr); } .witcher-repair-card footer { grid-column:1 / -1; flex-direction:row; } }
-
-/* Alchemy tab, core pp. 141–147 */
-.witcher-eliott .witcher-alchemy-page .witcher-crafting-heading h2 { color:#3f5a4a; }
-.witcher-alchemy-metrics { background:#2f4440; }
-.witcher-alchemy-metrics strong i { font-size:20px; }
-.witcher-alchemy-steps { list-style:none; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:14px 0 18px; padding:0; }
-.witcher-alchemy-steps li { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:6px; background:#eef0e4; border:1px solid #cfd3bb; color:#4a5543; }
-.witcher-alchemy-steps b { flex:none; display:grid; place-items:center; width:26px; height:26px; border-radius:50%; background:#5f7d5b; color:#f6f1e1; font:700 14px Georgia,serif; }
-.witcher-alchemy-steps strong { display:block; font-size:13px; color:#3d4f3a; }
-.witcher-alchemy-steps span { display:block; font-size:12px; line-height:1.45; margin-top:2px; }
-.witcher-alchemy-steps em { font-style:normal; font-weight:700; color:#5d3e30; }
-.witcher-substance-pouch { margin-bottom:18px; }
-.witcher-substance-pouch > header { display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-.witcher-eliott .witcher-substance-pouch h3 { display:flex; align-items:center; gap:8px; color:#3f5a4a; border:0; font-size:19px; margin:4px 0 10px; }
-.witcher-substance-pouch h3 small { font:12px var(--font-body,Arial,sans-serif); border:1px solid #b9c3a9; border-radius:12px; padding:2px 7px; color:#566650; }
-.witcher-substance-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; align-items:start; }
-.witcher-substance-tile { border:1px solid color-mix(in srgb, var(--substance-color) 45%, #d8ccb4); border-radius:8px; background:linear-gradient(135deg, color-mix(in srgb, var(--substance-color) 16%, #fffaf0), #fffaf0 70%); color:#3d352b; overflow:hidden; }
-.witcher-substance-tile.is-empty { filter:saturate(.35); opacity:.75; }
-.witcher-substance-tile summary { display:grid; grid-template-columns:34px minmax(0,1fr) auto; align-items:center; gap:10px; padding:8px 10px; list-style:none; cursor:pointer; }
-.witcher-substance-tile summary::marker { content:""; }
-.witcher-substance-tile summary img { border:0; filter:drop-shadow(0 1px 1px rgba(0,0,0,.25)); }
-.witcher-substance-tile summary span { font:600 15px Georgia,serif; color:#3d352b; text-shadow:none; }
-.witcher-eliott .witcher-substance-tile summary strong { font:700 20px Georgia,serif; color:color-mix(in srgb, var(--substance-color) 65%, #2c2620); }
-.witcher-substance-tile ul { list-style:none; margin:0; padding:4px 10px 8px; border-top:1px dashed color-mix(in srgb, var(--substance-color) 45%, #d8ccb4); }
-.witcher-substance-tile li { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:12px; padding:2px 0; }
-.witcher-eliott .witcher-crafting-page .witcher-substance-ingredient { min-height:0; padding:0; border:0; background:none; text-align:left; color:#4a3a2d; font-size:12px; }
-.witcher-substance-ingredient:hover { text-decoration:underline; }
-.witcher-substance-none { color:#7d6d58; font-style:italic; }
-.witcher-formula-card { border-top-color:#5f7d5b; }
-.witcher-formula-signs { display:flex; flex-wrap:wrap; align-items:center; gap:4px; padding:0 14px 12px; }
-.witcher-formula-signs img { border:0; filter:drop-shadow(0 1px 1px rgba(0,0,0,.2)); }
-.witcher-formula-signs img.is-missing { opacity:.28; filter:grayscale(.6); }
-.witcher-formula-extra { font-size:11px; padding:2px 7px; border-radius:10px; background:#ece4d3; color:#4f5a46; }
-.witcher-formula-extra.is-missing { background:#f3dcd4; color:#924b3e; }
-@container (max-width:620px) { .witcher-substance-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .witcher-alchemy-steps { grid-template-columns:1fr; } }
+.witcher-repair-note { display:flex; gap:9px; align-items:flex-start; margin:10px 0 0; font-size:12px; line-height:1.55; color:#6f5d47; }
+@container (max-width:620px) {
+  .witcher-workshop-steps, .witcher-workshop-steps.is-four { grid-template-columns:1fr; }
+  .witcher-stock-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .witcher-repair-card { grid-template-columns:44px minmax(0,1fr); }
+  .witcher-repair-card footer { grid-column:1 / -1; flex-direction:row; }
+}
 
 /* Substance signs in item descriptions and formula details */
 .witcher-substance-badge { display:inline-flex; align-items:center; gap:6px; font-weight:600; }

@@ -5,24 +5,24 @@
     <button type="button" data-action="memorizeCatalogRecipe" data-category="formula" {{disabled (or (not editable) alchemy.memory.full)}}><i class="fa-solid fa-brain" aria-hidden="true"></i> Запомнить формулу</button>
   </div>
 </header>
-<div class="witcher-crafting-metrics witcher-alchemy-metrics">
+<div class="witcher-crafting-metrics">
   <div><span>Алхимия</span><strong>{{alchemy.alchemy}}</strong><small>РЕМ + навык · затем 1d10</small></div>
   <div><span>Запомнено</span><strong>{{alchemy.memory.used}} <small>/ {{alchemy.memory.capacity}}</small></strong><small>Чертежи и формулы · лимит — Интеллект</small></div>
   <div><span>Инструменты алхимика</span><strong>{{#if alchemy.tools}}<i class="fa-solid fa-check" aria-hidden="true"></i> Есть{{else}}<i class="fa-solid fa-xmark" aria-hidden="true"></i> Нет{{/if}}</strong><small>Без них заниматься алхимией нельзя</small></div>
 </div>
-<ol class="witcher-alchemy-steps">
+<ol class="witcher-workshop-steps">
   <li><b>1</b><div><strong>Формула</strong><span>Записанная перед глазами формула даёт <em>+2</em> к проверке.</span></div></li>
   <li><b>2</b><div><strong>Ингредиенты</strong><span>Важна только субстанция и её количество, а не сырьё.</span></div></li>
   <li><b>3</b><div><strong>Проверка Алхимии</strong><span>Против СЛ формулы. Провал — состав ни на что не годен.</span></div></li>
 </ol>
-<section class="witcher-substance-pouch" aria-labelledby="{{rootId}}-substances">
+<section class="witcher-stock-panel" aria-labelledby="{{rootId}}-substances">
   <header><h3 id="{{rootId}}-substances"><i class="fa-solid fa-mortar-pestle" aria-hidden="true"></i> Субстанции при себе <small>{{alchemy.total}}</small></h3>
     <button type="button" data-action="buyIngredient" {{disabled (not editable)}}><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> Купить ингредиенты</button></header>
-  <div class="witcher-substance-grid">
+  <div class="witcher-stock-grid">
     {{#each alchemy.substances as |substance|}}
-    <details class="witcher-substance-tile {{#unless substance.count}}is-empty{{/unless}}" style="--substance-color:{{substance.color}}">
-      <summary><img src="{{substance.img}}" alt="" width="34" height="34"><span>{{substance.name}}</span><strong>{{substance.count}}</strong></summary>
-      <ul>{{#each substance.ingredients}}<li><button type="button" class="witcher-substance-ingredient" data-action="viewSheetItem" data-item-id="{{id}}">{{#if pure}}<i class="fa-solid fa-gem" aria-hidden="true"></i> {{/if}}{{name}}</button><b>×{{quantity}}</b></li>{{else}}<li class="witcher-substance-none">Нет ингредиентов с этой субстанцией.</li>{{/each}}</ul>
+    <details class="witcher-stock-tile {{#unless substance.count}}is-empty{{/unless}}" style="--stock-color:{{substance.color}}">
+      <summary class="witcher-stock-head"><img src="{{substance.img}}" alt="" width="34" height="34"><span>{{substance.name}}</span><strong>{{substance.count}}</strong></summary>
+      <ul>{{#each substance.ingredients}}<li><button type="button" class="witcher-stock-link" data-action="viewSheetItem" data-item-id="{{id}}">{{#if pure}}<i class="fa-solid fa-gem" aria-hidden="true"></i> {{/if}}{{name}}</button><b>×{{quantity}}</b></li>{{else}}<li class="witcher-stock-none">Нет ингредиентов с этой субстанцией.</li>{{/each}}</ul>
     </details>
     {{/each}}
   </div>
@@ -37,22 +37,8 @@
 <section class="witcher-crafting-group" data-recipe-group>
   <h3><i class="fa-solid {{group.icon}}" aria-hidden="true"></i> {{group.label}} <small>{{group.recipes.length}}</small></h3>
   <div class="witcher-crafting-recipes">
-    {{#each group.recipes as |recipe|}}
-    <article class="witcher-recipe-card witcher-formula-card" data-recipe-card data-kind="{{recipe.kind}}" data-search="{{recipe.search}}">
-      <header><button type="button" class="witcher-recipe-name" data-action="viewSheetItem" data-item-id="{{recipe.id}}">{{recipe.name}}</button><span>{{#if recipe.kindLabel}}{{recipe.kindLabel}} · {{/if}}{{#if recipe.grade}}{{recipe.grade}}{{else}}Формула{{/if}}{{#if recipe.physical}} · при себе{{/if}}</span></header>
-      <div class="witcher-formula-signs" role="list" aria-label="Субстанции формулы">
-        {{#each recipe.signs}}<img role="listitem" class="{{#if missing}}is-missing{{/if}}" src="{{img}}" alt="{{name}}{{#if missing}} — не хватает{{/if}}" title="{{name}}{{#if missing}} — не хватает{{/if}}" width="24" height="24">{{/each}}
-        {{#each recipe.extras}}<span role="listitem" class="witcher-formula-extra {{#if missing}}is-missing{{/if}}">+ {{name}}{{#if (gt quantity 1)}} ×{{quantity}}{{/if}}</span>{{/each}}
-      </div>
-      <dl><div><dt>Сложность</dt><dd>{{recipe.dc}}</dd></div><div><dt>Время</dt><dd>{{recipe.time}}</dd></div><div><dt>Результат</dt><dd>×{{recipe.quantity}}</dd></div><div><dt>Проверка{{#if recipe.bonus}} · формула +2{{/if}}</dt><dd>1d10 {{recipe.total}}</dd></div></dl>
-      <details><summary class="{{#if recipe.unavailable}}is-missing{{else}}is-ready{{/if}}"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> {{recipe.status}}</summary>
-        {{#unless recipe.error}}<ul class="witcher-recipe-materials">{{#each recipe.materials}}<li class="{{#if missing}}is-missing{{/if}}"><span>{{name}}</span><strong>{{supplied}} / {{quantity}}</strong></li>{{/each}}</ul>{{/unless}}
-        <ul class="witcher-recipe-facilities">{{#each recipe.facilities}}<li><i class="fa-solid {{#if present}}fa-check{{else}}fa-screwdriver-wrench{{/if}}" aria-hidden="true"></i> {{name}}{{#unless present}} — нужны в мастерской{{/unless}}</li>{{/each}}</ul>
-      </details>
-      <footer><button type="button" data-action="toggleRecipeMemory" data-item-id="{{recipe.id}}" {{disabled (or (not @root.editable) recipe.rememberDisabled)}} aria-pressed="{{recipe.memorized}}"><i class="fa-solid {{#if recipe.memorized}}fa-brain{{else}}fa-book-open{{/if}}" aria-hidden="true"></i> {{#if recipe.memorized}}Забыть{{else}}Запомнить{{/if}}</button><button type="button" class="witcher-craft-primary" data-action="craftInventory" data-item-id="{{recipe.id}}" {{disabled (or (not @root.editable) recipe.unavailable)}}><i class="fa-solid fa-flask" aria-hidden="true"></i> Приготовить</button></footer>
-    </article>
-    {{/each}}
+    {{#each group.recipes as |recipe|}}{{> "systems/witcher-eliott-system/templates/recipe-card.hbs" recipe=recipe editable=@root.editable}}{{/each}}
   </div>
 </section>
 {{/each}}
-<aside class="witcher-crafting-recycling"><i class="fa-solid fa-recycle" aria-hidden="true"></i><div><h3>Переработка (необязательно)</h3><p>Ингредиенты тратятся и при провале. Сразу после провала можно ещё раз проверить Алхимию со СЛ формулы: при успехе одна из затраченных субстанций возвращается в чистом виде и подходит для любой формулы.</p></div></aside>
+<aside class="witcher-crafting-recycling"><i class="fa-solid fa-recycle" aria-hidden="true"></i><div><h3>Переработка после неудачи</h3><p>Ингредиенты тратятся и при провале. Сразу после провала можно ещё раз проверить Алхимию со СЛ формулы: при успехе одна из затраченных субстанций возвращается в чистом виде и подходит для любой формулы.</p></div></aside>
