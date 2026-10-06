@@ -2,11 +2,7 @@
   <header><i class="fa-solid fa-leaf" aria-hidden="true"></i><div><span>Собирательство · ведущий</span><h2>{{name}}</h2></div></header>
   {{{details}}}
   <label>Кто собирает<select name="actor" required>{{#each actors}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}} · Выживание {{base}}</option>{{/each}}</select></label>
-  <div class="witcher-foraging-fields">
-    <label>Время поиска, мин.<input name="minutes" type="number" min="0" step="1" placeholder="Назначает ведущий" required></label>
-    <label>Количество при успехе<input name="formula" type="text" value="{{formula}}" placeholder="Например: 1d6 или 3" required></label>
-  </div>
+  <label>Количество при успехе<input name="formula" type="text" value="{{formula}}" placeholder="Например: 1d6 или 3" required></label>
   <div class="witcher-foraging-fields"><label class="witcher-foraging-toggle"><input type="checkbox" name="check" {{checked check}}> Проверка Выживания</label><label>Сложность<input type="number" name="dc" min="1" step="1" value="{{dc}}" placeholder="СЛ"></label></div>
-  <p class="witcher-foraging-hint">При успехе количество определяется отдельно и материал добавляется в инвентарь. Дробные единицы округляются вниз.</p>
-  <label class="witcher-foraging-confirm"><input type="checkbox" name="confirmed" required> Источник доступен в этом месте, время поиска уже прошло.</label>
+  <p class="witcher-foraging-hint">Игрок бросает проверку из чата. При успехе найденные материалы добавятся в его инвентарь.</p>
 </div>

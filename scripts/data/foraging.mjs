@@ -14,8 +14,6 @@ export function validateForaging(actor, material, options) {
   if (!actor?.isOwner || !COMBAT_ACTOR_TYPES.includes(actor.type)) throw new Error("Выберите доступного персонажа или существо.");
   if (material?.type !== "equipment" || material.system.kind !== "material") throw new Error("Выберите материал для сбора.");
   if (materialAcquisition(material.system) === "trade") throw new Error("Этот материал приобретают или изготавливают; для него не задан сбор в природе.");
-  if (!options.confirmed) throw new Error("Подтвердите доступ к источнику и завершение поиска.");
-  if (!Number.isFinite(options.minutes) || options.minutes < 0) throw new Error("Укажите затраченное время в минутах.");
   if (options.check && (!Number.isInteger(options.dc) || options.dc <= 0)) throw new Error("Укажите положительную целую СЛ проверки.");
   return foragingFormula(options.formula);
 }

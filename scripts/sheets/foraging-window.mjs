@@ -19,7 +19,7 @@ export async function openForagingWindow() {
   if (!actors.length) throw new Error("Сначала создайте персонажа или существо для сбора.");
   const pack = game.packs.get(`${SYSTEM_ID}.equipment`);
   const materials = [...(pack ? await pack.getDocuments() : []), ...game.items].filter(item=>item.testUserPermission(game.user,"LIMITED"));
-  const selected = await chooseReference("foraging","",{title:"Собирательство · выбрать материал",entries:foragingEntries(materials),groups:{forage:"Собирательство",harvest:"Добыча из источника"},hint:"Ищите по названию или месту: лес, поля, горы. Время и доступ к источнику определяет ведущий."});
+  const selected = await chooseReference("foraging","",{title:"Собирательство · выбрать материал",entries:foragingEntries(materials),groups:{forage:"Собирательство",harvest:"Добыча из источника"},hint:"Ищите по названию или месту: лес, поля, горы."});
   const material = materials.find(item=>item.uuid===selected);
   if (!material) return;
   const sourceState = JSON.stringify(material.system.material);
@@ -28,12 +28,12 @@ export async function openForagingWindow() {
     check:material.system.material.forageDC > 0, dc:material.system.material.forageDC || "", formula:material.system.material.quantityFormula || ""
   });
   const answer = await foundry.applications.api.DialogV2.prompt({classes:["witcher-foraging-dialog"],window:{title:"Собирательство",resizable:true},position:{width:600},content,
-    ok:{label:"Завершить поиск",callback:(_event,button)=>Object.fromEntries(new FormData(button.form))},rejectClose:false,
+    ok:{label:"Отправить проверку в чат",callback:(_event,button)=>Object.fromEntries(new FormData(button.form))},rejectClose:false,
     render:(_event,dialog)=>{
       const toggle=dialog.element.querySelector('[name="check"]'),dc=dialog.element.querySelector('[name="dc"]');
       const refresh=()=>{dc.disabled=!toggle.checked;dc.required=toggle.checked;};toggle.addEventListener("change",refresh);refresh();
     }});
   if (!answer) return;
   if (sourceState !== JSON.stringify(material.system.material)) throw new Error("Условия материала изменились; откройте сбор заново.");
-  return forage(actors.find(entry=>entry.id===answer.actor)?.actor,material,{check:Boolean(answer.check),dc:Number(answer.dc),formula:answer.formula,minutes:answer.minutes?.trim() ? Number(answer.minutes) : NaN,confirmed:Boolean(answer.confirmed)});
+  return forage(actors.find(entry=>entry.id===answer.actor)?.actor,material,{check:Boolean(answer.check),dc:Number(answer.dc),formula:answer.formula});
 }

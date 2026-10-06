@@ -43,7 +43,7 @@ export function materialDescriptionDetails(system) {
       ["Количество из источника", material.quantityFormula ? `${material.quantityFormula} ед.` : "Определяет ведущий"]);
     if (material.forageDC > 0) facts.push(["Проверка", "ИНТ + Выживание + 1d10"]);
   }
-  return `<section class="witcher-material-guide"><h3>${trade ? "Получение материала" : material.forageDC > 0 ? "Поиск и сбор" : "Источник добычи"}</h3><dl>${facts.map(([label,value])=>`<div><dt>${label}</dt><dd>${escape(value)}</dd></div>`).join("")}</dl>${trade ? "" : `<p>${material.forageDC > 0 ? "Искать можно только в подходящей местности. Время поиска назначает ведущий." : "Нужен доступ к указанному источнику. Ведущий определяет условия извлечения и необходимость проверки."}</p>`}<small>Вес и цена указаны за одну единицу материала.</small></section>`;
+  return `<section class="witcher-material-guide"><h3>${trade ? "Получение материала" : material.forageDC > 0 ? "Поиск и сбор" : "Источник добычи"}</h3><dl>${facts.map(([label,value])=>`<div><dt>${label}</dt><dd>${escape(value)}</dd></div>`).join("")}</dl>${trade ? "" : `<p>${material.forageDC > 0 ? "Искать можно только в подходящей местности." : "Нужен доступ к указанному источнику. Ведущий определяет условия извлечения и необходимость проверки."}</p>`}<small>Вес и цена указаны за одну единицу материала.</small></section>`;
 }
 
 // Only these shipped defaults were incorrect in the original catalog (core pp. 128–129).

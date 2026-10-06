@@ -14,7 +14,7 @@ export function workshopBase(actor, skill) {
   }
   return skillValue(actor.system, skill)?.total ?? null;
 }
-export async function workshopCheck(actor, { name, skill, dc, bonus = 0, details = "" }) {
+export async function workshopCheck(actor, { name, skill, dc, bonus = 0, details = "", flags = {} }) {
   const base = workshopBase(actor, skill);
   if (!actor.isOwner || !conditionRules(actor).canAct) throw new Error("Персонаж сейчас не может выполнять это действие.");
   if (base === null) throw new Error("Заполните связанный параметр и изучите необходимый профессиональный навык.");
@@ -24,7 +24,7 @@ export async function workshopCheck(actor, { name, skill, dc, bonus = 0, details
     const roll = await new foundry.dice.Roll(`1d10wc + ${base} + ${bonus}`).evaluate({ allowInteractive: messageMode !== "blind" });
     const message = await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }),
       flavor: `<b>${esc(name)}</b><p data-tooltip="${esc(`База ${base}; бонус ${bonus}. ${details}`)}">База ${base} + бонус ${bonus}; СЛ ${dc}</p>`,
-      flags: { ...display.flags, [SYSTEM_ID]: { ...display.flags[SYSTEM_ID], workshop: { skill, dc, base, bonus } } }
+      flags: { [SYSTEM_ID]: { ...flags, ...display.flags[SYSTEM_ID], workshop: { skill, dc, base, bonus } } }
     }, { messageMode });
     if (!message) throw new Error("Бросок отменён; предметы не изменены.");
     await display.wait(message);

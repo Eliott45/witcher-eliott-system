@@ -14,7 +14,7 @@ import { WitcherPowerPlaceSheet } from "./sheets/witcher-power-place-sheet.mjs";
 import { registerSpellContentMigration,migrateSpellContent } from "./migrations/spell-content.mjs";
 import { registerOilExpiry } from "./workshop/upgrades.mjs";
 import { registerConsumption } from "./workshop/consumption.mjs";
-import { registerForaging } from "./workshop/foraging.mjs";
+import { registerForaging } from "./chat/foraging.mjs";
 import { migratePoisonEffects } from "./migrations/poison-effects.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
