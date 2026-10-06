@@ -194,3 +194,20 @@ test("burning: 5 per body part minus that zone's SP, fire resistance halves, vul
   const beast = creature({ category: "beast", naturalArmor: 0, hasTailOrWings: true });
   assert.equal(burningParts(beast).length, 5);
 });
+
+test("grapple options follow who holds whom; a pinned creature may still try to break free", async () => {
+  const { grappleOptions, punchFormula } = await import("../scripts/combat/grapple.mjs");
+  const effect = (status, grapple) => ({ statuses: new Set([status]), disabled: false, isSuppressed: false, duration: {}, flags: { "witcher-eliott-system": { grapple, condition: status === "pinned" ? { incapacitated: true } : {} } } });
+  globalThis.fromUuidSync = () => null;
+  const actor = effects => ({ type: "character", isOwner: true, effects, items: [], system: { skills: { brawling: 4, dodgeEscape: 5 }, attributes: {}, abilityState: {},
+    statistics: { effective: { reflex: 6, body: 7 }, modifiers: [] } } });
+  const free = Object.fromEntries(grappleOptions(actor([])).map(option => [option.kind, option.disabled]));
+  assert.deepEqual(free, { grapple: false, pin: true, choke: true, throw: true, escape: true });
+  const holding = Object.fromEntries(grappleOptions(actor([effect("grappling", { target: "T", targetName: "Бандит" })])).map(option => [option.kind, option.disabled]));
+  assert.deepEqual(holding, { grapple: true, pin: false, choke: false, throw: false, escape: true });
+  const pinned = grappleOptions(actor([effect("grappled", { by: "G" }), effect("pinned", { by: "G" })]));
+  assert.equal(pinned.find(option => option.kind === "escape").disabled, false, "escape stays open while pinned");
+  assert.equal(pinned.find(option => option.kind === "grapple").disabled, true);
+  assert.equal(punchFormula({ system: { statistics: { effective: { body: 7 } } } }), "1d6+2");
+  delete globalThis.fromUuidSync;
+});

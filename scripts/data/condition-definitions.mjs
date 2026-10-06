@@ -39,7 +39,11 @@ export const CONDITION_DEFINITIONS = [
   // Core p.152 attack modifiers: a target that moved this round with REF > 10 is −3 to hit.
   entry("moving", "В движении", "wingfoot", "Персонаж перемещался в этом раунде, его РЕА больше 10: атаки по нему получают −3. Проходит в начале его следующего хода.", {rounds:1,expiry:"turnStart",modifiers:[{target:"combat.targeted",value:-3}]}),
   // Core p.153: declared at the start of a round; the initiative bonus is applied to the combatant and reverted on expiry.
-  entry("quick-draw", "Быстрое выхватывание", "sword", "+3 к инициативе в этом раунде, −3 к атаке. Бонусы прицеливания не действуют. Персонаж обязан атаковать; оружие можно выхватить в рамках этого действия.", {rounds:1,expiry:"roundEnd",modifiers:[{target:"combat.attack",value:-3}]})
+  entry("quick-draw", "Быстрое выхватывание", "sword", "+3 к инициативе в этом раунде, −3 к атаке. Бонусы прицеливания не действуют. Персонаж обязан атаковать; оружие можно выхватить в рамках этого действия.", {rounds:1,expiry:"roundEnd",modifiers:[{target:"combat.attack",value:-3}]}),
+  // Core p.163 grappling. Who holds whom is stored in the effect flags (grapple.by / grapple.target).
+  entry("grappled", "В захвате", "net", "Персонаж в захвате: не может отойти от захватчика, −2 к атаке и защите. Каждый ход может попытаться вырваться: Уклонение/Изворотливость против Борьбы захватчика.", {modifiers:[{target:"combat.attack",value:-2},{target:"combat.defense",value:-2}]}),
+  entry("grappling", "Держит в захвате", "net", "Персонаж удерживает противника. Может обездвижить, душить или бросить его, а удерживаемый служит живым щитом: удары в туловище сначала принимает он."),
+  entry("pinned", "Обездвижен", "padlock", "Персонаж обездвижен в захвате: не может передвигаться и действовать, пока не вырвется. Атаки по нему получают +4.", {incapacitated:true,modifiers:[{target:"combat.targeted",value:4}]})
 ];
 export const CONDITION_BY_ID = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,entry]));
 // Variants share the status ID: poison/drunkenness cannot stack with themselves.

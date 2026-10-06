@@ -17,6 +17,13 @@
     <div class="witcher-defense-buttons">{{#each combat.defenses}}<button type="button" data-action="defend" data-mode="{{mode}}" data-item-id="{{itemId}}" data-tooltip="{{hint}}" {{disabled (or disabled (not ../editable))}}><span>{{name}} <b>{{base}}</b></span>{{#if weaponName}}<small>{{weaponName}}</small>{{/if}}</button>{{/each}}</div>
     <p class="witcher-combat-muted">{{#if combat.fullTurn.activeDodge}}Активное уклонение: все защиты бесплатны. Атакующему в ближнем бою нужно учесть −2 к атаке.{{else}}Первая защита бесплатна. Для последующих включите «Повторная».{{/if}} Защита не расходует второе действие.</p>
   </section>
+  <section class="witcher-grapple-panel">
+    <header><h3><i class="fa-solid fa-hand-back-fist"></i> Борьба и захват</h3>{{#if combat.grapple.holding}}<button type="button" data-action="releaseGrapple" {{disabled (not editable)}} data-tooltip="Отпустить противника"><i class="fa-solid fa-hand"></i> Отпустить</button>{{/if}}</header>
+    {{#if combat.grapple.holding}}<p class="witcher-grapple-state is-holding"><i class="fa-solid fa-user-shield"></i> Держите <b>{{combat.grapple.holding.name}}</b>{{#if combat.grapple.holding.pinned}} · обездвижен{{/if}}{{#if combat.grapple.holding.choking}} · душите{{/if}}. Он служит живым щитом: удары в ваше туловище сначала принимает он.</p>{{/if}}
+    {{#if combat.grapple.heldBy}}<p class="witcher-grapple-state is-held"><i class="fa-solid fa-link"></i> Вас держит <b>{{combat.grapple.heldBy.name}}</b>: −2 к атаке и защите, нельзя отойти.</p>{{/if}}
+    <div class="witcher-grapple-actions">{{#each combat.grapple.options}}<button type="button" data-action="grappleAction" data-grapple="{{kind}}" data-tooltip="{{#if reason}}{{reason}}{{else}}{{hint}}{{/if}}" {{disabled (or disabled (not ../editable))}}><i class="fa-solid {{icon}}"></i> {{name}} <b>{{base}}</b></button>{{/each}}</div>
+    {{#unless combat.grapple.holding}}{{#unless combat.grapple.heldBy}}<p class="witcher-combat-muted">Захват: выберите цель (T) и нажмите «Захват». Цель защищается в чате.</p>{{/unless}}{{/unless}}
+  </section>
   <details class="witcher-full-turn" {{#unless compact}}open{{/unless}} {{#if combat.fullTurn.activeDodge}}open{{/if}} {{#if combat.fullTurn.aiming}}open{{/if}}><summary><h3><i class="fa-solid fa-hourglass-half"></i> Действия полного хода</h3><span>Бег · уклонение · прицел · отдых</span></summary>
     <div class="witcher-full-turn-grid">
       <article><header><i class="fa-solid fa-person-running"></i><h4>Бег</h4><b>{{combat.fullTurn.run}} м</b></header><p>Потратьте полный ход, чтобы переместиться на дистанцию Бега: СКОР × 3.</p><small>Переместите токен по сцене.</small></article>

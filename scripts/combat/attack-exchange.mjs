@@ -7,6 +7,7 @@ import { rollStun } from "./stun-roll.mjs";
 import { CONDITION_BY_ID, conditionSource } from "../data/condition-definitions.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
 import { woundEffectData } from "./critical-wound-effects.mjs";
+import { GRAPPLE_ACTIONS, applyGrappleSuccess, grappleState } from "./grapple.mjs";
 import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
 import { hitLocation, bodyPlanOf, ATTACK_LOCATIONS } from "./weapon-rules.mjs";
@@ -55,7 +56,8 @@ export function gangingUp(message) {
 }
 
 /** Defenses the target can choose for one incoming attack, best armed option per mode. */
-export function defenseChoices(actor, incoming, defenseModifier = 0) {
+export function defenseChoices(actor, incoming, defenseModifier = 0, allowed = null) {
+  if (allowed) return allowed.map(mode => ({ ...defenseQuote(actor, { mode, itemId: "", incoming, defenseModifier }), mode, itemId: "" }));
   // One button per weapon or shield so the defender chooses what takes the blow, plus bare-handed options.
   const items = equippedItems(actor.items).filter(item => item.type === "weapon" && ["melee", "shield"].includes(item.system.category));
   const options = [{ mode: "dodge" }, { mode: "reposition" },
@@ -112,7 +114,7 @@ export function exchangeOutcome(message, index) {
   const hit = attackTotal > defenseTotal, margin = attackTotal - defenseTotal;
   // Core p.164: a successful block with the body sends the attack's damage into the blocking arm.
   const limbBlock = !hit && !none && Boolean(flagsOf(defense).defense?.limb);
-  return { defense, none, attackTotal, defenseTotal, hit, limbBlock, margin, critical: hit ? criticalLevel(margin) : null,
+  return { defense, none, attackTotal, defenseTotal, hit, limbBlock, margin, critical: hit && !flagsOf(message).weaponAttack?.special ? criticalLevel(margin) : null,
     mode: flagsOf(defense).defense?.mode ?? "", name: none ? "Без защиты" : flagsOf(defense).defense?.name ?? "Защита" };
 }
 
@@ -191,37 +193,74 @@ export function damagePreview(message, index) {
   if (!damage || !target) return null;
   const data = exchangeOf(damage), armor = armorAt(target, data.location.id);
   const critical = data.critical ? { name: data.critical.name, bonus: data.critical.bonus } : null;
-  return { data, target, armor, result: resolveDamage({ base: data.base, silver: data.silver, location: data.location.id, multiplier: data.location.multiplier,
-    traits: data.traits, armor, monster: monsterResistant(target), vulnerableToFire: fireVulnerable(target), critical }) };
+  const hit = (actor, armorAtZone, base, silver, crit) => resolveDamage({ base, silver, location: data.location.id, multiplier: data.location.multiplier,
+    traits: data.traits, armor: armorAtZone, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor), critical: crit });
+  const preview = { data, target, armor, result: hit(target, armor, data.base, data.silver, critical), shield: null };
+  // House rule on core p.155: only a held creature can be a living shield. A torso hit goes into it as if it
+  // were the target; whatever exceeds its BODY + torso SP gets through to the grappler's torso.
+  const holding = data.location.id === "torso" ? grappleState(target).holding : null;
+  if (holding?.actor) {
+    const shieldArmor = armorAt(holding.actor, "torso"), body = holding.actor.system.statistics?.effective?.body ?? 0;
+    const overflow = Math.max(0, data.base - body - shieldArmor.sp);
+    preview.shield = { actor: holding.actor, token: holding.token, name: holding.name || holding.actor.name, armor: shieldArmor, body, overflow,
+      result: hit(holding.actor, shieldArmor, data.base, data.silver, critical), through: hit(target, armor, overflow, 0, null) };
+  }
+  return preview;
 }
 
-export async function applyExchangeDamage(message, index) {
-  const preview = damagePreview(message, index);
-  if (!preview?.target.isOwner || linkedAny(message.id, index, "applied")) return;
-  const { target, result, data } = preview, health = target.system.health.value;
-  await target.update({ "system.health.value": health - result.total });
+/** HP loss, armor wear and a critical wound on one actor; returns what wore down. */
+async function sufferDamage(actor, result, { wound = null, level = "", location = {} } = {}) {
+  await actor.update({ "system.health.value": actor.system.health.value - result.total });
   const worn = [];
   for (const id of result.ablate) {
     if (id === "natural") {
-      const value = target.system.creature?.naturalArmor ?? 0;
-      if (value > 0) { await target.update({ "system.creature.naturalArmor": value - 1 }); worn.push(`естественная броня ${value} → ${value - 1}`); }
+      const value = actor.system.creature?.naturalArmor ?? 0;
+      if (value > 0) { await actor.update({ "system.creature.naturalArmor": value - 1 }); worn.push(`естественная броня ${value} → ${value - 1}`); }
       continue;
     }
-    const item = target.items.get(id), from = item?.system.stoppingPower?.value;
+    const item = actor.items.get(id), from = item?.system.stoppingPower?.value;
     if (!item || !(from > 0)) continue;
     await item.update({ "system.stoppingPower.value": from - 1 });
     worn.push(`${item.name} ${from} → ${from - 1}`);
   }
-  if (data.critical?.wound) await target.createEmbeddedDocuments("ActiveEffect", [woundEffectData(data.critical.wound.id, data.critical.level,
-    { location: data.location.id, locationName: data.location.name })]);
-  return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${result.total} ПЗ</p>`,
-    flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: "applied", total: result.total, steps: result.steps, from: health,
-      ablated: worn.join(", "), armorHeld: !result.penetrated && preview.armor.sp > 0 } } } }, "public");
+  if (wound) await actor.createEmbeddedDocuments("ActiveEffect", [woundEffectData(wound.id, level, { location: location.id, locationName: location.name })]);
+  return worn;
+}
+
+export async function applyExchangeDamage(message, index, { useShield = false } = {}) {
+  const preview = damagePreview(message, index);
+  if (!preview?.target.isOwner || linkedAny(message.id, index, "applied")) return;
+  const { target, data } = preview, health = target.system.health.value, shield = useShield ? preview.shield : null;
+  const own = shield ? shield.through : preview.result;
+  const worn = await sufferDamage(target, own, shield ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location });
+  const exchange = { attack: message.id, index, kind: "applied", total: own.total, steps: own.steps, from: health,
+    ablated: worn.join(", "), armorHeld: !own.penetrated && preview.armor.sp > 0 && !shield };
+  if (shield) {
+    const shieldData = { token: shield.token, name: shield.name, total: shield.result.total, steps: shield.result.steps, ablate: shield.result.ablate,
+      wound: data.critical?.wound ?? null, level: data.critical?.level ?? "", location: data.location, overflow: shield.overflow };
+    // The grappler's owner may not own the held creature: the active GM applies that part.
+    if (shield.actor.isOwner) { shieldData.ablated = (await sufferDamage(shield.actor, shield.result, shieldData)).join(", "); shieldData.applied = true; }
+    exchange.shield = shieldData;
+  }
+  return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${own.total} ПЗ${shield ? ` · живой щит ${esc(shield.name)}: −${shield.result.total} ПЗ` : ""}</p>`,
+    flags: { [SYSTEM_ID]: { skipLuck: true, exchange } } }, "public");
+}
+
+/** Active GM: apply a living shield's share once when its owner could not. */
+export async function applyShieldShare(message) {
+  const link = exchangeOf(message), share = link?.shield;
+  if (link?.kind !== "applied" || !share || share.applied || !game.users.activeGM?.isSelf) return;
+  const actor = fromUuidSync(share.token)?.actor;
+  if (!actor) return;
+  await message.update({ [`flags.${SYSTEM_ID}.exchange.shield.applied`]: true });
+  const ablated = await sufferDamage(actor, { total: share.total, ablate: share.ablate ?? [] }, share);
+  if (ablated.length) await message.update({ [`flags.${SYSTEM_ID}.exchange.shield.ablated`]: ablated.join(", ") });
 }
 
 // ── Fumbles (core p.157, errata v4) ─────────────────────────────────────────
 
 function attackFumbleTable(message, attack) {
+  if (attack.special) return "unarmed";
   const item = message.speakerActor?.items.get(attack.itemId);
   if (attack.ranged) return "ranged";
   return item?.system.skill === "brawling" ? "unarmed" : "melee";
@@ -289,7 +328,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
     if (!target?.isOwner) return `<li class="is-waiting">${head}<em>${linkedAny(message.id, index, "defense") ? "защита бросается…" : "ждём защиту"}</em></header>${ownFumble}</li>`;
     if (linkedAny(message.id, index, "defense")) return `<li class="is-waiting">${head}<em><i class="fa-solid fa-dice-d10 fa-spin"></i> защита бросается…</em></header>${ownFumble}</li>`;
     const gang = gangingUp(message);
-    const choices = defenseChoices(target, incomingOf(attack), -gang).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
+    const choices = defenseChoices(target, incomingOf(attack), -gang, GRAPPLE_ACTIONS[attack.special]?.defenses ?? null).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
       `${esc(choice.name)}${choice.weaponName ? ` · ${esc(choice.weaponName)}` : ""}${choice.total != null && !choice.blocked ? ` <b>+${choice.total}</b>` : ""}`, !choice.blocked, choice.blocked || choice.note));
     const free = defenseChoices(target, incomingOf(attack))[0]?.activeDodge;
     const repeatBox = `<button type="button" class="witcher-exchange-repeat" data-exchange-repeat aria-pressed="${!free && repeatDefense(target)}" ${free ? "disabled" : ""} data-tooltip="${free ? "Активное уклонение: повторные защиты бесплатны" : "Вторая и следующие защиты за раунд стоят 1 ВЫН. Нажмите, чтобы переключить."}"><i class="fa-solid fa-rotate"></i> Повторная · ${free ? 0 : 1} ВЫН</button>`;
@@ -305,6 +344,13 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
   if (!outcome.hit && outcome.mode === "parry") body += `<p class="witcher-exchange-note"><i class="fa-solid fa-person-falling"></i> ${esc(message.speakerActor?.name ?? "Атакующий")} ошеломлён: −2 к атаке и защите до начала своего хода.</p>`;
   const wear = exchangeOf(outcome.defense).wear;
   if (wear) body += `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> Удар принял ${esc(wear.name)}: надёжность ${wear.from} → ${wear.to}${wear.to === 0 ? " · сломано" : ""}</p>`;
+  if (attack.special) {
+    const done = linkedAny(message.id, index, "special"), name = GRAPPLE_ACTIONS[attack.special]?.name ?? "";
+    if (outcome.hit) body += done ? `<p class="witcher-exchange-applied is-special"><i class="fa-solid fa-hand-back-fist"></i> ${esc(exchangeOf(done).notes?.join(" ") ?? "")}</p>`
+      : `<p class="witcher-exchange-note"><i class="fa-solid fa-hourglass-half"></i> ${esc(name)}: удалось — мастер применяет результат…</p>`;
+    else body += `<p class="witcher-exchange-note">${esc(name)}: не удалось.</p>`;
+    return `<li class="${outcome.hit ? "is-hit" : "is-miss"}">${head}<span>${defenseLine}</span><strong class="${outcome.hit ? "is-hit" : "is-miss"}">${outcome.hit ? "Удалось" : "Не удалось"}</strong></header>${body}</li>`;
+  }
   if (outcome.limbBlock) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-hand"></i> Блок телом: урон атаки приходится в подставленную руку, ПБ учитывается. Критического ранения нет.</p>`;
   if (outcome.hit || outcome.limbBlock) {
     const damage = linked(message.id, index, "damage"), applied = linked(message.id, index, "applied");
@@ -325,12 +371,16 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
       if (wound) body += `<details class="witcher-exchange-wound"><summary>${esc(wound.name)}</summary><p>${esc(wound.effect)}</p></details>`;
       if (applied) {
         const result = exchangeOf(applied);
-        body += `<p class="witcher-exchange-applied" data-tooltip="${esc(stepsHTML(result.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-heart-crack"></i> −${result.total} ПЗ</p>${result.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ −1: ${esc(result.ablated)}</p>` : result.armorHeld ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield"></i> Броня выдержала удар — ПБ не снижается</p>` : ""}`;
+        if (result.shield) body += `<p class="witcher-exchange-applied is-shield" data-tooltip="${esc(stepsHTML(result.shield.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-user-shield"></i> Живой щит ${esc(result.shield.name)}: −${result.shield.total} ПЗ${result.shield.applied ? "" : " <small>(применяет мастер)</small>"}</p>${result.shield.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ щита −1: ${esc(result.shield.ablated)}</p>` : ""}`;
+        body += `<p class="witcher-exchange-applied" data-tooltip="${esc(stepsHTML(result.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-heart-crack"></i> −${result.total} ПЗ${result.shield ? " сквозь щит" : ""}</p>${result.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ −1: ${esc(result.ablated)}</p>` : result.armorHeld ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield"></i> Броня выдержала удар — ПБ не снижается</p>` : ""}`;
         // Core p.158: every critical wound also forces a Stun save.
         if (data.critical && target?.isOwner) body += `<div class="witcher-exchange-actions">${button("data-exchange-stun", '<i class="fa-solid fa-dice-d10"></i> Испытание Устойчивости', true, "Критическое ранение требует испытания УСТ")}</div>`;
       } else if (target?.isOwner) {
-        const preview = damagePreview(message, index);
-        body += `<div class="witcher-exchange-actions">${button("data-exchange-apply", `<i class="fa-solid fa-heart-crack"></i> Применить −${preview.result.total} ПЗ`, true)}</div>${stepsHTML(preview.result.steps)}`;
+        const preview = damagePreview(message, index), shield = preview.shield;
+        if (shield) body += `<div class="witcher-exchange-shield"><p><i class="fa-solid fa-user-shield"></i> <b>Живой щит:</b> ${esc(shield.name)} в захвате прикрывает туловище. Удар принимает он; в вас проходит только урон сверх его ТЕЛ ${shield.body} + ПБ ${shield.armor.sp} = <b>${shield.overflow}</b>.</p>
+          <div class="witcher-exchange-actions">${button("data-exchange-apply-shield", `<i class="fa-solid fa-user-shield"></i> Прикрыться: щит −${shield.result.total}, вам −${shield.through.total}`, true)}${button("data-exchange-apply", `<i class="fa-solid fa-heart-crack"></i> Принять самому −${preview.result.total}`, true)}</div>
+          <details><summary>Расчёт для щита</summary>${stepsHTML(shield.result.steps)}</details><details><summary>Расчёт без щита</summary>${stepsHTML(preview.result.steps)}</details></div>`;
+        else body += `<div class="witcher-exchange-actions">${button("data-exchange-apply", `<i class="fa-solid fa-heart-crack"></i> Применить −${preview.result.total} ПЗ`, true)}</div>${stepsHTML(preview.result.steps)}`;
       } else body += `<p class="witcher-exchange-note">Урон применяет владелец цели или мастер.</p>`;
     }
   }
@@ -370,6 +420,7 @@ export function renderExchange(message, html) {
     run("[data-exchange-location]", () => rollExchangeLocation(message, index));
     run("[data-exchange-damage]", () => rollExchangeDamage(message, index));
     run("[data-exchange-apply]", () => applyExchangeDamage(message, index));
+    run("[data-exchange-apply-shield]", () => applyExchangeDamage(message, index, { useShield: true }));
     run("[data-exchange-stun]", () => rollStun(targetActor(attack)));
     run('[data-exchange-fumble="attack"]', () => applyFumble({ message, index, role: "attack", actor: message.speakerActor, itemId: attack.itemId, outcome: attackFumble(message, index) }));
     run('[data-exchange-fumble="defense"]', () => {
@@ -416,6 +467,10 @@ async function afterSettled(message) {
   const link = exchangeOf(message);
   if (link?.kind !== "defense") return;
   const attackMessage = game.messages.get(link.attack), outcome = attackMessage && exchangeOutcome(attackMessage, link.index);
+  if (outcome?.hit && flagsOf(attackMessage).weaponAttack?.special) {
+    if (game.users.activeGM?.isSelf) await applyGrappleSuccess(attackMessage);
+    return;
+  }
   if (!outcome || outcome.hit || outcome.mode !== "parry") return;
   const attack = flagsOf(attackMessage).weaponAttack;
   const attacker = (attack.attacker && fromUuidSync(attack.attacker)?.actor) ?? attackMessage.speakerActor;
@@ -433,6 +488,7 @@ async function afterSettled(message) {
 export function registerAttackExchange() {
   Hooks.on("renderChatMessageHTML", renderExchange);
   Hooks.on("createChatMessage", message => { try { settleThenRefresh(message); } catch (error) { console.error(error); } });
+  Hooks.on("createChatMessage", message => { applyShieldShare(message).catch(console.error); });
   Hooks.on("updateChatMessage", refreshAttack);
   Hooks.on("deleteChatMessage", refreshAttack);
   // Armor, health and equipment changes alter the live damage preview on open cards.

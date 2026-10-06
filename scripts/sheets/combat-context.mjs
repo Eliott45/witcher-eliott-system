@@ -12,6 +12,7 @@ import { consumeAiming } from "../combat/full-turn-rules.mjs";
 import { ambushState, tacticsFlags } from "../combat/tactics-rules.mjs";
 import { damageTypeLabel } from "../combat/damage-rules.mjs";
 import { toggleQuickDraw } from "../combat/quick-draw.mjs";
+import { grappleOptions, grappleState, rollGrappleAction } from "../combat/grapple.mjs";
 import { statusEffect } from "../data/effect-counters.mjs";
 
 export function combatContext(actor,options={}) {
@@ -26,6 +27,7 @@ export function combatContext(actor,options={}) {
   const defenses=[{mode:"dodge"},{mode:"reposition"},...equippedItems(actor.items).filter(item=>item.type==="weapon"&&["melee","shield"].includes(item.system.category)).flatMap(item=>[{mode:"block",itemId:item.id},{mode:"parry",itemId:item.id}]),{mode:"block",itemId:""},{mode:"parry",itemId:""}]
     .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
   return { extra,used,canAct,location:options.location??"random",range:options.range??"normal",modifier:options.modifier??0,
+    grapple:(()=>{const state=grappleState(actor);return {options:grappleOptions(actor),holding:state.holding?{name:state.holding.name,pinned:state.holding.pinned,choking:state.holding.choking}:null,heldBy:state.heldBy?{name:state.heldBy.name}:null};})(),
     fullTurn,defenses,quickDraw,canQuickDraw:canAct&&Boolean(globalThis.game?.combat?.started&&Array.from(globalThis.game.combat.combatants).some(entry=>entry.actor?.uuid===actor.uuid)),ambush:{active:Boolean(ambush),targets:ambushTargets,count:ambushTargets.length,
       canPrepare:Boolean(canAct&&ambusher&&!encounter.started&&!tacticsFlags(ambusher).tacticRequest),pending:Boolean(tacticsFlags(ambusher).tacticRequest)},
     repeat:!fullTurn.activeDodge&&Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
@@ -49,6 +51,8 @@ export function combatContext(actor,options={}) {
 }
 const guard=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){ui.notifications.warn(error.message);}};
 export const combatActions={
+  grappleAction:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollGrappleAction(this.actor,target.dataset.grapple);}finally{await this.render();}}),
+  releaseGrapple:guard(async function(){if(!this.isEditable)return;const {holding}=grappleState(this.actor);if(holding)await holding.effect.delete();await this.render();}),
   quickDraw:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await toggleQuickDraw(this.actor);}finally{await this.render();}}),
   openAmbush:guard(async function(_event,target){
     if(!this.isEditable||target.disabled)return;target.disabled=true;

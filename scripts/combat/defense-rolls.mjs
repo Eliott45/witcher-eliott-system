@@ -10,14 +10,14 @@ import { statusEffect } from "../data/effect-counters.mjs";
 import { ACTIVE_DODGE } from "./full-turn-rules.mjs";
 
 export const INCOMING_ATTACKS=[{id:"melee",name:"Ближняя атака"},{id:"thrown",name:"Метательное оружие"},{id:"ranged",name:"Лук / арбалет"}];
-const NAMES={dodge:"Уклонение",reposition:"Смена позиции",block:"Блок",parry:"Парирование"};
+const NAMES={dodge:"Уклонение",reposition:"Смена позиции",block:"Блок",parry:"Парирование",brawl:"Борьба"};
 export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repeat=false,defenseModifier=0}={}) {
   if(!NAMES[mode]||!INCOMING_ATTACKS.some(entry=>entry.id===incoming))throw new Error("Неизвестный способ защиты.");
   const modifier=Number(defenseModifier);
   if(!Number.isFinite(modifier)||Math.abs(modifier)>100)throw new Error("Неверный модификатор защиты.");
   // Core p.164: block or parry with a weapon (its skill), a shield (Melee) or bare-handed (Brawling).
   const armed=["block","parry"].includes(mode),unarmed=armed&&!itemId,item=armed&&!unarmed?actor.items.get(itemId):null,weapon=item?.type==="weapon"?effectiveItem(item):null;
-  const skillKey=mode==="dodge"?"dodgeEscape":mode==="reposition"?"athletics":weapon?.category==="shield"?"melee":weapon?.skill??"brawling";
+  const skillKey=mode==="dodge"?"dodgeEscape":mode==="reposition"?"athletics":mode==="brawl"?"brawling":weapon?.category==="shield"?"melee":weapon?.skill??"brawling";
   const skill=skillValue(actor.system,skillKey),penalty=mode==="parry"?(incoming==="thrown"?-5:-3):0;
   const activeDodge=Boolean(statusEffect(actor,ACTIVE_DODGE));
   const effects=combatModifierParts(actor,"combat.defense"),effectTotal=effects.reduce((sum,part)=>sum+part.value,0);

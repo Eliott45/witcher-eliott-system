@@ -236,3 +236,20 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-group-initiative li b { text-align:right; font:700 15px Georgia,serif; }
 .witcher-armor-layered { grid-column:1/-1; margin:4px 0 0; font-size:12px; color:#6b5c49; }
 .witcher-npc-armor-total { color:#2f5a4c; }
+
+/* Grapple panel and living shield. */
+.witcher-grapple-panel { border:1px solid #c9b58f; border-radius:7px; padding:10px 14px; margin:16px 0; background:#faf6ee; color:#494239; }
+.witcher-grapple-panel header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.witcher-grapple-panel h3 { margin:0; border:0; font:700 19px Georgia,serif; color:#425456; }
+.witcher-grapple-panel header button { width:auto; height:28px; padding:0 10px; font-size:12px; }
+.witcher-grapple-actions { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.witcher-grapple-actions button { flex:1 1 auto; width:auto; height:auto; min-height:30px; padding:4px 9px; font-size:12px; }
+.witcher-grapple-state { margin:8px 0 0; padding:5px 8px; border-radius:4px; font-size:12px; }
+.witcher-grapple-state.is-holding { background:#e1e5da; color:#2f5240; }
+.witcher-grapple-state.is-held { background:#f0d4cc; color:#7b2a24; }
+.witcher-exchange-shield { margin-top:6px; padding:6px 8px; border:1px solid #b3c8b1; border-radius:4px; background:#e8efe6; }
+.witcher-exchange-shield p { margin:0 0 4px; }
+.witcher-exchange-shield details { margin-top:4px; font-size:11px; }
+.witcher-exchange-shield summary { cursor:pointer; color:#4f6a5c; }
+.witcher-exchange-actions [data-exchange-apply-shield] { color:#fff4e2; background:#3f6c5e; border-color:#2f5240; }
+.witcher-exchange-applied.is-shield { color:#2f5240; }

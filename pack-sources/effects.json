@@ -1104,6 +1104,113 @@
     }
   },
   {
+    "_id": "efct000000000032",
+    "name": "В захвате",
+    "img": "icons/svg/net.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Персонаж в захвате: не может отойти от захватчика, −2 к атаке и защите. Каждый ход может попытаться вырваться: Уклонение/Изворотливость против Борьбы захватчика.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "grappled"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "grappled",
+          "modifiers": [
+            {
+              "target": "combat.attack",
+              "value": -2
+            },
+            {
+              "target": "combat.defense",
+              "value": -2
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000033",
+    "name": "Держит в захвате",
+    "img": "icons/svg/net.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Персонаж удерживает противника. Может обездвижить, душить или бросить его, а удерживаемый служит живым щитом: удары в туловище сначала принимает он.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "grappling"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "grappling"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000034",
+    "name": "Обездвижен",
+    "img": "icons/svg/padlock.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Персонаж обездвижен в захвате: не может передвигаться и действовать, пока не вырвется. Атаки по нему получают +4.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "pinned"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "pinned",
+          "incapacitated": true,
+          "modifiers": [
+            {
+              "target": "combat.targeted",
+              "value": 4
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
     "_id": "efct000000000101",
     "name": "Чёрный яд",
     "img": "icons/svg/poison.svg",
