@@ -77,6 +77,22 @@ test("canonical consumables reuse kinds; custom overrides, quantity and 25-use b
   salt.system.quantity = 0; assert.throws(() => consumptionPlan(salt));
   salt.system.quantity = 1; salt.system.carried = false; assert.throws(() => consumptionPlan(salt));
 });
+
+test("Letho's bombs spend one of three without applying poison or frost to their owner; ritual pouch is reusable", async () => {
+  environment(); const owner = actor();
+  for (const [ruleId, price] of [["bomb.northern-wind",177],["bomb.devils-puffball",138]]) {
+    const bomb = item(owner, ruleId, 3);
+    assert.equal(bomb.system.weight, 1); assert.equal(bomb.system.price, price);
+    assert.equal(consumableContext(bomb).remaining, 3);
+    await useConsumable(bomb);
+    assert.equal(bomb.system.quantity, 2);
+    assert.equal(consumableContext(bomb).remaining, 2);
+    assert.equal(owner.effects.length, 0);
+    assert.ok(notices.at(-1).data.content.includes(bomb.system.description));
+  }
+  assert.equal(rolled, 0);
+  assert.equal(consumableContext(item(owner, "gear.ritual-pouch")).enabled, false);
+});
 test("non-witcher success spends one dose and grants its effect; DC18 uses the shared roll and private audience", async () => {
   environment(); const owner = actor("human"), potion = item(owner, "potion.swallow", 2);
   const result = await consumeOwnedItem(potion);

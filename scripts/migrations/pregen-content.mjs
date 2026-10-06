@@ -1,12 +1,13 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { pendingPregenItems, completePregenLoadout } from "./pregen-loadouts.mjs";
 
-export const PREGEN_CONTENT_VERSION = 1;
+export const PREGEN_CONTENT_VERSION = 2;
 
 export function registerPregenMigration() {
   game.settings.register(SYSTEM_ID, "pregenContentVersion", { scope: "world", config: false, type: Number, default: 0 });
 }
 
-/** Append source profiles through Foundry; keep edited pregens and imported actors intact. */
+/** Append profiles and explicitly missing gear through Foundry, preserving player edits. */
 export async function migratePregenContent() {
   if (game.user !== game.users.activeGM || game.settings.get(SYSTEM_ID, "pregenContentVersion") >= PREGEN_CONTENT_VERSION) return;
   const pack = game.packs.get(`${SYSTEM_ID}.pregens`);
@@ -23,12 +24,20 @@ export async function migratePregenContent() {
       throw new Error(`Проверьте преген «${source.name}»: ID занят или запись некорректна.`);
   }
   const locked = pack.locked;
+  const repairs = (await pack.getDocuments()).filter(actor => pendingPregenItems(actor, sources).length);
+  const writePack = missing.length || repairs.length;
   try {
+    if (locked && writePack) await pack.configure({ locked: false });
     if (missing.length) {
-      if (locked) await pack.configure({ locked: false });
       const created = await foundry.documents.Actor.implementation.createDocuments(missing, { pack: pack.collection, keepId: true });
       if (created.length !== missing.length) throw new Error("Добавлены не все прегены. Обновление будет повторено при следующем входе мастера.");
     }
-    await game.settings.set(SYSTEM_ID, "pregenContentVersion", PREGEN_CONTENT_VERSION);
-  } finally { if (locked && missing.length) await pack.configure({ locked: true }); }
+    for (const actor of repairs) await completePregenLoadout(actor, sources);
+  } finally { if (locked && writePack) await pack.configure({ locked: true }); }
+  const actors = new Map(Array.from(game.actors, actor => [actor.uuid, actor]));
+  for (const scene of game.scenes) for (const token of scene.tokens) {
+    if (!token.actorLink && token.actor) actors.set(token.actor.uuid, token.actor);
+  }
+  for (const actor of actors.values()) await completePregenLoadout(actor, sources);
+  await game.settings.set(SYSTEM_ID, "pregenContentVersion", PREGEN_CONTENT_VERSION);
 }

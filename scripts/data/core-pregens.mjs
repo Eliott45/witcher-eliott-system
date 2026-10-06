@@ -37,7 +37,6 @@ export function additionalPregenSources({ take, gear }) {
   lute.system.description = "<p>Струнный музыкальный инструмент для сольного исполнения и сопровождения песен.</p>";
   const flute = named("musical-instrument", "Флейта");
   flute.system.description = "<p>Духовой музыкальный инструмент, удобный для игры в дороге.</p>";
-  const ritualBag = [{ name: "Сумка с ингредиентами для ритуалов", quantity: 1 }];
   const profiles = [
     {
       documentId: "pregenYennefer01", id: "yennefer-of-vengerberg", name: "Йеннифэр из Венгерберга", page: 13,
@@ -53,7 +52,7 @@ export function additionalPregenSources({ take, gear }) {
         worn("gear.gem-amulet"), gear("material.fifth-essence", 10), gear("material.infused-dust", 6), gear("gear.chalk", 8),
         gear("gear.makeup-kit"), gear("gear.alchemy-tools"), gear("alchemy.perfume"), gear("alchemy.sterilizing", 5), gear("alchemy.numbing", 5),
         ...mount(), gear("gear.writing-kit"), gear("gear.mirror"), named("gear.perfume", "Духи"), named("gear.ledger", "Дневник"), gear("shoulder-bag")],
-      missing: ritualBag,
+      revision: 2,
       appearance: "Темноволосая чародейка в чёрно-белой одежде, с фиолетовыми глазами.",
       backstory: "Могущественная чародейка, обучавшаяся у Тиссаи де Врие. Её судьба тесно связана с Геральтом и Цири. После возвращения с острова туманов находится в Нильфгаарде и действует рядом с императорским двором."
     },
@@ -103,7 +102,7 @@ export function additionalPregenSources({ take, gear }) {
         gear("material.berbercane", 2), worn("gear.gem-amulet"), gear("gear.makeup-kit"), named("gear.perfume", "Духи"),
         gear("gear.alchemy-tools"), gear("shoulder-bag"), gear("alchemy.wives-tears", 2), gear("alchemy.talgar-tears", 2),
         gear("alchemy.pantagran", 2), gear("alchemy.perfume", 2), gear("alchemy.hallucinogen", 2)],
-      missing: ritualBag,
+      revision: 2,
       appearance: "Рыжеволосая чародейка с зелёными глазами.",
       backstory: "Бывшая советница короля Фольтеста и участница Ложи Чародеек. Близка с Геральтом и Йеннифэр, известна собственным заклинанием «Градобитие Меригольд». В Новиграде помогает преследуемым магам и ученикам бежать на север."
     },
@@ -155,13 +154,19 @@ export function additionalPregenSources({ take, gear }) {
       items: [held("weapon.dwarven-cleaver"), gear("weapon.short-dagger"), gear("weapon.torrwr"), worn("gear.witcher-medallion"),
         gear("potion.blizzard"), gear("potion.golden-oriole"), gear("potion.swallow"), gear("decoction.werewolf"),
         gear("decoction.grave-hag"), gear("decoction.arachas"), gear("weapon.throwing-knife", 4), worn("armor.torso.4"), worn("armor.legs.4"),
-        gear("gear.alchemy-tools"), gear("alchemy.black-venom", 3), gear("alchemy.chloroform", 3), gear("gear.bandolier"), ...mount()],
-      missing: [{ name: "Бомба «Северный ветер»", quantity: 3 }, { name: "Бомба «Чёртов гриб»", quantity: 3 }],
+        gear("gear.alchemy-tools"), gear("alchemy.black-venom", 3), gear("alchemy.chloroform", 3), gear("gear.bandolier"),
+        gear("bomb.northern-wind", 3), gear("bomb.devils-puffball", 3), ...mount()],
+      revision: 2,
       appearance: "Очень крупный, мускулистый и бритоголовый ведьмак школы Змеи.",
       backstory: "Ведьмак школы Змеи, известный как Убийца Королей. Работал на Нильфгаард в надежде восстановить свою школу; стоял за убийствами Демавенда и Фольтеста. После событий в Лок Муинне его судьба остаётся неясной."
     }
   ];
   return profiles.map(profile => {
+    if (["yennefer-of-vengerberg", "triss-merigold"].includes(profile.id)) {
+      const pouch = gear("gear.ritual-pouch");
+      for (const item of profile.items) if (item.system.kind === "material" || item.system.ruleId === "gear.chalk") item.system.containerId = pouch._id;
+      profile.items.push(pouch);
+    }
     const details = { race: profile.race, profession: profile.profession, gender: profile.gender };
     const modifiers = backgroundModifiers(details), missing = profile.missing ?? [];
     const notes = ["Возраст, кроны, опыт и репутация в блоке не указаны. Родной язык добавлен на уровне 8 по общему правилу; явно указанные в блоке языки сохранены.",
@@ -170,7 +175,7 @@ export function additionalPregenSources({ take, gear }) {
     return { _id: profile.documentId, name: profile.name, type: "character", img: "icons/svg/mystery-man.svg", sort: profile.page * 100000, ownership: { default: 2 },
       prototypeToken: { name: profile.name, actorLink: true, disposition: 1, texture: { src: "icons/svg/mystery-man.svg" },
         sight: { enabled: true, angle: VISION_ANGLE }, bar1: { attribute: "health" }, bar2: { attribute: "stamina" } },
-      flags: { [SYSTEM_ID]: { pregen: { id: profile.id, source: `Базовая книга, стр. ${profile.page}`, revision: 1, missing: structuredClone(missing) } } },
+      flags: { [SYSTEM_ID]: { pregen: { id: profile.id, source: `Базовая книга, стр. ${profile.page}`, revision: profile.revision ?? 1, missing: structuredClone(missing) } } },
       system: { details, attributes: baseValues(Object.fromEntries(ATTRIBUTE_KEYS.map((key, index) => [key, profile.attributes[index]])), modifiers, "attributes"),
         health: { value: profile.health, max: profile.health }, stamina: { value: profile.stamina, max: profile.stamina }, vigor: profile.vigor,
         skills: baseValues(profile.skills, modifiers, "skills"), languages: structuredClone(profile.languages ?? [common]),

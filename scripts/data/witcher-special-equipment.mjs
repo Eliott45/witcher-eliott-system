@@ -40,6 +40,18 @@ export const WITCHER_SPECIAL_EQUIPMENT = [
   { id: "bomb.samum", documentId: "bombSamum0000001", name: "Бомба «Самум»", type: "equipment", source: "alchemy", img: "icons/svg/explosion.svg",
     system: { kind: "gear", weight: 1, price: 147, damageType: "Д", properties: "Бомба; Радиус 4 м; Испытание УСТ −2; Слепота — 6 раундов",
       source: "Базовая книга, стр. 254–255", description: "<p>Светошумовая бомба. Бросок — Атлетика; дальность ТЕЛ × 4 м. Все в радиусе 4 м проходят испытание УСТ со штрафом −2 и получают слепоту на 6 раундов (18 секунд). При провале испытания УСТ наступает дезориентация. Прямого урона нет.</p>" } },
+  { id: "bomb.northern-wind", documentId: "bombNorthernW001", name: "Бомба «Северный ветер»", type: "equipment", source: "alchemy", img: "icons/svg/explosion.svg",
+    system: { kind: "gear", weight: 1, price: 177, damageType: "С", properties: "Бомба; Радиус 4 м; Замораживание на месте",
+      source: "Базовая книга, стр. 254", description: "<p>Бомба с замораживающим составом. Бросок — Атлетика; дальность ТЕЛ × 4 м.</p><p>Все существа в радиусе 4 м замерзают на месте. Эффект длится 8 раундов (24 секунды) и заканчивается раньше, если цель успешно проходит проверку Силы СЛ 18 или по ней наносят удар. Атака по замороженной цели наносит дополнительно [[/r 2d6]] урона. Сам взрыв прямого урона не наносит.</p>" } },
+  { id: "bomb.devils-puffball", documentId: "bombDevilsPuf001", name: "Бомба «Чёртов гриб»", type: "equipment", source: "alchemy", img: "icons/svg/explosion.svg",
+    system: { kind: "gear", weight: 1, price: 138, damageType: "С", properties: "Бомба; Радиус 4 м; Отравление (100%); Двойной урон яда",
+      source: "Базовая книга, стр. 161, 254", description: "<p>Бомба, выпускающая ядовитую смесь. Бросок — Атлетика; дальность ТЕЛ × 4 м.</p><p>Существа в радиусе 4 м получают отравление с вероятностью 100%. Яд наносит двойной обычный урон: 6 ПЗ в начале хода, игнорируя броню. Чтобы прекратить отравление, нужно потратить обычное действие и пройти проверку Стойкости СЛ 15. Фиксированной длительности нет: яд действует до избавления от отравления. Сам взрыв прямого урона не наносит.</p>" } },
+  // Ritual pouch has no separate stat block. Model its container as a belt pouch;
+  // the pregen's explicitly listed ingredients remain separate, finite Items.
+  { id: "gear.ritual-pouch", documentId: "gearRitualBag001", name: "Сумка с ингредиентами для ритуалов", type: "equipment", source: "core", flags: unpriced,
+    img: "icons/svg/item-bag.svg", system: { kind: "container", weight: .1, capacity: 5, price: 0, concealment: "tiny",
+      properties: "Для маленьких предметов", source: "Базовая книга, стр. 13, 16, 93, 95, 117; параметры контейнера приняты как у поясной сумки",
+      description: "<p>Сумка для хранения ритуальных ингредиентов: порошков, трав и мелких принадлежностей. Реагенты хранятся в ней отдельными предметами.</p><p>Для ритуала нужны компоненты из его описания. Они расходуются и при успехе, и при провале; исключение — мегаскоп. Сама сумка сохраняется после использования ингредиентов.</p>" } },
   { id: "ammunition.explosive", documentId: "ammoExplosive001", name: "Взрывные боеприпасы", type: "equipment", source: "ammunition", img: AMMUNITION_ICON,
     system: { kind: "ammunition", quantity: 1, purchaseQuantity: 1, weight: .1, price: 108, damageType: "С",
       properties: "Взрыв; Радиус 2 м; Урон 4d6 по всем частям тела", source: "Базовая книга, стр. 254–255; параметры за один снаряд",

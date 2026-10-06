@@ -14,9 +14,9 @@ function fixture(t, { locked = true } = {}) {
   } });
   const gm = {}, index = new Map([[sources[0]._id, entry(sources[0])]]), created = [], locks = [];
   const state = { version: 0, fetches: 0, mode: "success" };
-  const pack = { collection: `${SYSTEM_ID}.pregens`, locked, async getIndex() { return index; },
+  const pack = { collection: `${SYSTEM_ID}.pregens`, locked, async getIndex() { return index; }, async getDocuments() { return []; },
     async configure({ locked: value }) { this.locked = value; locks.push(value); } };
-  globalThis.game = { user: gm, users: { activeGM: gm }, packs: new Map([[pack.collection, pack]]),
+  globalThis.game = { user: gm, users: { activeGM: gm }, packs: new Map([[pack.collection, pack]]), actors: [], scenes: [],
     settings: { get: () => state.version, async set(_system, _key, value) { state.version = value; } } };
   globalThis.fetch = async url => {
     assert.equal(url, `systems/${SYSTEM_ID}/pack-sources/pregens.json`);
@@ -43,7 +43,7 @@ test("an existing world gets seven pregens once without changing edited profiles
   assert.equal(f.state.version, PREGEN_CONTENT_VERSION);
   assert.deepEqual(f.index.get(sources[0]._id), saved);
   assert.deepEqual(f.locks, [false, true]);
-  assert.equal(f.created.find(actor => actor.name === "Лето из Гулеты").items.length, 39);
+  assert.equal(f.created.find(actor => actor.name === "Лето из Гулеты").items.length, 41);
   await migratePregenContent();
   assert.equal(f.created.length, 7); assert.equal(f.state.fetches, 1);
 });
@@ -91,4 +91,59 @@ test("players, secondary GMs and a missing pack do not run the import", async t 
   game.user = gm; game.packs.clear();
   await migratePregenContent();
   assert.equal(f.state.fetches, 0); assert.equal(f.state.version, 0);
+});
+
+test("version-one worlds complete catalog, imported actors and unlinked tokens once, restoring pack locks on failure", async t => {
+  const f = fixture(t);
+  f.state.version = 1;
+  for (const source of sources) f.index.set(source._id, entry(source));
+  let fail = true;
+  function incomplete(id, uuid, packed = false) {
+    const actor = structuredClone(sources.find(source => source.flags[SYSTEM_ID].pregen.id === id));
+    const missing = actor.items.filter(item => ["gear.ritual-pouch", "bomb.northern-wind", "bomb.devils-puffball"].includes(item.system.ruleId));
+    actor.flags[SYSTEM_ID].pregen.missing = missing.map(item => ({ name: item.name, quantity: item.system.quantity }));
+    actor.flags[SYSTEM_ID].pregen.revision = 1;
+    actor.items = actor.items.filter(item => !missing.includes(item));
+    actor.items.forEach(item => { item.id = item._id; item.system.containerId = ""; });
+    actor.uuid = uuid; actor.isOwner = true; actor.creates = 0;
+    actor.createEmbeddedDocuments = async (_type, rows) => {
+      if (packed) {
+        assert.equal(f.pack.locked, false);
+        if (fail) throw Error("gear create failed");
+      }
+      return rows.map(row => {
+        const item = { ...structuredClone(row), id: `item${actor.creates++}` };
+        actor.items.push(item); return item;
+      });
+    };
+    const assign = (object, patch) => {
+      for (const [path, value] of Object.entries(patch)) {
+        const keys = path.split("."), key = keys.pop(); let target = object;
+        for (const part of keys) target = target[part] ??= {};
+        target[key] = value;
+      }
+    };
+    actor.updateEmbeddedDocuments = async (_type, rows) => {
+      for (const {_id, ...patch} of rows) assign(actor.items.find(item => item.id === _id), patch);
+    };
+    actor.update = async patch => assign(actor, patch);
+    return actor;
+  }
+  const catalog = incomplete("letho-of-gulet", "Compendium.letho", true);
+  const world = incomplete("yennefer-of-vengerberg", "Actor.yennefer");
+  const token = incomplete("triss-merigold", "Scene.s.Token.triss.Actor.triss");
+  f.pack.getDocuments = async () => [catalog];
+  game.actors.push(world);
+  game.scenes.push({ tokens: [{actorLink:true,actor:world}, {actorLink:false,actor:token}] });
+  await assert.rejects(migratePregenContent(), /gear create failed/);
+  assert.equal(f.state.version, 1); assert.equal(f.pack.locked, true);
+  assert.equal(world.creates, 0); assert.equal(token.creates, 0);
+  fail = false;
+  await migratePregenContent();
+  assert.equal(f.state.version, PREGEN_CONTENT_VERSION); assert.equal(f.created.length, 0);
+  assert.deepEqual([catalog.creates,world.creates,token.creates], [2,1,1]);
+  for (const actor of [catalog,world,token]) assert.deepEqual(actor.flags[SYSTEM_ID].pregen.missing, []);
+  await migratePregenContent();
+  assert.deepEqual([catalog.creates,world.creates,token.creates], [2,1,1]);
+  assert.deepEqual(f.locks, [false,true,false,true]);
 });

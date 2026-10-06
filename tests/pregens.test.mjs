@@ -144,7 +144,7 @@ test("all heroes embed independent canonical Items and survive the pack's embedd
   assert.equal(notes[0].flags.core.sourceId, notes[1].flags.core.sourceId);
 });
 
-test("loadouts retain stacks, full magic lists and explicit missing content without fake replacements", () => {
+test("loadouts retain stacks and full magic lists, including the completed ritual pouches and bombs", () => {
   for (const [id, count] of [["yennefer-of-vengerberg",11],["triss-merigold",11],["letho-of-gulet",10],["dandelion",0],["zoltan-chivay",0],["vernon-roche",0],["iorveth",0]])
     assert.equal(hero(id).items.filter(item => item.type === "spell").length, count);
   for (const id of ["zoltan-chivay", "vernon-roche", "iorveth"]) assert.equal(byRule(hero(id), "ammunition.standard").system.quantity, 20);
@@ -161,8 +161,17 @@ test("loadouts retain stacks, full magic lists and explicit missing content with
     assert.ok(!actor.items.some(owned => owned.name === item.name));
     return [actor.name, item.name, item.quantity];
   }));
-  assert.deepEqual(shortages, [["Йеннифэр из Венгерберга","Сумка с ингредиентами для ритуалов",1],
-    ["Трисс Меригольд","Сумка с ингредиентами для ритуалов",1],["Лето из Гулеты","Бомба «Северный ветер»",3],["Лето из Гулеты","Бомба «Чёртов гриб»",3]]);
+  assert.deepEqual(shortages, []);
+  for (const id of ["bomb.northern-wind", "bomb.devils-puffball"]) assert.equal(byRule(hero("letho-of-gulet"), id).system.quantity, 3);
+  for (const id of ["yennefer-of-vengerberg", "triss-merigold"]) {
+    const actor = hero(id), pouch = byRule(actor, "gear.ritual-pouch");
+    assert.equal(pouch.system.kind, "container"); assert.equal(pouch.system.quantity, 1);
+    assert.equal(pouch.system.capacity, 5);
+    const ingredients = actor.items.filter(item => item.system.kind === "material" || item.system.ruleId === "gear.chalk");
+    assert.ok(ingredients.length);
+    assert.ok(ingredients.every(item => item.system.containerId === pouch._id));
+    assert.ok(!actor.system.biography.sessionNotes.includes("В каталоге пока отсутствуют"));
+  }
 });
 
 test("Zoltan's horse, saddle, saddlebags and cart use native transport links and do not weigh down the character", () => {
