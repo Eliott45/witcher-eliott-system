@@ -1,3 +1,4 @@
+import { freeStuckWeapon } from "../combat/weapon-block.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { effectDurationLabel } from "../data/effect-duration.mjs";
 import { effectRules, EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions.mjs";
@@ -30,6 +31,7 @@ export async function effectsContext(sheet) {
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
       autoAllowed:Boolean(!rules.manualOnly&&rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
       durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,canEditDuration:sheet.isEditable&&canEditEffectDuration(effect),
+      weaponBlock:effect.flags?.[SYSTEM_ID]?.weaponBlock?.reason==="stuck",
       action:rules.action,canAct:sheet.isEditable&&conditionRules(sheet.actor).canAct,critical:woundContext(effect,sheet.isEditable),
       description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(text.startsWith("WITCHER.")?game.i18n.localize(text):text,{secrets:sheet.actor.isOwner,relativeTo:effect})};
   }));
@@ -61,6 +63,10 @@ export const effectActions={
   effectAction:safe(async function(_event,target){
     if(!this.isEditable)return;
     const effect=this.actor.effects.get(target.dataset.effectId);if(effect)await requestEffectSave(this.actor,effect,{action:true});
+  }),
+  freeWeapon:safe(async function(_event,target){
+    if(!this.isEditable||target.disabled)return;target.disabled=true;
+    const effect=this.actor.effects.get(target.dataset.effectId);if(effect)await freeStuckWeapon(this.actor,effect);
   }),
   stabilizeWound:safe(async function(_event,target){
     if(!this.isEditable||target.disabled)return;target.disabled=true;

@@ -357,8 +357,8 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
       notes.push(item?.system.skill === "crossbow" ? `${item.name}: заклинило, нужна перезарядка` : "1 раунд на исправление");
     }
     if (step.id === "stuck") {
-      if (item) await blockWeapon(actor, item, "stuck", `Оружие застряло: ${item.name}`, `${item.name} застряло в ближайшем предмете. Им нельзя атаковать и блокировать до конца вашего следующего хода.`, 1);
-      notes.push(`${item?.name ?? "Оружие"} застряло: 1 раунд, чтобы достать`);
+      if (item) await blockWeapon(actor, item, "stuck", `Оружие застряло: ${item.name}`, `${item.name} застряло в ближайшем предмете. Пока его не достанете (это действие), им нельзя атаковать и блокировать.`, null);
+      notes.push(`${item?.name ?? "Оружие"} застряло: достать — действие`);
     }
     if (step.id === "stun") { await rollStun(actor); notes.push("испытание Устойчивости брошено"); }
     return await post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls, content: `<p>Провал: ${esc(notes.join("; "))}</p>`,
