@@ -244,3 +244,11 @@ test("concealment: attackers' owners and the GM see everything; creature numbers
   assert.equal(attackConcealed({ speakerActor: monster }), false);
   delete globalThis.game;
 });
+
+test("debug dice queue parses plain d10 lists and per-die groups", async () => {
+  const { parseDebugDice, formatDebugDice } = await import("../scripts/dice/debug-dice.mjs");
+  assert.deepEqual(parseDebugDice("10, 4 1"), { 10: [10, 4, 1] });
+  assert.deepEqual(parseDebugDice("d6: 6, 7; d10: 1"), { 6: [6], 10: [1] }, "7 is not a d6 face");
+  assert.deepEqual(parseDebugDice(""), {});
+  assert.equal(formatDebugDice({ 6: [6], 10: [] }), "d6: 6");
+});

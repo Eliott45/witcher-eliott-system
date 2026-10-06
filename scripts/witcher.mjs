@@ -26,6 +26,7 @@ import { registerQuickDraw } from "./combat/quick-draw.mjs";
 import { registerGroupInitiative } from "./combat/group-initiative.mjs";
 import { registerGrapple } from "./combat/grapple.mjs";
 import { registerConcealedDice } from "./chat/concealment.mjs";
+import { registerDebugDice } from "./dice/debug-dice.mjs";
 import { WitcherRecipeData } from "./data/witcher-recipe-data.mjs";
 import { COMBAT_ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID, ROUND_SECONDS, INITIATIVE_FORMULA } from "./config.mjs";
 import { WitcherServicesData } from "./data/witcher-services-data.mjs";
@@ -96,6 +97,7 @@ Hooks.once("init", async () => {
   registerGroupInitiative();
   registerGrapple();
   registerConcealedDice();
+  registerDebugDice();
   registerEffectDurationChat();
   registerServiceOrders();
   CONFIG.time.roundTime = ROUND_SECONDS;

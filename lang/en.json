@@ -1382,6 +1382,8 @@
       "ConcealAttackRollsHint": "Players who do not own the attacker cannot see the attack total, its dice (Dice So Nice shows ghost dice), criticals or fumbles until they pick a defense. The GM and the attacker's owners see everything.",
       "ConcealCreatureDetails": "Hide creature details from players",
       "ConcealCreatureDetailsHint": "Players do not see other creatures' roll bases and modifiers, roll breakdowns, their SP, armor, resistances or armor wear in damage results — only the outcome.",
+      "DebugDice": "Debug: next die results (GM only)",
+      "DebugDiceHint": "For testing mechanics. Enter values and the next rolls land exactly on them: \"10, 4\" for the next two d10; \"d6: 6; d10: 1, 7\" for different dice. Each value is used once, then rolls are random again. Only for the GM on this computer. Leave empty for normal play.",
       "Language": "System language",
       "LanguageHint": "Language of translated system labels for this user. Foundry itself is unchanged. Catalog content and untranslated sections remain in Russian. Requires reload.",
       "FoundryLanguage": "Use Foundry language"
