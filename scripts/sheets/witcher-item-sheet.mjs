@@ -12,6 +12,7 @@ import { editEffectDuration } from "./effect-duration-editor.mjs";
 import { effectDurationLabel } from "../data/effect-duration.mjs";
 import { initialEffectTemplate } from "../data/effect-items.mjs";
 import { alchemyDescriptionDetails } from "../data/alchemy-descriptions.mjs";
+import { itemDescriptionSource } from "../data/item-lore.mjs";
 import { consumptionActions } from "./consumption-actions.mjs";
 import { consumableContext } from "../data/consumables.mjs";
 
@@ -76,11 +77,11 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
       item: this.item,
       system: this.item.system,
       physicalGroups: spell?.groups ?? physicalItemContext(this.item, this.isEditable),
-      itemTraits: isPhysical(this.item) ? equipmentEntry(this.item).traitDetails : [],
+      itemTraits: isPhysical(this.item) ? equipmentEntry(this.item).traitDetails : [],itemStats: isPhysical(this.item) ? equipmentEntry(this.item).stats : [],
       isAbility: this.item.type === "ability",
       attributeChoices: [{value: "", label: game.i18n.localize("WITCHER.Professions.Passive")}, ...["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"].map(value => ({value, label: game.i18n.localize(`WITCHER.Attributes.${value}.Label`)}))].map(entry => ({...entry, selected: entry.value === this.item.system.attribute})),
       typeLabel: `TYPES.Item.${this.item.type}`,
-      description: await enrich(this.item.system.description??""),
+      description: await enrich(itemDescriptionSource(this.item)),descriptionSource:itemDescriptionSource(this.item),
       alchemyDetails: alchemyDescriptionDetails(this.item.system),
       abilities: abilities.filter(Boolean)
     });

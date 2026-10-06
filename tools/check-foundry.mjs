@@ -408,7 +408,9 @@ for (const entry of EQUIPMENT) {
   // Common models retain foreign IDs in this server-side harness.
   assert.equal(document.folder, EQUIPMENT_FOLDERS[entry.source].id);
   assert.ok(game.packs.get(equipmentPack).folders.has(document.folder));
-  assert.equal(Boolean(document.system.description), entry.source === "family" || entry.id === "shoulder-bag");
+  // Every lifepath item has prose: family text, rules text or a catalog description; never a bare page citation.
+  assert.ok(document.system.description);
+  assert.doesNotMatch(document.system.description, /Базовая книга/);
 }
 for (const origin of ORIGINS) {
   const document = documents.get(originUuid(origin.id));

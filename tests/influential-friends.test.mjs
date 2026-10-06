@@ -1,3 +1,4 @@
+import { itemLore, stripPageReferences } from "../scripts/data/item-lore.mjs";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readFile } from "node:fs/promises";
@@ -35,7 +36,8 @@ test("items are sorted by lifepath source and family descriptions do not contain
     assert.deepEqual(item.effects, []);
     assert.equal(item.folder, EQUIPMENT_FOLDERS[entry.source].id);
     assert.ok(!item.system.description.includes("+"), "Bonuses belong to the lifepath, not the equipment");
-    assert.equal(item.system.description, (entry.source === "family" ? `<p>${localize(entry.description)}</p>` : "") + (generalGearContent(entry.id)?.description ?? ""));
+    const expected = stripPageReferences((entry.source === "family" ? `<p>${localize(entry.description)}</p>` : "") + (generalGearContent(entry.id)?.description ?? ""));
+    assert.equal(item.system.description, expected || itemLore(item));
   }
   assert.equal(getEquipment("noble-charter").documentId, "gear000000000001");
   assert.equal(getEquipment("trained-snake").documentId, "gear000000000010");

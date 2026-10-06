@@ -5,10 +5,11 @@ import { browseEquipmentCatalog } from "./equipment-browser.mjs";
 import { toolContent } from "../data/tool-rules.mjs";
 import { generalGearContent } from "../data/general-gear.mjs";
 import { alchemyDescriptionDetails } from "../data/alchemy-descriptions.mjs";
+import { itemDescriptionSource } from "../data/item-lore.mjs";
 
 export async function itemPresentation(item, { secrets = false } = {}) {
   const properties = item.system.properties?.trim() ?? "";
-  const description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description ?? "", { secrets, relativeTo: item });
+  const description = await foundry.applications.ux.TextEditor.implementation.enrichHTML(itemDescriptionSource(item), { secrets, relativeTo: item });
   const canonical = toolContent(item.system.ruleId) ?? generalGearContent(item.system.ruleId);
   const rulesInDescription = canonical && item.system.description?.endsWith(canonical.description) && properties === canonical.properties;
   const entry = equipmentEntry(item);

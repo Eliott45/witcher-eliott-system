@@ -2,7 +2,8 @@ import { isTransport } from "./transport.mjs";
 import { EQUIPMENT_KINDS, RARITIES, ARMOR_COVERAGE, armorZones, CONCEALMENT, isAmmunition } from "./physical-items.mjs";
 import { effectiveItem } from "./workshop.mjs";
 import { hasMarketPrice } from "./equipment-price.mjs";
-import { equipmentTrait } from "./equipment-traits.mjs";
+import { equipmentTrait, traitTone } from "./equipment-traits.mjs";
+import { stripPageReferences } from "./item-lore.mjs";
 import { toolTraitDescription } from "./tool-rules.mjs";
 import { generalGearTraitDescription } from "./general-gear.mjs";
 
@@ -14,6 +15,19 @@ export const WEAPON_CATEGORIES = [{ id: "melee", name: "Ближний бой" }
 export const ARMOR_CLASSES = [{ id: "light", name: "Лёгкая броня" }, { id: "medium", name: "Средняя броня" }, { id: "heavy", name: "Тяжёлая броня" }];
 
 /** All chips are views of existing fields, including free-form properties; no parallel tag storage. */
+/** Headline numbers for an item card, most important first. */
+export function itemStats(item, data = effectiveItem(item)) {
+  const stats = [];
+  const signed = value => `${value >= 0 ? "+" : "−"}${Math.abs(value)}`;
+  if (item.type === "weapon") stats.push({label:"Урон", value:data.damage || "—", tone:"damage"}, {label:"Точность", value:signed(data.accuracy ?? 0)},
+    {label:"Надёжность", value:`${data.reliability?.value ?? 0}/${data.reliability?.max ?? 0}`});
+  if (item.type === "armor") stats.push({label:"ПБ", value:`${data.stoppingPower?.value ?? 0}/${data.stoppingPower?.max ?? 0}`, tone:"armor"}, {label:"Скованность", value:data.encumbrance ?? 0});
+  if (isAmmunition(item)) stats.push({label:"Надёжность", value:`${data.reliability?.value ?? 0}/${data.reliability?.max ?? 0}`});
+  if (isTransport(item)) stats.push({label:"Грузоподъёмность", value:`${data.capacity} кг`});
+  stats.push({label:"Вес", value:`${Math.round((data.weight ?? 0) * 1000) / 1000} кг`}, {label:"Цена", value:hasMarketPrice(item) ? `${data.price ?? 0} кр.` : "—", tone:"price"});
+  return stats;
+}
+
 export function equipmentEntry(item) {
   const data = effectiveItem(item), category = equipmentCategory(item);
   const traits = [...new Set([
@@ -32,7 +46,8 @@ export function equipmentEntry(item) {
   if (item.type === "armor") facts.push(`ПБ ${data.stoppingPower?.value ?? 0}/${data.stoppingPower?.max ?? 0}`, `Скованность ${data.encumbrance}`);
   if (isAmmunition(item)) facts.push(`Тип урона ${data.damageType}`, `Н ${data.reliability?.value ?? 0}/${data.reliability?.max ?? 0}`, `Скрытность: ${label(CONCEALMENT, data.concealment)}`);
   return { id: item.uuid ?? item.id, label: item.name, img: item.img, group: category, groupLabel: label(EQUIPMENT_CATEGORIES, category),
-    traits, traitDetails: traits.map(label=>({label,description:toolTraitDescription(item,label)??generalGearTraitDescription(item,label)??equipmentTrait(label).description})), summary: facts.join(" · "), details: [], price: data.price ?? 0, weight: data.weight ?? 0,
+    traits, traitDetails: traits.map(label=>({label,tone:traitTone(label),description:stripPageReferences(toolTraitDescription(item,label)??generalGearTraitDescription(item,label)??equipmentTrait(label).description)})),
+    stats: itemStats(item, data), summary: facts.join(" · "), details: [], price: data.price ?? 0, weight: data.weight ?? 0,
     rarity: data.rarity ?? "", weaponCategory: item.type === "weapon" ? data.category : "", hands: item.type === "weapon" ? String(data.hands) : "",
     armorClass: item.type === "armor" ? data.armorClass : "", zone: item.type === "armor" ? data.zone : "", zones: item.type === "armor" ? armorZones(item) : [], source: data.source ?? "",
     search: [item.name, ...traits, plain(data.properties), plain(data.description), data.source].join(" ").toLocaleLowerCase() };

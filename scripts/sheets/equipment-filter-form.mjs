@@ -23,3 +23,34 @@ export function readEquipmentFilters(root) {
   }
   return result;
 }
+
+const NEUTRAL = { sort: "name", traitMode: "all", descending: false };
+const isActive = field => field.type === "checkbox" ? field.checked && !(field.dataset.equipmentFilter in NEUTRAL)
+  : field.value !== "" && field.value !== NEUTRAL[field.dataset.equipmentFilter];
+
+/** Human-readable list of every filter that narrows the results, so none of them is ever invisible. */
+export function activeEquipmentFilters(root) {
+  const active = [];
+  const query = root.querySelector(".witcher-picker-search").value.trim();
+  if (query) active.push({ label: `«${query}»`, clear: () => { root.querySelector(".witcher-picker-search").value = ""; } });
+  for (const field of root.querySelectorAll("[data-equipment-filter]")) {
+    if (!isActive(field)) continue;
+    const section = field.closest("details")?.querySelector("summary")?.firstChild?.textContent.trim();
+    const own = field.closest("label")?.textContent.trim() ?? "";
+    const text = field.type === "checkbox" ? own
+      : field.tagName === "SELECT" ? `${own.replace(field.selectedOptions[0]?.textContent ?? "", "").trim() || section}: ${field.selectedOptions[0]?.textContent.trim()}`
+      : `${own} ${field.value}`;
+    active.push({ label: text, group: field.dataset.equipmentFilter === "types" ? "Тип" : section ?? "",
+      clear: () => { if (field.type === "checkbox") field.checked = false; else field.value = ""; } });
+  }
+  return active;
+}
+
+/** Open sections that hold active filters and show how many each one has. */
+export function syncFilterSections(root) {
+  for (const section of root.querySelectorAll("[data-filter-section]")) {
+    const count = [...section.querySelectorAll("[data-equipment-filter]")].filter(isActive).length;
+    section.querySelector("[data-filter-count]").textContent = count || "";
+    if (count) section.open = true;
+  }
+}

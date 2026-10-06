@@ -1,8 +1,9 @@
 import { equipmentEntry, equipmentFacets, filterEquipment } from "../data/equipment-search.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
 import { equipmentQuote, acquireEquipment } from "../data/equipment-purchase.mjs";
-import { bindEquipmentFilters, readEquipmentFilters } from "./equipment-filter-form.mjs";
+import { bindEquipmentFilters, readEquipmentFilters, activeEquipmentFilters, syncFilterSections } from "./equipment-filter-form.mjs";
 import { SYSTEM_ID } from "../config.mjs";
+import { escapeTooltip } from "./statistics-tooltips.mjs";
 
 export async function browseEquipmentCatalog({ actor, categories = [], trait = "", documents, title = "Поиск предметов", containerId = "" } = {}) {
   const items = documents ?? [...await game.packs.get("witcher-eliott-system.equipment").getDocuments(), ...game.items].filter(item => isPhysical(item) && item.testUserPermission(game.user, "OBSERVER"));
@@ -14,7 +15,7 @@ export async function browseEquipmentCatalog({ actor, categories = [], trait = "
   const subscriptions = [];
   try {
     return await foundry.applications.api.DialogV2.wait({
-      modal: false, classes: ["witcher-picker", "witcher-equipment-browser"], position: { width: 980 },
+      modal: false, classes: ["witcher-picker", "witcher-equipment-browser"], position: { width: 1000, height: Math.min(860, Math.round(window.innerHeight * 0.88)) },
       window: { title, resizable: true }, content,
       buttons: [{ action: "close", label: "Закрыть", default: true }],
       render: (_event, dialog) => {
@@ -39,6 +40,23 @@ export async function browseEquipmentCatalog({ actor, categories = [], trait = "
             row.querySelector("[data-catalog-cost]").textContent = Number.isFinite(quote.cost) ? `${quote.cost} кр.` : "—";
           }
         };
+        const renderActive = () => {
+          const active = activeEquipmentFilters(root), bar = root.querySelector("[data-catalog-active]"), chips = bar.querySelector("[data-catalog-chips]");
+          bar.hidden = !active.length;
+          chips.replaceChildren(...active.map(filter => {
+            const chip = document.createElement("button");
+            chip.type = "button"; chip.className = "witcher-catalog-chip";
+            chip.innerHTML = `${filter.group ? `<small>${escapeTooltip(filter.group)}</small> ` : ""}${escapeTooltip(filter.label)} <i class="fa-solid fa-xmark" aria-hidden="true"></i>`;
+            chip.setAttribute("aria-label", `Убрать фильтр: ${filter.label}`);
+            chip.addEventListener("click", () => { filter.clear(); refresh(); });
+            return chip;
+          }));
+          for (const result of root.querySelectorAll("[data-catalog-trait]")) result.setAttribute("aria-pressed", String(!!root.querySelector(`[data-equipment-filter=traits][value="${CSS.escape(result.dataset.catalogTrait)}"]`)?.checked));
+          // Selected properties float to the top of their scrolling list, so they stay in view.
+          const options = root.querySelector(".witcher-facet-options");
+          for (const label of [...options.children].filter(label => label.querySelector("input").checked).reverse()) options.prepend(label);
+          syncFilterSections(root);
+        };
         const refresh = () => {
           const matched = filterEquipment(entries, readEquipmentFilters(root)), visible = new Set(matched.map(entry => entry.id));
           for (const [id, row] of rows) row.hidden = !visible.has(id);
@@ -46,9 +64,16 @@ export async function browseEquipmentCatalog({ actor, categories = [], trait = "
           for (const entry of matched) list.append(rows.get(entry.id));
           root.querySelector(".witcher-picker-count").textContent = game.i18n.format("WITCHER.Picker.Found", { count: visible.size });
           root.querySelector(".witcher-picker-empty").hidden = visible.size > 0;
+          renderActive();
           refreshActions();
         };
         root.addEventListener("click", async event => {
+          const traitChip = event.target.closest("[data-catalog-trait]");
+          if (traitChip) {
+            const box = root.querySelector(`[data-equipment-filter=traits][value="${CSS.escape(traitChip.dataset.catalogTrait)}"]`);
+            if (box) { box.checked = !box.checked; refresh(); }
+            return;
+          }
           const button = event.target.closest("[data-catalog-action]");
           if (!button || button.disabled) return;
           const item = byId.get(button.closest("[data-entry-id]").dataset.entryId);
@@ -68,6 +93,10 @@ export async function browseEquipmentCatalog({ actor, categories = [], trait = "
           } finally { busy = false; refreshActions(); }
         });
         search.addEventListener("input", refresh);
+        root.querySelector("[data-facet-search]")?.addEventListener("input", event => {
+          const query = event.target.value.trim().toLocaleLowerCase();
+          for (const option of root.querySelectorAll("[data-facet]")) option.hidden = Boolean(query) && !option.dataset.facet.toLocaleLowerCase().includes(query);
+        });
         quantity?.addEventListener("input", refreshActions);
         bindEquipmentFilters(root, { types: categories, traits: trait ? [trait] : [] }, refresh);
         if (actor) subscriptions.push(["updateActor", Hooks.on("updateActor", updated => { if (updated.uuid === actor.uuid) refreshActions(); })]);

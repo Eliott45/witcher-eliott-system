@@ -25,7 +25,7 @@ test("all sixty p93 physical items have descriptions, twenty-six additions have 
     const matches = all.filter(item => item.system.ruleId === id);
     assert.equal(matches.length, 1, id);
     assert.ok(matches[0].system.description.includes(GENERAL_GEAR_RULES[id].description), id);
-    assert.match(matches[0].system.description, /<small>Базовая книга, стр. 93,/);
+    assert.doesNotMatch(matches[0].system.description, /Базовая книга|стр\. \d/);
   }
   // These identities are also linked by family and friend compendiums.
   assert.equal(all.find(item => item.system.ruleId === "musical-instrument")._id, "gear000000000006");

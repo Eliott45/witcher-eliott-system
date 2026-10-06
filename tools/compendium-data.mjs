@@ -18,6 +18,7 @@ import { CORE_EQUIPMENT, LEGACY_GEAR_STATS } from "../scripts/data/core-equipmen
 import { WITCHER_SPECIAL_EQUIPMENT } from "../scripts/data/witcher-special-equipment.mjs";
 import { generalGearContent } from "../scripts/data/general-gear.mjs";
 import { defaultItemIcon } from "../scripts/data/item-icons.mjs";
+import { itemLore, stripPageReferences } from "../scripts/data/item-lore.mjs";
 import { EFFECT_TEMPLATES, conditionSource } from "../scripts/data/condition-definitions.mjs";
 
 const coreFolders = { transport: {id:"gearTransport001",name:"Транспорт"}, tack: {id:"gearTack00000001",name:"Упряжь и седельные сумки"}, materials: {id:"gearMaterials001",name:"Материалы и ингредиенты"}, alchemy:{id:"gearAlchemy00001",name:"Алхимия"}, mutagens:{id:"gearMutagens0001",name:"Мутагены"}, upgrades:{id:"gearUpgrades0001",name:"Улучшения"}, recipes:{id:"gearRecipes00001",name:"Чертежи и формулы"}, weapons: { id: "gearFolderWeapon", name: "Оружие и щиты" }, ammunition: { id: "gearAmmo00000001", name: "Боеприпасы" }, armor: { id: "gearFolderArmors", name: "Броня" }, tools: { id: "gearFolderTools1", name: "Инструменты" }, core: { id: "gearFolderCore01", name: "Снаряжение" } };
@@ -73,9 +74,11 @@ export function compendiumData(translations) {
     spells: spellSources(),
     equipment: [...EQUIPMENT.map(entry => {
       const content = generalGearContent(entry.id);
-      return item(entry.documentId, "equipment", entry, { ...LEGACY_GEAR_STATS[entry.id], ...content, description: paragraph(entry.description) + (content?.description ?? "") });
+      const gear = item(entry.documentId, "equipment", entry, { ...LEGACY_GEAR_STATS[entry.id], ...content, description: stripPageReferences(paragraph(entry.description) + (content?.description ?? "")) });
+      gear.system.description ||= itemLore(gear);
+      return gear;
     }),
-      ...[...CORE_EQUIPMENT, ...WITCHER_SPECIAL_EQUIPMENT, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: entry.system.description ?? `<p>${escapeHTML(entry.system.source)}</p>` }),
+      ...[...CORE_EQUIPMENT, ...WITCHER_SPECIAL_EQUIPMENT, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: stripPageReferences(entry.system.description ?? "") || itemLore(entry) }),
         img: entry.img ?? defaultItemIcon(entry) }))],
     "influential-friends": INFLUENTIAL_FRIENDS.map(entry => item(entry.documentId, "influence", entry, {
       region: entry.group, roll: entry.roll,
