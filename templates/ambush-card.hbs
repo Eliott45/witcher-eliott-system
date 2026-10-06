@@ -1,16 +1,28 @@
-<header class="witcher-group-title"><h3>Групповая засада</h3>{{#if available}}<b>{{progress}}</b>{{/if}}</header>
-<p class="witcher-group-phase">{{phase}}</p>
+<header class="witcher-group-title"><i class="fa-solid fa-user-ninja"></i><h3>Групповая засада</h3>{{#if available}}<b class="witcher-group-progress" data-tooltip="Выполнено проверок">{{progress}}</b>{{/if}}</header>
+<p class="witcher-group-phase is-{{status}}">{{phase}}</p>
 {{#if available}}
-<div class="witcher-group-rolls">
-  {{#each rows}}<div class="witcher-group-participant">
-    <img src="{{img}}" alt=""><span><b>{{name}}</b><small>{{label}}</small></span>
+<div class="witcher-group-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{progressPercent}}"><span style="width:{{progressPercent}}%"></span></div>
+{{#each groups}}<section class="witcher-group-section is-{{role}}">
+  <h4><i class="fa-solid {{icon}}"></i> {{title}}</h4>
+  <div class="witcher-group-rolls">
+  {{#each rows}}<div class="witcher-group-participant{{#if rolled}} is-rolled{{/if}}">
+    <img src="{{img}}" alt=""><span><b>{{name}}</b><small>{{label}}{{#if detail}} · <span class="witcher-group-dice{{#if detail.critical}} is-critical{{/if}}{{#if detail.fumble}} is-fumble{{/if}}" data-tooltip="{{detail.formula}}">к10: {{detail.die}}</span> {{detail.modifier}}{{/if}}</small></span>
     {{#if rolled}}<strong class="witcher-group-total">{{totalLabel}}</strong>
-    {{else}}{{#if canRoll}}<button type="button" data-ambush-roll="{{id}}"><i class="fa-solid fa-dice-d10"></i> Бросить</button>
-    {{else}}<small>{{#if pending}}Бросает…{{else}}{{#if participant}}В бою{{else}}Ожидание{{/if}}{{/if}}</small>{{/if}}{{/if}}
+    {{else}}{{#if canRoll}}<button type="button" data-ambush-roll="{{id}}" class="witcher-group-roll"><i class="fa-solid fa-dice-d10"></i> Бросить</button>
+    {{else}}<small class="witcher-group-wait">{{#if pending}}<i class="fa-solid fa-spinner fa-spin"></i> Бросает…{{else}}{{#if participant}}В бою{{else}}Ожидание{{/if}}{{/if}}</small>{{/if}}{{/if}}
     {{#if canUnlock}}<button type="button" data-ambush-unlock="{{id}}" class="witcher-group-unlock" data-tooltip="Прервать незавершённый бросок и разрешить повторить" aria-label="Разблокировать бросок"><i class="fa-solid fa-unlock"></i></button>{{/if}}
   </div>{{/each}}
-</div>
-{{#if hasMatrix}}<div class="witcher-group-table"><table><caption>Кто остался незамеченным</caption><thead><tr><th>Скрывается ↓ / Наблюдает →</th>{{#each observers}}<th>{{name}}</th>{{/each}}</tr></thead>
-  <tbody>{{#each matrix}}<tr><th>{{name}}</th>{{#each cells}}<td class="{{#if unseen}}is-unseen{{else}}{{#unless pending}}is-seen{{/unless}}{{/if}}" data-tooltip="{{hint}}" aria-label="{{hint}}">{{label}}</td>{{/each}}</tr>{{/each}}</tbody>
-</table></div><small class="witcher-group-legend">+5 — не заметил · — заметил · … ждём бросок. При равенстве наблюдатель замечает скрывающегося.</small>{{/if}}
+  </div>
+</section>{{/each}}
+{{#if hasMatrix}}<section class="witcher-group-results">
+  <h4><i class="fa-solid fa-crosshairs"></i> Кто остался незамеченным</h4>
+  {{#each matrix}}<div class="witcher-group-result">
+    <div class="witcher-group-result-head"><img src="{{img}}" alt=""><b>{{name}}</b>{{#if total}}<small>Скрытность {{total}}</small>{{/if}}</div>
+    <ul>{{#each cells}}<li class="{{#if unseen}}is-unseen{{else}}{{#unless pending}}is-seen{{/unless}}{{/if}}" data-tooltip="{{hint}}" aria-label="{{name}}: {{hint}}">
+      <i class="fa-solid {{#if pending}}fa-hourglass-half{{else}}{{#if unseen}}fa-eye-slash{{else}}fa-eye{{/if}}{{/if}}"></i>
+      <span>{{name}}{{#if total}} <small>({{total}})</small>{{/if}}</span><b>{{label}}</b>
+    </li>{{/each}}</ul>
+  </div>{{/each}}
+  <small class="witcher-group-legend"><b>+5</b> — не заметил, бонус к атакам по нему в первом раунде. При равенстве наблюдатель замечает.</small>
+</section>{{/if}}
 {{/if}}

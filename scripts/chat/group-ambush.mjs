@@ -32,8 +32,15 @@ export function bindGroupCard(html, combat, sessionId) {
   }
 }
 
+/** Checks are shown inside their ambush card, so the separate dice messages stay out of the log. */
+export function foldedIntoCard(message) {
+  const check = tacticsFlags(message).groupAmbushRoll;
+  return !!check && game.messages.some(entry => tacticsFlags(entry).groupAmbushCard?.session === check.session);
+}
+
 export async function renderGroupAmbush(message, html) {
   const flags = tacticsFlags(message), request = flags.ambushRequest, card = flags.groupAmbushCard;
+  if (foldedIntoCard(message)) { html.classList.add("witcher-ambush-folded"); html.hidden = true; return; }
   if (!request && !card) return;
   const root = html.querySelector(".witcher-group-ambush");
   if (!root) return;
@@ -45,7 +52,8 @@ export async function renderGroupAmbush(message, html) {
     bindGroupCard(root,combat,card.session);
   }
   if (game.user.isGM && (request || groupAmbush(combat)?.id === card.session)) {
-    const button = document.createElement("button"); button.type = "button"; button.textContent = "Настроить засаду";
+    const button = document.createElement("button"); button.type = "button"; button.className = "witcher-group-manage";
+    button.innerHTML = '<i class="fa-solid fa-sliders"></i> Настроить засаду';
     button.addEventListener("click",async () => {
       try {
         const {openAmbushWindow} = await import("../sheets/ambush-window.mjs");
