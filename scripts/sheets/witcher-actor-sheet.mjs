@@ -1,3 +1,4 @@
+import { takeLootByDrop } from "../loot/loot.mjs";
 import { magicContext, magicActions, bindMagic, learnSpell } from "./magic-context.mjs";
 import { combatContext, combatActions, bindCombat } from "./combat-context.mjs";
 import { changeGrip, toggleVisor } from "./inventory-context.mjs";
@@ -255,6 +256,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
 
   async _onDropItem(event, item) {
     if (!this.isEditable) return null;
+    if (item.parent?.type === "loot") return void await takeLootByDrop(this.actor, item).catch(error => ui.notifications.warn(error.message));
     if(item.type==="effect")return applyEffectItem(this.actor,item);
     if (isPhysical(item)) return dropPhysicalItem(this, event, item);
     if (item.type === "spell") { await learnSpell(this.actor,item); return null; }

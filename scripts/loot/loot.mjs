@@ -123,6 +123,14 @@ export async function dropItemToGround(actor, item, { quantity = null, point = n
   return requestLoot(actor, { action: "drop", itemId: item.id, quantity: amount, scene: scene.id, point: where, silent });
 }
 
+/** An item dragged out of loot onto a character sheet or token is taken (whole stack) by that character. */
+export async function takeLootByDrop(actor, item) {
+  const loot = item?.parent;
+  if (loot?.type !== "loot" || loot === actor) return false;
+  await requestLoot(actor, { action: "take", loot: loot.token?.uuid ?? loot.uuid, itemId: item.id, quantity: item.system.quantity ?? 1 });
+  return true;
+}
+
 export function registerLoot() {
   Hooks.on("updateActor", (actor, changes) => {
     const request = foundry.utils.getProperty(changes, `flags.${SYSTEM_ID}.${REQUEST}`);
@@ -137,7 +145,14 @@ export function registerLoot() {
   Hooks.on("dropCanvasData", (canvasRef, data) => {
     if (data.type !== "Item" || !data.uuid) return;
     const item = fromUuidSync(data.uuid), actor = item?.parent;
-    if (!actor || actor.type === "loot" || !isPhysical(item) || !actor.isOwner) return;
+    if (actor?.type === "loot") {
+      // Dropped on one of your tokens: that character takes it.
+      const token = (globalThis.canvas?.tokens?.placeables ?? []).find(entry => entry.actor?.isOwner && COMBAT_ACTOR_TYPES.includes(entry.actor.type) && entry.bounds?.contains(data.x, data.y));
+      if (token) takeLootByDrop(token.actor, item).catch(error => ui.notifications.warn(error.message));
+      else ui.notifications.info("Перетащите предмет на свой токен или на лист персонажа, чтобы забрать его.");
+      return false;
+    }
+    if (!actor || !isPhysical(item) || !actor.isOwner) return;
     dropItemToGround(actor, item, { point: { x: data.x, y: data.y } }).catch(error => ui.notifications.warn(error.message));
     return false;
   });

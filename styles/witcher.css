@@ -1073,3 +1073,5 @@ b.witcher-gm-only::after, span.witcher-gm-only::after { display:none; }
 .witcher-loot-empty { display:block !important; text-align:center; color:#8a7356; font-style:italic; }
 .witcher-loot-option { display:flex; align-items:center; gap:6px; font-size:12px; color:#6b5c49; }
 .witcher-loot-note { margin:0; }
+.witcher-loot-items li.draggable { cursor:grab; }
+.witcher-loot-items li.draggable:active { cursor:grabbing; }

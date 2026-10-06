@@ -1,3 +1,4 @@
+import { takeLootByDrop } from "../loot/loot.mjs";
 import { creatureResistances, conditionResistant, DAMAGE_TYPE_NAMES } from "../combat/damage-rules.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { consumptionActions } from "./consumption-actions.mjs";
@@ -102,5 +103,5 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     });
   }
   _toggleDisabled(disabled){super._toggleDisabled(disabled);for(const control of this.element.querySelectorAll('[data-action="tab"],[data-action="viewSheetItem"],[data-action="toggleItemDescription"],[data-inventory-search],[data-action="toggleInventoryGroup"],[data-action="toggleContainer"]'))control.disabled=false;}
-  async _onDropItem(event,item){if(!this.isEditable)return null;if(item.type==="effect")return applyEffectItem(this.actor,item);if(isPhysical(item))return dropPhysicalItem(this,event,item);return super._onDropItem(event,item);}
+  async _onDropItem(event,item){if(!this.isEditable)return null;if(item.parent?.type==="loot")return void await takeLootByDrop(this.actor,item).catch(error=>ui.notifications.warn(error.message));if(item.type==="effect")return applyEffectItem(this.actor,item);if(isPhysical(item))return dropPhysicalItem(this,event,item);return super._onDropItem(event,item);}
 }
