@@ -110,3 +110,20 @@ test("a dying patient is stabilised against how far HP is below 0", async () => 
   healer.system.statistics.dead = true;
   assert.equal(healingContext(healer).dying, null);
 });
+
+test("natural healing waits for stabilisation", async () => {
+  const { healingBlocker } = await import("../scripts/combat/healing.mjs");
+  const actor = patient({ healing: { active: true }, hp: 10 });
+  actor.system.statistics.dying = true;
+  assert.match(healingBlocker(actor), /при смерти/);
+  await restDay(actor);
+  assert.equal(actor.system.health.value, 10, "No HP while dying");
+  actor.system.statistics.dying = false;
+  const fresh = woundEffectData("broken-ribs", "medium", { state: "fresh" });
+  actor.effects.push({ ...fresh, id: "w", disabled: false });
+  assert.match(healingBlocker(actor), /критические ранения/);
+  actor.effects[0].flags[ID].criticalWound.state = "stabilized";
+  assert.equal(healingBlocker(actor), "");
+  await restDay(actor);
+  assert.equal(actor.system.health.value, 17);
+});

@@ -38,6 +38,14 @@ export function healingPatient(healer) {
 }
 
 const wounds = actor => Array.from(actor?.effects ?? []).filter(effect => !effect.disabled && effect.flags?.[SYSTEM_ID]?.criticalWound);
+/** Natural healing waits until the patient is stable: not dying and no untreated, unstabilised wound. */
+export function healingBlocker(patient) {
+  if (patient.system?.statistics?.dead) return "Пациент мёртв.";
+  if (patient.system?.statistics?.dying) return "Сначала стабилизируйте пациента: он при смерти.";
+  if (wounds(patient).some(effect => (effect.flags[SYSTEM_ID].criticalWound.state ?? "fresh") === "fresh"))
+    return "Сначала стабилизируйте критические ранения.";
+  return "";
+}
 
 export function healingContext(healer) {
   const patient = healingPatient(healer), self = patient === healer;
@@ -49,7 +57,7 @@ export function healingContext(healer) {
     hp, started: Boolean(healing?.active), handsBonus: Boolean(healing?.hands),
     // Core p.162: First Aid against how far HP is below 0 brings a dying character back to 1 HP.
     dying: readable && patient.system?.statistics?.dying && !patient.system.statistics.dead ? { dc: dyingDC(patient) } : null,
-    canHeal: skills.best.total !== null,
+    canHeal: skills.best.total !== null, healingBlocked: readable ? healingBlocker(patient) : "",
     perDay: recovery + (healing?.hands ? 3 : 0), halfDay: Math.floor(recovery / 2) + (healing?.hands ? 3 : 0),
     canRest: self && healer.isOwner,
     wounds: readable ? wounds(patient).map(effect => {
@@ -98,11 +106,18 @@ export function registerHealingRequests() {
     })().catch(error => { console.error(`${SYSTEM_ID} | Healing`, error); ui.notifications.error(error.message); })
       .finally(() => healer.update({ [`flags.${SYSTEM_ID}.${REQUEST}`]: null }));
   });
-  // The patient follows the user's target; refresh open sheets so the healing panel names the right one.
-  Hooks.on("targetToken", user => {
-    if (user !== game.user) return;
-    for (const app of foundry.applications.instances.values()) if (app.actor && app.options?.classes?.includes("witcher-eliott") && app.rendered && app.element?.querySelector(".witcher-healing-panel")) app.render();
-  });
+  // The panel shows the patient: follow the user's target and any change to the patient (HP, dying, wounds).
+  const panels = () => Array.from(foundry.applications.instances.values()).filter(app => app.actor && app.rendered && app.element?.querySelector(".witcher-healing-panel"));
+  const pending = new Set();
+  const refresh = foundry.utils.debounce(() => { for (const app of pending) if (app.rendered) app.render(); pending.clear(); }, 150);
+  const patientChanged = actor => {
+    if (!actor) return;
+    for (const app of panels()) if (app.actor !== actor && healingPatient(app.actor)?.uuid === actor.uuid) pending.add(app);
+    if (pending.size) refresh();
+  };
+  Hooks.on("targetToken", user => { if (user === game.user) { for (const app of panels()) pending.add(app); refresh(); } });
+  Hooks.on("updateActor", actor => patientChanged(actor));
+  for (const hook of ["createActiveEffect", "updateActiveEffect", "deleteActiveEffect"]) Hooks.on(hook, effect => patientChanged(effect.parent?.documentName === "Actor" ? effect.parent : null));
 }
 
 const check = (healer, { label, total, dc, title, patient }) => rollActionCheck(healer, { formula: `1d10wc + ${total}`,
@@ -162,6 +177,8 @@ export async function treatPatientWound(healer, patient, effectId) {
 
 /** Errata p.173: natural healing starts with a DC 14 Healing Hands or First Aid check by anyone. */
 export async function startNaturalHealing(healer, patient) {
+  const blocked = healingBlocker(patient);
+  if (blocked) throw new Error(blocked);
   const { best } = healerSkills(healer);
   if (best.total === null) throw new Error("Заполните навык «Первая помощь».");
   const message = await check(healer, { ...best, dc: START_HEALING_DC, patient, title: "Начало исцеления" });
@@ -180,7 +197,9 @@ export async function restDay(actor, { active = false } = {}) {
   if (!actor.isOwner) throw new Error("Нет прав на этого персонажа.");
   const healing = actor.flags?.[SYSTEM_ID]?.healing, lines = [];
   const { value, max } = actor.system.health, recovery = actor.system.statistics?.recovery ?? 0;
-  if (healing?.active && value < max) {
+  const blocked = healingBlocker(actor);
+  if (blocked && value < max) lines.push(`ПЗ не восстанавливаются. ${blocked}`);
+  else if (healing?.active && value < max) {
     const gain = Math.min(max - value, (active ? Math.floor(recovery / 2) : recovery) + (healing.hands ? 3 : 0));
     await actor.update({ "system.health.value": value + gain, ...(value + gain >= max ? { [`flags.${SYSTEM_ID}.healing`]: null } : {}) });
     lines.push(`Восстановлено ${gain} ПЗ (${value} → ${value + gain})${active ? ", половина Отдыха: персонаж был активен" : ""}${healing.hands ? ", +3 от Лечащего прикосновения" : ""}.`);
