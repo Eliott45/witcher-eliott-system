@@ -12799,6 +12799,7 @@
         "quantity": 1,
         "dc": 14,
         "time": 1800,
+        "investment": 15,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -12842,6 +12843,7 @@
         "quantity": 1,
         "dc": 12,
         "time": 1800,
+        "investment": 11,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -12885,6 +12887,7 @@
         "quantity": 1,
         "dc": 14,
         "time": 1800,
+        "investment": 32,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -12892,14 +12895,14 @@
         ],
         "components": [
           {
-            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
             "substance": "",
-            "quantity": 2
+            "quantity": 1
           },
           {
-            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000009",
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
             "substance": "",
-            "quantity": 4
+            "quantity": 2
           }
         ]
       },
@@ -12928,6 +12931,7 @@
         "quantity": 1,
         "dc": 12,
         "time": 3600,
+        "investment": 19,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -12971,6 +12975,7 @@
         "quantity": 1,
         "dc": 10,
         "time": 900,
+        "investment": 6,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -13009,6 +13014,7 @@
         "quantity": 1,
         "dc": 10,
         "time": 900,
+        "investment": 2,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -13047,6 +13053,7 @@
         "quantity": 1,
         "dc": 17,
         "time": 3600,
+        "investment": 55,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -13090,6 +13097,7 @@
         "quantity": 1,
         "dc": 17,
         "time": 3600,
+        "investment": 40,
         "grade": "journeyman",
         "forge": false,
         "tools": [
@@ -13138,6 +13146,7 @@
         "quantity": 1,
         "dc": 15,
         "time": 3600,
+        "investment": 35,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -13181,6 +13190,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 3600,
+        "investment": 43,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -13229,6 +13239,7 @@
         "quantity": 1,
         "dc": 20,
         "time": 3600,
+        "investment": 160,
         "grade": "master",
         "forge": false,
         "tools": [
@@ -13267,6 +13278,7 @@
         "quantity": 1,
         "dc": 18,
         "time": 3600,
+        "investment": 39,
         "grade": "master",
         "forge": false,
         "tools": [
@@ -13310,6 +13322,7 @@
         "quantity": 1,
         "dc": 24,
         "time": 3600,
+        "investment": 201,
         "grade": "master",
         "forge": false,
         "tools": [
@@ -13363,6 +13376,7 @@
         "quantity": 1,
         "dc": 22,
         "time": 3600,
+        "investment": 76,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -13421,6 +13435,7 @@
         "quantity": 1,
         "dc": 13,
         "time": 25200,
+        "investment": 201,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -13474,6 +13489,7 @@
         "quantity": 1,
         "dc": 10,
         "time": 7200,
+        "investment": 72,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -13527,6 +13543,7 @@
         "quantity": 1,
         "dc": 8,
         "time": 7200,
+        "investment": 33,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -13570,6 +13587,7 @@
         "quantity": 1,
         "dc": 14,
         "time": 25200,
+        "investment": 210,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -13638,6 +13656,7 @@
         "quantity": 1,
         "dc": 10,
         "time": 10800,
+        "investment": 148,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -13696,6 +13715,7 @@
         "quantity": 1,
         "dc": 14,
         "time": 25200,
+        "investment": 240,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -13749,6 +13769,7 @@
         "quantity": 1,
         "dc": 10,
         "time": 18000,
+        "investment": 119,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -13797,6 +13818,7 @@
         "quantity": 3,
         "dc": 12,
         "time": 3600,
+        "investment": 62,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -13850,6 +13872,7 @@
         "quantity": 1,
         "dc": 15,
         "time": 28800,
+        "investment": 210,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -13918,6 +13941,7 @@
         "quantity": 1,
         "dc": 12,
         "time": 21600,
+        "investment": 276,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -13976,6 +14000,7 @@
         "quantity": 3,
         "dc": 10,
         "time": 3600,
+        "investment": 51,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -14019,6 +14044,7 @@
         "quantity": 3,
         "dc": 8,
         "time": 3600,
+        "investment": 48,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -14057,6 +14083,7 @@
         "quantity": 1,
         "dc": 17,
         "time": 32400,
+        "investment": 389,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14120,6 +14147,7 @@
         "quantity": 1,
         "dc": 17,
         "time": 32400,
+        "investment": 343,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14198,6 +14226,7 @@
         "quantity": 1,
         "dc": 17,
         "time": 32400,
+        "investment": 481,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14256,6 +14285,7 @@
         "quantity": 1,
         "dc": 15,
         "time": 28800,
+        "investment": 214,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14334,6 +14364,7 @@
         "quantity": 1,
         "dc": 18,
         "time": 32400,
+        "investment": 412,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14407,6 +14438,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 28800,
+        "investment": 438,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14475,6 +14507,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 28800,
+        "investment": 252,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14543,6 +14576,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 28800,
+        "investment": 384,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14606,6 +14640,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 28800,
+        "investment": 349,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14669,6 +14704,7 @@
         "quantity": 1,
         "dc": 18,
         "time": 14400,
+        "investment": 250,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14732,6 +14768,7 @@
         "quantity": 1,
         "dc": 18,
         "time": 32400,
+        "investment": 250,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14790,6 +14827,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 14400,
+        "investment": 184,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -14858,6 +14896,7 @@
         "quantity": 1,
         "dc": 25,
         "time": 46800,
+        "investment": 722,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -14926,6 +14965,7 @@
         "quantity": 1,
         "dc": 25,
         "time": 46800,
+        "investment": 623,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -14999,6 +15039,7 @@
         "quantity": 1,
         "dc": 25,
         "time": 46800,
+        "investment": 772,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -15072,6 +15113,7 @@
         "quantity": 1,
         "dc": 20,
         "time": 36000,
+        "investment": 506,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -15135,6 +15177,7 @@
         "quantity": 1,
         "dc": 20,
         "time": 18000,
+        "investment": 342,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -15203,6 +15246,7 @@
         "quantity": 1,
         "dc": 22,
         "time": 39600,
+        "investment": 525,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -15276,6 +15320,7 @@
         "quantity": 1,
         "dc": 24,
         "time": 43200,
+        "investment": 844,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -15359,6 +15404,7 @@
         "quantity": 1,
         "dc": 22,
         "time": 39600,
+        "investment": 646,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -15422,6 +15468,7 @@
         "quantity": 1,
         "dc": 25,
         "time": 46800,
+        "investment": 760,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -15495,6 +15542,7 @@
         "quantity": 1,
         "dc": 24,
         "time": 43200,
+        "investment": 660,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -15563,6 +15611,7 @@
         "quantity": 1,
         "dc": 22,
         "time": 39600,
+        "investment": 626,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -15636,6 +15685,7 @@
         "quantity": 1,
         "dc": 10,
         "time": 10800,
+        "investment": 70,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -15689,6 +15739,7 @@
         "quantity": 1,
         "dc": 13,
         "time": 14400,
+        "investment": 129,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -15742,6 +15793,7 @@
         "quantity": 1,
         "dc": 15,
         "time": 14400,
+        "investment": 152,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -15785,6 +15837,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 14400,
+        "investment": 192,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -15823,6 +15876,7 @@
         "quantity": 1,
         "dc": 17,
         "time": 18000,
+        "investment": 260,
         "grade": "journeyman",
         "forge": false,
         "tools": [
@@ -15881,6 +15935,7 @@
         "quantity": 1,
         "dc": 18,
         "time": 18000,
+        "investment": 352,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -15934,6 +15989,7 @@
         "quantity": 1,
         "dc": 19,
         "time": 18000,
+        "investment": 431,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -15992,6 +16048,7 @@
         "quantity": 1,
         "dc": 22,
         "time": 21600,
+        "investment": 527,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -16050,6 +16107,7 @@
         "quantity": 1,
         "dc": 24,
         "time": 21600,
+        "investment": 537,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -16118,6 +16176,7 @@
         "quantity": 1,
         "dc": 10,
         "time": 18000,
+        "investment": 75,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -16161,6 +16220,7 @@
         "quantity": 1,
         "dc": 12,
         "time": 21600,
+        "investment": 131,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -16214,6 +16274,7 @@
         "quantity": 1,
         "dc": 15,
         "time": 28800,
+        "investment": 187,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -16272,6 +16333,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 28800,
+        "investment": 228,
         "grade": "journeyman",
         "forge": false,
         "tools": [
@@ -16315,6 +16377,7 @@
         "quantity": 1,
         "dc": 17,
         "time": 32400,
+        "investment": 295,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -16368,6 +16431,7 @@
         "quantity": 1,
         "dc": 18,
         "time": 32400,
+        "investment": 392,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -16426,6 +16490,7 @@
         "quantity": 1,
         "dc": 19,
         "time": 36000,
+        "investment": 468,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -16489,6 +16554,7 @@
         "quantity": 1,
         "dc": 22,
         "time": 39600,
+        "investment": 569,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -16547,6 +16613,7 @@
         "quantity": 1,
         "dc": 24,
         "time": 43200,
+        "investment": 637,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -16615,6 +16682,7 @@
         "quantity": 1,
         "dc": 13,
         "time": 25200,
+        "investment": 57,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -16658,6 +16726,7 @@
         "quantity": 1,
         "dc": 14,
         "time": 25200,
+        "investment": 94,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -16711,6 +16780,7 @@
         "quantity": 1,
         "dc": 15,
         "time": 28800,
+        "investment": 165,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -16764,6 +16834,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 28800,
+        "investment": 187,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -16817,6 +16888,7 @@
         "quantity": 1,
         "dc": 17,
         "time": 32400,
+        "investment": 295,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -16880,6 +16952,7 @@
         "quantity": 1,
         "dc": 18,
         "time": 32400,
+        "investment": 392,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -16938,6 +17011,7 @@
         "quantity": 1,
         "dc": 19,
         "time": 36000,
+        "investment": 468,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -17001,6 +17075,7 @@
         "quantity": 1,
         "dc": 22,
         "time": 39600,
+        "investment": 561,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -17064,6 +17139,7 @@
         "quantity": 1,
         "dc": 24,
         "time": 43200,
+        "investment": 631,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -17137,6 +17213,7 @@
         "quantity": 1,
         "dc": 12,
         "time": 10800,
+        "investment": 37,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -17185,6 +17262,7 @@
         "quantity": 1,
         "dc": 15,
         "time": 14400,
+        "investment": 112,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -17233,6 +17311,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 14400,
+        "investment": 172,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -17286,6 +17365,7 @@
         "quantity": 1,
         "dc": 19,
         "time": 18000,
+        "investment": 300,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -17349,6 +17429,7 @@
         "quantity": 1,
         "dc": 17,
         "time": 18000,
+        "investment": 302,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -17397,6 +17478,7 @@
         "quantity": 1,
         "dc": 18,
         "time": 18000,
+        "investment": 240,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -17455,6 +17537,7 @@
         "quantity": 1,
         "dc": 19,
         "time": 18000,
+        "investment": 378,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -17513,6 +17596,7 @@
         "quantity": 1,
         "dc": 22,
         "time": 21600,
+        "investment": 450,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -17586,6 +17670,7 @@
         "quantity": 1,
         "dc": 14,
         "time": 10800,
+        "investment": 28,
         "grade": "novice",
         "forge": false,
         "tools": [
@@ -17629,6 +17714,7 @@
         "quantity": 1,
         "dc": 14,
         "time": 10800,
+        "investment": 61,
         "grade": "novice",
         "forge": true,
         "tools": [
@@ -17677,6 +17763,7 @@
         "quantity": 1,
         "dc": 17,
         "time": 18000,
+        "investment": 96,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -17715,6 +17802,7 @@
         "quantity": 1,
         "dc": 16,
         "time": 14400,
+        "investment": 97,
         "grade": "journeyman",
         "forge": false,
         "tools": [
@@ -17768,6 +17856,7 @@
         "quantity": 1,
         "dc": 18,
         "time": 18000,
+        "investment": 109,
         "grade": "journeyman",
         "forge": true,
         "tools": [
@@ -17816,6 +17905,7 @@
         "quantity": 1,
         "dc": 24,
         "time": 21600,
+        "investment": 149,
         "grade": "master",
         "forge": true,
         "tools": [
@@ -17869,6 +17959,7 @@
         "quantity": 1,
         "dc": 24,
         "time": 21600,
+        "investment": 144,
         "grade": "master",
         "forge": true,
         "tools": [

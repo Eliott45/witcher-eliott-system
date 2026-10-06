@@ -1,0 +1,38 @@
+{{#if recipeDetails}}
+<div class="witcher-recipe-details">
+  {{#if recipeDetails.isRecipe}}
+  <section class="witcher-diagram-panel" aria-label="{{recipeDetails.title}}">
+    <header><div><span class="witcher-eyebrow">{{recipeDetails.grade}}</span><h2>{{recipeDetails.title}}</h2></div><i class="fa-solid fa-scroll" aria-hidden="true"></i></header>
+    <div class="witcher-diagram-result"><span>Результат</span>{{> "systems/witcher-eliott-system/templates/item-reference.hbs" recipeDetails.result}}<b class="witcher-recipe-quantity">×{{recipeDetails.quantity}}</b></div>
+    <dl class="witcher-diagram-metrics">
+      <div><dt><i class="fa-regular fa-clock" aria-hidden="true"></i> Время</dt><dd>{{recipeDetails.time}}</dd></div>
+      <div><dt><i class="fa-solid fa-hammer" aria-hidden="true"></i> СЛ изготовления</dt><dd>{{recipeDetails.dc}}</dd></div>
+      {{#if recipeDetails.isDiagram}}<div><dt><i class="fa-solid fa-coins" aria-hidden="true"></i> Доплата</dt><dd>{{recipeDetails.investment}} <small>крон</small></dd></div>{{/if}}
+    </dl>
+    <div class="witcher-diagram-components"><h3>Компоненты <span>{{recipeDetails.components.length}}</span></h3>
+      <ul class="witcher-recipe-list">{{#each recipeDetails.components}}
+        <li><div class="witcher-recipe-row">
+          {{#if substance}}<strong>{{name}}</strong>{{else}}{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this}}{{/if}}
+          <b class="witcher-recipe-quantity">×{{quantity}}</b>
+        </div>{{#if substance}}<details class="witcher-substance-alternatives"><summary>Подходящие ингредиенты · {{alternatives.length}}</summary><ul>{{#each alternatives}}<li>{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this}}</li>{{else}}<li>В доступном каталоге нет ингредиентов этой субстанции.</li>{{/each}}</ul></details>{{/if}}</li>
+      {{else}}<li class="witcher-recipe-empty">Компоненты пока не заданы.</li>{{/each}}</ul>
+    </div>
+    {{#if recipeDetails.isDiagram}}<p class="witcher-diagram-note"><i class="fa-solid fa-coins" aria-hidden="true"></i><span>В городе или посёлке с разрешения ведущего доплата позволяет сразу получить необходимые материалы. Цена самого чертежа указана отдельно.</span></p>{{/if}}
+  </section>
+  {{/if}}
+  {{#if recipeDetails.recipes.length}}
+  <section class="witcher-recipe-relations"><h3><i class="fa-solid fa-scroll" aria-hidden="true"></i> Как изготовить <span>{{recipeDetails.recipes.length}}</span></h3>
+    <ul class="witcher-recipe-list">{{#each recipeDetails.recipes}}<li><div class="witcher-recipe-row">{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this}}</div><small class="witcher-recipe-meta">{{time}} · СЛ {{dc}}</small></li>{{/each}}</ul>
+  </section>
+  {{/if}}
+  {{#if recipeDetails.showUses}}
+  <section class="witcher-recipe-relations"><h3><i class="fa-solid fa-diagram-project" aria-hidden="true"></i> Используется в <span>{{recipeDetails.uses.length}}</span></h3>
+    <ul class="witcher-recipe-list">{{#each recipeDetails.uses}}<li><div class="witcher-recipe-row">{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this}}{{#if quantity}}<b class="witcher-recipe-quantity">×{{quantity}}</b>{{/if}}</div>
+      {{#if result.available}}<div class="witcher-recipe-meta">Результат: {{> "systems/witcher-eliott-system/templates/item-reference.hbs" result}}</div>{{/if}}
+      {{#if substance}}<small class="witcher-recipe-meta">Как источник субстанции «{{substance}}» · ×{{substanceQuantity}}</small>{{/if}}
+    </li>{{else}}<li class="witcher-recipe-empty">В доступных чертежах и формулах пока не используется.</li>{{/each}}</ul>
+  </section>
+  {{/if}}
+  {{#if recipeDetails.incomplete}}<p class="witcher-recipe-empty">Часть каталогов недоступна. Список связанных рецептов может быть неполным.</p>{{/if}}
+</div>
+{{/if}}

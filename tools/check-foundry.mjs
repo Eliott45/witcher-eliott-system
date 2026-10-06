@@ -539,7 +539,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["combat-actions", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor", "crafting"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["combat-actions", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "crafting"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -1046,7 +1046,7 @@ foundry.utils.fromUuid = async uuid => {
   const document = documents.get(uuid);
   if (!document) return null;
   return {
-    ...document.toObject(), uuid, isOwner: true, system: document.system,
+    ...document.toObject(), uuid, documentName: document.documentName, isOwner: true, system: document.system,
     testUserPermission: () => true,
     toAnchor: () => ({ outerHTML: `<a data-uuid="${uuid}">${handlebars.escapeExpression(document.name)}</a>` }),
     sheet: { render: async () => { openedUuid = uuid; } }
@@ -1061,9 +1061,35 @@ assert.equal(openedUuid, familyStatusUuid(actorData.details.familyStatus));
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.viewFriend.call(sheet, null, { dataset: { action: "viewFriend" } });
 assert.equal(openedUuid, influentialFriendUuid(actorData.details.influentialFriend));
 const { WitcherItemSheet } = await import("../scripts/sheets/witcher-item-sheet.mjs");
+for (const [collection, pack] of game.packs) {
+  pack.collection = collection;
+  pack.testUserPermission = () => true;
+  pack.getIndex = async () => new Map([...documents].filter(([uuid]) => uuid.startsWith(`Compendium.${collection}.`))
+    .map(([uuid, item]) => [item.id, { ...item.toObject(), uuid }]));
+}
 const referenceSheet = new WitcherItemSheet();
 referenceSheet.isEditable = false;
 const itemTemplate = handlebars.compile(await readFile(new URL("../templates/item-sheet.hbs", import.meta.url), "utf8"), { strict: true });
+const nativeLinenDiagram = [...documents.values()].find(item => item.system?.ruleId === "diagram.material.linen");
+referenceSheet.item = await foundry.utils.fromUuid(nativeLinenDiagram.uuid);
+const nativeRecipeContext = await referenceSheet._prepareContext({});
+const nativeRecipeHTML = itemTemplate(nativeRecipeContext);
+assert.equal(nativeRecipeContext.recipeDetails.investment, 6);
+assert.match(nativeRecipeHTML, /15 мин\./);
+assert.match(nativeRecipeHTML, /Доплата/);
+assert.ok(nativeRecipeHTML.includes(`data-uuid="${nativeLinenDiagram.system.recipe.resultUuid}"`));
+assert.ok(nativeRecipeHTML.includes(`data-uuid="${nativeLinenDiagram.system.recipe.components[0].uuid}"`));
+assert.match(nativeRecipeHTML, /name="system.recipe.investment"[^>]*value="6"[^>]*disabled/);
+const nativeThread = [...documents.values()].find(item => item.system?.ruleId === "material.thread");
+referenceSheet.item = nativeThread;
+const nativeThreadContext = await referenceSheet._prepareContext({});
+assert.ok(nativeThreadContext.recipeDetails.recipes.some(item => item.name === "Чертёж: Нитки"));
+assert.ok(nativeThreadContext.recipeDetails.uses.some(item => item.uuid === nativeLinenDiagram.uuid && item.quantity === 2));
+assert.match(itemTemplate(nativeThreadContext), /Используется в/);
+referenceSheet.item = await foundry.utils.fromUuid(nativeLinenDiagram.uuid);
+referenceSheet.isEditable = true;
+assert.match(itemTemplate(await referenceSheet._prepareContext({})), /name="system.recipe.investment"[^>]*value="6"/);
+referenceSheet.isEditable = false;
 const materialSource=(await import('../scripts/data/workshop-materials.mjs')).MATERIALS.find(item=>item.id==='material.timber');
 const nativeMaterialItem=new foundry.documents.BaseItem({name:materialSource.name,type:'equipment',system:{...materialSource.system,ruleId:materialSource.id}});
 referenceSheet.item=new foundry.documents.BaseItem(JSON.parse(JSON.stringify(nativeMaterialItem.toObject())));

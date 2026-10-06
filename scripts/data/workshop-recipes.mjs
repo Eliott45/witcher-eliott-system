@@ -3,12 +3,13 @@ import { MATERIALS, materialUuid } from "./workshop-materials.mjs";
 import { ALCHEMY, SUBSTANCE_CODES } from "./workshop-alchemy.mjs";
 import { UPGRADES } from "./workshop-upgrades.mjs";
 import { equipmentUuid } from "./workshop.mjs";
+import { DIAGRAM_INVESTMENTS } from "./diagram-investments.mjs";
 
 // Core pp. 130–135, 139. Result references point to existing canonical equipment.
 const diagrams = [
  ["material.double-linen",14,30,30,"linen:1 thread:2"], ["material.hardened-timber",12,30,21,"timber:2 resin:4"],
- // The errata labels the timber/resin correction "Hardened Leather". Preserve its explicit correction; see audit TODO.
- ["material.hardened-leather",14,30,64,"timber:2 resin:4"], ["material.leather",12,60,38,"cow-hide:1 tanning-herbs:3"],
+ // Follow the supplied Russian book, p. 130: leather and wax, not the ambiguous errata label.
+ ["material.hardened-leather",14,30,64,"leather:1 wax:2"], ["material.leather",12,60,38,"cow-hide:1 tanning-herbs:3"],
  ["material.linen",10,15,12,"thread:2"], ["material.thread",10,15,4,"cotton:2"],
  ["material.dark-steel",17,60,110,"dark-iron:1 coal:3","journeyman"], ["material.lyrian-leather",17,60,80,"leather:1 ogre-wax:1 coal:2","journeyman"],
  ["material.steel",15,60,70,"iron:1 coal:5","journeyman"], ["material.tretogor-steel",16,60,86,"iron:1 coal:5 feathers:2","journeyman"],
@@ -84,7 +85,7 @@ export const RECIPES = diagrams.map(([id,dc,minutes,price,components,grade="novi
  const result = catalog.find(item=>item.id===id);
  const materials = components.split(" ").map(token=>{const [material,q]=token.split(":"); return {uuid:materialUuid(material),substance:"",quantity:Number(q)};});
  const forge = components.split(" ").some(token=>/^(iron|steel|dark-iron|dark-steel|silver|gold|dimeritium|mahakaman-steel|mahakaman-dimeritium|tretogor-steel|meteorite):/.test(token));
- return {id:`diagram.${id}`,documentId:`recp${String(i+1).padStart(12,"0")}`,name:`Чертёж: ${result.name}`,type:"recipe",source:"recipes",system:{price,source:"Базовая книга, стр. 130–135 / 139; errata v4",recipe:{category:"diagram",resultUuid:equipmentUuid(result.documentId),quantity,dc,time:minutes*60,grade,forge,tools:["gear.crafting-tools"],components:materials}}};
+ return {id:`diagram.${id}`,documentId:`recp${String(i+1).padStart(12,"0")}`,name:`Чертёж: ${result.name}`,type:"recipe",source:"recipes",system:{price,source:"Базовая книга, стр. 130–135 / 139; errata v4",recipe:{category:"diagram",resultUuid:equipmentUuid(result.documentId),quantity,dc,time:minutes*60,investment:DIAGRAM_INVESTMENTS[id],grade,forge,tools:["gear.crafting-tools"],components:materials}}};
 });
 RECIPES.push(...ALCHEMY.map((result,i)=>{
  const recipe = result.formula;

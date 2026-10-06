@@ -38,7 +38,7 @@ export function physicalItemContext(item, editable) {
   if(item.type === "equipment" && item.system.kind === "container") groups.push({ title: "Контейнер", fields: [decimal("capacity", "Вместимость, кг (0 — не задана)")] });
   if(item.type==="recipe") groups.push({title:"Чертёж / формула",fields:[
     choice("recipe.category","Вид",[{id:"diagram",name:"Чертёж"},{id:"formula",name:"Формула"}]),
-    number("recipe.dc","Сложность (СЛ)"),number("recipe.time","Время, секунды"),number("recipe.quantity","Результат, штук",1),
+    number("recipe.dc","Сложность (СЛ)"),number("recipe.time","Время, секунды"),decimal("recipe.investment","Доплата за материалы, кроны"),number("recipe.quantity","Результат, штук",1),
     choice("recipe.grade","Уровень",[{id:"novice",name:"Новичок"},{id:"journeyman",name:"Подмастерье"},{id:"master",name:"Мастер"}]),
     bool("recipe.memorized","Запомнен (не требует физической копии)"),bool("recipe.forge","Нужна кузница"),text("recipe.resultUuid","UUID результата")
   ]});

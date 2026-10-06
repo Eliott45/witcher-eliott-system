@@ -3,9 +3,9 @@
 {{#if workshop.repairable}}<p>{{workshop.condition.label}}: {{workshop.condition.value}} / {{workshop.condition.max}} · с улучшениями</p>{{/if}}
 {{#if workshop.bonusPath}}<h3>{{workshop.bonusHeading}}</h3>{{#each workshop.bonuses}}<p>{{label}}: {{value}} <button type="button" data-action="removeWorkshopBonus" data-index="{{index}}" {{disabled (not ../editable)}} aria-label="Удалить бонус"><i class="fa-solid fa-xmark"></i></button></p>{{/each}}<button type="button" data-action="addWorkshopBonus" {{disabled (not editable)}}>Добавить бонус</button>{{/if}}
 {{#if workshop.recipe}}
-<h2>Рецепт</h2><p><strong>{{workshop.resultName}}</strong> · {{workshop.time}}</p>
+<h2>Настройка рецепта</h2><p>{{> "systems/witcher-eliott-system/templates/item-reference.hbs" recipeDetails.result}} · {{workshop.time}}</p>
 <div class="witcher-item-actions"><button type="button" data-action="chooseRecipeResult" {{disabled (not editable)}}>Выбрать результат</button><button type="button" data-action="addRecipeComponent" {{disabled (not editable)}}>Добавить компонент</button></div>
-<ul>{{#each workshop.components}}<li>{{name}} ×{{quantity}} <button type="button" data-action="removeRecipeComponent" data-index="{{index}}" aria-label="Удалить компонент: {{name}}" {{disabled (not ../editable)}}><i class="fa-solid fa-xmark"></i></button></li>{{/each}}</ul>
+<ul class="witcher-recipe-editor">{{#each workshop.components}}<li>{{#if substance}}<span>{{name}}</span>{{else}}{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this}}{{/if}}<b>×{{quantity}}</b><button type="button" data-action="removeRecipeComponent" data-index="{{index}}" aria-label="Удалить компонент: {{name}}" {{disabled (not ../editable)}}><i class="fa-solid fa-xmark"></i></button></li>{{/each}}</ul>
 <button type="button" data-action="configureRecipeTools" {{disabled (not editable)}}>Настроить инструменты</button>
 {{#if workshop.owned}}<button type="button" data-action="craftRecipe" {{disabled (not editable)}}><i class="fa-solid fa-hammer"></i> Создать по рецепту</button>{{/if}}
 {{/if}}

@@ -13,11 +13,12 @@ import { CORE_GENERAL_ADDITIONS, GENERAL_GEAR_RULES } from "../data/general-gear
 import { generalGearDescriptionUpdate } from "./general-gear-descriptions.mjs";
 import { specialEquipmentDescriptionUpdate } from "./special-equipment-descriptions.mjs";
 import { materialDescriptionUpdate } from "./material-descriptions.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 15;
+import { recipeDetailsUpdate } from "./recipe-details.mjs";
+export const EQUIPMENT_CONTENT_VERSION = 16;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {
-  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item), ...toolDescriptionUpdate(item), ...generalGearDescriptionUpdate(item), ...specialEquipmentDescriptionUpdate(item), ...materialDescriptionUpdate(item) };
+  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item), ...toolDescriptionUpdate(item), ...generalGearDescriptionUpdate(item), ...specialEquipmentDescriptionUpdate(item), ...materialDescriptionUpdate(item), ...recipeDetailsUpdate(item) };
   return Object.keys(update).length ? [{ _id: item.id ?? item._id, ...update }] : [];
 });
 
@@ -34,7 +35,7 @@ export async function migrateEquipmentContent() {
   const existing = new Set(Array.from(index.values(), entry => entry.system?.ruleId));
   const missing = [...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS, ...WITCHER_SPECIAL_EQUIPMENT].filter(entry => !existing.has(entry.id));
   const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry =>
-    specialRuleIds.has(entry.system?.ruleId) || TOOL_RULES[entry.system?.ruleId] || GENERAL_GEAR_RULES[entry.system?.ruleId] || /^(material|ammunition|alchemy|potion|oil|decoction|mutagen|formula)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
+    specialRuleIds.has(entry.system?.ruleId) || TOOL_RULES[entry.system?.ruleId] || GENERAL_GEAR_RULES[entry.system?.ruleId] || /^(material|ammunition|alchemy|potion|oil|decoction|mutagen|formula|diagram)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
   const updates = updatesFor(oldDocuments);
   let documents = [], requiredFolders = [];
   if (missing.length) {
