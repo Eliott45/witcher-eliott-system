@@ -1,6 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { CONDITION_DEFINITIONS, conditionSource } from "../data/condition-definitions.mjs";
 import { stripPageReferences } from "../data/item-lore.mjs";
+import { activeEffect } from "../data/effect-counters.mjs";
 
 export const STUNNED = "stunned";
 export const STUNNED_ICON = "icons/svg/daze.svg";
@@ -29,7 +30,7 @@ export function localizeStatusEffects() {
 }
 
 export function hasStatus(actor, status) {
-  return actor.effects.some(effect => effect.statuses.has(status) && !effect.disabled && !effect.isSuppressed);
+  return actor.effects.some(effect => effect.statuses.has(status) && activeEffect(effect));
 }
 export const hasStunned = actor => hasStatus(actor, STUNNED) || hasStatus(actor, EXHAUSTED_STUN);
 export const setStunned = (actor, active) => setStatus(actor, STUNNED, active);
@@ -75,6 +76,11 @@ export function duplicateStatusEffects(actor) {
   return [...remove];
 }
 const cleaning = new Map();
+const FALLEN_STATUSES = new Set([UNCONSCIOUS, DEAD, "chloroform", "fisstech-unconscious"]);
+async function syncProne(actor) {
+  if (actor.effects.some(effect => activeEffect(effect) && [...effect.statuses].some(status => FALLEN_STATUSES.has(status))))
+    await setStatus(actor, "prone", true);
+}
 async function removeDuplicates(actor) {
   const ids = duplicateStatusEffects(actor).filter(id => actor.effects.has(id));
   if (ids.length) await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
@@ -87,13 +93,15 @@ export function registerUniqueStatuses() {
     if (data.disabled) return;
     if (statuses.some(status => UNIQUE_STATUSES.has(status) && activeWith(actor, status).length)) return false;
   });
-  // An unconscious or dead body lies on the ground (core p.163: «Ничком»).
-  Hooks.on("createActiveEffect", effect => {
+  // Waking up ends the cause, not the prone position; standing up is a separate choice.
+  const onFall = effect => {
     const actor = effect.parent;
-    if (actor?.documentName !== "Actor" || !game.users.activeGM?.isSelf || ![UNCONSCIOUS, DEAD].some(status => effect.statuses.has(status))) return;
-    if (activeWith(actor, "prone").length) return;
-    setStatus(actor, "prone", true).catch(reportEffectError);
-  });
+    if (actor?.documentName !== "Actor" || !game.users.activeGM?.isSelf || !activeEffect(effect)
+      || ![...effect.statuses].some(status => FALLEN_STATUSES.has(status))) return;
+    return syncProne(actor).catch(reportEffectError);
+  };
+  Hooks.on("createActiveEffect", onFall);
+  Hooks.on("updateActiveEffect", onFall);
   // Two clients may create the same status at once; the active GM keeps the first one.
   Hooks.on("createActiveEffect", effect => {
     const actor = effect.parent;
@@ -103,10 +111,13 @@ export function registerUniqueStatuses() {
     job.catch(reportEffectError).finally(() => { if (cleaning.get(actor.uuid) === job) cleaning.delete(actor.uuid); });
   });
 }
-/** Active GM at startup: clean duplicates left in the world. */
+/** Active GM at startup: repair existing states, including unconscious unlinked tokens. */
 export async function removeExistingDuplicateStatuses() {
   if (!game.user.isActiveGM) return;
   const actors = new Map(game.actors.map(actor => [actor.uuid, actor]));
   for (const scene of game.scenes) for (const token of scene.tokens) if (!token.actorLink && token.actor) actors.set(token.actor.uuid, token.actor);
-  for (const actor of actors.values()) await removeDuplicates(actor);
+  for (const actor of actors.values()) {
+    await removeDuplicates(actor);
+    await syncProne(actor);
+  }
 }

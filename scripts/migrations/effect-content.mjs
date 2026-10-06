@@ -1,6 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
-import { EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions.mjs";
+import { CONDITION_BY_ID, EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions.mjs";
 import { CRITICAL_WOUND_SOURCES } from "../combat/critical-wound-effects.mjs";
+import { stripPageReferences } from "../data/item-lore.mjs";
 
 // 2: also append conditions added to the system after a world's compendium was created (Staggered, Grappled…).
 // 3: refresh untouched critical wound entries (prostheses on lost limbs).
@@ -8,10 +9,27 @@ import { CRITICAL_WOUND_SOURCES } from "../combat/critical-wound-effects.mjs";
 // 5: Dying explains stabilisation by First Aid (core p.162).
 // 6: Prone — stand up by spending movement (core p.163).
 // 7: Prone is called «Ничком».
-export const EFFECT_CONTENT_VERSION = 7;
+// 8: Standing spends all movement; refresh existing prone effects as well as the catalog.
+export const EFFECT_CONTENT_VERSION = 8;
 // Earlier shipped names still count as unedited entries.
 const PREVIOUS_NAMES = { prone: ["Сбит с ног"] };
 const REFRESHED_CONDITIONS = new Set(["burning", "bleeding", "burrowing", "intoxicated", "blinded", "nauseated", "dying", "prone"]);
+const OLD_PRONE_DESCRIPTIONS = new Set([
+  "−2 к атаке и защите, пока персонаж не потратит перемещение, чтобы встать.",
+  "−2 к атаке и защите, пока персонаж не потратит перемещение, чтобы встать. Встав, можно потратить действие, чтобы переместиться на обычное расстояние.",
+  "Персонаж лежит: сбит с ног, брошен или упал без сознания. −2 к атаке и защите, пока не потратит перемещение, чтобы встать. Встав, можно потратить действие, чтобы переместиться на обычное расстояние."
+].flatMap(text => [text, `<p>${text}</p>`]));
+
+export function proneContentUpdate(effect) {
+  if (!Array.from(effect.statuses ?? []).includes("prone")) return {};
+  const source = conditionSource(CONDITION_BY_ID.prone), update = {};
+  if (effect.name === "Сбит с ног") update.name = source.name;
+  if (!effect.description || OLD_PRONE_DESCRIPTIONS.has(stripPageReferences(effect.description))) update.description = source.description;
+  const rules = effect.flags?.[SYSTEM_ID]?.condition;
+  if (!rules) update[`flags.${SYSTEM_ID}.condition`] = source.flags[SYSTEM_ID].condition;
+  else if (!rules.action || rules.action === "Встать — потратить перемещение") update[`flags.${SYSTEM_ID}.condition.action`] = CONDITION_BY_ID.prone.rules.action;
+  return update;
+}
 export function registerEffectContentMigration() {
   game.settings.register(SYSTEM_ID, "effectContentVersion", { scope: "world", config: false, type: Number, default: 0 });
 }
@@ -41,6 +59,16 @@ export async function migrateEffectContent() {
       if (created.length !== missing.length) throw new Error("Добавлены не все эффекты. Обновление будет повторено при следующем входе мастера.");
       if (refresh.length) await foundry.documents.ActiveEffect.implementation.updateDocuments(refresh, { pack: pack.collection, broadcast: false });
     } finally { if (locked) await pack.configure({ locked: true }); }
+  }
+  const actors = new Map(game.actors.map(actor => [actor.uuid, actor]));
+  for (const scene of game.scenes) for (const token of scene.tokens)
+    if (!token.actorLink && token.actor) actors.set(token.actor.uuid, token.actor);
+  for (const parent of [...actors.values(), ...game.items, ...Array.from(actors.values()).flatMap(actor => Array.from(actor.items))]) {
+    const updates = Array.from(parent.effects).flatMap(effect => {
+      const update = proneContentUpdate(effect);
+      return Object.keys(update).length ? [{_id:effect.id,...update}] : [];
+    });
+    if (updates.length) await parent.updateEmbeddedDocuments("ActiveEffect", updates);
   }
   await game.settings.set(SYSTEM_ID, "effectContentVersion", EFFECT_CONTENT_VERSION);
 }

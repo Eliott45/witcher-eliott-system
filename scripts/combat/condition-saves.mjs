@@ -64,7 +64,8 @@ export async function performEffectSave(actor,effect,{turn="",automatic=false,me
   if(automatic&&rules.manualOnly)return;
   if(action&&rules.action){
     if(conditionRules(actor).canAct){
-      if(turn)await actor.update({[`flags.${SYSTEM_ID}.conditionActionTurn`]:turn});
+      // Standing spends movement, leaving the ordinary action available for a condition save.
+      if(turn&&!effect.statuses.has("prone"))await actor.update({[`flags.${SYSTEM_ID}.conditionActionTurn`]:turn});
       await effect.delete();
     }
     return;

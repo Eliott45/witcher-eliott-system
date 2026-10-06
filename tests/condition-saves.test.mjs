@@ -159,6 +159,21 @@ test("a full-turn extinguish action prevents an extra automatic save, and rapid 
   await Promise.all([requestEffectSave(f.actor,other),requestEffectSave(f.actor,other)]);
   assert.equal(submissions,1);
 });
+
+test("standing leaves the ordinary action for a poison save, and cannot be done while unconscious",async()=>{
+  const f=fixture("prone"),turn="Combat.test:1:c";
+  f.actor.effects.push({id:"sleep",statuses:new Set(["unconscious"])});
+  await performEffectSave(f.actor,f.effect,{turn,action:true});
+  assert.ok(f.actor.effects.includes(f.effect));
+  f.actor.effects.pop();
+  await performEffectSave(f.actor,f.effect,{turn,action:true});
+  assert.equal(f.actor.effects.includes(f.effect),false);
+  assert.equal(f.actor.flags[SYSTEM_ID]?.conditionActionTurn,undefined);
+  const poison=fixture("black-venom").effect;poison.parent=f.actor;f.actor.effects=[poison];
+  assert.equal(canSaveEffect(f.actor,poison),true);
+  await performEffectSave(f.actor,poison,{turn});
+  assert.equal(f.actor.flags[SYSTEM_ID].conditionActionTurn,turn);
+});
 test("delegated private saves preserve the player author and self-only recipient instead of the executing GM",async()=>{
   let f=fixture();
   await performEffectSave(f.actor,f.effect,{messageMode:"self",requesterId:f.player.id});
