@@ -32,6 +32,29 @@
       <article><header><i class="fa-solid fa-bed"></i><h4>Отдых</h4><b>+{{combat.fullTurn.recovery}} ВЫН</b></header><p>Переведите дух за полный ход. Восстанавливает Выносливость на значение Отдыха, до максимума.</p><button type="button" data-action="fullTurnRecovery" {{disabled (or (not editable) (not combat.fullTurn.canRecover))}}>Отдохнуть</button></article>
     </div>
   </details>
+  {{#with combat.healing as |heal|}}
+  <section class="witcher-healing-panel">
+    <header><h3><i class="fa-solid fa-kit-medical"></i> Лечение</h3><span class="witcher-healing-patient">{{#if heal.self}}Самолечение{{else}}Пациент: <b>{{heal.patientName}}</b>{{/if}}</span></header>
+    <p class="witcher-healing-skills"><span>Первая помощь <b>{{#if (eq heal.firstAid null)}}—{{else}}{{heal.firstAid}}{{/if}}</b></span><span data-tooltip="Навык медика: заменяет Первую помощь и лечит критические ранения">Лечащее прикосновение <b>{{#if (eq heal.hands null)}}нет{{else}}{{heal.hands}}{{/if}}</b></span></p>
+    {{#unless ../compact}}<p class="witcher-combat-muted">{{#if heal.self}}Выберите цель (T), чтобы лечить другого персонажа.{{else}}Цель выбрана (T) — снимите выделение, чтобы лечить себя.{{/if}}</p>{{/unless}}
+    {{#if heal.readable}}
+    <div class="witcher-healing-wounds">
+      {{#each heal.wounds as |wound|}}
+      <article class="witcher-healing-wound is-{{wound.state}}">
+        <div><b>{{wound.name}}</b><small>{{wound.level}}{{#if wound.place}} · {{wound.place}}{{/if}} · {{wound.stateLabel}}{{#if wound.days}} · ещё {{wound.days}} дн.{{/if}}</small></div>
+        {{#if wound.canStabilize}}<button type="button" data-action="healStabilize" data-effect-id="{{wound.id}}" data-tooltip="{{heal.best.label}} против СЛ {{wound.stabilizeDC}}. Останавливает кровотечение и другие последствия, рана больше не опасна для жизни." {{disabled (not @root.editable)}}><i class="fa-solid fa-kit-medical"></i> Стабилизировать · СЛ {{wound.stabilizeDC}}</button>{{/if}}
+        {{#if wound.canTreat}}<button type="button" data-action="healTreat" data-effect-id="{{wound.id}}" data-tooltip="{{wound.treatRounds}} раунд(ов) работы, затем Лечащее прикосновение против СЛ {{wound.treatDC}}. После лечения остаются слабые штрафы до полного заживления." {{disabled (not @root.editable)}}><i class="fa-solid fa-hand-holding-medical"></i> Лечить · {{wound.treatRounds}} р. · СЛ {{wound.treatDC}}</button>{{/if}}
+      </article>
+      {{else}}<p class="witcher-combat-muted">Критических ранений нет.</p>{{/each}}
+    </div>
+    <div class="witcher-healing-natural">
+      <div><b>Постепенное исцеление</b><small>ПЗ {{heal.hp.value}} / {{heal.hp.max}} · {{#if heal.started}}идёт: +{{heal.perDay}} ПЗ в день{{#if heal.handsBonus}} (с Лечащим прикосновением){{/if}}{{else}}не начато{{/if}}</small></div>
+      {{#unless heal.started}}<button type="button" data-action="healStart" data-tooltip="{{heal.best.label}} против СЛ 14: после этого пациент восстанавливает ПЗ, равные Отдыху, за каждый день отдыха" {{disabled (not @root.editable)}}><i class="fa-solid fa-bandage"></i> Начать исцеление · СЛ 14</button>{{/unless}}
+      {{#if heal.canRest}}<label class="witcher-healing-active" data-tooltip="Бег, работа или бой во время отдыха: восстанавливается только половина Отдыха"><input type="checkbox" data-heal-active> был активен</label><button type="button" data-action="healRestDay" data-tooltip="Прошёл день отдыха: ПЗ по Отдыху (если исцеление начато) и на день ближе заживление вылеченных ранений" {{disabled (not @root.editable)}}><i class="fa-solid fa-bed"></i> День отдыха</button>{{/if}}
+    </div>
+    {{else}}<p class="witcher-combat-muted">Нет доступа к листу пациента.</p>{{/if}}
+  </section>
+  {{/with}}
   <section class="witcher-ambush-panel">
     <header><h3><i class="fa-solid fa-user-ninja"></i> Засада</h3><button type="button" data-action="openAmbush" {{disabled (not editable)}}><i class="fa-solid fa-users"></i> Запросить засаду</button></header>
     {{#if combat.ambush.pending}}<p>Проверка обрабатывается мастером…</p>{{/if}}

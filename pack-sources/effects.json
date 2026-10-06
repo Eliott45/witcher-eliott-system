@@ -172,7 +172,7 @@
     "img": "icons/svg/fire.svg",
     "type": "base",
     "system": {},
-    "description": "<p>Каждый ход: 5 урона каждой части тела, который поглощается бронёй; огонь также повреждает броню и оружие на 1. Чтобы потушить пламя, потратьте ход на воду или перекатывание по земле. Урон и повреждение снаряжения учитываются вручную.</p>",
+    "description": "<p>Каждый ход: 5 урона каждой части тела, который поглощается бронёй; огонь также повреждает броню и оружие на 1. Чтобы потушить пламя, потратьте ход на воду или перекатывание по земле. В бою урон и повреждение снаряжения считаются автоматически в начале хода.</p>",
     "disabled": false,
     "transfer": false,
     "statuses": [
@@ -242,7 +242,7 @@
     "img": "icons/svg/blood.svg",
     "type": "base",
     "system": {},
-    "description": "<p>Каждый ход: 2 урона, пока рана не обработана. Первая помощь СЛ 15 за действие или исцеляющая магия останавливает кровотечение. Урон учитывается вручную.</p>",
+    "description": "<p>Каждый ход: 2 урона, пока рана не обработана. Первая помощь СЛ 15 за действие или исцеляющая магия останавливает кровотечение. В бою урон наносится автоматически в начале хода.</p>",
     "disabled": false,
     "transfer": false,
     "statuses": [
@@ -360,6 +360,34 @@
             {
               "target": "attributes.intelligence",
               "value": -2
+            },
+            {
+              "target": "skills.charisma",
+              "value": -3
+            },
+            {
+              "target": "skills.persuasion",
+              "value": -3
+            },
+            {
+              "target": "skills.seduction",
+              "value": -3
+            },
+            {
+              "target": "skills.leadership",
+              "value": -3
+            },
+            {
+              "target": "skills.deceit",
+              "value": -3
+            },
+            {
+              "target": "skills.socialEtiquette",
+              "value": -3
+            },
+            {
+              "target": "skills.intimidation",
+              "value": -3
             }
           ]
         }
@@ -953,6 +981,7 @@
       "witcher-eliott-system": {
         "condition": {
           "key": "blinded",
+          "action": "Восстановить зрение — полный ход",
           "modifiers": [
             {
               "target": "combat.attack",
@@ -961,6 +990,10 @@
             {
               "target": "combat.defense",
               "value": -3
+            },
+            {
+              "target": "skills.awareness",
+              "value": -5
             }
           ]
         }
@@ -1003,7 +1036,7 @@
     "img": "icons/svg/acid.svg",
     "type": "base",
     "system": {},
-    "description": "<p>Каждые 3 раунда бросьте 1d10: результат не ниже ТЕЛ — раунд уходит на рвоту.</p>",
+    "description": "<p>Каждые 3 раунда в начале хода бросается 1d10: результат должен быть ниже ТЕЛ, иначе раунд уходит на рвоту. В бою бросок делается автоматически.</p>",
     "disabled": false,
     "transfer": false,
     "statuses": [
@@ -1022,7 +1055,10 @@
     "flags": {
       "witcher-eliott-system": {
         "condition": {
-          "key": "nauseated"
+          "key": "nauseated",
+          "nausea": {
+            "every": 3
+          }
         }
       }
     }
@@ -1211,6 +1247,39 @@
     }
   },
   {
+    "_id": "efct000000000035",
+    "name": "Рвота",
+    "img": "icons/svg/acid.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Персонажа рвёт или мучают рвотные позывы: он не может действовать до конца своего хода.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "vomiting"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "vomiting",
+          "rounds": 1,
+          "expiry": "turnEnd",
+          "incapacitated": true
+        }
+      }
+    }
+  },
+  {
     "_id": "efct000000000101",
     "name": "Чёрный яд",
     "img": "icons/svg/poison.svg",
@@ -1325,6 +1394,34 @@
             {
               "target": "attributes.intelligence",
               "value": -2
+            },
+            {
+              "target": "skills.charisma",
+              "value": -3
+            },
+            {
+              "target": "skills.persuasion",
+              "value": -3
+            },
+            {
+              "target": "skills.seduction",
+              "value": -3
+            },
+            {
+              "target": "skills.leadership",
+              "value": -3
+            },
+            {
+              "target": "skills.deceit",
+              "value": -3
+            },
+            {
+              "target": "skills.socialEtiquette",
+              "value": -3
+            },
+            {
+              "target": "skills.intimidation",
+              "value": -3
             }
           ],
           "secondsFormula": "1d10 * 3600"
@@ -1338,7 +1435,7 @@
     "img": "icons/svg/blood.svg",
     "type": "base",
     "system": {},
-    "description": "<p>Кровотечение от эльфского наконечника: 2 урона за ход. Для прекращения нужно извлечь наконечник: Первая помощь СЛ 16. Урон учитывается вручную.</p>",
+    "description": "<p>Кровотечение от эльфского наконечника: 2 урона за ход. Для прекращения нужно извлечь наконечник: Первая помощь СЛ 16. В бою урон наносится автоматически в начале хода.</p>",
     "disabled": false,
     "transfer": false,
     "statuses": [

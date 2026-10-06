@@ -262,3 +262,19 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-fumble-steps [data-fumble-ally] { color:#fff4e2; background:#7a2f29; border-color:#5c211d; }
 .witcher-fumble-steps [data-fumble-ally]:hover:not(:disabled) { background:#922f27; }
 .witcher-concealed-roll { margin:4px 0; padding:6px 8px; border:1px dashed #b8aa94; border-radius:4px; color:#7a6a52; font-size:12px; text-align:center; }
+/* Healing, core pp.173–174 */
+.witcher-healing-panel { border:1px solid #c9b58f; border-radius:7px; padding:10px 14px; margin:16px 0; background:#faf6ee; color:#494239; }
+.witcher-healing-panel header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.witcher-healing-panel h3 { margin:0; border:0; font:700 19px Georgia,serif; color:#425456; }
+.witcher-healing-patient { font-size:12px; color:#6f5d47; }
+.witcher-healing-skills { display:flex; gap:16px; flex-wrap:wrap; margin:8px 0 4px; font-size:12px; color:#5e4f3d; }
+.witcher-healing-skills b { color:#3c423c; font-size:14px; }
+.witcher-healing-wounds { display:flex; flex-direction:column; gap:6px; margin:8px 0; }
+.witcher-healing-wound, .witcher-healing-natural { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:7px 10px; border:1px solid #e0d2b8; border-left:3px solid #a13d2f; border-radius:5px; background:#fffcf5; }
+.witcher-healing-wound.is-stabilized { border-left-color:#c99a3c; }
+.witcher-healing-wound.is-treated { border-left-color:#6e8464; }
+.witcher-healing-natural { border-left-color:#6e8464; }
+:is(.witcher-healing-wound, .witcher-healing-natural) > div { flex:1 1 180px; display:flex; flex-direction:column; gap:2px; }
+:is(.witcher-healing-wound, .witcher-healing-natural) small { color:#78664e; font-size:11px; }
+:is(.witcher-healing-wound, .witcher-healing-natural) button { width:auto; height:auto; min-height:28px; padding:3px 10px; font-size:12px; white-space:nowrap; }
+.witcher-healing-active { display:flex; align-items:center; gap:4px; font-size:12px; white-space:nowrap; }

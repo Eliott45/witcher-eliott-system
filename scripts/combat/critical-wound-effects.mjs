@@ -319,6 +319,7 @@ export function woundContext(effect, editable) {
   return { state: data.state ?? "fresh", stateLabel: WOUND_STATES[data.state ?? "fresh"], dc: stabilizeDC(data.level),
     canStabilize: editable && !fatal && (data.state ?? "fresh") === "fresh", canTreat: editable && !fatal && data.state !== "treated",
     prosthesis: data.prosthesis?.quality ? PROSTHESIS_NAMES[data.prosthesis.quality] : "",
+    days: data.state === "treated" && data.recoveryDays > 0 ? data.recoveryDays : null,
     canFitProsthesis: editable && Boolean(limb) && data.state === "treated" && !data.prosthesis?.quality,
     canRemoveProsthesis: editable && Boolean(data.prosthesis?.quality) };
 }

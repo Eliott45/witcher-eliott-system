@@ -1,3 +1,4 @@
+import { hasStatus, setStatus, STUNNED } from "./status-effects.mjs";
 import { dropItemToGround } from "../loot/loot.mjs";
 import { scatterOffset } from "../canvas/scatter-overlay.mjs";
 import { SYSTEM_ID } from "../config.mjs";
@@ -258,6 +259,8 @@ export async function applyExchangeDamage(message, index, { useShield = false } 
   const own = shield ? shield.through : preview.result;
   const worn = await sufferDamage(target, own, shield || preview.prosthesis ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location });
   if (preview.prosthesis) await knockOffProsthesis(target, preview.prosthesis);
+  // Core p.161: a disoriented character comes round after one hit, even if the armor stopped it.
+  if (!shield && hasStatus(target, STUNNED)) await setStatus(target, STUNNED, false);
   const exchange = { attack: message.id, index, kind: "applied", total: own.total, steps: own.steps, from: health,
     ablated: worn.join(", "), armorHeld: !own.penetrated && preview.armor.sp > 0 && !shield };
   if (shield) {
