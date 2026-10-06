@@ -65,7 +65,7 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
     {label:"Прицеливание",value:ranged&&!targetContext?.blind?aimingBonus(actor):0},
     {label:attack.name,value:attack.penalty},{label:"Дополнительное действие",value:extraPenalty},
     {label:aim.name,value:aim.penalty},{label:band.name.replace(/ · [−+]?\d+$/u,""),value:band.penalty},{label:"Ситуация",value:Number(modifier)},
-    ...(targetContext?.parts??[]), ...(ambushBonus?[{label:"Засада",value:ambushBonus}]:[]), ...combatModifierParts(actor,"combat.attack")];
+    ...(targetContext?.parts??[]), ...(ambushBonus?[{label:"Засада",value:ambushBonus}]:[]), ...combatModifierParts(actor,"combat.attack"), ...(targetContext?.target?.actor?combatModifierParts(targetContext.target.actor,"combat.targeted"):[])];
   const total=skill.total===null?null:parts.reduce((sum,part)=>sum+part.value,0);
   const melee=["melee","thrown","shield"].includes(weapon.category);
   const shield=weapon.category==="shield"&&weapon.damage==="0";

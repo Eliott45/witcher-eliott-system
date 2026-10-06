@@ -11,6 +11,7 @@ import { effectCounter, changeEffectCounter, activeEffect } from "../data/effect
 import { doseToxicity } from "../data/consumables.mjs";
 import { isToxicityPoison, poisonDescription } from "../data/poison-rules.mjs";
 import { woundContext, stabilizeWound, setWoundState } from "../combat/critical-wound-effects.mjs";
+import { stripPageReferences } from "../data/item-lore.mjs";
 
 export function toxicitySaveContext(sheet) {
   const effect = sheet.actor.effects.find(effect => activeEffect(effect) && isToxicityPoison(effect));
@@ -22,7 +23,7 @@ export async function effectsContext(sheet) {
     const definition=Object.values(STATUS_DEFINITIONS).find(entry=>effect.statuses.has(entry.id));
     const rules=effectRules(effect),pending=Boolean(effect.flags?.[SYSTEM_ID]?.conditionRequest);
     const legacy=definition&&!effect.flags?.[SYSTEM_ID]?.condition;
-    const text=poisonDescription(effect,effect.description||definition?.description||"");
+    const text=stripPageReferences(poisonDescription(effect,effect.description||definition?.description||""));
     return {id:effect.id,name:legacy?game.i18n.localize(definition.name):effect.name,img:effect.img??definition?.img,inactive:effect.disabled||effect.isSuppressed,
       canRemove:sheet.isEditable&&(game.user.isGM||![DYING,DEAD,EXHAUSTED_STUN,UNCONSCIOUS].some(status=>effect.statuses.has(status))),
       toxicity:sheet.actor.system.details?.race==="witcher"?doseToxicity(effect):0,counter:effectCounter(effect),save:rules.save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),

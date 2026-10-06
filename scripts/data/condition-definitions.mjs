@@ -1,5 +1,6 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { poisonSaveRules, poisonDescription } from "./poison-rules.mjs";
+import { stripPageReferences } from "./item-lore.mjs";
 
 const skillSave = (skill, dc, action = "Одно действие") => ({ kind: "skill", skill, dc, action, ends: true });
 const entry = (id, name, icon, description, rules = {}) => ({ id, name, img: `icons/svg/${icon}.svg`, description, rules });
@@ -34,7 +35,9 @@ export const CONDITION_DEFINITIONS = [
   entry("prone", "Сбит с ног", "falling", "−2 к атаке и защите, пока персонаж не потратит перемещение, чтобы встать. Стр. 163.", {modifiers:[{target:"combat.attack",value:-2},{target:"combat.defense",value:-2}]}),
   entry("blinded", "Слепота", "blind", "−3 ко всем атакам и защите, −5 к Вниманию, связанному со зрением. Снимается, если потратить ход на восстановление зрения. Стр. 161.", {modifiers:[{target:"combat.attack",value:-3},{target:"combat.defense",value:-3}]}),
   entry("suffocating", "Удушье", "silenced", "Каждый раунд 3 урона, не снижаемых бронёй, пока персонаж не восстановит доступ к воздуху. Стр. 161."),
-  entry("nauseated", "Тошнота", "acid", "Каждые 3 раунда бросьте 1d10: результат не ниже ТЕЛ — раунд уходит на рвоту. Стр. 161.")
+  entry("nauseated", "Тошнота", "acid", "Каждые 3 раунда бросьте 1d10: результат не ниже ТЕЛ — раунд уходит на рвоту. Стр. 161."),
+  // Core p.152 attack modifiers: a target that moved this round with REF > 10 is −3 to hit.
+  entry("moving", "В движении", "wingfoot", "Персонаж перемещался в этом раунде, его РЕА больше 10: атаки по нему получают −3. Проходит в начале его следующего хода.", {rounds:1,expiry:"turnStart",modifiers:[{target:"combat.targeted",value:-3}]})
 ];
 export const CONDITION_BY_ID = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,entry]));
 // Variants share the status ID: poison/drunkenness cannot stack with themselves.
@@ -47,7 +50,7 @@ export const EFFECT_TEMPLATES = [...CONDITION_DEFINITIONS.map((entry,i)=>({...en
 export const ALCHEMY_EFFECT_KEYS = {clotting:["clotting"],hallucinogen:["hallucinogen"],numbing:["numbing"],sterilizing:["sterilizing"],"succubus-breath":["succubus-skin","succubus-drink"],adhesive:["adhesive"],"black-venom":["black-venom"],chloroform:["chloroform"],"quick-fire":["quick-fire"],fisstech:["fisstech"],pantagran:["pantagran"],perfume:["perfume"],"talgar-tears":["frozen"],"zerrikanian-fire":["burning"]};
 export const effectUuid = key => `Compendium.${SYSTEM_ID}.effects.ActiveEffect.${EFFECT_TEMPLATES.find(entry=>entry.key===key).documentId}`;
 export function conditionSource(entry, localize = text=>text) {
-  const name=localize(entry.name), description=localize(entry.description);
+  const name=localize(entry.name), description=stripPageReferences(localize(entry.description));
   const source = {_id:entry.documentId,name,img:entry.img,type:"base",system:{},description:`<p>${description}</p>`,disabled:false,transfer:false,statuses:[entry.id],showIcon:2,
     start:null,duration:{value:null,units:"seconds",expiry:null,expired:false},folder:null,sort:0,
     flags:{[SYSTEM_ID]:{condition:{key:entry.key??entry.id,...structuredClone(entry.rules)}}}};

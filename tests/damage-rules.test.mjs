@@ -81,3 +81,19 @@ test("fumble consequences follow the subtracted amount and the errata unarmed co
   assert.equal(fumbleMagnitude(roll), 7);
   assert.equal(fumbleMagnitude({ dice: [{ options: {} }] }), 0);
 });
+
+test("ganging up counts distinct melee attackers on the target this round, up to the current attack", async () => {
+  const { gangingUp } = await import("../scripts/combat/attack-exchange.mjs");
+  const attack = (id, attacker, timestamp, extra = {}) => ({ id, timestamp, speakerActor: null,
+    flags: { "witcher-eliott-system": { weaponAttack: { attacker, target: "T", combat: { id: "c", round: 2 }, ranged: false, ...extra } } } });
+  const messages = [attack("a", "nekker1", 1), attack("b", "nekker1", 2), attack("c", "nekker2", 3), attack("d", "archer", 4, { ranged: true }),
+    attack("e", "nekker3", 5, { combat: { id: "c", round: 1 } }), attack("f", "nekker3", 6), attack("g", "nekker4", 7, { target: "other" })];
+  globalThis.game = { messages: Object.assign(messages, { filter: Array.prototype.filter }) };
+  const byId = id => messages.find(message => message.id === id);
+  assert.equal(gangingUp(byId("a")), 0, "the first attacker alone");
+  assert.equal(gangingUp(byId("b")), 0, "the same attacker twice is still one");
+  assert.equal(gangingUp(byId("c")), 1);
+  assert.equal(gangingUp(byId("d")), 0, "ranged attacks never gang up");
+  assert.equal(gangingUp(byId("f")), 2, "a previous round does not count");
+  delete globalThis.game;
+});

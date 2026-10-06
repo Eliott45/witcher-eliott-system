@@ -1,9 +1,10 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { effectDurationLabel } from "../data/effect-duration.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { stripPageReferences } from "../data/item-lore.mjs";
 
 // Effects of the single controlled token, shown in the free column left of the sidebar.
-// Click or the pencil opens the effect; right-click offers edit/delete to its owners.
+// Click or the pencil opens the effect; right-click deletes it (owners only).
 
 let panel = null;
 const controlledActor = () => {
@@ -24,37 +25,17 @@ function ensurePanel() {
     const row = event.target.closest("[data-effect-id]"), effect = row && controlledActor()?.effects.get(row.dataset.effectId);
     if (effect) effect.sheet.render({ force: true });
   });
-  panel.addEventListener("contextmenu", event => {
+  // Right-click removes the effect from the token at once.
+  panel.addEventListener("contextmenu", async event => {
     const row = event.target.closest("[data-effect-id]");
     if (!row) return;
     event.preventDefault();
-    openMenu(row, event);
+    const effect = controlledActor()?.effects.get(row.dataset.effectId);
+    if (!effect?.isOwner) return;
+    row.classList.add("is-removing");
+    try { await effect.delete(); } catch (error) { row.classList.remove("is-removing"); ui.notifications.error(error.message); }
   });
   return panel;
-}
-
-function openMenu(row, event) {
-  const actor = controlledActor(), effect = actor?.effects.get(row.dataset.effectId);
-  if (!effect?.isOwner) return;
-  panel.querySelector(".witcher-token-effects-menu")?.remove();
-  const menu = document.createElement("menu");
-  menu.className = "witcher-token-effects-menu";
-  menu.innerHTML = `<li><button type="button" data-menu="edit"><i class="fa-solid fa-pen"></i> Редактировать</button></li>
-    <li><button type="button" data-menu="delete"><i class="fa-solid fa-trash"></i> Удалить с токена</button></li>`;
-  menu.style.top = `${row.offsetTop + row.offsetHeight}px`;
-  panel.append(menu);
-  const close = () => { menu.remove(); document.removeEventListener("pointerdown", outside, true); };
-  const outside = pointer => { if (!menu.contains(pointer.target)) close(); };
-  document.addEventListener("pointerdown", outside, true);
-  menu.addEventListener("click", async click => {
-    click.stopPropagation();
-    const action = click.target.closest("[data-menu]")?.dataset.menu;
-    close();
-    try {
-      if (action === "edit") await effect.sheet.render({ force: true });
-      if (action === "delete") await effect.delete();
-    } catch (error) { ui.notifications.error(error.message); }
-  });
 }
 
 export function renderTokenEffects() {
@@ -68,7 +49,7 @@ export function renderTokenEffects() {
     const timed = effect.duration?.value || Number.isFinite(effect.duration?.remaining) || Number.isFinite(effect.duration?.secondsRemaining);
     const duration = timed ? effectDurationLabel(effect, roundTime) : "";
     const critical = effect.flags?.[SYSTEM_ID]?.criticalWound;
-    return `<li data-effect-id="${effect.id}" class="${effect.disabled ? "is-disabled" : ""}${critical ? " is-critical" : ""}" data-tooltip="${esc(`<strong>${esc(effect.name)}</strong>${effect.description ? `<div>${effect.description}</div>` : ""}`)}" data-tooltip-direction="LEFT">
+    return `<li data-effect-id="${effect.id}" class="${effect.disabled ? "is-disabled" : ""}${critical ? " is-critical" : ""}" data-tooltip="${esc(`<strong>${esc(effect.name)}</strong>${effect.description ? `<div>${stripPageReferences(effect.description)}</div>` : ""}${effect.isOwner ? "<small>ПКМ — удалить</small>" : ""}`)}" data-tooltip-direction="LEFT">
       <img src="${esc(effect.img || "icons/svg/aura.svg")}" alt=""><span>${esc(effect.name)}${duration ? `<small>${esc(duration)}</small>` : ""}</span>
       ${effect.isOwner ? `<button type="button" class="witcher-token-effects-edit" aria-label="Редактировать: ${esc(effect.name)}"><i class="fa-solid fa-pen"></i></button>` : ""}</li>`;
   }).join("")}</ol>`;

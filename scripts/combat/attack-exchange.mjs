@@ -10,7 +10,6 @@ import { woundEffectData } from "./critical-wound-effects.mjs";
 import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
 import { hitLocation, ATTACK_LOCATIONS } from "./weapon-rules.mjs";
-import { tokenCenter } from "./attack-target.mjs";
 import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
 import { criticalWoundByRoll, aimedCriticalRoll, ORGAN_WOUNDS, ANATOMY_FREE_BONUS } from "../data/critical-wounds.mjs";
 
@@ -39,26 +38,32 @@ async function post(data, mode = game.settings.get("core", "messageMode")) {
   return Message.create(Message.applyMode(data, mode));
 }
 
-/** Core p.153 «Объединение сил»: −1 to melee defense for each adjacent hostile beyond the first. */
-export function gangingUp(target) {
-  const scene = target?.parent;
-  if (!scene || !globalThis.canvas?.grid) return 0;
-  const from = tokenCenter(target), reach = Math.max(2, (target.width ?? 1) * canvas.grid.distance);
-  const hostile = Array.from(scene.tokens).filter(token => token.id !== target.id && !token.hidden && token.actor
-    && token.disposition !== target.disposition && token.disposition !== CONST.TOKEN_DISPOSITIONS.NEUTRAL
-    && canvas.grid.measurePath([from, tokenCenter(token)]).distance <= reach + 0.01);
-  return Math.max(0, hostile.length - 1);
+/**
+ * Core p.153 «Объединение сил» (errata v4): −1 to defense for every melee attacker beyond the first.
+ * Counts distinct attackers who struck this target in melee during the same combat round, up to this attack.
+ */
+export function gangingUp(message) {
+  const attack = flagsOf(message).weaponAttack;
+  if (!attack?.combat || attack.ranged) return 0;
+  const attackerOf = (entry, data) => data.attacker ?? entry.speakerActor?.uuid ?? entry.id;
+  const attackers = new Set(game.messages.filter(entry => {
+    const data = flagsOf(entry).weaponAttack;
+    return data && !data.ranged && data.target === attack.target && data.combat?.id === attack.combat.id
+      && data.combat.round === attack.combat.round && entry.timestamp <= message.timestamp;
+  }).map(entry => attackerOf(entry, flagsOf(entry).weaponAttack)));
+  attackers.add(attackerOf(message, attack));
+  return Math.max(0, attackers.size - 1);
 }
 
 /** Defenses the target can choose for one incoming attack, best armed option per mode. */
-export function defenseChoices(actor, incoming) {
+export function defenseChoices(actor, incoming, defenseModifier = 0) {
   const options = [{ mode: "dodge" }, { mode: "reposition" }];
   for (const mode of ["block", "parry"]) {
     const quotes = equippedItems(actor.items).filter(item => item.type === "weapon" && ["melee", "shield"].includes(item.system.category))
-      .map(item => defenseQuote(actor, { mode, itemId: item.id, incoming })).filter(quote => !quote.blocked);
+      .map(item => defenseQuote(actor, { mode, itemId: item.id, incoming, defenseModifier })).filter(quote => !quote.blocked);
     options.push(quotes.sort((a, b) => b.total - a.total)[0] ?? { mode, blocked: true, name: mode === "block" ? "Блок" : "Парирование" });
   }
-  return options.map(option => option.total !== undefined ? option : { ...defenseQuote(actor, { ...option, incoming }), mode: option.mode });
+  return options.map(option => option.total !== undefined ? option : { ...defenseQuote(actor, { ...option, incoming, defenseModifier }), mode: option.mode });
 }
 
 const incomingOf = attack => attack.ranged ? (attack.thrown ? "thrown" : "ranged") : "melee";
@@ -83,7 +88,7 @@ export async function defendAttack(message, index, mode, itemId = "", repeat = n
     return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), content: `<p>${esc(actor.name)} не защищается.</p>`,
       flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { ...link, none: true } } } });
   }
-  const gang = incomingOf(attack) === "melee" ? gangingUp(targetToken(attack)) : 0;
+  const gang = gangingUp(message);
   const defense = await rollDefense(actor, { mode, itemId, incoming: incomingOf(attack), repeat: repeat ?? repeatDefense(actor), defenseModifier: -gang,
     exchange: { ...link, gang } });
   if (!defense) return;
@@ -241,15 +246,17 @@ function rowHTML(message, index, attack) {
   if (!outcome) {
     if (!target?.isOwner) return `<li class="is-waiting">${head}<em>${linkedAny(message.id, index, "defense") ? "защита бросается…" : "ждём защиту"}</em></header>${ownFumble}</li>`;
     if (linkedAny(message.id, index, "defense")) return `<li class="is-waiting">${head}<em><i class="fa-solid fa-dice-d10 fa-spin"></i> защита бросается…</em></header>${ownFumble}</li>`;
-    const choices = defenseChoices(target, incomingOf(attack)).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
+    const gang = gangingUp(message);
+    const choices = defenseChoices(target, incomingOf(attack), -gang).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
       `${esc(choice.name)}${choice.total != null && !choice.blocked ? ` <b>+${choice.total}</b>` : ""}`, !choice.blocked, choice.blocked || choice.note));
     const free = defenseChoices(target, incomingOf(attack))[0]?.activeDodge;
-    const repeatBox = `<label class="witcher-exchange-repeat" data-tooltip="${free ? "Активное уклонение: повторные защиты бесплатны" : "Вторая и следующие защиты за раунд стоят 1 ВЫН"}"><input type="checkbox" data-exchange-repeat ${repeatDefense(target) ? "checked" : ""} ${free ? "disabled" : ""}> Повторная · ${free ? 0 : 1} ВЫН</label>`;
-    return `<li class="is-waiting">${head}<em>защита ${esc(target.name)}</em>${repeatBox}</header><div class="witcher-exchange-actions">${choices.join("")}${button('data-exchange-defend="none"', "Не защищается", true, `Атака сравнивается со СЛ ${DC_UNAWARE}`)}</div>${ownFumble}</li>`;
+    const repeatBox = `<button type="button" class="witcher-exchange-repeat" data-exchange-repeat aria-pressed="${!free && repeatDefense(target)}" ${free ? "disabled" : ""} data-tooltip="${free ? "Активное уклонение: повторные защиты бесплатны" : "Вторая и следующие защиты за раунд стоят 1 ВЫН. Нажмите, чтобы переключить."}"><i class="fa-solid fa-rotate"></i> Повторная · ${free ? 0 : 1} ВЫН</button>`;
+    const gangNote = gang ? `<p class="witcher-exchange-note" data-tooltip="Errata: −1 к защите за каждого нападающего в ближнем бою сверх первого">Объединение сил: ${gang + 1} нападающих в этом раунде · защита −${gang}</p>` : "";
+    return `<li class="is-waiting">${head}<em>защита ${esc(target.name)}</em>${repeatBox}</header>${gangNote}<div class="witcher-exchange-actions">${choices.join("")}${button('data-exchange-defend="none"', "Не защищается", true, `Атака сравнивается со СЛ ${DC_UNAWARE}`)}</div>${ownFumble}</li>`;
   }
   const verdict = outcome.hit ? `<strong class="is-hit">Попадание +${outcome.margin}</strong>` : `<strong class="is-miss">${outcome.mode === "parry" ? "Парировано" : "Промах"}</strong>`;
   const gang = exchangeOf(outcome.defense).gang;
-  const defenseLine = `${esc(outcome.name)} <b>${outcome.defenseTotal}</b>${gang ? ` <small>(окружение −${gang})</small>` : ""}`;
+  const defenseLine = `${esc(outcome.name)} <b>${outcome.defenseTotal}</b>${gang ? ` <small data-tooltip="Объединение сил: нападающих в этом раунде ${gang + 1}">(объединение сил −${gang})</small>` : ""}`;
   let body = ownFumble + fumbleHTML(message, index, "defense", outcome.none ? null : defenseFumble(outcome.defense), target?.isOwner);
   if (outcome.critical) body += `<p class="witcher-exchange-crit"><i class="fa-solid fa-burst"></i> Критическое ранение: ${esc(outcome.critical.name.toLocaleLowerCase("ru"))} (+${outcome.critical.bonus} урона)</p>`;
   if (!outcome.hit && outcome.mode === "parry") body += `<p class="witcher-exchange-note"><i class="fa-solid fa-person-falling"></i> ${esc(message.speakerActor?.name ?? "Атакующий")} ошеломлён: −2 к атаке и защите до начала своего хода.</p>`;
@@ -296,11 +303,15 @@ export function renderExchange(message, html) {
       event.stopPropagation(); event.currentTarget.disabled = true;
       try { await work(event.currentTarget); } catch (error) { ui.notifications.warn(error.message); }
     });
-    row.querySelector("[data-exchange-repeat]")?.addEventListener("click", event => event.stopPropagation());
+    row.querySelector("[data-exchange-repeat]")?.addEventListener("click", event => {
+      event.stopPropagation();
+      const toggle = event.currentTarget;
+      toggle.setAttribute("aria-pressed", String(toggle.getAttribute("aria-pressed") !== "true"));
+    });
     row.querySelectorAll("[data-exchange-defend]").forEach(choice => choice.addEventListener("click", async event => {
       event.stopPropagation(); for (const other of row.querySelectorAll("[data-exchange-defend]")) other.disabled = true;
       const repeatBox = row.querySelector("[data-exchange-repeat]");
-      try { await defendAttack(message, index, choice.dataset.exchangeDefend, choice.dataset.itemId, repeatBox && !repeatBox.disabled ? repeatBox.checked : null); } catch (error) { ui.notifications.warn(error.message); }
+      try { await defendAttack(message, index, choice.dataset.exchangeDefend, choice.dataset.itemId, repeatBox && !repeatBox.disabled ? repeatBox.getAttribute("aria-pressed") === "true" : null); } catch (error) { ui.notifications.warn(error.message); }
     }));
     run("[data-exchange-damage]", () => rollExchangeDamage(message, index));
     run("[data-exchange-apply]", () => applyExchangeDamage(message, index));

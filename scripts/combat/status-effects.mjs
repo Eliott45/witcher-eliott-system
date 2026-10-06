@@ -1,5 +1,6 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { CONDITION_DEFINITIONS, conditionSource } from "../data/condition-definitions.mjs";
+import { stripPageReferences } from "../data/item-lore.mjs";
 
 export const STUNNED = "stunned";
 export const STUNNED_ICON = "icons/svg/daze.svg";
@@ -23,7 +24,7 @@ export function localizeStatusEffects() {
     const own = STATUS_DEFINITIONS[definition.id];
     if (!own) continue; // Other modules may add their own statuses before localization.
     const text = own.description;
-    definition.description = `<p>${text.startsWith("WITCHER.") ? game.i18n.localize(text) : text}</p>`;
+    definition.description = `<p>${stripPageReferences(text.startsWith("WITCHER.") ? game.i18n.localize(text) : text)}</p>`;
   }
 }
 
