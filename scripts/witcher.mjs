@@ -68,7 +68,7 @@ import { migrateVisionDefaults, registerVisionMigration } from "./migrations/vis
 import { migrateCompendiumFolders, registerCompendiumFolderMigration } from "./migrations/compendium-folders.mjs";
 import { migrateEquipmentContent, registerEquipmentContentMigration } from "./migrations/equipment-content.mjs";
 import { renderDiceTray } from "./chat/dice-tray.mjs";
-import { registerStatusEffects, localizeStatusEffects, reportEffectError } from "./combat/status-effects.mjs";
+import { registerStatusEffects, localizeStatusEffects, reportEffectError, registerUniqueStatuses, removeExistingDuplicateStatuses } from "./combat/status-effects.mjs";
 import { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources, applyInitialConditions } from "./combat/resource-updates.mjs";
 import { prepareDeathRound, applyDeathRound, syncExistingDeathStates } from "./combat/death-state.mjs";
 import { preventIncapacitatedMovement, preventIncapacitatedPositionUpdate } from "./combat/condition-rules.mjs";
@@ -91,6 +91,7 @@ Hooks.once("init", async () => {
   registerForaging();
   CONFIG.Combat.initiative.formula = INITIATIVE_FORMULA;
   registerStatusEffects();
+  registerUniqueStatuses();
   registerCriticalWoundHooks();
   registerHealingRequests();
   registerBrawling();
@@ -217,6 +218,7 @@ Hooks.once("ready", async () => {
   });
   syncExistingDeathStates().catch(reportEffectError);
   syncExistingExhaustion().catch(reportEffectError);
+  removeExistingDuplicateStatuses().catch(reportEffectError);
   migrateCompendiumFolders().catch(error => {
     console.error(`${SYSTEM_ID} | Could not organize compendiums`, error);
     ui.notifications.error(game.i18n.localize("WITCHER.Compendiums.FolderError"));

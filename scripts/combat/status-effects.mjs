@@ -61,3 +61,45 @@ export function reportEffectError(error) {
   console.error(`${SYSTEM_ID} | Status effect update failed`, error);
   ui.notifications.error(game.i18n.localize("WITCHER.Effects.UpdateError"));
 }
+
+// Core p.161: several identical effects cannot act at once. Every system condition is unique per actor.
+export const UNIQUE_STATUSES = new Set(CONDITION_DEFINITIONS.map(entry => entry.id));
+const activeWith = (actor, status, except = null) => Array.from(actor?.effects ?? []).filter(effect => effect !== except && !effect.disabled && effect.statuses?.has(status));
+/** Duplicates to delete: keep the oldest active effect of each unique status. */
+export function duplicateStatusEffects(actor) {
+  const remove = new Set();
+  for (const status of UNIQUE_STATUSES) {
+    const list = activeWith(actor, status).sort((a, b) => (a._stats?.createdTime ?? 0) - (b._stats?.createdTime ?? 0));
+    for (const effect of list.slice(1)) remove.add(effect.id);
+  }
+  return [...remove];
+}
+const cleaning = new Map();
+async function removeDuplicates(actor) {
+  const ids = duplicateStatusEffects(actor).filter(id => actor.effects.has(id));
+  if (ids.length) await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
+}
+export function registerUniqueStatuses() {
+  Hooks.on("preCreateActiveEffect", (effect, data) => {
+    const actor = effect.parent;
+    if (actor?.documentName !== "Actor") return;
+    const statuses = Array.from(data.statuses ?? effect.statuses ?? []);
+    if (data.disabled) return;
+    if (statuses.some(status => UNIQUE_STATUSES.has(status) && activeWith(actor, status).length)) return false;
+  });
+  // Two clients may create the same status at once; the active GM keeps the first one.
+  Hooks.on("createActiveEffect", effect => {
+    const actor = effect.parent;
+    if (actor?.documentName !== "Actor" || !game.users.activeGM?.isSelf || ![...effect.statuses].some(status => UNIQUE_STATUSES.has(status))) return;
+    const job = (cleaning.get(actor.uuid) ?? Promise.resolve()).catch(() => {}).then(() => removeDuplicates(actor));
+    cleaning.set(actor.uuid, job);
+    job.catch(reportEffectError).finally(() => { if (cleaning.get(actor.uuid) === job) cleaning.delete(actor.uuid); });
+  });
+}
+/** Active GM at startup: clean duplicates left in the world. */
+export async function removeExistingDuplicateStatuses() {
+  if (!game.user.isActiveGM) return;
+  const actors = new Map(game.actors.map(actor => [actor.uuid, actor]));
+  for (const scene of game.scenes) for (const token of scene.tokens) if (!token.actorLink && token.actor) actors.set(token.actor.uuid, token.actor);
+  for (const actor of actors.values()) await removeDuplicates(actor);
+}

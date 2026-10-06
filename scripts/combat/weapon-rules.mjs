@@ -58,12 +58,12 @@ export function attackModes(actor,item) {
   // Core pp.163–164 special attacks; each is one action replacing the attack (a charge takes the full round).
   if(item.system.category==="melee"&&!item.system.natural) modes.push(
     {id:"charge",name:"С разбега",count:1,penalty:-3,multiplier:2,charge:true,secondary:true,
-      hint:"Полный ход: переместитесь на расстояние Бега и нанесите сильную атаку. Если её заблокировали — Сила против Силы, чтобы сбить с ног."},
-    {id:"pommel",name:"Удар эфесом",count:1,penalty:0,multiplier:1,pommel:true,secondary:true,hint:"Половина урона, несмертельный."},
-    {id:"disarm",name:"Разоружение",count:1,penalty:0,multiplier:1,special:"weapon-disarm",secondary:true,hint:"При попадании оружие выпадает из рук цели и отлетает на 1d6 м в случайную сторону. Урона нет."},
-    {id:"trip",name:"Подсечка",count:1,penalty:0,multiplier:1,special:"weapon-trip",secondary:true,hint:"Удар по ногам: при попадании цель сбита с ног. Урона нет."});
+      hint:"Полный ход: переместитесь до расстояния Бега и нанесите сильную атаку (−3 к попаданию, урон ×2). Если цель заблокирует удар, в чате появится встречная проверка Силы: при победе цель сбита с ног."},
+    {id:"pommel",name:"Удар эфесом",count:1,penalty:0,multiplier:1,pommel:true,secondary:true,hint:"Удар рукоятью или обухом: проверка как у обычной атаки, урон оружия вдвое меньше и несмертельный — отнимает Выносливость, а не ПЗ, и не оставляет критических ранений."},
+    {id:"disarm",name:"Разоружение",count:1,penalty:0,multiplier:1,special:"weapon-disarm",secondary:true,hint:"Прицельный удар по оружию цели. Урона нет. При попадании её оружие выпадает и отлетает на 1d6 м в случайную сторону (таблица разброса) — на карте появляется кучка добычи, оружие нужно подобрать."},
+    {id:"trip",name:"Подсечка",count:1,penalty:0,multiplier:1,special:"weapon-trip",secondary:true,hint:"Удар по ногам. Урона нет. При попадании цель сбита с ног: −2 к атаке и защите, пока не потратит перемещение, чтобы встать."});
   if(["melee","thrown"].includes(item.system.category)&&!item.system.natural&&(item.system.grip||item.system.hands||1)===1&&equippedItems(actor.items??[]).filter(entry=>entry.type==="weapon"&&!entry.system.natural&&entry.id!==item.id&&(entry.system.grip||entry.system.hands||1)===1).length)
-    modes.push({id:"dual",name:"Парная атака",count:1,penalty:-3,multiplier:1,dual:true,secondary:true,hint:"Errata: одно действие атаки — по броску каждым оружием в руках, оба с −3. Блокировать и парировать её можно только с двумя оружиями или оружием и щитом."});
+    modes.push({id:"dual",name:"Парная атака",count:1,penalty:-3,multiplier:1,dual:true,secondary:true,hint:"Одно действие атаки (errata): по удару каждым оружием в руках, оба с −3, урон каждого считается отдельно. Блокировать или парировать её может только тот, у кого тоже два оружия или оружие и щит, остальные лишь уклоняются или меняют позицию."});
   return modes;
 }
 /** Humanoid or monster hit-location table for a target actor (core p.152). */

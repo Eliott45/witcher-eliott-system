@@ -289,3 +289,7 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-unarmed-row { display:grid; grid-template-columns:92px minmax(0,1fr); gap:8px; align-items:center; margin-top:6px; }
 .witcher-unarmed-row > span { font-size:12px; font-weight:600; color:#5b3d31; }
 .witcher-attack-note { font-size:12px; color:#6f5d47; margin:2px 0; }
+.witcher-technique-help { margin-top:6px; font-size:12px; color:#5e4f3d; }
+.witcher-technique-help summary { cursor:pointer; color:#7b5a3d; }
+.witcher-technique-help ul { margin:4px 0 0; padding-left:16px; line-height:1.45; }
+.witcher-technique-help li { margin:2px 0; }

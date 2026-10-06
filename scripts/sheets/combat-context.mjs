@@ -44,7 +44,8 @@ export function combatContext(actor,options={}) {
         const second=mode.pair&&fastPending&&actor.flags[SYSTEM_ID].fastStrike.extra===extra;
         const label=mode.pair?(second?"Быстрая · удар 2/2":"Быстрая · удар 1/2"):mode.name;
         const pairHint=mode.pair?(second?"Второй удар той же быстрой атаки: можно по другой цели, нового действия не нужно. ":"Быстрая атака — два удара за одно действие. Каждый удар бросается отдельно. "):"";
-        return {...mode,name:label,second,base:quote.total===null?"—":signed(quote.total),damage:quote.damage,disabled:Boolean(reason),hint:reason||pairHint+quote.parts.map(part=>`${part.label}: ${signed(part.value??0)}`).join("; ")};
+        const description=mode.hint??"";
+        return {...mode,name:label,second,description,base:quote.total===null?"—":signed(quote.total),damage:quote.damage,disabled:Boolean(reason),hint:reason||`${description?`${description} `:""}${pairHint}${quote.parts.map(part=>`${part.label}: ${signed(part.value??0)}`).join("; ")}`};
       });
       const loaded=item.system.skill!=="crossbow"||item.system.loaded!==false;
       return {id:item.id,name:item.name,img:item.img,properties:item.system.properties??"",damageTypes:damageTypeLabel(item.system.damageType),rate:actor.type==="npc"?item.system.attackRate??1:null,natural:Boolean(item.system.natural),grip:gripOf(item),
