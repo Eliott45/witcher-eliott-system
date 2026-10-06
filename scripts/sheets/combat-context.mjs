@@ -14,6 +14,7 @@ import { damageTypeLabel } from "../combat/damage-rules.mjs";
 import { toggleQuickDraw } from "../combat/quick-draw.mjs";
 import { grappleOptions, grappleState, rollGrappleAction } from "../combat/grapple.mjs";
 import { statusEffect } from "../data/effect-counters.mjs";
+import { unarmedContext, rollFeint, dualWeapons } from "../combat/brawling.mjs";
 import { healingContext, healingPatient, stabilizePatientWound, treatPatientWound, startNaturalHealing, restDay, stabilizeDying } from "../combat/healing.mjs";
 
 export function combatContext(actor,options={}) {
@@ -27,7 +28,8 @@ export function combatContext(actor,options={}) {
   const ambushTargets=(ambush?.targets??[]).map(uuid=>({uuid,name:encounter.combatants.find(entry=>entry.token?.uuid===uuid)?.name??"Цель"}));
   const defenses=[{mode:"dodge"},{mode:"reposition"},...equippedItems(actor.items).filter(item=>item.type==="weapon"&&["melee","shield"].includes(item.system.category)).flatMap(item=>[{mode:"block",itemId:item.id},{mode:"parry",itemId:item.id}]),{mode:"block",itemId:""},{mode:"parry",itemId:""}]
     .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
-  return { healing:healingContext(actor), extra,used,canAct,location:options.location??"random",range:options.range??"normal",modifier:options.modifier??0,
+  const unarmed=actor.type==="npc"?[]:unarmedContext(actor,options,{extra,fastPending:fastPending&&actor.flags[SYSTEM_ID].fastStrike.extra===extra});
+  return { healing:healingContext(actor), unarmed, feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"normal",modifier:options.modifier??0,
     grapple:(()=>{const state=grappleState(actor);return {options:grappleOptions(actor),holding:state.holding?{name:state.holding.name,pinned:state.holding.pinned,choking:state.holding.choking}:null,heldBy:state.heldBy?{name:state.heldBy.name}:null};})(),
     fullTurn,defenses,quickDraw,canQuickDraw:canAct&&Boolean(globalThis.game?.combat?.started&&Array.from(globalThis.game.combat.combatants).some(entry=>entry.actor?.uuid===actor.uuid)),ambush:{active:Boolean(ambush),targets:ambushTargets,count:ambushTargets.length,
       canPrepare:Boolean(canAct&&ambusher&&!encounter.started&&!tacticsFlags(ambusher).tacticRequest),pending:Boolean(tacticsFlags(ambusher).tacticRequest)},
@@ -47,6 +49,7 @@ export function combatContext(actor,options={}) {
       const loaded=item.system.skill!=="crossbow"||item.system.loaded!==false;
       return {id:item.id,name:item.name,img:item.img,properties:item.system.properties??"",damageTypes:damageTypeLabel(item.system.damageType),rate:actor.type==="npc"?item.system.attackRate??1:null,natural:Boolean(item.system.natural),grip:gripOf(item),
         equipped:equippedItems(actor.items).some(entry=>entry.id===item.id),modes,loaded,needsReload:!loaded,
+        melee:item.system.category==="melee"&&!item.system.natural,techniques:actor.type!=="npc"&&!item.system.natural&&modes.some(mode=>mode.secondary)&&equippedItems(actor.items).some(entry=>entry.id===item.id),
         skill:game.i18n.localize(`WITCHER.Skills.Entries.${item.system.skill}.Label`)};
     }) };
 }
@@ -79,6 +82,15 @@ export const combatActions={
   }),
   defend:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollDefense(this.actor,{...this.combatOptions,mode:target.dataset.mode,itemId:target.dataset.itemId});}finally{await this.render();}}),
   toggleExtraAction:guard(async function(){if(!this.isEditable)return;await inventoryWrite(this.actor,()=>this.actor.update({"system.combatAction.extra":!this.actor.system.combatAction.extra}));}),
+  attackUnarmed:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollWeaponAttack(this.actor,null,{...this.combatOptions,unarmed:target.dataset.strike,mode:target.dataset.mode});}finally{await this.render();}}),
+  feint:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollFeint(this.actor);}finally{await this.render();}}),
+  attackDual:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;
+    try{
+      const pair=dualWeapons(this.actor,equippedItems(this.actor.items)),first=pair.find(item=>item.id===target.dataset.itemId),second=pair.find(item=>item!==first);
+      if(!first||!second)throw new Error("Нужны два одноручных оружия в руках.");
+      const opened=await rollWeaponAttack(this.actor,first.id,{...this.combatOptions,mode:"dual"});
+      if(opened)await rollWeaponAttack(this.actor,second.id,{...this.combatOptions,mode:"dual",free:true});
+    }finally{await this.render();}}),
   attackWeapon:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollWeaponAttack(this.actor,target.dataset.itemId,{...this.combatOptions,mode:target.dataset.mode});}finally{await this.render();}}),
   reloadWeapon:guard(async function(_event,target){
     if(!this.isEditable)return;

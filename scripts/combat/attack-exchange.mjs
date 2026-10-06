@@ -1,3 +1,4 @@
+import { canAnswerDual, rollChargeContest } from "./brawling.mjs";
 import { hasStatus, setStatus, STUNNED } from "./status-effects.mjs";
 import { dropItemToGround } from "../loot/loot.mjs";
 import { scatterOffset } from "../canvas/scatter-overlay.mjs";
@@ -184,6 +185,7 @@ export function rollExchangeDamage(message, index) {
       const tableRoll = aimed ? aimedCriticalRoll(location.id, critRoll.total) : critRoll.total;
       let wound = criticalWoundByRoll(outcome.critical.id, tableRoll), bonus = outcome.critical.bonus;
       if (wound && anatomyFree(target) && ORGAN_WOUNDS.has(wound.id)) { bonus += ANATOMY_FREE_BONUS[outcome.critical.id]; wound = null; }
+      if (attack.nonLethal) wound = null;
       critical = { level: outcome.critical.id, name: outcome.critical.name, bonus, roll: tableRoll, aimed, wound };
     }
     return { rolls, flavor: `<h3>${esc(attack.name)} · урон</h3>`,
@@ -233,9 +235,23 @@ async function knockOffProsthesis(actor, { effectId, itemId }) {
   if (token?.parent) await dropItemToGround(actor, item, { quantity: 1, silent: true }).catch(error => ui.notifications.warn(error.message));
 }
 
+/** Push kick (core p.163): the target flies BODY/3 m straight away from the attacker. */
+const attackerActor = (attack, message) => (attack.attacker && fromUuidSync(attack.attacker)?.actor) ?? message.speakerActor;
+export const pushMeters = attack => Math.max(1, Math.floor((fromUuidSync(attack.attacker)?.actor?.system.statistics?.effective?.body ?? 3) / 3));
+async function pushTarget(attack) {
+  const from = attack.attacker && fromUuidSync(attack.attacker), to = attack.target && fromUuidSync(attack.target);
+  if (!from?.parent || !to?.parent || from.parent !== to.parent || !to.isOwner) return;
+  const scene = to.parent, centre = token => ({ x: token.x + token.width * scene.grid.size / 2, y: token.y + token.height * scene.grid.size / 2 });
+  const a = centre(from), b = centre(to), length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  const pixels = pushMeters(attack) / scene.grid.distance * scene.grid.size;
+  await to.update({ x: Math.round(to.x + (b.x - a.x) / length * pixels), y: Math.round(to.y + (b.y - a.y) / length * pixels) });
+}
+const chargeContest = (message, index) => game.messages.contents.map(entry => flagsOf(entry).chargeContest).find(contest => contest?.source === `${message.id}:${index}`) ?? null;
+
 /** HP loss, armor wear and a critical wound on one actor; returns what wore down. */
-async function sufferDamage(actor, result, { wound = null, level = "", location = {} } = {}) {
-  await actor.update({ "system.health.value": actor.system.health.value - result.total });
+async function sufferDamage(actor, result, { wound = null, level = "", location = {}, nonLethal = false } = {}) {
+  if (nonLethal) await actor.update({ "system.stamina.value": actor.system.stamina.value - result.total });
+  else await actor.update({ "system.health.value": actor.system.health.value - result.total });
   const worn = [];
   for (const id of result.ablate) {
     if (id === "natural") {
@@ -257,11 +273,13 @@ export async function applyExchangeDamage(message, index, { useShield = false } 
   if (!preview?.target.isOwner || linkedAny(message.id, index, "applied")) return;
   const { target, data } = preview, health = target.system.health.value, shield = useShield ? preview.shield : null;
   const own = shield ? shield.through : preview.result;
-  const worn = await sufferDamage(target, own, shield || preview.prosthesis ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location });
+  const attack = flagsOf(message).weaponAttack, nonLethal = Boolean(attack.nonLethal) && !shield;
+  const worn = await sufferDamage(target, own, shield || preview.prosthesis ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location, nonLethal });
+  if (attack.push && own.total >= 0) await pushTarget(attack);
   if (preview.prosthesis) await knockOffProsthesis(target, preview.prosthesis);
   // Core p.161: a disoriented character comes round after one hit, even if the armor stopped it.
   if (!shield && hasStatus(target, STUNNED)) await setStatus(target, STUNNED, false);
-  const exchange = { attack: message.id, index, kind: "applied", total: own.total, steps: own.steps, from: health,
+  const exchange = { attack: message.id, index, kind: "applied", total: own.total, steps: own.steps, from: health, nonLethal,
     ablated: worn.join(", "), armorHeld: !own.penetrated && preview.armor.sp > 0 && !shield };
   if (shield) {
     const shieldData = { token: shield.token, name: shield.name, total: shield.result.total, steps: shield.result.steps, ablate: shield.result.ablate,
@@ -270,7 +288,7 @@ export async function applyExchangeDamage(message, index, { useShield = false } 
     if (shield.actor.isOwner) { shieldData.ablated = (await sufferDamage(shield.actor, shield.result, shieldData)).join(", "); shieldData.applied = true; }
     exchange.shield = shieldData;
   }
-  return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${own.total} ПЗ${shield ? ` · живой щит ${esc(shield.name)}: −${shield.result.total} ПЗ` : ""}${preview.prosthesis ? ` · ${esc(preview.prosthesis.name)} отвалился` : ""}</p>`,
+  return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${own.total} ${nonLethal ? "ВЫН" : "ПЗ"}${shield ? ` · живой щит ${esc(shield.name)}: −${shield.result.total} ПЗ` : ""}${preview.prosthesis ? ` · ${esc(preview.prosthesis.name)} отвалился` : ""}</p>`,
     flags: { [SYSTEM_ID]: { skipLuck: true, exchange } } }, "public");
 }
 
@@ -288,7 +306,7 @@ export async function applyShieldShare(message) {
 // ── Fumbles (core p.157, errata v4) ─────────────────────────────────────────
 
 function attackFumbleTable(message, attack) {
-  if (attack.special) return "unarmed";
+  if (attack.unarmed || (attack.special && !attack.special.startsWith("weapon-"))) return "unarmed";
   const item = message.speakerActor?.items.get(attack.itemId);
   if (attack.ranged) return "ranged";
   return item?.system.skill === "brawling" ? "unarmed" : "melee";
@@ -481,7 +499,8 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
     if (!target?.isOwner) return `<li class="is-waiting">${head}<em>${linkedAny(message.id, index, "defense") ? "защита бросается…" : "ждём защиту"}</em></header>${ownFumble}</li>`;
     if (linkedAny(message.id, index, "defense")) return `<li class="is-waiting">${head}<em><i class="fa-solid fa-dice-d10 fa-spin"></i> защита бросается…</em></header>${ownFumble}</li>`;
     const gang = gangingUp(message);
-    const choices = defenseChoices(target, incomingOf(attack), -gang, GRAPPLE_ACTIONS[attack.special]?.defenses ?? null).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
+    const dualLimit = attack.dual && !canAnswerDual(target, equippedItems(target.items)) ? ["dodge", "reposition"] : null;
+    const choices = defenseChoices(target, incomingOf(attack), -gang, GRAPPLE_ACTIONS[attack.special]?.defenses ?? dualLimit).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
       `${esc(choice.name)}${choice.weaponName ? ` · ${esc(choice.weaponName)}` : ""}${choice.total != null && !choice.blocked ? ` <b>+${choice.total}</b>` : ""}`, !choice.blocked, choice.blocked || choice.note));
     const free = defenseChoices(target, incomingOf(attack))[0]?.activeDodge;
     const repeatBox = `<button type="button" class="witcher-exchange-repeat" data-exchange-repeat aria-pressed="${!free && repeatDefense(target)}" ${free ? "disabled" : ""} data-tooltip="${free ? "Активное уклонение: повторные защиты бесплатны" : "Вторая и следующие защиты за раунд стоят 1 ВЫН. Нажмите, чтобы переключить."}"><i class="fa-solid fa-rotate"></i> Повторная · ${free ? 0 : 1} ВЫН</button>`;
@@ -504,6 +523,12 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
     else body += `<p class="witcher-exchange-note">${esc(name)}: не удалось.</p>`;
     return `<li class="${outcome.hit ? "is-hit" : "is-miss"}">${head}<span>${defenseLine}</span><strong class="${outcome.hit ? "is-hit" : "is-miss"}">${outcome.hit ? "Удалось" : "Не удалось"}</strong></header>${body}</li>`;
   }
+  if (attack.charge && !outcome.hit && !outcome.limbBlock && outcome.mode === "block") {
+    const contest = chargeContest(message, index);
+    body += contest ? `<p class="witcher-exchange-note"><i class="fa-solid fa-person-falling"></i> С разбега: ${contest.success ? "противник сбит с ног" : "противник устоял"}.</p>`
+      : message.speakerActor?.isOwner ? `<div class="witcher-exchange-actions">${button("data-exchange-charge", '<i class="fa-solid fa-person-falling"></i> Сбить с ног · Сила против Силы', true, "Атака с разбега заблокирована: встречная проверка Силы")}</div>`
+      : `<p class="witcher-exchange-note">Атакующий может попытаться сбить с ног: Сила против Силы.</p>`;
+  }
   if (outcome.limbBlock) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-hand"></i> Блок телом: урон атаки приходится в подставленную руку, ПБ учитывается. Критического ранения нет.</p>`;
   if (outcome.hit || outcome.limbBlock) {
     const damage = linked(message.id, index, "damage"), applied = linked(message.id, index, "applied");
@@ -525,8 +550,9 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
       if (applied) {
         const result = exchangeOf(applied);
         if (result.shield) body += `<p class="witcher-exchange-applied is-shield" data-tooltip="${esc(stepsHTML(result.shield.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-user-shield"></i> Живой щит ${esc(result.shield.name)}: −${result.shield.total} ПЗ${result.shield.applied ? "" : " <small>(применяет мастер)</small>"}</p>${result.shield.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ щита −1: ${esc(result.shield.ablated)}</p>` : ""}`;
-        if (hideTargetNumbers) body += `<p class="witcher-exchange-applied"><i class="fa-solid fa-heart-crack"></i> −${result.total} ПЗ</p>`;
-        else body += `<p class="witcher-exchange-applied" data-tooltip="${esc(stepsHTML(result.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-heart-crack"></i> −${result.total} ПЗ${result.shield ? " сквозь щит" : ""}</p>${result.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ −1: ${esc(result.ablated)}</p>` : result.armorHeld ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield"></i> Броня выдержала удар — ПБ не снижается</p>` : ""}`;
+        const unit = result.nonLethal ? "ВЫН" : "ПЗ";
+        if (hideTargetNumbers) body += `<p class="witcher-exchange-applied"><i class="fa-solid fa-heart-crack"></i> −${result.total} ${unit}</p>`;
+        else body += `<p class="witcher-exchange-applied" data-tooltip="${esc(stepsHTML(result.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-heart-crack"></i> −${result.total} ${unit}${result.shield ? " сквозь щит" : ""}${result.nonLethal ? " · несмертельный" : ""}</p>${result.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ −1: ${esc(result.ablated)}</p>` : result.armorHeld ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield"></i> Броня выдержала удар — ПБ не снижается</p>` : ""}`;
         // Core p.158: every critical wound also forces a Stun save.
         if (data.critical && target?.isOwner) body += `<div class="witcher-exchange-actions">${button("data-exchange-stun", '<i class="fa-solid fa-dice-d10"></i> Испытание Устойчивости', true, "Критическое ранение требует испытания УСТ")}</div>`;
       } else if (target?.isOwner) {
@@ -534,7 +560,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
         if (shield) body += `<div class="witcher-exchange-shield"><p><i class="fa-solid fa-user-shield"></i> <b>Живой щит:</b> ${esc(shield.name)} в захвате прикрывает туловище. Удар принимает он; в вас проходит только урон сверх его ТЕЛ ${shield.body} + ПБ ${shield.armor.sp} = <b>${shield.overflow}</b>.</p>
           <div class="witcher-exchange-actions">${button("data-exchange-apply-shield", `<i class="fa-solid fa-user-shield"></i> Прикрыться: щит −${shield.result.total}, вам −${shield.through.total}`, true)}${button("data-exchange-apply", `<i class="fa-solid fa-heart-crack"></i> Принять самому −${preview.result.total}`, true)}</div>
           <details><summary>Расчёт для щита</summary>${stepsHTML(shield.result.steps)}</details><details><summary>Расчёт без щита</summary>${stepsHTML(preview.result.steps)}</details></div>`;
-        else body += `<div class="witcher-exchange-actions">${button("data-exchange-apply", `<i class="fa-solid fa-heart-crack"></i> Применить −${preview.result.total} ПЗ`, true)}</div>${stepsHTML(preview.result.steps)}`;
+        else body += `<div class="witcher-exchange-actions">${button("data-exchange-apply", `<i class="fa-solid fa-heart-crack"></i> Применить −${preview.result.total} ${attack.nonLethal ? "ВЫН" : "ПЗ"}`, true)}</div>${stepsHTML(preview.result.steps)}${attack.push ? `<p class="witcher-exchange-note">Толчок: цель отлетит на ${pushMeters(attack)} м от атакующего.</p>` : ""}`;
       } else body += `<p class="witcher-exchange-note">Урон применяет владелец цели или мастер.</p>`;
     }
   }
@@ -577,6 +603,7 @@ export function renderExchange(message, html) {
     run("[data-exchange-apply]", () => applyExchangeDamage(message, index));
     run("[data-exchange-apply-shield]", () => applyExchangeDamage(message, index, { useShield: true }));
     run("[data-exchange-stun]", () => rollStun(targetActor(attack)));
+    run("[data-exchange-charge]", () => chargeContest(message, index) ? null : rollChargeContest(attackerActor(attack, message), targetActor(attack), `${message.id}:${index}`));
     const fumbleContext = role => {
       if (role === "attack") return { message, index, role, actor: message.speakerActor, itemId: attack.itemId, outcome: attackFumble(message, index), author: message.author?.id };
       const defense = linked(message.id, index, "defense");

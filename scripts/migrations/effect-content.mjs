@@ -6,8 +6,9 @@ import { CRITICAL_WOUND_SOURCES } from "../combat/critical-wound-effects.mjs";
 // 3: refresh untouched critical wound entries (prostheses on lost limbs).
 // 4: p.161 conditions now automated (Vomiting added; Intoxication, Blindness, Nausea, bleeding/burning texts).
 // 5: Dying explains stabilisation by First Aid (core p.162).
-export const EFFECT_CONTENT_VERSION = 5;
-const REFRESHED_CONDITIONS = new Set(["burning", "bleeding", "burrowing", "intoxicated", "blinded", "nauseated", "dying"]);
+// 6: Prone — stand up by spending movement (core p.163).
+export const EFFECT_CONTENT_VERSION = 6;
+const REFRESHED_CONDITIONS = new Set(["burning", "bleeding", "burrowing", "intoxicated", "blinded", "nauseated", "dying", "prone"]);
 export function registerEffectContentMigration() {
   game.settings.register(SYSTEM_ID, "effectContentVersion", { scope: "world", config: false, type: Number, default: 0 });
 }

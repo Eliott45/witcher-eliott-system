@@ -8,6 +8,7 @@ import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { consumeAiming } from "./full-turn-rules.mjs";
 import { selectedAttackTarget } from "./attack-target.mjs";
 import { ambushAttack, ambushState, tacticsFlags } from "./tactics-rules.mjs";
+import { unarmedAttack, consumeFeint } from "./brawling.mjs";
 
 /** Pair state of a fast attack: the second click in the same round (and extra-action status) is strike 2/2. */
 export function fastPair(actor,attack,action) {
@@ -34,38 +35,44 @@ export function rollWeaponAttack(actor,itemId,options={}) {
     if(actorCombatants.some(entry=>tacticsFlags(entry).tacticRequest))throw new Error("Дождитесь завершения запроса в трекере боя.");
     if(!targetContext&&actorCombatants.some(entry=>ambushState(combat,entry)))throw new Error("Выберите цель атаки, чтобы учесть засаду.");
     const ambush=targetContext?ambushAttack(combat,targetContext.attacker,targetContext.target):{bonus:0};
-    const item=actor.items.get(itemId),action=actionQuote(actor),quote=weaponAttack(actor,item,{...options,
-      extraPenalty:action.penalty,targetContext,ambushBonus:ambush.bonus});
+    const item=itemId?actor.items.get(itemId):null,action=actionQuote(actor),attackOptions={...options,extraPenalty:action.penalty,targetContext,ambushBonus:ambush.bonus};
+    // Unarmed strikes (core p.163) share the attack card; the second blow of a joint attack is part of the same action.
+    const quote=options.unarmed?unarmedAttack(actor,options.unarmed,attackOptions):weaponAttack(actor,item,attackOptions);
     if(quote.blocked)throw new Error(quote.blocked);
+    if(options.free){action.stamina=0;}
     // The second strike of a fast attack belongs to the same action: no new STA for an extra action.
     const pair=fastPair(actor,quote.attack,action),strike=pair?(pair.second?2:1):0;
     if(pair?.second)action.stamina=0;
     const display=trackRollDisplay(),messageMode=game.settings.get("core","messageMode");
     try {
       const rolls=[];
-      for(let i=0;i<quote.attack.count;i++)rolls.push(await new foundry.dice.Roll(`1d10wc + ${quote.total}`,{}, {flavor:`${item.name} · ${i+1}/${quote.attack.count}`}).evaluate({allowInteractive:messageMode!=="blind"}));
+      for(let i=0;i<quote.attack.count;i++)rolls.push(await new foundry.dice.Roll(`1d10wc + ${quote.total}`,{}, {flavor:`${quote.name} · ${i+1}/${quote.attack.count}`}).evaluate({allowInteractive:messageMode!=="blind"}));
       const math=quote.parts.filter(part=>part.value||part.label==="Основа навыка").map(part=>`${part.label}: ${signed(part.value)}`).join("; ");
       const types=damageTypeLabel(quote.weapon.damageType);
-      const flavor=`<section class="witcher-attack-chat"><h3>${esc(item.name)} · ${esc(quote.attack.name)}${strike?` ${strike}/2`:""}</h3>${types?`<p class="witcher-damage-type">Урон: ${esc(types)}</p>`:""}<p data-tooltip="${esc(math)}">База проверки <b>${signed(quote.total)}</b> · ${quote.attack.count} ${quote.attack.count===1?"бросок":"броска"}</p>`
+      const notes=[quote.nonLethal?"Несмертельный урон: отнимает Выносливость.":"",quote.attack.charge?"С разбега: полный ход. Если удар заблокируют — Сила против Силы, чтобы сбить с ног.":"",
+        quote.attack.push?"Толчок: цель отлетает на ТЕЛ/3 м.":"",quote.attack.dual?"Парная атака: блок и парирование — только с двумя оружиями или оружием и щитом.":"",quote.attack.hint&&quote.attack.special?quote.attack.hint:""].filter(Boolean);
+      const flavor=`<section class="witcher-attack-chat"><h3>${esc(quote.name)} · ${esc(quote.attack.name)}${strike?` ${strike}/2`:""}</h3>${notes.map(note=>`<p class="witcher-attack-note">${esc(note)}</p>`).join("")}${types?`<p class="witcher-damage-type">Урон: ${esc(types)}</p>`:""}<p data-tooltip="${esc(math)}">База проверки <b>${signed(quote.total)}</b> · ${quote.attack.count} ${quote.attack.count===1?"бросок":"броска"}</p>`
         +(targetContext?`<p>Цель: <b>${esc(targetContext.target.name)}</b></p>`:"<small>Цель не выбрана — направление взгляда не учтено.</small>")
         +attackModifierMarkup(quote.parts)
         +(targetContext?.blind?"<small>Вне конуса зрения: бонус прицеливания не применяется.</small>":"")
         +`<p>${esc(quote.aim.name)}${quote.aim.id!=="random"?` · урон ×${quote.aim.multiplier} после брони`:" · место попадания после успешной атаки"}</p>`
-        +actionNote(action)+`<button type="button" data-weapon-damage><i class="fa-solid fa-dice-d6"></i> Урон: ${esc(quote.damage)}</button>`
+        +actionNote(action)+(quote.damage?`<button type="button" data-weapon-damage><i class="fa-solid fa-dice-d6"></i> Урон: ${esc(quote.damage)}</button>`:"")
         +(quote.aim.id==="random"?'<div class="witcher-location-buttons"><button type="button" data-hit-location="humanoid">Место: гуманоид</button><button type="button" data-hit-location="monster">Место: чудовище</button></div>':"")
         +`<small>Каждое попадание — отдельный урон и зона. Сравните атаку с защитой цели.</small></section>`;
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls,flavor,
-        flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId,name:item.name,mode:quote.attack.id,base:quote.total,count:quote.attack.count,
+        flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId:itemId??null,name:quote.name,mode:quote.attack.id,unarmed:options.unarmed??null,nonLethal:Boolean(quote.nonLethal),
+          special:quote.attack.special??null,charge:Boolean(quote.attack.charge),push:Boolean(quote.attack.push),dual:Boolean(quote.attack.dual),base:quote.total,count:quote.attack.count,
           damage:quote.damage,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
           target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,ranged:quote.ranged,thrown:quote.weapon.category==="thrown",combat:combat?.started?{id:combat.id,round:combat.round}:null,strike,damageTypes:damageTypeLabel(quote.weapon.damageType)}}}},messageMode));
       if(!message)return;
       await display.wait(message);
-      const update=actionUpdate(actor,action);
+      const update=options.free?{}:actionUpdate(actor,action);
       if(pair&&!pair.second){delete update["system.combatAction.extra"];delete update["system.combatAction.lastExtraRound"];}
-      update[`flags.${SYSTEM_ID}.fastStrike`]=pair&&!pair.second?{round:pair.key,extra:action.extra,itemId}:null;
-      if(item.system.skill==="crossbow")update.items=[{_id:item.id,"system.loaded":false}];
+      if(!options.free)update[`flags.${SYSTEM_ID}.fastStrike`]=pair&&!pair.second?{round:pair.key,extra:action.extra,itemId:itemId??""}:null;
+      if(item?.system.skill==="crossbow")update.items=[{_id:item.id,"system.loaded":false}];
       if(Object.keys(update).length)await actor.update(update);
       await consumeAiming(actor);
+      await consumeFeint(actor);
       return message;
     } finally {display.close();}
   });

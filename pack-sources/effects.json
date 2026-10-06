@@ -921,7 +921,7 @@
     "img": "icons/svg/falling.svg",
     "type": "base",
     "system": {},
-    "description": "<p>−2 к атаке и защите, пока персонаж не потратит перемещение, чтобы встать.</p>",
+    "description": "<p>−2 к атаке и защите, пока персонаж не потратит перемещение, чтобы встать. Встав, можно потратить действие, чтобы переместиться на обычное расстояние.</p>",
     "disabled": false,
     "transfer": false,
     "statuses": [
@@ -941,6 +941,7 @@
       "witcher-eliott-system": {
         "condition": {
           "key": "prone",
+          "action": "Встать — потратить перемещение",
           "modifiers": [
             {
               "target": "combat.attack",

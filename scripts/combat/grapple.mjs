@@ -8,6 +8,10 @@ import { actionQuote, actionUpdate, actionNote } from "./action-economy.mjs";
 import { conditionRules } from "./condition-rules.mjs";
 import { attackerToken, selectedAttackTarget } from "./attack-target.mjs";
 import { bodyDamage, combatModifierParts, signed } from "./weapon-rules.mjs";
+import { equippedItems } from "../data/physical-items.mjs";
+import { usableHands } from "./critical-wound-effects.mjs";
+import { scatterItem } from "../loot/loot.mjs";
+import { setStunned } from "./status-effects.mjs";
 
 // Core p.163 «Борьба»: a grapple is a Brawling check the target defends against. While held, the
 // grappler may pin, choke or throw; the held one may try to break free (Dodge/Escape vs Brawling).
@@ -24,7 +28,17 @@ export const GRAPPLE_ACTIONS = {
   throw: { name: "Бросок", skill: "brawling", defenses: ["dodge"], icon: "fa-person-falling",
     hint: "Борьба против Уклонения/Изворотливости. При успехе захват заканчивается: цель сбита с ног, получает урон удара рукой и проходит испытание УСТ −1." },
   escape: { name: "Вырваться", skill: "dodgeEscape", defenses: ["brawl"], icon: "fa-person-running",
-    hint: "Уклонение/Изворотливость против Борьбы захватчика. При успехе захват, обездвиживание и удушение снимаются." }
+    hint: "Уклонение/Изворотливость против Борьбы захватчика. При успехе захват, обездвиживание и удушение снимаются." },
+  // Core p.163: unarmed trip and disarm need no grapple.
+  trip: { name: "Подсечка", skill: "brawling", defenses: null, icon: "fa-shoe-prints", free: true,
+    hint: "Удар по ногам: Борьба против защиты цели. При успехе цель сбита с ног." },
+  disarm: { name: "Выбить оружие", skill: "brawling", defenses: ["dodge"], icon: "fa-hand-holding", free: true,
+    hint: "Борьба против Уклонения/Изворотливости. При успехе оружие цели отлетает на 1d6/2 м в случайную сторону." },
+  "disarm-take": { name: "Отобрать оружие", skill: "brawling", defenses: ["dodge"], icon: "fa-hand-holding-hand", free: true, penalty: -3, hand: true,
+    hint: "Борьба −3 против Уклонения/Изворотливости, нужна свободная рука. При успехе оружие цели оказывается у вас." },
+  // Weapon special attacks (core p.164) are rolled from the weapon card; listed here for the chat exchange.
+  "weapon-disarm": { name: "Разоружение", weapon: true, defenses: null, icon: "fa-hand-holding" },
+  "weapon-trip": { name: "Подсечка оружием", weapon: true, defenses: null, icon: "fa-shoe-prints" }
 };
 
 const flagsOf = document => document?.flags?.[SYSTEM_ID] ?? {};
@@ -49,14 +63,16 @@ export function grappleState(actor) {
 /** Which grapple actions are open to the actor right now, and why the others are not. */
 export function grappleOptions(actor) {
   const { holding, heldBy } = grappleState(actor), canAct = conditionRules(actor).canAct;
-  return Object.entries(GRAPPLE_ACTIONS).map(([kind, data]) => {
+  return Object.entries(GRAPPLE_ACTIONS).filter(([, data]) => !data.weapon).map(([kind, data]) => {
     // A pinned creature can do nothing except try to break free (core p.163).
+    const freeHand = data.hand && equippedItems(actor.items ?? []).filter(item => item.type === "weapon" && !item.system.natural).reduce((sum, item) => sum + (item.system.grip || item.system.hands || 1), 0) >= usableHands(actor);
     const reason = !canAct && kind !== "escape" ? "Персонаж не может действовать."
+      : data.free ? (freeHand ? "Нужна свободная рука." : "")
       : kind === "grapple" ? (holding ? "Вы уже держите противника." : heldBy ? "Сначала вырвитесь из захвата." : "")
       : kind === "escape" ? (heldBy ? "" : "Вас никто не держит.")
       : holding ? (kind === "pin" && holding.pinned ? "Противник уже обездвижен." : kind === "choke" && holding.choking ? "Вы уже душите противника." : "") : "Сначала возьмите противника в захват.";
     const skill = skillValue(actor.system, data.skill);
-    const total = skill?.total == null ? null : skill.total + combatModifierParts(actor, "combat.attack").reduce((sum, part) => sum + part.value, 0);
+    const total = skill?.total == null ? null : skill.total + (data.penalty ?? 0) + combatModifierParts(actor, "combat.attack").reduce((sum, part) => sum + part.value, 0);
     return { kind, ...data, total, base: total == null ? "—" : signed(total), disabled: Boolean(reason) || total == null, reason: reason || (total == null ? "Заполните навык." : "") };
   });
 }
@@ -67,11 +83,11 @@ export async function rollGrappleAction(actor, kind) {
   if (!data || !actor.isOwner) return;
   if (option.disabled) throw new Error(option.reason);
   const { holding, heldBy } = grappleState(actor), attacker = attackerToken(actor);
-  const targetUuid = kind === "grapple" ? selectedAttackTarget(actor, { attackerUuid: attacker.uuid })?.target.uuid : kind === "escape" ? heldBy.token : holding.token;
-  if (!targetUuid) throw new Error("Выберите цель захвата.");
+  const targetUuid = kind === "grapple" || data.free ? selectedAttackTarget(actor, { attackerUuid: attacker.uuid })?.target.uuid : kind === "escape" ? heldBy.token : holding.token;
+  if (!targetUuid) throw new Error("Выберите цель (T).");
   const action = kind === "escape" && !conditionRules(actor).canAct ? { extra: false, penalty: 0, stamina: 0, roundKey: "" } : actionQuote(actor);
   const skill = skillValue(actor.system, data.skill);
-  const parts = [{ label: game.i18n.localize(skill.label), value: skill.total }, { label: "Дополнительное действие", value: action.penalty }, ...combatModifierParts(actor, "combat.attack")];
+  const parts = [{ label: game.i18n.localize(skill.label), value: skill.total }, ...(data.penalty ? [{ label: data.name, value: data.penalty }] : []), { label: "Дополнительное действие", value: action.penalty }, ...combatModifierParts(actor, "combat.attack")];
   const total = parts.reduce((sum, part) => sum + part.value, 0), combat = game.combat;
   const display = trackRollDisplay(), messageMode = game.settings.get("core", "messageMode");
   try {
@@ -119,14 +135,47 @@ export async function applyGrappleSuccess(message) {
   } else if (attack.special === "pin") { await addStatus(heldActor, "pinned", { by: grappler }); notes.push(`${tokenName(held)} обездвижен.`); }
   else if (attack.special === "choke") { await addStatus(heldActor, "suffocating", { by: grappler }); notes.push(`${tokenName(held)} задыхается: 3 урона в раунд.`); }
   else if (attack.special === "escape") { await releaseGrapple(grappler, held); notes.push(`${tokenName(held)} вырвался из захвата.`); }
+  else if (["trip", "weapon-trip"].includes(attack.special)) {
+    const source = conditionSource(CONDITION_BY_ID.prone); delete source._id;
+    if (heldActor && !heldActor.effects.some(effect => effect.statuses.has("prone"))) await heldActor.createEmbeddedDocuments("ActiveEffect", [source]);
+    notes.push(`${tokenName(held)} сбит с ног.`);
+  } else if (["disarm", "disarm-take", "weapon-disarm"].includes(attack.special)) {
+    // The weapon in hand: the first equipped one that is not part of the body.
+    const weapon = heldActor ? equippedItems(heldActor.items).find(item => item.type === "weapon" && !item.system.natural) : null;
+    if (!weapon) notes.push(`У ${tokenName(held)} нет оружия в руках.`);
+    else if (attack.special === "disarm-take" && grapplerActor) {
+      const data = weapon.toObject(); delete data._id;
+      Object.assign(data.system, { quantity: 1, equipped: false, carried: true, containerId: "" });
+      await grapplerActor.createEmbeddedDocuments("Item", [data]);
+      if ((weapon.system.quantity ?? 1) > 1) await weapon.update({ "system.quantity": weapon.system.quantity - 1, "system.equipped": false });
+      else await weapon.delete();
+      notes.push(`${tokenName(grappler)} отбирает у ${tokenName(held)}: ${weapon.name}.`);
+    } else {
+      const rolls = [await new foundry.dice.Roll("1d10").evaluate(), await new foundry.dice.Roll(attack.special === "disarm" ? "1d6" : "1d6").evaluate()];
+      const meters = attack.special === "disarm" ? Math.max(1, Math.floor(rolls[1].total / 2)) : rolls[1].total;
+      const dropped = await scatterItem(heldActor, weapon, meters, rolls[0].total);
+      notes.push(`${weapon.name} выбито у ${tokenName(held)}: отлетает на ${meters} м (направление ${rolls[0].total} по таблице разброса)${dropped ? "" : " — поднимите его, чтобы снова взять в руки"}.`);
+      return foundry.documents.ChatMessage.create({ speaker: message.speaker, rolls, content: `<p>${esc(notes.join(" "))}</p>`,
+        flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index: 0, kind: "special", notes } } } });
+    }
+  }
   else if (attack.special === "throw") {
     await releaseGrapple(grappler, held);
     const source = conditionSource(CONDITION_BY_ID.prone); delete source._id;
     if (heldActor && !heldActor.effects.some(effect => effect.statuses.has("prone"))) await heldActor.createEmbeddedDocuments("ActiveEffect", [source]);
-    const roll = await new foundry.dice.Roll(attack.damage || "1d6").evaluate(), damage = Math.max(0, roll.total);
-    if (heldActor && damage) await heldActor.update({ "system.health.value": heldActor.system.health.value - damage });
-    notes.push(`${tokenName(held)} брошен и сбит с ног: −${damage} ПЗ (удар рукой ${attack.damage}). Испытание Устойчивости −1.`);
-    return foundry.documents.ChatMessage.create({ speaker: message.speaker, rolls: [roll], content: `<p>${esc(notes.join(" "))}</p>`,
+    // Brawling deals non-lethal damage (core p.163): the throw lands as Stamina loss, then a Stun save at −1.
+    const roll = await new foundry.dice.Roll(attack.damage || "1d6").evaluate(), damage = Math.max(0, roll.total), rolls = [roll];
+    if (heldActor && damage) await heldActor.update({ "system.stamina.value": heldActor.system.stamina.value - damage });
+    let stunned = "";
+    const stun = heldActor?.system.statistics?.stun;
+    if (heldActor && stun != null && conditionRules(heldActor).canStunSave) {
+      const save = await new foundry.dice.Roll("1d10").evaluate(); rolls.push(save);
+      const failed = save.total >= stun - 1;
+      if (failed) await setStunned(heldActor, true);
+      stunned = ` Испытание Устойчивости −1: ${save.total} против ${stun - 1} — ${failed ? "дезориентирован" : "устоял"}.`;
+    }
+    notes.push(`${tokenName(held)} брошен и сбит с ног: −${damage} ВЫН (несмертельный урон удара рукой ${attack.damage}).${stunned}`);
+    return foundry.documents.ChatMessage.create({ speaker: message.speaker, rolls, content: `<p>${esc(notes.join(" "))}</p>`,
       flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index: 0, kind: "special", notes } } } });
   }
   return foundry.documents.ChatMessage.create({ speaker: message.speaker, content: `<p>${esc(notes.join(" "))}</p>`,

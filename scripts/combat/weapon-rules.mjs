@@ -53,8 +53,18 @@ export function attackModes(actor,item) {
   if (actor.type === "npc") return [{id:"npc",name:`Атака ×${item.system.attackRate??1}`,count:item.system.attackRate??1,penalty:0,multiplier:1}];
   if (item.system.skill === "crossbow") return [{id:"shot",name:"Выстрел",count:1,penalty:0,multiplier:1}];
   // Core p.153: a fast attack is two strikes for one action. Each click rolls one strike, so the two may hit different targets.
-  return [{id:"fast",name:item.system.skill==="archery"?"Быстрый выстрел":"Быстрая",count:1,penalty:0,multiplier:1,pair:item.system.skill!=="archery"},
+  const modes=[{id:"fast",name:item.system.skill==="archery"?"Быстрый выстрел":"Быстрая",count:1,penalty:0,multiplier:1,pair:item.system.skill!=="archery"},
     {id:"strong",name:"Сильная",count:1,penalty:-3,multiplier:2}];
+  // Core pp.163–164 special attacks; each is one action replacing the attack (a charge takes the full round).
+  if(item.system.category==="melee"&&!item.system.natural) modes.push(
+    {id:"charge",name:"С разбега",count:1,penalty:-3,multiplier:2,charge:true,secondary:true,
+      hint:"Полный ход: переместитесь на расстояние Бега и нанесите сильную атаку. Если её заблокировали — Сила против Силы, чтобы сбить с ног."},
+    {id:"pommel",name:"Удар эфесом",count:1,penalty:0,multiplier:1,pommel:true,secondary:true,hint:"Половина урона, несмертельный."},
+    {id:"disarm",name:"Разоружение",count:1,penalty:0,multiplier:1,special:"weapon-disarm",secondary:true,hint:"При попадании оружие выпадает из рук цели и отлетает на 1d6 м в случайную сторону. Урона нет."},
+    {id:"trip",name:"Подсечка",count:1,penalty:0,multiplier:1,special:"weapon-trip",secondary:true,hint:"Удар по ногам: при попадании цель сбита с ног. Урона нет."});
+  if(["melee","thrown"].includes(item.system.category)&&!item.system.natural&&(item.system.grip||item.system.hands||1)===1&&equippedItems(actor.items??[]).filter(entry=>entry.type==="weapon"&&!entry.system.natural&&entry.id!==item.id&&(entry.system.grip||entry.system.hands||1)===1).length)
+    modes.push({id:"dual",name:"Парная атака",count:1,penalty:-3,multiplier:1,dual:true,secondary:true,hint:"Errata: одно действие атаки — по броску каждым оружием в руках, оба с −3. Блокировать и парировать её можно только с двумя оружиями или оружием и щитом."});
+  return modes;
 }
 /** Humanoid or monster hit-location table for a target actor (core p.152). */
 export const bodyPlanOf = actor => actor?.type === "npc" && actor.system.creature?.category !== "humanoid" ? "monster" : "humanoid";
@@ -82,7 +92,9 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   const body=shield?shieldPunch(actor.system.statistics.effective.body,shieldClass(weapon)):melee&&!weapon.damageIncludesBody?bodyDamage(actor.system.statistics.effective.body):0;
   const bonus=(melee?actor.system.statistics.meleeDamageBonus??0:0)+(actor.system.statistics.physicalDamageBonus??0);
   const unarmedBonus=weapon.ruleId==="weapon.brass-knuckles"&&!weapon.damageIncludesBody?" + 1d6":"";
-  const damage=`(${shield?"1d6":weapon.damage}${unarmedBonus}${body+bonus?` + ${body+bonus}`:""})${attack.multiplier===2?" * 2":""}`;
+  const base=`(${shield?"1d6":weapon.damage}${unarmedBonus}${body+bonus?` + ${body+bonus}`:""})${attack.multiplier===2?" * 2":""}`;
+  // Pommel strike (core p.164): half damage, non-lethal. Disarm and trip deal no damage.
+  const damage=attack.special?null:attack.pommel?`floor(${base} / 2)`:base;
   const blocked=targetContext?.blind&&location!=="random"?"Нельзя выбирать место удара по цели вне вашего конуса зрения":shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":"");
-  return {weapon,attack,skill,parts,total,damage,body,bonus,aim,band,ranged,blocked,range:weapon.rangeBodyMultiplier?weapon.rangeBodyMultiplier*actor.system.statistics.effective.body:weapon.range};
+  return {name:item.name,nonLethal:Boolean(attack.pommel),weapon,attack,skill,parts,total,damage,body,bonus,aim,band,ranged,blocked,range:weapon.rangeBodyMultiplier?weapon.rangeBodyMultiplier*actor.system.statistics.effective.body:weapon.range};
 }

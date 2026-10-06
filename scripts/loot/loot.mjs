@@ -107,6 +107,18 @@ export async function processLootRequest(actor, request, user) {
 const chat = (actor, text, silent = false) => silent ? null : foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }),
   content: `<p class="witcher-loot-note"><i class="fa-solid fa-sack"></i> ${esc(text)}</p>`, flags: { [SYSTEM_ID]: { skipLuck: true } } });
 
+/** An item knocked out of hand lands meters away in a 1d10 scatter direction (core p.163). Without a token it is just unequipped. */
+export async function scatterItem(actor, item, meters, direction) {
+  if (item.system.equipped) await item.update({ "system.equipped": false });
+  const token = actor.token ?? actor.getActiveTokens?.()[0]?.document;
+  if (!token?.parent) return false;
+  const offset = scatterOffset(direction, token.rotation, 1), length = Math.hypot(offset.x, offset.y) || 1;
+  const scene = token.parent, pixels = meters / scene.grid.distance * scene.grid.size, { width, height } = token.getSize();
+  const point = { x: token.x + width / 2 + offset.x / length * pixels, y: token.y + height / 2 + offset.y / length * pixels };
+  await dropItemToGround(actor, item, { quantity: 1, point, silent: true });
+  return true;
+}
+
 /** Drop an owned item in front of the actor's token (inventory button). */
 export async function dropItemToGround(actor, item, { quantity = null, point = null, silent = false } = {}) {
   const token = actor.token ?? actor.getActiveTokens?.()[0]?.document;
