@@ -16,6 +16,7 @@ import { registerConsumption } from "./workshop/consumption.mjs";
 import { migratePoisonEffects } from "./migrations/poison-effects.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
+import { registerRollBreakdown } from "./chat/roll-breakdown.mjs";
 import { WitcherRecipeData } from "./data/witcher-recipe-data.mjs";
 import { COMBAT_ACTOR_TYPES, ITEM_TYPES, SYSTEM_ID, ROUND_SECONDS, INITIATIVE_FORMULA } from "./config.mjs";
 import { WitcherServicesData } from "./data/witcher-services-data.mjs";
@@ -77,6 +78,7 @@ Hooks.once("init", async () => {
   registerOilExpiry();
   registerConsumption();
   registerStubbornnessChat();
+  registerRollBreakdown();
   registerEffectDurationChat();
   registerServiceOrders();
   CONFIG.time.roundTime = ROUND_SECONDS;

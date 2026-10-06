@@ -743,3 +743,18 @@
 .witcher-eliott .witcher-toxicity.is-overloaded { border-color:#a55039; background:#f2d9c9; color:#7d2f26; }
 .witcher-consume-dialog .witcher-consume-description { max-height:300px; overflow:auto; padding:8px 12px; background:#f7f1e5; color:#342c25; border-radius:6px; }
 .witcher-consume-dialog .witcher-consume-description :is(h2,h3,h4,strong) { color:#59412e; text-shadow:none; }
+
+/* Hover breakdown of a check total: die, every recorded modifier, then the result. */
+.witcher-roll-total { cursor:help; transition:box-shadow .15s; }
+.witcher-roll-total:hover { box-shadow:0 0 0 1px #b8955a inset; }
+.witcher-roll-total.is-critical { color:#2f6a46; }
+.witcher-roll-total.is-fumble { color:#8f302a; }
+#tooltip.witcher-roll-tooltip { padding:8px 10px; max-width:280px; text-align:left; }
+.witcher-roll-breakdown { margin:0; padding:0; list-style:none; min-width:190px; font-variant-numeric:tabular-nums; }
+.witcher-roll-breakdown li { display:flex; justify-content:space-between; gap:14px; padding:2px 0; font-size:13px; line-height:1.35; }
+.witcher-roll-breakdown li small { opacity:.7; }
+.witcher-roll-breakdown li b { white-space:nowrap; }
+.witcher-roll-breakdown li.is-critical b { color:#8fd3a3; }
+.witcher-roll-breakdown li.is-fumble b,.witcher-roll-breakdown li.is-penalty b { color:#f0a08f; }
+.witcher-roll-breakdown li.is-bonus b,.witcher-roll-breakdown li.is-luck b { color:#e8cf91; }
+.witcher-roll-breakdown li.is-total { margin-top:4px; padding-top:5px; border-top:1px solid #ffffff40; font-size:15px; font-weight:700; }

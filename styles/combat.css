@@ -72,7 +72,7 @@
 @media(prefers-reduced-motion:reduce) { .witcher-combat-panel button { transition:none; } }
 .witcher-defenses { border-top:1px solid #bfa985; padding-top:14px; margin-top:18px; }
 .witcher-defenses>header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
-.witcher-combat-heading h3,.witcher-defenses h3,.witcher-full-turn>h3 { border:0; margin:0; font:700 19px Georgia,serif; color:#425456; }
+.witcher-combat-heading h3,.witcher-defenses h3,.witcher-full-turn>summary h3 { border:0; margin:0; font:700 19px Georgia,serif; color:#425456; }
 .witcher-repeat-defense { display:flex; align-items:center; gap:5px; font-size:12px; }
 .witcher-defense-options { display:grid; grid-template-columns:1fr 160px; gap:10px; margin-bottom:10px; }
 .witcher-defense-options label { display:grid; gap:4px; font-size:11px; color:#77644b; }
