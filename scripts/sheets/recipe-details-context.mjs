@@ -58,7 +58,7 @@ export async function recipeDetailsContext(item) {
   const recipe = item.type === "recipe" ? item.system.recipe : null;
   const components = recipe ? (await Promise.all(recipe.components.map(async (entry, index) => ({
     ...reference(entry.substance ? null : await resolve(entry.uuid), entry.substance ? substanceName(entry.substance) : "Компонент недоступен"),
-    index, quantity: entry.quantity, substance: entry.substance,
+    index, quantity: entry.quantity, substance: entry.substance, substanceImg: SUBSTANCES.find(row => row.id === entry.substance)?.img ?? "",
     alternatives: entry.substance ? documents.filter(document => document.type === "equipment" && document.system?.material?.substance === entry.substance)
       .filter((document, i, list) => list.findIndex(other => (other.system.ruleId || other.uuid) === (document.system.ruleId || document.uuid)) === i)
       .map(document => reference(document)).sort(byRarity) : []

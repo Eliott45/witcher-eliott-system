@@ -10085,6 +10085,294 @@
     "flags": {}
   },
   {
+    "_id": "matr000000000300",
+    "name": "Чистая субстанция: Купорос",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
+    "system": {
+      "ruleId": "substance.vitriol",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "rarity": "",
+      "material": {
+        "substance": "vitriol",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Спасение компонентов после неудачной проверки Алхимии"
+      },
+      "source": "Базовая книга, стр. 142",
+      "description": "<p>Субстанция «Купорос», извлечённая в чистом виде. Подходит для любой формулы вместо одной единицы этой субстанции.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "matr000000000301",
+    "name": "Чистая субстанция: Ребис",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
+    "system": {
+      "ruleId": "substance.rebis",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "rarity": "",
+      "material": {
+        "substance": "rebis",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Спасение компонентов после неудачной проверки Алхимии"
+      },
+      "source": "Базовая книга, стр. 142",
+      "description": "<p>Субстанция «Ребис», извлечённая в чистом виде. Подходит для любой формулы вместо одной единицы этой субстанции.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "matr000000000302",
+    "name": "Чистая субстанция: Эфир",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
+    "system": {
+      "ruleId": "substance.aether",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "rarity": "",
+      "material": {
+        "substance": "aether",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Спасение компонентов после неудачной проверки Алхимии"
+      },
+      "source": "Базовая книга, стр. 142",
+      "description": "<p>Субстанция «Эфир», извлечённая в чистом виде. Подходит для любой формулы вместо одной единицы этой субстанции.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "matr000000000303",
+    "name": "Чистая субстанция: Квебрит",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/quebrith.svg",
+    "system": {
+      "ruleId": "substance.quebrith",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "rarity": "",
+      "material": {
+        "substance": "quebrith",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Спасение компонентов после неудачной проверки Алхимии"
+      },
+      "source": "Базовая книга, стр. 142",
+      "description": "<p>Субстанция «Квебрит», извлечённая в чистом виде. Подходит для любой формулы вместо одной единицы этой субстанции.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "matr000000000304",
+    "name": "Чистая субстанция: Гидраген",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
+    "system": {
+      "ruleId": "substance.hydragenum",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "rarity": "",
+      "material": {
+        "substance": "hydragenum",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Спасение компонентов после неудачной проверки Алхимии"
+      },
+      "source": "Базовая книга, стр. 142",
+      "description": "<p>Субстанция «Гидраген», извлечённая в чистом виде. Подходит для любой формулы вместо одной единицы этой субстанции.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "matr000000000305",
+    "name": "Чистая субстанция: Киноварь",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/vermilion.svg",
+    "system": {
+      "ruleId": "substance.vermilion",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "rarity": "",
+      "material": {
+        "substance": "vermilion",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Спасение компонентов после неудачной проверки Алхимии"
+      },
+      "source": "Базовая книга, стр. 142",
+      "description": "<p>Субстанция «Киноварь», извлечённая в чистом виде. Подходит для любой формулы вместо одной единицы этой субстанции.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "matr000000000306",
+    "name": "Чистая субстанция: Солнце",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/sol.svg",
+    "system": {
+      "ruleId": "substance.sol",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "rarity": "",
+      "material": {
+        "substance": "sol",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Спасение компонентов после неудачной проверки Алхимии"
+      },
+      "source": "Базовая книга, стр. 142",
+      "description": "<p>Субстанция «Солнце», извлечённая в чистом виде. Подходит для любой формулы вместо одной единицы этой субстанции.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "matr000000000307",
+    "name": "Чистая субстанция: Аер",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
+    "system": {
+      "ruleId": "substance.caelum",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "rarity": "",
+      "material": {
+        "substance": "caelum",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Спасение компонентов после неудачной проверки Алхимии"
+      },
+      "source": "Базовая книга, стр. 142",
+      "description": "<p>Субстанция «Аер», извлечённая в чистом виде. Подходит для любой формулы вместо одной единицы этой субстанции.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "matr000000000308",
+    "name": "Чистая субстанция: Фульгор",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
+    "system": {
+      "ruleId": "substance.fulgur",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "rarity": "",
+      "material": {
+        "substance": "fulgur",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Спасение компонентов после неудачной проверки Алхимии"
+      },
+      "source": "Базовая книга, стр. 142",
+      "description": "<p>Субстанция «Фульгор», извлечённая в чистом виде. Подходит для любой формулы вместо одной единицы этой субстанции.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
     "_id": "alch000000000001",
     "name": "Могила Адды",
     "type": "equipment",

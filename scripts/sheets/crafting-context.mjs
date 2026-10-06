@@ -1,54 +1,99 @@
-import { recipeGroups, recipeMemory, recipeAccess } from "../data/crafting.mjs";
-import { craftingPreview, durationLabel } from "../workshop/crafting.mjs";
+import { recipeGroups, recipeMemory, recipeAccess, RECIPE_GRADES } from "../data/crafting.mjs";
+import { craftingPreview, durationLabel, craftDialog } from "../workshop/crafting.mjs";
 import { workshopBase } from "../workshop/check.mjs";
 import { memorizeRecipe } from "../workshop/recipe-memory.mjs";
+import { repairContext, disassembleItem, diagramIndex, diagramFor } from "../workshop/repair.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { workshopAction, selectCatalogItem } from "./workshop-item-context.mjs";
+import { chooseReference } from "./reference-picker.mjs";
 import { acquireEquipment, equipmentQuote } from "../data/equipment-purchase.mjs";
+import { SUBSTANCES, available } from "../data/workshop.mjs";
 import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
 
-export async function craftingContext(actor) {
-  const memory = recipeMemory(actor);
-  const groups = [
-    { id: "memory", label: "Запомненные рецепты", icon: "fa-brain", recipes: [] },
-    { id: "physical", label: "Чертежи и формулы при себе", icon: "fa-scroll", recipes: [] },
-    { id: "unavailable", label: "Рецепты не при себе", icon: "fa-box-archive", recipes: [] }
-  ];
+const RECIPE_SECTIONS = category => [
+  { id: "memory", label: category === "formula" ? "Запомненные формулы" : "Запомненные чертежи", icon: "fa-brain", recipes: [] },
+  { id: "physical", label: category === "formula" ? "Формулы при себе" : "Чертежи при себе", icon: "fa-scroll", recipes: [] },
+  { id: "unavailable", label: category === "formula" ? "Формулы не при себе" : "Чертежи не при себе", icon: "fa-box-archive", recipes: [] }
+];
+const ALCHEMY_KINDS = { substance: "Алхимия", potion: "Эликсир", oil: "Масло", decoction: "Отвар" };
+
+/** Substance units of a formula as signs; the first carried units are lit, the missing ones are hollow. */
+function substanceSigns(preview) {
+  return (preview?.plan.rows ?? []).filter(row => row.substance).flatMap(row => {
+    const substance = SUBSTANCES.find(entry => entry.id === row.substance);
+    return Array.from({ length: row.quantity }, (_unit, i) => ({ ...substance, missing: i >= row.quantity - row.missing }));
+  });
+}
+
+/** Cards of one recipe category: the same memory, physical copy and material plan for diagrams and formulas. */
+export async function recipeCards(actor, category) {
+  const groups = RECIPE_SECTIONS(category);
   const canAct = conditionRules(actor).canAct;
+  const skill = category === "formula" ? "alchemy" : "crafting";
+  const total = workshopBase(actor, skill);
   // Older forgotten memory records have zero copies; they are not recipes stored elsewhere.
-  const recipes = recipeGroups(actor).filter(group => group.memorized || group.copies.some(item => item.system.quantity > 0));
+  const recipes = recipeGroups(actor).filter(group => group.item.system.recipe.category === category
+    && (group.memorized || group.copies.some(item => item.system.quantity > 0)));
   const rows = await Promise.all(recipes.map(async ({ item, physical, memorized }) => {
     const recipe = item.system.recipe;
-    let preview, error = "";
+    let preview, error = "", result = null;
     try { preview = await craftingPreview(actor, item); } catch (reason) { error = reason.message; }
-    const total = workshopBase(actor, recipe.category === "formula" ? "alchemy" : "crafting");
-    const ready = preview?.plan.complete && total !== null && canAct;
+    if (category === "formula") result = await foundry.utils.fromUuid(recipe.resultUuid).catch(() => null);
+    const bonus = physical ? 2 : 0;
+    const ready = preview?.plan.complete && total !== null && canAct && !preview.needsTools;
+    const kind = result?.system?.alchemy?.category ?? "";
     return {
-      id: item.id, name: item.name, search: item.name.toLocaleLowerCase("ru"), physical, memorized, category: recipe.category,
-      typeLabel: recipe.category === "formula" ? "Формула" : "Чертёж",
+      id: item.id, name: item.name.replace(/^(Формула|Чертёж):\s*/, ""), search: item.name.toLocaleLowerCase("ru"), physical, memorized, category, kind,
+      kindLabel: ALCHEMY_KINDS[kind] ?? "", grade: RECIPE_GRADES[recipe.grade] ?? "",
+      typeLabel: category === "formula" ? "Формула" : "Чертёж",
       dc: recipe.dc, time: durationLabel(recipe.time), quantity: recipe.quantity,
-      bonus: physical ? 2 : 0, total: total === null ? "—" : `${total + (physical ? 2 : 0) >= 0 ? "+" : ""}${total + (physical ? 2 : 0)}`,
-      materials: preview?.materials ?? [], facilities: preview?.tools ?? [], forge: recipe.forge,
-      needsForge: preview?.needsForge,
-      status: error || (total === null ? "Укажите РЕМ и навык" : !canAct ? "Персонаж не может действовать" : !preview.plan.complete ? "Не хватает материалов" : "Материалы собраны"),
-      unavailable: !ready, error: Boolean(error), rememberDisabled: !memorized && memory.full,
+      bonus, total: total === null ? "—" : `${total + bonus >= 0 ? "+" : ""}${total + bonus}`,
+      materials: preview?.materials ?? [], facilities: preview?.tools ?? [], forge: recipe.forge, needsForge: preview?.needsForge,
+      signs: substanceSigns(preview), extras: (preview?.materials ?? []).filter((_row, i) => !preview.plan.rows[i].substance),
+      status: error || (total === null ? "Укажите РЕМ и навык" : !canAct ? "Персонаж не может действовать" : !preview.plan.complete
+        ? (category === "formula" ? "Не хватает субстанций" : "Не хватает материалов")
+        : preview.needsTools ? "Материалы собраны · нужны инструменты" : (category === "formula" ? "Ингредиенты собраны" : "Материалы собраны")),
+      unavailable: !(preview?.plan.complete && total !== null && canAct), toolsOnly: Boolean(preview?.plan.complete && preview.needsTools), ready,
+      error: Boolean(error), rememberDisabled: !memorized && recipeMemory(actor).full,
       group: memorized ? "memory" : physical ? "physical" : "unavailable"
     };
   }));
   rows.sort((a, b) => a.name.localeCompare(b.name, "ru"));
   for (const row of rows) groups.find(group => group.id === row.group).recipes.push(row);
-  return { memory, groups: groups.filter(group => group.recipes.length), empty: !rows.length,
-    crafting: workshopBase(actor, "crafting") ?? "—", alchemy: workshopBase(actor, "alchemy") ?? "—" };
+  return { groups: groups.filter(group => group.recipes.length), empty: !rows.length, count: rows.length };
 }
+
+export async function craftingContext(actor) {
+  const cards = await recipeCards(actor, "diagram");
+  const repair = await repairContext(actor);
+  return { ...cards, memory: recipeMemory(actor), repair, crafting: workshopBase(actor, "crafting") ?? "—" };
+}
+
+export async function alchemyContext(actor) {
+  const cards = await recipeCards(actor, "formula");
+  const has = id => actor.items.some(item => available(item) && item.system.ruleId === id);
+  const substances = SUBSTANCES.map(substance => {
+    const ingredients = actor.items.filter(item => available(item) && item.system.material?.substance === substance.id)
+      .map(item => ({ id: item.id, name: item.name, img: item.img, quantity: item.system.quantity, pure: item.system.ruleId?.startsWith("substance.") }))
+      .sort((a, b) => a.name.localeCompare(b.name, "ru"));
+    return { ...substance, ingredients, count: ingredients.reduce((sum, item) => sum + item.quantity, 0) };
+  });
+  return { ...cards, memory: recipeMemory(actor), substances, total: substances.reduce((sum, entry) => sum + entry.count, 0),
+    alchemy: workshopBase(actor, "alchemy") ?? "—", tools: has("gear.alchemy-tools") };
+}
+
+const recipeFilter = category => item => item.type === "recipe" && (!category || item.system.recipe?.category === category);
 export const craftingActions = {
-  memorizeCatalogRecipe: workshopAction(async function() {
+  memorizeCatalogRecipe: workshopAction(async function(_event, target) {
     if (!this.isEditable) return;
-    const source = await selectCatalogItem("Запомнить рецепт", item => item.type === "recipe");
+    const category = target?.dataset.category ?? "";
+    const source = await selectCatalogItem(category === "formula" ? "Запомнить формулу" : category === "diagram" ? "Запомнить чертёж" : "Запомнить рецепт", recipeFilter(category));
     if (source) await memorizeRecipe(this.actor, source);
   }),
-  buyCraftingRecipe: workshopAction(async function() {
+  buyCraftingRecipe: workshopAction(async function(_event, target) {
     if (!this.isEditable) return;
-    const source = await selectCatalogItem("Купить чертёж или формулу", item => item.type === "recipe");
+    const category = target?.dataset.category ?? "";
+    const source = await selectCatalogItem(category === "formula" ? "Купить формулу" : category === "diagram" ? "Купить чертёж" : "Купить чертёж или формулу", recipeFilter(category));
     if (!source) return;
     const quote = equipmentQuote(this.actor, source);
     if (!quote.canBuy) throw new Error(quote.buyReason);
@@ -59,31 +104,68 @@ export const craftingActions = {
     if (!this.isEditable) return;
     const item = this.actor.items.get(target.dataset.itemId);
     if (item) await memorizeRecipe(this.actor, item, !recipeAccess(this.actor, item).memorized);
+  }),
+  repairWorkpiece: workshopAction(async function(_event, target) {
+    if (!this.isEditable) return;
+    const item = this.actor.items.get(target.dataset.itemId);
+    const diagram = item && diagramFor(item, await diagramIndex(this.actor));
+    const recipe = diagram && await foundry.utils.fromUuid(diagram.uuid);
+    if (!recipe) throw new Error("Для починки нужен чертёж этого предмета.");
+    await craftDialog(this.actor, recipe, item);
+  }),
+  disassembleWorkpiece: workshopAction(async function(_event, target) {
+    if (!this.isEditable) return;
+    let id = target.dataset.itemId;
+    if (!id) {
+      const { candidates } = await repairContext(this.actor);
+      if (!candidates.length) throw new Error("Нечего разбирать: нужны оружие или броня при себе, не надетые, с известным чертежом.");
+      id = await chooseReference("workshop", "", { title: "Разобрать предмет", hint: "Возвращается половина компонентов чертежа, минимум 1 каждого. Проверка не нужна.",
+        groups: {}, entries: candidates.map(entry => ({ id: entry.id, label: entry.name, summary: entry.summary, details: [] })) });
+    }
+    const item = id && this.actor.items.get(id);
+    if (item) await disassembleItem(this.actor, item);
+  }),
+  buyIngredient: workshopAction(async function() {
+    if (!this.isEditable) return;
+    const item = await selectCatalogItem("Купить ингредиенты", entry => entry.system.kind === "material" && Boolean(entry.system.material?.substance));
+    if (!item) return;
+    const quote = equipmentQuote(this.actor, item);
+    if (!quote.canBuy) throw new Error(quote.buyReason);
+    const quantity = await foundry.applications.api.DialogV2.prompt({classes:["witcher-crafting-dialog"],window:{title:"Покупка ингредиентов"},content:`<p>${esc(item.name)}: ${item.system.price} крон за единицу.</p><label>Количество<input name="quantity" type="number" min="1" step="1" value="1"></label>`,ok:{label:"Купить и списать кроны",callback:(_e,b)=>Number(new FormData(b.form).get("quantity"))},rejectClose:false});
+    if (Number.isInteger(quantity) && quantity >= 1) await acquireEquipment(this.actor, item, { purchase: true, quantity });
   })
 };
-export function bindCrafting(sheet) {
-  const page = sheet.element.querySelector("[data-tab=crafting].witcher-character-content");
+
+/** Search and kind filters stay client-side and survive re-renders through the sheet instance. */
+function bindRecipeFilters(sheet, tab, key) {
+  const page = sheet.element.querySelector(`[data-tab=${tab}].witcher-character-content`);
   if (!page) return;
-  const search = page.querySelector("[data-crafting-search]"), category = page.querySelector("[data-crafting-category]");
+  const search = page.querySelector("[data-recipe-search]"), kind = page.querySelector("[data-recipe-kind]");
+  if (!search) return;
   const apply = () => {
-    sheet.craftingQuery = search.value;
-    sheet.craftingCategory = category.value;
+    sheet[`${key}Query`] = search.value;
+    if (kind) sheet[`${key}Kind`] = kind.value;
     const query = search.value.trim().toLocaleLowerCase("ru").replaceAll("ё", "е");
     let matches = 0;
-    for (const group of page.querySelectorAll("[data-crafting-group]")) {
+    for (const group of page.querySelectorAll("[data-recipe-group]")) {
       let visible = 0;
-      for (const card of group.querySelectorAll("[data-crafting-recipe]")) {
-        card.hidden = !card.dataset.search.replaceAll("ё", "е").includes(query) || (category.value && card.dataset.category !== category.value);
+      for (const card of group.querySelectorAll("[data-recipe-card]")) {
+        card.hidden = !card.dataset.search.replaceAll("ё", "е").includes(query) || Boolean(kind?.value && card.dataset.kind !== kind.value);
         if (!card.hidden) visible++;
       }
       group.hidden = !visible;
       matches += visible;
     }
-    page.querySelector("[data-crafting-no-results]").hidden = matches > 0 || !page.querySelector("[data-crafting-recipe]");
+    const empty = page.querySelector("[data-recipe-no-results]");
+    if (empty) empty.hidden = matches > 0 || !page.querySelector("[data-recipe-card]");
   };
-  search.value = sheet.craftingQuery ?? "";
-  category.value = sheet.craftingCategory ?? "";
+  search.value = sheet[`${key}Query`] ?? "";
+  if (kind) kind.value = sheet[`${key}Kind`] ?? "";
   search.addEventListener("input", apply);
-  category.addEventListener("change", event => { event.stopPropagation(); apply(); });
+  kind?.addEventListener("change", event => { event.stopPropagation(); apply(); });
   apply();
+}
+export function bindCrafting(sheet) {
+  bindRecipeFilters(sheet, "crafting", "crafting");
+  bindRecipeFilters(sheet, "alchemy", "alchemy");
 }

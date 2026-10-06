@@ -1,10 +1,12 @@
-import { materialPlan, repairRecipe, available, sameItem, SUBSTANCES, effectiveItem } from "../data/workshop.mjs";
+import { materialPlan, repairRecipe, available, SUBSTANCES, effectiveItem, equipmentUuid } from "../data/workshop.mjs";
 import { conditionKey, isPhysical } from "../data/physical-items.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { recipeAccess, salvagedComponents, craftingDuration } from "../data/crafting.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { workshopCheck, workshopBase, workshopNotice } from "./check.mjs";
 import { inventoryTransaction, copyPhysical } from "./transaction.mjs";
+import { diagramIndex, diagramFor } from "./repair.mjs";
+import { PURE_SUBSTANCES } from "../data/workshop-materials.mjs";
 
 export async function resolveRequirements(recipe) {
   const refs = new Map();
@@ -17,12 +19,9 @@ export async function resolveRequirements(recipe) {
 }
 export const durationLabel = craftingDuration;
 export async function findRepairDiagram(item) {
-  const recipes = [...item.actor.items.filter(entry => entry.type === "recipe"), ...(await game.packs.get("witcher-eliott-system.equipment").getDocuments()).filter(entry => entry.type === "recipe")];
-  for (const recipe of recipes) {
-    if (recipe.system.recipe.category !== "diagram") continue;
-    const source = await foundry.utils.fromUuid(recipe.system.recipe.resultUuid);
-    if (source && sameItem(item, source)) return recipe;
-  }
+  const diagram = diagramFor(item, await diagramIndex(item.actor));
+  const recipe = diagram && await foundry.utils.fromUuid(diagram.uuid);
+  if (recipe?.type === "recipe") return recipe;
   throw new Error("Для ремонта нужен чертёж этого предмета с компонентами и СЛ. Создайте свой чертёж с ссылкой на исходный предмет.");
 }
 function requireRecipe(actor, item, repair) {
@@ -72,8 +71,9 @@ async function executeCraftDialog(actor, recipeItem, target) {
   const plan = materialPlan(actor.items, recipe.components, references);
   const { tools, needsTools, needsForge } = craftingFacilities(actor, recipe);
   const bonus = !target && recipeAccess(actor, recipeItem).physical ? 2 : 0;
+  const workLabel = target ? "Починка" : recipe.category === "formula" ? "Алхимия" : "Изготовление";
   const content = `<div class="witcher-workshop-dialog"><h3>${esc(target ? target.name : result.name)}</h3>
-    <p>СЛ <b>${recipe.dc}</b> · ${target ? "Длительность ремонта определяет ведущий" : durationLabel(recipe.time)} · ${recipe.category==="formula"?"Алхимия":"Изготовление"} + РЕМ + 1d10</p>
+    <p>СЛ <b>${recipe.dc}</b> · ${target ? "Длительность починки определяет ведущий" : durationLabel(recipe.time)} · ${recipe.category==="formula"?"Алхимия":"Изготовление"} + РЕМ + 1d10</p>
     <p>${target ? "Полное восстановление; СЛ чертежа − 5 + 2 за установленное усиление/руну/глиф." : `Бонус физического рецепта: +${bonus}. Результат: ${recipe.quantity} шт.`}</p>
     <table><thead><tr><th>Компонент</th><th>Нужно / выделено</th><th>Будет потрачено</th></tr></thead><tbody>${plan.rows.map(row=>`<tr><td>${esc(row.substance ? SUBSTANCES.find(s=>s.id===row.substance)?.name??row.substance : references.get(row.uuid).name)}</td><td>${row.quantity} / ${row.quantity-row.missing}${row.missing?` · не хватает ${row.missing}`:""}</td><td>${row.used.map(entry=>`${esc(entry.name)} ×${entry.quantity}`).join(", ")||"—"}</td></tr>`).join("")}</tbody></table>
     <p>${tools.map(tool=>`${esc(tool.name)}: ${tool.present?"есть":"нет"}`).join(" · ")}${recipe.forge ? ` · Кузница: ${needsForge?"нужна":"есть"}`:""}</p>
@@ -81,8 +81,8 @@ async function executeCraftDialog(actor, recipeItem, target) {
     ${needsForge?'<label><input type="checkbox" name="forge"> Есть доступ к стационарной кузнице</label>':""}
     <label><input type="checkbox" name="time"> ${target ? "Работа завершена" : `Работа завершена: затрачено ${durationLabel(recipe.time)}`}</label><p>Материалы расходуются и при неудаче. Сразу после провала можно попытаться ${recipe.category === "formula" ? "спасти субстанцию" : "переработать материалы"}.</p>
     ${plan.complete?"":"<p><strong>Недостаточно материалов — проверка недоступна.</strong></p>"}</div>`;
-  if (!plan.complete) { await foundry.applications.api.DialogV2.prompt({classes:["witcher-crafting-dialog"],window:{title:target?"Ремонт":"Изготовление"},content,ok:{label:"Закрыть"},rejectClose:false});return; }
-  const answer = await foundry.applications.api.DialogV2.prompt({classes:["witcher-crafting-dialog"],window:{title:target?"Ремонт":"Изготовление"},position:{width:640},content,
+  if (!plan.complete) { await foundry.applications.api.DialogV2.prompt({classes:["witcher-crafting-dialog"],window:{title:workLabel},content,ok:{label:"Закрыть"},rejectClose:false});return; }
+  const answer = await foundry.applications.api.DialogV2.prompt({classes:["witcher-crafting-dialog"],window:{title:workLabel},position:{width:640},content,
     ok:{label:"Проверка и расход материалов",callback:(_event,button)=>Object.fromEntries(new FormData(button.form))},rejectClose:false});
   if(!answer) return;
   if(!answer.time || (needsTools&&!answer.borrowTools) || (needsForge&&!answer.forge)) throw new Error("Подтвердите доступ к инструментам/кузнице и затраченное время.");
@@ -98,7 +98,7 @@ async function executeCraftDialog(actor, recipeItem, target) {
     const fresh = materialPlan(actor.items,recipe.components,references);
     if(!fresh.complete) throw new Error("Материалы изменились; откройте рецепт заново.");
     const signature = JSON.stringify(target?.system.toObject?.()??target?.system);
-    const check = await workshopCheck(actor,{name:`${target?"Ремонт":"Изготовление"}: ${target?.name??result.name}`,skill:recipe.category==="formula"?"alchemy":"crafting",dc:recipe.dc,bonus,details:target?"СЛ чертежа − 5 + 2 за усиление. Полное восстановление.":bonus?"Физический рецепт: +2.":"По памяти, без бонуса физического рецепта."});
+    const check = await workshopCheck(actor,{name:`${workLabel}: ${target?.name??result.name}`,skill:recipe.category==="formula"?"alchemy":"crafting",dc:recipe.dc,bonus,details:target?"СЛ чертежа − 5 + 2 за усиление. Полное восстановление.":bonus?"Физический рецепт: +2.":"По памяти, без бонуса физического рецепта."});
     validate();
     if(target && signature!==JSON.stringify(target.system.toObject?.()??target.system)) throw new Error("Состояние предмета изменилось во время броска; материалы сохранены.");
     const currentPlan = materialPlan(actor.items,recipe.components,references);
@@ -121,8 +121,10 @@ async function salvage(actor,recipe,plan,references) {
     if(!substances.length)return;
     const substance=await foundry.applications.api.DialogV2.prompt({window:{title:"Сохранённая субстанция"},content:`<label>Субстанция<select name="substance">${substances.map(s=>`<option value="${s}">${esc(SUBSTANCES.find(x=>x.id===s)?.name??s)}</option>`).join("")}</select></label>`,ok:{label:"Сохранить",callback:(_e,b)=>new FormData(b.form).get("substance")},rejectClose:false});
     if(!substances.includes(substance))return;
-    // Core does not specify a pure substance's market price or weight. Keep unknown defaults, no invented price.
-    await inventoryTransaction(actor,{creates:[{name:`Чистая субстанция: ${SUBSTANCES.find(s=>s.id===substance).name}`,type:"equipment",system:{ruleId:`substance.${substance}`,kind:"material",quantity:1,material:{substance},source:"Базовая книга, стр. 142"}}]});
+    // Prefer the catalog entry (sign icon, links); a missing catalog falls back to a plain item without invented price or weight.
+    const entry=PURE_SUBSTANCES.find(row=>row.id===`substance.${substance}`);
+    const source=await foundry.utils.fromUuid(equipmentUuid(entry.documentId)).catch(()=>null);
+    await inventoryTransaction(actor,{creates:[source?copyPhysical(source,1):{name:entry.name,type:"equipment",img:entry.img,system:{ruleId:entry.id,kind:"material",quantity:1,material:{substance},source:entry.system.source}}]});
     await workshopNotice(actor,`<p>Сохранена субстанция: ${esc(SUBSTANCES.find(s=>s.id===substance).name)} ×1.</p>`);
   } else {
     const creates=returned.map(row=>copyPhysical(references.get(row.uuid),row.quantity));

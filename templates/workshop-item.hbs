@@ -5,7 +5,7 @@
 {{#if workshop.recipe}}
 <h2>Настройка рецепта</h2><p>{{> "systems/witcher-eliott-system/templates/item-reference.hbs" recipeDetails.result}} · {{workshop.time}}</p>
 <div class="witcher-item-actions"><button type="button" data-action="chooseRecipeResult" {{disabled (not editable)}}>Выбрать результат</button><button type="button" data-action="addRecipeComponent" {{disabled (not editable)}}>Добавить компонент</button></div>
-<ul class="witcher-recipe-editor">{{#each workshop.components}}<li>{{#if substance}}<span>{{name}}</span>{{else}}{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this showRarity=true}}{{/if}}<b>×{{quantity}}</b><button type="button" data-action="removeRecipeComponent" data-index="{{index}}" aria-label="Удалить компонент: {{name}}" {{disabled (not ../editable)}}><i class="fa-solid fa-xmark"></i></button></li>{{/each}}</ul>
+<ul class="witcher-recipe-editor">{{#each workshop.components}}<li>{{#if substance}}<span class="witcher-substance-name">{{#if substanceImg}}<img src="{{substanceImg}}" alt="" width="20" height="20">{{/if}}{{name}}</span>{{else}}{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this showRarity=true}}{{/if}}<b>×{{quantity}}</b><button type="button" data-action="removeRecipeComponent" data-index="{{index}}" aria-label="Удалить компонент: {{name}}" {{disabled (not ../editable)}}><i class="fa-solid fa-xmark"></i></button></li>{{/each}}</ul>
 <button type="button" data-action="configureRecipeTools" {{disabled (not editable)}}>Настроить инструменты</button>
 {{#if workshop.owned}}<button type="button" data-action="craftRecipe" {{disabled (not editable)}}><i class="fa-solid fa-hammer"></i> Создать по рецепту</button>{{/if}}
 {{/if}}

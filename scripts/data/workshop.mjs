@@ -1,6 +1,11 @@
 import { isCarried } from "./containers.mjs";
 /** Shared, document-independent workshop rules. Catalog entries use the same Items as inventory. */
-export const SUBSTANCES = Object.entries({ vitriol: "Купорос", rebis: "Ребис", aether: "Эфир", quebrith: "Квебрит", hydragenum: "Гидраген", vermilion: "Киноварь", sol: "Солнце", caelum: "Аер", fulgur: "Фульгор" }).map(([id, name]) => ({ id, name }));
+// Core p. 142: the nine substances, their printed colors and cut signs (assets/substances).
+export const SUBSTANCES = [
+  ["vitriol", "Купорос", "#9a5aa0"], ["rebis", "Ребис", "#ef5b36"], ["aether", "Эфир", "#8ecbc6"],
+  ["quebrith", "Квебрит", "#e3c62c"], ["hydragenum", "Гидраген", "#6e74c4"], ["vermilion", "Киноварь", "#5f9f4d"],
+  ["sol", "Солнце", "#f2b44a"], ["caelum", "Аер", "#cdd643"], ["fulgur", "Фульгор", "#b2302e"]
+].map(([id, name, color]) => ({ id, name, color, img: `systems/witcher-eliott-system/assets/substances/${id}.svg` }));
 export { MONSTER_CATEGORIES } from "./monster-categories.mjs";
 export const equipmentUuid = id => `Compendium.witcher-eliott-system.equipment.Item.${id}`;
 export const WORKSHOP_BONUS_LABELS = {
@@ -20,7 +25,9 @@ export function materialPlan(items, requirements, references = new Map(), choice
     const candidates = Array.from(items).filter(item => available(item) && (row.substance
       ? item.system.material?.substance === row.substance : sameItem(item, references.get(row.uuid))));
     const preferred = choices[row.index];
-    candidates.sort((a, b) => Number(b.id === preferred) - Number(a.id === preferred) || a.system.price - b.system.price || a.id.localeCompare(b.id));
+    // A salvaged pure substance has no price; keep it for last instead of treating it as the cheapest source.
+    const pure = item => Number(Boolean(item.system.ruleId?.startsWith("substance.")));
+    candidates.sort((a, b) => Number(b.id === preferred) - Number(a.id === preferred) || pure(a) - pure(b) || a.system.price - b.system.price || a.id.localeCompare(b.id));
     for (const item of candidates) {
       const quantity = Math.min(row.missing, remaining.get(item.id) ?? 0);
       if (!quantity) continue;

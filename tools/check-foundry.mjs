@@ -539,7 +539,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["combat-actions", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "crafting"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["combat-actions", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "crafting", "alchemy"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -595,14 +595,52 @@ assert.equal(nativeCraftContext.crafting,11);
 assert.equal(nativeCraftContext.groups[0].recipes[0].total,"+11");
 assert.equal(nativeCraftContext.groups[0].recipes[0].materials[0].supplied,2);
 const craftingPartial=handlebars.compile(await readFile(new URL("../templates/crafting.hbs",import.meta.url),"utf8"),{strict:true});
-const craftingHTML=craftingPartial({crafting:nativeCraftContext,editable:true});
+const craftingHTML=craftingPartial({crafting:nativeCraftContext,editable:true,rootId:"sheet"});
 assert.ok(craftingHTML.includes("1 ч. 30 мин."));assert.ok(craftingHTML.includes("Переработка после неудачи"));
 assert.ok(!craftingHTML.includes("<script>тест</script>"));assert.ok(craftingHTML.includes("&lt;script&gt;тест&lt;/script&gt;"));
 assert.match(craftingHTML,/data-action="craftInventory"[^>]*>/);
-const observerCraftingHTML=craftingPartial({crafting:nativeCraftContext,editable:false});
+const observerCraftingHTML=craftingPartial({crafting:nativeCraftContext,editable:false,rootId:"sheet"});
 assert.match(observerCraftingHTML,/data-action="craftInventory"[^>]*disabled/);
 assert.match(observerCraftingHTML,/data-action="toggleRecipeMemory"[^>]*disabled/);
 assert.ok(html.includes('data-tab="crafting"'));
+// Repair (p. 140) and the alchemy tab (pp. 141–147) render through native schemas, strict templates and observer mode.
+const { alchemyContext } = await import("../scripts/sheets/crafting-context.mjs");
+const workshopNative = new foundry.documents.BaseActor({name:"Workshop",type:"character",system:{attributes:{intelligence:6,craft:7},skills:{crafting:4,alchemy:3}},items:[
+  {name:"Сломанный меч",type:"weapon",_stats:{compendiumSource:"Item.sword00000000001"},system:{ruleId:"weapon.test",reliability:{value:0,max:10}}},
+  {name:"Железо",type:"equipment",system:{ruleId:"material.iron",kind:"material",quantity:3}},
+  {name:"Чертёж меча",type:"recipe",system:{quantity:1,recipe:{category:"diagram",resultUuid:"Item.sword00000000001",dc:14,time:600,tools:[],components:[{uuid:"Item.iron",quantity:3}]}}},
+  {name:"Ячмень",type:"equipment",system:{ruleId:"material.barley",kind:"material",quantity:2,material:{substance:"vitriol"}}},
+  {name:"Формула: Галлюциноген",type:"recipe",system:{quantity:1,recipe:{category:"formula",resultUuid:"Item.potion",dc:12,time:15,tools:["gear.alchemy-tools"],components:[{substance:"vitriol",quantity:1},{substance:"rebis",quantity:1}]}}}
+]});
+const workshopRestored = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(workshopNative.toObject())));
+for (const item of workshopRestored.items) item.testUserPermission = () => true;
+const nativeSword = new foundry.documents.BaseItem({name:"Меч",type:"weapon",system:{ruleId:"weapon.test"}}), nativePotion = new foundry.documents.BaseItem({name:"Галлюциноген",type:"equipment",system:{kind:"alchemy",alchemy:{category:"substance"}}});
+for (const item of [nativeSword, nativePotion]) item.testUserPermission = () => true;
+const workshopLookup = {"Item.iron":workshopRestored.items.find(item=>item.system.ruleId==="material.iron"),"Item.sword00000000001":nativeSword,"Item.potion":nativePotion};
+const equipmentIndex = game.packs.get(equipmentPack);
+equipmentIndex.getIndex = async () => new Map();
+foundry.utils.fromUuid = async uuid => workshopLookup[uuid] ?? null;
+const repairActor = {...sheet.actor,system:workshopRestored.system,items:workshopRestored.items};
+const nativeRepairContext = await craftingContext(repairActor), nativeAlchemyContext = await alchemyContext(repairActor);
+foundry.utils.fromUuid = previousCraftLookup;
+delete equipmentIndex.getIndex;
+assert.equal(nativeRepairContext.repair.rows.length, 1);
+assert.equal(nativeRepairContext.repair.rows[0].dc, 9, "Repair DC is the diagram DC − 5");
+assert.equal(nativeRepairContext.repair.rows[0].condition.broken, true);
+assert.equal(nativeRepairContext.groups[0].recipes.length, 1, "Formulas are not listed on the crafting tab");
+assert.equal(nativeAlchemyContext.groups[0].recipes[0].kind, "substance");
+assert.deepEqual(nativeAlchemyContext.groups[0].recipes[0].signs.map(sign => [sign.id, sign.missing]), [["vitriol", false], ["rebis", true]]);
+assert.equal(nativeAlchemyContext.substances.find(entry => entry.id === "vitriol").count, 2);
+const repairHTML = craftingPartial({crafting:nativeRepairContext,editable:true,rootId:"sheet"});
+assert.ok(repairHTML.includes("Починка и разборка") && repairHTML.includes("Сломано"));
+assert.match(repairHTML, /data-action="repairWorkpiece"(?![^>]*disabled)[^>]*>/);
+assert.match(craftingPartial({crafting:nativeRepairContext,editable:false,rootId:"sheet"}), /data-action="repairWorkpiece"[^>]*disabled/);
+const alchemyPartial = handlebars.compile(await readFile(new URL("../templates/alchemy.hbs", import.meta.url), "utf8"), {strict:true});
+const alchemyHTML = alchemyPartial({alchemy:nativeAlchemyContext,editable:true,rootId:"sheet"});
+assert.ok(alchemyHTML.includes("assets/substances/vitriol.svg") && alchemyHTML.includes("Ячмень"));
+assert.match(alchemyHTML, /class="is-missing" src="systems\/witcher-eliott-system\/assets\/substances\/rebis.svg"/);
+assert.match(alchemyPartial({alchemy:nativeAlchemyContext,editable:false,rootId:"sheet"}), /data-action="craftInventory"[^>]*disabled/);
+assert.ok(html.includes('data-tab="alchemy"'));
 // Real old/new record schemas, chronological presentation, escaping and native disclosure preferences.
 const {lifepathContext:timelineContext}=await import("../scripts/sheets/lifepath-context.mjs");
 const timelineSource=new WitcherActorData({details:{race:"witcher",age:110},lifepath:{witcher:{decades:[
@@ -876,7 +914,7 @@ assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
 assert.ok(!html.includes("witcher-footnote"));
-assert.equal([...html.matchAll(/data-action="tab"/g)].length, 12);
+assert.equal([...html.matchAll(/data-action="tab"/g)].length, 13);
 assert.equal([...html.matchAll(/name="system.attributes\./g)].length, 0, "Base attributes are locked by default");
 sheet.submit = async () => {};
 sheet.render = async () => {};
@@ -943,7 +981,7 @@ sheet.tabGroups.character = "main";
 await updateSheetPreferences(sheet.actor.uuid, { hiddenTabs: ["main"], collapsed: { parents: true, appearance: true } });
 const customized = await sheet._prepareContext({});
 assert.equal(sheet.tabGroups.character, "skills", "Hiding the active tab must select a visible one");
-assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "actions", "magic", "inventory", "crafting", "transport", "biography", "family", "lifepath", "effects"]);
+assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "actions", "magic", "inventory", "crafting", "alchemy", "transport", "biography", "family", "lifepath", "effects"]);
 assert.equal(customized.familySections.find(section => section.id === "parents").open, false);
 assert.equal(customized.biographySections.find(section => section.id === "appearance").open, false);
 assert.ok(!template(customized).includes('data-action="tab" data-group="character" data-tab="main"'));
@@ -1261,7 +1299,7 @@ for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   assert.ok(!rendered.includes("undefined"));
 }
 const tabsTemplate = handlebars.compile(await readFile(new URL("../templates/sheet-tabs.hbs", import.meta.url), "utf8"), { strict: true });
-assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 12);
+assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 13);
 // New transport Items survive native schema round trips without changing old Actor shapes.
 const { CORE_TRANSPORT, CORE_TACK } = await import("../scripts/data/core-transport.mjs");
 const { transportContext } = await import("../scripts/sheets/transport-context.mjs");

@@ -8,6 +8,7 @@ export const SHEET_TABS = [
   { id: "magic", label: "WITCHER.Magic.Title", icon: "fa-solid fa-wand-magic-sparkles" },
   { id: "inventory", label: "WITCHER.Inventory.Title", icon: "fa-solid fa-sack" },
   { id: "crafting", label: "WITCHER.Crafting.Title", icon: "fa-solid fa-hammer" },
+  { id: "alchemy", label: "WITCHER.Alchemy.Title", icon: "fa-solid fa-flask" },
   { id: "transport", label: "WITCHER.Transport.Title", icon: "fa-solid fa-horse" },
   { id: "biography", label: "WITCHER.Sheet.Biography", icon: "fa-solid fa-book-open" },
   { id: "family", label: "WITCHER.Sheet.Family", icon: "fa-solid fa-people-roof" },

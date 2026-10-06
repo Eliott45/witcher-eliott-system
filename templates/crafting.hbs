@@ -1,31 +1,30 @@
 <header class="witcher-crafting-heading">
   <div><p class="witcher-crafting-eyebrow">От чертежа к готовой вещи</p><h2><i class="fa-solid fa-hammer" aria-hidden="true"></i> Ремесло</h2></div>
   <div class="witcher-crafting-controls">
-    <button type="button" data-action="buyCraftingRecipe" {{disabled (not editable)}}><i class="fa-solid fa-scroll" aria-hidden="true"></i> Купить рецепт</button>
-    <button type="button" data-action="memorizeCatalogRecipe" {{disabled (or (not editable) crafting.memory.full)}}><i class="fa-solid fa-brain" aria-hidden="true"></i> Запомнить рецепт</button>
+    <button type="button" data-action="buyCraftingRecipe" data-category="diagram" {{disabled (not editable)}}><i class="fa-solid fa-scroll" aria-hidden="true"></i> Купить чертёж</button>
+    <button type="button" data-action="memorizeCatalogRecipe" data-category="diagram" {{disabled (or (not editable) crafting.memory.full)}}><i class="fa-solid fa-brain" aria-hidden="true"></i> Запомнить чертёж</button>
   </div>
 </header>
 <div class="witcher-crafting-metrics">
   <div><span>Изготовление</span><strong>{{crafting.crafting}}</strong><small>РЕМ + навык · затем 1d10</small></div>
-  <div><span>Алхимия</span><strong>{{crafting.alchemy}}</strong><small>РЕМ + навык · затем 1d10</small></div>
-  <div><span>Запомнено</span><strong>{{crafting.memory.used}} <small>/ {{crafting.memory.capacity}}</small></strong><small>Общий лимит — Интеллект</small></div>
+  <div><span>Запомнено</span><strong>{{crafting.memory.used}} <small>/ {{crafting.memory.capacity}}</small></strong><small>Чертежи и формулы · лимит — Интеллект</small></div>
+  <div><span>Требуют починки</span><strong>{{crafting.repair.rows.length}}{{#if crafting.repair.broken}} <small>· сломано {{crafting.repair.broken}}</small>{{/if}}</strong><small>Оружие и броня в инвентаре</small></div>
 </div>
-<aside class="witcher-crafting-rule"><i class="fa-solid fa-scroll" aria-hidden="true"></i><p>Физический рецепт даёт <strong>+2 к проверке</strong>. Запомненный позволяет работать без него. Инструменты и кузницу можно использовать в мастерской.</p></aside>
+<aside class="witcher-crafting-rule"><i class="fa-solid fa-scroll" aria-hidden="true"></i><p>Физический чертёж даёт <strong>+2 к проверке</strong>. Запомненный позволяет работать без него. Инструменты и кузницу можно использовать в мастерской. Алхимические формулы — во вкладке «Алхимия».</p></aside>
 <div class="witcher-crafting-filters">
-  <label><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" data-crafting-search placeholder="Найти рецепт…" aria-label="Найти рецепт"></label>
-  <select data-crafting-category aria-label="Вид рецепта"><option value="">Все рецепты</option value="diagram">Чертежи</option><option value="formula">Формулы</option></select>
+  <label><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" data-recipe-search placeholder="Найти чертёж…" aria-label="Найти чертёж"></label>
   <button type="button" data-action="buyMaterial" {{disabled (not editable)}}><i class="fa-solid fa-cubes-stacked" aria-hidden="true"></i> Материалы</button>
 </div>
-{{#if crafting.empty}}<div class="witcher-crafting-empty"><i class="fa-solid fa-book-open" aria-hidden="true"></i><h3>Начните с рецепта</h3><p>Запомните рецепт из каталога или добавьте его физическую копию в инвентарь. Здесь появятся материалы, время работы и проверка изготовления.</p></div>{{/if}}
-<p data-crafting-no-results hidden role="status">Подходящих рецептов не найдено.</p>
+{{#if crafting.empty}}<div class="witcher-crafting-empty"><i class="fa-solid fa-book-open" aria-hidden="true"></i><h3>Начните с чертежа</h3><p>Запомните чертёж из каталога или добавьте его физическую копию в инвентарь. Здесь появятся материалы, время работы и проверка изготовления.</p></div>{{/if}}
+<p data-recipe-no-results hidden role="status">Подходящих чертежей не найдено.</p>
 {{#each crafting.groups as |group|}}
-<section class="witcher-crafting-group" data-crafting-group>
+<section class="witcher-crafting-group" data-recipe-group>
   <h3><i class="fa-solid {{group.icon}}" aria-hidden="true"></i> {{group.label}} <small>{{group.recipes.length}}</small></h3>
   <div class="witcher-crafting-recipes">
     {{#each group.recipes as |recipe|}}
-    <article class="witcher-recipe-card" data-crafting-recipe data-category="{{recipe.category}}" data-search="{{recipe.search}}">
-      <header><button type="button" class="witcher-recipe-name" data-action="viewSheetItem" data-item-id="{{recipe.id}}">{{recipe.name}}</button><span>{{recipe.typeLabel}}{{#if recipe.physical}} · при себе{{/if}}</span></header>
-      <dl><div><dt>Сложность</dt><dd>{{recipe.dc}}</dd></div><div><dt>Время</dt><dd>{{recipe.time}}</dd></div><div><dt>Результат</dt><dd>×{{recipe.quantity}}</dd></div><div><dt>Проверка{{#if recipe.bonus}} · рецепт +2{{/if}}</dt><dd>1d10 {{recipe.total}}</dd></div></dl>
+    <article class="witcher-recipe-card" data-recipe-card data-search="{{recipe.search}}">
+      <header><button type="button" class="witcher-recipe-name" data-action="viewSheetItem" data-item-id="{{recipe.id}}">{{recipe.name}}</button><span>{{recipe.typeLabel}}{{#if recipe.grade}} · {{recipe.grade}}{{/if}}{{#if recipe.physical}} · при себе{{/if}}</span></header>
+      <dl><div><dt>Сложность</dt><dd>{{recipe.dc}}</dd></div><div><dt>Время</dt><dd>{{recipe.time}}</dd></div><div><dt>Результат</dt><dd>×{{recipe.quantity}}</dd></div><div><dt>Проверка{{#if recipe.bonus}} · чертёж +2{{/if}}</dt><dd>1d10 {{recipe.total}}</dd></div></dl>
       <details><summary class="{{#if recipe.unavailable}}is-missing{{else}}is-ready{{/if}}"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> {{recipe.status}}</summary>
         {{#unless recipe.error}}<ul class="witcher-recipe-materials">{{#each recipe.materials}}<li class="{{#if missing}}is-missing{{/if}}"><span>{{name}}</span><strong>{{supplied}} / {{quantity}}</strong></li>{{/each}}</ul>{{/unless}}
         <ul class="witcher-recipe-facilities">{{#each recipe.facilities}}<li><i class="fa-solid {{#if present}}fa-check{{else}}fa-screwdriver-wrench{{/if}}" aria-hidden="true"></i> {{name}}{{#unless present}} — нужны в мастерской{{/unless}}</li>{{/each}}{{#if recipe.forge}}<li><i class="fa-solid fa-fire" aria-hidden="true"></i> Кузница{{#if recipe.needsForge}} — нужен доступ{{else}} — есть{{/if}}</li>{{/if}}</ul>
@@ -36,4 +35,32 @@
   </div>
 </section>
 {{/each}}
-<aside class="witcher-crafting-recycling"><i class="fa-solid fa-recycle" aria-hidden="true"></i><div><h3>Переработка после неудачи</h3><p>После провала изготовления появится предложение переработать материалы: ещё одна проверка против той же СЛ. Успех вернёт половину каждого компонента с округлением вверх. Для алхимии — одну использованную субстанцию в чистом виде.</p></div></aside>
+<aside class="witcher-crafting-recycling"><i class="fa-solid fa-recycle" aria-hidden="true"></i><div><h3>Переработка после неудачи</h3><p>После провала изготовления или починки появится предложение переработать материалы: ещё одна проверка против той же СЛ. Успех вернёт половину каждого компонента с округлением вверх.</p></div></aside>
+<section class="witcher-repair" aria-labelledby="{{rootId}}-repair-title">
+  <header class="witcher-repair-heading">
+    <div><p class="witcher-crafting-eyebrow">Кузнечное волшебство</p><h2 id="{{rootId}}-repair-title"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> Починка и разборка</h2></div>
+    <button type="button" data-action="disassembleWorkpiece" {{disabled (or (not editable) (not crafting.repair.candidates.length))}}><i class="fa-solid fa-gears" aria-hidden="true"></i> Разобрать предмет…</button>
+  </header>
+  <ol class="witcher-repair-steps">
+    <li><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i><div><strong>Собрать обломки</strong><span>Чинится только то, что у вас есть — хотя бы основа.</span></div></li>
+    <li><i class="fa-solid fa-cubes-stacked" aria-hidden="true"></i><div><strong>Достать материалы</strong><span>По 1 единице каждого компонента из чертежа.</span></div></li>
+    <li><i class="fa-solid fa-toolbox" aria-hidden="true"></i><div><strong>Найти инструменты</strong><span>Те же, что для изготовления.</span></div></li>
+    <li><i class="fa-solid fa-dice-d10" aria-hidden="true"></i><div><strong>Проверка Изготовления</strong><span>СЛ чертежа − 5, +2 за каждую руну, глиф или усиление.</span></div></li>
+  </ol>
+  {{#each crafting.repair.rows as |row|}}
+  <article class="witcher-repair-card {{#if row.condition.broken}}is-broken{{/if}}">
+    <img src="{{row.img}}" alt="" width="44" height="44">
+    <div class="witcher-repair-main">
+      <header><button type="button" class="witcher-recipe-name" data-action="viewSheetItem" data-item-id="{{row.id}}">{{row.name}}</button><span class="witcher-repair-state">{{#if row.condition.broken}}<i class="fa-solid fa-heart-crack" aria-hidden="true"></i> Сломано{{else}}<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Повреждено{{/if}}</span></header>
+      <div class="witcher-repair-meter" role="meter" aria-valuemin="0" aria-valuemax="{{row.condition.max}}" aria-valuenow="{{row.condition.value}}" aria-label="{{row.condition.label}}"><span style="width:{{row.condition.percent}}%"></span></div>
+      <p class="witcher-repair-facts"><span>{{row.condition.label}} <b>{{row.condition.value}} / {{row.condition.max}}</b></span>{{#if row.hasDiagram}}<span>СЛ починки <b>{{row.dc}}</b> <small>({{row.baseDC}} − 5{{#if row.enhancements}} + 2×{{row.enhancements}}{{/if}})</small></span>{{#if row.forge}}<span><i class="fa-solid fa-fire" aria-hidden="true"></i> Кузница</span>{{/if}}{{else}}<span class="is-missing">Нет чертежа этого предмета</span>{{/if}}</p>
+      {{#if row.components.length}}<ul class="witcher-repair-components">{{#each row.components}}<li class="{{#if missing}}is-missing{{/if}}">{{name}} <b>{{owned}}/1</b></li>{{/each}}</ul>{{/if}}
+    </div>
+    <footer>
+      <button type="button" class="witcher-craft-primary" data-action="repairWorkpiece" data-item-id="{{row.id}}" {{disabled (or (not @root.editable) (not row.hasDiagram))}}><i class="fa-solid fa-hammer" aria-hidden="true"></i> Починить</button>
+      {{#if row.disassemble}}<button type="button" data-action="disassembleWorkpiece" data-item-id="{{row.id}}" {{disabled (not @root.editable)}}><i class="fa-solid fa-gears" aria-hidden="true"></i> Разобрать</button>{{/if}}
+    </footer>
+  </article>
+  {{else}}<p class="witcher-repair-empty"><i class="fa-solid fa-shield-heart" aria-hidden="true"></i> Оружие и броня в порядке — чинить нечего.</p>{{/each}}
+  <p class="witcher-repair-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> При провале предмет остаётся сломанным, потраченные компоненты не возвращаются; сразу можно попробовать переработку с той же СЛ. Разборка не требует проверки: из-за повреждений возвращается половина компонентов чертежа, минимум по 1 каждого.</p>
+</section>

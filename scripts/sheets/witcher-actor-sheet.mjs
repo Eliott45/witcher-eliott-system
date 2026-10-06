@@ -6,7 +6,7 @@ import { consumptionActions } from "./consumption-actions.mjs";
 import { learningContext, learningActions } from "./learning-context.mjs";
 import { transportContext, transportActions, bindTransport } from "./transport-context.mjs";
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
-import { craftingContext, craftingActions, bindCrafting } from "./crafting-context.mjs";
+import { craftingContext, alchemyContext, craftingActions, bindCrafting } from "./crafting-context.mjs";
 import { openAdvancement } from "./advancement-window.mjs";
 import { setExperience } from "../data/advancement-purchase.mjs";
 import { setReputationValue } from "../data/reputation.mjs";
@@ -103,7 +103,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   static PARTS = {
     content: {
       template: `systems/${SYSTEM_ID}/templates/actor-sheet.hbs`,
-      scrollable: [".witcher-character-content[data-tab=crafting]", ".witcher-character-content[data-tab=magic]", ".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=profession]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=transport]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-character-content[data-tab=lifepath]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
+      scrollable: [".witcher-character-content[data-tab=crafting]", ".witcher-character-content[data-tab=alchemy]", ".witcher-character-content[data-tab=magic]", ".witcher-character-content[data-tab=main]", ".witcher-character-content[data-tab=skills]", ".witcher-character-content[data-tab=profession]", ".witcher-character-content[data-tab=inventory]", ".witcher-character-content[data-tab=transport]", ".witcher-character-content[data-tab=actions]", ".witcher-character-content[data-tab=effects]", ".witcher-character-content[data-tab=lifepath]", ".witcher-biography[data-tab=biography]", ".witcher-biography[data-tab=family]", ".witcher-character-sidebar"]
     }
   };
 
@@ -155,6 +155,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       inventory, transport: transportContext(this.actor,inventory,this.selectedTransportId),
       workshop: await workshopActorContext(this.actor),
       crafting: await craftingContext(this.actor),
+      alchemy: await alchemyContext(this.actor),
       abilitiesOpen: !preferences.collapsed?.abilities,
       editingAttributes: this.isEditable && this.#editingAttributes,
       editingExperience: this.isEditable && this.#editingCounters.has("experience"),
@@ -198,7 +199,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=viewFriend], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs], [data-action=viewSheetItem], [data-action=browseAbilities], [data-action=browseLanguages], [data-action=browseSpells]")) {
       button.disabled = false;
     }
-    for (const search of this.element.querySelectorAll("[data-crafting-search], [data-crafting-category], [data-magic-search], [data-magic-element], [data-magic-grade], [data-skill-search], [data-inventory-search], [data-action=toggleInventoryGroup], [data-action=browseEquipment]")) search.disabled = false;
+    for (const search of this.element.querySelectorAll("[data-recipe-search], [data-recipe-kind], [data-magic-search], [data-magic-element], [data-magic-grade], [data-skill-search], [data-inventory-search], [data-action=toggleInventoryGroup], [data-action=browseEquipment]")) search.disabled = false;
     for (const button of this.element.querySelectorAll("[data-action=toggleItemDescription], [data-action=searchItemTrait], [data-action=toggleContainer], [data-action=selectTransport]")) button.disabled = false;
   }
 

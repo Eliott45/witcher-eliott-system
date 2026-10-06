@@ -25,6 +25,7 @@
   },
   "WITCHER": {
     "Crafting": { "Title": "Ремесло" },
+    "Alchemy": { "Title": "Алхимия" },
     "Toxicity": {
       "Title": "Токсичность",
       "Limit": "Предел",

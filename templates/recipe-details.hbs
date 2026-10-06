@@ -6,13 +6,13 @@
     <div class="witcher-diagram-result"><span>Результат</span>{{> "systems/witcher-eliott-system/templates/item-reference.hbs" recipeDetails.result}}<b class="witcher-recipe-quantity">×{{recipeDetails.quantity}}</b></div>
     <dl class="witcher-diagram-metrics">
       <div><dt><i class="fa-regular fa-clock" aria-hidden="true"></i> Время</dt><dd>{{recipeDetails.time}}</dd></div>
-      <div><dt><i class="fa-solid fa-hammer" aria-hidden="true"></i> СЛ изготовления</dt><dd>{{recipeDetails.dc}}</dd></div>
+      <div><dt><i class="fa-solid fa-hammer" aria-hidden="true"></i> {{#if recipeDetails.isDiagram}}СЛ изготовления{{else}}СЛ формулы{{/if}}</dt><dd>{{recipeDetails.dc}}</dd></div>
       {{#if recipeDetails.isDiagram}}<div><dt><i class="fa-solid fa-coins" aria-hidden="true"></i> Доплата</dt><dd>{{recipeDetails.investment}} <small>крон</small></dd></div>{{/if}}
     </dl>
     <div class="witcher-diagram-components"><h3>Компоненты <span>{{recipeDetails.components.length}}</span></h3>
       <ul class="witcher-recipe-list">{{#each recipeDetails.components}}
         <li><div class="witcher-recipe-row">
-          {{#if substance}}<strong>{{name}}</strong>{{else}}{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this showRarity=true}}{{/if}}
+          {{#if substance}}<strong class="witcher-substance-name">{{#if substanceImg}}<img src="{{substanceImg}}" alt="" width="22" height="22">{{/if}}{{name}}</strong>{{else}}{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this showRarity=true}}{{/if}}
           <b class="witcher-recipe-quantity">×{{quantity}}</b>
         </div>{{#if substance}}<details class="witcher-substance-alternatives"><summary>Подходящие ингредиенты · {{alternatives.length}}</summary><ul>{{#each alternatives}}<li>{{> "systems/witcher-eliott-system/templates/item-reference.hbs" this showRarity=true}}</li>{{else}}<li>В доступном каталоге нет ингредиентов этой субстанции.</li>{{/each}}</ul></details>{{/if}}</li>
       {{else}}<li class="witcher-recipe-empty">Компоненты пока не заданы.</li>{{/each}}</ul>

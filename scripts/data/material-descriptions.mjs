@@ -34,16 +34,23 @@ export function materialProse(item) {
 export const materialAcquisition = system => /^Покупается/i.test(system.material?.location ?? "") ? "trade" : system.material?.forageDC > 0 ? "forage" : "harvest";
 
 /** Facts are read from current fields so editing a DC or location never leaves stale prose. */
+export function substanceBadge(id) {
+  const substance = SUBSTANCES.find(entry => entry.id === id);
+  if (!substance) return "";
+  return `<span class="witcher-substance-badge" style="--substance-color:${substance.color}"><img src="${substance.img}" alt="" width="18" height="18">${escape(substance.name)}</span>`;
+}
 export function materialDescriptionDetails(system) {
   if (system.kind !== "material") return "";
   const material = system.material ?? {}, trade = materialAcquisition(system) === "trade";
-  const facts = [["Где найти", material.location || "Определяет ведущий"]];
+  const badge = substanceBadge(material.substance);
+  if (system.ruleId?.startsWith("substance.")) return `<section class="witcher-material-guide"><h3>Чистая субстанция</h3><dl><div><dt>Субстанция</dt><dd>${badge}</dd></div><div><dt>Получение</dt><dd>Спасение компонентов после неудачной проверки Алхимии</dd></div></dl><p>Сразу после провала можно повторить проверку Алхимии со СЛ формулы. При успехе одна из затраченных субстанций возвращается в чистом виде.</p></section>`;
+  const facts = [["Где найти", material.location || "Определяет ведущий"], ...(badge ? [["Субстанция", badge, true]] : [])];
   if (!trade) {
     facts.push(["Сложность сбора", material.forageDC > 0 ? `СЛ ${material.forageDC}` : "Не задана"],
       ["Количество из источника", material.quantityFormula ? `${material.quantityFormula} ед.` : "Определяет ведущий"]);
     if (material.forageDC > 0) facts.push(["Проверка", "ИНТ + Выживание + 1d10"]);
   }
-  return `<section class="witcher-material-guide"><h3>${trade ? "Получение материала" : material.forageDC > 0 ? "Поиск и сбор" : "Источник добычи"}</h3><dl>${facts.map(([label,value])=>`<div><dt>${label}</dt><dd>${escape(value)}</dd></div>`).join("")}</dl>${trade ? "" : `<p>${material.forageDC > 0 ? "Искать можно только в подходящей местности." : "Нужен доступ к указанному источнику. Ведущий определяет условия извлечения и необходимость проверки."}</p>`}<small>Вес и цена указаны за одну единицу материала.</small></section>`;
+  return `<section class="witcher-material-guide"><h3>${trade ? "Получение материала" : material.forageDC > 0 ? "Поиск и сбор" : "Источник добычи"}</h3><dl>${facts.map(([label,value,html])=>`<div><dt>${label}</dt><dd>${html ? value : escape(value)}</dd></div>`).join("")}</dl>${trade ? "" : `<p>${material.forageDC > 0 ? "Искать можно только в подходящей местности." : "Нужен доступ к указанному источнику. Ведущий определяет условия извлечения и необходимость проверки."}</p>`}<small>Вес и цена указаны за одну единицу материала.</small></section>`;
 }
 
 // Only these shipped defaults were incorrect in the original catalog (core pp. 128–129).
