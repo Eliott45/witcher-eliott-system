@@ -166,3 +166,18 @@ test("bleeding ticks 2, halved by resistance and suspended by a clotting powder"
   assert.equal(bleedingDamage(actor(["bleeding", "clotting"])), 0);
   assert.equal(bleedingDamage(actor([])), 0);
 });
+
+test("blocking: per item, bare-handed with Brawling, and only a shield stops missiles", async () => {
+  const { defenseQuote } = await import("../scripts/combat/defense-rolls.mjs");
+  const sword = { id: "sword", type: "weapon", name: "Меч", system: { hands: 1, grip: 1, category: "melee", skill: "swordsmanship", quantity: 1, carried: true, equipped: true, reliability: { value: 10, max: 10 } } };
+  const items = [sword]; items.get = id => items.find(entry => entry.id === id);
+  const actor = { isOwner: true, type: "character", items, effects: [], system: { attributes: {}, abilityState: {}, skills: { swordsmanship: 6, brawling: 3 }, stamina: { value: 20 },
+    statistics: { effective: { reflex: 7, speed: 6 }, modifiers: [] } } };
+  globalThis.foundry ??= { utils: {} };
+  const armed = defenseQuote(actor, { mode: "block", itemId: "sword" }), bare = defenseQuote(actor, { mode: "block", itemId: "" });
+  assert.equal(armed.skillKey, "swordsmanship"); assert.equal(armed.limb, false); assert.equal(armed.weaponName, "Меч");
+  assert.equal(bare.skillKey, "brawling"); assert.equal(bare.limb, true); assert.equal(bare.name, "Блок рукой"); assert.equal(bare.blocked, "");
+  assert.match(defenseQuote(actor, { mode: "block", itemId: "", incoming: "ranged" }).blocked, /только щитом/);
+  const parry = defenseQuote(actor, { mode: "parry", itemId: "" });
+  assert.equal(parry.name, "Парирование рукой"); assert.equal(parry.penalty, -3); assert.equal(parry.limb, false);
+});

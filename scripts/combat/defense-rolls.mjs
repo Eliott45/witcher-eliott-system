@@ -15,22 +15,24 @@ export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repe
   if(!NAMES[mode]||!INCOMING_ATTACKS.some(entry=>entry.id===incoming))throw new Error("Неизвестный способ защиты.");
   const modifier=Number(defenseModifier);
   if(!Number.isFinite(modifier)||Math.abs(modifier)>100)throw new Error("Неверный модификатор защиты.");
-  const armed=["block","parry"].includes(mode),item=armed?actor.items.get(itemId):null,weapon=item?.type==="weapon"?effectiveItem(item):null;
+  // Core p.164: block or parry with a weapon (its skill), a shield (Melee) or bare-handed (Brawling).
+  const armed=["block","parry"].includes(mode),unarmed=armed&&!itemId,item=armed&&!unarmed?actor.items.get(itemId):null,weapon=item?.type==="weapon"?effectiveItem(item):null;
   const skillKey=mode==="dodge"?"dodgeEscape":mode==="reposition"?"athletics":weapon?.category==="shield"?"melee":weapon?.skill??"brawling";
   const skill=skillValue(actor.system,skillKey),penalty=mode==="parry"?(incoming==="thrown"?-5:-3):0;
   const activeDodge=Boolean(statusEffect(actor,ACTIVE_DODGE));
   const effects=combatModifierParts(actor,"combat.defense"),effectTotal=effects.reduce((sum,part)=>sum+part.value,0);
   const total=skill.total===null?null:skill.total+penalty+modifier+effectTotal,cost=repeat&&!activeDodge?1:0;
   let blocked=!actor.isOwner||!conditionRules(actor).canDefend?"Персонаж сейчас не может защищаться.":"";
-  if(armed)blocked ||= !weapon?"Выберите оружие для защиты.":weaponReadiness(actor,item,weapon)|| (!["melee","shield"].includes(weapon.category)?"Для этой защиты нужно оружие ближнего боя или щит.":"");
-  if(mode==="block"&&incoming!=="melee"&&weapon?.category!=="shield")blocked ||= "Дистанционные атаки можно блокировать только щитом.";
+  if(armed&&!unarmed)blocked ||= !weapon?"Выберите оружие для защиты.":weaponReadiness(actor,item,weapon)|| (!["melee","shield"].includes(weapon.category)?"Для этой защиты нужно оружие ближнего боя или щит.":"");
+  if(mode==="block"&&incoming!=="melee"&&(unarmed||weapon?.category!=="shield"))blocked ||= "Дистанционные атаки можно блокировать только щитом.";
   if(mode==="parry"&&incoming==="ranged")blocked ||= "Обычное парирование не отражает стрелы и болты.";
   if(total===null)blocked ||= "Заполните параметр навыка.";
   if(actor.system.stamina.value<cost)blocked ||= "Недостаточно Выносливости: нужно 1.";
   const note=mode==="reposition"?`При успехе можно переместиться на половину СКОР (${Math.floor((actor.system.statistics.effective.speed??0)/2)} м).`:
-    mode==="block"?(weapon?.natural?"При блоке телом урон приходится в подставленную конечность с учётом её брони.":"При успешном блоке уменьшите надёжность предмета на 1; особые свойства могут изменить износ."):
+    mode==="block"?(unarmed||weapon?.natural?"Блок телом в безвыходном положении: при успехе урон атаки сразу приходится в подставленную руку (ПБ учитывается, ×½).":"При успешном блоке предмет теряет 1 надёжности."):
     mode==="parry"?"При успехе атака отражена, противник ошеломлён. Оружие не теряет надёжность.":"Сравните результат с атакой противника.";
-  return {mode,itemId,skillKey,total,cost,penalty,modifier,incoming,blocked,activeDodge,name:NAMES[mode],weaponName:item?.name??"",note:note+(activeDodge?" Активное уклонение: защиты без расхода ВЫН; атакующему в ближнем бою −2.":""),
+  const limb=mode==="block"&&(unarmed||Boolean(weapon?.natural));
+  return {mode,itemId,skillKey,total,cost,penalty,modifier,incoming,blocked,activeDodge,limb,unarmed,name:unarmed?(mode==="block"?"Блок рукой":"Парирование рукой"):NAMES[mode],weaponName:item?.name??"",note:note+(activeDodge?" Активное уклонение: защиты без расхода ВЫН; атакующему в ближнем бою −2.":""),
     math:`Основа навыка: ${signed(skill.total??0)}; ${NAMES[mode]}: ${signed(penalty)}; ситуация: ${signed(modifier)}${effects.map(part=>`; ${part.label}: ${signed(part.value)}`).join("")}. Точность оружия не добавляется.`};
 }
 const pending=new WeakMap();

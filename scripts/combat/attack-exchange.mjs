@@ -56,13 +56,12 @@ export function gangingUp(message) {
 
 /** Defenses the target can choose for one incoming attack, best armed option per mode. */
 export function defenseChoices(actor, incoming, defenseModifier = 0) {
-  const options = [{ mode: "dodge" }, { mode: "reposition" }];
-  for (const mode of ["block", "parry"]) {
-    const quotes = equippedItems(actor.items).filter(item => item.type === "weapon" && ["melee", "shield"].includes(item.system.category))
-      .map(item => defenseQuote(actor, { mode, itemId: item.id, incoming, defenseModifier })).filter(quote => !quote.blocked);
-    options.push(quotes.sort((a, b) => b.total - a.total)[0] ?? { mode, blocked: true, name: mode === "block" ? "Блок" : "Парирование" });
-  }
-  return options.map(option => option.total !== undefined ? option : { ...defenseQuote(actor, { ...option, incoming, defenseModifier }), mode: option.mode });
+  // One button per weapon or shield so the defender chooses what takes the blow, plus bare-handed options.
+  const items = equippedItems(actor.items).filter(item => item.type === "weapon" && ["melee", "shield"].includes(item.system.category));
+  const options = [{ mode: "dodge" }, { mode: "reposition" },
+    ...items.map(item => ({ mode: "block", itemId: item.id })), { mode: "block", itemId: "" },
+    ...items.map(item => ({ mode: "parry", itemId: item.id })), { mode: "parry", itemId: "" }];
+  return options.map(option => ({ ...defenseQuote(actor, { ...option, incoming, defenseModifier }), mode: option.mode, itemId: option.itemId ?? "" }));
 }
 
 const incomingOf = attack => attack.ranged ? (attack.thrown ? "thrown" : "ranged") : "melee";
@@ -111,7 +110,9 @@ export function exchangeOutcome(message, index) {
   if (!defense) return null;
   const none = exchangeOf(defense).none, defenseTotal = none ? DC_UNAWARE : defense.rolls[0]?.total;
   const hit = attackTotal > defenseTotal, margin = attackTotal - defenseTotal;
-  return { defense, none, attackTotal, defenseTotal, hit, margin, critical: hit ? criticalLevel(margin) : null,
+  // Core p.164: a successful block with the body sends the attack's damage into the blocking arm.
+  const limbBlock = !hit && !none && Boolean(flagsOf(defense).defense?.limb);
+  return { defense, none, attackTotal, defenseTotal, hit, limbBlock, margin, critical: hit ? criticalLevel(margin) : null,
     mode: flagsOf(defense).defense?.mode ?? "", name: none ? "Без защиты" : flagsOf(defense).defense?.name ?? "Защита" };
 }
 
@@ -121,7 +122,7 @@ const pendingRolls = new Set();
 async function rollAttackStep(message, index, kind, prepare) {
   const attack = flagsOf(message).weaponAttack, outcome = exchangeOutcome(message, index), actor = message.speakerActor;
   const key = `${message.id}:${index}:${kind}`;
-  if (!attack || !actor?.isOwner || !message.isContentVisible || !outcome?.hit || pendingRolls.has(key)
+  if (!attack || !actor?.isOwner || !message.isContentVisible || !(outcome?.hit || outcome?.limbBlock) || pendingRolls.has(key)
     || linkedAny(message.id, index, kind) || linkedAny(message.id, index, "damage")) return;
   pendingRolls.add(key);
   const display = trackRollDisplay();
@@ -140,6 +141,8 @@ async function rollAttackStep(message, index, kind, prepare) {
 
 function exchangeLocation(message, index) {
   const attack = flagsOf(message).weaponAttack;
+  // A body block takes the blow on the blocking arm (core p.164); no location roll.
+  if (exchangeOutcome(message, index)?.limbBlock) return ATTACK_LOCATIONS.find(entry => entry.id === "leftArm");
   return attack.location === "random" ? exchangeOf(linked(message.id, index, "location"))?.location
     : ATTACK_LOCATIONS.find(entry => entry.id === attack.location);
 }
@@ -287,13 +290,14 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
     if (linkedAny(message.id, index, "defense")) return `<li class="is-waiting">${head}<em><i class="fa-solid fa-dice-d10 fa-spin"></i> защита бросается…</em></header>${ownFumble}</li>`;
     const gang = gangingUp(message);
     const choices = defenseChoices(target, incomingOf(attack), -gang).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
-      `${esc(choice.name)}${choice.total != null && !choice.blocked ? ` <b>+${choice.total}</b>` : ""}`, !choice.blocked, choice.blocked || choice.note));
+      `${esc(choice.name)}${choice.weaponName ? ` · ${esc(choice.weaponName)}` : ""}${choice.total != null && !choice.blocked ? ` <b>+${choice.total}</b>` : ""}`, !choice.blocked, choice.blocked || choice.note));
     const free = defenseChoices(target, incomingOf(attack))[0]?.activeDodge;
     const repeatBox = `<button type="button" class="witcher-exchange-repeat" data-exchange-repeat aria-pressed="${!free && repeatDefense(target)}" ${free ? "disabled" : ""} data-tooltip="${free ? "Активное уклонение: повторные защиты бесплатны" : "Вторая и следующие защиты за раунд стоят 1 ВЫН. Нажмите, чтобы переключить."}"><i class="fa-solid fa-rotate"></i> Повторная · ${free ? 0 : 1} ВЫН</button>`;
     const gangNote = gang ? `<p class="witcher-exchange-note" data-tooltip="Errata: −1 к защите за каждого нападающего в ближнем бою сверх первого">Объединение сил: ${gang + 1} нападающих в этом раунде · защита −${gang}</p>` : "";
     return `<li class="is-waiting">${head}<em>защита ${esc(target.name)}</em>${repeatBox}</header>${gangNote}<div class="witcher-exchange-actions">${choices.join("")}${button('data-exchange-defend="none"', "Не защищается", true, `Атака сравнивается со СЛ ${DC_UNAWARE}`)}</div>${ownFumble}</li>`;
   }
-  const verdict = outcome.hit ? `<strong class="is-hit">Попадание +${outcome.margin}</strong>` : `<strong class="is-miss">${outcome.mode === "parry" ? "Парировано" : "Промах"}</strong>`;
+  const verdict = outcome.hit ? `<strong class="is-hit">Попадание +${outcome.margin}</strong>` : outcome.limbBlock ? `<strong class="is-hit">Заблокировано рукой</strong>`
+    : `<strong class="is-miss">${outcome.mode === "parry" ? "Парировано" : outcome.mode === "block" ? "Заблокировано" : "Промах"}</strong>`;
   const gang = exchangeOf(outcome.defense).gang;
   const defenseLine = `${esc(outcome.name)} <b>${outcome.defenseTotal}</b>${gang ? ` <small data-tooltip="Объединение сил: нападающих в этом раунде ${gang + 1}">(объединение сил −${gang})</small>` : ""}`;
   let body = ownFumble + fumbleHTML(message, index, "defense", outcome.none ? null : defenseFumble(outcome.defense), target?.isOwner);
@@ -301,7 +305,8 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
   if (!outcome.hit && outcome.mode === "parry") body += `<p class="witcher-exchange-note"><i class="fa-solid fa-person-falling"></i> ${esc(message.speakerActor?.name ?? "Атакующий")} ошеломлён: −2 к атаке и защите до начала своего хода.</p>`;
   const wear = exchangeOf(outcome.defense).wear;
   if (wear) body += `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> Удар принял ${esc(wear.name)}: надёжность ${wear.from} → ${wear.to}${wear.to === 0 ? " · сломано" : ""}</p>`;
-  if (outcome.hit) {
+  if (outcome.limbBlock) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-hand"></i> Блок телом: урон атаки приходится в подставленную руку, ПБ учитывается. Критического ранения нет.</p>`;
+  if (outcome.hit || outcome.limbBlock) {
     const damage = linked(message.id, index, "damage"), applied = linked(message.id, index, "applied");
     if (!damage && linkedAny(message.id, index, "damage")) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-dice-d6 fa-spin"></i> Урон бросается…</p>`;
     else if (!damage) {
@@ -329,7 +334,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
       } else body += `<p class="witcher-exchange-note">Урон применяет владелец цели или мастер.</p>`;
     }
   }
-  return `<li class="${outcome.hit ? "is-hit" : "is-miss"}">${head}<span>${defenseLine}</span>${verdict}</header>${body}</li>`;
+  return `<li class="${outcome.hit || outcome.limbBlock ? "is-hit" : "is-miss"}">${head}<span>${defenseLine}</span>${verdict}</header>${body}</li>`;
 }
 
 export function renderExchange(message, html) {
