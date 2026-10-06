@@ -23,6 +23,7 @@
     }
   },
   "WITCHER": {
+    "Crafting": { "Title": "Ремесло" },
     "Toxicity": {
       "Title": "Токсичность",
       "Limit": "Предел",

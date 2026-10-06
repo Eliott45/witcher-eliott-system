@@ -570,6 +570,70 @@
 .witcher-eliott .witcher-harvest-row { display: flex; align-items: center; gap: 6px; margin-block: 5px; }
 .witcher-eliott .witcher-harvest-row span:first-child { flex: 1; }
 .witcher-workshop-dialog table { width: 100%; margin-block: 12px; }
+/* Crafting uses the sheet's parchment palette; explicit text colors also work with a dark Foundry theme. */
+.witcher-crafting-page { container-type: inline-size; }
+.witcher-eliott .witcher-crafting-page :is(h2,h3,dt,dd,p,small,summary,button,label) { text-shadow:none; }
+.witcher-crafting-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.witcher-eliott .witcher-crafting-heading h2 { color:#713f35; border:0; font-size:28px; margin:3px 0; }
+.witcher-crafting-heading .witcher-crafting-eyebrow { color:#766249; font-size:11px; letter-spacing:.1em; text-transform:uppercase; margin:0; }
+.witcher-crafting-controls { display:flex; gap:6px; flex-wrap:wrap; }
+.witcher-crafting-page button { width:auto; height:auto; min-height:34px; padding:7px 11px; white-space:normal; line-height:1.3; color:#674833; background:#faf6ed; border:1px solid #c3ab88; }
+.witcher-crafting-page button:disabled { opacity:.55; cursor:default; }
+.witcher-crafting-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); border:1px solid #9b885e; border-radius:8px; overflow:hidden; background:#324348; }
+.witcher-crafting-metrics > div { display:flex; flex-direction:column; padding:14px 18px; gap:6px; border-right:1px solid #687779; }
+.witcher-crafting-metrics > div:last-child { border:0; }
+.witcher-crafting-metrics span { color:#e8d1a4; font-size:14px; }
+.witcher-eliott .witcher-crafting-metrics strong { font:700 28px var(--witcher-font-heading,Georgia,serif); color:#fff5e0; }
+.witcher-eliott .witcher-crafting-metrics small { font:12px/1.4 var(--font-body,Arial,sans-serif); color:#e0d5c1; }
+.witcher-crafting-rule { display:flex; align-items:center; gap:12px; color:#68543e; margin:14px 0 18px; }
+.witcher-crafting-rule > i { font-size:22px; }
+.witcher-crafting-rule p { margin:0; line-height:1.5; font-size:13px; }
+.witcher-crafting-filters { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.witcher-crafting-filters label { display:flex; align-items:center; gap:8px; flex:1 1 180px; border:1px solid #c3ab88; border-radius:5px; padding:0 10px; background:#fbf8ef; color:#7e694d; }
+.witcher-crafting-filters input { border:0; background:transparent; box-shadow:none; width:100%; color:#3d342c; }
+.witcher-crafting-filters select { width:auto; background:#fbf8ef; color:#3d342c; border:1px solid #c3ab88; }
+.witcher-eliott .witcher-crafting-group > h3 { display:flex; align-items:center; gap:8px; color:#634336; border:0; font-size:19px; margin:18px 0 10px; }
+.witcher-crafting-group > h3 small { font:12px var(--font-body,Arial,sans-serif); border:1px solid #c3ab88; border-radius:12px; padding:2px 7px; color:#705b43; }
+.witcher-crafting-recipes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; align-items:start; }
+.witcher-recipe-card { overflow:hidden; min-width:0; background:#fbf7ee; border:1px solid #ceb996; border-top:3px solid #948059; border-radius:7px; color:#41392f; }
+.witcher-recipe-card > header { padding:14px 14px 10px; }
+.witcher-eliott .witcher-recipe-card .witcher-recipe-name { display:block; width:100%; background:none; border:0; box-shadow:none; color:#613b30; font:700 18px/1.35 var(--witcher-font-heading,Georgia,serif); text-align:left; padding:0; min-height:0; }
+.witcher-recipe-name:hover { text-decoration:underline; }
+.witcher-recipe-card > header > span { display:block; color:#78664e; font-size:12px; margin-top:5px; }
+.witcher-recipe-card dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 14px; margin:0 14px 14px; padding:12px 0; border-block:1px solid #e2d5bd; }
+.witcher-eliott .witcher-recipe-card dt { font-size:11px; color:#79664e; }
+.witcher-eliott .witcher-recipe-card dd { margin:3px 0 0; font-weight:600; color:#3c423c; font-size:15px; }
+.witcher-recipe-card details { padding:0 14px 14px; }
+.witcher-recipe-card summary { display:flex; align-items:center; gap:8px; list-style:none; cursor:pointer; font-size:13px; line-height:1.45; color:#4b6652; }
+.witcher-recipe-card summary::marker { content:""; }
+.witcher-recipe-card summary i { font-size:10px; transition:transform .15s ease; }
+.witcher-recipe-card details[open] summary i { transform:rotate(90deg); }
+.witcher-crafting-page .is-missing { color:#924b3e; }
+.witcher-recipe-materials { list-style:none; margin:12px 0 0; padding:0; }
+.witcher-recipe-materials li { display:flex; justify-content:space-between; gap:12px; padding:5px 0; border-bottom:1px dotted #d9ccb6; font-size:13px; }
+.witcher-recipe-materials strong { color:inherit; white-space:nowrap; }
+.witcher-recipe-facilities { list-style:none; padding:0; margin:10px 0 0; font-size:12px; color:#736046; line-height:1.6; }
+.witcher-recipe-card footer { display:flex; justify-content:space-between; gap:8px; padding:10px 12px; background:#eee5d5; border-top:1px solid #ddceb4; flex-wrap:wrap; }
+.witcher-eliott .witcher-crafting-page .witcher-craft-primary { background:#65483c; border-color:#65483c; color:#fff2db; }
+.witcher-crafting-empty { text-align:center; border:1px dashed #c3ad89; border-radius:8px; padding:30px 22px; color:#6f5c46; }
+.witcher-crafting-empty > i { font-size:30px; color:#9d865d; }
+.witcher-eliott .witcher-crafting-empty h3 { color:#674737; margin:12px 0; }
+.witcher-crafting-empty p { max-width:520px; margin:auto; line-height:1.6; }
+.witcher-crafting-recycling { display:flex; gap:14px; padding:18px; margin-top:22px; border-left:3px solid #82947c; border-radius:4px; background:#e3e5d9; color:#475344; }
+.witcher-crafting-recycling > i { font-size:23px; margin-top:3px; }
+.witcher-eliott .witcher-crafting-recycling h3 { color:#40523f; font-size:17px; margin:0 0 7px; }
+.witcher-crafting-recycling p { color:#475344; font-size:13px; line-height:1.6; margin:0; }
+.witcher-crafting-page [hidden] { display:none !important; }
+.witcher-crafting-dialog { --color-text-primary:#3d352b; --color-text-secondary:#716049; --color-text-emphatic:#633e32; --color-text-light-highlight:#633e32; --color-text-selection:#fff4dd; --color-form-label:#3d352b; }
+.witcher-crafting-dialog .window-content { background:#f2ecdf; color:#3d352b; }
+.witcher-crafting-dialog .witcher-workshop-dialog h3 { color:#683e32; text-shadow:none; border:0; font:700 21px Georgia,serif; }
+.witcher-crafting-dialog .witcher-workshop-dialog { line-height:1.55; }
+.witcher-crafting-dialog .witcher-workshop-dialog table { border:1px solid #c7b28e; background:#faf7ef; }
+.witcher-crafting-dialog .witcher-workshop-dialog th { background:#e5dac5; color:#624530; text-shadow:none; }
+.witcher-crafting-dialog .witcher-workshop-dialog :is(td,th) { padding:8px; }
+.witcher-crafting-dialog .witcher-workshop-dialog label { background:#e8e0d1; border:1px solid #cdbd9f; border-radius:4px; padding:10px; cursor:pointer; }
+@container (max-width:620px) { .witcher-crafting-recipes { grid-template-columns:1fr; } .witcher-crafting-metrics > div { padding:10px; } }
+@media (prefers-reduced-motion:reduce) { .witcher-recipe-card summary i { transition:none; } }
 .witcher-workshop-dialog td, .witcher-workshop-dialog th { padding: 5px; text-align: left; }
 .witcher-workshop-dialog label { display: flex; gap: 8px; align-items: center; margin-block: 8px; }
 

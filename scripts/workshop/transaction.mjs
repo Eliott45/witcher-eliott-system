@@ -17,7 +17,10 @@ export async function inventoryTransaction(actor, { expenses = [], updates = [],
   let changed = false, created = [], createdEffects = [], deletedEffects = false, changedEffects = false;
   try {
     if (changes.size) { await actor.updateEmbeddedDocuments("Item", [...changes.values()]); changed = true; }
-    if (creates.length) created = await actor.createEmbeddedDocuments("Item", creates);
+    if (creates.length) {
+      created = await actor.createEmbeddedDocuments("Item", creates);
+      if (created.length !== creates.length) throw new Error("Не удалось создать все предметы; материалы возвращены.");
+    }
     if (effectCreates.length) {
       createdEffects = await actor.createEmbeddedDocuments("ActiveEffect", effectCreates);
       if (createdEffects.length !== effectCreates.length) throw new Error("Эффект не был создан; порция возвращена в инвентарь.");
@@ -46,5 +49,12 @@ export function copyPhysical(source, quantity = 1) {
   data.system.quantity = quantity; data.system.carried = true; data.system.equipped = false;
   data.system.containerId = ""; data.system.containerSection = "";
   if(data.system.transport) data.system.transport.mountId = "";
+  if (source.type === "recipe") {
+    // Paper can be transferred; the previous owner's memory cannot. Retain custom world recipe identity.
+    data.system.recipe.memorized = false;
+    data.flags ??= {};
+    data.flags["witcher-eliott-system"] = { ...data.flags["witcher-eliott-system"], recipeSource:
+      source.flags?.["witcher-eliott-system"]?.recipeSource || source._stats?.compendiumSource || source.uuid };
+  }
   return data;
 }

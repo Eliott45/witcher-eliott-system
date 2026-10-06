@@ -8,6 +8,7 @@ import { generalGearDescriptionUpdate } from "../migrations/general-gear-descrip
 import { specialEquipmentDescriptionUpdate } from "../migrations/special-equipment-descriptions.mjs";
 import { alchemyDescriptionUpdate } from "../migrations/alchemy-descriptions.mjs";
 import { defaultItemIcon, equipmentIconUpdate } from "../data/item-icons.mjs";
+import { requireMemorySlot } from "../data/crafting.mjs";
 export class WitcherItem extends foundry.documents.Item {
   async _preCreate(data, options, user) {
     const result = await super._preCreate(data, options, user);
@@ -33,6 +34,10 @@ export class WitcherItem extends foundry.documents.Item {
     const result = await super._preUpdate(changes, options, user);
     if (result === false) return false;
     if (!isPhysical(this)) return;
+    if (this.type === "recipe" && this.actor && (changes["system.recipe.memorized"] ?? changes.system?.recipe?.memorized) === true) {
+      try { requireMemorySlot(this.actor, this); }
+      catch (error) { ui.notifications.warn(error.message); return false; }
+    }
     Object.assign(changes, conditionUpdate(this, changes));
     const kind = changes["system.kind"] ?? changes.system?.kind ?? this.system.kind;
     if (this.type === "equipment" && ["container", "transport"].includes(kind)) {

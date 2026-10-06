@@ -395,6 +395,9 @@
       </div>
       <p class="witcher-drop-hint" data-no-skills {{#unless skills.empty}}hidden{{/unless}}>{{localize "WITCHER.Skills.NoResults"}}</p>
     </section>
+    <section id="{{rootId}}-crafting" class="witcher-character-content witcher-crafting-page tab {{tabs.crafting.cssClass}}" data-group="character" data-tab="crafting" aria-label="{{localize 'WITCHER.Crafting.Title'}}">
+      {{> "systems/witcher-eliott-system/templates/crafting.hbs"}}
+    </section>
     <section id="{{rootId}}-transport" class="witcher-character-content witcher-transport tab {{tabs.transport.cssClass}}" data-group="character" data-tab="transport" aria-label="{{localize 'WITCHER.Transport.Title'}}">
       {{> "systems/witcher-eliott-system/templates/transport.hbs"}}
     </section>

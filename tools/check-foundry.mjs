@@ -539,7 +539,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["combat-actions", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["combat-actions", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "workshop-actor", "crafting"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -569,10 +569,39 @@ foundry.applications = {
 const { WitcherActorSheet } = await import("../scripts/sheets/witcher-actor-sheet.mjs");
 foundry.utils.fromUuid = async () => null;
 const sheet = new WitcherActorSheet();
-sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/svg/mystery-man.svg", type: "character", system: actorData, prototypeToken: prototype, effects: [], isOwner: true };
+sheet.actor = { uuid: "Actor.test", name: "<script>test</script>", img: "icons/svg/mystery-man.svg", type: "character", system: actorData, prototypeToken: prototype, items: [], effects: [], isOwner: true };
 sheet.token = null;
 sheet.isEditable = true;
 const html = template(await sheet._prepareContext({}));
+// Crafting renders persisted recipes and material counts through real Foundry schemas.
+const { craftingContext } = await import("../scripts/sheets/crafting-context.mjs");
+const { recipeMemory } = await import("../scripts/data/crafting.mjs");
+const craftingNative = new foundry.documents.BaseActor({name:"Crafting",type:"character",system:{attributes:{intelligence:6,craft:7},skills:{crafting:4}},items:[
+  {name:"Железо",type:"equipment",system:{ruleId:"material.iron",kind:"material",quantity:3}},
+  {name:"Рецепт <script>тест</script>",type:"recipe",system:{quantity:0,carried:false,recipe:{memorized:true,resultUuid:"Item.result",dc:14,time:5400,tools:["gear.crafting-tools"],components:[{uuid:"Item.iron",quantity:2}]}}}
+]});
+const craftingRestored = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(craftingNative.toObject())));
+const nativeMaterial = craftingRestored.items.find(item=>item.system.ruleId==="material.iron");
+nativeMaterial.testUserPermission=()=>true;
+const nativeCraftResult=new foundry.documents.BaseItem({name:"Изделие",type:"weapon"});
+nativeCraftResult.testUserPermission=()=>true;
+const previousCraftLookup=foundry.utils.fromUuid;
+foundry.utils.fromUuid=async uuid=>uuid==="Item.iron"?nativeMaterial:uuid==="Item.result"?nativeCraftResult:null;
+const nativeCraftContext=await craftingContext({...sheet.actor,system:craftingRestored.system,items:craftingRestored.items});
+foundry.utils.fromUuid=previousCraftLookup;
+assert.deepEqual(recipeMemory({system:craftingRestored.system,items:craftingRestored.items}),{used:1,capacity:6,free:5,full:false});
+assert.equal(nativeCraftContext.crafting,11);
+assert.equal(nativeCraftContext.groups[0].recipes[0].total,"+11");
+assert.equal(nativeCraftContext.groups[0].recipes[0].materials[0].supplied,2);
+const craftingPartial=handlebars.compile(await readFile(new URL("../templates/crafting.hbs",import.meta.url),"utf8"),{strict:true});
+const craftingHTML=craftingPartial({crafting:nativeCraftContext,editable:true});
+assert.ok(craftingHTML.includes("1 ч. 30 мин."));assert.ok(craftingHTML.includes("Переработка после неудачи"));
+assert.ok(!craftingHTML.includes("<script>тест</script>"));assert.ok(craftingHTML.includes("&lt;script&gt;тест&lt;/script&gt;"));
+assert.match(craftingHTML,/data-action="craftInventory"[^>]*>/);
+const observerCraftingHTML=craftingPartial({crafting:nativeCraftContext,editable:false});
+assert.match(observerCraftingHTML,/data-action="craftInventory"[^>]*disabled/);
+assert.match(observerCraftingHTML,/data-action="toggleRecipeMemory"[^>]*disabled/);
+assert.ok(html.includes('data-tab="crafting"'));
 // Real old/new record schemas, chronological presentation, escaping and native disclosure preferences.
 const {lifepathContext:timelineContext}=await import("../scripts/sheets/lifepath-context.mjs");
 const timelineSource=new WitcherActorData({details:{race:"witcher",age:110},lifepath:{witcher:{decades:[
@@ -846,7 +875,7 @@ assert.ok(!html.includes('data-action="viewRace"'), "An unset race has no broken
 assert.ok(!html.includes('name="system.notes"'));
 assert.ok(!html.includes("witcher-vision"));
 assert.ok(!html.includes("witcher-footnote"));
-assert.equal([...html.matchAll(/data-action="tab"/g)].length, 11);
+assert.equal([...html.matchAll(/data-action="tab"/g)].length, 12);
 assert.equal([...html.matchAll(/name="system.attributes\./g)].length, 0, "Base attributes are locked by default");
 sheet.submit = async () => {};
 sheet.render = async () => {};
@@ -913,7 +942,7 @@ sheet.tabGroups.character = "main";
 await updateSheetPreferences(sheet.actor.uuid, { hiddenTabs: ["main"], collapsed: { parents: true, appearance: true } });
 const customized = await sheet._prepareContext({});
 assert.equal(sheet.tabGroups.character, "skills", "Hiding the active tab must select a visible one");
-assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "actions", "magic", "inventory", "transport", "biography", "family", "lifepath", "effects"]);
+assert.deepEqual(customized.visibleTabs.map(tab => tab.id), ["skills", "profession", "actions", "magic", "inventory", "crafting", "transport", "biography", "family", "lifepath", "effects"]);
 assert.equal(customized.familySections.find(section => section.id === "parents").open, false);
 assert.equal(customized.biographySections.find(section => section.id === "appearance").open, false);
 assert.ok(!template(customized).includes('data-action="tab" data-group="character" data-tab="main"'));
@@ -1172,7 +1201,7 @@ for (const kind of ["race", "origin", "familyStatus", "influentialFriend"]) {
   assert.ok(!rendered.includes("undefined"));
 }
 const tabsTemplate = handlebars.compile(await readFile(new URL("../templates/sheet-tabs.hbs", import.meta.url), "utf8"), { strict: true });
-assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 11);
+assert.equal([...tabsTemplate({ tabs: Object.values((await sheet._prepareContext({})).tabs).map(tab => ({ ...tab, visible: true })) }).matchAll(/data-sheet-tab/g)].length, 12);
 // New transport Items survive native schema round trips without changing old Actor shapes.
 const { CORE_TRANSPORT, CORE_TACK } = await import("../scripts/data/core-transport.mjs");
 const { transportContext } = await import("../scripts/sheets/transport-context.mjs");

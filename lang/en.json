@@ -23,6 +23,7 @@
     }
   },
   "WITCHER": {
+    "Crafting": { "Title": "Crafting" },
     "Toxicity": {
       "Title": "Toxicity",
       "Limit": "Limit",
