@@ -89,14 +89,15 @@ function performCast(actor,itemId,options) {
         `За раунд: ${quote.before} + ${quote.stamina} = ${quote.after}; предел ${quote.vigor}`];
       if(quote.power.label)summary.push(`${quote.power.label}: +${quote.power.vigor} к пределу этой стихии${quote.power.casting?`; +${quote.power.casting} к Сотворению`:""}.`);
       if(quote.damage)summary.push(`Перегрузка: ${quote.excess} × 5 = ${quote.damage} урона`);
-      if(fumble.severity)summary.push(hex?`Обратная порча: 1d100 = ${backlash.total}; 01–50 — на заклинателя. ${reflected?"Порча поражает заклинателя вместо цели; примените её описание к нему.":"Обратной порчи нет; сравните проверку с защитой цели."}`:ritual?`Критический провал ритуала: ${quote.stamina} потраченных ВЫН = ${fumbleDamage} урона ПЗ.`:`Магический провал ${fumble.severity}: ${fumbleDamage} урона; ${fumble.failed?"заклинание не сработало":"заклинание всё ещё может сработать"}`);
+      // A spell's own fumble is shown by the magic fumble panel (magic-fumble.mjs); rituals and hexes keep their line.
+      if(fumble.severity&&(hex||ritual))summary.push(hex?`Обратная порча: 1d100 = ${backlash.total}; 01–50 — на заклинателя. ${reflected?"Порча поражает заклинателя вместо цели; примените её описание к нему.":"Обратной порчи нет; сравните проверку с защитой цели."}`:ritual?`Критический провал ритуала: ${quote.stamina} потраченных ВЫН = ${fumbleDamage} урона ПЗ.`:`Магический провал ${fumble.severity}: ${fumbleDamage} урона; ${fumble.failed?"заклинание не сработало":"заклинание всё ещё может сработать"}`);
       if(!options.maintenance&&quote.skillKey==="spellCasting")summary.push(castingComponents(actor.system.skills?.spellCasting??0));
       if(kind==="sign")summary.push(signPotency(item.system,options.maintenance?actor.system.magic.sustainedCost:quote.base));
       if(ritual&&!options.maintenance){summary.push(`Подготовка: ${item.system.ritual.preparationRounds} раундов завершена. Ингредиенты учитываются вручную при любом результате: ${ritualComponents(item.system)||"нет расходуемых предметов"}`);if(item.system.ritual.requirements)summary.push(item.system.ritual.requirements);}
-      if(elemental)summary.push(ELEMENTAL_MISHAPS[element]);
+      if(elemental&&(hex||ritual))summary.push(ELEMENTAL_MISHAPS[element]);
       // TODO(core p.166): focus explosions affect nearby tokens/objects. Keep that adjudication
       // with the GM until area damage and equipment destruction have a shared combat workflow.
-      if(fumble.explosion)summary.push("Фокусирующие предметы при себе взрываются: 1d10 урона в радиусе 2 м. Разрешите взрыв и уничтожение предметов с ведущим.");
+
       if(quote.focus?.greater)summary.push("Улучшенное фокусирующее: +2 к устанавливаемой заклинанием СЛ для противника (не к броску атаки).");
       const flavor=`<section class="witcher-magic-chat"><h3>${title}: ${escape(item.name)}</h3>`
         +`<p data-tooltip="${escape(calc)}">Воля + ${CASTING_SKILL_LABELS[quote.skillKey]}: ${quote.skill.total}</p>`
@@ -105,7 +106,7 @@ function performCast(actor,itemId,options) {
         +`<ul>${summary.map(line=>`<li>${escape(line)}</li>`).join("")}</ul>`
         +`<details><summary>Действие магии</summary>${await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:false,relativeTo:item})}${hex?`<p>Снятие: ${escape(item.system.hex.lifting)}</p>`:""}</details></section>`;
       const flags={[SYSTEM_ID]:{...display.flags[SYSTEM_ID],...(!roll?{skipLuck:true}:{}),
-        magicCast:{kind,spellId:item.id,spellName:item.name,roundKey:quote.roundKey,stamina:quote.stamina,overload:quote.damage,fumble,fumbleDamage,reflected,difficulty:quote.difficulty,maintenance:Boolean(options.maintenance)}}};
+        magicCast:{kind,element,elemental,spellId:item.id,spellName:item.name,roundKey:quote.roundKey,stamina:quote.stamina,overload:quote.damage,fumble,fumbleDamage,reflected,difficulty:quote.difficulty,maintenance:Boolean(options.maintenance)}}};
       const data={speaker:foundry.documents.ChatMessage.getSpeaker({actor}),flavor,flags};
       posted=backlash?await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({...data,rolls:[roll,backlash]},messageMode))
         :roll?await roll.toMessage(data,{messageMode}):await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({...data,content:options.maintenance?"Поддержание оплачено.":"Ритуал без проверки."},messageMode));

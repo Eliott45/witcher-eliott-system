@@ -44,6 +44,13 @@ export function signPotency(system,cost) {
 }
 
 /** Use one equipped focus; bonuses from multiple foci never stack (core p.167). */
+/** Focus rating of an item (0 if it is not a magical focus). */
+export function focusRating(item) {
+  const effective=effectiveItem(item), properties=effective.properties??item.system.properties??"";
+  return getToolRules(item)?.focus??Number(properties.match(/Фокусирующее\s*\((\d+)\)/iu)?.[1]??0);
+}
+/** Core p.166: on a fumble above 9 every focus the caster carries explodes, held or not. */
+export const carriedFocuses = actor => Array.from(actor.items??[]).filter(item=>item.system?.carried!==false&&(item.system?.quantity??1)>0&&focusRating(item)>0);
 export function focusOptions(actor) {
   if (!["mage","priest"].includes(actor.system.details.profession)) return [];
   return equippedItems(actor.items).flatMap(item=>{

@@ -332,7 +332,7 @@ function attackFumbleTable(message, attack) {
 export function attackFumble(message, index) {
   const attack = flagsOf(message).weaponAttack;
   // A spell's own fumble is the magical one, resolved on the casting card.
-  if (attack?.spellSource) return null;
+  if (attack?.spell || attack?.spellSource) return null;
   return fumbleOutcome(attackFumbleTable(message, attack), fumbleMagnitude(message.rolls[index]));
 }
 export function defenseFumble(defense) {
@@ -593,7 +593,7 @@ export function renderExchange(message, html) {
   const attack = flags.weaponAttack;
   if (!attack || !message.isContentVisible || !attackRolls(message).length) return;
   if (!attack.target) return renderUntargetedFumbles(message, html, attack);
-  const section = html.querySelector(".witcher-attack-chat");
+  const section = html.querySelector(".witcher-attack-chat, .witcher-magic-chat");
   if (!section) return;
   for (const legacy of section.querySelectorAll("[data-weapon-damage], .witcher-location-buttons")) legacy.remove();
   const target = targetActor(attack);

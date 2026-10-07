@@ -97,3 +97,7 @@
 .witcher-ritual-interrupt { display:flex; align-items:center; gap:6px; margin:6px 0; font-size:12px; }
 .witcher-ritual-interrupt span { flex:1; }
 .witcher-ritual-interrupt button { flex:0 0 auto; width:auto; height:24px; padding:0 8px; font-size:11px; }
+.witcher-spell-target { display:grid; gap:4px; margin-top:8px; }
+.witcher-spell-target small { font-size:11px; opacity:.8; }
+.witcher-magic-fumble .witcher-exchange-actions { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:6px; }
+.witcher-magic-fumble .witcher-exchange-actions button { flex:0 0 auto; width:auto; }

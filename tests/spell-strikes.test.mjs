@@ -45,3 +45,12 @@ test("dimeritium lowers Vigor by 1 per unit within 5 m and to 0 on contact; witc
   assert.equal(dimeritiumResult(12).status, "nausea"); assert.equal(dimeritiumResult(9).damage, "1d6"); assert.match(dimeritiumResult(18).text, /чешется/);
   assert.match(castingComponents(4), /слова/); assert.match(castingComponents(8), /только пассы/); assert.match(castingComponents(10), /любой частью тела/);
 });
+
+test("magical fumble rows follow the table on p.166", async () => {
+  const { fumbleRow, ELEMENT_STATUS } = await import("../scripts/magic/magic-fumble.mjs");
+  assert.equal(fumbleRow(0), null);
+  assert.equal(fumbleRow(3).id, "crackle"); assert.equal(fumbleRow(6).id, "crackle");
+  assert.equal(fumbleRow(7).id, "backfire"); assert.equal(fumbleRow(9).id, "backfire");
+  assert.equal(fumbleRow(10).id, "explosion");
+  assert.deepEqual(ELEMENT_STATUS, { earth: "stunned", fire: "burning", water: "frozen" });
+});

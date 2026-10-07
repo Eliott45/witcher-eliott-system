@@ -124,6 +124,19 @@ export function throwBomb(actor, item) {
   return work;
 }
 
+/** A blast at a scene point that the GM applies like a bomb (used by magical fumbles: exploding focuses). */
+export async function postBlast(actor, scene, point, { name, radius, damage, intro = "" }) {
+  const profile = { radius, damage, burning: 0, poison: 0, doublePoison: false, blind: 0, stunSave: null, freeze: 0,
+    traits: { types: [], piercing: "none", silver: false, silverDice: "", nonLethal: false } };
+  const victims = tokensInBlast(scene, point, radius).map(token => ({ uuid: token.uuid, name: token.name, burning: false, poisoned: false }));
+  canvas?.ping?.(point);
+  const content = `<section class="witcher-attack-chat witcher-bomb-card"><h3><i class="fa-solid fa-burst"></i> ${esc(name)}</h3>${intro}
+    <p>Радиус ${radius} м · урон ${esc(damage)} — отдельный бросок на каждую часть тела, минус ПБ части, затем множитель зоны.</p>
+    ${victims.length ? `<ul class="witcher-bomb-victims">${victims.map(v => `<li>${esc(v.name)}</li>`).join("")}</ul><button type="button" data-bomb-apply><i class="fa-solid fa-burst"></i> Применить взрыв</button><small>Урон применяет мастер.</small>` : "<p>В радиусе никого нет.</p>"}</section>`;
+  return foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), content,
+    flags: { [SYSTEM_ID]: { skipLuck: true, bomb: { name, profile, victims, applied: false } } } });
+}
+
 /** Damage of one blast on one actor: a separate roll per body part, minus its SP, then the location multiplier. */
 export function blastDamage(actor, rolls, traits) {
   const monster = monsterResistant(actor), vulnerable = fireVulnerable(actor);

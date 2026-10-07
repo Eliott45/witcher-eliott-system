@@ -80,7 +80,7 @@ test("invocation upkeep and mixed fumbles reuse magic state and do not spend ext
   await castSpell(actor,heal.id,{maintenance:true});assert.equal(actor.system.stamina.value,32);assert.equal(messages[1].flags[SYS].skipLuck,true);
   await endConcentration(actor);state.severity=7;
   await castSpell(actor,spell("invocation.cleansing-fire").id);
-  assert.equal(actor.effects.length,0);assert.match(messages[2].flavor,/ведущий выбирает/);
+  assert.equal(actor.effects.length,0);assert.equal(messages[2].flags[SYS].magicCast.element,"mixed");assert.equal(messages[2].flags[SYS].magicCast.elemental,true);
 });
 test("focus comes from one equipped carried item, excludes broken/in-container gear and non-magic-users",()=>{
   const {actor}=fixture();
