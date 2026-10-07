@@ -10,7 +10,8 @@ import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { escapeTooltip as escape } from "../sheets/statistics-tooltips.mjs";
 import { skillCalculationTooltip } from "../sheets/skills-context.mjs";
 import { SPELL_DEFENSES, spellRange, spellDuration } from "../data/spells.mjs";
-import { castingCost, spellBaseCost, focusOptions, magicRoundKey, roundSpent, magicFumble, ELEMENTAL_MISHAPS, learnedSpell, castingSkill, CASTING_SKILL_LABELS, maintenanceCost, ritualDifficulty, ritualComponents, signPotency } from "./rules.mjs";
+import { createSpellStrikes } from "./spell-strikes.mjs";
+import { castingCost, spellBaseCost, focusOptions, magicRoundKey, roundSpent, magicFumble, ELEMENTAL_MISHAPS, learnedSpell, castingSkill, CASTING_SKILL_LABELS, maintenanceCost, ritualDifficulty, ritualComponents, signPotency, castingComponents, RITUAL_INTERRUPTIONS } from "./rules.mjs";
 
 export async function learnSpell(actor,source) {
   return inventoryWrite(actor,async()=>{
@@ -89,6 +90,7 @@ function performCast(actor,itemId,options) {
       if(quote.power.label)summary.push(`${quote.power.label}: +${quote.power.vigor} к пределу этой стихии${quote.power.casting?`; +${quote.power.casting} к Сотворению`:""}.`);
       if(quote.damage)summary.push(`Перегрузка: ${quote.excess} × 5 = ${quote.damage} урона`);
       if(fumble.severity)summary.push(hex?`Обратная порча: 1d100 = ${backlash.total}; 01–50 — на заклинателя. ${reflected?"Порча поражает заклинателя вместо цели; примените её описание к нему.":"Обратной порчи нет; сравните проверку с защитой цели."}`:ritual?`Критический провал ритуала: ${quote.stamina} потраченных ВЫН = ${fumbleDamage} урона ПЗ.`:`Магический провал ${fumble.severity}: ${fumbleDamage} урона; ${fumble.failed?"заклинание не сработало":"заклинание всё ещё может сработать"}`);
+      if(!options.maintenance&&quote.skillKey==="spellCasting")summary.push(castingComponents(actor.system.skills?.spellCasting??0));
       if(kind==="sign")summary.push(signPotency(item.system,options.maintenance?actor.system.magic.sustainedCost:quote.base));
       if(ritual&&!options.maintenance){summary.push(`Подготовка: ${item.system.ritual.preparationRounds} раундов завершена. Ингредиенты учитываются вручную при любом результате: ${ritualComponents(item.system)||"нет расходуемых предметов"}`);if(item.system.ritual.requirements)summary.push(item.system.ritual.requirements);}
       if(elemental)summary.push(ELEMENTAL_MISHAPS[element]);
@@ -122,6 +124,8 @@ function performCast(actor,itemId,options) {
         if(status)await setStatus(actor,status,true);
       }
       if(!options.maintenance)await consumeAiming(actor);
+      // Core p.168: each targeted token defends against this casting check (a failed spell reaches nobody).
+      if(!options.maintenance&&!ritual&&!hex&&roll&&!fumble.failed)await createSpellStrikes(actor,item,posted,{total:posted.rolls[0]?.total??roll.total});
       return posted;
     } catch(error) {
       if(posted)ui.notifications.error("Результат уже в чате, но расход магии не завершён. Проверьте ПЗ, Выносливость и состояния перед повторным броском.");
@@ -134,4 +138,14 @@ export function endConcentration(actor) {return inventoryWrite(actor,()=>actor.u
 export function resetMagicRound(actor) {
   if(game.combat?.started)throw new Error("В бою счётчик обновляется при смене раунда.");
   return inventoryWrite(actor,()=>actor.update({"system.magic.roundKey":"free","system.magic.spent":0,"system.magic.maintainedRound":""}));
+}
+
+/** Core p.168: a disturbed ritualist rolls Ritual Crafting against 15/18/16 to keep the ritual going. */
+export async function rollRitualInterruption(actor,id) {
+  const entry=RITUAL_INTERRUPTIONS.find(row=>row.id===id);
+  if(!entry)throw new Error("Неизвестная помеха.");
+  const skill=skillValue(actor.system,"ritualCrafting");
+  const roll=await new foundry.dice.Roll(`1d10wc + ${skill.total??0}`).evaluate();
+  return roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),flags:{[SYSTEM_ID]:{skillCheck:{key:"ritualCrafting",base:skill.total??0,label:"Прерывание ритуала"}}},
+    flavor:`<section class="witcher-magic-chat"><h3>Прерывание ритуала · СЛ ${entry.dc}</h3><p>${escape(entry.name)}. Проведение ритуалов против СЛ ${entry.dc}: при успехе концентрация сохранена и ритуал продолжается, при провале ритуал сорван.</p></section>`});
 }

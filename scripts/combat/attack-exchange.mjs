@@ -40,8 +40,16 @@ const targetToken = attack => attack?.target ? globalThis.canvas?.scene?.tokens.
 const targetActor = attack => targetToken(attack)?.actor ?? null;
 const anatomyFree = actor => ["specter", "elemental"].includes(actor?.system.creature?.category);
 const DC_UNAWARE = 10;
+/** A spell strike (core p.168) has no roll of its own: it is the casting check of the source message, Luck included. */
+export const attackRolls = message => {
+  const source = flagsOf(message).weaponAttack?.spellSource;
+  return source ? game.messages.get(source)?.rolls?.slice(0, 1) ?? [] : message.rolls;
+};
+const attackRoll = (message, index) => attackRolls(message)[index];
 /** DC of a target that does not defend: 10 in melee; a ranged attack uses the distance DC plus the size modifier (core pp.164–165). */
 export function unawareDC(attack, target) {
+  if (attack?.unaware) return attack.unaware.willTriple
+    ? { dc: (target?.system?.statistics?.effective?.will ?? 0) * 3, note: `СЛ ${(target?.system?.statistics?.effective?.will ?? 0) * 3}: Воля цели × 3` } : attack.unaware;
   if (!attack?.ranged) return { dc: DC_UNAWARE, note: `СЛ ${DC_UNAWARE}` };
   const size = sizeClassOf(target), base = attack.dc ?? 15, dc = base + size.modifier;
   return { dc, note: `СЛ ${dc}: дистанция ${base}${size.modifier ? `, размер «${size.name}» ${size.modifier > 0 ? "+" : "−"}${Math.abs(size.modifier)}` : ""}` };
@@ -71,13 +79,14 @@ export function gangingUp(message) {
 
 /** Defenses the target can choose for one incoming attack, best armed option per mode. */
 export function defenseChoices(actor, incoming, defenseModifier = 0, allowed = null) {
-  if (allowed) return allowed.map(mode => ({ ...defenseQuote(actor, { mode, itemId: "", incoming, defenseModifier }), mode, itemId: "" }));
   // One button per weapon or shield so the defender chooses what takes the blow, plus bare-handed options.
   const items = equippedItems(actor.items).filter(item => item.type === "weapon" && ["melee", "shield"].includes(item.system.category));
   const options = [{ mode: "dodge" }, { mode: "reposition" },
     ...items.map(item => ({ mode: "block", itemId: item.id })), { mode: "block", itemId: "" },
     ...items.map(item => ({ mode: "parry", itemId: item.id })), { mode: "parry", itemId: "" }];
-  return options.map(option => ({ ...defenseQuote(actor, { ...option, incoming, defenseModifier }), mode: option.mode, itemId: option.itemId ?? "" }));
+  // A restricted list (grapple, joint attack, a spell) keeps the per-item buttons of the modes it allows.
+  const chosen = allowed ? allowed.flatMap(mode => { const own = options.filter(option => option.mode === mode); return own.length ? own : [{ mode }]; }) : options;
+  return chosen.map(option => ({ ...defenseQuote(actor, { ...option, incoming, defenseModifier }), mode: option.mode, itemId: option.itemId ?? "" }));
 }
 
 const incomingOf = attack => attack.ranged ? (attack.thrown ? "thrown" : "ranged") : "melee";
@@ -109,7 +118,7 @@ export async function defendAttack(message, index, mode, itemId = "", repeat = n
   if (!defense) return;
   await countDefense(actor);
   // A successful block wears the blocking item by 1 reliability (core p.164).
-  const won = defense.rolls[0].total >= message.rolls[index].total;
+  const won = defense.rolls[0].total >= attackRoll(message, index).total;
   if (won && mode === "block" && itemId) {
     const item = actor.items.get(itemId), reliability = effectiveItem(item)?.reliability;
     if (item && !item.system.natural && reliability?.max) {
@@ -123,13 +132,13 @@ export async function defendAttack(message, index, mode, itemId = "", repeat = n
 
 /** Hit or miss for one attack roll, with the critical level when the margin is large enough. */
 export function exchangeOutcome(message, index) {
-  const attackTotal = message.rolls[index]?.total, defense = linked(message.id, index, "defense");
+  const attackTotal = attackRoll(message, index)?.total, defense = linked(message.id, index, "defense");
   if (!defense) return null;
   const none = exchangeOf(defense).none, defenseTotal = none ? exchangeOf(defense).dc ?? DC_UNAWARE : defense.rolls[0]?.total;
   const hit = attackTotal > defenseTotal, margin = attackTotal - defenseTotal;
   // Core p.164: a successful block with the body sends the attack's damage into the blocking arm.
   const limbBlock = !hit && !none && Boolean(flagsOf(defense).defense?.limb);
-  return { defense, none, attackTotal, defenseTotal, hit, limbBlock, margin, critical: hit && !flagsOf(message).weaponAttack?.special ? criticalLevel(margin) : null,
+  return { defense, none, attackTotal, defenseTotal, hit, limbBlock, margin, critical: hit && !flagsOf(message).weaponAttack?.special && !flagsOf(message).weaponAttack?.noCritical ? criticalLevel(margin) : null,
     mode: flagsOf(defense).defense?.mode ?? "", name: none ? "Без защиты" : flagsOf(defense).defense?.name ?? "Защита" };
 }
 
@@ -180,7 +189,7 @@ export function rollExchangeDamage(message, index) {
     const location = exchangeLocation(message, index);
     if (!location) return;
     const target = targetActor(attack), item = actor.items.get(attack.itemId), weapon = item ? effectiveItem(item) : {};
-    const traits = weaponDamageTraits(weapon), monster = target ? monsterResistant(target) : false;
+    const traits = attack.traits ?? weaponDamageTraits(weapon), monster = target ? monsterResistant(target) : false;
     const options = { allowInteractive: !message.blind };
     const rolls = [await new foundry.dice.Roll(attack.damage).evaluate(options)];
     const silver = traits.silverDice && monster ? await new foundry.dice.Roll(traits.silverDice).evaluate(options) : null;
@@ -322,6 +331,8 @@ function attackFumbleTable(message, attack) {
 }
 export function attackFumble(message, index) {
   const attack = flagsOf(message).weaponAttack;
+  // A spell's own fumble is the magical one, resolved on the casting card.
+  if (attack?.spellSource) return null;
   return fumbleOutcome(attackFumbleTable(message, attack), fumbleMagnitude(message.rolls[index]));
 }
 export function defenseFumble(defense) {
@@ -496,7 +507,7 @@ const stepsHTML = steps => `<ul class="witcher-roll-breakdown">${steps.map(step 
 const button = (attrs, label, enabled, hint = "") => `<button type="button" ${attrs} ${enabled ? "" : "disabled"} ${hint ? `data-tooltip="${esc(hint)}"` : ""}>${label}</button>`;
 
 export function exchangeRowHTML(message, index, attack = flagsOf(message).weaponAttack) {
-  const total = message.rolls[index]?.total, target = targetActor(attack), outcome = exchangeOutcome(message, index);
+  const total = attackRoll(message, index)?.total, target = targetActor(attack), outcome = exchangeOutcome(message, index);
   // Until the defense is chosen (and its dice landed) the defender does not learn the total or a fumble.
   const concealed = attackConcealed(message) && !linked(message.id, index, "defense");
   // The GM and the attacker's owners see it, marked like pf2e's GM-only info.
@@ -509,7 +520,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
     if (linkedAny(message.id, index, "defense")) return `<li class="is-waiting">${head}<em><i class="fa-solid fa-dice-d10 fa-spin"></i> защита бросается…</em></header>${ownFumble}</li>`;
     const gang = gangingUp(message);
     const dualLimit = attack.dual && !canAnswerDual(target, equippedItems(target.items)) ? ["dodge", "reposition"] : null;
-    const choices = defenseChoices(target, incomingOf(attack), -gang, GRAPPLE_ACTIONS[attack.special]?.defenses ?? dualLimit).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
+    const choices = defenseChoices(target, incomingOf(attack), -gang, GRAPPLE_ACTIONS[attack.special]?.defenses ?? attack.defenses ?? dualLimit).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
       `${esc(choice.name)}${choice.weaponName ? ` · ${esc(choice.weaponName)}` : ""}${choice.total != null && !choice.blocked ? ` <b>+${choice.total}</b>` : ""}`, !choice.blocked, choice.blocked || choice.note));
     const free = defenseChoices(target, incomingOf(attack))[0]?.activeDodge;
     const repeatBox = `<button type="button" class="witcher-exchange-repeat" data-exchange-repeat aria-pressed="${!free && repeatDefense(target)}" ${free ? "disabled" : ""} data-tooltip="${free ? "Активное уклонение: повторные защиты бесплатны" : "Вторая и следующие защиты за раунд стоят 1 ВЫН. Нажмите, чтобы переключить."}"><i class="fa-solid fa-rotate"></i> Повторная · ${free ? 0 : 1} ВЫН</button>`;
@@ -580,7 +591,7 @@ export function renderExchange(message, html) {
   const flags = flagsOf(message);
   if (exchangeOf(message) && game.messages.has(exchangeOf(message).attack)) { html.classList.add("witcher-ambush-folded"); html.hidden = true; return; }
   const attack = flags.weaponAttack;
-  if (!attack || !message.isContentVisible || !message.rolls?.length) return;
+  if (!attack || !message.isContentVisible || !attackRolls(message).length) return;
   if (!attack.target) return renderUntargetedFumbles(message, html, attack);
   const section = html.querySelector(".witcher-attack-chat");
   if (!section) return;
@@ -588,7 +599,7 @@ export function renderExchange(message, html) {
   const target = targetActor(attack);
   const list = document.createElement("div");
   list.className = "witcher-exchange";
-  list.innerHTML = `<h4><i class="fa-solid fa-swords"></i> Против: ${esc(target?.name ?? "цель недоступна")}</h4><ol>${message.rolls.map((_roll, index) => exchangeRowHTML(message, index, attack)).join("")}</ol>`;
+  list.innerHTML = `<h4><i class="fa-solid fa-swords"></i> Против: ${esc(target?.name ?? "цель недоступна")}</h4><ol>${attackRolls(message).map((_roll, index) => exchangeRowHTML(message, index, attack)).join("")}</ol>`;
   (html.querySelector(".message-content") ?? section).append(list);
   concealAttackCard(message, html, attack);
   list.querySelectorAll(":scope > ol > li").forEach((row, index) => {
@@ -634,7 +645,7 @@ export function renderExchange(message, html) {
 
 /** Hide what the defender must not know yet, and a creature's numbers from players who do not own it. */
 function concealAttackCard(message, html, attack) {
-  if (attackConcealed(message) && message.rolls.some((_roll, index) => !linked(message.id, index, "defense"))) {
+  if (attackConcealed(message) && attackRolls(message).some((_roll, index) => !linked(message.id, index, "defense"))) {
     html.querySelectorAll(".dice-roll").forEach((element, index) => {
       if (linked(message.id, index, "defense")) return;
       element.hidden = true;
@@ -649,7 +660,7 @@ function concealAttackCard(message, html, attack) {
   if (!attackConcealed(message) && enemyAttackHidden(message)) html.querySelectorAll(".dice-roll").forEach((element, index) => {
     if (!linked(message.id, index, "defense")) { element.classList.add("witcher-gm-only"); element.dataset.tooltip ??= "Игроки не видят до выбора защиты"; }
   });
-  if (!attackConcealed(message) && enemyAttackHidden(message) && message.rolls.some((_roll, index) => !linked(message.id, index, "defense")))
+  if (!attackConcealed(message) && enemyAttackHidden(message) && attackRolls(message).some((_roll, index) => !linked(message.id, index, "defense")))
     html.querySelectorAll(".witcher-critical-result").forEach(element => element.classList.add("witcher-gm-only"));
 }
 
@@ -677,6 +688,9 @@ function renderUntargetedFumbles(message, html, attack) {
 function refreshAttack(message) {
   const link = exchangeOf(message), attack = link && game.messages.get(link.attack);
   if (attack && ui.chat) ui.chat.updateMessage(attack, { notify: false });
+  // Spending Luck on a casting check changes the total of every spell strike made from it.
+  if (flagsOf(message).magicCast && ui.chat) for (const strike of game.messages.contents.slice(-40))
+    if (flagsOf(strike).weaponAttack?.spellSource === message.id) ui.chat.updateMessage(strike, { notify: false });
 }
 
 /** Re-render once the linked dice have landed (or at once without Dice So Nice). */

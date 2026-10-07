@@ -1445,6 +1445,36 @@
     }
   },
   {
+    "_id": "efct000000000041",
+    "name": "Касается двимерита",
+    "img": "icons/svg/padlock.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Кандалы, цепи или оружие из двимерита касаются адепта магии: Энергия 0. Стойкость СЛ 16 по таблице двимерита каждые полчаса контакта.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "dimeritium-contact"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "dimeritium-contact"
+        }
+      }
+    }
+  },
+  {
     "_id": "efct000000000101",
     "name": "Чёрный яд",
     "img": "icons/svg/poison.svg",

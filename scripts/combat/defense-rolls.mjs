@@ -12,7 +12,8 @@ import { ACTIVE_DODGE } from "./full-turn-rules.mjs";
 import { actorEnvironment } from "./environment.mjs";
 
 export const INCOMING_ATTACKS=[{id:"melee",name:"Ближняя атака"},{id:"thrown",name:"Метательное оружие"},{id:"ranged",name:"Лук / арбалет"}];
-const NAMES={dodge:"Уклонение",reposition:"Смена позиции",block:"Блок",parry:"Парирование",brawl:"Борьба"};
+// Core p.168: spells name their defenses — Resist Magic, or a counter-casting check against Dispel.
+const NAMES={dodge:"Уклонение",reposition:"Смена позиции",block:"Блок",parry:"Парирование",brawl:"Борьба",resist:"Сопротивление магии",counter:"Сотворение заклинаний"};
 export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repeat=false,defenseModifier=0}={}) {
   if(!NAMES[mode]||!INCOMING_ATTACKS.some(entry=>entry.id===incoming))throw new Error("Неизвестный способ защиты.");
   const modifier=Number(defenseModifier);
@@ -21,7 +22,7 @@ export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repe
   const armed=["block","parry"].includes(mode),unarmed=armed&&!itemId,item=armed&&!unarmed?actor.items.get(itemId):null,weapon=item?.type==="weapon"?effectiveItem(item):null;
   // Core p.165: under water a dodge is an Athletics check too.
   const underwater=Boolean(actorEnvironment(actor)?.underwater);
-  const skillKey=mode==="dodge"?(underwater?"athletics":"dodgeEscape"):mode==="reposition"?"athletics":mode==="brawl"?"brawling":weapon?.category==="shield"?"melee":weapon?.skill??"brawling";
+  const skillKey=mode==="dodge"?(underwater?"athletics":"dodgeEscape"):mode==="reposition"?"athletics":mode==="brawl"?"brawling":mode==="resist"?"resistMagic":mode==="counter"?"spellCasting":weapon?.category==="shield"?"melee":weapon?.skill??"brawling";
   const skill=skillValue(actor.system,skillKey),penalty=mode==="parry"?(incoming==="thrown"?-5:-3):0;
   const activeDodge=Boolean(statusEffect(actor,ACTIVE_DODGE));
   const effects=[...combatModifierParts(actor,"combat.defense"),...(armed?combatModifierParts(actor,"combat.blockParry"):[]),...(item?armPenaltyParts(actor,item):[])],effectTotal=effects.reduce((sum,part)=>sum+part.value,0);

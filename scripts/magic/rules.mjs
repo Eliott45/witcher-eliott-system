@@ -102,3 +102,16 @@ export function learnedSpell(actor,source) {
     || source.system.ruleId&&item.system.ruleId===source.system.ruleId
     || item.flags?.core?.sourceId===source.uuid));
 }
+
+// Core p.167 «Могущественные маги»: how much a caster must speak and gesture, by Spell Casting skill level.
+export function castingComponents(level) {
+  if (level >= 9) return "Сотворение: достаточно небольших пассов любой частью тела.";
+  if (level >= 7) return "Сотворение: только пассы руками, слова не нужны.";
+  return "Сотворение: нужно произносить слова и совершать пассы руками.";
+}
+// Core p.168 «Прерывание ритуала»: Ritual Crafting to keep concentration.
+export const RITUAL_INTERRUPTIONS = [
+  { id: "shaken", dc: 15, name: "Тряхнули, толкнули, накричали, что-то бросили" },
+  { id: "harmed", dc: 18, name: "Напали и нанесли физический вред" },
+  { id: "moved", dc: 16, name: "Вынесли из зоны ритуала, вернулся за 1 раунд" }
+];

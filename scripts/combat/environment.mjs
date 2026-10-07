@@ -27,7 +27,7 @@ export const ENVIRONMENT_STATUSES = { lit: "env-lit", sun: "env-against-sun", dr
 
 export const sceneEnvironment = scene => ({ ...DEFAULT_ENVIRONMENT, ...(scene?.flags?.[SYSTEM_ID]?.environment ?? {}) });
 
-function actorToken(actor) {
+export function actorToken(actor) {
   if (actor?.isToken) return actor.token ?? null;
   const tokens = globalThis.canvas?.ready ? actor?.getActiveTokens?.(false, true) ?? [] : [];
   return tokens[0] ?? null;
