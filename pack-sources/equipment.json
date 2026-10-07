@@ -20445,6 +20445,205 @@
     "flags": {}
   },
   {
+    "_id": "recp000000000124",
+    "name": "Чертёж: Ведьмачий медальон",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.gear.witcher-medallion",
+      "description": "<p>Медальон отливает маг. Затем заготовку нужно на час отнести в место силы, чтобы она напиталась энергией; в этот час место силы не даёт других бонусов.</p>",
+      "price": 0,
+      "source": "Базовая книга, стр. 249",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.witchMedallion01",
+        "quantity": 1,
+        "dc": 15,
+        "time": 14400,
+        "investment": 82,
+        "grade": "journeyman",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 5
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "recp000000000125",
+    "name": "Чертёж: Стальной ведьмачий меч",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.witcher-steel-sword",
+      "price": 0,
+      "source": "Базовая книга, стр. 249",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.witchSteelSword1",
+        "quantity": 1,
+        "dc": 18,
+        "time": 32400,
+        "investment": 507,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Стальной ведьмачий меч».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "recp000000000126",
+    "name": "Чертёж: Серебряный ведьмачий меч",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.witcher-silver-sword",
+      "price": 0,
+      "source": "Базовая книга, стр. 249",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.witchSilvSword01",
+        "quantity": 1,
+        "dc": 19,
+        "time": 36000,
+        "investment": 498,
+        "grade": "master",
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Серебряный ведьмачий меч».</p>"
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
     "_id": "recp000000000501",
     "name": "Формула: Могила Адды",
     "type": "recipe",

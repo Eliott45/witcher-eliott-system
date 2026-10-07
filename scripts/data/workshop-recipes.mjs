@@ -4,6 +4,7 @@ import { ALCHEMY, SUBSTANCE_CODES } from "./workshop-alchemy.mjs";
 import { UPGRADES } from "./workshop-upgrades.mjs";
 import { equipmentUuid } from "./workshop.mjs";
 import { DIAGRAM_INVESTMENTS } from "./diagram-investments.mjs";
+import { WITCHER_SPECIAL_EQUIPMENT } from "./witcher-special-equipment.mjs";
 
 // Core pp. 130–139. Result references point to existing canonical equipment.
 // Append new rows: the array positions form persistent compendium document IDs.
@@ -115,14 +116,21 @@ const diagrams = [
  ["armor.gnomish-chain",24,1440,1462,"dark-steel:8 leather:2 darkening-oil:1","grandmaster",1,138],
  ["armor.gnomish-dragoon",25,1500,4274,"dark-steel:12 meteorite:1 mahakaman-dimeritium:2 ester-grease:10 etching-acid:14 double-linen:5 darkening-oil:4 drake-oil:2 thread:15","grandmaster",1,138],
  ["weapon.mahakam-pavise",26,420,1574,"hardened-timber:10 hardened-leather:5 ogre-wax:11 ester-grease:2 mahakaman-steel:2 etching-acid:3 leather:4","grandmaster",1,138],
- ["armor.mahakam-plate",28,1680,5286,"mahakaman-steel:12 mahakaman-dimeritium:2 ester-grease:8 etching-acid:12 hardened-leather:5 darkening-oil:2 drake-oil:1 meteorite:2 ogre-wax:3 thread:10","grandmaster",1,138]
+ ["armor.mahakam-plate",28,1680,5286,"mahakaman-steel:12 mahakaman-dimeritium:2 ester-grease:8 etching-acid:12 hardened-leather:5 darkening-oil:2 drake-oil:1 meteorite:2 ogre-wax:3 thread:10","grandmaster",1,138],
+ // Witcher gear, p. 249: the book prints no diagram price (they are rewards or found on dead witchers), only the supplement.
+ ["gear.witcher-medallion",15,240,null,"silver:1 etching-acid:5","journeyman",1,249],
+ ["weapon.witcher-steel-sword",18,540,null,"hardened-timber:2 leather:2 meteorite:2 steel:3 sharpening-grit:2 etching-acid:2 ester-grease:1 thread:1","master",1,249],
+ ["weapon.witcher-silver-sword",19,600,null,"hardened-timber:2 leather:2 silver:4 steel:1 sharpening-grit:2 etching-acid:1 ester-grease:1","master",1,249]
 ];
-const catalog = [...CORE_EQUIPMENT,...MATERIALS,...UPGRADES];
+// Core p.249 sidebar: a mage casts the medallion from silver, then it must spend an hour in a place of power.
+const DIAGRAM_NOTES = { "gear.witcher-medallion": "Медальон отливает маг. Затем заготовку нужно на час отнести в место силы, чтобы она напиталась энергией; в этот час место силы не даёт других бонусов." };
+const catalog = [...CORE_EQUIPMENT,...MATERIALS,...UPGRADES,...WITCHER_SPECIAL_EQUIPMENT];
 export const RECIPES = diagrams.map(([id,dc,minutes,price,components,grade="novice",quantity=1,page],i)=>{
  const result = catalog.find(item=>item.id===id);
  const materials = components.split(" ").map(token=>{const [material,q]=token.split(":"); return {uuid:materialUuid(material),substance:"",quantity:Number(q)};});
  const forge = components.split(" ").some(token=>/^(iron|steel|dark-iron|dark-steel|silver|gold|dimeritium|mahakaman-steel|mahakaman-dimeritium|tretogor-steel|meteorite):/.test(token));
- return {id:`diagram.${id}`,documentId:`recp${String(i+1).padStart(12,"0")}`,name:`Чертёж: ${result.name}`,type:"recipe",source:"recipes",system:{price,source:page?`Базовая книга, стр. ${page}`:"Базовая книга, стр. 130–135 / 139; errata v4",recipe:{category:"diagram",resultUuid:equipmentUuid(result.documentId),quantity,dc,time:minutes*60,investment:DIAGRAM_INVESTMENTS[id],grade,forge,tools:["gear.crafting-tools"],components:materials}}};
+ return {id:`diagram.${id}`,documentId:`recp${String(i+1).padStart(12,"0")}`,name:`Чертёж: ${result.name}`,type:"recipe",source:"recipes",
+  ...(price === null ? { flags: { "witcher-eliott-system": { priceUnavailable: true } } } : {}),system:{...(DIAGRAM_NOTES[id] ? { description: `<p>${DIAGRAM_NOTES[id]}</p>` } : {}),price:price??0,source:page?`Базовая книга, стр. ${page}`:"Базовая книга, стр. 130–135 / 139; errata v4",recipe:{category:"diagram",resultUuid:equipmentUuid(result.documentId),quantity,dc,time:minutes*60,investment:DIAGRAM_INVESTMENTS[id],grade,forge,tools:["gear.crafting-tools"],components:materials}}};
 });
 RECIPES.push(...ALCHEMY.map((result,i)=>{
  const recipe = result.formula;

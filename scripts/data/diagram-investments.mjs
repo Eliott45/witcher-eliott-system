@@ -1,6 +1,7 @@
 // Printed supplement column in the supplied Russian core book, pp. 130–139.
 // These amounts are independent of the price of the diagram.
 export const DIAGRAM_INVESTMENTS = {
+  "gear.witcher-medallion": 82, "weapon.witcher-steel-sword": 507, "weapon.witcher-silver-sword": 498,
   "material.double-linen": 15, "material.hardened-timber": 11, "material.hardened-leather": 32,
   "material.leather": 19, "material.linen": 6, "material.thread": 2,
   "material.dark-steel": 55, "material.lyrian-leather": 40, "material.steel": 35,
