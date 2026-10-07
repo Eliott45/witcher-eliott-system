@@ -44,6 +44,21 @@ test("poison deals three HP once at the actor's next turn and posts the actual l
   await startTurnPoison(f.combat,f.combatant,{...f.context,round:3});assert.equal(f.actor.system.health.value,4);
 });
 
+test("creature regeneration heals once per turn up to maximum, pauses under suppression and never revives the dead",async()=>{
+  const f=fixture(false);f.actor.type="npc";f.actor.effects=[];
+  f.actor.items=[{type:"ability",system:{ruleId:"creature.regeneration"},flags:{[SYSTEM_ID]:{regeneration:5,regenerationSunlight:3}}}];
+  f.actor.system.creature={regenerationMode:"normal"};
+  f.actor.system.health.value=38;
+  await Promise.all([startTurnPoison(f.combat,f.combatant,f.context),startTurnPoison(f.combat,f.combatant,f.context)]);
+  assert.equal(f.actor.system.health.value,40);assert.equal(f.messages.length,1);
+  f.actor.system.health.value=30;f.actor.system.creature.regenerationMode="suppressed";
+  await startTurnPoison(f.combat,f.combatant,{...f.context,round:3});assert.equal(f.actor.system.health.value,30);
+  f.actor.system.creature.regenerationMode="sunlight";
+  await startTurnPoison(f.combat,f.combatant,{...f.context,round:4});assert.equal(f.actor.system.health.value,33);
+  f.actor.effects.push({statuses:new Set(["dead"])});
+  await startTurnPoison(f.combat,f.combatant,{...f.context,round:5});assert.equal(f.actor.system.health.value,33);
+});
+
 test("poison applied after a healthy turn begins cannot damage retroactively",async()=>{
   const f=fixture();const poison=f.actor.effects.shift();
   await startTurnPoison(f.combat,f.combatant,f.context);assert.equal(f.actor.system.health.value,10);

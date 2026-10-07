@@ -1541,7 +1541,14 @@ for(const source of bestiarySources()) {
     assert.equal(rendered.includes('name="system.creature.hasTailOrWings"'),editing);
     assert.equal((rendered.match(/name="system\.creature\.category"/g)??[]).length,editing?1:0);
     assert.ok(rendered.includes(view.creatureClass.description));
-    assert.ok(rendered.includes(source.name));assert.ok(rendered.includes('data-action="attackWeapon"'));assert.ok(!rendered.includes('data-mode="strong"'));
+    assert.ok(rendered.includes(handlebars.escapeExpression(source.name)));assert.ok(rendered.includes('data-action="attackWeapon"'));assert.ok(!rendered.includes('data-mode="strong"'));
+    const hasRegeneration=source.items.some(item=>item.flags?.[game.system.id]?.regeneration>0);
+    assert.equal(rendered.includes('aria-label="Режим регенерации"'),hasRegeneration);
+    if(hasRegeneration) {
+      assert.equal(actor.system.creature.regenerationMode,'normal');
+      assert.ok(rendered.includes('Подавлена: 0 ПЗ'));
+      assert.equal(rendered.includes('На солнце: 3 ПЗ'),source.name==='Катакан');
+    }
     assert.match(rendered,/<nav class="[^\"]*\btabs\b[^\"]*"/,"Foundry changeTab requires a .tabs navigation container");
     if(!editing)creatureViews.push({actor,sheet:npcSheet,view,html:rendered});
   }
@@ -1550,7 +1557,7 @@ for(const source of bestiarySources()) {
     assert.equal(skillValue(actor.system,'education').total,1);assert.equal(actor.system.harvest.length,3);
     const claws=actor.items.find(i=>i.type==='weapon');assert.equal(weaponAttack(actor,claws,{mode:'npc'}).total,13);
     assert.equal(weaponAttack(actor,claws,{mode:'npc'}).damage,'(3d6)');
-  } else {
+  } else if(source.name==='Бандит') {
     assert.equal(skillValue(actor.system,'swordsmanship').total,12);
     assert.equal(actor.items.find(i=>i.system.ruleId==='weapon.hand-crossbow').system.accuracy,1);
   }
@@ -1643,7 +1650,8 @@ assert.ok(consumptionItemHTML.includes('data-action="useConsumable"'));
 assert.ok(consumptionItemHTML.includes('system.consumption.mode'));
 const inventoryPartial=handlebars.compile(await readFile(new URL('../templates/inventory.hbs',import.meta.url),'utf8'),{strict:true});
 const { inventoryContext: consumableInventory } = await import('../scripts/sheets/inventory-context.mjs');
-const consumptionInventoryHTML=inventoryPartial({rootId:'consumption',system:doseActor.system,editable:true,inventory:consumableInventory(doseActor),workshop:{witcher:false,npc:false}});
+const { workshopActorContext: consumableWorkshop } = await import('../scripts/sheets/workshop-actor-context.mjs');
+const consumptionInventoryHTML=inventoryPartial({rootId:'consumption',system:doseActor.system,editable:true,inventory:consumableInventory(doseActor),workshop:await consumableWorkshop(doseActor)});
 assert.ok(!consumptionInventoryHTML.includes('witcher-toxicity '),'Character inventory must not duplicate sidebar toxicity');
 assert.ok(consumptionInventoryHTML.includes('data-action="useConsumable"'));
 const doseSheet = new WitcherActorSheet();
@@ -1658,7 +1666,8 @@ assert.ok(doseSidebar.includes('witcher-sidebar-toxicity'));
 assert.ok(doseSidebar.indexOf('witcher-sidebar-toxicity') > doseSidebar.indexOf('data-action="rollStun"'));
 assert.ok(!html.includes('THE WITCHER'));
 assert.ok(!html.includes('witcher-sidebar-toxicity'),'Non-witchers do not see the toxicity meter');
-const npcToxicityHTML=inventoryPartial({rootId:'npc-consumption',system:doseActor.system,editable:true,inventory:{...consumableInventory(doseActor),showToxicity:true},workshop:{witcher:false,npc:true}});
+const npcDoseActor=new foundry.documents.BaseActor({...doseActor.toObject(),type:'npc'});
+const npcToxicityHTML=inventoryPartial({rootId:'npc-consumption',system:npcDoseActor.system,editable:true,inventory:consumableInventory(npcDoseActor),workshop:await consumableWorkshop(npcDoseActor)});
 assert.ok(npcToxicityHTML.includes('witcher-toxicity '),'NPC inventory retains its toxicity meter');
 doseActor.updateSource({'system.details.race':'human'});
 const humanDoseHTML = template(await doseSheet._prepareContext({}));

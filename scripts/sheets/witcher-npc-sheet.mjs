@@ -8,7 +8,8 @@ import { ATTRIBUTE_KEYS } from "../data/statistics.mjs";
 import { SKILLS, skillValue } from "../data/skills.mjs";
 import { MONSTER_CATEGORIES } from "../data/monster-categories.mjs";
 import { SIZE_CLASSES, sizeClassOf } from "../data/creatures.mjs";
-import { bestiarySources } from "../data/bestiary.mjs";
+import { creatureRegeneration } from "../data/creature-regeneration.mjs";
+import { bestiarySources, bestiaryPreset } from "../data/bestiary.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
 import { inventoryContext,bindInventory,equipItem,dropToGround,toggleVisor,changeGrip,createInventoryItem,browseEquipment,addCatalogItem,changeInventoryQuantity,toggleCarried,toggleInventoryGroup,inventoryWrite } from "./inventory-context.mjs";
 import { itemPresentation,toggleItemDescription,postItem,searchItemTrait } from "./item-presentation.mjs";
@@ -49,14 +50,14 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     restoreCreatureItems:guard(async function(){
       if(!this.isEditable)return;
       await inventoryWrite(this.actor,async()=>{
-        const preset=bestiarySources().find(entry=>entry.system.creature.source===this.actor.system.creature.source);
+        const preset=bestiaryPreset(this.actor);
         if(preset&&!this.actor.items.size)await this.actor.createEmbeddedDocuments("Item",preset.items,{keepId:true});
       });
     }),
     creaturePreset:guard(async function(_e,target){
       if(!this.isEditable||this.actor.items.size||ATTRIBUTE_KEYS.some(key=>this.actor.system.attributes[key]!==null))return;
       const preset=bestiarySources().find(entry=>entry._id===target.dataset.preset);if(!preset)return;
-      const {_id,ownership,...source}=preset;await this.actor.update(source);
+      const {_id,ownership,...source}=preset;await this.actor.update({...source,"flags.core.sourceId":`Compendium.${SYSTEM_ID}.bestiary.Actor.${_id}`});
     }),
     removeCreatureEffect:guard(async function(_e,target){if(this.isEditable&&game.user.isGM)await this.actor.deleteEmbeddedDocuments("ActiveEffect",[target.dataset.effectId]);}),
     removeEffect:guard(async function(_e,target){if(this.isEditable&&!target.disabled)await this.actor.effects.get(target.dataset.effectId)?.delete();}),
@@ -72,8 +73,8 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     const i18n={localize:key=>game.i18n.localize(key),format:(key,data)=>game.i18n.format(key,data)};
     const abilities=await Promise.all(actor.items.filter(item=>item.type==="ability").map(async item=>({id:item.id,name:item.name,img:item.img,description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:actor.isOwner,relativeTo:item})})));
     return {...context,actor,system,stats,editing,inventory,abilities,workshop:await workshopActorContext(actor),isGM:game.user.isGM,conditions:conditionRules(actor),combat:combatContext(actor,this.combatOptions),effects:await effectsContext(this),
-      empty:!actor.items.size&&ATTRIBUTE_KEYS.every(key=>system.attributes[key]===null),
-      canRestoreItems:!actor.items.size&&bestiarySources().some(entry=>entry.system.creature.source===system.creature.source),
+      empty:!actor.items.size&&ATTRIBUTE_KEYS.every(key=>system.attributes[key]===null),regeneration:creatureRegeneration(actor),
+      canRestoreItems:!actor.items.size&&Boolean(bestiaryPreset(actor)),
       categories:MONSTER_CATEGORIES.map(entry=>({...entry,selected:entry.id===system.creature.category})),category:MONSTER_CATEGORIES.find(c=>c.id===system.creature.category)?.name,
       creatureClass:MONSTER_CATEGORIES.find(entry=>entry.id===system.creature.category),verbalDuel:Boolean(duelOf(this.actor)),
       sizeClasses:SIZE_CLASSES.map(entry=>({...entry,selected:entry.id===sizeClassOf(this.actor).id,label:`${entry.name} (${entry.examples}) ${entry.modifier>0?"+":entry.modifier<0?"−":""}${Math.abs(entry.modifier)}`})),sizeClass:sizeClassOf(this.actor),

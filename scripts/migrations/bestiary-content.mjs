@@ -21,3 +21,21 @@ export async function migrateBestiaryContent() {
     await game.settings.set(SYSTEM_ID,"bestiaryContentVersion",1);
   } finally {if(locked&&repairs.length)await pack.configure({locked:true});}
 }
+
+/** Version 2 (core pp.270–313): append creatures the world pack does not have yet; existing ones stay as edited. */
+export async function migrateBestiaryCreatures() {
+  if(game.user!==game.users.activeGM||game.settings.get(SYSTEM_ID,"bestiaryContentVersion")>=2)return;
+  const pack=game.packs.get(`${SYSTEM_ID}.bestiary`);if(!pack)return;
+  const index=await pack.getIndex(),locked=pack.locked;
+  const missing=bestiarySources().filter(source=>!index.has(source._id));
+  try {
+    if(locked&&missing.length)await pack.configure({locked:false});
+    if(missing.length) {
+      const created=await Actor.implementation.createDocuments(missing.map(source=>foundry.utils.deepClone(source)),{pack:pack.collection,keepId:true});
+      const createdIds=new Set(created.map(actor=>actor.id));
+      if(missing.some(source=>!createdIds.has(source._id)))throw new Error("Не удалось добавить всех существ бестиария. Повторная загрузка продолжит миграцию.");
+    }
+    await game.settings.set(SYSTEM_ID,"bestiaryContentVersion",2);
+    if(missing.length)ui.notifications.info(`Бестиарий: добавлено существ — ${missing.length}.`);
+  } finally {if(locked&&missing.length)await pack.configure({locked:true});}
+}

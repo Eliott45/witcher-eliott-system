@@ -24,6 +24,7 @@
       </div>
       {{#if stats.dying}}<div class="witcher-npc-danger"><strong>При смерти</strong><label>Штраф <input type="number" name="system.death.penalty" min="0" value="{{system.death.penalty}}"></label><button type="button" data-action="creatureDeath" {{disabled (not editable)}}>Испытание смерти</button></div>{{/if}}
       {{#if stats.dead}}<div class="witcher-npc-danger"><i class="fa-solid fa-skull"></i> Мёртв</div>{{/if}}
+      {{#if regeneration.available}}<label class="witcher-npc-regeneration"><span><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> Регенерация</span><select name="system.creature.regenerationMode" aria-label="Режим регенерации" {{disabled (not editable)}}>{{#each regeneration.options}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select><small>В начале хода. При подавлении, например Лунной пылью, выберите 0 ПЗ.</small></label>{{/if}}
       <div class="witcher-npc-statblock">
         <aside class="witcher-npc-aside">
           <div class="witcher-npc-stats">{{#each attributes}}<div><span data-tooltip="{{label}}">{{name}}</span>{{#if ../editing}}<input type="number" name="system.attributes.{{key}}" value="{{base}}" min="0" max="100" aria-label="{{label}}">{{else}}<button type="button" data-action="creatureAttribute" data-attribute="{{key}}" data-tooltip="Проверка {{label}}: 1d10 + {{value}}" {{disabled (not ../editable)}}>{{value}}</button>{{/if}}</div>{{/each}}</div>

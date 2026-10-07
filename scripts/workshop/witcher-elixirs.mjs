@@ -1,5 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { activeDoses, consumedDose } from "../data/consumables.mjs";
+import { activeEffect } from "../data/effect-counters.mjs";
+import { creatureRegeneration } from "../data/creature-regeneration.mjs";
 
 // Core pp.247–248: witcher potions and decoctions whose effects depend on combat events. Hits, kills and
 // turn starts come from the attack exchange and the turn-start tick; this module keeps the counters on the
@@ -39,10 +41,14 @@ export const criticalLocationBonus = actor => dose(actor, "decoction.katakan") ?
 /** HP regained at the start of the actor's turn, with the reasons. */
 export function regenerationAtStart(actor) {
   const parts = [];
+  if (actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("dead"))) return {total:0,parts,swallow:null};
   const swallow = dose(actor, "potion.swallow");
   // Swallow: no healing in a round in which the drinker was hit.
   if (swallow) parts.push(state(swallow).hitSince ? { label: "Ласточка: по вам попали — без восстановления", value: 0 } : { label: "Ласточка", value: 3 });
   if (dose(actor, "decoction.troll")) parts.push({ label: "Отвар из тролля", value: 5 });
+  // Creatures with Regeneration (werewolf, fiend, katakan: core bestiary) heal at the start of their turn.
+  const creature = creatureRegeneration(actor);
+  if (creature.available) parts.push({ label: creature.label, value: creature.total });
   const hag = dose(actor, "decoction.grave-hag");
   if (hag && state(hag).kills) parts.push({ label: `Отвар из кладбищенской бабы (${state(hag).kills} убит.)`, value: 2 * state(hag).kills });
   return { total: parts.reduce((sum, part) => sum + part.value, 0), parts, swallow };

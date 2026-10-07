@@ -20,7 +20,7 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const background = backgroundModifiers(details, abilityIds).filter(modifier =>
     modifier.source !== ENHANCED_SENSES || !witcherSensesSuppressed(details, items));
   const modifiers = [...background, ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(wearerBonuses), ...conditionModifiers(effects),
-    ...environmentModifiers(environment, { items, effects, senses: background.some(modifier => modifier.source === ENHANCED_SENSES) }), ...dimeritiumModifiers(dimeritium)];
+    ...environmentModifiers(environment, { items, effects, senses: background.some(modifier => modifier.source === ENHANCED_SENSES) || Array.from(items).some(item => item.type === "ability" && item.system?.ruleId === "creature.night-vision") }), ...dimeritiumModifiers(dimeritium)];
   const reputationBonus = modifierTotal(modifiers, "reputation");
   const reputationTotal = reputationLevel(reputation.value, reputationBonus);
   modifiers.push(...reputationModifiers(reputation, reputationTotal));
