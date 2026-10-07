@@ -27,10 +27,23 @@ export const ENVIRONMENT_STATUSES = { lit: "env-lit", sun: "env-against-sun", dr
 
 export const sceneEnvironment = scene => ({ ...DEFAULT_ENVIRONMENT, ...(scene?.flags?.[SYSTEM_ID]?.environment ?? {}) });
 
-function actorScene(actor) {
-  if (actor?.isToken) return actor.token?.parent ?? null;
+function actorToken(actor) {
+  if (actor?.isToken) return actor.token ?? null;
   const tokens = globalThis.canvas?.ready ? actor?.getActiveTokens?.(false, true) ?? [] : [];
-  return tokens[0]?.parent ?? null;
+  return tokens[0] ?? null;
+}
+
+/** Scene settings overridden by «Среда Ведьмака» region behaviors the token stands in (empty field = as the scene). */
+export function regionEnvironment(environment, token) {
+  const merged = { ...environment };
+  for (const region of token?.regions ?? []) for (const behavior of region.behaviors ?? []) {
+    if (behavior.type !== "environment" || behavior.disabled) continue;
+    const { light, terrain, heat } = behavior.system ?? {};
+    if (light) merged.light = light;
+    if (terrain) merged.terrain = terrain;
+    if (heat) merged.heat = heat === "on";
+  }
+  return merged;
 }
 
 /** Light level after «auto» and the «lit» exception. */
@@ -51,9 +64,10 @@ export function terrainOf(environment, statuses = new Set()) {
 }
 
 /** What the environment does to one actor right now; `scene` may be passed explicitly (tests, previews). */
-export function actorEnvironment(actor, scene = actorScene(actor)) {
+export function actorEnvironment(actor, scene = undefined, token = actorToken(actor)) {
+  scene ??= token?.parent ?? null;
   if (!scene) return null;
-  const environment = sceneEnvironment(scene), statuses = actor?.statuses ?? new Set();
+  const environment = regionEnvironment(sceneEnvironment(scene), token), statuses = actor?.statuses ?? new Set();
   const light = LIGHT_LEVELS.find(entry => entry.id === lightLevel(environment, scene, statuses));
   const terrain = TERRAINS.find(entry => entry.id === terrainOf(environment, statuses)) ?? TERRAINS[0];
   return { light, terrain, heat: Boolean(environment.heat), underwater: terrain.id === "underwater" };
@@ -116,7 +130,32 @@ async function openEnvironmentDialog(scene = globalThis.canvas?.scene) {
   if (result) await scene.update({ [`flags.${SYSTEM_ID}.environment`]: result });
 }
 
+/** Region behavior «Среда Ведьмака»: light, terrain or heat inside the region (ice, a swamp, a lit hall…). */
+function environmentBehaviorClass() {
+  const { StringField } = foundry.data.fields, base = foundry.data.regionBehaviors.RegionBehaviorType;
+  const choices = (list, blank) => ({ "": blank, ...Object.fromEntries(list.filter(entry => entry.id !== "auto").map(entry => [entry.id, entry.name])) });
+  return class EnvironmentRegionBehavior extends base {
+    static defineSchema() {
+      return {
+        light: new StringField({ required: true, blank: true, initial: "", choices: choices(LIGHT_LEVELS, "Как в сцене"), label: "Освещение" }),
+        terrain: new StringField({ required: true, blank: true, initial: "snow", choices: choices(TERRAINS, "Как в сцене"), label: "Местность" }),
+        heat: new StringField({ required: true, blank: true, initial: "", choices: { "": "Как в сцене", on: "Жара", off: "Без жары" }, label: "Экстремальная жара" })
+      };
+    }
+    // Statistics are read live: redraw the sheet when a token steps in or out.
+    static events = Object.fromEntries([CONST.REGION_EVENTS.TOKEN_ENTER, CONST.REGION_EVENTS.TOKEN_EXIT].map(name => [name, async function(event) {
+      const actor = event.data?.token?.actor;
+      actor?.reset?.();
+      if (actor?.sheet?.rendered) actor.sheet.render();
+    }]));
+  };
+}
+
 export function registerEnvironment() {
+  CONFIG.RegionBehavior.dataModels.environment = environmentBehaviorClass();
+  CONFIG.RegionBehavior.typeLabels.environment = "Среда Ведьмака";
+  CONFIG.RegionBehavior.typeIcons.environment = "fa-solid fa-snowflake";
+  CONFIG.RegionBehavior.typeHints = { ...CONFIG.RegionBehavior.typeHints, environment: "Освещение, местность (лёд и снег, болото, вода) или жара внутри региона (стр. 165). Пустое поле — как в сцене." };
   Hooks.on("getSceneControlButtons", controls => {
     const tokens = controls.tokens ?? controls.token;
     if (!tokens?.tools || !game.user.isGM) return;

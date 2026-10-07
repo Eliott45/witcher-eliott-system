@@ -13,8 +13,8 @@ import { fullTurnStart } from "./full-turn-rules.mjs";
 import { scatterOffset } from "../canvas/scatter-overlay.mjs";
 
 // Core p.165 «Бомбы и ловушки»: a bomb is thrown with Athletics (range BODY × 4 m) at a point; a failed
-// throw lands per the scatter table (1d10 direction, 1d6 m). Everyone in the radius takes the damage
-// on every body part (armor of each part absorbs it, no location multipliers) plus the bomb's effect.
+// throw lands per the scatter table (1d10 direction, 1d6 m). Everyone in the radius takes a separate
+// full damage roll on every body part: minus that part's SP, then the location multiplier; plus the bomb's effect.
 export const isBomb = item => item?.type === "equipment" && String(item.system.ruleId ?? "").startsWith("bomb.");
 
 /** What a bomb does, read from its properties line (e.g. «Бомба; Радиус 4 м; Урон 7d6; Горение (25%)»). */
@@ -95,7 +95,6 @@ export function throwBomb(actor, item) {
         point = { x: aim.x + offset.x / length * pixels, y: aim.y + offset.y / length * pixels };
         scatter = { direction: direction.total, metres: far.total };
       }
-      const damage = profile.damage ? await new foundry.dice.Roll(profile.damage).evaluate() : null;
       const victims = await Promise.all(tokensInBlast(scene, point, profile.radius).map(async token => ({
         uuid: token.uuid, name: token.name,
         burning: profile.burning ? (await new foundry.dice.Roll("1d100").evaluate()).total <= profile.burning : false,
@@ -107,12 +106,12 @@ export function throwBomb(actor, item) {
       const content = `<section class="witcher-attack-chat witcher-bomb-card"><h3><i class="fa-solid fa-bomb"></i> ${esc(item.name)}</h3>
         <p>Бросок Атлетики <b>${roll.total}</b> против СЛ ${quote.dc} (${esc(quote.band.name)}, дальность ${quote.range} м): <strong>${hit ? "точно в цель" : "мимо"}</strong>.</p>
         ${scatter ? `<p>Разброс: направление ${scatter.direction} по таблице, ${scatter.metres} м от точки прицеливания.</p>` : ""}
-        <p>Радиус ${profile.radius} м${damage ? ` · урон <b>${damage.total}</b> (${esc(profile.damage)}) по каждой части тела, минус ПБ этой части` : ""}${effects.length ? ` · ${esc(effects.join("; "))}` : ""}.</p>
+        <p>Радиус ${profile.radius} м${profile.damage ? ` · урон ${esc(profile.damage)} — отдельный бросок на каждую часть тела, минус ПБ части, затем множитель зоны` : ""}${effects.length ? ` · ${esc(effects.join("; "))}` : ""}.</p>
         ${victims.length ? `<ul class="witcher-bomb-victims">${victims.map(v => `<li>${esc(v.name)}${v.burning ? " · загорается" : ""}${v.poisoned ? " · отравлен" : ""}</li>`).join("")}</ul>` : "<p>В радиусе никого нет.</p>"}
         ${actionNote(action)}
         ${victims.length ? `<button type="button" data-bomb-apply><i class="fa-solid fa-burst"></i> Применить взрыв</button><small>Урон и эффекты применяет мастер.</small>` : ""}</section>`;
-      const message = await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls: [roll, ...(damage ? [damage] : [])], content,
-        flags: { [SYSTEM_ID]: { skipLuck: true, bomb: { name: item.name, profile: { ...profile, traits: profile.traits }, damage: damage?.total ?? 0, victims, applied: false } } } });
+      const message = await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls: [roll], content,
+        flags: { [SYSTEM_ID]: { skipLuck: true, bomb: { name: item.name, profile, victims, applied: false } } } });
       if (!message) return;
       const quantity = (item.system.quantity ?? 1) - 1;
       await actor.update({ ...actionUpdate(actor, action), items: [{ _id: item.id, "system.quantity": Math.max(0, quantity) }] });
@@ -125,16 +124,22 @@ export function throwBomb(actor, item) {
   return work;
 }
 
-/** Damage of one blast on one actor: every body part takes the roll minus its own armor. */
-export function blastDamage(actor, damage, traits) {
-  if (!damage) return { total: 0, parts: [], ablate: [] };
+/** Damage of one blast on one actor: a separate roll per body part, minus its SP, then the location multiplier. */
+export function blastDamage(actor, rolls, traits) {
   const monster = monsterResistant(actor), vulnerable = fireVulnerable(actor);
   const parts = burningParts(actor).map(id => {
-    const armor = armorAt(actor, id), result = resolveDamage({ base: damage, location: id, multiplier: 1, traits, armor, monster, vulnerableToFire: vulnerable });
-    return { id, name: ATTACK_LOCATIONS.find(entry => entry.id === id)?.name ?? id, sp: armor.sp, total: result.total, ablate: result.ablate };
+    const base = rolls[id] ?? 0, location = ATTACK_LOCATIONS.find(entry => entry.id === id);
+    const armor = armorAt(actor, id), result = resolveDamage({ base, location: id, multiplier: location?.multiplier ?? 1, traits, armor, monster, vulnerableToFire: vulnerable });
+    return { id, name: location?.name ?? id, roll: base, sp: armor.sp, multiplier: location?.multiplier ?? 1, total: result.total, ablate: result.ablate };
   });
   // A piece of armor covering several parts wears once per blast.
   return { total: parts.reduce((sum, part) => sum + part.total, 0), parts, ablate: [...new Set(parts.flatMap(part => part.ablate))] };
+}
+async function partRolls(actor, formula) {
+  if (!formula) return {};
+  const out = {};
+  for (const id of burningParts(actor)) out[id] = (await new foundry.dice.Roll(formula).evaluate()).total;
+  return out;
 }
 
 const timedCondition = (actor, id, rounds, extra = {}) => {
@@ -152,7 +157,7 @@ export async function applyBlast(message) {
   for (const victim of data.victims) {
     const actor = fromUuidSync(victim.uuid)?.actor;
     if (!actor) continue;
-    const result = blastDamage(actor, data.damage, data.profile.traits), notes = [];
+    const result = blastDamage(actor, await partRolls(actor, data.profile.damage), data.profile.traits), notes = [];
     const before = actor.system.health.value;
     const worn = result.total || result.ablate.length ? await sufferDamage(actor, result) : [];
     const effects = [];
@@ -166,7 +171,7 @@ export async function applyBlast(message) {
       else { effects.push(timedCondition(actor, "stunned", 0)); notes.push(`испытание УСТ ${save.total} (нужно меньше ${target}): дезориентирован`); }
     }
     if (effects.length) await actor.createEmbeddedDocuments("ActiveEffect", effects);
-    lines.push(`<li><b>${esc(actor.name)}</b>${result.total ? `: −${result.total} ПЗ (${before} → ${before - result.total}) — ${result.parts.map(part => `${esc(part.name)} ${part.total}${part.sp ? ` (ПБ ${part.sp})` : ""}`).join(", ")}` : data.damage ? ": броня поглотила урон" : ""}${notes.length ? `; ${esc(notes.join("; "))}` : ""}${worn.length ? `<br><small>Износ брони: ${esc(worn.join("; "))}</small>` : ""}</li>`);
+    lines.push(`<li><b>${esc(actor.name)}</b>${result.total ? `: −${result.total} ПЗ (${before} → ${before - result.total}) — ${result.parts.map(part => `${esc(part.name)} ${part.total} (бросок ${part.roll}${part.sp ? `, ПБ ${part.sp}` : ""}${part.multiplier !== 1 ? `, ×${part.multiplier === 0.5 ? "½" : part.multiplier}` : ""})`).join(", ")}` : data.profile.damage ? ": броня поглотила урон" : ""}${notes.length ? `; ${esc(notes.join("; "))}` : ""}${worn.length ? `<br><small>Износ брони: ${esc(worn.join("; "))}</small>` : ""}</li>`);
   }
   return foundry.documents.ChatMessage.create({ speaker: message.speaker, flags: { [SYSTEM_ID]: { skipLuck: true } },
     content: `<section class="witcher-attack-chat"><h3><i class="fa-solid fa-burst"></i> ${esc(data.name)} · взрыв</h3><ul class="witcher-bomb-victims">${lines.join("")}</ul></section>` });

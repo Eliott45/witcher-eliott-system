@@ -32,6 +32,9 @@
     }
   ],
   "documentTypes": {
+    "RegionBehavior": {
+      "environment": {}
+    },
     "Actor": {
       "character": {},
       "npc": {},

@@ -61,10 +61,22 @@ test("a throw uses Athletics against the distance DC; range is BODY × 4 m", () 
 
 test("the blast hits every body part against its own armor and finds tokens in the radius", () => {
   const target = { type: "character", items: [], effects: [], system: { creature: {}, statistics: { modifiers: [] } } };
-  const blast = blastDamage(target, 10, { types: ["piercing"], piercing: "none", silver: false });
-  assert.equal(blast.parts.length, 6); assert.equal(blast.total, 60);
+  const rolls = { head: 10, torso: 10, rightArm: 10, leftArm: 10, rightLeg: 10, leftLeg: 10 };
+  const blast = blastDamage(target, rolls, { types: ["piercing"], piercing: "none", silver: false });
+  assert.equal(blast.parts.length, 6); assert.equal(blast.total, 30 + 10 + 4 * 5, "head ×3, torso ×1, limbs ×½");
   const scene = { grid: { size: 100, distance: 2 }, tokens: [{ actor: {}, x: 0, y: 0, width: 1, height: 1, getSize: () => ({ width: 100, height: 100 }) },
     { actor: {}, x: 400, y: 0, width: 1, height: 1, getSize: () => ({ width: 100, height: 100 }) }] };
   assert.equal(tokensInBlast(scene, { x: 50, y: 50 }, 4).length, 1);
   assert.equal(tokensInBlast(scene, { x: 250, y: 50 }, 4).length, 2);
+});
+
+test("a «Среда Ведьмака» region overrides the scene for tokens inside it; blank fields keep the scene", () => {
+  const behavior = (system, extra = {}) => ({ type: "environment", disabled: false, system, ...extra });
+  const token = { parent: scene({ light: "day", terrain: "normal" }), regions: new Set([{ behaviors: [behavior({ light: "", terrain: "snow", heat: "" }), behavior({ light: "dark", terrain: "", heat: "on" }, { disabled: true })] }]) };
+  const state = actorEnvironment(who(), undefined, token);
+  assert.equal(state.terrain.id, "snow"); assert.equal(state.light.id, "day"); assert.equal(state.heat, false);
+  token.regions = new Set([{ behaviors: [behavior({ light: "dark", terrain: "", heat: "on" })] }]);
+  const hot = actorEnvironment(who(), undefined, token);
+  assert.equal(hot.light.id, "dark"); assert.equal(hot.terrain.id, "normal"); assert.equal(hot.heat, true);
+  assert.equal(actorEnvironment(who("env-dry-ground"), undefined, { ...token, regions: new Set([{ behaviors: [behavior({ terrain: "snow" })] }]) }).terrain.id, "normal");
 });
