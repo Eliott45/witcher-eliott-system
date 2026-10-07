@@ -1,19 +1,21 @@
 import { available } from "../data/workshop.mjs";
 import { workshopAction, selectCatalogItem, esc } from "./workshop-item-context.mjs";
 import { craftDialog } from "../workshop/crafting.mjs";
-import { applyMutagen, harvestMaterial } from "../workshop/mutagens.mjs";
+import { consumeMutagen, harvestMaterial, harvestMutagen, mutagenFor } from "../workshop/mutagens.mjs";
 import { acquireEquipment } from "../data/equipment-purchase.mjs";
 export async function workshopActorContext(actor) {
   const mutations=actor.system.mutations??[];
   const items=Array.from(actor.items??[]);
   return { witcher:actor.system.details.race==="witcher",npc:actor.type==="npc",mutations,free:Math.max(0,2-mutations.length),
-    ready:items.filter(item=>item.system.kind==="mutagen"&&available(item)&&item.system.mutagen.prepared&&mutations.length<2).map(item=>({id:item.id,name:item.name})),
+    ready:items.filter(item=>item.system.kind==="mutagen"&&available(item)&&mutations.length<2).map(item=>({id:item.id,name:item.name,dc:item.system.mutagen.dc,prepared:item.system.mutagen.prepared})),
+    mutagenSource:actor.type==="npc"&&mutagenFor(actor)?{name:mutagenFor(actor).name,harvested:Boolean(actor.flags?.["witcher-eliott-system"]?.mutagenHarvested)}:null,
     recipes:items.filter(item=>item.type==="recipe").map(item=>({id:item.id,name:item.name,dc:item.system.recipe.dc})),
     harvest:await Promise.all((actor.system.harvest??[]).map(async row=>({...row,name:(await foundry.utils.fromUuid(row.uuid))?.name??"Недоступный предмет"}))) };
 }
 export const workshopActorActions={
  craftInventory:workshopAction(async function(_event,target){if(this.isEditable)await craftDialog(this.actor,this.actor.items.get(target.dataset.itemId));}),
- applySheetMutagen:workshopAction(async function(_event,target){if(this.isEditable)await applyMutagen(this.actor.items.get(target.dataset.itemId));}),
+ applySheetMutagen:workshopAction(async function(_event,target){if(this.isEditable)await consumeMutagen(this.actor.items.get(target.dataset.itemId));}),
+ harvestMutagen:workshopAction(async function(){if(this.isEditable)await harvestMutagen(this.actor);}),
  buyMaterial:workshopAction(async function(){
    if(!this.isEditable)return;
    const item=await selectCatalogItem("Купить материалы",entry=>entry.system.kind==="material");if(!item)return;

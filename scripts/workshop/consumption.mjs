@@ -10,7 +10,7 @@ import { workshopCheck, workshopNotice } from "./check.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { applyOil } from "./upgrades.mjs";
-import { applyMutagen } from "./mutagens.mjs";
+import { consumeMutagen } from "./mutagens.mjs";
 import { itemPresentation } from "../sheets/item-presentation.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 
@@ -140,7 +140,7 @@ const beneficial = new Set(["clotting", "numbing", "sterilizing", "succubus-brea
 async function usageDialog(item) {
   const actor = item.actor, context = consumableContext(item);
   if (!actor?.isOwner || !context.canUse) throw new Error("Нет доступных порций при себе.");
-  if (item.system.kind === "mutagen") return applyMutagen(item);
+  if (item.system.kind === "mutagen") return consumeMutagen(item);
   if (item.system.alchemy?.category === "oil") {
     const weapons = actor.items.filter(weapon => weapon.type === "weapon" && !weapon.system.natural && weapon.system.category !== "shield" && weapon.system.quantity === 1 && weapon.system.carried);
     if (!weapons.length) throw new Error("Нет оружия для нанесения масла.");

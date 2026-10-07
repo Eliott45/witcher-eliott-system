@@ -2,7 +2,7 @@ import { spellItemContext } from "./magic-context.mjs";
 import { ritualComponentActions } from "./ritual-components.mjs";
 import { workshopItemContext, workshopItemActions, workshopAction } from "./workshop-item-context.mjs";
 import { installUpgrade, removeArmorUpgrade, augmentItem, applyOil } from "../workshop/upgrades.mjs";
-import { prepareMutagen, applyMutagen } from "../workshop/mutagens.mjs";
+import { prepareMutagen, consumeMutagen } from "../workshop/mutagens.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { physicalItemContext } from "./physical-item-context.mjs";
 import { equipmentEntry } from "../data/equipment-search.mjs";
@@ -30,7 +30,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     classes: ["witcher-eliott", "reference-sheet"],
     position: { width: 620, height: 660 },
     window: { resizable: true },
-    actions: { ...consumptionActions, ...effectItemActions, ...ritualComponentActions, installUpgradeDirect: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item,{withoutCheck:true});}), searchItemTrait, ...workshopItemActions, installUpgrade: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item);}), removeArmorUpgrade:workshopAction(async function(_e,target){if(this.isEditable)await removeArmorUpgrade(this.item,target.dataset.installationId);}), augmentItem:workshopAction(async function(){if(this.isEditable)await augmentItem(this.item);}), applyOil:workshopAction(async function(){if(this.isEditable)await applyOil(this.item);}), prepareMutagen:workshopAction(async function(){if(this.isEditable)await prepareMutagen(this.item);}), applyMutagen:workshopAction(async function(){if(this.isEditable)await applyMutagen(this.item);}) },
+    actions: { ...consumptionActions, ...effectItemActions, ...ritualComponentActions, installUpgradeDirect: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item,{withoutCheck:true});}), searchItemTrait, ...workshopItemActions, installUpgrade: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item);}), removeArmorUpgrade:workshopAction(async function(_e,target){if(this.isEditable)await removeArmorUpgrade(this.item,target.dataset.installationId);}), augmentItem:workshopAction(async function(){if(this.isEditable)await augmentItem(this.item);}), applyOil:workshopAction(async function(){if(this.isEditable)await applyOil(this.item);}), prepareMutagen:workshopAction(async function(){if(this.isEditable)await prepareMutagen(this.item);}), applyMutagen:workshopAction(async function(){if(this.isEditable)await consumeMutagen(this.item);}) },
     form: { submitOnChange: true, closeOnSubmit: false }
   };
 

@@ -39,3 +39,12 @@ test("Griffin hardens after hits over 5; Arachas counts free carry; Wyvern grows
   await onKill(b); await onKill(b);
   assert.deepEqual(blizzard.flags[SYSTEM_ID].condition.modifiers, [{ target: "attributes.reflex", value: 4 }]);
 });
+
+test("mutation DC and mutagen sources follow p.251", async () => {
+  const { mutationDC, mutagenFor } = await import("../scripts/workshop/mutagens.mjs");
+  assert.equal(mutationDC({ system: { statistics: { effective: { body: 6, will: 7 } } } }), 22);
+  assert.equal(mutagenFor({ type: "npc", name: "Накер-воин" })?.id, "mutagen.nekker");
+  assert.equal(mutagenFor({ type: "npc", name: "Скальный тролль" })?.id, "mutagen.troll");
+  assert.equal(mutagenFor({ type: "npc", name: "Бандит" }), null);
+  assert.equal(mutagenFor({ type: "character", name: "Грифон" }), null);
+});

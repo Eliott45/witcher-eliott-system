@@ -20,7 +20,7 @@ export async function workshopItemContext(item, recipeDetails) {
     bonuses:(foundry.utils.getProperty(item.system,bonusPath(item))??[]).map((b,index)=>({...b,index,label:WORKSHOP_BONUS_LABELS[b.target]??b.target})),
     canOil:Boolean(item.actor&&item.type==="weapon"&&item.system.category!=="shield"),
     canPrepare:Boolean(item.actor&&available(item)&&!item.system.mutagen.prepared),
-    canApply:Boolean(item.actor?.system.details.race==="witcher"&&available(item)&&item.system.mutagen.prepared&&item.actor.system.mutations.length<2),
+    canApply:Boolean(item.actor&&available(item)&&(item.actor.system.mutations??[]).length<2),
     isMutagen:item.system.kind==="mutagen", isOil:item.system.alchemy?.category==="oil", isUpgrade:item.system.kind==="upgrade" };
 }
 export async function selectCatalogItem(title, predicate = ()=>true) {
