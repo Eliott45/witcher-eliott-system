@@ -1141,3 +1141,5 @@ b.witcher-gm-only::after, span.witcher-gm-only::after { display:none; }
 .witcher-loot-note { margin:0; }
 .witcher-loot-items li.draggable { cursor:grab; }
 .witcher-loot-items li.draggable:active { cursor:grabbing; }
+
+.witcher-character-sidebar .witcher-stun-block { margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #b39a6740; }
