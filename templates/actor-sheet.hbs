@@ -83,6 +83,20 @@
     {{#if conditions.unconscious}}
     <p class="witcher-exhaustion-notice">{{localize "WITCHER.Effects.Unconscious"}}</p>
     {{/if}}
+    <fieldset class="witcher-resource resolve {{#if verbalDuel}}is-dueling{{/if}}">
+      <legend><span data-tooltip="Решительность (стр. 176): заменяет ПЗ в словесной дуэли. (ВОЛЯ + ИНТ) / 2 × 5. На 0 персонаж проигрывает дуэль и делает то, чего хотел противник." data-tooltip-direction="RIGHT" tabindex="0">Решительность <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></legend>
+      <div class="witcher-resource-values">
+        <label for="{{rootId}}-resolve-value">{{localize "WITCHER.Sheet.Current"}}
+          <input id="{{rootId}}-resolve-value" type="number" name="system.resolve.value"
+                 value="{{system.resolve.value}}" min="0" step="1" {{disabled (not editable)}}>
+        </label>
+        <span aria-hidden="true">/</span>
+        <label for="{{rootId}}-resolve-max">{{localize "WITCHER.Sheet.Maximum"}}
+          <output id="{{rootId}}-resolve-max">{{system.resolve.max}}</output>
+        </label>
+      </div>
+    <div class="witcher-meter is-resolve {{#if meters.resolve.low}}is-low{{/if}}" aria-hidden="true"><span style="width:{{meters.resolve.percent}}%"></span></div>
+    </fieldset>
   </section>
     <section class="witcher-derived" aria-label="{{localize 'WITCHER.Statistics.Physical'}}">
       <div class="witcher-stat-row">

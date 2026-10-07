@@ -1,3 +1,4 @@
+import { duelOf } from "../combat/verbal-duel.mjs";
 import { takeLootByDrop } from "../loot/loot.mjs";
 import { creatureResistances, conditionResistant, DAMAGE_TYPE_NAMES } from "../combat/damage-rules.mjs";
 import { SYSTEM_ID } from "../config.mjs";
@@ -74,7 +75,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
       empty:!actor.items.size&&ATTRIBUTE_KEYS.every(key=>system.attributes[key]===null),
       canRestoreItems:!actor.items.size&&bestiarySources().some(entry=>entry.system.creature.source===system.creature.source),
       categories:MONSTER_CATEGORIES.map(entry=>({...entry,selected:entry.id===system.creature.category})),category:MONSTER_CATEGORIES.find(c=>c.id===system.creature.category)?.name,
-      creatureClass:MONSTER_CATEGORIES.find(entry=>entry.id===system.creature.category),
+      creatureClass:MONSTER_CATEGORIES.find(entry=>entry.id===system.creature.category),verbalDuel:Boolean(duelOf(this.actor)),
       sizeClasses:SIZE_CLASSES.map(entry=>({...entry,selected:entry.id===sizeClassOf(this.actor).id,label:`${entry.name} (${entry.examples}) ${entry.modifier>0?"+":entry.modifier<0?"−":""}${Math.abs(entry.modifier)}`})),sizeClass:sizeClassOf(this.actor),
       attributes:ATTRIBUTE_KEYS.filter(key=>key!=="luck").map(key=>({key,name:i18n.localize(`WITCHER.Attributes.${key}.Short`),label:i18n.localize(`WITCHER.Attributes.${key}.Label`),base:system.attributes[key],value:stats.effective[key]??"—"})),
       skills:SKILLS.filter(skill=>skill.key!=="language"&&(editing||system.skills[skill.key]>0)).map(skill=>{const value=skillValue(system,skill.key);return {...value,name:i18n.localize(skill.label),calculation:skillCalculationTooltip(system,value,i18n)};}),

@@ -89,6 +89,8 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
       }),
       health: resource(true),
       stamina: resource(),
+      // Core p.176: Resolve replaces HP in a verbal duel.
+      resolve: resource(),
       notes: new StringField({ required: true, nullable: false, initial: "" })
     };
   }
@@ -110,6 +112,8 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
     // Keep legacy limits until BODY and WILL are entered. Never heal/refill on a stat change.
     if (statistics.healthMax !== null) this.health.max = statistics.healthMax;
     if (statistics.staminaMax !== null) this.stamina.max = statistics.staminaMax;
+    if (statistics.resolveMax !== null) this.resolve.max = statistics.resolveMax;
+    this.resolve.value = Math.min(this.resolve.value, this.resolve.max);
     this.health.value = Math.min(this.health.value, this.health.max);
     this.stamina.value = Math.min(this.stamina.value, this.stamina.max);
     this.carriedWeight = carriedWeight(this.parent?.items);

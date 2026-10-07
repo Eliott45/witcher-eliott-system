@@ -1066,6 +1066,9 @@
 .witcher-meter.is-health.is-low>span { background:linear-gradient(90deg,#6d1515,#b3261e); animation:witcher-meter-pulse 2.4s ease-in-out infinite; }
 .witcher-meter.is-stamina>span { background:linear-gradient(90deg,#3f6c5e,#6fa38d); box-shadow:0 0 6px #6fa38d66; }
 .witcher-meter.is-stamina.is-low>span { background:linear-gradient(90deg,#7a5a2a,#b98a3e); }
+.witcher-meter.is-resolve>span { background:linear-gradient(90deg,#4a4170,#8a7cc4); box-shadow:0 0 6px #8a7cc466; }
+.witcher-meter.is-resolve.is-low>span { background:linear-gradient(90deg,#6b2f3a,#b0566a); }
+.witcher-resource.resolve.is-dueling { box-shadow:0 0 0 1px #8a7cc4; }
 @keyframes witcher-meter-pulse { 50% { filter:brightness(1.35); } }
 @media (prefers-reduced-motion:reduce) { .witcher-meter>span { transition:none; animation:none !important; } }
 

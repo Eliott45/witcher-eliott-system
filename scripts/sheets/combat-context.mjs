@@ -1,3 +1,4 @@
+import { skillValue } from "../data/skills.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
@@ -22,6 +23,7 @@ import { isBomb, bombProfile, throwBomb } from "../combat/bombs.mjs";
 import { activeOil, available } from "../data/workshop.mjs";
 import { MONSTER_CATEGORIES } from "../data/monster-categories.mjs";
 import { applyOil } from "../workshop/upgrades.mjs";
+import { duelOf, VERBAL_ATTACKS, VERBAL_LEVERS, VERBAL_DEFENSES, TORTURE, verbalAttack } from "../combat/verbal-duel.mjs";
 import { healingContext, healingPatient, stabilizePatientWound, treatPatientWound, startNaturalHealing, restDay, stabilizeDying } from "../combat/healing.mjs";
 
 export function combatContext(actor,options={}) {
@@ -37,10 +39,19 @@ export function combatContext(actor,options={}) {
     .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
   const unarmed=actor.type==="npc"?[]:unarmedContext(actor,options,{extra,fastPending:fastPending&&actor.flags[SYSTEM_ID].fastStrike.extra===extra});
   const environmentState=actorEnvironment(actor);
+  const duelCombat=duelOf(actor),skillName=key=>key?game.i18n.localize(`WITCHER.Skills.Entries.${key}.Label`):"своя атака";
+  const verbalEntry=entry=>{const total=skillValue(actor.system,entry.skill)?.total;return {...entry,skillName:skillName(entry.skill),base:total==null?"—":signed(total),
+    damage:entry.damage?`${entry.label??entry.damage} + ${({empathy:"ЭМП",intelligence:"ИНТ",will:"ВОЛЯ"})[entry.stat]}`:"",disabled:!canAct};};
+  const duel=duelCombat?{resolve:actor.system.resolve,crowns:options.crowns??50,
+    torture:TORTURE.map(entry=>({...entry,selected:Number(options.torture??0)===entry.id})),
+    groups:[{name:"Эмпатические атаки",hint:"Расположить к себе: слабее, но не настраивают против вас",actions:VERBAL_ATTACKS.filter(entry=>entry.type==="empathic").map(verbalEntry)},
+      {name:"Антагонистические атаки",hint:"Сильнее, но противник запомнит",actions:VERBAL_ATTACKS.filter(entry=>entry.type==="antagonistic").map(verbalEntry)},
+      {name:"Рычаги давления",hint:"Полный ход вместо атаки; бонусы до конца дуэли",actions:[...VERBAL_LEVERS.map(verbalEntry),{...verbalEntry({...VERBAL_LEVERS.find(entry=>entry.id==="hint"),skill:"deceit"}),name:"Намёк (Обман)"}]}],
+    defenses:VERBAL_DEFENSES.map(entry=>({...entry,skillName:skillName(entry.skill),damage:entry.damage?`${entry.damage} + ${({empathy:"ЭМП",intelligence:"ИНТ"})[entry.stat]}`:"",effect:entry.effect??"при успешной защите наносит урон Решительности атакующего"}))}:null;
   const hasOils=Array.from(actor.items??[]).some(entry=>entry.system?.alchemy?.category==="oil"&&available(entry));
   const bombs=actor.type==="npc"?[]:Array.from(actor.items??[]).filter(item=>isBomb(item)&&(item.system.quantity??0)>0&&item.system.carried!==false).map(item=>{const profile=bombProfile(item),body=actor.system.statistics.effective.body??0;
     return {id:item.id,name:item.name,img:item.img,quantity:item.system.quantity,summary:[`радиус ${profile.radius} м`,profile.damage?`урон ${profile.damage}`:"",`дальность ${body*4} м`].filter(Boolean).join(" · "),properties:item.system.properties??""};});
-  return { healing:healingContext(actor), unarmed, bombs, environment:environmentSummary(environmentState), snow:environmentState?.terrain.id==="snow", feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"auto",modifier:options.modifier??0,
+  return { duel, healing:healingContext(actor), unarmed, bombs, environment:environmentSummary(environmentState), snow:environmentState?.terrain.id==="snow", feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"auto",modifier:options.modifier??0,
     grapple:(()=>{const state=grappleState(actor);return {options:grappleOptions(actor),holding:state.holding?{name:state.holding.name,pinned:state.holding.pinned,choking:state.holding.choking}:null,heldBy:state.heldBy?{name:state.heldBy.name}:null};})(),
     fullTurn,defenses,quickDraw,canQuickDraw:canAct&&Boolean(globalThis.game?.combat?.started&&Array.from(globalThis.game.combat.combatants).some(entry=>entry.actor?.uuid===actor.uuid)),ambush:{active:Boolean(ambush),targets:ambushTargets,count:ambushTargets.length,
       canPrepare:Boolean(canAct&&ambusher&&!encounter.started&&!tacticsFlags(ambusher).tacticRequest),pending:Boolean(tacticsFlags(ambusher).tacticRequest)},
@@ -101,6 +112,8 @@ export const combatActions={
   defend:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollDefense(this.actor,{...this.combatOptions,mode:target.dataset.mode,itemId:target.dataset.itemId});}finally{await this.render();}}),
   toggleExtraAction:guard(async function(){if(!this.isEditable)return;await inventoryWrite(this.actor,()=>this.actor.update({"system.combatAction.extra":!this.actor.system.combatAction.extra}));}),
   attackUnarmed:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollWeaponAttack(this.actor,null,{...this.combatOptions,unarmed:target.dataset.strike,mode:target.dataset.mode});}finally{await this.render();}}),
+  verbalAttack:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;
+    try{await verbalAttack(this.actor,target.dataset.verbal,{skill:target.dataset.skill??null,situational:Number(this.combatOptions?.modifier)||0,torture:Number(this.combatOptions?.torture)||0,crowns:target.dataset.verbal==="bribe"?Number(this.combatOptions?.crowns)||50:0});}finally{await this.render();}}),
   applyWeaponOil:guard(async function(_event,target){if(!this.isEditable)return;try{await applyOil(this.actor.items.get(target.dataset.itemId));}finally{await this.render();}}),
   throwBomb:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await throwBomb(this.actor,this.actor.items.get(target.dataset.itemId));}finally{await this.render();}}),
   snowFooting:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollFooting(this.actor);}finally{await this.render();}}),

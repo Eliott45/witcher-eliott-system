@@ -40,6 +40,9 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   if (modifiers.some(modifier => modifier.source === "witcher.dulled-emotions") && adjusted.empathy !== null) adjusted.empathy = Math.min(6, Math.max(1, adjusted.empathy));
   const { body, will } = adjusted;
   const limitBody = limitValue("body"), limitWill = limitValue("will");
+  // Core p.176: Resolve = (WILL + INT) / 2 × 5, from the base values like HP and STA.
+  const limitInt = limitValue("intelligence");
+  const resolveMax = limitInt !== null && limitWill !== null ? Math.floor((Math.max(0, limitInt) + Math.max(0, limitWill)) / 2) * 5 : null;
   const physical = body !== null && will !== null ? Math.floor((Math.max(0, limitBody) + Math.max(0, limitWill)) / 2) : null;
   // A creature's printed HP/STA (set by the GM) replace the BODY/WILL formula; effect modifiers still apply.
   const baseLimit = key => creature?.[key] > 0 ? creature[key] : physical === null ? null : physical * 5;
@@ -57,7 +60,7 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const { speed } = effective;
   const run = speed === null ? null : speed * 3;
   return {
-    healthMax, staminaMax, meleeDamageBonus: modifierTotal(modifiers, "meleeDamage"), physicalDamageBonus: modifierTotal(modifiers, "physicalDamage"), encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),
+    healthMax, staminaMax, resolveMax, meleeDamageBonus: modifierTotal(modifiers, "meleeDamage"), physicalDamageBonus: modifierTotal(modifiers, "physicalDamage"), encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),
     stun: physical === null ? null : Math.max(0, Math.min(10, physical) + modifierTotal(modifiers, "stun")),
     recovery: physical === null ? null : Math.max(0, scale(physical + modifierTotal(modifiers, "recovery"), "recovery")), woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
     reputationBonus, reputation: reputationTotal, naturalArmor: modifierTotal(modifiers, "naturalArmor"),

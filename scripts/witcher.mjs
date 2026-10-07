@@ -27,6 +27,7 @@ import { registerBombs } from "./combat/bombs.mjs";
 import { registerSpellStrikes } from "./magic/spell-strikes.mjs";
 import { registerMagicFumble } from "./magic/magic-fumble.mjs";
 import { registerWitcherElixirs } from "./workshop/witcher-elixirs.mjs";
+import { registerVerbalDuel } from "./combat/verbal-duel.mjs";
 import { migrateEffectContent, registerEffectContentMigration } from "./migrations/effect-content.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
@@ -82,7 +83,7 @@ import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
 Hooks.once("init", async () => {
   registerSystemSettings();
   registerManualCriticalChat();
-  const templatesReady = foundry.applications.handlebars.loadTemplates(["ambush-card", "combat-actions", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "crafting", "alchemy", "recipe-card"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
+  const templatesReady = foundry.applications.handlebars.loadTemplates(["ambush-card", "combat-actions", "verbal-duel", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "crafting", "alchemy", "recipe-card"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Actor.documentClass = WitcherActor;
   CONFIG.ActiveEffect.documentClass = WitcherActiveEffect;
@@ -105,6 +106,7 @@ Hooks.once("init", async () => {
   registerSpellStrikes();
   registerMagicFumble();
   registerWitcherElixirs();
+  registerVerbalDuel();
   registerConditionSaves();
   registerEffectExpiry();
   registerOilExpiry();

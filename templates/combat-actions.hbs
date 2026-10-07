@@ -1,3 +1,4 @@
+{{#if combat.duel}}{{> "systems/witcher-eliott-system/templates/verbal-duel.hbs"}}{{else}}
 <section class="witcher-combat-panel">
   <header class="witcher-combat-heading"><h3><i class="fa-solid fa-khanda"></i> Атака</h3>
     <button type="button" data-action="toggleExtraAction" class="witcher-extra-toggle" aria-pressed="{{combat.extra}}" {{disabled (not editable)}} data-tooltip="3 ВЫН за дополнительное действие. −3 ко всем его проверкам: атака, навык, параметр или магия. После действия переключатель сбрасывается."><i class="fa-solid fa-bolt"></i> Второе действие <b>−3</b></button>
@@ -79,3 +80,4 @@
     {{else}}{{#unless compact}}<p>Отправьте запрос в чат. Мастер выберет участников, затем каждый выполнит свою проверку.</p>{{/unless}}{{/if}}
   </section>
 </section>
+{{/if}}

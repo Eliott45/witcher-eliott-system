@@ -1,3 +1,4 @@
+import { duelOf } from "../combat/verbal-duel.mjs";
 import { temporaryHealth } from "../workshop/witcher-elixirs.mjs";
 import { takeLootByDrop } from "../loot/loot.mjs";
 import { magicContext, magicActions, bindMagic, learnSpell } from "./magic-context.mjs";
@@ -166,7 +167,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       }), rollUnavailable: !conditions.canAct || this.actor.system.statistics.effective.will === null || this.#rollingReputation },
       effects: await effectsContext(this),
       toxicitySave: toxicitySaveContext(this),
-      meters: { health: meter(this.actor.system.health), stamina: meter(this.actor.system.stamina) }, temporaryHealth: temporaryHealth(this.actor),
+      meters: { health: meter(this.actor.system.health), stamina: meter(this.actor.system.stamina), resolve: meter(this.actor.system.resolve) }, verbalDuel: Boolean(duelOf(this.actor)), temporaryHealth: temporaryHealth(this.actor),
       stats,
       visibleTabs: visible.map(tab => context.tabs[tab.id]),
       actor: this.actor,
