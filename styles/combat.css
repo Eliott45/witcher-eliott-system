@@ -312,3 +312,6 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-bomb-row span { flex:1; font-size:13px; }
 .witcher-bomb-row button { flex:0 0 auto; width:auto; height:28px; padding:0 10px; font-size:12px; }
 .witcher-bomb-victims { margin:6px 0; padding-left:18px; font-size:13px; }
+.witcher-attack-oil { display:flex; align-items:center; gap:6px; margin:0 14px 9px; padding:4px 8px; border-radius:5px; background:#e1ecdb; color:#3f5a3b; font-size:12px; font-weight:700; }
+.witcher-attack-oil.is-empty { background:none; padding:0; }
+.witcher-attack-oil button { flex:0 0 auto; width:auto; height:24px; padding:0 8px; font-size:11px; order:2; margin-left:auto; }

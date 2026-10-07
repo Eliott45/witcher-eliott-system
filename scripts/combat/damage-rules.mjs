@@ -86,13 +86,15 @@ export const criticalLevel = margin => CRITICAL_LEVELS.find(level => margin >= l
  * Step-by-step damage against one hit location. Every step is recorded so the chat card can explain the result.
  * `base` is the rolled weapon damage (already ×2 for a strong strike); `silver` the separate silver dice total.
  */
-export function resolveDamage({ base, silver = 0, location, multiplier, traits, armor, monster = false, vulnerableToFire = false, critical = null }) {
+export function resolveDamage({ base, silver = 0, location, multiplier, traits, armor, monster = false, vulnerableToFire = false, critical = null, extra = null }) {
   const steps = [], note = (label, value, detail = "") => steps.push({ label, value, detail });
   const fire = traits.types.includes("elemental");
   const silverApplies = monster && silver > 0;
   let damage = base + (silverApplies ? silver : 0);
   note("Бросок урона", base, traits.types.map(type => DAMAGE_TYPE_NAMES[type]).join(" / "));
   if (silverApplies) note("Серебро против чудовища", `+${silver}`);
+  // A sword oil against its monster class (core p.248) adds to the weapon damage before armor.
+  if (extra?.value) { damage += extra.value; note(extra.label, `+${extra.value}`, extra.detail ?? ""); }
   const sp = traits.piercing === "improved" ? Math.floor(armor.sp / 2) : armor.sp;
   if (armor.sp) note(traits.piercing === "improved" ? "ПБ (улучшенное пробивание: ½)" : "ПБ брони", `−${sp}`, armor.layers.map(layer => `${layer.name} ${layer.sp}`).join(", "));
   damage = Math.max(0, damage - sp);

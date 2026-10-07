@@ -19,6 +19,9 @@ import { isCrossbow, loadedBolt, boltChoices, loadUpdate, unloadCrossbow } from 
 import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
 import { actorEnvironment, environmentSummary, rollFooting } from "../combat/environment.mjs";
 import { isBomb, bombProfile, throwBomb } from "../combat/bombs.mjs";
+import { activeOil, available } from "../data/workshop.mjs";
+import { MONSTER_CATEGORIES } from "../data/monster-categories.mjs";
+import { applyOil } from "../workshop/upgrades.mjs";
 import { healingContext, healingPatient, stabilizePatientWound, treatPatientWound, startNaturalHealing, restDay, stabilizeDying } from "../combat/healing.mjs";
 
 export function combatContext(actor,options={}) {
@@ -34,6 +37,7 @@ export function combatContext(actor,options={}) {
     .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
   const unarmed=actor.type==="npc"?[]:unarmedContext(actor,options,{extra,fastPending:fastPending&&actor.flags[SYSTEM_ID].fastStrike.extra===extra});
   const environmentState=actorEnvironment(actor);
+  const hasOils=Array.from(actor.items??[]).some(entry=>entry.system?.alchemy?.category==="oil"&&available(entry));
   const bombs=actor.type==="npc"?[]:Array.from(actor.items??[]).filter(item=>isBomb(item)&&(item.system.quantity??0)>0&&item.system.carried!==false).map(item=>{const profile=bombProfile(item),body=actor.system.statistics.effective.body??0;
     return {id:item.id,name:item.name,img:item.img,quantity:item.system.quantity,summary:[`радиус ${profile.radius} м`,profile.damage?`урон ${profile.damage}`:"",`дальность ${body*4} м`].filter(Boolean).join(" · "),properties:item.system.properties??""};});
   return { healing:healingContext(actor), unarmed, bombs, environment:environmentSummary(environmentState), snow:environmentState?.terrain.id==="snow", feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"auto",modifier:options.modifier??0,
@@ -55,10 +59,14 @@ export function combatContext(actor,options={}) {
         return {...mode,name:label,second,description,base:quote.total===null?"—":signed(quote.total),damage:quote.damage,disabled:Boolean(reason),hint:reason||`${description?`${description} `:""}${pairHint}${quote.parts.map(part=>`${part.label}: ${signed(part.value??0)}`).join("; ")}`};
       });
       const loaded=item.system.skill!=="crossbow"||item.system.loaded!==false,bolt=loadedBolt(item);
+      // Core p.248: an oil lasts 30 minutes; its bonus applies to damage against its monster class.
+      const now=game.time?.worldTime??0,coat=item.system.natural?null:activeOil(item,now);
+      const oil=coat?{name:coat.name,bonus:coat.bonus,target:MONSTER_CATEGORIES.find(entry=>entry.id===coat.target)?.name??coat.target,minutes:Math.max(1,Math.ceil((coat.expiresAt-now)/60))}:null;
+      const canOil=!item.system.natural&&item.system.category!=="shield"&&item.system.quantity===1&&hasOils;
       const bolts=isCrossbow(item)&&!loaded?boltChoices(actor).map(ammo=>({id:ammo.id,name:ammo.name,quantity:ammo.system.quantity})):[];
       const crossbow=isCrossbow(item)?{loaded,bolt:bolt?.name??"",bolts,choose:bolts.length>1}:null;
       return {id:item.id,name:item.name,img:item.img,properties:item.system.properties??"",damageTypes:damageTypeLabel(item.system.damageType),rate:actor.type==="npc"?item.system.attackRate??1:null,natural:Boolean(item.system.natural),grip:gripOf(item),
-        equipped:equippedItems(actor.items).some(entry=>entry.id===item.id),modes,loaded,needsReload:!loaded,crossbow,
+        equipped:equippedItems(actor.items).some(entry=>entry.id===item.id),modes,loaded,needsReload:!loaded,crossbow,oil,canOil,
         melee:item.system.category==="melee"&&!item.system.natural,techniques:actor.type!=="npc"&&!item.system.natural&&modes.some(mode=>mode.secondary)&&equippedItems(actor.items).some(entry=>entry.id===item.id),
         skill:game.i18n.localize(`WITCHER.Skills.Entries.${item.system.skill}.Label`)};
     }) };
@@ -93,6 +101,7 @@ export const combatActions={
   defend:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollDefense(this.actor,{...this.combatOptions,mode:target.dataset.mode,itemId:target.dataset.itemId});}finally{await this.render();}}),
   toggleExtraAction:guard(async function(){if(!this.isEditable)return;await inventoryWrite(this.actor,()=>this.actor.update({"system.combatAction.extra":!this.actor.system.combatAction.extra}));}),
   attackUnarmed:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollWeaponAttack(this.actor,null,{...this.combatOptions,unarmed:target.dataset.strike,mode:target.dataset.mode});}finally{await this.render();}}),
+  applyWeaponOil:guard(async function(_event,target){if(!this.isEditable)return;try{await applyOil(this.actor.items.get(target.dataset.itemId));}finally{await this.render();}}),
   throwBomb:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await throwBomb(this.actor,this.actor.items.get(target.dataset.itemId));}finally{await this.render();}}),
   snowFooting:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollFooting(this.actor);}finally{await this.render();}}),
   feint:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollFeint(this.actor);}finally{await this.render();}}),

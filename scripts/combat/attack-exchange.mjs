@@ -6,7 +6,7 @@ import { dropItemToGround } from "../loot/loot.mjs";
 import { scatterOffset } from "../canvas/scatter-overlay.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
-import { effectiveItem } from "../data/workshop.mjs";
+import { effectiveItem, activeOil } from "../data/workshop.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { trackRollDisplay, waitsForDice, diceSyncEnabled } from "../chat/roll-display.mjs";
 import { rollStun } from "./stun-roll.mjs";
@@ -206,8 +206,11 @@ export function rollExchangeDamage(message, index) {
       if (attack.nonLethal) wound = null;
       critical = { level: outcome.critical.id, name: outcome.critical.name, bonus, roll: tableRoll, aimed, wound };
     }
+    // Core p.248: an active oil adds its bonus against the monster class it was made for.
+    const oil = item ? activeOil(item, game.time?.worldTime ?? 0) : null, category = target?.type === "npc" ? target.system.creature?.category : "humanoid";
+    const oilBonus = oil && oil.target === category ? { name: oil.name, bonus: oil.bonus } : null;
     return { rolls, flavor: `<h3>${esc(attack.name)} · урон</h3>`,
-      exchange: { base: rolls[0].total, silver: silver?.total ?? 0,
+      exchange: { base: rolls[0].total, silver: silver?.total ?? 0, oil: oilBonus,
         location: { id: location.id, name: location.name, multiplier: location.multiplier }, traits, critical } };
   });
 }
@@ -220,8 +223,9 @@ export function damagePreview(message, index) {
   const critical = data.critical ? { name: data.critical.name, bonus: data.critical.bonus } : null;
   // Cracked Skull (core p.159): later wounds to the head deal ×4 instead of ×3.
   const multiplierFor = actor => data.location.id === "head" ? data.location.multiplier + modifierTotal(actor.system.statistics?.modifiers ?? [], "damage.headMultiplier") : data.location.multiplier;
-  const hit = (actor, armorAtZone, base, silver, crit) => resolveDamage({ base, silver, location: data.location.id, multiplier: multiplierFor(actor),
-    traits: data.traits, armor: armorAtZone, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor), critical: crit });
+  const oil = data.oil ? { label: `Масло: ${data.oil.name}`, value: data.oil.bonus } : null;
+  const hit = (actor, armorAtZone, base, silver, crit, extra = oil) => resolveDamage({ base, silver, location: data.location.id, multiplier: multiplierFor(actor),
+    traits: data.traits, armor: armorAtZone, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor), critical: crit, extra });
   const preview = { data, target, armor, result: hit(target, armor, data.base, data.silver, critical), shield: null, prosthesis: null };
   // Core p.160: a blow to a prosthesis does not hurt its owner, but knocks the prosthesis off.
   const fitted = prosthesisAt(target, data.location.id);
@@ -236,9 +240,9 @@ export function damagePreview(message, index) {
   const holding = data.location.id === "torso" ? grappleState(target).holding : null;
   if (holding?.actor) {
     const shieldArmor = armorAt(holding.actor, "torso"), body = holding.actor.system.statistics?.effective?.body ?? 0;
-    const overflow = Math.max(0, data.base - body - shieldArmor.sp);
+    const overflow = Math.max(0, data.base + (data.oil?.bonus ?? 0) - body - shieldArmor.sp);
     preview.shield = { actor: holding.actor, token: holding.token, name: holding.name || holding.actor.name, armor: shieldArmor, body, overflow,
-      result: hit(holding.actor, shieldArmor, data.base, data.silver, critical), through: hit(target, armor, overflow, 0, null) };
+      result: hit(holding.actor, shieldArmor, data.base, data.silver, critical), through: hit(target, armor, overflow, 0, null, null) };
   }
   return preview;
 }
@@ -565,7 +569,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
     }
     else {
       const data = exchangeOf(damage), wound = data.critical?.wound;
-      body += `<p class="witcher-exchange-damage">Урон <b>${data.base}</b>${data.silver ? ` + серебро <b>${data.silver}</b>` : ""} → ${esc(data.location.name)}${data.location.multiplier !== 1 ? ` (×${data.location.multiplier === 0.5 ? "½" : data.location.multiplier})` : ""}</p>`;
+      body += `<p class="witcher-exchange-damage">Урон <b>${data.base}</b>${data.oil ? ` + масло <b>${data.oil.bonus}</b>` : ""}${data.silver ? ` + серебро <b>${data.silver}</b>` : ""} → ${esc(data.location.name)}${data.location.multiplier !== 1 ? ` (×${data.location.multiplier === 0.5 ? "½" : data.location.multiplier})` : ""}</p>`;
       if (wound) body += `<details class="witcher-exchange-wound"><summary>${esc(wound.name)}</summary><p>${esc(wound.effect)}</p></details>`;
       if (applied) {
         const result = exchangeOf(applied);

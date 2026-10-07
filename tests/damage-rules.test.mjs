@@ -310,3 +310,12 @@ test("only enemies are concealed: allies and player characters rolled by the GM 
   assert.equal(creatureDetailsHidden(npc(-1)), true);
   delete globalThis.game; delete globalThis.CONST;
 });
+
+test("a sword oil adds its bonus to the weapon damage before armor (core p.248)", async () => {
+  const { resolveDamage } = await import("../scripts/combat/damage-rules.mjs");
+  const armor = { sp: 4, layers: [{ name: "Куртка", sp: 4 }], resistances: [], ablate: [] };
+  const plain = resolveDamage({ base: 6, location: "torso", multiplier: 1, traits: { types: [], piercing: "none" }, armor });
+  const oiled = resolveDamage({ base: 6, location: "torso", multiplier: 1, traits: { types: [], piercing: "none" }, armor, extra: { label: "Масло: Яд повешенного", value: 5 } });
+  assert.equal(plain.total, 2); assert.equal(oiled.total, 7);
+  assert.ok(oiled.steps.some(step => step.label === "Масло: Яд повешенного" && step.value === "+5"));
+});
