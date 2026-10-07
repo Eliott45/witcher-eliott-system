@@ -1,3 +1,4 @@
+import { isCrossbow, loadedBolt } from "../combat/crossbow-ammo.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { usableHands } from "../combat/critical-wound-effects.mjs";
 import { dropItemToGround } from "../loot/loot.mjs";
@@ -58,6 +59,7 @@ export function inventoryContext(actor, preferences = {}) {
     isWeapon: item.type === "weapon" && !item.system.natural, grip: gripOf(item),
     category: equipmentCategory(item), search: equipmentEntry(item).search, canEquip: ["weapon", "armor"].includes(item.type),
     condition: conditionKey(item) ? effectiveItem(item)[conditionKey(item)] : null, conditionLabel: item.type === "armor" ? "ПБ" : "Н",
+    crossbow: isCrossbow(item) ? { loaded: item.system.loaded !== false, bolt: loadedBolt(item)?.name ?? "" } : null,
     broken: isBroken(item), fittedOn: fittedLimbs(actor, item.id).join(", "),
     totalWeight: Math.round(itemWeight(item) * 1000) / 1000 }));
   for (const row of rows) {

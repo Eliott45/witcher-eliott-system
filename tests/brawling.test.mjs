@@ -55,3 +55,22 @@ test("brawling disarm and trip need no grapple; prone stands up by spending move
   assert.equal(GRAPPLE_ACTIONS["disarm-take"].penalty, -3);
   assert.match(CONDITION_BY_ID.prone.rules.action, /Встать/);
 });
+
+test("a joint attack works with a shield or two hand crossbows; the Viper school takes no penalty (core p.163)", () => {
+  const weapon = (id, extra = {}) => ({ id, type: "weapon", system: { category: "melee", skill: "melee", grip: 1, hands: 1, equipped: true, carried: true, quantity: 1, damage: "1d6", reliability: { value: 10, max: 10 }, ...extra } });
+  const a = actor(), sword = weapon("sword"), shield = weapon("shield", { category: "shield", shieldClass: "medium", damage: "0" });
+  a.items = [sword, shield];
+  assert.equal(dualWeapons(a, a.items).length, 2);
+  assert.ok(attackModes(a, sword).some(mode => mode.id === "dual"));
+  assert.ok(attackModes(a, shield).some(mode => mode.id === "dual"), "the shield strikes as the second weapon");
+  assert.equal(weaponAttack(a, shield, { mode: "dual" }).blocked, "");
+  const left = weapon("left", { category: "ranged", skill: "crossbow", loaded: true }), right = weapon("right", { category: "ranged", skill: "crossbow", loaded: true });
+  a.items = [left, right]; a.system.skills.crossbow = 4; a.system.statistics.effective.dexterity = 6;
+  assert.deepEqual(attackModes(a, left).map(mode => mode.id), ["shot", "dual"]);
+  assert.equal(attackModes(a, left)[1].penalty, -3);
+  right.system.loaded = false;
+  assert.match(weaponAttack(a, right, { mode: "dual" }).blocked, /перезарядка/);
+  assert.equal(dualWeapons(a, [weapon("bow", { category: "ranged", skill: "archery", hands: 2 }), left]).length, 0);
+  a.system.lifepath = { witcher: { school: "viper" } };
+  assert.equal(attackModes(a, left)[1].penalty, 0);
+});

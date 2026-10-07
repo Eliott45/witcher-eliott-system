@@ -39,19 +39,39 @@ export const ATTACK_LOCATIONS = [
   {id:"leftLeg",name:"Левая нога",penalty:-2,multiplier:0.5},
   {id:"tail",name:"Хвост / крыло",penalty:-2,multiplier:0.5}
 ];
-export const RANGED_BANDS = [{id:"normal",name:"Дистанция: без поправки",penalty:0},
-  {id:"point",name:"В упор (≤ 0,5 м) · +5",penalty:5},{id:"short",name:"Ближняя (¼ дальности) · 0",penalty:0},
-  {id:"medium",name:"Средняя (½ дальности) · −2",penalty:-2},{id:"long",name:"Дальняя · −4",penalty:-4},
-  {id:"extreme",name:"Предельная (×2) · −6",penalty:-6}];
+// Core p.164: distance bands with the DC of a target that does not defend (p.165 adds the size modifier).
+export const RANGED_BANDS = [{id:"auto",name:"Дистанция: авто по токенам",penalty:0},{id:"normal",name:"Дистанция: без поправки",penalty:0,dc:15},
+  {id:"point",name:"В упор (≤ 0,5 м) · +5",penalty:5,dc:10},{id:"short",name:"Ближняя (¼ дальности) · 0",penalty:0,dc:15},
+  {id:"medium",name:"Средняя (½ дальности) · −2",penalty:-2,dc:20},{id:"long",name:"Дальняя · −4",penalty:-4,dc:25},
+  {id:"extreme",name:"Предельная (×2) · −6",penalty:-6,dc:30}];
+const BAND_NAMES={point:"в упор",short:"ближняя",medium:"средняя",long:"дальняя",extreme:"предельная"};
+/** The band for `distance` metres with a weapon of `range` metres; null beyond twice the range. */
+export function bandFor(range,distance) {
+  if(!(range>0)||distance==null)return null;
+  const id=distance<=0.5?"point":distance<=range/4?"short":distance<=range/2?"medium":distance<=range?"long":distance<=range*2?"extreme":null;
+  if(!id)return {id:"beyond",name:`Дистанция ${distance} м: дальше предельной (${range*2} м)`,penalty:0,dc:30,distance,beyond:true};
+  const band=RANGED_BANDS.find(entry=>entry.id===id);
+  return {...band,name:`Дистанция ${String(distance).replace(".",",")} м: ${BAND_NAMES[id]}`,distance,auto:true};
+}
 export function hitLocation(result,bodyPlan="humanoid",{hasTailOrWings=true}={}) {
   if(!Number.isInteger(result)||result<1||result>10||!["humanoid","monster"].includes(bodyPlan))throw new Error("Неизвестная зона попадания.");
   const table=bodyPlan==="humanoid"?["head","torso","torso","torso","rightArm","leftArm","rightLeg","rightLeg","leftLeg","leftLeg"]:
     ["head","torso","torso","torso","torso","rightArm","rightArm","leftArm","leftArm",hasTailOrWings?"tail":"leftArm"];
   return ATTACK_LOCATIONS.find(entry=>entry.id===table[result-1]);
 }
+/** Core p.163 «Парное оружие»: any weapon held in one hand, two hand crossbows included; a shield is held in one hand too. */
+export const canDualWield = item => item?.type==="weapon"&&!item.system.natural&&gripOf(item)===1&&(["melee","thrown","shield"].includes(item.system.category)||item.system.skill==="crossbow");
+/** Witchers of the Viper school (Gorthur Gvaed) take no penalty for a joint attack. */
+export const dualPenalty = actor => actor?.system?.lifepath?.witcher?.school==="viper"?0:-3;
+function dualMode(actor,item) {
+  if(!canDualWield(item)||!equippedItems(actor.items??[]).some(entry=>entry.id!==item.id&&canDualWield(entry)))return null;
+  const penalty=dualPenalty(actor);
+  return {id:"dual",name:"Парная атака",count:1,penalty,multiplier:1,dual:true,secondary:true,
+    hint:`Одно действие атаки (errata): по удару каждым оружием в руках (в том числе щитом или двумя ручными арбалетами), ${penalty?"оба с −3":"без штрафа — школа Змеи"}, урон каждого считается отдельно. Блокировать или парировать её может только тот, у кого тоже два оружия или оружие и щит, остальные лишь уклоняются или меняют позицию.`};
+}
 export function attackModes(actor,item) {
   if (actor.type === "npc") return [{id:"npc",name:`Атака ×${item.system.attackRate??1}`,count:item.system.attackRate??1,penalty:0,multiplier:1}];
-  if (item.system.skill === "crossbow") return [{id:"shot",name:"Выстрел",count:1,penalty:0,multiplier:1}];
+  if (item.system.skill === "crossbow") { const dual=dualMode(actor,item); return [{id:"shot",name:"Выстрел",count:1,penalty:0,multiplier:1},...(dual?[dual]:[])]; }
   // Core p.153: a fast attack is two strikes for one action. Each click rolls one strike, so the two may hit different targets.
   const modes=[{id:"fast",name:item.system.skill==="archery"?"Быстрый выстрел":"Быстрая",count:1,penalty:0,multiplier:1,pair:item.system.skill!=="archery"},
     {id:"strong",name:"Сильная",count:1,penalty:-3,multiplier:2}];
@@ -62,21 +82,21 @@ export function attackModes(actor,item) {
     {id:"pommel",name:"Удар эфесом",count:1,penalty:0,multiplier:1,pommel:true,secondary:true,hint:"Удар рукоятью или обухом: проверка как у обычной атаки, урон оружия вдвое меньше и несмертельный — отнимает Выносливость, а не ПЗ, и не оставляет критических ранений."},
     {id:"disarm",name:"Разоружение",count:1,penalty:0,multiplier:1,special:"weapon-disarm",secondary:true,hint:"Прицельный удар по оружию цели. Урона нет. При попадании её оружие выпадает и отлетает на 1d6 м в случайную сторону (таблица разброса) — на карте появляется кучка добычи, оружие нужно подобрать."},
     {id:"trip",name:"Подсечка",count:1,penalty:0,multiplier:1,special:"weapon-trip",secondary:true,hint:"Удар по ногам. Урона нет. При попадании цель падает ничком: −2 к атаке и защите. Чтобы встать, нужно потратить всё передвижение за текущий ход."});
-  if(["melee","thrown"].includes(item.system.category)&&!item.system.natural&&(item.system.grip||item.system.hands||1)===1&&equippedItems(actor.items??[]).filter(entry=>entry.type==="weapon"&&!entry.system.natural&&entry.id!==item.id&&(entry.system.grip||entry.system.hands||1)===1).length)
-    modes.push({id:"dual",name:"Парная атака",count:1,penalty:-3,multiplier:1,dual:true,secondary:true,hint:"Одно действие атаки (errata): по удару каждым оружием в руках, оба с −3, урон каждого считается отдельно. Блокировать или парировать её может только тот, у кого тоже два оружия или оружие и щит, остальные лишь уклоняются или меняют позицию."});
+  const dual=dualMode(actor,item);if(dual)modes.push(dual);
   return modes;
 }
 /** Humanoid or monster hit-location table for a target actor (core p.152). */
 export const bodyPlanOf = actor => actor?.type === "npc" && actor.system.creature?.category !== "humanoid" ? "monster" : "humanoid";
 
-export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="normal",modifier=0,targetContext=null,ambushBonus=0}={}) {
+export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="auto",modifier=0,targetContext=null,ambushBonus=0}={}) {
   if(item?.type!=="weapon")throw new Error("Выберите оружие.");
   const weapon=effectiveItem(item),attack=attackModes(actor,item).find(entry=>entry.id===mode);
   if(!attack)throw new Error("Этот режим недоступен для данного оружия.");
   const skill=skillValue(actor.system,weapon.skill);
   const aim=ATTACK_LOCATIONS.find(entry=>entry.id===location);
   if(!aim||!Number.isFinite(Number(modifier))||Math.abs(Number(modifier))>100)throw new Error("Неверный модификатор атаки.");
-  const ranged=["ranged","thrown"].includes(weapon.category),band=ranged?RANGED_BANDS.find(entry=>entry.id===range):RANGED_BANDS[0];
+  const ranged=["ranged","thrown"].includes(weapon.category),reach=weapon.rangeBodyMultiplier?weapon.rangeBodyMultiplier*actor.system.statistics.effective.body:weapon.range;
+  const band=!ranged?RANGED_BANDS[1]:range==="auto"?bandFor(reach,targetContext?.distance)??{...RANGED_BANDS[1],id:"auto",name:"Дистанция: не измерена"}:RANGED_BANDS.find(entry=>entry.id===range&&entry.id!=="auto");
   if(!band)throw new Error("Неверная дистанция.");
   const parts=[{label:"Основа навыка",value:skill.total},{label:"Точность оружия",value:weapon.accuracy??0},
     {label:"Двуручное оружие одной рукой",value:!weapon.natural&&gripOf(item)<(weapon.hands??1)?-3:0},
@@ -95,6 +115,6 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   const base=`(${shield?"1d6":weapon.damage}${unarmedBonus}${body+bonus?` + ${body+bonus}`:""})${attack.multiplier===2?" * 2":""}`;
   // Pommel strike (core p.164): half damage, non-lethal. Disarm and trip deal no damage.
   const damage=attack.special?null:attack.pommel?`floor(${base} / 2)`:base;
-  const blocked=targetContext?.blind&&location!=="random"?"Нельзя выбирать место удара по цели вне вашего конуса зрения":shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":"");
-  return {name:item.name,nonLethal:Boolean(attack.pommel),weapon,attack,skill,parts,total,damage,body,bonus,aim,band,ranged,blocked,range:weapon.rangeBodyMultiplier?weapon.rangeBodyMultiplier*actor.system.statistics.effective.body:weapon.range};
+  const blocked=targetContext?.blind&&location!=="random"?"Нельзя выбирать место удара по цели вне вашего конуса зрения":shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":band.beyond?`Цель дальше предельной дистанции (${reach*2} м)`:"");
+  return {name:item.name,nonLethal:Boolean(attack.pommel),weapon,attack,skill,parts,total,damage,body,bonus,aim,band,ranged,blocked,range:reach};
 }

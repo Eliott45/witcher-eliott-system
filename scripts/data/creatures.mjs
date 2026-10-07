@@ -3,10 +3,15 @@ import { MONSTER_CATEGORIES } from "./monster-categories.mjs";
 import { potionImmunity } from "./consumables.mjs";
 
 /** NPC metadata only. Statistics, attacks, skills, abilities and equipment keep their existing models. */
+// Core p.164 «Модификаторы размера»: added to the DC of an unaware or inanimate target of a ranged attack (p.165).
+export const SIZE_CLASSES = [
+  {id:"small",name:"Небольшой",modifier:2,examples:"кошка, накер"},{id:"medium",name:"Средний",modifier:0,examples:"с человека"},
+  {id:"large",name:"Крупный",modifier:-2,examples:"тролль, лошадь"},{id:"huge",name:"Огромный",modifier:-4,examples:"бес"}];
+export const sizeClassOf = actor => SIZE_CLASSES.find(entry=>entry.id===actor?.system?.creature?.sizeClass)??SIZE_CLASSES[1];
 export function creatureFields() {
   const {SchemaField,ArrayField,BooleanField}=foundry.data.fields;
   return new SchemaField({category:itemText("humanoid",{choices:MONSTER_CATEGORIES.map(c=>c.id)}),difficulty:itemText("Простые / обычные"),reward:itemNumber(),
-    habitat:itemText(),size:itemText(),weight:itemText(),intellect:itemText(),group:itemText(),source:itemText(),
+    habitat:itemText(),size:itemText(),sizeClass:itemText("medium",{choices:SIZE_CLASSES.map(entry=>entry.id)}),weight:itemText(),intellect:itemText(),group:itemText(),source:itemText(),
     naturalArmor:itemNumber(),resistances:itemText(),healthMax:itemNumber(),staminaMax:itemNumber(),description:itemText(),tactics:itemText(),
     hasTailOrWings:new BooleanField({initial:false}),
     lore:new ArrayField(new SchemaField({name:itemText(),skill:itemText("education"),dc:itemNumber(),text:itemText()})),

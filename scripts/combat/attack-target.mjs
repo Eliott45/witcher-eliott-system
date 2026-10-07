@@ -7,6 +7,16 @@ export function tokenCenter(token) {
   return {x:doc.x + size.width / 2, y:doc.y + size.height / 2};
 }
 
+/** Metres between token edges (core p.164 distance bands): touching tokens are 0 m apart. */
+export function tokenGap(a, b) {
+  const from = tokenDocument(a), to = tokenDocument(b), scene = from.parent, grid = scene?.grid;
+  if (!grid) return null;
+  const p = tokenCenter(from), q = tokenCenter(to);
+  const measured = grid.measurePath?.([p, q])?.distance ?? Math.hypot(q.x - p.x, q.y - p.y) / grid.size * grid.distance;
+  const half = doc => Math.max(doc.width ?? 1, doc.height ?? 1) / 2 * grid.distance;
+  return Math.max(0, Math.round((measured - half(from) - half(to)) * 10) / 10);
+}
+
 /** System facing is north at 0°, clockwise. It is independent of the local vision preview. */
 export function withinFacing(observer, subject) {
   const doc = tokenDocument(observer), from = tokenCenter(observer), to = tokenCenter(subject);
@@ -45,5 +55,5 @@ export function selectedAttackTarget(actor, {attackerUuid, targetUuid} = {}) {
   const attacker = attackerUuid ? globalThis.canvas?.scene?.tokens.find(token=>token.uuid===attackerUuid) : attackerToken(actor), target = tokenDocument(targets[0]);
   if(!attacker||attacker.actor?.uuid!==actor.uuid)throw new Error("Токен атакующего больше не доступен.");
   if (!COMBAT_ACTOR_TYPES.includes(target.actor?.type) || target.uuid === attacker.uuid || attacker.parent?.id !== target.parent?.id) throw new Error("Выберите другое существо на той же сцене.");
-  return {attacker, target, ...facingModifiers(attacker, target)};
+  return {attacker, target, distance: tokenGap(attacker, target), ...facingModifiers(attacker, target)};
 }

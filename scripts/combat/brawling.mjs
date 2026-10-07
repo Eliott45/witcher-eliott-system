@@ -5,7 +5,7 @@ import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { conditionRules } from "./condition-rules.mjs";
 import { actionQuote, actionUpdate, actionNote, actionRoundKey } from "./action-economy.mjs";
 import { attackerToken, selectedAttackTarget } from "./attack-target.mjs";
-import { ATTACK_LOCATIONS, RANGED_BANDS, bodyDamage, combatModifierParts, signed } from "./weapon-rules.mjs";
+import { ATTACK_LOCATIONS, RANGED_BANDS, bodyDamage, combatModifierParts, signed, canDualWield } from "./weapon-rules.mjs";
 import { usableHands } from "./critical-wound-effects.mjs";
 
 // Core p.163 «Борьба и рукопашный бой»: every unarmed attack is an action replacing a fast or strong attack and
@@ -54,7 +54,7 @@ export function unarmedAttack(actor, strike, { mode = "fast", extraPenalty = 0, 
     : data.hands > usableHands(actor) ? "Руки выведены из строя" : "";
   return { name: `${data.name}${attack.push || attack.charge ? ` · ${attack.name}` : ""}`, weapon: { damageType: "", category: "melee", skill: "brawling" },
     attack: { ...attack, name: attack.push || attack.charge ? attack.name : `${data.name} · ${attack.name.toLocaleLowerCase("ru")}` },
-    skill, parts, total, damage, body: 0, bonus, aim, band: RANGED_BANDS[0], ranged: false, blocked, nonLethal: true, strike };
+    skill, parts, total, damage, body: 0, bonus, aim, band: RANGED_BANDS[1], ranged: false, blocked, nonLethal: true, strike };
 }
 
 /** Unarmed buttons for the Actions tab. */
@@ -99,9 +99,9 @@ export async function consumeFeint(actor) {
   if (ids.length) await actor.deleteEmbeddedDocuments("ActiveEffect", ids);
 }
 
-/** Two one-handed weapons in hand can make a joint attack (errata p.163). */
+/** Two one-handed weapons in hand (a shield or a hand crossbow counts) can make a joint attack (core p.163, errata). */
 export function dualWeapons(actor, equipped) {
-  const hands = equipped.filter(item => item.type === "weapon" && !item.system.natural && (item.system.grip || item.system.hands || 1) === 1);
+  const hands = equipped.filter(canDualWield);
   return hands.length >= 2 ? hands.slice(0, 2) : [];
 }
 /** The defender needs two weapons, or a weapon and a shield, to block or parry a joint attack. */

@@ -15,6 +15,8 @@ import { toggleQuickDraw } from "../combat/quick-draw.mjs";
 import { grappleOptions, grappleState, rollGrappleAction } from "../combat/grapple.mjs";
 import { statusEffect } from "../data/effect-counters.mjs";
 import { unarmedContext, rollFeint, dualWeapons } from "../combat/brawling.mjs";
+import { isCrossbow, loadedBolt, boltChoices, loadUpdate, unloadCrossbow } from "../combat/crossbow-ammo.mjs";
+import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
 import { healingContext, healingPatient, stabilizePatientWound, treatPatientWound, startNaturalHealing, restDay, stabilizeDying } from "../combat/healing.mjs";
 
 export function combatContext(actor,options={}) {
@@ -29,14 +31,14 @@ export function combatContext(actor,options={}) {
   const defenses=[{mode:"dodge"},{mode:"reposition"},...equippedItems(actor.items).filter(item=>item.type==="weapon"&&["melee","shield"].includes(item.system.category)).flatMap(item=>[{mode:"block",itemId:item.id},{mode:"parry",itemId:item.id}]),{mode:"block",itemId:""},{mode:"parry",itemId:""}]
     .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
   const unarmed=actor.type==="npc"?[]:unarmedContext(actor,options,{extra,fastPending:fastPending&&actor.flags[SYSTEM_ID].fastStrike.extra===extra});
-  return { healing:healingContext(actor), unarmed, feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"normal",modifier:options.modifier??0,
+  return { healing:healingContext(actor), unarmed, feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"auto",modifier:options.modifier??0,
     grapple:(()=>{const state=grappleState(actor);return {options:grappleOptions(actor),holding:state.holding?{name:state.holding.name,pinned:state.holding.pinned,choking:state.holding.choking}:null,heldBy:state.heldBy?{name:state.heldBy.name}:null};})(),
     fullTurn,defenses,quickDraw,canQuickDraw:canAct&&Boolean(globalThis.game?.combat?.started&&Array.from(globalThis.game.combat.combatants).some(entry=>entry.actor?.uuid===actor.uuid)),ambush:{active:Boolean(ambush),targets:ambushTargets,count:ambushTargets.length,
       canPrepare:Boolean(canAct&&ambusher&&!encounter.started&&!tacticsFlags(ambusher).tacticRequest),pending:Boolean(tacticsFlags(ambusher).tacticRequest)},
     repeat:!fullTurn.activeDodge&&Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
     incoming:INCOMING_ATTACKS.map(entry=>({...entry,selected:entry.id===(options.incoming??"melee")})),
     locations:ATTACK_LOCATIONS.map(entry=>({...entry,selected:entry.id===(options.location??"random")})),
-    ranges:RANGED_BANDS.map(entry=>({...entry,selected:entry.id===(options.range??"normal")})),
+    ranges:RANGED_BANDS.map(entry=>({...entry,selected:entry.id===(options.range??"auto")})),
     weapons:Array.from(actor.items ?? []).filter(item=>item.type==="weapon").map(item=>{
       const modes=attackModes(actor,item).map(mode=>{
         const quote=weaponAttack(actor,item,{...options,mode:mode.id,extraPenalty:extra?-3:0});
@@ -47,9 +49,11 @@ export function combatContext(actor,options={}) {
         const description=mode.hint??"";
         return {...mode,name:label,second,description,base:quote.total===null?"—":signed(quote.total),damage:quote.damage,disabled:Boolean(reason),hint:reason||`${description?`${description} `:""}${pairHint}${quote.parts.map(part=>`${part.label}: ${signed(part.value??0)}`).join("; ")}`};
       });
-      const loaded=item.system.skill!=="crossbow"||item.system.loaded!==false;
+      const loaded=item.system.skill!=="crossbow"||item.system.loaded!==false,bolt=loadedBolt(item);
+      const bolts=isCrossbow(item)&&!loaded?boltChoices(actor).map(ammo=>({id:ammo.id,name:ammo.name,quantity:ammo.system.quantity})):[];
+      const crossbow=isCrossbow(item)?{loaded,bolt:bolt?.name??"",bolts,choose:bolts.length>1}:null;
       return {id:item.id,name:item.name,img:item.img,properties:item.system.properties??"",damageTypes:damageTypeLabel(item.system.damageType),rate:actor.type==="npc"?item.system.attackRate??1:null,natural:Boolean(item.system.natural),grip:gripOf(item),
-        equipped:equippedItems(actor.items).some(entry=>entry.id===item.id),modes,loaded,needsReload:!loaded,
+        equipped:equippedItems(actor.items).some(entry=>entry.id===item.id),modes,loaded,needsReload:!loaded,crossbow,
         melee:item.system.category==="melee"&&!item.system.natural,techniques:actor.type!=="npc"&&!item.system.natural&&modes.some(mode=>mode.secondary)&&equippedItems(actor.items).some(entry=>entry.id===item.id),
         skill:game.i18n.localize(`WITCHER.Skills.Entries.${item.system.skill}.Label`)};
     }) };
@@ -89,6 +93,8 @@ export const combatActions={
     try{
       const pair=dualWeapons(this.actor,equippedItems(this.actor.items)),first=pair.find(item=>item.id===target.dataset.itemId),second=pair.find(item=>item!==first);
       if(!first||!second)throw new Error("Нужны два одноручных оружия в руках.");
+      // Both strikes are one action: check the second weapon (e.g. an unloaded crossbow) before the first is used.
+      for(const item of [first,second]){const blocked=weaponAttack(this.actor,item,{...this.combatOptions,mode:"dual"}).blocked;if(blocked)throw new Error(`${item.name}: ${blocked}`);}
       const opened=await rollWeaponAttack(this.actor,first.id,{...this.combatOptions,mode:"dual"});
       if(opened)await rollWeaponAttack(this.actor,second.id,{...this.combatOptions,mode:"dual",free:true});
     }finally{await this.render();}}),
@@ -96,11 +102,20 @@ export const combatActions={
   reloadWeapon:guard(async function(_event,target){
     if(!this.isEditable)return;
     await inventoryWrite(this.actor,async()=>{
-      const item=this.actor.items.get(target.dataset.itemId);if(item?.system.skill!=="crossbow"||item.system.loaded)return;
-      const quote=actionQuote(this.actor);
+      const item=this.actor.items.get(target.dataset.itemId);if(!isCrossbow(item)||item.system.loaded)return;
+      const ammoId=target.closest(".witcher-attack-card")?.querySelector("[data-bolt-choice]")?.value||"";
+      const {ammo,items}=loadUpdate(this.actor,item,ammoId),quote=actionQuote(this.actor);
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor:this.actor}),
-        content:`<p>Арбалет перезаряжен — действие${quote.extra?"; дополнительно, 3 ВЫН":""}. Болты учитываются в инвентаре вручную.</p>`,flags:{[SYSTEM_ID]:{skipLuck:true}}},game.settings.get("core","messageMode")));
-      if(message){await this.actor.update({...actionUpdate(this.actor,quote),items:[{_id:item.id,"system.loaded":true}]});await consumeAiming(this.actor);}
+        content:`<p>${esc(item.name)} заряжен: ${esc(ammo.name)} — действие${quote.extra?"; дополнительно, 3 ВЫН":""}.</p>`,flags:{[SYSTEM_ID]:{skipLuck:true}}},game.settings.get("core","messageMode")));
+      if(message){await this.actor.update({...actionUpdate(this.actor,quote),items});await consumeAiming(this.actor);}
+    });
+  }),
+  unloadWeapon:guard(async function(_event,target){
+    if(!this.isEditable)return;
+    await inventoryWrite(this.actor,async()=>{
+      const item=this.actor.items.get(target.dataset.itemId);if(!loadedBolt(item))return;
+      const bolt=await unloadCrossbow(this.actor,item);
+      if(bolt)ui.notifications.info(`${item.name} разряжен: ${bolt.name} возвращён в инвентарь.`);
     });
   }),
   spendExtraAction:guard(async function(){

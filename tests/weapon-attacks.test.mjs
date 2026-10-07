@@ -134,3 +134,21 @@ test("location roll is ordinary d10 and preserves private audience without using
   assert.match(sent.data.flavor,/нет хвоста и крыльев.*левую конечность/);
   sent=null;message.isContentVisible=false;await rollHitLocation(message,"monster");assert.equal(sent,null);
 });
+test("distance bands are measured from the target automatically or chosen by hand (core p.164)",async()=>{
+  const {bandFor}=await import("../scripts/combat/weapon-rules.mjs");
+  const {unawareDC}=await import("../scripts/combat/attack-exchange.mjs");
+  assert.equal(bandFor(40,0).id,"point");assert.equal(bandFor(40,10).id,"short");assert.equal(bandFor(40,20).id,"medium");
+  assert.equal(bandFor(40,40).id,"long");assert.equal(bandFor(40,80).id,"extreme");assert.equal(bandFor(40,81).beyond,true);
+  const actor=fixture(),weapon=actor.items[0];Object.assign(weapon.system,{category:"ranged",skill:"archery",hands:2,range:40});
+  const context=distance=>({target:{actor:null},parts:[],distance});
+  assert.equal(weaponAttack(actor,weapon,{targetContext:context(25)}).band.id,"long");
+  assert.equal(weaponAttack(actor,weapon,{targetContext:context(25)}).total,weaponAttack(actor,weapon,{range:"long"}).total);
+  assert.equal(weaponAttack(actor,weapon,{range:"point",targetContext:context(25)}).band.id,"point","a manual band wins over the measured one");
+  assert.match(weaponAttack(actor,weapon,{targetContext:context(100)}).blocked,/предельной/);
+  assert.equal(weaponAttack(actor,weapon).band.id,"auto");
+  const target=size=>({system:{creature:{sizeClass:size}}});
+  assert.equal(unawareDC({ranged:false},target("huge")).dc,10);
+  assert.equal(unawareDC({ranged:true,dc:20},target("small")).dc,22);
+  assert.equal(unawareDC({ranged:true,dc:25},target("huge")).dc,21);
+  assert.equal(unawareDC({ranged:true,dc:15},{system:{}}).dc,15);
+});

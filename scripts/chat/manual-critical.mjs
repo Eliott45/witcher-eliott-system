@@ -46,7 +46,8 @@ export async function beginManualCritical(first,chain) {
     },
     async show(next,complete) {
       const message=record.message;
-      if(game.dice3d)await game.dice3d.showForRoll(faceRoll(next.result),game.user,true,message.whisper.length?[...message.whisper]:null,message.blind,null,message.speaker);
+      // A paused animation (hidden window) must not hold the chain forever.
+      if(game.dice3d)await Promise.race([game.dice3d.showForRoll(faceRoll(next.result),game.user,true,message.whisper.length?[...message.whisper]:null,message.blind,null,message.speaker),new Promise(resolve=>setTimeout(resolve,15000))]);
       next.hidden=true;
       await publish(record,complete?"complete":"pending");
     },

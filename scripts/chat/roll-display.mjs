@@ -6,7 +6,8 @@ export function diceSyncEnabled() {
 }
 export const waitsForDice = () => Boolean(globalThis.game?.dice3d) && diceSyncEnabled();
 
-const nextPaint = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+// Hidden windows pause animation frames: fall back to a short timer so the action still finishes.
+const nextPaint = () => new Promise(resolve => { requestAnimationFrame(() => requestAnimationFrame(resolve)); setTimeout(resolve, 250); });
 
 /** Subscribe before creation so fast chat renders/DSN completions cannot be missed. */
 export function trackRollDisplay() {

@@ -1,4 +1,6 @@
+import { sizeClassOf } from "../data/creatures.mjs";
 import { canAnswerDual, rollChargeContest } from "./brawling.mjs";
+import { loadedBolt, firedUpdate } from "./crossbow-ammo.mjs";
 import { hasStatus, setStatus, STUNNED } from "./status-effects.mjs";
 import { dropItemToGround } from "../loot/loot.mjs";
 import { scatterOffset } from "../canvas/scatter-overlay.mjs";
@@ -38,6 +40,12 @@ const targetToken = attack => attack?.target ? globalThis.canvas?.scene?.tokens.
 const targetActor = attack => targetToken(attack)?.actor ?? null;
 const anatomyFree = actor => ["specter", "elemental"].includes(actor?.system.creature?.category);
 const DC_UNAWARE = 10;
+/** DC of a target that does not defend: 10 in melee; a ranged attack uses the distance DC plus the size modifier (core pp.164–165). */
+export function unawareDC(attack, target) {
+  if (!attack?.ranged) return { dc: DC_UNAWARE, note: `СЛ ${DC_UNAWARE}` };
+  const size = sizeClassOf(target), base = attack.dc ?? 15, dc = base + size.modifier;
+  return { dc, note: `СЛ ${dc}: дистанция ${base}${size.modifier ? `, размер «${size.name}» ${size.modifier > 0 ? "+" : "−"}${Math.abs(size.modifier)}` : ""}` };
+}
 
 async function post(data, mode = game.settings.get("core", "messageMode")) {
   const Message = foundry.documents.ChatMessage.implementation;
@@ -91,8 +99,9 @@ export async function defendAttack(message, index, mode, itemId = "", repeat = n
   if (!actor?.isOwner || linkedAny(message.id, index, "defense")) return;
   const link = { attack: message.id, index, kind: "defense" };
   if (mode === "none") {
-    return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), content: `<p>${esc(actor.name)} не защищается.</p>`,
-      flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { ...link, none: true } } } });
+    const { dc, note } = unawareDC(attack, actor);
+    return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), content: `<p>${esc(actor.name)} не защищается: ${esc(note)}.</p>`,
+      flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { ...link, none: true, dc } } } });
   }
   const gang = gangingUp(message);
   const defense = await rollDefense(actor, { mode, itemId, incoming: incomingOf(attack), repeat: repeat ?? repeatDefense(actor), defenseModifier: -gang,
@@ -116,7 +125,7 @@ export async function defendAttack(message, index, mode, itemId = "", repeat = n
 export function exchangeOutcome(message, index) {
   const attackTotal = message.rolls[index]?.total, defense = linked(message.id, index, "defense");
   if (!defense) return null;
-  const none = exchangeOf(defense).none, defenseTotal = none ? DC_UNAWARE : defense.rolls[0]?.total;
+  const none = exchangeOf(defense).none, defenseTotal = none ? exchangeOf(defense).dc ?? DC_UNAWARE : defense.rolls[0]?.total;
   const hit = attackTotal > defenseTotal, margin = attackTotal - defenseTotal;
   // Core p.164: a successful block with the body sends the attack's damage into the blocking arm.
   const limbBlock = !hit && !none && Boolean(flagsOf(defense).defense?.limb);
@@ -406,7 +415,7 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
       notes.push(`${item?.name ?? "Оружие"} выбито: направление ${direction.total} по таблице разброса, ${distance.total} м`);
     }
     if (step.id === "jam") {
-      if (item?.system.skill === "crossbow" && item.system.loaded !== false) await item.update({ "system.loaded": false });
+      if (loadedBolt(item)) await item.update(firedUpdate(item));
       if (item) await blockWeapon(actor, item, "jammed", `Заклинило: ${item.name}`, `${item.name} нельзя использовать до конца вашего следующего хода: тетива слетела или механизм заклинило.`, 1);
       notes.push(item?.system.skill === "crossbow" ? `${item.name}: заклинило, нужна перезарядка` : "1 раунд на исправление");
     }
@@ -505,7 +514,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
     const free = defenseChoices(target, incomingOf(attack))[0]?.activeDodge;
     const repeatBox = `<button type="button" class="witcher-exchange-repeat" data-exchange-repeat aria-pressed="${!free && repeatDefense(target)}" ${free ? "disabled" : ""} data-tooltip="${free ? "Активное уклонение: повторные защиты бесплатны" : "Вторая и следующие защиты за раунд стоят 1 ВЫН. Нажмите, чтобы переключить."}"><i class="fa-solid fa-rotate"></i> Повторная · ${free ? 0 : 1} ВЫН</button>`;
     const gangNote = gang ? `<p class="witcher-exchange-note" data-tooltip="Errata: −1 к защите за каждого нападающего в ближнем бою сверх первого">Объединение сил: ${gang + 1} нападающих в этом раунде · защита −${gang}</p>` : "";
-    return `<li class="is-waiting">${head}<em>защита ${esc(target.name)}</em>${repeatBox}</header>${gangNote}<div class="witcher-exchange-actions">${choices.join("")}${button('data-exchange-defend="none"', "Не защищается", true, `Атака сравнивается со СЛ ${DC_UNAWARE}`)}</div>${ownFumble}</li>`;
+    return `<li class="is-waiting">${head}<em>защита ${esc(target.name)}</em>${repeatBox}</header>${gangNote}<div class="witcher-exchange-actions">${choices.join("")}${button('data-exchange-defend="none"', "Не защищается", true, `Атака сравнивается со ${unawareDC(attack, target).note}`)}</div>${ownFumble}</li>`;
   }
   const verdict = outcome.hit ? `<strong class="is-hit">Попадание +${outcome.margin}</strong>` : outcome.limbBlock ? `<strong class="is-hit">Заблокировано рукой</strong>`
     : `<strong class="is-miss">${outcome.mode === "parry" ? "Парировано" : outcome.mode === "block" ? "Заблокировано" : "Промах"}</strong>`;

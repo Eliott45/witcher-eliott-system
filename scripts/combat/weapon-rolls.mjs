@@ -9,6 +9,7 @@ import { consumeAiming } from "./full-turn-rules.mjs";
 import { selectedAttackTarget } from "./attack-target.mjs";
 import { ambushAttack, ambushState, tacticsFlags } from "./tactics-rules.mjs";
 import { unarmedAttack, consumeFeint } from "./brawling.mjs";
+import { loadedBolt, firedUpdate } from "./crossbow-ammo.mjs";
 
 /** Pair state of a fast attack: the second click in the same round (and extra-action status) is strike 2/2. */
 export function fastPair(actor,attack,action) {
@@ -49,7 +50,8 @@ export function rollWeaponAttack(actor,itemId,options={}) {
       for(let i=0;i<quote.attack.count;i++)rolls.push(await new foundry.dice.Roll(`1d10wc + ${quote.total}`,{}, {flavor:`${quote.name} · ${i+1}/${quote.attack.count}`}).evaluate({allowInteractive:messageMode!=="blind"}));
       const math=quote.parts.filter(part=>part.value||part.label==="Основа навыка").map(part=>`${part.label}: ${signed(part.value)}`).join("; ");
       const types=damageTypeLabel(quote.weapon.damageType);
-      const notes=[quote.nonLethal?"Несмертельный урон: отнимает Выносливость.":"",quote.attack.charge?"С разбега: полный ход. Если удар заблокируют — Сила против Силы, чтобы сбить с ног.":"",
+      const bolt=loadedBolt(item);
+      const notes=[quote.ranged&&quote.band.distance!=null?`${quote.band.name} (дальность оружия ${quote.range} м).`:"",bolt?`Болт: ${bolt.name}${bolt.properties?` (${bolt.properties})`:""}.`:"",quote.nonLethal?"Несмертельный урон: отнимает Выносливость.":"",quote.attack.charge?"С разбега: полный ход. Если удар заблокируют — Сила против Силы, чтобы сбить с ног.":"",
         quote.attack.push?"Толчок: цель отлетает на ТЕЛ/3 м.":"",quote.attack.dual?"Парная атака: блок и парирование — только с двумя оружиями или оружием и щитом.":"",quote.attack.hint&&quote.attack.special?quote.attack.hint:""].filter(Boolean);
       const flavor=`<section class="witcher-attack-chat"><h3>${esc(quote.name)} · ${esc(quote.attack.name)}${strike?` ${strike}/2`:""}</h3>${notes.map(note=>`<p class="witcher-attack-note">${esc(note)}</p>`).join("")}${types?`<p class="witcher-damage-type">Урон: ${esc(types)}</p>`:""}<p data-tooltip="${esc(math)}">База проверки <b>${signed(quote.total)}</b> · ${quote.attack.count} ${quote.attack.count===1?"бросок":"броска"}</p>`
         +(targetContext?`<p>Цель: <b>${esc(targetContext.target.name)}</b></p>`:"<small>Цель не выбрана — направление взгляда не учтено.</small>")
@@ -63,13 +65,13 @@ export function rollWeaponAttack(actor,itemId,options={}) {
         flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId:itemId??null,name:quote.name,mode:quote.attack.id,unarmed:options.unarmed??null,nonLethal:Boolean(quote.nonLethal),
           special:quote.attack.special??null,charge:Boolean(quote.attack.charge),push:Boolean(quote.attack.push),dual:Boolean(quote.attack.dual),base:quote.total,count:quote.attack.count,
           damage:quote.damage,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
-          target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,ranged:quote.ranged,thrown:quote.weapon.category==="thrown",combat:combat?.started?{id:combat.id,round:combat.round}:null,strike,damageTypes:damageTypeLabel(quote.weapon.damageType)}}}},messageMode));
+          target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,ranged:quote.ranged,band:quote.band.id,dc:quote.band.dc??null,thrown:quote.weapon.category==="thrown",combat:combat?.started?{id:combat.id,round:combat.round}:null,strike,damageTypes:damageTypeLabel(quote.weapon.damageType)}}}},messageMode));
       if(!message)return;
       await display.wait(message);
       const update=options.free?{}:actionUpdate(actor,action);
       if(pair&&!pair.second){delete update["system.combatAction.extra"];delete update["system.combatAction.lastExtraRound"];}
       if(!options.free)update[`flags.${SYSTEM_ID}.fastStrike`]=pair&&!pair.second?{round:pair.key,extra:action.extra,itemId:itemId??""}:null;
-      if(item?.system.skill==="crossbow")update.items=[{_id:item.id,"system.loaded":false}];
+      if(bolt)update.items=[firedUpdate(item)];
       if(Object.keys(update).length)await actor.update(update);
       await consumeAiming(actor);
       await consumeFeint(actor);

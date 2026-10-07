@@ -27,6 +27,13 @@
 .witcher-attack-buttons>button:disabled { opacity:.5; }
 .witcher-combat-muted,.witcher-combat-empty { font-size:12px; color:#806f58; line-height:1.5; }
 .witcher-combat-panel .witcher-reload { margin:0 14px 12px; width:calc(100% - 28px); height:29px; font-size:12px; }
+.witcher-crossbow-load { display:flex; align-items:center; gap:8px; margin:0 14px 12px; padding:6px 8px; border-radius:5px; font-size:12px; }
+.witcher-crossbow-load.is-loaded { background:#dce7db; color:#365943; }
+.witcher-crossbow-load.is-empty { background:#f0dfda; color:#7b3b36; }
+.witcher-crossbow-state { flex:1 0 auto; white-space:nowrap; display:inline-flex; align-items:center; gap:6px; font-weight:700; }
+.witcher-crossbow-load small { display:inline; color:inherit; }
+.witcher-crossbow-load select { flex:0 1 220px; min-width:0; height:26px; font-size:12px; }
+.witcher-combat-panel .witcher-crossbow-load button,.witcher-combat-panel .witcher-crossbow-load .witcher-reload { flex:0 0 auto; width:auto; height:26px; margin:0; padding:0 10px; font-size:12px; }
 .witcher-attack-chat h3 { font:700 18px Georgia,serif; color:inherit; }
 .witcher-attack-chat small { display:block; margin:8px 0; }
 .witcher-attack-modifiers { list-style:none; padding:0; margin:8px 0; display:grid; gap:4px; }

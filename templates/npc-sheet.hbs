@@ -5,6 +5,8 @@
       <div class="witcher-npc-traits">
         {{#if editing}}<label class="witcher-npc-category-select">Класс<select name="system.creature.category" aria-label="Класс чудовища">{{#each categories}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
         {{else}}<span class="witcher-npc-category" tabindex="0" data-tooltip="{{creatureClass.description}}" aria-label="Класс чудовища: {{category}}">{{category}} <i class="fa-solid fa-circle-info" aria-hidden="true"></i></span>{{/if}}
+        {{#if editing}}<label class="witcher-npc-category-select" data-tooltip="Модификатор размера (стр. 164–165): прибавляется к СЛ, если по существу стреляют, а оно не защищается.">Размер<select name="system.creature.sizeClass" aria-label="Размер существа">{{#each sizeClasses}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+        {{else}}<span tabindex="0" data-tooltip="Модификатор размера {{sizeClass.modifier}} к СЛ, если по существу стреляют, а оно не защищается (стр. 164–165)">Размер: {{sizeClass.name}}</span>{{/if}}
         <span>{{system.creature.difficulty}}</span><span data-tooltip="Награда за победу по бестиарию">Награда {{system.creature.reward}}</span>
       </div>
     </div><button type="button" data-action="editCreature" class="witcher-npc-edit" aria-pressed="{{editing}}" aria-label="Редактировать существо" {{disabled (not editable)}}><i class="fa-solid fa-sliders"></i></button>
