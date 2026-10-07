@@ -300,3 +300,15 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-technique-help summary { cursor:pointer; color:#7b5a3d; }
 .witcher-technique-help ul { margin:4px 0 0; padding-left:16px; line-height:1.45; }
 .witcher-technique-help li { margin:2px 0; }
+
+.witcher-environment-line { display:flex; align-items:center; gap:8px; margin:0 14px 10px; padding:6px 10px; border-radius:5px; background:#e3e8ee; color:#33475c; font-size:12px; font-weight:700; }
+.witcher-environment-line button { margin-left:auto; flex:0 0 auto; width:auto; height:24px; padding:0 8px; font-size:11px; }
+.witcher-environment-form label { display:flex; justify-content:space-between; align-items:center; gap:12px; margin:6px 0; }
+.witcher-environment-form label.checkbox { justify-content:flex-start; }
+.witcher-environment-form ul { padding-left:18px; font-size:12px; }
+.witcher-bomb-list { display:grid; gap:6px; padding:0 14px 12px; }
+.witcher-bomb-row { display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:5px; background:#efe5d2; }
+.witcher-bomb-row img { width:28px; height:28px; border:0; }
+.witcher-bomb-row span { flex:1; font-size:13px; }
+.witcher-bomb-row button { flex:0 0 auto; width:auto; height:28px; padding:0 10px; font-size:12px; }
+.witcher-bomb-victims { margin:6px 0; padding-left:18px; font-size:13px; }

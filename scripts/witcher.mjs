@@ -22,6 +22,8 @@ import { migratePoisonEffects } from "./migrations/poison-effects.mjs";
 import { registerCriticalWoundHooks } from "./combat/critical-wound-effects.mjs";
 import { registerHealingRequests } from "./combat/healing.mjs";
 import { registerBrawling } from "./combat/brawling.mjs";
+import { registerEnvironment } from "./combat/environment.mjs";
+import { registerBombs } from "./combat/bombs.mjs";
 import { migrateEffectContent, registerEffectContentMigration } from "./migrations/effect-content.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
@@ -95,6 +97,8 @@ Hooks.once("init", async () => {
   registerCriticalWoundHooks();
   registerHealingRequests();
   registerBrawling();
+  registerEnvironment();
+  registerBombs();
   registerConditionSaves();
   registerEffectExpiry();
   registerOilExpiry();

@@ -10,6 +10,7 @@ import { FAMILY_STATUS_CHOICES, getFamilyReward } from "./family-statuses.mjs";
 import { INFLUENTIAL_FRIEND_CHOICES } from "./influential-friends.mjs";
 import { ATTRIBUTE_KEYS, deriveStatistics } from "./statistics.mjs";
 import { hasStatus, DYING, DEAD } from "../combat/status-effects.mjs";
+import { actorEnvironment } from "../combat/environment.mjs";
 import { SKILL_KEYS } from "./skills.mjs";
 import { additionalAbilityIds } from "./abilities.mjs";
 import { carriedWeight } from "./physical-items.mjs";
@@ -96,6 +97,7 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
     return deriveStatistics(this, {
       items: actor?.items ?? [],
       effects: actor?.effects ?? [],
+      environment: actor ? actorEnvironment(actor) : null,
       abilityIds: actor ? additionalAbilityIds(actor) : [],
       ...(actor?.effects ? { dying: hasStatus(actor, DYING), dead: hasStatus(actor, DEAD) } : {})
     });

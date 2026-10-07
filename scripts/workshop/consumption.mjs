@@ -164,6 +164,8 @@ export function useConsumable(item) {
   const actor = item?.actor;
   if (!actor?.isOwner) return;
   if (pending.has(actor)) return pending.get(actor);
+  // Core p.165: a bomb is thrown, not drunk.
+  if (String(item.system.ruleId ?? "").startsWith("bomb.")) return import("../combat/bombs.mjs").then(({ throwBomb }) => throwBomb(actor, item));
   const work = usageDialog(item).finally(() => pending.delete(actor));
   pending.set(actor, work);
   return work;

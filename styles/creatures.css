@@ -109,3 +109,5 @@
 .witcher-npc-resistances:empty { display:none; }
 .witcher-npc-resistances label { display:grid; gap:3px; width:100%; font-size:11px; color:#7a5a43; }
 .witcher-npc-resistance { padding:2px 8px; border:1px solid #b3c8b1; border-radius:10px; background:#dce7db; color:#2f5240; font-size:11px; font-weight:600; }
+
+.witcher-npc-tabs .witcher-tab-count { display:inline-block; min-width:18px; margin-left:4px; padding:0 5px; border-radius:9px; background:#a3402f; color:#fff; font:700 11px/18px var(--font-primary,sans-serif); text-align:center; }

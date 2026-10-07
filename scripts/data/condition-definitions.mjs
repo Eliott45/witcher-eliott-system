@@ -49,7 +49,13 @@ export const CONDITION_DEFINITIONS = [
   entry("grappling", "Держит в захвате", "net", "Персонаж удерживает противника. Может обездвижить, душить или бросить его, а удерживаемый служит живым щитом: удары в туловище сначала принимает он."),
   entry("pinned", "Обездвижен", "padlock", "Персонаж обездвижен в захвате: не может передвигаться и действовать, пока не вырвется. Атаки по нему получают +4.", {incapacitated:true,modifiers:[{target:"combat.targeted",value:4}]}),
   // Appended last: compendium IDs follow this order.
-  entry("vomiting", "Рвота", "acid", "Персонажа рвёт или мучают рвотные позывы: он не может действовать до конца своего хода. Стр. 161.", {rounds:1,expiry:"turnEnd",incapacitated:true})
+  entry("vomiting", "Рвота", "acid", "Персонажа рвёт или мучают рвотные позывы: он не может действовать до конца своего хода. Стр. 161.", {rounds:1,expiry:"turnEnd",incapacitated:true}),
+  // Core p.165: token exceptions to the scene environment (see combat/environment.mjs).
+  entry("env-against-sun", "Против солнца", "sun", "Смотрит против яркого солнца: −3 к Вниманию, атаке и защите.", { modifiers: [{ target: "skills.awareness", value: -3 }, { target: "combat.attack", value: -3 }, { target: "combat.defense", value: -3 }] }),
+  entry("env-lit", "Освещён", "light", "Рядом факел или другой источник света: штрафы слабого света и темноты сцены не действуют."),
+  entry("env-dry-ground", "На суше", "stone-path", "Местность сцены (болото, снег, вода) на этот токен не действует."),
+  entry("env-in-water", "В воде", "waterfall", "−2 к атаке, блоку и парированию, −3 к Вниманию. Смена позиции — по трём осям, на половину расстояния."),
+  entry("env-underwater", "Под водой", "whale", "Как в воде, а также: оружием ближнего боя — одна атака за ход; уклонение и смена позиции — Атлетикой; метательное оружие (кроме копья) не работает; луки и арбалеты — дальность ×¼, урон ×½.")
 ];
 export const CONDITION_BY_ID = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,entry]));
 // Variants share the status ID: poison/drunkenness cannot stack with themselves.

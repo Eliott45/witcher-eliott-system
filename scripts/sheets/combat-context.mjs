@@ -17,6 +17,8 @@ import { statusEffect } from "../data/effect-counters.mjs";
 import { unarmedContext, rollFeint, dualWeapons } from "../combat/brawling.mjs";
 import { isCrossbow, loadedBolt, boltChoices, loadUpdate, unloadCrossbow } from "../combat/crossbow-ammo.mjs";
 import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
+import { actorEnvironment, environmentSummary, rollFooting } from "../combat/environment.mjs";
+import { isBomb, bombProfile, throwBomb } from "../combat/bombs.mjs";
 import { healingContext, healingPatient, stabilizePatientWound, treatPatientWound, startNaturalHealing, restDay, stabilizeDying } from "../combat/healing.mjs";
 
 export function combatContext(actor,options={}) {
@@ -31,7 +33,10 @@ export function combatContext(actor,options={}) {
   const defenses=[{mode:"dodge"},{mode:"reposition"},...equippedItems(actor.items).filter(item=>item.type==="weapon"&&["melee","shield"].includes(item.system.category)).flatMap(item=>[{mode:"block",itemId:item.id},{mode:"parry",itemId:item.id}]),{mode:"block",itemId:""},{mode:"parry",itemId:""}]
     .map(entry=>{const quote=defenseQuote(actor,{...options,...entry});return {...quote,base:quote.total===null?"—":signed(quote.total),disabled:Boolean(quote.blocked),hint:quote.blocked||`${quote.math} ${quote.note}`};});
   const unarmed=actor.type==="npc"?[]:unarmedContext(actor,options,{extra,fastPending:fastPending&&actor.flags[SYSTEM_ID].fastStrike.extra===extra});
-  return { healing:healingContext(actor), unarmed, feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"auto",modifier:options.modifier??0,
+  const environmentState=actorEnvironment(actor);
+  const bombs=actor.type==="npc"?[]:Array.from(actor.items??[]).filter(item=>isBomb(item)&&(item.system.quantity??0)>0&&item.system.carried!==false).map(item=>{const profile=bombProfile(item),body=actor.system.statistics.effective.body??0;
+    return {id:item.id,name:item.name,img:item.img,quantity:item.system.quantity,summary:[`радиус ${profile.radius} м`,profile.damage?`урон ${profile.damage}`:"",`дальность ${body*4} м`].filter(Boolean).join(" · "),properties:item.system.properties??""};});
+  return { healing:healingContext(actor), unarmed, bombs, environment:environmentSummary(environmentState), snow:environmentState?.terrain.id==="snow", feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"auto",modifier:options.modifier??0,
     grapple:(()=>{const state=grappleState(actor);return {options:grappleOptions(actor),holding:state.holding?{name:state.holding.name,pinned:state.holding.pinned,choking:state.holding.choking}:null,heldBy:state.heldBy?{name:state.heldBy.name}:null};})(),
     fullTurn,defenses,quickDraw,canQuickDraw:canAct&&Boolean(globalThis.game?.combat?.started&&Array.from(globalThis.game.combat.combatants).some(entry=>entry.actor?.uuid===actor.uuid)),ambush:{active:Boolean(ambush),targets:ambushTargets,count:ambushTargets.length,
       canPrepare:Boolean(canAct&&ambusher&&!encounter.started&&!tacticsFlags(ambusher).tacticRequest),pending:Boolean(tacticsFlags(ambusher).tacticRequest)},
@@ -88,6 +93,8 @@ export const combatActions={
   defend:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollDefense(this.actor,{...this.combatOptions,mode:target.dataset.mode,itemId:target.dataset.itemId});}finally{await this.render();}}),
   toggleExtraAction:guard(async function(){if(!this.isEditable)return;await inventoryWrite(this.actor,()=>this.actor.update({"system.combatAction.extra":!this.actor.system.combatAction.extra}));}),
   attackUnarmed:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollWeaponAttack(this.actor,null,{...this.combatOptions,unarmed:target.dataset.strike,mode:target.dataset.mode});}finally{await this.render();}}),
+  throwBomb:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await throwBomb(this.actor,this.actor.items.get(target.dataset.itemId));}finally{await this.render();}}),
+  snowFooting:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollFooting(this.actor);}finally{await this.render();}}),
   feint:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollFeint(this.actor);}finally{await this.render();}}),
   attackDual:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;
     try{

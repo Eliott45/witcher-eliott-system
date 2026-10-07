@@ -15,8 +15,10 @@ import { woundAcidDamage } from "./critical-wound-effects.mjs";
 export function poisonDamage(actor) {
   if (immuneToCondition(actor, ["poisoned"]) || actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("dead"))) return 0;
   if (!actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("poisoned"))) return 0;
-  // SP does not absorb poison; resistance halves the damage, rounded down.
-  return conditionResistant(actor, "poison") ? 1 : 3;
+  // SP does not absorb poison; resistance halves the damage, rounded down. Some poisons (Devil's Puffball) deal double.
+  const double = actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("poisoned") && effect.flags?.[SYSTEM_ID]?.condition?.doubleDamage);
+  const damage = double ? 6 : 3;
+  return conditionResistant(actor, "poison") ? Math.floor(damage / 2) : damage;
 }
 
 /** Core p.161: bleeding deals 2 a turn, ignoring armor; resistance halves it; a clotting powder suspends it. */

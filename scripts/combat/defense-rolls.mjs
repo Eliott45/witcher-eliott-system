@@ -9,6 +9,7 @@ import { weaponReadiness, signed, combatModifierParts } from "./weapon-rules.mjs
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { statusEffect } from "../data/effect-counters.mjs";
 import { ACTIVE_DODGE } from "./full-turn-rules.mjs";
+import { actorEnvironment } from "./environment.mjs";
 
 export const INCOMING_ATTACKS=[{id:"melee",name:"Ближняя атака"},{id:"thrown",name:"Метательное оружие"},{id:"ranged",name:"Лук / арбалет"}];
 const NAMES={dodge:"Уклонение",reposition:"Смена позиции",block:"Блок",parry:"Парирование",brawl:"Борьба"};
@@ -18,10 +19,12 @@ export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repe
   if(!Number.isFinite(modifier)||Math.abs(modifier)>100)throw new Error("Неверный модификатор защиты.");
   // Core p.164: block or parry with a weapon (its skill), a shield (Melee) or bare-handed (Brawling).
   const armed=["block","parry"].includes(mode),unarmed=armed&&!itemId,item=armed&&!unarmed?actor.items.get(itemId):null,weapon=item?.type==="weapon"?effectiveItem(item):null;
-  const skillKey=mode==="dodge"?"dodgeEscape":mode==="reposition"?"athletics":mode==="brawl"?"brawling":weapon?.category==="shield"?"melee":weapon?.skill??"brawling";
+  // Core p.165: under water a dodge is an Athletics check too.
+  const underwater=Boolean(actorEnvironment(actor)?.underwater);
+  const skillKey=mode==="dodge"?(underwater?"athletics":"dodgeEscape"):mode==="reposition"?"athletics":mode==="brawl"?"brawling":weapon?.category==="shield"?"melee":weapon?.skill??"brawling";
   const skill=skillValue(actor.system,skillKey),penalty=mode==="parry"?(incoming==="thrown"?-5:-3):0;
   const activeDodge=Boolean(statusEffect(actor,ACTIVE_DODGE));
-  const effects=[...combatModifierParts(actor,"combat.defense"),...(item?armPenaltyParts(actor,item):[])],effectTotal=effects.reduce((sum,part)=>sum+part.value,0);
+  const effects=[...combatModifierParts(actor,"combat.defense"),...(armed?combatModifierParts(actor,"combat.blockParry"):[]),...(item?armPenaltyParts(actor,item):[])],effectTotal=effects.reduce((sum,part)=>sum+part.value,0);
   const total=skill.total===null?null:skill.total+penalty+modifier+effectTotal,cost=repeat&&!activeDodge?1:0;
   let blocked=!actor.isOwner||!conditionRules(actor).canDefend?"Персонаж сейчас не может защищаться.":"";
   if(armed&&!unarmed)blocked ||= !weapon?"Выберите оружие для защиты.":weaponReadiness(actor,item,weapon)|| (!["melee","shield"].includes(weapon.category)?"Для этой защиты нужно оружие ближнего боя или щит.":"");

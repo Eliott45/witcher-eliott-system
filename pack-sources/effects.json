@@ -1281,6 +1281,170 @@
     }
   },
   {
+    "_id": "efct000000000036",
+    "name": "Против солнца",
+    "img": "icons/svg/sun.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Смотрит против яркого солнца: −3 к Вниманию, атаке и защите.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "env-against-sun"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "env-against-sun",
+          "modifiers": [
+            {
+              "target": "skills.awareness",
+              "value": -3
+            },
+            {
+              "target": "combat.attack",
+              "value": -3
+            },
+            {
+              "target": "combat.defense",
+              "value": -3
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000037",
+    "name": "Освещён",
+    "img": "icons/svg/light.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Рядом факел или другой источник света: штрафы слабого света и темноты сцены не действуют.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "env-lit"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "env-lit"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000038",
+    "name": "На суше",
+    "img": "icons/svg/stone-path.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Местность сцены (болото, снег, вода) на этот токен не действует.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "env-dry-ground"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "env-dry-ground"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000039",
+    "name": "В воде",
+    "img": "icons/svg/waterfall.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>−2 к атаке, блоку и парированию, −3 к Вниманию. Смена позиции — по трём осям, на половину расстояния.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "env-in-water"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "env-in-water"
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000040",
+    "name": "Под водой",
+    "img": "icons/svg/whale.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Как в воде, а также: оружием ближнего боя — одна атака за ход; уклонение и смена позиции — Атлетикой; метательное оружие (кроме копья) не работает; луки и арбалеты — дальность ×¼, урон ×½.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "env-underwater"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "env-underwater"
+        }
+      }
+    }
+  },
+  {
     "_id": "efct000000000101",
     "name": "Чёрный яд",
     "img": "icons/svg/poison.svg",

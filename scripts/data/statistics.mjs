@@ -8,16 +8,18 @@ import { armorEncumbrance } from "./physical-items.mjs";
 import { reputationLevel, reputationModifiers } from "./reputation.mjs";
 import { conditionModifiers } from "./condition-definitions.mjs";
 import { ENHANCED_SENSES, witcherSensesSuppressed } from "./visor.mjs";
+import { environmentModifiers } from "../combat/environment.mjs";
 
 export const ATTRIBUTE_KEYS = ["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"];
 
 const WOUNDED_ATTRIBUTES = new Set(["intelligence", "reflex", "dexterity", "will"]);
 
 /** Use base BODY/WILL for resource limits: wound penalties must not lower their own threshold. */
-export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, mutations = [], vigor = 0, reputation = {}, creature = null }, { dying = false, dead = false, abilityIds = [], items = [], effects = [] } = {}) {
+export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, mutations = [], vigor = 0, reputation = {}, creature = null }, { dying = false, dead = false, abilityIds = [], items = [], effects = [], environment = null } = {}) {
   const background = backgroundModifiers(details, abilityIds).filter(modifier =>
     modifier.source !== ENHANCED_SENSES || !witcherSensesSuppressed(details, items));
-  const modifiers = [...background, ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(wearerBonuses), ...conditionModifiers(effects)];
+  const modifiers = [...background, ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(wearerBonuses), ...conditionModifiers(effects),
+    ...environmentModifiers(environment, { items, effects, senses: background.some(modifier => modifier.source === ENHANCED_SENSES) })];
   const reputationBonus = modifierTotal(modifiers, "reputation");
   const reputationTotal = reputationLevel(reputation.value, reputationBonus);
   modifiers.push(...reputationModifiers(reputation, reputationTotal));

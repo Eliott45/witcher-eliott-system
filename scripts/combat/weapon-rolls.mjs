@@ -10,6 +10,7 @@ import { selectedAttackTarget } from "./attack-target.mjs";
 import { ambushAttack, ambushState, tacticsFlags } from "./tactics-rules.mjs";
 import { unarmedAttack, consumeFeint } from "./brawling.mjs";
 import { loadedBolt, firedUpdate } from "./crossbow-ammo.mjs";
+import { actorEnvironment, rollFooting } from "./environment.mjs";
 
 /** Pair state of a fast attack: the second click in the same round (and extra-action status) is strike 2/2. */
 export function fastPair(actor,attack,action) {
@@ -60,6 +61,7 @@ export function rollWeaponAttack(actor,itemId,options={}) {
         +`<p>${esc(quote.aim.name)}${quote.aim.id!=="random"?` · урон ×${quote.aim.multiplier} после брони`:" · место попадания после успешной атаки"}</p>`
         +actionNote(action)+(quote.damage?`<button type="button" data-weapon-damage><i class="fa-solid fa-dice-d6"></i> Урон: ${esc(quote.damage)}</button>`:"")
         +(quote.aim.id==="random"?'<div class="witcher-location-buttons"><button type="button" data-hit-location="humanoid">Место: гуманоид</button><button type="button" data-hit-location="monster">Место: чудовище</button></div>':"")
+        +(actorEnvironment(actor)?.terrain.id==="snow"?'<button type="button" data-snow-footing><i class="fa-solid fa-person-falling"></i> Лёд и снег: Атлетика СЛ 14</button>':"")
         +`<small>Каждое попадание — отдельный урон и зона. Сравните атаку с защитой цели.</small></section>`;
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls,flavor,
         flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId:itemId??null,name:quote.name,mode:quote.attack.id,unarmed:options.unarmed??null,nonLethal:Boolean(quote.nonLethal),
@@ -108,6 +110,10 @@ export function registerWeaponChat() {
     for(const button of html.querySelectorAll("[data-weapon-damage]")) {
       button.disabled=!message.speakerActor?.isOwner||!message.isContentVisible;
       button.addEventListener("click",async()=>{button.disabled=true;try{await rollWeaponDamage(message);}catch(error){ui.notifications.error(error.message);}finally{button.disabled=!message.speakerActor?.isOwner;}});
+    }
+    for(const button of html.querySelectorAll("[data-snow-footing]")) {
+      button.disabled=!message.speakerActor?.isOwner||Boolean(message.flags[SYSTEM_ID]?.footing);
+      button.addEventListener("click",async()=>{button.disabled=true;try{await rollFooting(message.speakerActor);await message.setFlag(SYSTEM_ID,"footing",true);}catch(error){ui.notifications.error(error.message);button.disabled=false;}});
     }
     for(const button of html.querySelectorAll("[data-hit-location]")) {
       button.disabled=!message.speakerActor?.isOwner||!message.isContentVisible;

@@ -258,7 +258,7 @@ async function pushTarget(attack) {
 const chargeContest = (message, index) => game.messages.contents.map(entry => flagsOf(entry).chargeContest).find(contest => contest?.source === `${message.id}:${index}`) ?? null;
 
 /** HP loss, armor wear and a critical wound on one actor; returns what wore down. */
-async function sufferDamage(actor, result, { wound = null, level = "", location = {}, nonLethal = false } = {}) {
+export async function sufferDamage(actor, result, { wound = null, level = "", location = {}, nonLethal = false } = {}) {
   if (nonLethal) await actor.update({ "system.stamina.value": actor.system.stamina.value - result.total });
   else await actor.update({ "system.health.value": actor.system.health.value - result.total });
   const worn = [];

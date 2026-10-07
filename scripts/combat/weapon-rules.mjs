@@ -5,6 +5,7 @@ import { equippedItems } from "../data/physical-items.mjs";
 import { shieldClass } from "../data/shields.mjs";
 import { aimingBonus } from "./full-turn-rules.mjs";
 import { statusEffect } from "../data/effect-counters.mjs";
+import { actorEnvironment, worksUnderwater } from "./environment.mjs";
 
 export const gripOf = item => item.system.natural ? 0 : item.system.grip || item.system.hands || 1;
 /** Effect penalties such as Staggered or Prone, targeted at "combat.attack" / "combat.defense". */
@@ -70,10 +71,13 @@ function dualMode(actor,item) {
     hint:`Одно действие атаки (errata): по удару каждым оружием в руках (в том числе щитом или двумя ручными арбалетами), ${penalty?"оба с −3":"без штрафа — школа Змеи"}, урон каждого считается отдельно. Блокировать или парировать её может только тот, у кого тоже два оружия или оружие и щит, остальные лишь уклоняются или меняют позицию.`};
 }
 export function attackModes(actor,item) {
-  if (actor.type === "npc") return [{id:"npc",name:`Атака ×${item.system.attackRate??1}`,count:item.system.attackRate??1,penalty:0,multiplier:1}];
+  // Core p.165: under water a melee weapon strikes once per turn.
+  const underwaterMelee=["melee","shield"].includes(item.system.category)&&!item.system.natural||item.system.natural&&item.system.category!=="ranged";
+  const slowed=underwaterMelee&&Boolean(actorEnvironment(actor)?.underwater);
+  if (actor.type === "npc") { const count=slowed?1:item.system.attackRate??1; return [{id:"npc",name:`Атака ×${count}`,count,penalty:0,multiplier:1}]; }
   if (item.system.skill === "crossbow") { const dual=dualMode(actor,item); return [{id:"shot",name:"Выстрел",count:1,penalty:0,multiplier:1},...(dual?[dual]:[])]; }
   // Core p.153: a fast attack is two strikes for one action. Each click rolls one strike, so the two may hit different targets.
-  const modes=[{id:"fast",name:item.system.skill==="archery"?"Быстрый выстрел":"Быстрая",count:1,penalty:0,multiplier:1,pair:item.system.skill!=="archery"},
+  const modes=[{id:"fast",name:item.system.skill==="archery"?"Быстрый выстрел":"Быстрая",count:1,penalty:0,multiplier:1,pair:item.system.skill!=="archery"&&!slowed,...(slowed?{hint:"Под водой оружием ближнего боя — один удар за ход."}:{})},
     {id:"strong",name:"Сильная",count:1,penalty:-3,multiplier:2}];
   // Core pp.163–164 special attacks; each is one action replacing the attack (a charge takes the full round).
   if(item.system.category==="melee"&&!item.system.natural) modes.push(
@@ -95,7 +99,9 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   const skill=skillValue(actor.system,weapon.skill);
   const aim=ATTACK_LOCATIONS.find(entry=>entry.id===location);
   if(!aim||!Number.isFinite(Number(modifier))||Math.abs(Number(modifier))>100)throw new Error("Неверный модификатор атаки.");
-  const ranged=["ranged","thrown"].includes(weapon.category),reach=weapon.rangeBodyMultiplier?weapon.rangeBodyMultiplier*actor.system.statistics.effective.body:weapon.range;
+  const ranged=["ranged","thrown"].includes(weapon.category),underwater=Boolean(actorEnvironment(actor)?.underwater),bowUnderwater=underwater&&weapon.category==="ranged";
+  // Core p.165: under water bows and crossbows reach a quarter as far and deal half damage.
+  const reach=(weapon.rangeBodyMultiplier?weapon.rangeBodyMultiplier*actor.system.statistics.effective.body:weapon.range)/(bowUnderwater?4:1);
   const band=!ranged?RANGED_BANDS[1]:range==="auto"?bandFor(reach,targetContext?.distance)??{...RANGED_BANDS[1],id:"auto",name:"Дистанция: не измерена"}:RANGED_BANDS.find(entry=>entry.id===range&&entry.id!=="auto");
   if(!band)throw new Error("Неверная дистанция.");
   const parts=[{label:"Основа навыка",value:skill.total},{label:"Точность оружия",value:weapon.accuracy??0},
@@ -114,7 +120,7 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   const unarmedBonus=weapon.ruleId==="weapon.brass-knuckles"&&!weapon.damageIncludesBody?" + 1d6":"";
   const base=`(${shield?"1d6":weapon.damage}${unarmedBonus}${body+bonus?` + ${body+bonus}`:""})${attack.multiplier===2?" * 2":""}`;
   // Pommel strike (core p.164): half damage, non-lethal. Disarm and trip deal no damage.
-  const damage=attack.special?null:attack.pommel?`floor(${base} / 2)`:base;
-  const blocked=targetContext?.blind&&location!=="random"?"Нельзя выбирать место удара по цели вне вашего конуса зрения":shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":band.beyond?`Цель дальше предельной дистанции (${reach*2} м)`:"");
+  const damage=attack.special?null:attack.pommel||bowUnderwater?`floor(${base} / 2)`:base;
+  const blocked=targetContext?.blind&&location!=="random"?"Нельзя выбирать место удара по цели вне вашего конуса зрения":shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":band.beyond?`Цель дальше предельной дистанции (${reach*2} м)`:underwater&&!worksUnderwater({...weapon,name:item.name})?"Под водой метательное оружие (кроме копья) не работает":"");
   return {name:item.name,nonLethal:Boolean(attack.pommel),weapon,attack,skill,parts,total,damage,body,bonus,aim,band,ranged,blocked,range:reach};
 }
