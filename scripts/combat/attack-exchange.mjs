@@ -7,6 +7,7 @@ import { scatterOffset } from "../canvas/scatter-overlay.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { effectiveItem, activeOil } from "../data/workshop.mjs";
+import { onDamaged, onHit, onKill, elixirDamage, criticalLocationBonus } from "../workshop/witcher-elixirs.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { trackRollDisplay, waitsForDice, diceSyncEnabled } from "../chat/roll-display.mjs";
 import { rollStun } from "./stun-roll.mjs";
@@ -200,7 +201,9 @@ export function rollExchangeDamage(message, index) {
       const aimed = attack.location !== "random" && !attack.locationRoll;
       const critRoll = await new foundry.dice.Roll(aimed && ["head", "torso"].includes(location.id) ? "1d6" : aimed ? "0" : "2d6").evaluate(options);
       if (critRoll.dice.length) rolls.push(critRoll);
-      const tableRoll = aimed ? aimedCriticalRoll(location.id, critRoll.total) : critRoll.total;
+      // Katakan decoction (core p.248): +3 to the critical location roll, within the table.
+      const katakan = criticalLocationBonus(actor), rolled = katakan ? Math.min(aimed ? 6 : 12, critRoll.total + katakan) : critRoll.total;
+      const tableRoll = aimed ? aimedCriticalRoll(location.id, rolled) : rolled;
       let wound = criticalWoundByRoll(outcome.critical.id, tableRoll), bonus = outcome.critical.bonus;
       if (wound && anatomyFree(target) && ORGAN_WOUNDS.has(wound.id)) { bonus += ANATOMY_FREE_BONUS[outcome.critical.id]; wound = null; }
       if (attack.nonLethal) wound = null;
@@ -209,8 +212,9 @@ export function rollExchangeDamage(message, index) {
     // Core p.248: an active oil adds its bonus against the monster class it was made for.
     const oil = item ? activeOil(item, game.time?.worldTime ?? 0) : null, category = target?.type === "npc" ? target.system.creature?.category : "humanoid";
     const oilBonus = oil && oil.target === category ? { name: oil.name, bonus: oil.bonus } : null;
+    const extras = [...(oilBonus ? [{ label: `Масло: ${oilBonus.name}`, value: oilBonus.bonus }] : []), ...elixirDamage(actor)];
     return { rolls, flavor: `<h3>${esc(attack.name)} · урон</h3>`,
-      exchange: { base: rolls[0].total, silver: silver?.total ?? 0, oil: oilBonus,
+      exchange: { base: rolls[0].total, silver: silver?.total ?? 0, oil: oilBonus, extras,
         location: { id: location.id, name: location.name, multiplier: location.multiplier }, traits, critical } };
   });
 }
@@ -223,7 +227,8 @@ export function damagePreview(message, index) {
   const critical = data.critical ? { name: data.critical.name, bonus: data.critical.bonus } : null;
   // Cracked Skull (core p.159): later wounds to the head deal ×4 instead of ×3.
   const multiplierFor = actor => data.location.id === "head" ? data.location.multiplier + modifierTotal(actor.system.statistics?.modifiers ?? [], "damage.headMultiplier") : data.location.multiplier;
-  const oil = data.oil ? { label: `Масло: ${data.oil.name}`, value: data.oil.bonus } : null;
+  const oil = data.extras ?? (data.oil ? [{ label: `Масло: ${data.oil.name}`, value: data.oil.bonus }] : null);
+  const extraTotal = [oil].flat().reduce((sum, entry) => sum + (entry?.value ?? 0), 0);
   const hit = (actor, armorAtZone, base, silver, crit, extra = oil) => resolveDamage({ base, silver, location: data.location.id, multiplier: multiplierFor(actor),
     traits: data.traits, armor: armorAtZone, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor), critical: crit, extra });
   const preview = { data, target, armor, result: hit(target, armor, data.base, data.silver, critical), shield: null, prosthesis: null };
@@ -240,7 +245,7 @@ export function damagePreview(message, index) {
   const holding = data.location.id === "torso" ? grappleState(target).holding : null;
   if (holding?.actor) {
     const shieldArmor = armorAt(holding.actor, "torso"), body = holding.actor.system.statistics?.effective?.body ?? 0;
-    const overflow = Math.max(0, data.base + (data.oil?.bonus ?? 0) - body - shieldArmor.sp);
+    const overflow = Math.max(0, data.base + extraTotal - body - shieldArmor.sp);
     preview.shield = { actor: holding.actor, token: holding.token, name: holding.name || holding.actor.name, armor: shieldArmor, body, overflow,
       result: hit(holding.actor, shieldArmor, data.base, data.silver, critical), through: hit(target, armor, overflow, 0, null, null) };
   }
@@ -273,7 +278,12 @@ const chargeContest = (message, index) => game.messages.contents.map(entry => fl
 /** HP loss, armor wear and a critical wound on one actor; returns what wore down. */
 export async function sufferDamage(actor, result, { wound = null, level = "", location = {}, nonLethal = false } = {}) {
   if (nonLethal) await actor.update({ "system.stamina.value": actor.system.stamina.value - result.total });
-  else await actor.update({ "system.health.value": actor.system.health.value - result.total });
+  else {
+    // Full Moon's temporary HP take the blow first; Griffin, Wyvern and Swallow react to it (core pp.247–248).
+    const { absorbed } = await onDamaged(actor, result.total);
+    result.absorbed = absorbed;
+    await actor.update({ "system.health.value": actor.system.health.value - (result.total - absorbed) });
+  }
   const worn = [];
   for (const id of result.ablate) {
     if (id === "natural") {
@@ -310,7 +320,7 @@ export async function applyExchangeDamage(message, index, { useShield = false } 
     if (shield.actor.isOwner) { shieldData.ablated = (await sufferDamage(shield.actor, shield.result, shieldData)).join(", "); shieldData.applied = true; }
     exchange.shield = shieldData;
   }
-  return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${own.total} ${nonLethal ? "ВЫН" : "ПЗ"}${shield ? ` · живой щит ${esc(shield.name)}: −${shield.result.total} ПЗ` : ""}${preview.prosthesis ? ` · ${esc(preview.prosthesis.name)} отвалился` : ""}</p>`,
+  return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${own.total - (own.absorbed ?? 0)} ${nonLethal ? "ВЫН" : "ПЗ"}${own.absorbed ? ` (временные ПЗ поглотили ${own.absorbed})` : ""}${shield ? ` · живой щит ${esc(shield.name)}: −${shield.result.total} ПЗ` : ""}${preview.prosthesis ? ` · ${esc(preview.prosthesis.name)} отвалился` : ""}</p>`,
     flags: { [SYSTEM_ID]: { skipLuck: true, exchange } } }, "public");
 }
 
@@ -569,7 +579,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
     }
     else {
       const data = exchangeOf(damage), wound = data.critical?.wound;
-      body += `<p class="witcher-exchange-damage">Урон <b>${data.base}</b>${data.oil ? ` + масло <b>${data.oil.bonus}</b>` : ""}${data.silver ? ` + серебро <b>${data.silver}</b>` : ""} → ${esc(data.location.name)}${data.location.multiplier !== 1 ? ` (×${data.location.multiplier === 0.5 ? "½" : data.location.multiplier})` : ""}</p>`;
+      body += `<p class="witcher-exchange-damage">Урон <b>${data.base}</b>${(data.extras ?? (data.oil ? [{ label: "масло", value: data.oil.bonus }] : [])).map(entry => ` + ${esc(entry.label.replace(/^Масло:.*/u, "масло").toLocaleLowerCase("ru"))} <b>${entry.value}</b>`).join("")}${data.silver ? ` + серебро <b>${data.silver}</b>` : ""} → ${esc(data.location.name)}${data.location.multiplier !== 1 ? ` (×${data.location.multiplier === 0.5 ? "½" : data.location.multiplier})` : ""}</p>`;
       if (wound) body += `<details class="witcher-exchange-wound"><summary>${esc(wound.name)}</summary><p>${esc(wound.effect)}</p></details>`;
       if (applied) {
         const result = exchangeOf(applied);
@@ -733,7 +743,18 @@ async function afterSettled(message) {
     duration: { value: 1, units: "rounds", expiry: "turnStart", expired: false }, flags: { [SYSTEM_ID]: { ...source.flags[SYSTEM_ID], parryKey: key } } }]);
 }
 
+/** Active GM: a hit that dealt damage or killed feeds the attacker's elixirs (Wyvern, Blizzard, Grave Hag). */
+async function elixirEvents(message) {
+  const link = exchangeOf(message);
+  if (link?.kind !== "applied" || link.nonLethal || !game.users.activeGM?.isSelf) return;
+  const source = game.messages.get(link.attack), attacker = source?.speakerActor, target = targetActor(flagsOf(source ?? {}).weaponAttack ?? {});
+  if (!attacker || !(link.total > 0)) return;
+  await onHit(attacker);
+  if (link.from > 0 && (target?.system.health.value ?? 1) <= 0) await onKill(attacker);
+}
+
 export function registerAttackExchange() {
+  Hooks.on("createChatMessage", message => elixirEvents(message).catch(console.error));
   Hooks.on("renderChatMessageHTML", renderExchange);
   Hooks.on("createChatMessage", message => { try { settleThenRefresh(message); } catch (error) { console.error(error); } });
   Hooks.on("createChatMessage", message => { applyShieldShare(message).catch(console.error); applyDeferredShare(message).catch(console.error); });

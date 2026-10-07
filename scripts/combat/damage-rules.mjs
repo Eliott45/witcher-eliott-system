@@ -1,3 +1,4 @@
+import { elixirArmor } from "../workshop/witcher-elixirs.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
 import { equippedItems, armorZones } from "../data/physical-items.mjs";
 import { layeredStoppingPower } from "../data/armor-layers.mjs";
@@ -55,13 +56,15 @@ export function armorAt(actor, location) {
   const items = equippedItems(actor.items).filter(item => item.type === "armor" && armorZones(item).includes(zone));
   const worn = items.map(item => ({ item, sp: Math.max(0, effectiveItem(item).stoppingPower?.value ?? 0), resistances: itemResistances(item) }));
   const innate = creatureResistances(actor);
+  // Griffin and Arachas decoctions (core p.248) add SP to every location; it is never worn down.
+  const extra = elixirArmor(actor), extraSp = extra.reduce((sum, layer) => sum + layer.sp, 0), extraLayers = extra.map(layer => ({ id: "", name: layer.name, sp: layer.sp }));
   if (worn.length) {
     const top = worn.reduce((best, layer) => layer.sp > best.sp ? layer : best, worn[0]);
-    return { zone, sp: layeredStoppingPower(worn.map(layer => layer.sp)), resistances: [...new Set([...worn.flatMap(layer => layer.resistances), ...innate])],
-      layers: worn.map(layer => ({ id: layer.item.id, name: layer.item.name, sp: layer.sp })), ablate: worn.filter(layer => layer.sp > 0).map(layer => layer.item.id), natural: false };
+    return { zone, sp: layeredStoppingPower(worn.map(layer => layer.sp)) + extraSp, resistances: [...new Set([...worn.flatMap(layer => layer.resistances), ...innate])],
+      layers: [...worn.map(layer => ({ id: layer.item.id, name: layer.item.name, sp: layer.sp })), ...extraLayers], ablate: worn.filter(layer => layer.sp > 0).map(layer => layer.item.id), natural: false };
   }
   const natural = actor.type === "npc" ? Math.max(0, actor.system.creature?.naturalArmor ?? 0) : 0;
-  return { zone, sp: natural, resistances: innate, layers: natural ? [{ id: "", name: "Естественная броня", sp: natural }] : [], ablate: natural ? ["natural"] : [], natural: Boolean(natural) };
+  return { zone, sp: natural + extraSp, resistances: innate, layers: [...(natural ? [{ id: "", name: "Естественная броня", sp: natural }] : []), ...extraLayers], ablate: natural ? ["natural"] : [], natural: Boolean(natural) };
 }
 
 const hasAbility = (actor, ruleId) => (actor.items ?? []).some(item => item.type === "ability" && item.system.ruleId === ruleId);
@@ -94,7 +97,7 @@ export function resolveDamage({ base, silver = 0, location, multiplier, traits, 
   note("Бросок урона", base, traits.types.map(type => DAMAGE_TYPE_NAMES[type]).join(" / "));
   if (silverApplies) note("Серебро против чудовища", `+${silver}`);
   // A sword oil against its monster class (core p.248) adds to the weapon damage before armor.
-  if (extra?.value) { damage += extra.value; note(extra.label, `+${extra.value}`, extra.detail ?? ""); }
+  for (const bonus of [extra].flat().filter(entry => entry?.value)) { damage += bonus.value; note(bonus.label, `+${bonus.value}`, bonus.detail ?? ""); }
   const sp = traits.piercing === "improved" ? Math.floor(armor.sp / 2) : armor.sp;
   if (armor.sp) note(traits.piercing === "improved" ? "ПБ (улучшенное пробивание: ½)" : "ПБ брони", `−${sp}`, armor.layers.map(layer => `${layer.name} ${layer.sp}`).join(", "));
   damage = Math.max(0, damage - sp);

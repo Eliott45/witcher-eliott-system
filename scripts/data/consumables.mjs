@@ -52,9 +52,8 @@ const modifiers = {
   "decoction.fiend": [{ target: "carryMultiplier", value: 1 }],
   "decoction.nekker": ["riding", "athletics"].map(skill => ({ target: `skills.${skill}`, value: 3 }))
 };
-// TODO: combat-triggered regeneration, temporary HP, kills and incoming hits need
-// a shared damage/event pipeline. Keep their timed rule text on the effect until then;
-// never convert temporary HP into a permanent healthMax bonus or guess the trigger.
+// Combat-triggered effects (regeneration, temporary HP, kills, hits) live in workshop/witcher-elixirs.mjs;
+// never convert temporary HP into a permanent healthMax bonus.
 export function potionEffectSource(item) {
   const s = item.system, ruleId = s.ruleId || item.uuid;
   const source = conditionSource({ id: ruleId, name: item.name, img: item.img, description: "", rules: { seconds: s.alchemy.duration, modifiers: modifiers[ruleId] ?? [] } });

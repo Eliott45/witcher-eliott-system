@@ -86,7 +86,9 @@ export function environmentModifiers(state, { items = [], effects = [], senses =
   const out = [];
   const ignoresLight = state.light.id === "dark" ? catPotion(effects) : state.light.id === "dim" ? senses || catPotion(effects) : false;
   if (!ignoresLight) for (const modifier of state.light.modifiers ?? []) out.push({ ...modifier, ...label(state.light.name) });
-  for (const modifier of state.terrain.modifiers ?? []) out.push({ ...modifier, ...label(state.terrain.name) });
+  // Killer Whale (core p.247) cancels the sight penalty under water.
+  const clearSight = ["water", "underwater"].includes(state.terrain.id) && Array.from(effects ?? []).some(effect => !effect.disabled && effect.flags?.[SYSTEM_ID]?.consumable?.ruleId === "potion.killer-whale");
+  for (const modifier of state.terrain.modifiers ?? []) if (!(clearSight && modifier.target === "skills.awareness")) out.push({ ...modifier, ...label(state.terrain.name) });
   if (state.heat) out.push({ target: "staminaMax", factor: heavyArmor(items) ? 1 / 2 : 2 / 3, ...label("Экстремальная жара") });
   return out;
 }

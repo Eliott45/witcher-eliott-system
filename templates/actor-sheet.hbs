@@ -25,6 +25,7 @@
       <strong>{{stats.woundThreshold.value}}</strong>
     </div>
     {{#if stats.wounded}}<p class="witcher-wound-notice" role="status">{{localize stats.woundNotice}}</p>{{/if}}
+    {{#if temporaryHealth}}<div class="witcher-stat-row witcher-resource-detail" data-tooltip="«Полнолуние»: временные ПЗ поглощают урон первыми и пропадают с концом эликсира."><span>Временные ПЗ</span><strong>+{{temporaryHealth}}</strong></div>{{/if}}
     {{#if stats.death.dead}}
     <section class="witcher-death-state dead" role="status">
       <h3><i class="fa-solid fa-skull" aria-hidden="true"></i> {{localize "WITCHER.Effects.Dead"}}</h3>

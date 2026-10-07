@@ -26,6 +26,7 @@ import { registerEnvironment } from "./combat/environment.mjs";
 import { registerBombs } from "./combat/bombs.mjs";
 import { registerSpellStrikes } from "./magic/spell-strikes.mjs";
 import { registerMagicFumble } from "./magic/magic-fumble.mjs";
+import { registerWitcherElixirs } from "./workshop/witcher-elixirs.mjs";
 import { migrateEffectContent, registerEffectContentMigration } from "./migrations/effect-content.mjs";
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
@@ -103,6 +104,7 @@ Hooks.once("init", async () => {
   registerBombs();
   registerSpellStrikes();
   registerMagicFumble();
+  registerWitcherElixirs();
   registerConditionSaves();
   registerEffectExpiry();
   registerOilExpiry();
