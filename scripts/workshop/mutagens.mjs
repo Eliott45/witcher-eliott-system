@@ -39,17 +39,19 @@ export async function applyMutagen(item) {
 /** Loot is configured on an NPC; no implicit access to someone else's inventory or infinite harvesting. */
 export async function harvestMaterial(npc,id) {
   if(!npc.isOwner)return;
-  const entry=npc.system.harvest.find(row=>row.id===id);
+  const selected=npc.system.harvest.find(row=>row.id===id),entry=selected?{...selected}:null;
   if(!entry||entry.attempted)throw new Error("Добыча уже собрана или попытка извлечения потрачена.");
-  if(entry.formula&&!npc.system.creature.lootGenerated)throw new Error("Сначала определите случайную добычу в разделе «Сведения».");
+  if(entry.formula&&!npc.system.creature.lootGenerated)throw new Error("Сначала нажмите «Бросить добычу» во вкладке «Инвентарь».");
   if(entry.quantity<=0)throw new Error("Этого материала в добыче нет.");
   const source=await foundry.utils.fromUuid(entry.uuid);if(!source)throw new Error("Исходный материал недоступен.");
   const actors=game.actors.filter(actor=>actor.isOwner&&actor.id!==npc.id);
   const targetId=await foundry.applications.api.DialogV2.prompt({window:{title:"Получатель добычи"},content:`<label>Персонаж<select name="actor">${actors.map(actor=>`<option value="${actor.id}">${esc(actor.name)}</option>`).join("")}</select></label><p>${esc(source.name)} ×${entry.quantity}. ${entry.skill?`СЛ ${entry.dc}`:"Проверка для этой добычи не задана"}.</p>`,ok:{label:"Извлечь",callback:(_e,b)=>new FormData(b.form).get("actor")},rejectClose:false});
   const actor=game.actors.get(targetId);if(!actor?.isOwner)return;
   return inventoryWrite(npc,async()=>{
-    const current=npc.system.harvest.find(row=>row.id===id);if(!current||current.attempted)throw new Error("Попытка уже потрачена.");
+    const unchanged=()=>{const row=npc.system.harvest.find(row=>row.id===id);return row&&!row.attempted&&["uuid","quantity","skill","dc","formula"].every(key=>row[key]===entry[key]);};
+    if(!unchanged())throw new Error("Добыча изменилась. Откройте извлечение заново.");
     const check=entry.skill?await workshopCheck(actor,{name:`Извлечение: ${source.name}`,skill:entry.skill,dc:entry.dc}):{success:true};
+    if(!unchanged())throw new Error("Добыча изменилась во время проверки. Предметы не выданы.");
     // Mark before transfer; restore the flag on a failed transfer, never award the same row twice.
     await npc.update({"system.harvest":npc.system.harvest.map(row=>row.id===id?{...row,attempted:true}:row)});
     try {

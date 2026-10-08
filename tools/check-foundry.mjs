@@ -43,6 +43,7 @@ assert.deepEqual(Array.from(packFolder.packs), ["effects", "races", "abilities",
 game.model = { ...game.system.documentTypes, ActiveEffect:{base:{}}, Macro:Object.fromEntries(Object.values(CONST.MACRO_TYPES).map(type => [type,{}])), Folder: Object.fromEntries(CONST.FOLDER_DOCUMENT_TYPES.map(type => [type, {}])) };
 game.packs = new Map(game.system.packs.map(pack => [`${game.system.id}.${pack.name}`, { documentName: pack.type, folders: new Map() }]));
 game.user = { id: "testuser00000001", isGM: true, can:()=>true };
+game.users = {activeGM:game.user};
 let preferences = {};
 const player = { id: "player0000000001", isGM: false, hasPermission: () => false, can:()=>false };
 assert.equal(foundry.documents.BaseSetting.metadata.permissions.create(player, {
@@ -539,7 +540,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["combat-actions", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "crafting", "alchemy", "recipe-card"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["combat-actions", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "npc-loot", "crafting", "alchemy", "recipe-card"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -840,6 +841,7 @@ assert.ok(plannedTreeHTML.includes('data-action="viewSheetItem"'));
 assert.equal(advancingActor.items.getName(bardDefinition.name).system.level, 2, "Planning never mutates the actor");
 // Render saved inventory through the same strict template used by old and new actors.
 const { inventoryContext } = await import("../scripts/sheets/inventory-context.mjs");
+const { workshopActorContext } = await import("../scripts/sheets/workshop-actor-context.mjs");
 const inventoryHTML = handlebars.compile(await readFile(new URL("../templates/inventory.hbs", import.meta.url), "utf8"), { strict: true });
 // Old catalog imports default to a raised visor; PC/NPC save/reopen uses one native Boolean.
 const { abilitiesContext } = await import("../scripts/sheets/abilities-context.mjs");
@@ -857,10 +859,10 @@ for (const type of ["character", "npc"]) {
   assert.equal(savedHelm.system.visorDown, true);
   assert.equal(reopened.system.notes, "Existing notes");
   assert.equal(reopened.system.statistics.skillBonuses.awareness ?? 0, 0);
-  const visorHTML = inventoryHTML({rootId: "visor", editable: true, system: reopened.system, inventory: inventoryContext(reopened), workshop: {witcher: false, npc: false}});
+  const visorHTML = inventoryHTML({rootId: "visor", editable: true, system: reopened.system, inventory: inventoryContext(reopened), workshop: await workshopActorContext(reopened)});
   assert.match(visorHTML, /data-action="toggleVisor"[^>]*aria-pressed="true"/);
   assert.ok(visorHTML.includes("Забрало опущено"));
-  const observerHTML = inventoryHTML({rootId: "visor", editable: false, system: reopened.system, inventory: inventoryContext(reopened), workshop: {witcher: false, npc: false}});
+  const observerHTML = inventoryHTML({rootId: "visor", editable: false, system: reopened.system, inventory: inventoryContext(reopened), workshop: await workshopActorContext(reopened)});
   assert.match(observerHTML, /data-action="toggleVisor"[^>]*disabled/);
   assert.ok(physicalItemContext(savedHelm, true).some(group => group.fields.some(field => field.name === "system.visorDown" && field.value)));
   assert.equal((await abilitiesContext(reopened)).entries.filter(entry => entry.suppressed).length, 1);
@@ -877,7 +879,7 @@ const reopenedBags = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(b
 const bagContext = inventoryContext(reopenedBags);
 assert.equal(bagContext.weight, 2);
 assert.equal(bagContext.groups.find(group => group.id === "container").items[0].children[0].children[0].name, "Ore");
-const bagHTML = inventoryHTML({ rootId: "nested-inventory", editable: true, system: reopenedBags.system, inventory: bagContext, workshop: { witcher: false, npc: false } });
+const bagHTML = inventoryHTML({ rootId: "nested-inventory", editable: true, system: reopenedBags.system, inventory: bagContext, workshop: await workshopActorContext(reopenedBags) });
 assert.ok(bagHTML.includes("1 / 5 кг")); assert.ok(bagHTML.includes("0.8 / 1 кг"));
 assert.equal([...bagHTML.matchAll(/data-inventory-name=/g)].length, 3);
 const legacyBag = new foundry.documents.BaseItem({ name: "Legacy bag", type: "equipment", system: { ruleId: "gear.bag" } });
@@ -885,7 +887,7 @@ assert.equal(legacyBag.system.kind, "container"); assert.equal(legacyBag.system.
 const customBag = new foundry.documents.BaseItem({ name: "Customized bag", type: "equipment", system: { ruleId: "gear.bag", kind: "gear", capacity: 0, quantity: 3 } });
 assert.equal(customBag.system.kind, "gear"); assert.equal(customBag.system.quantity, 3);
 const savedInventoryContext = inventoryContext(restoredInventory);
-const savedInventoryHTML = inventoryHTML({ rootId: "saved-inventory", editable: true, system: restoredInventory.system, inventory: savedInventoryContext, workshop: { witcher: false, npc: false } });
+const savedInventoryHTML = inventoryHTML({ rootId: "saved-inventory", editable: true, system: restoredInventory.system, inventory: savedInventoryContext, workshop: await workshopActorContext(restoredInventory) });
 const { equipmentEntry, equipmentFacets } = await import("../scripts/data/equipment-search.mjs");
 const browserEntries = [...documents.values()].filter(item => ["weapon", "armor", "equipment", "recipe"].includes(item.type)).map(equipmentEntry);
 const browserTemplate = handlebars.compile(await readFile(new URL("../templates/equipment-browser.hbs", import.meta.url), "utf8"), { strict: true });
@@ -1542,6 +1544,11 @@ for(const source of bestiarySources()) {
     assert.equal((rendered.match(/name="system\.creature\.category"/g)??[]).length,editing?1:0);
     assert.ok(rendered.includes(view.creatureClass.description));
     assert.ok(rendered.includes(handlebars.escapeExpression(source.name)));assert.ok(rendered.includes('data-action="attackWeapon"'));assert.ok(!rendered.includes('data-mode="strong"'));
+    assert.equal((rendered.match(/aria-label="Добыча существа"/g)??[]).length,1,'NPC loot has one home in inventory');
+    const inventoryTab=rendered.search(/<section class="tab[^\"]*" data-group="creature" data-tab="inventory">/);
+    const loreTab=rendered.search(/<section class="tab[^\"]*" data-group="creature" data-tab="lore">/);
+    const lootPanel=rendered.indexOf('aria-label="Добыча существа"');
+    assert.ok(inventoryTab>=0&&inventoryTab<lootPanel&&lootPanel<loreTab,'Loot controls render inside inventory, not lore');
     const hasRegeneration=source.items.some(item=>item.flags?.[game.system.id]?.regeneration>0);
     assert.equal(rendered.includes('aria-label="Режим регенерации"'),hasRegeneration);
     if(hasRegeneration) {

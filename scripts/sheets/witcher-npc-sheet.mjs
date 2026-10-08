@@ -72,7 +72,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     await Promise.all(inventory.items.map(async row=>{row.containerOpen=!this.collapsedContainers?.has(row.id);row.expanded=this.expandedInventoryItems?.has(row.id)??false;row.presentation=row.expanded?await itemPresentation(actor.items.get(row.id),{secrets:actor.isOwner}):null;}));
     const i18n={localize:key=>game.i18n.localize(key),format:(key,data)=>game.i18n.format(key,data)};
     const abilities=await Promise.all(actor.items.filter(item=>item.type==="ability").map(async item=>({id:item.id,name:item.name,img:item.img,description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:actor.isOwner,relativeTo:item})})));
-    return {...context,actor,system,stats,editing,inventory,abilities,workshop:await workshopActorContext(actor),isGM:game.user.isGM,conditions:conditionRules(actor),combat:combatContext(actor,this.combatOptions),effects:await effectsContext(this),
+    return {...context,actor,system,stats,editing,inventory,abilities,workshop:await workshopActorContext(actor,{editing}),isGM:game.user.isGM,conditions:conditionRules(actor),combat:combatContext(actor,this.combatOptions),effects:await effectsContext(this),
       empty:!actor.items.size&&ATTRIBUTE_KEYS.every(key=>system.attributes[key]===null),regeneration:creatureRegeneration(actor),
       canRestoreItems:!actor.items.size&&Boolean(bestiaryPreset(actor)),
       categories:MONSTER_CATEGORIES.map(entry=>({...entry,selected:entry.id===system.creature.category})),category:MONSTER_CATEGORIES.find(c=>c.id===system.creature.category)?.name,

@@ -43,6 +43,20 @@
 .witcher-npc-body blockquote { border-left:3px solid #71826e; padding:10px 14px; margin:16px 0; background:#dfe2d655; font-size:13px; color:#56604d; }
 .witcher-npc-lore { margin-top:10px; padding:10px 12px; }.witcher-npc-lore summary { font-weight:bold; cursor:pointer; }.witcher-npc-lore summary span { float:right; color:#8d704c; font-size:12px; }.witcher-npc-lore p { font-size:13px; }
 .witcher-npc-loot>div { display:flex; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px solid #cebea3; font-size:13px; }.witcher-npc-loot input { min-width:30px; width:100%; }.witcher-npc-loot label { display:flex; align-items:center; }
+.witcher-npc-loot-panel { margin:0 0 18px; padding:14px 16px; border:1px solid #c9b99d; border-top:3px solid #947244; border-radius:6px; background:#faf6ed; }
+.witcher-npc-loot-panel>header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.witcher-npc-loot-panel h2 { margin:0; border:0; font:700 21px Georgia,serif; color:#684d31; text-shadow:none; }
+.witcher-npc-loot-panel h3 { margin:14px 0 5px; border:0; color:#684d31; font-size:14px; text-shadow:none; }
+.witcher-npc-loot-panel button { width:auto; padding:0 10px; font-size:12px; }
+.witcher-npc-loot-panel>header button { background:#425b55; color:#fff5e2; border-color:#34483f; height:34px; }
+.witcher-npc-loot-hint,.witcher-npc-loot-help { color:#75634d; font-size:12px; line-height:1.5; }
+.witcher-npc-loot-hint { margin:8px 0; }
+.witcher-npc-loot-help { margin-top:10px; }.witcher-npc-loot-help summary { cursor:pointer; }.witcher-npc-loot-help p { margin:6px 0 0; }
+.witcher-npc-loot-done { color:#425b55; font-size:12px; }
+.witcher-npc-loot-panel .witcher-harvest-row { padding:7px 0; border-bottom:1px solid #e0d4bf; flex-wrap:wrap; }
+.witcher-npc-loot-panel .witcher-harvest-row small { color:#75634d; font-size:11px; }
+.witcher-npc-loot-panel .witcher-harvest-row span>small { display:block; }
+.witcher-npc-loot-mutagen { margin-top:10px; }
 .witcher-npc-effects details { border:1px solid #b37955; border-radius:4px; background:#ebd4c3; padding:5px 10px; margin-bottom:7px; font-size:12px; }.witcher-npc-effects summary img { width:18px; height:18px; vertical-align:middle; margin-right:5px; border:0; }
 .witcher-npc-danger { display:flex; align-items:center; gap:10px; padding:9px; margin:10px 0; background:#7a302c; color:#fff0d8; }.witcher-npc-danger label { display:flex; align-items:center; gap:7px; }.witcher-npc-danger input { width:50px; }
 .witcher-npc-presets { padding:15px; margin-bottom:15px; background:#ded8c7; border:1px dashed #9c8460; border-radius:8px; }.witcher-npc-presets button { display:inline-flex; padding:0 15px; width:auto; margin-right:10px; }

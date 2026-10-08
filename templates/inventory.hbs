@@ -1,3 +1,4 @@
+{{#if workshop.npc}}{{> "systems/witcher-eliott-system/templates/npc-loot.hbs"}}{{/if}}
 <div class="witcher-inventory-bar">
   <label class="witcher-inventory-coins"><i class="fa-solid fa-coins" aria-hidden="true"></i> Кроны <input type="number" name="system.crowns" value="{{system.crowns}}" min="0" step="0.01" aria-label="Кроны" {{disabled (not editable)}}></label>
   <div class="witcher-inventory-bar-actions">
@@ -42,7 +43,7 @@
 <p class="witcher-drop-hint" data-inventory-no-results hidden>Ничего не найдено.</p>
 {{#unless inventory.items.length}}<p class="witcher-drop-hint">Перетащите предмет сюда или выберите его через лупу рядом с группой.</p>{{/unless}}
 </div>
-{{#if (or workshop.witcher workshop.npc)}}<details class="witcher-inventory-workshop" data-biography-section="inventory-workshop" {{#if inventory.workshopOpen}}open{{/if}}><summary><i class="fa-solid fa-flask" aria-hidden="true"></i> {{#if workshop.witcher}}Мутагены{{else}}Добыча{{/if}}</summary>{{> "systems/witcher-eliott-system/templates/workshop-actor.hbs"}}</details>{{/if}}
+{{#if (or workshop.witcher workshop.mutations.length workshop.ready.length)}}<details class="witcher-inventory-workshop" data-biography-section="inventory-workshop" {{#if inventory.workshopOpen}}open{{/if}}><summary><i class="fa-solid fa-flask" aria-hidden="true"></i> Мутагены</summary>{{> "systems/witcher-eliott-system/templates/workshop-actor.hbs"}}</details>{{/if}}
 <footer class="witcher-inventory-load {{#if inventory.overloaded}}overloaded{{/if}}">
   <div><span><i class="fa-solid fa-weight-hanging" aria-hidden="true"></i> {{#if inventory.overloaded}}Перегрузка{{else}}Переносимый вес{{/if}}</span><strong>{{inventory.weight}} / {{inventory.capacity}} кг</strong></div>
   <div class="witcher-inventory-load-track" aria-hidden="true"><span style="width: {{inventory.loadPercent}}%"></span></div>
