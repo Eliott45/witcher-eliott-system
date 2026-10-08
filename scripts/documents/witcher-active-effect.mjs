@@ -6,6 +6,7 @@ import { effectCounter, activeEffect } from "../data/effect-counters.mjs";
 import { fullTurnStart } from "../combat/full-turn-rules.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { creatureEffectImmunity } from "../combat/creature-spirits.mjs";
 
 export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
   async _preCreate(data, options, user) {
@@ -13,6 +14,8 @@ export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
     const actor=this.parent;
     if(actor?.documentName!=="Actor")return;
     if(options.witcherRestoreEffects)return;
+    const immunity = creatureEffectImmunity(actor, this);
+    if(immunity){ui.notifications.info(immunity);return false;}
     if(immuneToCondition(actor,this.statuses)){ui.notifications.info("У существа иммунитет к этому состоянию.");return false;}
     if(actor.effects.some(effect=>activeEffect(effect)&&[...this.statuses].some(status=>effect.statuses.has(status)
       && (status!=="poisoned" || Boolean(effect.flags?.[SYSTEM_ID]?.toxicity)===Boolean(this.flags?.[SYSTEM_ID]?.toxicity))))) {

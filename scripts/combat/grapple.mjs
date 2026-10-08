@@ -12,6 +12,8 @@ import { equippedItems } from "../data/physical-items.mjs";
 import { usableHands } from "./critical-wound-effects.mjs";
 import { scatterItem } from "../loot/loot.mjs";
 import { setStunned } from "./status-effects.mjs";
+import { spiritState } from "./creature-spirits.mjs";
+import { creatureHasInfiniteStamina } from "../data/creature-modes.mjs";
 
 // Core p.163 «Борьба»: a grapple is a Brawling check the target defends against. While held, the
 // grappler may pin, choke or throw; the held one may try to break free (Dodge/Escape vs Brawling).
@@ -51,9 +53,10 @@ export const punchFormula = actor => { const bonus = bodyDamage(actor.system.sta
 export function grappleState(actor) {
   const live = status => (actor?.effects ?? []).find(effect => activeEffect(effect) && effect.statuses.has(status));
   const holdingEffect = live("grappling"), heldEffect = live("grappled");
-  const holding = holdingEffect ? { effect: holdingEffect, token: flagsOf(holdingEffect).grapple?.target ?? "" } : null;
-  const heldBy = heldEffect ? { effect: heldEffect, token: flagsOf(heldEffect).grapple?.by ?? "" } : null;
+  let holding = holdingEffect ? { effect: holdingEffect, token: flagsOf(holdingEffect).grapple?.target ?? "" } : null;
+  const heldBy = heldEffect && !spiritState(actor).incorporeal ? { effect: heldEffect, token: flagsOf(heldEffect).grapple?.by ?? "" } : null;
   if (holding) Object.assign(holding, { actor: tokenActor(holding.token), name: tokenName(holding.token) || flagsOf(holdingEffect).grapple?.targetName || "" });
+  if (holding?.actor && spiritState(holding.actor).incorporeal) holding = null;
   if (heldBy) Object.assign(heldBy, { actor: tokenActor(heldBy.token), name: tokenName(heldBy.token) || flagsOf(heldEffect).grapple?.byName || "" });
   if (holding?.actor) Object.assign(holding, { pinned: holding.actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("pinned")),
     choking: holding.actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("suffocating") && flagsOf(effect).grapple?.by) });
@@ -85,6 +88,7 @@ export async function rollGrappleAction(actor, kind) {
   const { holding, heldBy } = grappleState(actor), attacker = attackerToken(actor);
   const targetUuid = kind === "grapple" || data.free ? selectedAttackTarget(actor, { attackerUuid: attacker.uuid })?.target.uuid : kind === "escape" ? heldBy.token : holding.token;
   if (!targetUuid) throw new Error("Выберите цель (T).");
+  if (kind !== "escape" && spiritState(tokenActor(targetUuid)).incorporeal) throw new Error("Бесплотная цель невосприимчива к физической борьбе.");
   const action = kind === "escape" && !conditionRules(actor).canAct ? { extra: false, penalty: 0, stamina: 0, roundKey: "" } : actionQuote(actor);
   const skill = skillValue(actor.system, data.skill);
   const parts = [{ label: game.i18n.localize(skill.label), value: skill.total }, ...(data.penalty ? [{ label: data.name, value: data.penalty }] : []), { label: "Дополнительное действие", value: action.penalty }, ...combatModifierParts(actor, "combat.attack")];
@@ -109,7 +113,8 @@ export async function rollGrappleAction(actor, kind) {
 async function addStatus(actor, status, grapple) {
   if (!actor || actor.effects.some(effect => effect.statuses.has(status) && flagsOf(effect).grapple)) return;
   const source = conditionSource(CONDITION_BY_ID[status]); delete source._id;
-  await actor.createEmbeddedDocuments("ActiveEffect", [{ ...source, flags: { [SYSTEM_ID]: { ...source.flags[SYSTEM_ID], grapple } } }]);
+  await actor.createEmbeddedDocuments("ActiveEffect", [{ ...source, flags: { [SYSTEM_ID]: { ...source.flags[SYSTEM_ID],
+    condition: { ...source.flags[SYSTEM_ID].condition, physical: true }, grapple } } }]);
 }
 async function removeStatuses(actor, statuses, filter = () => true) {
   const ids = (actor?.effects ?? []).filter(effect => statuses.some(status => effect.statuses.has(status)) && flagsOf(effect).grapple && filter(effect)).map(effect => effect.id);
@@ -121,6 +126,18 @@ export async function releaseGrapple(grapplerToken, heldToken) {
   await removeStatuses(tokenActor(heldToken), ["grappled", "pinned", "suffocating"], effect => flagsOf(effect).grapple?.by === grapplerToken);
 }
 
+/** A materialized spirit escapes its old hold as soon as incorporeality returns. */
+export async function releaseIncorporealGrapple(actor) {
+  if (!actor || !spiritState(actor).incorporeal) return;
+  const effects = actor.effects.filter(effect => ["grappled", "pinned", "suffocating"].some(status => effect.statuses.has(status)) && flagsOf(effect).grapple?.by);
+  for (const by of new Set(effects.map(effect => flagsOf(effect).grapple.by))) {
+    const grappler = tokenActor(by);
+    // Remove only the matching hold; the grappler may already have caught someone else.
+    await removeStatuses(grappler, ["grappling"], effect => tokenActor(flagsOf(effect).grapple?.target) === actor);
+  }
+  if (effects.length) await actor.deleteEmbeddedDocuments("ActiveEffect", effects.map(effect => effect.id), { witcherGrappleCleanup: true });
+}
+
 /** Active GM side: apply a successful special attack once (core p.163). */
 export async function applyGrappleSuccess(message) {
   const attack = flagsOf(message).weaponAttack;
@@ -128,7 +145,10 @@ export async function applyGrappleSuccess(message) {
   await message.update({ [`flags.${SYSTEM_ID}.grappleApplied`]: true });
   const grappler = attack.special === "escape" ? attack.target : attack.attacker, held = attack.special === "escape" ? attack.attacker : attack.target;
   const grapplerActor = tokenActor(grappler), heldActor = tokenActor(held), notes = [];
-  if (attack.special === "grapple") {
+  if (attack.special !== "escape" && spiritState(heldActor).incorporeal) {
+    await releaseIncorporealGrapple(heldActor);
+    notes.push(`${tokenName(held)} бесплотен: физическая борьба не действует.`);
+  } else if (attack.special === "grapple") {
     await addStatus(heldActor, "grappled", { by: grappler, byName: tokenName(grappler) });
     await addStatus(grapplerActor, "grappling", { target: held, targetName: tokenName(held) });
     notes.push(`${tokenName(held)} в захвате у ${tokenName(grappler)}.`);
@@ -165,7 +185,8 @@ export async function applyGrappleSuccess(message) {
     if (heldActor && !heldActor.effects.some(effect => effect.statuses.has("prone"))) await heldActor.createEmbeddedDocuments("ActiveEffect", [source]);
     // Brawling deals non-lethal damage (core p.163): the throw lands as Stamina loss, then a Stun save at −1.
     const roll = await new foundry.dice.Roll(attack.damage || "1d6").evaluate(), damage = Math.max(0, roll.total), rolls = [roll];
-    if (heldActor && damage) await heldActor.update({ "system.stamina.value": heldActor.system.stamina.value - damage });
+    const infinite = heldActor && creatureHasInfiniteStamina(heldActor);
+    if (heldActor && damage && !infinite) await heldActor.update({ "system.stamina.value": heldActor.system.stamina.value - damage });
     let stunned = "";
     const stun = heldActor?.system.statistics?.stun;
     if (heldActor && stun != null && conditionRules(heldActor).canStunSave) {
@@ -174,7 +195,7 @@ export async function applyGrappleSuccess(message) {
       if (failed) await setStunned(heldActor, true);
       stunned = ` Испытание Устойчивости −1: ${save.total} против ${stun - 1} — ${failed ? "дезориентирован" : "устоял"}.`;
     }
-    notes.push(`${tokenName(held)} брошен и сбит с ног: −${damage} ВЫН (несмертельный урон удара рукой ${attack.damage}).${stunned}`);
+    notes.push(`${tokenName(held)} брошен и сбит с ног: ${infinite ? "бесконечная ВЫН не расходуется" : `−${damage} ВЫН (несмертельный урон удара рукой ${attack.damage})`}.${stunned}`);
     return foundry.documents.ChatMessage.create({ speaker: message.speaker, rolls, content: `<p>${esc(notes.join(" "))}</p>`,
       flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index: 0, kind: "special", notes } } } });
   }
@@ -183,6 +204,12 @@ export async function applyGrappleSuccess(message) {
 }
 
 export function registerGrapple() {
+  const releaseSpirit = actor => {
+    if (game.users.activeGM?.isSelf && actor?.isOwner) releaseIncorporealGrapple(actor).catch(console.error);
+  };
+  Hooks.on("updateActor", releaseSpirit);
+  for (const hook of ["createActiveEffect", "updateActiveEffect", "deleteActiveEffect"]) Hooks.on(hook, effect => releaseSpirit(effect.parent));
+  Hooks.on("updateToken", token => releaseSpirit(token.actor));
   // Removing either side of a grapple (sheet, effects panel, expiry) ends it on the other side too.
   Hooks.on("deleteActiveEffect", (effect, options) => {
     if (options.witcherGrappleCleanup || !game.users.activeGM?.isSelf) return;

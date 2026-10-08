@@ -4,14 +4,23 @@ import { conditionRules } from "./condition-rules.mjs";
 import { combatantForToken, tacticsFlags, tacticalEffect } from "./tactics-rules.mjs";
 import { requestTactic, tacticsWrite } from "./combat-tactics.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
+import { creatureProfile } from "../data/creature-modes.mjs";
 
 export const groupAmbush = combat => tacticsFlags(combat).groupAmbush;
 export const ambushComplete = session => session.entries.every(row => row.role === "participant" || Number.isFinite(row.total));
-export function ambushMatrix(session) {
+export function ambushMatrix(session, combat = null) {
   const observers = session.entries.filter(row => row.role === "awareness");
-  return session.entries.filter(row => row.role === "stealth").map(row => ({...row, cells:observers.map(observer => ({
-    observer:observer.id, unseen:Number.isFinite(row.total) && Number.isFinite(observer.total) ? row.total > observer.total : null
-  }))}));
+  const stealth = session.entries.filter(row => row.role === "stealth");
+  // Core p.275: the archers share their highest check, preserving each original die in the card.
+  const specialists = stealth.filter(row => row.groupStealth ?? creatureProfile(combat?.combatants.get(row.id)?.actor)?.id === "scoiatael-archer");
+  const groupTotal = specialists.length && specialists.every(row => Number.isFinite(row.total)) ? Math.max(...specialists.map(row => row.total)) : null;
+  return stealth.map(row => {
+    const sharedStealth = specialists.includes(row) && specialists.length > 1;
+    const effectiveTotal = sharedStealth ? groupTotal : row.total;
+    return {...row, effectiveTotal, sharedStealth, cells:observers.map(observer => ({
+      observer:observer.id, unseen:Number.isFinite(effectiveTotal) && Number.isFinite(observer.total) ? effectiveTotal > observer.total : null
+    }))};
+  });
 }
 const save = (combat, session) => combat.update({[`flags.${SYSTEM_ID}.groupAmbush`]:session}, {turnEvents:false});
 function requireGM() { if (!game.user.isGM) throw new Error("Настраивать засаду может только мастер."); }
@@ -54,7 +63,8 @@ export async function createGroupAmbush(scene, assignments) {
     await clearBonuses(combat);
     await combat.updateEmbeddedDocuments("Combatant", tokens.map(({token}) => ({_id:combatantForToken(combat,token).id,initiative:null})), {turnEvents:false});
     const session = {id:foundry.utils.randomID(),status:"checks",entries:tokens.map(({token,role}) => ({
-      id:combatantForToken(combat,token).id,token:token.uuid,role,total:null,claim:null,message:null
+      id:combatantForToken(combat,token).id,token:token.uuid,role,total:null,claim:null,message:null,
+      groupStealth:role === "stealth" && creatureProfile(token.actor)?.id === "scoiatael-archer"
     }))};
     await save(combat,session);
     await publishGroupCard(combat,session);
@@ -171,7 +181,7 @@ export async function acceptAmbushRoll(message) {
 export async function applyGroupAmbush(combat) {
   const session = groupAmbush(combat);
   if (!session || session.status !== "checks" || combat.started || !ambushComplete(session)) return;
-  for (const row of ambushMatrix(session)) {
+  for (const row of ambushMatrix(session, combat)) {
     const participant = combat.combatants.get(row.id);
     if (!participant) throw new Error("Участник удалён из боя. Отмените засаду и выберите состав заново.");
     const targets = row.cells.filter(cell => cell.unseen).map(cell => session.entries.find(entry => entry.id === cell.observer).token);

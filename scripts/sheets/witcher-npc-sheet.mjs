@@ -30,6 +30,11 @@ import { conditionRules } from "../combat/condition-rules.mjs";
 import { requestEffectSave } from "../combat/condition-saves.mjs";
 import { generateCreatureLoot } from "../combat/creature-loot.mjs";
 import { skillCalculationTooltip } from "./skills-context.mjs";
+import { creatureModeContext } from "../data/creature-modes.mjs";
+import { setCreatureMode, rollLycanthropy, detectCreature, senseCreatureMagic, continueCreatureFall } from "../combat/creature-modes.mjs";
+import { creatureActions, useCreatureAction, attackCreatureWeb, dispelSirenIllusion } from "../combat/creature-actions.mjs";
+import { liveCreatureWeb } from "../combat/creature-actions-common.mjs";
+import { hagActions, useHagAction } from "../combat/hag-actions.mjs";
 
 const guard=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){ui.notifications.error(error.message);console.error(`${SYSTEM_ID} | Creature sheet`,error);}};
 export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
@@ -48,6 +53,14 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     creatureDeath:guard(async function(){if(this.isEditable)await rollDeath(this.actor);}),
     creatureRecover:guard(async function(){if(this.isEditable)await recoverStamina(this.actor);}),
     creatureLoot:guard(async function(){await generateCreatureLoot(this.actor);}),
+    creatureSpecial:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await useCreatureAction(this.actor,target.dataset.creatureAction);}finally{await this.render();}}),
+    creatureHag:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await useHagAction(this.actor,target.dataset.creatureAction);}finally{await this.render();}}),
+    creatureLycanthropy:guard(async function(){if(this.isEditable)await rollLycanthropy(this.actor);}),
+    creatureDetect:guard(async function(_event,target){if(this.isEditable)await detectCreature(this.actor,{magic:target.dataset.magic==="true"});}),
+    creatureSenseMagic:guard(async function(){if(this.isEditable)await senseCreatureMagic(this.actor);}),
+    creatureFall:guard(async function(){if(this.isEditable)await continueCreatureFall(this.actor);}),
+    creatureWeb:guard(async function(){if(this.isEditable)await attackCreatureWeb(this.actor);}),
+    creatureDispelIllusion:guard(async function(){if(this.isEditable)await dispelSirenIllusion(this.actor);}),
     restoreCreatureItems:guard(async function(){
       if(!this.isEditable)return;
       await inventoryWrite(this.actor,async()=>{
@@ -77,6 +90,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     const abilities=await Promise.all(actor.items.filter(item=>item.type==="ability").map(async item=>({id:item.id,name:item.name,img:item.img,description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:actor.isOwner,relativeTo:item})})));
     return {...context,actor,system,stats,editing,inventory,abilities,magic,workshop:await workshopActorContext(actor,{editing}),isGM:game.user.isGM,conditions:conditionRules(actor),combat:combatContext(actor,this.combatOptions),effects:await effectsContext(this),
       empty:!actor.items.size&&ATTRIBUTE_KEYS.every(key=>system.attributes[key]===null),regeneration:creatureRegeneration(actor),
+      creatureModes:creatureModeContext(actor),creatureSpecialActions:creatureActions(actor),creatureHagActions:hagActions(actor),creatureWeb:Boolean(liveCreatureWeb(actor)),
       canRestoreItems:!actor.items.size&&Boolean(bestiaryPreset(actor)),
       categories:MONSTER_CATEGORIES.map(entry=>({...entry,selected:entry.id===system.creature.category})),category:MONSTER_CATEGORIES.find(c=>c.id===system.creature.category)?.name,
       creatureClass:MONSTER_CATEGORIES.find(entry=>entry.id===system.creature.category),verbalDuel:Boolean(duelOf(this.actor)),
@@ -89,6 +103,10 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
   }
   async _onRender(context,options) {
     await super._onRender(context,options);bindInventory(this);bindCombat(this);bindMagic(this);
+    for(const field of this.element.querySelectorAll("[data-creature-mode]"))field.addEventListener("change",event=>{
+      event.stopPropagation();if(!this.isEditable)return;
+      setCreatureMode(this.actor,field.dataset.creatureMode,field.type==="checkbox"?field.checked:field.value).then(()=>this.render()).catch(error=>{ui.notifications.warn(error.message);this.render();});
+    });
     // The model caps HP/STA anyway; clamp the field too, otherwise an unchanged value keeps showing the typed number.
     for(const field of this.element.querySelectorAll("[data-clamp-max]"))field.addEventListener("change",()=>{
       const max=Number(field.dataset.clampMax);if(Number.isFinite(max)&&Number(field.value)>max)field.value=max;

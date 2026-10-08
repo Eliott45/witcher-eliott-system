@@ -3,6 +3,7 @@ import { conditionRules } from "./condition-rules.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { consumeAiming } from "./full-turn-rules.mjs";
+import { creatureHasInfiniteStamina } from "../data/creature-modes.mjs";
 
 export function actionFields() {
   const { SchemaField, BooleanField, StringField } = foundry.data.fields;
@@ -15,15 +16,18 @@ export function actionRoundKey(actor, combat = globalThis.game?.combat) {
 /** Errata p.151: one extra ACTION, not one extra attack; all its checks take −3. */
 export function actionQuote(actor, { ignoreExtra = false, cost = 0 } = {}) {
   if (!actor.isOwner || !conditionRules(actor).canAct) throw new Error("Персонаж сейчас не может действовать.");
+  if (actor.flags?.[SYSTEM_ID]?.noonCopy) throw new Error("Копия полуденницы только защищается; высасывание жизни происходит в ход создателя.");
+  if (Array.from(actor.effects ?? []).some(effect => !effect.disabled && !effect.isSuppressed && !effect.duration?.expired && effect.flags?.[SYSTEM_ID]?.creatureFullTurn))
+    throw new Error("Существо уже потратило полный ход. Дождитесь начала следующего хода.");
   const extra = !ignoreExtra && Boolean(actor.system.combatAction?.extra), roundKey = actionRoundKey(actor);
   if (extra && roundKey && actor.system.combatAction.lastExtraRound === roundKey) throw new Error("Дополнительное действие в этом раунде уже использовано.");
-  const stamina = extra ? 3 : 0;
-  if (stamina + cost > 0 && actor.system.stamina.value < stamina + cost) throw new Error(`Недостаточно Выносливости: нужно ${stamina + cost}.`);
+  const stamina = extra && !creatureHasInfiniteStamina(actor) ? 3 : 0;
+  if (!creatureHasInfiniteStamina(actor) && stamina + cost > 0 && actor.system.stamina.value < stamina + cost) throw new Error(`Недостаточно Выносливости: нужно ${stamina + cost}.`);
   return { extra, penalty: extra ? -3 : 0, stamina, roundKey };
 }
-export const actionNote = quote => quote.extra ? '<p class="witcher-extra-note">Дополнительное действие: −3 к проверкам · 3 ВЫН за всё действие.</p>' : "";
+export const actionNote = quote => quote.extra ? `<p class="witcher-extra-note">Дополнительное действие: −3 к проверкам · ${quote.stamina} ВЫН за всё действие.</p>` : "";
 export function actionUpdate(actor, quote, otherCost = 0) {
-  return { ...(quote.stamina + otherCost ? { "system.stamina.value": Math.max(0, actor.system.stamina.value - quote.stamina - otherCost) } : {}),
+  return { ...(!creatureHasInfiniteStamina(actor) && quote.stamina + otherCost ? { "system.stamina.value": Math.max(0, actor.system.stamina.value - quote.stamina - otherCost) } : {}),
     ...(quote.extra ? { "system.combatAction.extra": false, "system.combatAction.lastExtraRound": quote.roundKey } : {}) };
 }
 

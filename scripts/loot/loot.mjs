@@ -76,6 +76,7 @@ export async function processLootRequest(actor, request, user) {
   if (request.action === "drop") {
     const item = actor.items.get(request.itemId), scene = game.scenes.get(request.scene), quantity = Math.max(1, Math.floor(request.quantity ?? 1));
     if (!item || !isPhysical(item) || !scene) throw new Error("Предмет или сцена недоступны.");
+    if (item.system.natural) throw new Error("Естественное или призрачное оружие нельзя отделить от существа и забрать как добычу.");
     if (actor.items.some(other => other.system?.containerId === item.id)) throw new Error("Сначала выложите вещи из контейнера.");
     const amount = Math.min(quantity, item.system.quantity ?? 1);
     await placeOnGround(scene, request.point, [itemSource(item, amount)], item.name);
@@ -95,6 +96,7 @@ export async function processLootRequest(actor, request, user) {
     } else {
       const item = loot.items.get(request.itemId);
       if (!item) throw new Error("Этого предмета уже нет.");
+      if (item.system.natural) throw new Error("Это оружие — часть существа, его нельзя забрать.");
       const amount = Math.min(Math.max(1, Math.floor(request.quantity ?? 1)), item.system.quantity ?? 1);
       await actor.createEmbeddedDocuments("Item", [itemSource(item, amount)]);
       await reduce(loot, item, amount);
@@ -121,6 +123,7 @@ export async function scatterItem(actor, item, meters, direction) {
 
 /** Drop an owned item in front of the actor's token (inventory button). */
 export async function dropItemToGround(actor, item, { quantity = null, point = null, silent = false } = {}) {
+  if (item.system.natural) throw new Error("Естественное или призрачное оружие нельзя бросить на землю.");
   const token = actor.token ?? actor.getActiveTokens?.()[0]?.document;
   const scene = token?.parent ?? globalThis.canvas?.scene;
   if (!scene) throw new Error("Откройте сцену, чтобы бросить предмет.");

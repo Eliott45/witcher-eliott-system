@@ -6,6 +6,8 @@ import { shieldClass } from "../data/shields.mjs";
 import { aimingBonus } from "./full-turn-rules.mjs";
 import { statusEffect } from "../data/effect-counters.mjs";
 import { actorEnvironment, worksUnderwater } from "./environment.mjs";
+import { creatureHypnosisPenalty } from "./creature-actions-rules.mjs";
+import { creatureAttackParts, creatureCanSwim, creatureHumanForm } from "../data/creature-modes.mjs";
 
 export const gripOf = item => item.system.natural ? 0 : item.system.grip || item.system.hands || 1;
 /** Effect penalties such as Staggered or Prone, targeted at "combat.attack" / "combat.defense". */
@@ -15,6 +17,8 @@ export const signed = value => value >= 0 ? `+${value}` : `−${Math.abs(value)}
 // Core p.48 only tabulates BODY 1–13. Do not extrapolate beyond that table.
 export const bodyDamage = body => body == null ? 0 : 2 * Math.ceil(Math.min(13, Math.max(1, body)) / 2) - 6;
 export function weaponReadiness(actor,item,weapon=effectiveItem(item),{allowOneHand=false}={}) {
+  if (weapon.natural && creatureHumanForm(actor)) return "В человеческом облике когти и укус волколака недоступны";
+  if (actor.flags?.["witcher-eliott-system"]?.severedTongue && item.name === "Язык") return "Язык отрублен";
   if(!equippedItems(actor.items).some(entry=>entry.id===item.id))return "Возьмите оружие в руки";
   if(!allowOneHand&&!weapon.natural&&gripOf(item)<(weapon.hands??1))return `Нужно рук: ${weapon.hands}`;
   if(!weapon.natural&&gripOf(item)>usableHands(actor))return usableHands(actor)?"Одна рука выведена из строя: держите оружие одной рукой":"Обе руки выведены из строя";
@@ -73,7 +77,7 @@ function dualMode(actor,item) {
 export function attackModes(actor,item) {
   // Core p.165: under water a melee weapon strikes once per turn.
   const underwaterMelee=["melee","shield"].includes(item.system.category)&&!item.system.natural||item.system.natural&&item.system.category!=="ranged";
-  const slowed=underwaterMelee&&Boolean(actorEnvironment(actor)?.underwater);
+  const slowed=underwaterMelee&&Boolean(actorEnvironment(actor)?.underwater)&&!creatureCanSwim(actor);
   if (actor.type === "npc") { const count=slowed?1:item.system.attackRate??1; return [{id:"npc",name:`Атака ×${count}`,count,penalty:0,multiplier:1}]; }
   if (item.system.skill === "crossbow") { const dual=dualMode(actor,item); return [{id:"shot",name:"Выстрел",count:1,penalty:0,multiplier:1},...(dual?[dual]:[])]; }
   // Core p.153: a fast attack is two strikes for one action. Each click rolls one strike, so the two may hit different targets.
@@ -92,7 +96,7 @@ export function attackModes(actor,item) {
 /** Humanoid or monster hit-location table for a target actor (core p.152). */
 export const bodyPlanOf = actor => actor?.type === "npc" && actor.system.creature?.category !== "humanoid" ? "monster" : "humanoid";
 
-export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="auto",modifier=0,targetContext=null,ambushBonus=0}={}) {
+export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="auto",modifier=0,targetContext=null,ambushBonus=0,ignoreNaturalRange=false}={}) {
   if(item?.type!=="weapon")throw new Error("Выберите оружие.");
   const weapon=effectiveItem(item),attack=attackModes(actor,item).find(entry=>entry.id===mode);
   if(!attack)throw new Error("Этот режим недоступен для данного оружия.");
@@ -111,7 +115,7 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
     {label:"Прицеливание",value:ranged&&!targetContext?.blind&&!statusEffect(actor,"quick-draw")?aimingBonus(actor):0},
     {label:attack.name,value:attack.penalty},{label:"Дополнительное действие",value:extraPenalty},
     {label:aim.name,value:aim.penalty},{label:band.name.replace(/ · [−+]?\d+$/u,""),value:band.penalty},{label:"Ситуация",value:Number(modifier)},
-    ...(targetContext?.parts??[]), ...(ambushBonus?[{label:"Засада",value:ambushBonus}]:[]), ...combatModifierParts(actor,"combat.attack"), ...armPenaltyParts(actor,item), ...(targetContext?.target?.actor?combatModifierParts(targetContext.target.actor,"combat.targeted"):[])];
+    ...(targetContext?.parts??[]), ...creatureAttackParts(actor,targetContext?.target?.actor), {label:"Гипноз беса",value:creatureHypnosisPenalty(actor,targetContext?.target?.actor)}, ...(ambushBonus?[{label:"Засада",value:ambushBonus}]:[]), ...combatModifierParts(actor,"combat.attack"), ...armPenaltyParts(actor,item), ...(targetContext?.target?.actor?combatModifierParts(targetContext.target.actor,"combat.targeted"):[])];
   const total=skill.total===null?null:parts.reduce((sum,part)=>sum+part.value,0);
   const melee=["melee","thrown","shield"].includes(weapon.category);
   const shield=weapon.category==="shield"&&weapon.damage==="0";
@@ -121,6 +125,9 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   const base=`(${shield?"1d6":weapon.damage}${unarmedBonus}${body+bonus?` + ${body+bonus}`:""})${attack.multiplier===2?" * 2":""}`;
   // Pommel strike (core p.164): half damage, non-lethal. Disarm and trip deal no damage.
   const damage=attack.special?null:attack.pommel||bowUnderwater?`floor(${base} / 2)`:base;
-  const blocked=targetContext?.blind&&location!=="random"?"Нельзя выбирать место удара по цели вне вашего конуса зрения":shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":band.beyond?`Цель дальше предельной дистанции (${reach*2} м)`:underwater&&!worksUnderwater({...weapon,name:item.name})?"Под водой метательное оружие (кроме копья) не работает":"");
+  const distance=targetContext?.distance,minRange=Number(String(weapon.properties??"").match(/дальше (\d+) м/iu)?.[1]??0);
+  const naturalRange=weapon.natural&&!ranged&&!ignoreNaturalRange?(weapon.range||1):null;
+  const rangeBlocked=distance!=null&&minRange>0&&distance<=minRange?`Цель должна быть дальше ${minRange} м`:distance!=null&&naturalRange!==null&&distance>naturalRange?`До цели дальше ${naturalRange} м`:"";
+  const blocked=targetContext?.blind&&location!=="random"?"Нельзя выбирать место удара по цели вне вашего конуса зрения":rangeBlocked|| (shield&&body===null?"Укажите класс щита или формулу урона в предмете":weaponReadiness(actor,item,weapon,{allowOneHand:true})|| (total===null?"Заполните параметр навыка":weapon.skill==="crossbow"&&!weapon.loaded?"Нужна перезарядка":band.beyond?`Цель дальше предельной дистанции (${reach*2} м)`:underwater&&!worksUnderwater({...weapon,name:item.name})?"Под водой метательное оружие (кроме копья) не работает":""));
   return {name:item.name,nonLethal:Boolean(attack.pommel),weapon,attack,skill,parts,total,damage,body,bonus,aim,band,ranged,blocked,range:reach};
 }

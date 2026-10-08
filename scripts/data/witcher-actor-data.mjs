@@ -1,6 +1,7 @@
 import { magicFields } from "../magic/rules.mjs";
 import { actionFields } from "../combat/action-economy.mjs";
 import { creatureFields } from "./creatures.mjs";
+import { creatureHasInfiniteStamina } from "./creature-modes.mjs";
 import { workshopActorFields } from "./workshop-schema.mjs";
 import { PROFESSIONS } from "./professions.mjs";
 import { lifepathSchema } from "./lifepath-fields.mjs";
@@ -115,7 +116,7 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
     if (statistics.resolveMax !== null) this.resolve.max = statistics.resolveMax;
     this.resolve.value = Math.min(this.resolve.value, this.resolve.max);
     this.health.value = Math.min(this.health.value, this.health.max);
-    this.stamina.value = Math.min(this.stamina.value, this.stamina.max);
+    this.stamina.value = creatureHasInfiniteStamina(this.parent) ? this.stamina.max : Math.min(this.stamina.value, this.stamina.max);
     this.carriedWeight = carriedWeight(this.parent?.items);
   }
 

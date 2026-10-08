@@ -16,7 +16,7 @@ export function loadedBolt(item) {
 /** Ammunition stacks that can be loaded, the first one by default. */
 export const boltChoices = actor => Array.from(actor.items ?? []).filter(item => isAmmunition(item) && (item.system.quantity ?? 0) > 0);
 
-const boltRecord = ammo => ({ name: ammo.name, img: ammo.img, ruleId: ammo.system.ruleId ?? "", properties: ammo.system.properties ?? "", source: (() => {
+const boltRecord = ammo => ({ name: ammo.name, img: ammo.img, ruleId: ammo.system.ruleId ?? "", properties: ammo.system.properties ?? "", damageType: ammo.system.damageType ?? "К", source: (() => {
   const { name, img, type, flags, system } = ammo.toObject?.() ?? structuredClone(ammo);
   return { name, img, type, flags, system: { ...system, quantity: 1, equipped: false, containerId: "" } };
 })() });

@@ -40,6 +40,10 @@ export async function toggleContainer(_event, target) {
 
 export async function dropPhysicalItem(sheet, event, item) {
   if(!sheet.isEditable)return;
+  if (item.system?.natural && item.parent && item.parent.uuid !== sheet.actor.uuid) {
+    ui.notifications.warn("Естественное или призрачное оружие нельзя перенести другому существу.");
+    return;
+  }
   const target = sheet.actor.items.get(event.target.closest("[data-item-id]")?.dataset.itemId);
   const parentId = isTransport(item) ? "" : isContainer(target) ? target.id : containerParent(target ?? { system: {} }, sheet.actor.items)?.id ?? "";
   const section=event.target.closest("[data-cargo-section]")?.dataset.cargoSection??"";

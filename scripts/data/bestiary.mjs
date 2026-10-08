@@ -70,6 +70,9 @@ function lootSource(name) {
   return alias ? catalog.find(entry => entry.id === alias) : catalog.find(entry => normal(entry.name) === normal(name)) ?? null;
 }
 const WEAPON_ALIASES = { "Метательные ножи": "weapon.throwing-knife" };
+// The statblocks omit damage-type letters. Editable defaults use the attack's physical action.
+export const NATURAL_DAMAGE_TYPES = { "Когти":"Р", "Укус":"К", "Язык":"Д", "Меч призрака":"Р", "Фонарь призрака":"Д", "Хвост":"Д", "Хвост воина":"К", "Иглы трутня":"К", "Паутина":"Д", "Кулаки":"Д", "Рога":"К", "Метательные камни":"Д", "Шипастый хвост":"К", "Плевок ядом":"К", "Копыта":"Д" };
+const ABILITY_IDS = { "Бесплотность":"incorporeal", "Ускользание":"slip", "Телепортация":"teleport" };
 function catalogItem(source, id, overrides = {}) {
   return { _id: id, name: source.name, type: source.type, img: source.img ?? defaultItemIcon(source),
     system: { ...structuredClone(source.system), ruleId: source.id, ...overrides },
@@ -79,6 +82,7 @@ function creatureWeapon(weapon, id, page) {
   const source = weapon.natural ? null : CORE_EQUIPMENT.find(entry => entry.id === WEAPON_ALIASES[weapon.name] || entry.name === weapon.name);
   if (!weapon.natural && !source) throw new Error(`Missing bestiary weapon: ${weapon.name}`);
   const system = { category: weapon.category ?? "melee", skill: weapon.skill, damage: weapon.damage, natural: Boolean(weapon.natural), damageIncludesBody: true,
+    ...(weapon.natural ? { damageType: weapon.damageType ?? NATURAL_DAMAGE_TYPES[weapon.name] ?? "Д" } : {}),
     equipped: true, attackRate: weapon.rate ?? 1, accuracy: weapon.accuracy ?? source?.system.accuracy ?? 0, range: weapon.range ?? source?.system.range ?? 0,
     ...(weapon.range !== undefined ? { rangeBodyMultiplier: 0 } : {}),
     hands: weapon.hands ?? source?.system.hands ?? 1, quantity: 1, carried: true, source: `Базовая книга, стр. ${page + 1}` };
@@ -95,11 +99,12 @@ function coreCreature(entry, index) {
     prototypeToken: { name: entry.name, texture: { src: img }, actorLink: false, disposition: -1, sight: { enabled: false } },
     system: { attributes: attributes(entry.attrs), health: { value: entry.hp, max: entry.hp }, stamina: { value: entry.sta, max: entry.sta }, vigor: entry.vigor ?? 0, skills: { ...entry.skills },
       ...(entry.id === "mage" ? { details: { profession: "mage" } } : {}) } };
-  const loot = [], harvest = [], ammunition = [];
+  const loot = [], harvest = [], ammunition = [], armor = [];
   for (const [name, formula, currency] of entry.loot ?? []) {
     const source = currency ? null : lootSource(name);
     if (!source) { loot.push({ name, formula, currency: Boolean(currency) }); continue; }
     const fixed = /^\d+$/.test(formula);
+    if (entry.id === "scoiatael-archer" && source.type === "armor" && fixed) { armor.push(source); continue; }
     // Carried ammunition is available to the creature and looted from its inventory, never awarded a second time as harvest.
     if (source.system.kind === "ammunition" && fixed) { ammunition.push({ source, quantity: Number(formula) }); continue; }
     harvest.push({ id: `${entry.id}-${harvest.length}`.slice(0, 32), uuid: `Compendium.witcher-eliott-system.equipment.Item.${source.documentId}`, quantity: fixed ? Number(formula) : 0,
@@ -111,23 +116,29 @@ function coreCreature(entry, index) {
     runBase: entry.runBase ?? 0, recoveryBase: entry.recoveryBase ?? 0,
     sizeClass: entry.size_class ?? "medium", lore: (entry.lore ?? []).map(([name, skill, dc, text]) => ({ name, skill, dc, text })), loot, lootGenerated: false };
   actor.system.harvest = harvest;
+  if (armor.length) actor.system.creature.naturalArmor = 0;
+  if (entry.id === "warg") actor.system.creature.source = "Базовая книга, стр. 287";
   const ability = (ruleId, name, description, flags = {}) => ({ _id: itemId(), name, type: "ability", img: "icons/svg/aura.svg", system: { ruleId, description: `<p>${description}</p>` }, flags });
   const items = [];
-  for (const weapon of entry.weapons ?? []) items.push(creatureWeapon(weapon, itemId(), entry.page));
+  for (const weapon of entry.weapons ?? []) {
+    const item = creatureWeapon(weapon, itemId(), entry.id === "warg" ? 286 : entry.page);
+    if (weapon.natural) item.system.ruleId = `creature.weapon.${entry.id}.${items.length}`;
+    items.push(item);
+  }
   for (const trait of entry.traits ?? []) {
     const [id, value] = trait.split(":"), known = CREATURE_TRAITS.find(row => row.id === `creature.${id}`);
     if (known) items.push(ability(known.id, known.name, id === "wild" && value ? `Внимание и Выживание в дикой природе рассчитываются с Интеллектом ${value} за инстинкты.` : known.description,
       id === "wild" && value ? { [SYSTEM_ID]: { wildIntelligence: Number(value) } } : {}));
     else if (EXTRA_TRAITS[id]) items.push(ability(`creature.${id}`, ...EXTRA_TRAITS[id]));
   }
-  for (const [name, text] of entry.abilities ?? []) items.push(ability(`creature.${entry.id}.${items.length}`, name, text,
+  for (const [name, text] of entry.abilities ?? []) items.push(ability(ABILITY_IDS[name] ? `creature.${ABILITY_IDS[name]}` : `creature.${entry.id}.${items.length}`, name, text,
     name === "Регенерация" && entry.regeneration ? { [SYSTEM_ID]: { regeneration: entry.regeneration,
       ...(entry.regenerationSunlight !== undefined ? { regenerationSunlight: entry.regenerationSunlight } : {}) } } : {}));
   for (const vulnerability of entry.vulnerabilities ?? []) {
     if (OILS[vulnerability]) { if (vulnerability === "necrophage-oil") items.push(ability("creature.necrophage-oil", "Масло против трупоедов", CREATURE_TRAITS.find(row => row.id === "creature.necrophage-oil").description)); else items.push(ability(`creature.${vulnerability}`, `Масло против ${OILS[vulnerability]}`, `Уязвимость: масло против ${OILS[vulnerability]} добавляет свой бонус к урону по этому существу.`)); continue; }
     if (vulnerability === "hanged-man-venom") { items.push(ability("creature.hanged-man-venom", "Яд повешенного", CREATURE_TRAITS.find(row => row.id === "creature.hanged-man-venom").description)); continue; }
     const [title, ...rest] = vulnerability.split(":");
-    items.push(ability(`creature.${entry.id}.${items.length}`, `Уязвимость: ${title.trim()}`, rest.length ? rest.join(":").trim() : title));
+    items.push(ability(entry.id === "noonwraith" && title.trim() === "Небесная слабость" ? "creature.lunar-weakness" : `creature.${entry.id}.${items.length}`, `Уязвимость: ${title.trim()}`, rest.length ? rest.join(":").trim() : title));
   }
   for (const name of entry.spells ?? []) {
     const spell = CORE_MAGIC.find(row => row.name === name);
@@ -136,6 +147,7 @@ function coreCreature(entry, index) {
       flags: { core: { sourceId: `Compendium.witcher-eliott-system.spells.Item.${spell.documentId}` } } });
   }
   items.push(...ammunition.map(({ source, quantity }) => catalogItem(source, itemId(), { quantity, equipped: false, carried: true })));
+  items.push(...armor.map(source => catalogItem(source, itemId(), { quantity: 1, equipped: true, carried: true })));
   actor.items = items;
   return actor;
 }

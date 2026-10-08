@@ -250,6 +250,35 @@ test("group comparison uses one shared Awareness for all sneaking participants a
   entries[0].total=null;assert.equal(ambushMatrix({entries})[0].cells[0].unseen,null);
 });
 
+test("Scoiatael archers share only their highest Stealth result, keeping raw dice and pending checks",()=>{
+  const entries=[{id:"archer1",role:"stealth",total:12,groupStealth:true},{id:"archer2",role:"stealth",total:19,groupStealth:true},
+    {id:"ally",role:"stealth",total:30},{id:"watcher",role:"awareness",total:18},{id:"tie",role:"awareness",total:19}];
+  let matrix=ambushMatrix({entries});
+  assert.deepEqual(matrix.map(row=>row.effectiveTotal),[19,19,30]);
+  assert.deepEqual(matrix.map(row=>row.cells.map(cell=>cell.unseen)),[[true,false],[true,false],[true,true]]);
+  assert.equal(matrix[0].total,12);assert.equal(entries[0].total,12);
+  entries[1].total=null;matrix=ambushMatrix({entries});
+  assert.equal(matrix[0].effectiveTotal,null);assert.equal(matrix[0].cells[0].unseen,null);
+  assert.equal(matrix[2].cells[0].unseen,true);
+});
+
+test("renamed imported archers receive the shared ambush bonus and the card explains the effective total",async()=>{
+  const f=fixture();f.combat.started=false;f.combat.round=0;f.combat.turn=null;
+  for(const entry of [f.a,f.b]) {
+    entry.actor.type="npc";entry.actor.name="Переименованный лучник";
+    entry.actor._stats={compendiumSource:`Compendium.${SYSTEM_ID}.bestiary.Actor.bstr000000000002`};
+  }
+  await createGroupAmbush(canvas.scene,f.tokens.map((token,i)=>({tokenId:token.id,role:i<2?"stealth":"awareness"})));
+  assert.deepEqual(groupAmbush(f.combat).entries.map(row=>row.groupStealth),[true,true,false]);
+  await submitGroup(f,f.a,10);await submitGroup(f,f.b,19);await submitGroup(f,f.c,18);
+  assert.deepEqual(tacticsFlags(f.a).ambush.targets,[f.c.token.uuid]);
+  assert.deepEqual(tacticsFlags(f.b).ambush.targets,[f.c.token.uuid]);
+  const context=groupCardContext(f.combat,groupAmbush(f.combat).id,f.gm);
+  assert.equal(context.rows[0].total,10);assert.equal(context.matrix[0].total,19);assert.equal(context.matrix[0].sharedStealth,true);
+  for(const row of groupAmbush(f.combat).entries)delete row.groupStealth;
+  assert.equal(ambushMatrix(groupAmbush(f.combat),f.combat)[0].effectiveTotal,19,"legacy sessions use the current stable creature identity");
+});
+
 test("only GM configures group; players post a request and non-rolling participants enter combat",async()=>{
   const f=fixture();game.user=f.player;
   await assert.rejects(()=>createGroupAmbush(canvas.scene,[]),/только мастер/);

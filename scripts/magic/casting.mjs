@@ -11,6 +11,7 @@ import { escapeTooltip as escape } from "../sheets/statistics-tooltips.mjs";
 import { skillCalculationTooltip } from "../sheets/skills-context.mjs";
 import { SPELL_DEFENSES, spellRange, spellDuration } from "../data/spells.mjs";
 import { createSpellStrikes } from "./spell-strikes.mjs";
+import { creatureSuppression } from "../combat/creature-spirits.mjs";
 import { castingCost, spellBaseCost, focusOptions, magicRoundKey, roundSpent, magicFumble, ELEMENTAL_MISHAPS, learnedSpell, castingSkill, CASTING_SKILL_LABELS, maintenanceCost, ritualDifficulty, ritualComponents, signPotency, castingComponents, RITUAL_INTERRUPTIONS } from "./rules.mjs";
 
 export async function learnSpell(actor,source) {
@@ -27,6 +28,8 @@ export async function learnSpell(actor,source) {
 
 export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,helpers=0}={}) {
   if(item?.type!=="spell"||item.parent!==actor)throw new Error("Сначала добавьте заклинание в книгу персонажа.");
+  if(creatureSuppression(actor).dimeritium)throw new Error("В зоне двимеритовой бомбы нельзя использовать магию.");
+  if(item.system.ruleId==="sign.yrden"&&!game.user.isGM&&!game.users?.activeGM)throw new Error("Для размещения Ирдена нужен подключённый ведущий.");
   const conditions=conditionRules(actor);
   if(!actor.isOwner || !(item.system.ruleId==="spell.dispel"?conditions.canDefend:conditions.canAct))throw new Error("Персонаж сейчас не может творить магию.");
   const active=actor.items.get(actor.system.magic.sustainedId);
@@ -106,7 +109,7 @@ function performCast(actor,itemId,options) {
         +`<ul>${summary.map(line=>`<li>${escape(line)}</li>`).join("")}</ul>`
         +`<details><summary>Действие магии</summary>${await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:false,relativeTo:item})}${hex?`<p>Снятие: ${escape(item.system.hex.lifting)}</p>`:""}</details></section>`;
       const flags={[SYSTEM_ID]:{...display.flags[SYSTEM_ID],...(!roll?{skipLuck:true}:{}),
-        magicCast:{kind,element,elemental,spellId:item.id,spellName:item.name,roundKey:quote.roundKey,stamina:quote.stamina,overload:quote.damage,fumble,fumbleDamage,reflected,difficulty:quote.difficulty,maintenance:Boolean(options.maintenance)}}};
+        magicCast:{kind,element,elemental,spellId:item.id,spellName:item.name,roundKey:quote.roundKey,stamina:quote.stamina,powerCost:quote.base,overload:quote.damage,fumble,fumbleDamage,reflected,difficulty:quote.difficulty,maintenance:Boolean(options.maintenance)}}};
       const data={speaker:foundry.documents.ChatMessage.getSpeaker({actor}),flavor,flags};
       posted=backlash?await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({...data,rolls:[roll,backlash]},messageMode))
         :roll?await roll.toMessage(data,{messageMode}):await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({...data,content:options.maintenance?"Поддержание оплачено.":"Ритуал без проверки."},messageMode));

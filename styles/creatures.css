@@ -131,3 +131,14 @@
 .witcher-npc-resistance { padding:2px 8px; border:1px solid #b3c8b1; border-radius:10px; background:#dce7db; color:#2f5240; font-size:11px; font-weight:600; }
 
 .witcher-npc-tabs .witcher-tab-count { display:inline-block; min-width:18px; margin-left:4px; padding:0 5px; border-radius:9px; background:#a3402f; color:#fff; font:700 11px/18px var(--font-primary,sans-serif); text-align:center; }
+.witcher-creature-modes { padding:12px 14px; margin:10px 0; border:1px solid #b9a47e; border-radius:8px; background:#eee6d5; }
+.witcher-creature-modes h3 { margin:0 0 8px; border:0; color:#634732; font:700 14px Georgia,serif; }
+.witcher-creature-mode-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px 14px; }
+.witcher-creature-mode-fields label { display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:12px; color:#543e29; }
+.witcher-creature-mode-fields label>span { width:100%; font-weight:600; }
+.witcher-creature-mode-fields select,.witcher-creature-mode-fields input:not([type=checkbox]) { width:100%; min-height:30px; background:#faf6ed; }
+.witcher-creature-modes p { margin:7px 0 0; font-size:12px; color:#6d4931; }
+.witcher-creature-specials { display:flex; flex-wrap:wrap; gap:6px; margin:9px 0; }
+.witcher-creature-specials:empty { display:none; }
+.witcher-creature-specials button { flex:1 1 130px; white-space:normal; line-height:1.3; min-height:34px; padding:5px 9px; }
+.npc-stamina strong { font-size:38px; line-height:1.1; }

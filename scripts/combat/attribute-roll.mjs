@@ -1,6 +1,7 @@
 import { ATTRIBUTE_KEYS } from "../data/statistics.mjs";
 import { rollActionCheck } from "./action-economy.mjs";
 import { conditionRules } from "./condition-rules.mjs";
+import { modifierTotal } from "../data/background-modifiers.mjs";
 
 export async function rollAttribute(actor, key) {
   if (!actor.isOwner || !ATTRIBUTE_KEYS.includes(key)) return;
@@ -8,7 +9,8 @@ export async function rollAttribute(actor, key) {
     ui.notifications.warn(game.i18n.localize("WITCHER.Conditions.CannotAct"));
     return;
   }
-  const value = actor.system.statistics.effective[key];
+  const base = actor.system.statistics.effective[key];
+  const value = base === null ? null : base + modifierTotal(actor.system.statistics.modifiers ?? [],"attributeCheck");
   if (value === null) {
     ui.notifications.warn(game.i18n.localize("WITCHER.Statistics.UnfilledAttribute"));
     return;

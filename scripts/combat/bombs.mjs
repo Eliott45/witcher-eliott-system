@@ -11,6 +11,7 @@ import { armorAt, resolveDamage, monsterResistant, fireVulnerable, weaponDamageT
 import { burningParts } from "./burning.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
 import { scatterOffset } from "../canvas/scatter-overlay.mjs";
+import { spiritSuppressionSource, createSpiritZone } from "./creature-spirits.mjs";
 
 // Core p.165 «Бомбы и ловушки»: a bomb is thrown with Athletics (range BODY × 4 m) at a point; a failed
 // throw lands per the scatter table (1d10 direction, 1d6 m). Everyone in the radius takes a separate
@@ -30,6 +31,8 @@ export function bombProfile(item) {
     blind: number(/Слепота\s*—\s*(\d+)\s*раунд/u),
     stunSave: /Испытание УСТ/u.test(item.system.properties ?? "") ? number(/Испытание УСТ\s*([−-]?\d+)/u) : null,
     freeze: /Замораживание/u.test(item.system.properties ?? "") ? number(/длится\s+(\d+)\s+раунд/u, 8) : 0,
+    moonDust: item.system.ruleId === "bomb.moon-dust" ? 20 : 0,
+    dimeritium: item.system.ruleId === "bomb.dimeritium" ? 20 : 0,
     traits: weaponDamageTraits(item.system)
   };
 }
@@ -102,16 +105,18 @@ export function throwBomb(actor, item) {
       canvas.ping?.(point);
       const effects = [profile.burning ? `горение ${profile.burning}%` : "", profile.poison ? `отравление ${profile.poison}%${profile.doublePoison ? " (двойной урон яда)" : ""}` : "",
         profile.blind ? `слепота ${profile.blind} раунд.` : "", profile.stunSave !== null ? `испытание УСТ ${signed(profile.stunSave)}, провал — дезориентация` : "",
-        profile.freeze ? `замораживание ${profile.freeze} раунд. (Сила СЛ 18 или удар освобождают)` : ""].filter(Boolean);
+        profile.freeze ? `замораживание ${profile.freeze} раунд. (Сила СЛ 18 или удар освобождают)` : "",
+        profile.moonDust ? "видимость и осязаемость; регенерация и превращения подавлены на 20 раундов" : "",
+        profile.dimeritium ? "зона без магии на 20 раундов" : ""].filter(Boolean);
       const content = `<section class="witcher-attack-chat witcher-bomb-card"><h3><i class="fa-solid fa-bomb"></i> ${esc(item.name)}</h3>
         <p>Бросок Атлетики <b>${roll.total}</b> против СЛ ${quote.dc} (${esc(quote.band.name)}, дальность ${quote.range} м): <strong>${hit ? "точно в цель" : "мимо"}</strong>.</p>
         ${scatter ? `<p>Разброс: направление ${scatter.direction} по таблице, ${scatter.metres} м от точки прицеливания.</p>` : ""}
         <p>Радиус ${profile.radius} м${profile.damage ? ` · урон ${esc(profile.damage)} — отдельный бросок на каждую часть тела, минус ПБ части, затем множитель зоны` : ""}${effects.length ? ` · ${esc(effects.join("; "))}` : ""}.</p>
         ${victims.length ? `<ul class="witcher-bomb-victims">${victims.map(v => `<li>${esc(v.name)}${v.burning ? " · загорается" : ""}${v.poisoned ? " · отравлен" : ""}</li>`).join("")}</ul>` : "<p>В радиусе никого нет.</p>"}
         ${actionNote(action)}
-        ${victims.length ? `<button type="button" data-bomb-apply><i class="fa-solid fa-burst"></i> Применить взрыв</button><small>Урон и эффекты применяет мастер.</small>` : ""}</section>`;
+        ${victims.length || profile.dimeritium ? `<button type="button" data-bomb-apply><i class="fa-solid fa-burst"></i> Применить взрыв</button><small>Урон и эффекты применяет мастер.</small>` : ""}</section>`;
       const message = await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls: [roll], content,
-        flags: { [SYSTEM_ID]: { skipLuck: true, bomb: { name: item.name, profile, victims, applied: false } } } });
+        flags: { [SYSTEM_ID]: { skipLuck: true, bomb: { name: item.name, profile, victims, sceneUuid: scene.uuid, point, applied: false } } } });
       if (!message) return;
       const quantity = (item.system.quantity ?? 1) - 1;
       await actor.update({ ...actionUpdate(actor, action), items: [{ _id: item.id, "system.quantity": Math.max(0, quantity) }] });
@@ -167,6 +172,12 @@ export async function applyBlast(message) {
   await message.update({ [`flags.${SYSTEM_ID}.bomb.applied`]: true });
   const { sufferDamage } = await import("./attack-exchange.mjs");
   const lines = [];
+  if (data.profile.dimeritium) {
+    const scene = fromUuidSync(data.sceneUuid);
+    if (!scene) throw new Error("Сцена взрыва недоступна.");
+    await createSpiritZone(scene, data.point, { kind: "dimeritium", radius: data.profile.radius, rounds: data.profile.dimeritium, sourceUuid: message.uuid });
+    lines.push("<li>Создана зона двимерита: магия внутри запрещена на 20 раундов.</li>");
+  }
   for (const victim of data.victims) {
     const actor = fromUuidSync(victim.uuid)?.actor;
     if (!actor) continue;
@@ -174,6 +185,12 @@ export async function applyBlast(message) {
     const before = actor.system.health.value;
     const worn = result.total || result.ablate.length ? await sufferDamage(actor, result) : [];
     const effects = [];
+    if (data.profile.moonDust) {
+      const previous = Array.from(actor.effects).filter(effect => effect.flags?.[SYSTEM_ID]?.creatureSuppression?.kind === "moon-dust");
+      if (previous.length) await actor.deleteEmbeddedDocuments("ActiveEffect", previous.map(effect => effect.id));
+      effects.push(spiritSuppressionSource(actor, { kind: "moon-dust", rounds: data.profile.moonDust }));
+      notes.push("Лунная пыль: видимость и осязаемость, без регенерации и превращений — 20 раундов");
+    }
     if (victim.burning) { effects.push(timedCondition(actor, "burning", 0)); notes.push("горит"); }
     if (victim.poisoned) { effects.push(timedCondition(actor, "poisoned", 0, data.profile.doublePoison ? { name: `Отравление: ${data.name}`, flags: { [SYSTEM_ID]: { condition: { doubleDamage: true } } } } : {})); notes.push(data.profile.doublePoison ? "отравлен (двойной урон)" : "отравлен"); }
     if (data.profile.blind) { effects.push(timedCondition(actor, "blinded", data.profile.blind)); notes.push(`ослеплён на ${data.profile.blind} раунд.`); }

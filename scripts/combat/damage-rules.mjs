@@ -2,6 +2,8 @@ import { elixirArmor } from "../workshop/witcher-elixirs.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
 import { equippedItems, armorZones } from "../data/physical-items.mjs";
 import { layeredStoppingPower } from "../data/armor-layers.mjs";
+import { spiritState } from "./creature-spirits.mjs";
+import { creatureProfile, creatureHumanForm } from "../data/creature-modes.mjs";
 
 // Core pp.153–162 with errata v4: SP first, then resistance, then the location multiplier.
 // Critical bonus damage ignores armor and never ablates it (Sage's Answers 2 and 20).
@@ -51,26 +53,34 @@ export function conditionResistant(actor, kind) {
 export const LOCATION_ZONE = { head: "head", torso: "torso", rightArm: "torso", leftArm: "torso", rightLeg: "legs", leftLeg: "legs", tail: "torso" };
 
 /** Armor protecting one hit location: worn layers, or a creature's natural armor when nothing is worn there. */
-export function armorAt(actor, location) {
+export function armorAt(actor, location, { weakSpot = actor.system?.creature?.weakSpot ?? false } = {}) {
   const zone = LOCATION_ZONE[location] ?? "torso";
   const items = equippedItems(actor.items).filter(item => item.type === "armor" && armorZones(item).includes(zone));
   const worn = items.map(item => ({ item, sp: Math.max(0, effectiveItem(item).stoppingPower?.value ?? 0), resistances: itemResistances(item) }));
-  const innate = creatureResistances(actor);
+  const innate = creatureResistances(actor), incorporeal = spiritState(actor).incorporeal;
   // Griffin and Arachas decoctions (core p.248) add SP to every location; it is never worn down.
   const extra = elixirArmor(actor), extraSp = extra.reduce((sum, layer) => sum + layer.sp, 0), extraLayers = extra.map(layer => ({ id: "", name: layer.name, sp: layer.sp }));
+  const profile = weakSpot ? creatureProfile(actor) : null;
+  const weakBase = profile?.id === "rock-troll" && location === "torso" ? 5 : profile?.id === "arachas" ? 10 : null;
+  if (weakBase !== null) {
+    const natural = Math.max(0, (actor.system.creature?.naturalArmor ?? profile.armor) - (profile.armor - weakBase));
+    return { zone, incorporeal, weakSpot: true, sp: natural + extraSp, resistances: [],
+      layers: [...(natural ? [{ id: "", name: profile.id === "rock-troll" ? "Живот тролля" : "Задняя часть панциря", sp: natural }] : []), ...extraLayers],
+      ablate: natural ? ["natural"] : [], natural: Boolean(natural) };
+  }
   if (worn.length) {
     const top = worn.reduce((best, layer) => layer.sp > best.sp ? layer : best, worn[0]);
-    return { zone, sp: layeredStoppingPower(worn.map(layer => layer.sp)) + extraSp, resistances: [...new Set([...worn.flatMap(layer => layer.resistances), ...innate])],
+    return { zone, incorporeal, sp: layeredStoppingPower(worn.map(layer => layer.sp)) + extraSp, resistances: [...new Set([...worn.flatMap(layer => layer.resistances), ...innate])],
       layers: [...worn.map(layer => ({ id: layer.item.id, name: layer.item.name, sp: layer.sp })), ...extraLayers], ablate: worn.filter(layer => layer.sp > 0).map(layer => layer.item.id), natural: false };
   }
-  const natural = actor.type === "npc" ? Math.max(0, actor.system.creature?.naturalArmor ?? 0) : 0;
-  return { zone, sp: natural + extraSp, resistances: innate, layers: [...(natural ? [{ id: "", name: "Естественная броня", sp: natural }] : []), ...extraLayers], ablate: natural ? ["natural"] : [], natural: Boolean(natural) };
+  const natural = actor.type === "npc" && !creatureHumanForm(actor) ? Math.max(0, actor.system.creature?.naturalArmor ?? 0) : 0;
+  return { zone, incorporeal, sp: natural + extraSp, resistances: innate, layers: [...(natural ? [{ id: "", name: "Естественная броня", sp: natural }] : []), ...extraLayers], ablate: natural ? ["natural"] : [], natural: Boolean(natural) };
 }
 
 const hasAbility = (actor, ruleId) => (actor.items ?? []).some(item => item.type === "ability" && item.system.ruleId === ruleId);
 /** Errata p.162: every monster except beasts halves non-silver damage; fire is exempt. */
 export function monsterResistant(actor) {
-  if (actor.type !== "npc") return false;
+  if (actor.type !== "npc" || creatureHumanForm(actor)) return false;
   if (hasAbility(actor, "creature.monster-resistance")) return true;
   return !["beast", "humanoid"].includes(actor.system.creature?.category ?? "humanoid");
 }
@@ -92,6 +102,9 @@ export const criticalLevel = margin => CRITICAL_LEVELS.find(level => margin >= l
 export function resolveDamage({ base, silver = 0, location, multiplier, traits, armor, monster = false, vulnerableToFire = false, critical = null, extra = null }) {
   const steps = [], note = (label, value, detail = "") => steps.push({ label, value, detail });
   const fire = traits.types.includes("elemental");
+  const physical = traits.physical ?? !fire;
+  if (armor.incorporeal && physical) return { total: 0, steps: [{ label: "Бесплотность: физическая атака не действует", value: 0 }],
+    penetrated: false, ablate: [], location, immune: true };
   const silverApplies = monster && silver > 0;
   let damage = base + (silverApplies ? silver : 0);
   note("Бросок урона", base, traits.types.map(type => DAMAGE_TYPE_NAMES[type]).join(" / "));

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { SYSTEM_ID } from "../scripts/config.mjs";
-import { rollExchangeLocation, rollExchangeDamage, exchangeRowHTML, damagePreview } from "../scripts/combat/attack-exchange.mjs";
+import { rollExchangeLocation, rollExchangeDamage, exchangeRowHTML, damagePreview, applyExchangeDamage, defendAttack, defenseChoices, applyCreatureBite } from "../scripts/combat/attack-exchange.mjs";
 
 const exchange = message => message.flags[SYSTEM_ID].exchange;
 
@@ -40,6 +40,102 @@ function fixture(t, { location = "random", totals = [12], category = "humanoid",
   } } };
   return { message, attack, actor, target, messages, evaluated, pending };
 }
+
+test("ablating and double equipment damage wear armor even when it stops the blow, applied once",async t=>{
+  const f=fixture(t,{location:"torso",results:[8,2]});
+  f.target.effects=[]; f.target.system.health={value:50,max:50}; f.target.system.creature.naturalArmor=10;
+  f.target.update=async changes=>{for(const [path,value] of Object.entries(changes)){const keys=path.split('.');let owner=f.target;for(const key of keys.slice(0,-1))owner=owner[key]??={};owner[keys.at(-1)]=value;}};
+  f.attack.hitTraits={ablating:true,wearMultiplier:2,poisoned:100};
+  game.settings={get:()=>"public"}; game.users={};
+  foundry.documents.ChatMessage.implementation.applyMode=data=>data;
+  await rollExchangeDamage(f.message,0);
+  const preview=damagePreview(f.message,0);assert.equal(preview.result.total,0);assert.equal(preview.result.wear,4);
+  await Promise.all([applyExchangeDamage(f.message,0),applyExchangeDamage(f.message,0)]);
+  assert.equal(f.target.system.creature.naturalArmor,6);assert.equal(f.target.system.health.value,50);
+  assert.equal(f.messages.filter(message=>exchange(message)?.kind==="applied").length,1);
+  assert.deepEqual(exchange(f.messages.at(-1)).effects,[],"poison does not pass through intact armor");
+  assert.deepEqual(f.messages.at(-1).whisper, f.message.whisper);
+});
+
+test("defense retains the invisible katakan penalty after it has revealed, and forbidden parry is rejected",async t=>{
+  const f=fixture(t,{results:[18]});f.messages.pop();
+  f.attack.attackingInvisible=true;f.actor.system={creature:{invisible:false}};
+  f.target.effects=[];Object.assign(f.target.system,{skills:{dodgeEscape:6},statistics:{effective:{reflex:8,speed:6},modifiers:[]},stamina:{value:30,max:30}});
+  f.target.getFlag=()=>null;game.settings={get:()=>"public"};
+  foundry.dice.Roll.prototype.toMessage=async function(data){return foundry.documents.ChatMessage.implementation.create({...data,rolls:[this]});};
+  await defendAttack(f.message,0,"dodge");
+  assert.equal(f.evaluated[0].formula,"1d10wc + 11");
+  f.messages.pop();f.attack.hitTraits={noParry:true};
+  await assert.rejects(defendAttack(f.message,0,"parry"),/нельзя парировать/);
+});
+
+test("a cat sees an invisible katakan and defends without its invisibility penalty", async t => {
+  const f = fixture(t, { results: [18] }); f.messages.pop();
+  f.attack.attackingInvisible = true;
+  f.target.items.push({ type: "ability", system: { ruleId: "creature.cat.magic-sense" } });
+  f.target.effects = [];
+  Object.assign(f.target.system, { skills: { dodgeEscape: 6 }, statistics: { effective: { reflex: 8, speed: 6 }, modifiers: [] }, stamina: { value: 30, max: 30 } });
+  f.target.getFlag = () => null; game.settings = { get: () => "public" };
+  foundry.dice.Roll.prototype.toMessage = async function(data) { return foundry.documents.ChatMessage.implementation.create({ ...data, rolls: [this] }); };
+  await defendAttack(f.message, 0, "dodge");
+  assert.equal(f.evaluated[0].formula, "1d10wc + 14");
+});
+
+test("a wraith can Slip instead of a restricted defense, but not against an indefensible attack", async t => {
+  const f = fixture(t, { results: [18] }); f.messages.pop();
+  f.target.items.push({ type: "ability", system: { ruleId: "creature.slip" } });
+  f.target.effects = [];
+  Object.assign(f.target.system, { skills: { spellCasting: 6 }, statistics: { effective: { will: 8, speed: 6 }, modifiers: [] }, stamina: { value: 30, max: 30 } });
+  f.target.getFlag = () => null; game.settings = { get: () => "public" };
+  foundry.dice.Roll.prototype.toMessage = async function(data) { return foundry.documents.ChatMessage.implementation.create({ ...data, rolls: [this] }); };
+  f.target.createEmbeddedDocuments = async (_type, effects) => f.target.effects.push(...effects);
+  foundry.documents.ActiveEffect = { getEffectStart: () => ({}) };
+  assert.deepEqual(defenseChoices(f.target, "melee", 0, ["resist"]).map(row => row.mode), ["resist", "slip"]);
+  assert.deepEqual(defenseChoices(f.target, "melee", 0, []), []);
+  f.attack.defenses = [];
+  await assert.rejects(defendAttack(f.message, 0, "slip"), /не подходит/);
+  f.attack.defenses = ["resist"];
+  await defendAttack(f.message, 0, "slip");
+  assert.equal(f.evaluated[0].formula, "1d10wc + 14");
+  assert.ok(f.target.effects.some(effect => effect.statuses.includes("creature-slip")));
+});
+
+test("the active GM transfers blood after player-applied damage, including a living shield, only once", async t => {
+  const f = fixture(t);
+  const bite = { id: "bite", name: "Укус", system: { natural: true } };
+  f.actor.items = Object.assign([bite, { type: "ability", system: { ruleId: "creature.katakan.blood" } }], { get: id => id === "bite" ? bite : null });
+  f.actor.effects = []; f.actor.system = { creature: {} };
+  f.attack.itemId = "bite";
+  f.target.effects = [{ name: "Опьянение", uuid: "Effect.drunk", statuses: new Set(["intoxicated"]), flags: {} }];
+  game.messages.get = id => f.messages.find(message => message.id === id);
+  game.users = { activeGM: { isSelf: false } }; game.settings = { get: () => "public" };
+  foundry.documents.ChatMessage.create = foundry.documents.ChatMessage.implementation.create;
+  foundry.documents.ChatMessage.applyMode = data => data;
+  f.actor.createEmbeddedDocuments = async (_type, effects) => {
+    assert.equal(game.users.activeGM.isSelf, true);
+    f.actor.effects.push(...effects);
+  };
+  const link = { attack: f.message.id, index: 0, kind: "applied", total: 5, penetrated: true };
+  const applied = { id: "receipt", flags: { [SYSTEM_ID]: { exchange: link } }, async update(patch) {
+    if (patch[`flags.${SYSTEM_ID}.exchange.biteApplied`]) link.biteApplied = true;
+  } };
+  await applyCreatureBite(applied); assert.equal(f.actor.effects.length, 0);
+  game.users.activeGM.isSelf = true;
+  await Promise.all([applyCreatureBite(applied), applyCreatureBite(applied)]);
+  assert.equal(f.actor.effects.length, 1); assert.equal(link.biteApplied, true);
+  await applyCreatureBite(applied); assert.equal(f.actor.effects.length, 1);
+
+  const before = globalThis.fromUuidSync; t.after(() => { if (before === undefined) delete globalThis.fromUuidSync; else globalThis.fromUuidSync = before; });
+  const shield = { effects: [{ name: "Галлюцинации", uuid: "Effect.hallucinating", statuses: new Set(["hallucinating"]), flags: {} }] };
+  globalThis.fromUuidSync = uuid => uuid === "Token.shield" ? { actor: shield } : null;
+  applied.id = "shield-receipt"; delete link.biteApplied;
+  link.total = 0; link.penetrated = false;
+  link.shield = { token: "Token.shield", total: 4, penetrated: true, applied: false };
+  await applyCreatureBite(applied); assert.equal(f.actor.effects.length, 1, "wait for the shield's own damage");
+  link.shield.applied = true;
+  await applyCreatureBite(applied); assert.equal(f.actor.effects.length, 2);
+  assert.equal(f.actor.effects.at(-1).name, "Выпитая кровь: Галлюцинации");
+});
 
 test("a hit asks for its location first, then damage uses the saved zone without another d10", async t => {
   const f = fixture(t);

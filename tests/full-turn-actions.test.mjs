@@ -21,10 +21,11 @@ function fixture() {
   const effects=[];effects.get=id=>effects.find(effect=>effect.id===id);
   const items=[{id:"bow",name:"Bow",type:"weapon",system:{quantity:1,hands:2,grip:2,equipped:true,carried:true,category:"ranged",skill:"archery",damage:"3d6",accuracy:0,reliability:{value:10,max:10}}}];
   items.get=id=>items.find(item=>item.id===id);
+  items.push({id:"arrows",name:"Стрелы",type:"equipment",system:{kind:"ammunition",quantity:10,carried:true,damageType:"К"}});
   const actor={uuid:"Actor.archer",documentName:"Actor",isOwner:true,type:"character",effects,items,
     system:{attributes:{},skills:{archery:5,dodgeEscape:4,swordsmanship:3},abilityState:{},combatAction:{extra:false},stamina:{value:20,max:40},
       statistics:{effective:{reflex:8,dexterity:7,body:8,speed:6},modifiers:[],recovery:8,run:18}},
-    async update(changes){patch(this,changes);},
+    async update(changes){const {items:updates,...rest}=changes;for(const update of updates??[]){const {_id,...data}=update;patch(items.get(_id),data);}patch(this,rest);},
     async createEmbeddedDocuments(type,sources){assert.equal(type,"ActiveEffect");return sources.map(source=>addEffect(source));}};
   let sequence=0,accepted=true;const messages=[];
   function addEffect(source) {
@@ -96,12 +97,14 @@ test("ranged attacks add Aim separately from grip, strong-strike and extra-actio
 test("Aim survives canceled attacks, is recorded in the posted math and is consumed once after success",async()=>{
   const f=fixture(),effect=f.add(AIMING);effect.flags[SYSTEM_ID].conditionState={counter:2};
   f.setAccepted(false);await rollWeaponAttack(f.actor,"bow");assert.equal(aimingBonus(f.actor),2);
+  assert.equal(f.actor.items.get("arrows").system.quantity,10);
   f.setAccepted(true);
   const create=foundry.documents.ChatMessage.create;
   foundry.documents.ChatMessage.create=async data=>{assert.equal(aimingBonus(f.actor),2,"Effect remains until the result exists");return create(data);};
   const first=rollWeaponAttack(f.actor,"bow");assert.equal(first,rollWeaponAttack(f.actor,"bow"));await first;
   assert.equal(aimingBonus(f.actor),0);assert.equal(f.messages.at(-1).rolls[0].formula,"1d10wc + 14");assert.match(f.messages.at(-1).flavor,/Прицеливание: \+2/);
   assert.equal(f.messages.at(-1).flags[SYSTEM_ID].weaponAttack.base,14);
+  assert.equal(f.actor.items.get("arrows").system.quantity,9);
 });
 
 test("Recovery cancels Aim, respects the STA cap and remains allowed during exhaustion",async()=>{

@@ -3,6 +3,7 @@ import { WitcherActorData } from "../data/witcher-actor-data.mjs";
 import { setStunned, reportEffectError } from "./status-effects.mjs";
 import { prepareDeathTransition, applyDeathTransition, syncDeathStatus } from "./death-state.mjs";
 import { applyExhaustion, syncExhaustion, regainConsciousness } from "./exhaustion.mjs";
+import { creatureHasInfiniteStamina } from "../data/creature-modes.mjs";
 
 /** Validate the entire proposed system update so changed maxima and current values agree. */
 export function prepareResourceUpdate(actor, changes, options) {
@@ -14,6 +15,7 @@ export function prepareResourceUpdate(actor, changes, options) {
   const projected = new WitcherActorData(source, { parent: actor.system.parent });
   const enteredHealth = patch.system?.health?.value;
   projected.prepareDerivedData();
+  if (creatureHasInfiniteStamina(actor)) projected.stamina.value = projected.stamina.max;
   for (const key of ["health", "stamina"]) {
     if (source[key].value !== projected[key].value) {
       foundry.utils.setProperty(changes, `system.${key}.value`, projected[key].value);
@@ -41,7 +43,7 @@ export async function applyResourceUpdate(actor, _changes, options, userId) {
 
 export function prepareInitialResources(actor) {
   if (!COMBAT_ACTOR_TYPES.includes(actor.type)) return;
-  actor.updateSource({ "system.health.value": actor.system.health.value, "system.stamina.value": actor.system.stamina.value });
+  actor.updateSource({ "system.health.value": actor.system.health.value, "system.stamina.value": creatureHasInfiniteStamina(actor) ? actor.system.stamina.max : actor.system.stamina.value });
 }
 
 export async function applyInitialConditions(actor, _options, userId) {

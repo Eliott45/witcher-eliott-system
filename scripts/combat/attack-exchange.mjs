@@ -1,4 +1,11 @@
 import { sizeClassOf } from "../data/creatures.mjs";
+import { inventoryWrite } from "../data/inventory-writes.mjs";
+import { weaponHitTraits, rollWeaponConditions, applyWeaponConditions, weaponConditionReport } from "./weapon-hit-effects.mjs";
+import { spiritState, setSlipIncorporeal } from "./creature-spirits.mjs";
+import { severHagTongue } from "./hag-actions.mjs";
+import { onCreatureDamaged, afterCreatureBite } from "./creature-modes.mjs";
+import { creatureHasInfiniteStamina, creatureSeesInvisible } from "../data/creature-modes.mjs";
+import { isCreatureSpecial, creatureSpecialDefenses, applyCreatureSpecial, onCreatureExchangeApplied, destroyNoonCopy, creatureHypnosisPenalty } from "./creature-actions.mjs";
 import { canAnswerDual, rollChargeContest } from "./brawling.mjs";
 import { loadedBolt, firedUpdate } from "./crossbow-ammo.mjs";
 import { hasStatus, setStatus, STUNNED } from "./status-effects.mjs";
@@ -83,10 +90,12 @@ export function defenseChoices(actor, incoming, defenseModifier = 0, allowed = n
   // One button per weapon or shield so the defender chooses what takes the blow, plus bare-handed options.
   const items = equippedItems(actor.items).filter(item => item.type === "weapon" && ["melee", "shield"].includes(item.system.category));
   const options = [{ mode: "dodge" }, { mode: "reposition" },
+    ...(spiritState(actor).canSlip ? [{mode:"slip"}] : []),
     ...items.map(item => ({ mode: "block", itemId: item.id })), { mode: "block", itemId: "" },
     ...items.map(item => ({ mode: "parry", itemId: item.id })), { mode: "parry", itemId: "" }];
   // A restricted list (grapple, joint attack, a spell) keeps the per-item buttons of the modes it allows.
-  const chosen = allowed ? allowed.flatMap(mode => { const own = options.filter(option => option.mode === mode); return own.length ? own : [{ mode }]; }) : options;
+  const modes = allowed?.length && spiritState(actor).canSlip ? [...new Set([...allowed, "slip"])] : allowed;
+  const chosen = modes ? modes.flatMap(mode => { const own = options.filter(option => option.mode === mode); return own.length ? own : [{ mode }]; }) : options;
   return chosen.map(option => ({ ...defenseQuote(actor, { ...option, incoming, defenseModifier }), mode: option.mode, itemId: option.itemId ?? "" }));
 }
 
@@ -108,22 +117,27 @@ export async function defendAttack(message, index, mode, itemId = "", repeat = n
   const attack = flagsOf(message).weaponAttack, actor = targetActor(attack);
   if (!actor?.isOwner || linkedAny(message.id, index, "defense")) return;
   const link = { attack: message.id, index, kind: "defense" };
+  const allowed=creatureSpecialDefenses(attack)??GRAPPLE_ACTIONS[attack.special]?.defenses??attack.defenses;
+  const replacesDefense = mode === "slip" && spiritState(actor).canSlip && (!allowed || allowed.length > 0);
+  if (mode!=="none" && allowed && !allowed.includes(mode) && !replacesDefense) throw new Error("Этот способ защиты не подходит против данной атаки.");
+  if (mode === "parry" && attack.hitTraits?.noParry) throw new Error("Эту атаку нельзя парировать. Выберите другую защиту.");
   if (mode === "none") {
     const { dc, note } = unawareDC(attack, actor);
     return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), content: `<p>${esc(actor.name)} не защищается: ${esc(note)}.</p>`,
       flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { ...link, none: true, dc } } } });
   }
-  const gang = gangingUp(message);
-  const defense = await rollDefense(actor, { mode, itemId, incoming: incomingOf(attack), repeat: repeat ?? repeatDefense(actor), defenseModifier: -gang,
+  const gang = gangingUp(message), hypnosis = creatureHypnosisPenalty(actor, message.speakerActor), invisible = attack.attackingInvisible && !creatureSeesInvisible(actor) ? -3 : 0;
+  const defense = await rollDefense(actor, { mode, itemId, incoming: incomingOf(attack), repeat: repeat ?? repeatDefense(actor), defenseModifier: -gang + hypnosis + invisible,
     exchange: { ...link, gang } });
   if (!defense) return;
   await countDefense(actor);
   // A successful block wears the blocking item by 1 reliability (core p.164).
   const won = defense.rolls[0].total >= attackRoll(message, index).total;
+  if (won && mode === "slip") await setSlipIncorporeal(actor);
   if (won && mode === "block" && itemId) {
     const item = actor.items.get(itemId), reliability = effectiveItem(item)?.reliability;
     if (item && !item.system.natural && reliability?.max) {
-      const from = item.system.reliability.value, to = Math.max(0, from - 1);
+      const from = item.system.reliability.value, to = Math.max(0, from - (attack.hitTraits?.wearMultiplier ?? 1));
       await item.update({ "system.reliability.value": to });
       await defense.update({ [`flags.${SYSTEM_ID}.exchange.wear`]: { name: item.name, from, to } });
     }
@@ -193,6 +207,9 @@ export function rollExchangeDamage(message, index) {
     const traits = attack.traits ?? weaponDamageTraits(weapon), monster = target ? monsterResistant(target) : false;
     const options = { allowInteractive: !message.blind };
     const rolls = [await new foundry.dice.Roll(attack.damage).evaluate(options)];
+    const hitTraits = attack.hitTraits ?? weaponHitTraits(weapon,actor);
+    const ablation = hitTraits.ablating ? await new foundry.dice.Roll("floor(1d6 / 2)").evaluate(options) : null;
+    if (ablation) rolls.push(ablation);
     const silver = traits.silverDice && monster ? await new foundry.dice.Roll(traits.silverDice).evaluate(options) : null;
     if (silver) rolls.push(silver);
     let critical = null;
@@ -214,7 +231,7 @@ export function rollExchangeDamage(message, index) {
     const oilBonus = oil && oil.target === category ? { name: oil.name, bonus: oil.bonus } : null;
     const extras = [...(oilBonus ? [{ label: `Масло: ${oilBonus.name}`, value: oilBonus.bonus }] : []), ...elixirDamage(actor)];
     return { rolls, flavor: `<h3>${esc(attack.name)} · урон</h3>`,
-      exchange: { base: rolls[0].total, silver: silver?.total ?? 0, oil: oilBonus, extras,
+      exchange: { base: rolls[0].total, silver: silver?.total ?? 0, oil: oilBonus, extras, hitTraits, ablation: ablation?.total ?? 0,
         location: { id: location.id, name: location.name, multiplier: location.multiplier }, traits, critical } };
   });
 }
@@ -232,6 +249,13 @@ export function damagePreview(message, index) {
   const hit = (actor, armorAtZone, base, silver, crit, extra = oil) => resolveDamage({ base, silver, location: data.location.id, multiplier: multiplierFor(actor),
     traits: data.traits, armor: armorAtZone, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor), critical: crit, extra });
   const preview = { data, target, armor, result: hit(target, armor, data.base, data.silver, critical), shield: null, prosthesis: null };
+  const wear = (result, armorAtZone = armor) => {
+    if (result.immune) return result;
+    const amount = ((result.penetrated ? 1 : 0) + (data.ablation ?? 0)) * (data.hitTraits?.wearMultiplier ?? 1);
+    return { ...result, ablate: amount > 0 ? armorAtZone.ablate ?? [] : [], wear: amount,
+      steps: amount > 1 ? [...result.steps, {label:"Разрушение брони", value:`ПБ −${amount}`} ] : result.steps };
+  };
+  preview.result = wear(preview.result);
   // Core p.160: a blow to a prosthesis does not hurt its owner, but knocks the prosthesis off.
   const fitted = prosthesisAt(target, data.location.id);
   if (fitted) {
@@ -247,7 +271,7 @@ export function damagePreview(message, index) {
     const shieldArmor = armorAt(holding.actor, "torso"), body = holding.actor.system.statistics?.effective?.body ?? 0;
     const overflow = Math.max(0, data.base + extraTotal - body - shieldArmor.sp);
     preview.shield = { actor: holding.actor, token: holding.token, name: holding.name || holding.actor.name, armor: shieldArmor, body, overflow,
-      result: hit(holding.actor, shieldArmor, data.base, data.silver, critical), through: hit(target, armor, overflow, 0, null, null) };
+      result: wear(hit(holding.actor, shieldArmor, data.base, data.silver, critical), shieldArmor), through: overflow > 0 ? wear(hit(target, armor, overflow, 0, null, null)) : hit(target, armor, 0, 0, null, null) };
   }
   return preview;
 }
@@ -276,8 +300,8 @@ async function pushTarget(attack) {
 const chargeContest = (message, index) => game.messages.contents.map(entry => flagsOf(entry).chargeContest).find(contest => contest?.source === `${message.id}:${index}`) ?? null;
 
 /** HP loss, armor wear and a critical wound on one actor; returns what wore down. */
-export async function sufferDamage(actor, result, { wound = null, level = "", location = {}, nonLethal = false } = {}) {
-  if (nonLethal) await actor.update({ "system.stamina.value": actor.system.stamina.value - result.total });
+export async function sufferDamage(actor, result, { wound = null, level = "", location = {}, nonLethal = false, electricity = false } = {}) {
+  if (nonLethal) { if (!creatureHasInfiniteStamina(actor)) await actor.update({ "system.stamina.value": actor.system.stamina.value - result.total }); }
   else {
     // Full Moon's temporary HP take the blow first; Griffin, Wyvern and Swallow react to it (core pp.247–248).
     const { absorbed } = await onDamaged(actor, result.total);
@@ -285,43 +309,60 @@ export async function sufferDamage(actor, result, { wound = null, level = "", lo
     await actor.update({ "system.health.value": actor.system.health.value - (result.total - absorbed) });
   }
   const worn = [];
+  const wear = result.wear ?? 1;
   for (const id of result.ablate) {
     if (id === "natural") {
       const value = actor.system.creature?.naturalArmor ?? 0;
-      if (value > 0) { await actor.update({ "system.creature.naturalArmor": value - 1 }); worn.push(`естественная броня ${value} → ${value - 1}`); }
+      if (value > 0) { const to = Math.max(0, value - wear); await actor.update({ "system.creature.naturalArmor": to }); worn.push(`естественная броня ${value} → ${to}`); }
       continue;
     }
     const item = actor.items.get(id), from = item?.system.stoppingPower?.value;
     if (!item || !(from > 0)) continue;
-    await item.update({ "system.stoppingPower.value": from - 1 });
-    worn.push(`${item.name} ${from} → ${from - 1}`);
+    const to = Math.max(0, from - wear);
+    await item.update({ "system.stoppingPower.value": to });
+    worn.push(`${item.name} ${from} → ${to}`);
   }
-  if (wound) await actor.createEmbeddedDocuments("ActiveEffect", [woundEffectData(wound.id, level, { location: location.id, locationName: location.name })]);
+  if (wound && !result.immune) await actor.createEmbeddedDocuments("ActiveEffect", [woundEffectData(wound.id, level, { location: location.id, locationName: location.name })]);
+  if (!nonLethal && !result.immune && result.total > 0) await onCreatureDamaged(actor, result.total, {electricity});
   return worn;
 }
 
-export async function applyExchangeDamage(message, index, { useShield = false } = {}) {
+export function applyExchangeDamage(message, index, options = {}) {
+  const target = targetActor(flagsOf(message).weaponAttack);
+  if (!target?.isOwner) return;
+  return inventoryWrite(target, () => applyExchangeDamageNow(message,index,options));
+}
+async function applyExchangeDamageNow(message, index, { useShield = false } = {}) {
   const preview = damagePreview(message, index);
   if (!preview?.target.isOwner || linkedAny(message.id, index, "applied")) return;
   const { target, data } = preview, health = target.system.health.value, shield = useShield ? preview.shield : null;
   const own = shield ? shield.through : preview.result;
   const attack = flagsOf(message).weaponAttack, nonLethal = Boolean(attack.nonLethal) && !shield;
-  const worn = await sufferDamage(target, own, shield || preview.prosthesis ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location, nonLethal });
-  if (attack.push && own.total >= 0) await pushTarget(attack);
+  const conditions = shield && shield.overflow <= 0 ? {rolls:[],effects:[]} : await rollWeaponConditions(target, data.hitTraits ?? attack.hitTraits, own, {nonLethal, blind: message.blind, ammunition:attack.ammunition});
+  // Remove only the disorientation that preceded this blow; electricity may cause a new one.
+  if (!shield && !own.immune && hasStatus(target, STUNNED)) await setStatus(target, STUNNED, false);
+  const worn = await sufferDamage(target, own, {electricity:Boolean(data.traits?.electricity), ...(shield || preview.prosthesis ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location, nonLethal })});
+  if (attack.push && !own.immune && own.total >= 0) await pushTarget(attack);
   if (preview.prosthesis) await knockOffProsthesis(target, preview.prosthesis);
-  // Core p.161: a disoriented character comes round after one hit, even if the armor stopped it.
-  if (!shield && hasStatus(target, STUNNED)) await setStatus(target, STUNNED, false);
-  const exchange = { attack: message.id, index, kind: "applied", total: own.total, steps: own.steps, from: health, nonLethal,
-    ablated: worn.join(", "), armorHeld: !own.penetrated && preview.armor.sp > 0 && !shield };
+  await applyWeaponConditions(target, conditions.effects);
+  await onCreatureExchangeApplied(message,index,own);
+  const exchange = { attack: message.id, index, kind: "applied", total: own.total, steps: own.steps, from: health, nonLethal, immune: Boolean(own.immune), penetrated: Boolean(own.penetrated),
+    effects: conditions.effects, ablated: worn.join(", "), armorHeld: !own.penetrated && preview.armor.sp > 0 && !shield };
   if (shield) {
-    const shieldData = { token: shield.token, name: shield.name, total: shield.result.total, steps: shield.result.steps, ablate: shield.result.ablate,
+    const shieldData = { token: shield.token, name: shield.name, ...shield.result, electricity:Boolean(data.traits?.electricity), hitTraits:data.hitTraits??attack.hitTraits, ammunition:attack.ammunition,
       wound: data.critical?.wound ?? null, level: data.critical?.level ?? "", location: data.location, overflow: shield.overflow };
     // The grappler's owner may not own the held creature: the active GM applies that part.
-    if (shield.actor.isOwner) { shieldData.ablated = (await sufferDamage(shield.actor, shield.result, shieldData)).join(", "); shieldData.applied = true; }
+    if (shield.actor.isOwner) {
+      const shieldConditions = await rollWeaponConditions(shield.actor,shieldData.hitTraits,shield.result,{blind:message.blind,ammunition:attack.ammunition});
+      shieldData.ablated = (await sufferDamage(shield.actor, shield.result, shieldData)).join(", ");
+      await applyWeaponConditions(shield.actor,shieldConditions.effects);
+      conditions.rolls.push(...shieldConditions.rolls); shieldData.effects=shieldConditions.effects; shieldData.applied = true;
+    }
     exchange.shield = shieldData;
   }
-  return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${own.total - (own.absorbed ?? 0)} ${nonLethal ? "ВЫН" : "ПЗ"}${own.absorbed ? ` (временные ПЗ поглотили ${own.absorbed})` : ""}${shield ? ` · живой щит ${esc(shield.name)}: −${shield.result.total} ПЗ` : ""}${preview.prosthesis ? ` · ${esc(preview.prosthesis.name)} отвалился` : ""}</p>`,
-    flags: { [SYSTEM_ID]: { skipLuck: true, exchange } } }, "public");
+  return foundry.documents.ChatMessage.implementation.create({ blind: Boolean(message.blind), whisper: [...(message.whisper ?? [])], speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${own.total - (own.absorbed ?? 0)} ${nonLethal ? "ВЫН" : "ПЗ"}${own.absorbed ? ` (временные ПЗ поглотили ${own.absorbed})` : ""}${shield ? ` · живой щит ${esc(shield.name)}: −${shield.result.total} ПЗ` : ""}${preview.prosthesis ? ` · ${esc(preview.prosthesis.name)} отвалился` : ""}</p>`,
+    rolls: conditions.rolls, flavor: weaponConditionReport(conditions.effects),
+    flags: { [SYSTEM_ID]: { skipLuck: true, exchange } } });
 }
 
 /** Active GM: apply a living shield's share once when its owner could not. */
@@ -331,7 +372,10 @@ export async function applyShieldShare(message) {
   const actor = fromUuidSync(share.token)?.actor;
   if (!actor) return;
   await message.update({ [`flags.${SYSTEM_ID}.exchange.shield.applied`]: true });
-  const ablated = await sufferDamage(actor, { total: share.total, ablate: share.ablate ?? [] }, share);
+  const conditions = await rollWeaponConditions(actor,share.hitTraits,share,{blind:message.blind,ammunition:share.ammunition});
+  const ablated = await sufferDamage(actor, { ...share, ablate: share.ablate ?? [] }, share);
+  await applyWeaponConditions(actor,conditions.effects);
+  if(conditions.rolls.length || conditions.effects.length) await post({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls:conditions.rolls,content:weaponConditionReport(conditions.effects),flags:{[SYSTEM_ID]:{skipLuck:true}}},message.blind?"blind":message.whisper?.length?"gm":"public");
   if (ablated.length) await message.update({ [`flags.${SYSTEM_ID}.exchange.shield.ablated`]: ablated.join(", ") });
 }
 
@@ -528,13 +572,14 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
   const secret = !concealed && enemyAttackHidden(message) && !linked(message.id, index, "defense");
   const head = `<header><span>Атака ${attack.count > 1 ? `${index + 1} ` : ""}<b class="${secret ? "witcher-gm-only" : ""}" ${secret ? 'data-tooltip="Игроки не видят до выбора защиты"' : ""}>${concealed ? '<i class="fa-solid fa-eye-slash" data-tooltip="Итог атаки откроется после выбора защиты"></i>' : total}</b></span>`;
   const ownFumble = concealed ? "" : (secret ? fumbleHTMLSecret : fumbleHTML)(message, index, "attack", attackFumble(message, index), message.speakerActor?.isOwner, message.speakerActor, attack.itemId);
+  if (exchangeOf(linkedAny(message.id,index,"applied"))?.copyDestroyed) return `<li class="is-hit">${head}<strong>Копия уничтожена попаданием</strong></header></li>`;
   const hideTargetNumbers = creatureDetailsHidden(target);
   if (!outcome) {
     if (!target?.isOwner) return `<li class="is-waiting">${head}<em>${linkedAny(message.id, index, "defense") ? "защита бросается…" : "ждём защиту"}</em></header>${ownFumble}</li>`;
     if (linkedAny(message.id, index, "defense")) return `<li class="is-waiting">${head}<em><i class="fa-solid fa-dice-d10 fa-spin"></i> защита бросается…</em></header>${ownFumble}</li>`;
-    const gang = gangingUp(message);
+    const gang = gangingUp(message), hypnosis = creatureHypnosisPenalty(target,message.speakerActor), invisible = attack.attackingInvisible && !creatureSeesInvisible(target) ? -3 : 0;
     const dualLimit = attack.dual && !canAnswerDual(target, equippedItems(target.items)) ? ["dodge", "reposition"] : null;
-    const choices = defenseChoices(target, incomingOf(attack), -gang, GRAPPLE_ACTIONS[attack.special]?.defenses ?? attack.defenses ?? dualLimit).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
+    const choices = defenseChoices(target, incomingOf(attack), -gang + hypnosis + invisible, creatureSpecialDefenses(attack) ?? GRAPPLE_ACTIONS[attack.special]?.defenses ?? attack.defenses ?? dualLimit).filter(choice => !(attack.hitTraits?.noParry && choice.mode === "parry")).map(choice => button(`data-exchange-defend="${choice.mode}" data-item-id="${choice.itemId ?? ""}"`,
       `${esc(choice.name)}${choice.weaponName ? ` · ${esc(choice.weaponName)}` : ""}${choice.total != null && !choice.blocked ? ` <b>+${choice.total}</b>` : ""}`, !choice.blocked, choice.blocked || choice.note));
     const free = defenseChoices(target, incomingOf(attack))[0]?.activeDodge;
     const repeatBox = `<button type="button" class="witcher-exchange-repeat" data-exchange-repeat aria-pressed="${!free && repeatDefense(target)}" ${free ? "disabled" : ""} data-tooltip="${free ? "Активное уклонение: повторные защиты бесплатны" : "Вторая и следующие защиты за раунд стоят 1 ВЫН. Нажмите, чтобы переключить."}"><i class="fa-solid fa-rotate"></i> Повторная · ${free ? 0 : 1} ВЫН</button>`;
@@ -583,12 +628,13 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
       if (wound) body += `<details class="witcher-exchange-wound"><summary>${esc(wound.name)}</summary><p>${esc(wound.effect)}</p></details>`;
       if (applied) {
         const result = exchangeOf(applied);
+        if (result.effects?.length) body += `<p class="witcher-exchange-note">${esc(weaponConditionReport(result.effects))}</p>`;
         if (result.shield) body += `<p class="witcher-exchange-applied is-shield" data-tooltip="${esc(stepsHTML(result.shield.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-user-shield"></i> Живой щит ${esc(result.shield.name)}: −${result.shield.total} ПЗ${result.shield.applied ? "" : " <small>(применяет мастер)</small>"}</p>${result.shield.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ щита −1: ${esc(result.shield.ablated)}</p>` : ""}`;
         const unit = result.nonLethal ? "ВЫН" : "ПЗ";
         if (hideTargetNumbers) body += `<p class="witcher-exchange-applied"><i class="fa-solid fa-heart-crack"></i> −${result.total} ${unit}</p>`;
-        else body += `<p class="witcher-exchange-applied" data-tooltip="${esc(stepsHTML(result.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-heart-crack"></i> −${result.total} ${unit}${result.shield ? " сквозь щит" : ""}${result.nonLethal ? " · несмертельный" : ""}</p>${result.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ −1: ${esc(result.ablated)}</p>` : result.armorHeld ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield"></i> Броня выдержала удар — ПБ не снижается</p>` : ""}`;
+        else body += `<p class="witcher-exchange-applied" data-tooltip="${esc(stepsHTML(result.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-heart-crack"></i> −${result.total} ${unit}${result.shield ? " сквозь щит" : ""}${result.nonLethal ? " · несмертельный" : ""}</p>${result.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> Износ брони: ${esc(result.ablated)}</p>` : result.armorHeld ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield"></i> Броня выдержала удар — ПБ не снижается</p>` : ""}`;
         // Core p.158: every critical wound also forces a Stun save.
-        if (data.critical && target?.isOwner) body += `<div class="witcher-exchange-actions">${button("data-exchange-stun", '<i class="fa-solid fa-dice-d10"></i> Испытание Устойчивости', true, "Критическое ранение требует испытания УСТ")}</div>`;
+        if (data.critical && !result.immune && target?.isOwner) body += `<div class="witcher-exchange-actions">${button("data-exchange-stun", '<i class="fa-solid fa-dice-d10"></i> Испытание Устойчивости', true, "Критическое ранение требует испытания УСТ")}</div>`;
       } else if (target?.isOwner) {
         const preview = damagePreview(message, index), shield = preview.shield;
         if (shield) body += `<div class="witcher-exchange-shield"><p><i class="fa-solid fa-user-shield"></i> <b>Живой щит:</b> ${esc(shield.name)} в захвате прикрывает туловище. Удар принимает он; в вас проходит только урон сверх его ТЕЛ ${shield.body} + ПБ ${shield.armor.sp} = <b>${shield.overflow}</b>.</p>
@@ -725,8 +771,18 @@ async function afterSettled(message) {
   const link = exchangeOf(message);
   if (link?.kind !== "defense") return;
   const attackMessage = game.messages.get(link.attack), outcome = attackMessage && exchangeOutcome(attackMessage, link.index);
+  if (outcome?.hit && game.users.activeGM?.isSelf && !linkedAny(attackMessage.id,link.index,"applied")) {
+    const token = targetToken(flagsOf(attackMessage).weaponAttack);
+    if (token?.actor?.flags?.[SYSTEM_ID]?.noonCopy && await destroyNoonCopy(token)) {
+      await post({content:"<p>Копия полуденницы уничтожена попаданием.</p>",flags:{[SYSTEM_ID]:{skipLuck:true,exchange:{attack:attackMessage.id,index:link.index,kind:"applied",copyDestroyed:true,total:0}}}},attackMessage.blind?"blind":attackMessage.whisper?.length?"gm":"public");
+      return;
+    }
+  }
   if (outcome?.hit && flagsOf(attackMessage).weaponAttack?.special) {
-    if (game.users.activeGM?.isSelf) await applyGrappleSuccess(attackMessage);
+    if (game.users.activeGM?.isSelf) {
+      if (isCreatureSpecial(flagsOf(attackMessage).weaponAttack)) await applyCreatureSpecial(attackMessage,link.index,outcome);
+      else await applyGrappleSuccess(attackMessage);
+    }
     return;
   }
   if (!outcome || outcome.hit || outcome.mode !== "parry") return;
@@ -734,6 +790,7 @@ async function afterSettled(message) {
   const attacker = (attack.attacker && fromUuidSync(attack.attacker)?.actor) ?? attackMessage.speakerActor;
   const writer = game.users.activeGM ? game.users.activeGM.isSelf : attacker?.isOwner;
   if (!attacker || !writer) return;
+  await severHagTongue(attacker,attacker.items.get(attack.itemId),targetActor(attack)?.items.get(flagsOf(outcome.defense).defense?.itemId));
   const key = `${attackMessage.id}:${link.index}`;
   if (attacker.effects.some(effect => effect.flags?.[SYSTEM_ID]?.parryKey === key)) return;
   const old = attacker.effects.filter(effect => effect.statuses.has("staggered"));
@@ -753,11 +810,31 @@ async function elixirEvents(message) {
   if (link.from > 0 && (target?.system.health.value ?? 1) <= 0) await onKill(attacker);
 }
 
+const pendingBites = new Set();
+/** The victim's player may apply damage without owning the vampire. Its reaction belongs to the GM. */
+export async function applyCreatureBite(message) {
+  const link = exchangeOf(message);
+  if (!game.users.activeGM?.isSelf || link?.kind !== "applied" || link.nonLethal || link.biteApplied || pendingBites.has(message.id)) return;
+  const source = game.messages.get(link.attack), attack = flagsOf(source).weaponAttack, attacker = source?.speakerActor;
+  const weapon = attacker?.items.get(attack?.itemId), result = link.shield ?? link;
+  if (!weapon?.system.natural || weapon.name !== "Укус" || !result.penetrated || !(result.total > 0) || result.immune || link.shield && !link.shield.applied) return;
+  const victim = link.shield ? fromUuidSync(link.shield.token)?.actor : targetActor(attack);
+  if (!victim || !attacker.isOwner) return;
+  pendingBites.add(message.id);
+  try {
+    await afterCreatureBite(attacker, victim);
+    await message.update({ [`flags.${SYSTEM_ID}.exchange.biteApplied`]: true });
+  } finally { pendingBites.delete(message.id); }
+}
+
 export function registerAttackExchange() {
   Hooks.on("createChatMessage", message => elixirEvents(message).catch(console.error));
   Hooks.on("renderChatMessageHTML", renderExchange);
   Hooks.on("createChatMessage", message => { try { settleThenRefresh(message); } catch (error) { console.error(error); } });
-  Hooks.on("createChatMessage", message => { applyShieldShare(message).catch(console.error); applyDeferredShare(message).catch(console.error); });
+  Hooks.on("createChatMessage", message => {
+    applyShieldShare(message).then(() => applyCreatureBite(message)).catch(console.error);
+    applyDeferredShare(message).catch(console.error);
+  });
   // Every client sees where a scatter roll sent the weapon, on the wielder's token.
   Hooks.on("createChatMessage", message => {
     const scatter = exchangeOf(message)?.scatter;

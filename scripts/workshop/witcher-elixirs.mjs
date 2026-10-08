@@ -2,6 +2,7 @@ import { SYSTEM_ID } from "../config.mjs";
 import { activeDoses, consumedDose } from "../data/consumables.mjs";
 import { activeEffect } from "../data/effect-counters.mjs";
 import { creatureRegeneration } from "../data/creature-regeneration.mjs";
+import { creatureProfile } from "../data/creature-modes.mjs";
 
 // Core pp.247–248: witcher potions and decoctions whose effects depend on combat events. Hits, kills and
 // turn starts come from the attack exchange and the turn-start tick; this module keeps the counters on the
@@ -116,6 +117,7 @@ export async function checkMedallions(scene) {
   for (const token of scene.tokens) {
     if (!wearsMedallion(token.actor)) continue;
     const near = new Set(scene.tokens.filter(other => other !== token && other.actor?.type === "npc" && !NOT_MONSTERS.has(other.actor.system.creature?.category)
+      && creatureProfile(other.actor)?.id !== "katakan"
       && (tokenGap(token, other) ?? Infinity) <= RANGE).map(other => other.id));
     const before = sensed.get(token.uuid) ?? new Set();
     sensed.set(token.uuid, near);

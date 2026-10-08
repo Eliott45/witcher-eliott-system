@@ -1,6 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { creatureHasTrait } from "../data/creature-modes.mjs";
 
 // Core pp.176–177 «Словесная дуэль». A duel is a Combat flagged `verbalDuel`: every participant's Resolve
 // ((WILL + INT) / 2 × 5) replaces HP. An attack card asks the target to defend; the higher result deals its
@@ -40,6 +41,7 @@ export const TORTURE = [{ id: 0, name: "Нет" }, { id: 1, name: "Наноси�
 
 const flags = document => document?.flags?.[SYSTEM_ID] ?? {};
 export const isDuel = combat => Boolean(flags(combat).verbalDuel);
+export const creatureCannotNegotiate = actor => ["fearless", "construct"].some(trait => creatureHasTrait(actor,trait));
 /** The verbal duel this actor takes part in (the active one first). */
 export function duelOf(actor) {
   if (!actor) return null;
@@ -86,6 +88,7 @@ export async function verbalAttack(actor, actionId, { skill = null, situational 
   if (targets.length !== 1) throw new Error("Выберите одного противника (T).");
   const target = targets[0].actor;
   if (!target || !Array.from(combat.combatants).some(entry => entry.actor?.uuid === target.uuid)) throw new Error("Цель не участвует в этой дуэли.");
+  if (creatureCannotNegotiate(target)) throw new Error("Это существо нельзя запугать или убедить: словесная дуэль на него не действует.");
   if (action.once && pairState(combat, actor.uuid, target.uuid)[action.id]) throw new Error(`${action.name}: только один раз за дуэль.`);
   const key = skill && [action.skill, action.alt].includes(skill) ? skill : action.skill;
   const parts = duelModifiers(combat, actor, target, action, { torture, situational });
@@ -108,6 +111,7 @@ export async function resolveVerbal(message, defenseId, { counterId = null, situ
   if (!data || data.kind !== "attack" || !combat) throw new Error("Дуэль уже закончилась.");
   if (game.messages.contents.some(entry => flags(entry).verbal?.kind === "outcome" && flags(entry).verbal.attack === message.id)) return;
   const attacker = actorOf(data.attacker), target = actorOf(data.target), action = actionById(data.action);
+  if (creatureCannotNegotiate(target) || creatureCannotNegotiate(attacker)) throw new Error("С существом нельзя договориться или запугать его: словесная дуэль недоступна.");
   const attackTotal = message.rolls[0]?.total ?? 0, rolls = [], lines = [], damage = [], state = [];
   let defenseTotal = data.fixed, winner = "attacker", defense = null, counter = null;
   if (data.fixed === null) {
@@ -189,6 +193,8 @@ export async function startVerbalDuel() {
   if (!game.user.isGM) return;
   const tokens = canvas?.tokens?.controlled ?? [];
   if (tokens.length < 2) throw new Error("Выделите на сцене участников словесной дуэли (не меньше двух).");
+  const blocked=tokens.filter(token=>creatureCannotNegotiate(token.actor));
+  if(blocked.length)throw new Error(`Нельзя договориться или запугать: ${blocked.map(token=>token.name).join(", ")}.`);
   const combat = await foundry.documents.Combat.create({ scene: canvas.scene.id, active: true, flags: { [SYSTEM_ID]: { verbalDuel: { pairs: {} } } } });
   await combat.createEmbeddedDocuments("Combatant", tokens.map(token => ({ tokenId: token.id, sceneId: canvas.scene.id, actorId: token.actor?.id })));
   for (const token of tokens) if (token.actor) await token.actor.update({ "system.resolve.value": token.actor.system.resolve.max });

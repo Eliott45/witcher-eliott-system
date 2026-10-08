@@ -2,12 +2,14 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { canGenerateCreatureLoot, generateCreatureLoot, pendingLegacyLoot } from "../scripts/combat/creature-loot.mjs";
 import { RANDOM_LOOT_TABLES } from "../scripts/data/random-loot.mjs";
+import { UPGRADES } from "../scripts/data/workshop-upgrades.mjs";
 
 const set = (object, path, value) => {
   const keys = path.split("."), key = keys.pop();
   keys.reduce((value, key) => value[key] ??= {}, object)[key] = structuredClone(value);
 };
-function fixture(totals = [12, 2, 3]) {
+const defaultBelonging = RANDOM_LOOT_TABLES.ordinary.find(entry => !entry.documentId);
+function fixture(totals = [12, 2, defaultBelonging.min, defaultBelonging.min, 3]) {
   const gm = { isGM: true, id: "gm" }, items = [{ id: "weapon", name: "Когти", type: "weapon", system: { equipped: true, quantity: 1 } }];
   items.get = id => items.find(item => item.id === id);
   const state = { rolls: [], messages: [], writes: [], created: [], deleted: [], limit: Infinity, failUpdate: false, cancel: false, totals };
@@ -39,7 +41,7 @@ function fixture(totals = [12, 2, 3]) {
   };
   delete globalThis.Hooks;
   globalThis.game = { user: gm, users: { activeGM: gm }, settings: { get: () => "blind" }, items: { fromCompendium: source => source.toObject() } };
-  globalThis.foundry = { utils: { fromUuid: async uuid => references.get(uuid), deepClone: structuredClone },
+  globalThis.foundry = { applications:{api:{DialogV2:{prompt:async()=>state.category===false?null:"ordinary"}}}, utils: { fromUuid: async uuid => references.get(uuid), deepClone: structuredClone },
     dice: { Roll: class {
       constructor(formula) { this.formula = formula; this.dice = /\d+d\d+/u.test(formula) ? [{}] : []; }
       async evaluate({ allowInteractive }) { assert.equal(allowInteractive, false); state.rolls.push(this.formula); this.total = totals.shift(); return this; }
@@ -59,7 +61,7 @@ test("one loot click places fixed and rolled materials in NPC inventory and leav
   assert.equal(actor.system.crowns, 17);
   assert.equal(actor.system.creature.lootGenerated, true);
   assert.deepEqual(actor.items[0], held);
-  assert.deepEqual(actor.items.slice(1).map(item => [item.name, item.system.quantity]), [["Случайные предметы", 2], ["Реагент fixed", 1], ["Реагент random", 3]]);
+  assert.deepEqual(actor.items.slice(1).map(item => [item.name, item.system.quantity]), [[defaultBelonging.name, defaultBelonging.quantity*2], ["Реагент fixed", 1], ["Реагент random", 3]]);
   for (const item of actor.items.slice(2)) {
     assert.equal(item.system.equipped, false);
     assert.equal(item.system.carried, true);
@@ -68,7 +70,7 @@ test("one loot click places fixed and rolled materials in NPC inventory and leav
   }
   assert.deepEqual(actor.system.harvest.map(row => row.attempted), [true, true, false, true]);
   assert.equal(canGenerateCreatureLoot(actor), false);
-  assert.equal(state.messages[0].rolls.length, 3);
+  assert.equal(state.messages[0].rolls.length, 5);
   assert.equal(state.messages[0].mode, "blind");
   assert.match(state.messages[0].content, /требуется извлечение/u);
 });
@@ -80,6 +82,22 @@ test("double clicks generate loot and crowns only once", async () => {
   assert.equal(state.writes.length, 1);
   assert.equal(actor.system.crowns, 17);
   assert.equal(actor.items.length, 4);
+});
+
+test("ambiguous loot asks its table and cancellation preserves all inventory and currency",async()=>{
+  const {actor,state}=fixture();state.category=false;
+  await generateCreatureLoot(actor);
+  assert.equal(actor.items.length,1);assert.equal(actor.system.crowns,5);assert.equal(actor.system.creature.lootGenerated,false);assert.equal(state.messages.length,0);
+});
+
+test("random rune loot creates a real catalog rune only once",async()=>{
+  const rune=UPGRADES.find(entry=>entry.id.startsWith("rune.")),{actor,state,source,references}=fixture([1,1]);
+  actor.system.harvest=[];actor.system.creature.loot=[{name:"Случайная руна",formula:"1",currency:false}];
+  const canonical=source(rune.documentId);canonical.name=rune.name;canonical.system.ruleId=rune.id;
+  references.set(`Compendium.witcher-eliott-system.equipment.Item.${rune.documentId}`,canonical);
+  await Promise.all([generateCreatureLoot(actor),generateCreatureLoot(actor)]);
+  assert.equal(actor.items[1].system.ruleId,rune.id);assert.equal(actor.items[1].system.quantity,1);assert.equal(actor.items.length,2);
+  assert.deepEqual(state.rolls,["1",`1d${UPGRADES.filter(entry=>entry.id.startsWith("rune.")).length}`]);
 });
 
 test("old rolled loot moves remaining materials without rerolling formulas, currency or previously claimed rows", async () => {

@@ -1,6 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { tokenGap } from "../combat/attack-target.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
+import { tokenActorSource } from "../data/token-actor-source.mjs";
 
 // Core p.167 «Двимерит, погибель магов». Every unit of dimeritium within 5 m lowers a magic adept's Vigor by 1;
 // touching it drops Vigor to 0 and calls for an Endurance check (DC 16) on the dimeritium table, repeated
@@ -30,8 +31,10 @@ export function dimeritiumState(actor, token = null) {
   let nearby = own.filter(carried).reduce((sum, item) => sum + units(item), 0);
   const scene = token?.parent;
   if (scene?.grid) for (const other of scene.tokens) {
-    if (other === token || !other.actor || other.actor === actor) continue;
-    const metal = Array.from(other.actor.items ?? []).filter(item => isDimeritium(item) && carried(item));
+    if (other === token) continue;
+    const neighbour = tokenActorSource(other);
+    if (!neighbour || neighbour === actor) continue;
+    const metal = Array.from(neighbour.items ?? []).filter(item => isDimeritium(item) && carried(item));
     if (!metal.length) continue;
     const gap = tokenGap(token, other);
     if (gap != null && gap <= DIMERITIUM_RANGE) nearby += metal.reduce((sum, item) => sum + units(item), 0);

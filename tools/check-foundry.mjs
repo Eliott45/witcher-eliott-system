@@ -1527,8 +1527,8 @@ const {weaponAttack}=await import('../scripts/combat/weapon-rules.mjs');
 const {castingQuote}=await import('../scripts/magic/casting.mjs');
 const {focusOptions}=await import('../scripts/magic/rules.mjs');
 const npcTemplate=handlebars.compile(await readFile(new URL('../templates/npc-sheet.hbs',import.meta.url),'utf8'),{strict:true});
-const creatureTestGlobals={user:game.user,fromUuid:foundry.utils.fromUuid};
-game.user={id:'gmCreature',isGM:true,can:()=>true};foundry.utils.fromUuid=async uuid=>documents.get(uuid);
+const creatureTestGlobals={user:game.user,users:game.users,fromUuid:foundry.utils.fromUuid};
+game.user={id:'gmCreature',isGM:true,can:()=>true};game.users={activeGM:game.user};foundry.utils.fromUuid=async uuid=>documents.get(uuid);
 const creatureViews=[];
 for(const source of bestiarySources()) {
   const initial=new foundry.documents.BaseActor(source);
@@ -1566,7 +1566,7 @@ for(const source of bestiarySources()) {
     const loreTab=rendered.search(/<section class="tab[^\"]*" data-group="creature" data-tab="lore">/);
     const lootPanel=rendered.indexOf('aria-label="Добыча существа"');
     assert.ok(inventoryTab>=0&&inventoryTab<lootPanel&&lootPanel<loreTab,'Loot controls render inside inventory, not lore');
-    const hasRegeneration=source.items.some(item=>item.flags?.[game.system.id]?.regeneration>0);
+    const hasRegeneration=source.name==='Гуль'||source.items.some(item=>item.flags?.[game.system.id]?.regeneration>0);
     assert.equal(rendered.includes('aria-label="Режим регенерации"'),hasRegeneration);
     if(hasRegeneration) {
       assert.equal(actor.system.creature.regenerationMode,'normal');
@@ -1586,6 +1586,55 @@ for(const source of bestiarySources()) {
     assert.equal(actor.items.find(i=>i.system.ruleId==='weapon.hand-crossbow').system.accuracy,1);
   }
 }
+// Stateful creature modes must survive the installed schema and render with strict Handlebars.
+const nativeModes=[
+  ['Сирена',{'system.creature.movementMode':'flying','system.creature.illusion':true}],
+  ['Птица',{'system.creature.movementMode':'flying','system.creature.flightHeight':8}],
+  ['Катакан',{'system.creature.invisible':true}],
+  ['Волколак',{'system.creature.transformed':false}],
+  ['Гуль',{'system.health.value':9}],
+  ['Полуденница',{'system.creature.moonlight':true,'system.creature.spiritMode':'suppressed'}],
+  ['Главоглаз',{'system.creature.camouflage':true,'system.creature.weakSpot':true}],
+  ['Скальный тролль',{'system.creature.weakSpot':true}],
+  ['Варг',{'system.creature.packId':'Лесная стая'}],
+  ['Голем',{}]
+];
+for(const [name,patch] of nativeModes) {
+  const actor=new foundry.documents.BaseActor(bestiarySources().find(source=>source.name===name));
+  Object.defineProperty(actor,'isOwner',{value:true});actor.updateSource(patch);actor.system.prepareDerivedData();
+  const sheet=new WitcherNPCSheet();sheet.actor=actor;sheet.isEditable=true;
+  const context=await sheet._prepareContext({}),html=npcTemplate(context);
+  assert.equal(actor.validate({strict:true}),true,`${name}: native mode schema`);
+  assert.ok(context.creatureModes.available,`${name}: mode controls available`);
+  if(name==='Сирена') {assert.equal(actor.system.statistics.effective.reflex,7);assert.ok(html.includes('data-action="creatureDispelIllusion"'));}
+  if(name==='Птица') {assert.equal(actor.system.statistics.effective.speed,7);assert.equal(actor.system.statistics.run,21);}
+  if(name==='Катакан') {assert.ok(html.includes('data-action="creatureDetect"'));assert.equal(actor.system.statistics.modifiers.find(mod=>mod.target==='combat.attack').value,5);}
+  if(name==='Волколак') {assert.equal(actor.system.statistics.effective.body,4);assert.equal(context.regeneration.total,0);}
+  if(name==='Гуль')assert.equal(context.regeneration.total,3);
+  assert.equal(context.combat.infiniteStamina,name==='Голем');
+  if(name==='Голем') {
+    assert.ok(html.includes('Бесконечная Выносливость'));assert.ok(!html.includes('name="system.stamina.value"'));
+    assert.ok(html.includes('Повторная · 0 ВЫН'));assert.ok(!html.includes('data-action="fullTurnRecovery"'));
+    assert.ok(!html.includes('Для последующих включите «Повторная»'));
+  }
+  if(['Главоглаз','Скальный тролль'].includes(name))assert.ok(html.includes('data-creature-mode="weakSpot"'));
+  for(const action of context.creatureSpecialActions)assert.ok(html.includes(`data-creature-action="${action.id}"`));
+  sheet.isEditable=false;
+  const observer=npcTemplate(await sheet._prepareContext({}));
+  assert.equal((observer.match(/data-creature-mode="[^"]+"(?:(?!>).)*>/g)??[]).every(control=>control.includes('disabled')),true,`${name}: read-only modes are disabled`);
+}
+const {createSpiritZone}=await import('../scripts/combat/creature-spirits.mjs');
+CONFIG.RegionBehavior={dataModels:{}};
+const nativeRegionScene={regions:[],grid:{size:100,distance:2},createEmbeddedDocuments:async(type,sources)=>{
+  assert.equal(type,'Region');
+  const region=new foundry.documents.BaseRegion(sources[0],{strict:true});
+  assert.equal(region.validate({strict:true}),true);
+  assert.equal(region.shapes[0].radiusX,150);assert.equal(region.shapes[0].radiusY,150);
+  return [{uuid:'Scene.native.Region.yrden'}];
+}};
+const regionGM=game.users.activeGM;game.users.activeGM=null;
+await createSpiritZone(nativeRegionScene,{x:50,y:50},{kind:'yrden',radius:3,rounds:5,penalty:4});
+game.users.activeGM=regionGM;
 const mageView=creatureViews.find(entry=>entry.actor.name==='Маг');
 assert.equal(mageView.view.magic.count,9);
 assert.deepEqual(mageView.view.magic.groups.map(group=>[group.id,group.spells.length]),[['spell',5],['ritual',2],['hex',2]]);
@@ -1661,7 +1710,7 @@ dropSheet.isEditable=false;
 await dropSheet._onDropItem({},mageView.actor.items.find(item=>item.name==='Рьеви'));
 assert.equal(dropActor.items.size,beforeSpellDrop+1,'Observers cannot add NPC spells');
 game.items=priorWorldItems;
-game.user=creatureTestGlobals.user;foundry.utils.fromUuid=creatureTestGlobals.fromUuid;
+game.user=creatureTestGlobals.user;game.users=creatureTestGlobals.users;foundry.utils.fromUuid=creatureTestGlobals.fromUuid;
 
 console.log(`Installed Foundry core: data, ${documents.size} compendium documents, templates, native Luck, death saves and all nine critical chains OK`);
 const {faceRoll}=await import('../scripts/chat/manual-critical.mjs');

@@ -505,7 +505,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.fire-vulnerable",
-          "description": "<p>Существо уязвимо к огню, включая состояние «Горение». Учитывается ведущим при применении урона.</p>"
+          "description": "<p>Существо получает двойной урон от огня, включая состояние «Горение». Множитель применяется автоматически.</p>"
         }
       },
       {
@@ -525,7 +525,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         }
       }
     ]
@@ -1303,7 +1303,7 @@
         "source": "Базовая книга, стр. 274–275",
         "description": "Эльфийские партизаны-«белки», мастера засад и стрельбы из лука.",
         "tactics": "Открывают бой залпом из-за деревьев; половина отряда идёт в ближний бой с фальшионами, остальные стреляют прицельно и метают ножи в тех, кто ближе 10 м. На переговоры почти не идут.",
-        "naturalArmor": 5,
+        "naturalArmor": 0,
         "resistances": "",
         "healthMax": 25,
         "staminaMax": 25,
@@ -1339,35 +1339,7 @@
         ],
         "lootGenerated": false
       },
-      "harvest": [
-        {
-          "id": "scoiatael-archer-0",
-          "uuid": "Compendium.witcher-eliott-system.equipment.Item.armo000000000002",
-          "quantity": 1,
-          "formula": "",
-          "skill": "",
-          "dc": 0,
-          "attempted": false
-        },
-        {
-          "id": "scoiatael-archer-1",
-          "uuid": "Compendium.witcher-eliott-system.equipment.Item.armo000000000011",
-          "quantity": 1,
-          "formula": "",
-          "skill": "",
-          "dc": 0,
-          "attempted": false
-        },
-        {
-          "id": "scoiatael-archer-2",
-          "uuid": "Compendium.witcher-eliott-system.equipment.Item.armo000000000020",
-          "quantity": 1,
-          "formula": "",
-          "skill": "",
-          "dc": 0,
-          "attempted": false
-        }
-      ]
+      "harvest": []
     },
     "items": [
       {
@@ -1631,6 +1603,96 @@
             "sourceId": "Compendium.witcher-eliott-system.equipment.Item.elde000000000001"
           }
         }
+      },
+      {
+        "_id": "bst002i000000010",
+        "name": "Двуслойный капюшон",
+        "type": "armor",
+        "img": "systems/witcher-eliott-system/assets/icons/helmet.svg",
+        "system": {
+          "zone": "head",
+          "armorClass": "light",
+          "stoppingPower": {
+            "value": 5,
+            "max": 5
+          },
+          "rarity": "rare",
+          "enhancementSlots": 1,
+          "encumbrance": 0,
+          "weight": 1,
+          "price": 175,
+          "properties": "",
+          "source": "Базовая книга, стр. 79–80",
+          "ruleId": "armor.head.2",
+          "quantity": 1,
+          "equipped": true,
+          "carried": true
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.armo000000000002"
+          }
+        }
+      },
+      {
+        "_id": "bst002i000000011",
+        "name": "Аэдирнский гамбезон",
+        "type": "armor",
+        "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+        "system": {
+          "zone": "torso",
+          "armorClass": "light",
+          "stoppingPower": {
+            "value": 5,
+            "max": 5
+          },
+          "rarity": "rare",
+          "enhancementSlots": 1,
+          "encumbrance": 0,
+          "weight": 1.5,
+          "price": 175,
+          "properties": "",
+          "source": "Базовая книга, стр. 79–80",
+          "ruleId": "armor.torso.2",
+          "quantity": 1,
+          "equipped": true,
+          "carried": true
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.armo000000000011"
+          }
+        }
+      },
+      {
+        "_id": "bst002i000000012",
+        "name": "Стёганые штаны",
+        "type": "armor",
+        "img": "systems/witcher-eliott-system/assets/icons/greaves.svg",
+        "system": {
+          "zone": "legs",
+          "armorClass": "light",
+          "stoppingPower": {
+            "value": 5,
+            "max": 5
+          },
+          "rarity": "common",
+          "enhancementSlots": 1,
+          "encumbrance": 0,
+          "weight": 1,
+          "price": 125,
+          "properties": "",
+          "source": "Базовая книга, стр. 79–80",
+          "ruleId": "armor.legs.2",
+          "quantity": 1,
+          "equipped": true,
+          "carried": true
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.armo000000000020"
+          }
+        }
       }
     ]
   },
@@ -1765,6 +1827,7 @@
           "damage": "3d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -1774,7 +1837,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 279",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.ghoul.0"
         }
       },
       {
@@ -1788,6 +1852,7 @@
           "damage": "3d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": -1,
@@ -1797,7 +1862,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 279",
           "properties": "Кровопускающее (25%)",
-          "description": "<p>Кровопускающее (25%) СА 1.</p>"
+          "description": "<p>Кровопускающее (25%) СА 1.</p>",
+          "ruleId": "creature.weapon.ghoul.1"
         }
       },
       {
@@ -1833,7 +1899,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -2015,6 +2081,7 @@
           "damage": "5d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 2,
           "accuracy": 0,
@@ -2024,7 +2091,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 281",
           "properties": "Кровопускающее (50%)",
-          "description": "<p>Кровопускающее (50%) СА 2.</p>"
+          "description": "<p>Кровопускающее (50%) СА 2.</p>",
+          "ruleId": "creature.weapon.grave-hag.0"
         }
       },
       {
@@ -2038,6 +2106,7 @@
           "damage": "6d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -2047,7 +2116,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 281",
           "properties": "Отравление (75%)",
-          "description": "<p>Отравление (75%) СА 1.</p>"
+          "description": "<p>Отравление (75%) СА 1.</p>",
+          "ruleId": "creature.weapon.grave-hag.1"
         }
       },
       {
@@ -2061,6 +2131,7 @@
           "damage": "3d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -2071,7 +2142,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 281",
           "properties": "Отравление (100%); Дистанция 4 м",
-          "description": "<p>Отравление (100%); Дистанция 4 м СА 1.</p>"
+          "description": "<p>Отравление (100%); Дистанция 4 м СА 1.</p>",
+          "ruleId": "creature.weapon.grave-hag.2"
         }
       },
       {
@@ -2092,7 +2164,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -2274,6 +2346,7 @@
           "damage": "3d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -2283,7 +2356,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 283",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.wraith.0"
         }
       },
       {
@@ -2297,6 +2371,7 @@
           "damage": "2d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -2306,7 +2381,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 283",
           "properties": "Горение (25%)",
-          "description": "<p>Горение (25%) СА 1.</p>"
+          "description": "<p>Горение (25%) СА 1.</p>",
+          "ruleId": "creature.weapon.wraith.1"
         }
       },
       {
@@ -2327,7 +2403,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -2359,7 +2435,7 @@
         "type": "ability",
         "img": "icons/svg/aura.svg",
         "system": {
-          "ruleId": "creature.wraith.6",
+          "ruleId": "creature.slip",
           "description": "<p>Вместо защиты делает проверку Сотворения заклинаний: при успехе становится бесплотным — атака отменена, физические эффекты и урон не действуют до его следующего хода.</p>"
         },
         "flags": {}
@@ -2370,7 +2446,7 @@
         "type": "ability",
         "img": "icons/svg/aura.svg",
         "system": {
-          "ruleId": "creature.wraith.7",
+          "ruleId": "creature.teleport",
           "description": "<p>Перемещаясь, может мгновенно телепортироваться на 10 м — обычно за спину цели, и сразу атакует.</p>"
         },
         "flags": {}
@@ -2475,7 +2551,7 @@
         "description": "Дух невесты, погибшей до свадьбы: бесплотна, кружит в пыльном вихре и танцует с копиями, выпивающими жизнь.",
         "tactics": "Рвёт когтями, ослепляет вихрем самого опасного противника; раненая — создаёт копии, которые лечат её ПЗ цели.",
         "naturalArmor": 0,
-        "resistances": "яд, кровотечение",
+        "resistances": "",
         "healthMax": 80,
         "staminaMax": 40,
         "hasTailOrWings": false,
@@ -2493,7 +2569,7 @@
             "name": "Знания ведьмаков",
             "skill": "monsterLore",
             "dc": 14,
-            "text": "Могущественный мстительный дух, неуязвимый для физических атак, пока не пойман Ирденом или «Лунной пылью». Получив урон, начинает танец с копиями, вытягивающими жизнь, — уничтожайте их сразу. Лучше биться ближе к закату; сожжённая у могилы любимая вещь почти всегда призывает её ночью."
+            "text": "Могущественный мстительный дух, неуязвимый для физических атак, пока не пойман Ирденом или «Лунной пылью». Получив урон, начинает танец с копиями, вытягивающими жизнь, — уничтожайте их сразу. Лучше биться ближе к закату; сожжённая у могилы любимая вещь призывает её ночью с вероятностью 90%."
           }
         ],
         "loot": [],
@@ -2550,6 +2626,7 @@
           "damage": "5d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 2,
           "accuracy": 0,
@@ -2559,7 +2636,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 285",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 2.</p>"
+          "description": "<p>Эффектов нет. СА 2.</p>",
+          "ruleId": "creature.weapon.noonwraith.0"
         }
       },
       {
@@ -2569,7 +2647,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -2601,7 +2679,7 @@
         "type": "ability",
         "img": "icons/svg/aura.svg",
         "system": {
-          "ruleId": "creature.noonwraith.4",
+          "ruleId": "creature.incorporeal",
           "description": "<p>Всегда бесплотна: невосприимчива к физическим атакам, кровотечению и яду (пока не поймана Ирденом или «Лунной пылью»).</p>"
         },
         "flags": {}
@@ -2656,7 +2734,7 @@
         "type": "ability",
         "img": "icons/svg/aura.svg",
         "system": {
-          "ruleId": "creature.noonwraith.9",
+          "ruleId": "creature.lunar-weakness",
           "description": "<p>под лунным светом −2 ко всем действиям.</p>"
         },
         "flags": {}
@@ -2794,6 +2872,7 @@
           "damage": "2d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -2803,7 +2882,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 287",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.wolf.0"
         }
       },
       {
@@ -2902,7 +2982,7 @@
         "habitat": "Леса и равнины",
         "intellect": "Умнее простого волка",
         "group": "Во главе волчьей стаи",
-        "source": "Базовая книга, стр. 287–288",
+        "source": "Базовая книга, стр. 287",
         "description": "Крупный умный волк-вожак с бурым мехом и красными глазами.",
         "tactics": "Держится позади, пока стая изматывает жертву; приказывает окружать и бить слабейших, затем наносит решающий удар.",
         "naturalArmor": 0,
@@ -2966,6 +3046,7 @@
           "damage": "2d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -2973,9 +3054,10 @@
           "hands": 1,
           "quantity": 1,
           "carried": true,
-          "source": "Базовая книга, стр. 288",
+          "source": "Базовая книга, стр. 287",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.warg.0"
         }
       },
       {
@@ -3153,6 +3235,7 @@
           "damage": "4d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 2,
           "accuracy": 0,
@@ -3162,7 +3245,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 289",
           "properties": "Кровопускающее (25%)",
-          "description": "<p>Кровопускающее (25%) СА 2.</p>"
+          "description": "<p>Кровопускающее (25%) СА 2.</p>",
+          "ruleId": "creature.weapon.werewolf.0"
         }
       },
       {
@@ -3176,6 +3260,7 @@
           "damage": "5d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -3185,7 +3270,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 289",
           "properties": "Кровопускающее (75%)",
-          "description": "<p>Кровопускающее (75%) СА 1.</p>"
+          "description": "<p>Кровопускающее (75%) СА 1.</p>",
+          "ruleId": "creature.weapon.werewolf.1"
         }
       },
       {
@@ -3206,7 +3292,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -3401,6 +3487,7 @@
           "damage": "2d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 1,
@@ -3410,7 +3497,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 291",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.siren.0"
         }
       },
       {
@@ -3424,6 +3512,7 @@
           "damage": "3d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -3433,7 +3522,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 291",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.siren.1"
         }
       },
       {
@@ -3454,7 +3544,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -3668,6 +3758,7 @@
           "damage": "6d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 2,
           "accuracy": 0,
@@ -3677,7 +3768,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 293",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 2.</p>"
+          "description": "<p>Эффектов нет. СА 2.</p>",
+          "ruleId": "creature.weapon.griffin.0"
         }
       },
       {
@@ -3691,6 +3783,7 @@
           "damage": "7d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -3700,7 +3793,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 293",
           "properties": "Кровопускающее (50%)",
-          "description": "<p>Кровопускающее (50%) СА 1.</p>"
+          "description": "<p>Кровопускающее (50%) СА 1.</p>",
+          "ruleId": "creature.weapon.griffin.1"
         }
       },
       {
@@ -3736,7 +3830,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -3928,6 +4022,7 @@
           "damage": "3d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -3937,7 +4032,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 295",
           "properties": "Отравление (25%)",
-          "description": "<p>Отравление (25%) СА 1.</p>"
+          "description": "<p>Отравление (25%) СА 1.</p>",
+          "ruleId": "creature.weapon.endrega-worker.0"
         }
       },
       {
@@ -3973,7 +4069,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -4165,6 +4261,7 @@
           "damage": "3d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -4174,7 +4271,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 295",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.endrega-warrior.0"
         }
       },
       {
@@ -4188,6 +4286,7 @@
           "damage": "4d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -4197,7 +4296,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 295",
           "properties": "Отравление (50%)",
-          "description": "<p>Отравление (50%) СА 1.</p>"
+          "description": "<p>Отравление (50%) СА 1.</p>",
+          "ruleId": "creature.weapon.endrega-warrior.1"
         }
       },
       {
@@ -4233,7 +4333,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -4425,6 +4525,7 @@
           "damage": "3d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -4434,7 +4535,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 295",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.endrega-drone.0"
         }
       },
       {
@@ -4448,6 +4550,7 @@
           "damage": "1d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -4458,7 +4561,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 295",
           "properties": "Круг 5 м; блок или уклонение СЛ 15; за каждый пункт ниже СЛ — 1d6 урона и отравление",
-          "description": "<p>Круг 5 м; блок или уклонение СЛ 15; за каждый пункт ниже СЛ — 1d6 урона и отравление СА 1.</p>"
+          "description": "<p>Круг 5 м; блок или уклонение СЛ 15; за каждый пункт ниже СЛ — 1d6 урона и отравление СА 1.</p>",
+          "ruleId": "creature.weapon.endrega-drone.1"
         }
       },
       {
@@ -4494,7 +4598,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -4695,6 +4799,7 @@
           "damage": "5d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 2,
           "accuracy": 0,
@@ -4704,7 +4809,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 297",
           "properties": "Отравление (25%)",
-          "description": "<p>Отравление (25%) СА 2.</p>"
+          "description": "<p>Отравление (25%) СА 2.</p>",
+          "ruleId": "creature.weapon.arachas.0"
         }
       },
       {
@@ -4718,6 +4824,7 @@
           "damage": "0",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -4728,7 +4835,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 297",
           "properties": "Против цели дальше 8 м; при попадании цель в захвате, пока не пройдёт Силу СЛ 16 или не нанесёт паутине 10 урона",
-          "description": "<p>Против цели дальше 8 м; при попадании цель в захвате, пока не пройдёт Силу СЛ 16 или не нанесёт паутине 10 урона СА 1.</p>"
+          "description": "<p>Против цели дальше 8 м; при попадании цель в захвате, пока не пройдёт Силу СЛ 16 или не нанесёт паутине 10 урона СА 1.</p>",
+          "ruleId": "creature.weapon.arachas.1"
         }
       },
       {
@@ -4764,7 +4872,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -4973,6 +5081,7 @@
           "damage": "8d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -4982,7 +5091,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 299",
           "properties": "Разрушающее; нельзя парировать; двойной урон оружию, щиту или броне",
-          "description": "<p>Разрушающее; нельзя парировать; двойной урон оружию, щиту или броне СА 1.</p>"
+          "description": "<p>Разрушающее; нельзя парировать; двойной урон оружию, щиту или броне СА 1.</p>",
+          "ruleId": "creature.weapon.golem.0"
         }
       },
       {
@@ -5014,7 +5124,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -5252,6 +5362,7 @@
           "damage": "6d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 2,
           "accuracy": 0,
@@ -5261,7 +5372,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 301",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 2.</p>"
+          "description": "<p>Эффектов нет. СА 2.</p>",
+          "ruleId": "creature.weapon.fiend.0"
         }
       },
       {
@@ -5275,6 +5387,7 @@
           "damage": "7d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -5284,7 +5397,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 301",
           "properties": "Кровопускающее (50%)",
-          "description": "<p>Кровопускающее (50%) СА 1.</p>"
+          "description": "<p>Кровопускающее (50%) СА 1.</p>",
+          "ruleId": "creature.weapon.fiend.1"
         }
       },
       {
@@ -5298,6 +5412,7 @@
           "damage": "8d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": -1,
@@ -5307,7 +5422,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 301",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.fiend.2"
         }
       },
       {
@@ -5332,7 +5448,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -5562,6 +5678,7 @@
           "damage": "2d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -5571,7 +5688,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 303",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.nekker.0"
         }
       },
       {
@@ -5592,7 +5710,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -5741,6 +5859,7 @@
           "damage": "2d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -5750,7 +5869,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 303",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.nekker-chief.0"
         }
       },
       {
@@ -5771,7 +5891,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -5936,6 +6056,7 @@
           "damage": "6d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 2,
           "accuracy": 0,
@@ -5945,7 +6066,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 305",
           "properties": "Нельзя парировать; двойной урон оружию, щиту или броне",
-          "description": "<p>Нельзя парировать; двойной урон оружию, щиту или броне СА 2.</p>"
+          "description": "<p>Нельзя парировать; двойной урон оружию, щиту или броне СА 2.</p>",
+          "ruleId": "creature.weapon.rock-troll.0"
         }
       },
       {
@@ -5959,6 +6081,7 @@
           "damage": "5d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -5969,7 +6092,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 305",
           "properties": "Против цели дальше 6 м",
-          "description": "<p>Против цели дальше 6 м СА 1.</p>"
+          "description": "<p>Против цели дальше 6 м СА 1.</p>",
+          "ruleId": "creature.weapon.rock-troll.1"
         }
       },
       {
@@ -5979,7 +6103,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -6191,6 +6315,7 @@
           "damage": "6d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 2,
           "accuracy": 0,
@@ -6200,7 +6325,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 307",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 2.</p>"
+          "description": "<p>Эффектов нет. СА 2.</p>",
+          "ruleId": "creature.weapon.wyvern.0"
         }
       },
       {
@@ -6214,6 +6340,7 @@
           "damage": "7d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -6223,7 +6350,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 307",
           "properties": "Отравление (25%)",
-          "description": "<p>Отравление (25%) СА 1.</p>"
+          "description": "<p>Отравление (25%) СА 1.</p>",
+          "ruleId": "creature.weapon.wyvern.1"
         }
       },
       {
@@ -6237,6 +6365,7 @@
           "damage": "5d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -6246,7 +6375,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 307",
           "properties": "Отравление (75%)",
-          "description": "<p>Отравление (75%) СА 1.</p>"
+          "description": "<p>Отравление (75%) СА 1.</p>",
+          "ruleId": "creature.weapon.wyvern.2"
         }
       },
       {
@@ -6260,6 +6390,7 @@
           "damage": "3d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -6270,7 +6401,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 307",
           "properties": "Отравление (100%)",
-          "description": "<p>Отравление (100%) СА 1.</p>"
+          "description": "<p>Отравление (100%) СА 1.</p>",
+          "ruleId": "creature.weapon.wyvern.3"
         }
       },
       {
@@ -6295,7 +6427,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -6502,6 +6634,7 @@
           "damage": "6d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 2,
           "accuracy": 0,
@@ -6511,7 +6644,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 309",
           "properties": "Кровопускающее (50%)",
-          "description": "<p>Кровопускающее (50%) СА 2.</p>"
+          "description": "<p>Кровопускающее (50%) СА 2.</p>",
+          "ruleId": "creature.weapon.katakan.0"
         }
       },
       {
@@ -6525,6 +6659,7 @@
           "damage": "7d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -6534,7 +6669,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 309",
           "properties": "Кровопускающее (100%)",
-          "description": "<p>Кровопускающее (100%) СА 1.</p>"
+          "description": "<p>Кровопускающее (100%) СА 1.</p>",
+          "ruleId": "creature.weapon.katakan.1"
         }
       },
       {
@@ -6555,7 +6691,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.monster-resistance",
-          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Исключения описываются в свойствах оружия. Учитывается после брони при ручном применении урона.</p>"
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
         },
         "flags": {}
       },
@@ -6566,7 +6702,7 @@
         "img": "icons/svg/aura.svg",
         "system": {
           "ruleId": "creature.fire-vulnerable",
-          "description": "<p>Существо уязвимо к огню, включая состояние «Горение». Учитывается ведущим при применении урона.</p>"
+          "description": "<p>Существо получает двойной урон от огня, включая состояние «Горение». Множитель применяется автоматически.</p>"
         },
         "flags": {}
       },
@@ -6783,6 +6919,7 @@
           "damage": "floor(1d6/2)",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -6792,7 +6929,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 311",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.cat.0"
         }
       },
       {
@@ -6806,6 +6944,7 @@
           "damage": "1d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -6815,7 +6954,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 311",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.cat.1"
         }
       },
       {
@@ -6995,6 +7135,7 @@
           "damage": "2d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -7004,7 +7145,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 311",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.dog.0"
         }
       },
       {
@@ -7162,6 +7304,7 @@
           "damage": "floor(1d6/2)",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Р",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -7171,7 +7314,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 312",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.bird.0"
         }
       },
       {
@@ -7340,6 +7484,7 @@
           "damage": "1d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -7349,7 +7494,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 312",
           "properties": "Отравление (75%)",
-          "description": "<p>Отравление (75%) СА 1.</p>"
+          "description": "<p>Отравление (75%) СА 1.</p>",
+          "ruleId": "creature.weapon.snake.0"
         }
       },
       {
@@ -7498,6 +7644,7 @@
           "damage": "2d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -7507,7 +7654,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 313",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.horse.0"
         }
       },
       {
@@ -7645,6 +7793,7 @@
           "damage": "4d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -7654,7 +7803,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 313",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.war-horse.0"
         }
       },
       {
@@ -7792,6 +7942,7 @@
           "damage": "4d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -7801,7 +7952,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 314",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.ox.0"
         }
       },
       {
@@ -7815,6 +7967,7 @@
           "damage": "5d6",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "К",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -7824,7 +7977,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 314",
           "properties": "Кровопускающее (50%)",
-          "description": "<p>Кровопускающее (50%) СА 1.</p>"
+          "description": "<p>Кровопускающее (50%) СА 1.</p>",
+          "ruleId": "creature.weapon.ox.1"
         }
       },
       {
@@ -7973,6 +8127,7 @@
           "damage": "2d6+2",
           "natural": true,
           "damageIncludesBody": true,
+          "damageType": "Д",
           "equipped": true,
           "attackRate": 1,
           "accuracy": 0,
@@ -7982,7 +8137,8 @@
           "carried": true,
           "source": "Базовая книга, стр. 314",
           "properties": "",
-          "description": "<p>Эффектов нет. СА 1.</p>"
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.mule.0"
         }
       },
       {

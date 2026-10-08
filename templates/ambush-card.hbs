@@ -17,7 +17,7 @@
 {{#if hasMatrix}}<section class="witcher-group-results">
   <h4><i class="fa-solid fa-crosshairs"></i> Кто остался незамеченным</h4>
   {{#each matrix}}<div class="witcher-group-result">
-    <div class="witcher-group-result-head"><img src="{{img}}" alt=""><b>{{name}}</b>{{#if total}}<small>Скрытность {{total}}</small>{{/if}}</div>
+    <div class="witcher-group-result-head"><img src="{{img}}" alt=""><b>{{name}}</b>{{#if total}}<small>Скрытность {{total}}{{#if sharedStealth}} · лучший бросок лучников{{/if}}</small>{{/if}}</div>
     <ul>{{#each cells}}<li class="{{#if unseen}}is-unseen{{else}}{{#unless pending}}is-seen{{/unless}}{{/if}}" data-tooltip="{{hint}}" aria-label="{{name}}: {{hint}}">
       <i class="fa-solid {{#if pending}}fa-hourglass-half{{else}}{{#if unseen}}fa-eye-slash{{else}}fa-eye{{/if}}{{/if}}"></i>
       <span>{{name}}{{#if total}} <small>({{total}})</small>{{/if}}</span><b>{{label}}</b>

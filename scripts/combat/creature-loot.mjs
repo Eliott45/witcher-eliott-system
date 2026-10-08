@@ -5,6 +5,7 @@ import { randomLootCategory, randomLootEntry } from "../data/random-loot.mjs";
 import { inventoryTransaction, copyPhysical } from "../workshop/transaction.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { UPGRADES } from "../data/workshop-upgrades.mjs";
 
 const pendingHarvest = actor => (actor.system.harvest ?? []).filter(row => !row.attempted);
 const LEGACY_DESCRIPTION = "<p>Добыча. Конкретные обычные предметы выбирает ведущий.</p>";
@@ -74,7 +75,23 @@ export function generateCreatureLoot(actor) {
         const quantity = await quantityRoll(row.formula);
         report.push(`${row.name}: ${quantity}`);
         if (row.currency) { crowns += quantity; continue; }
-        const category = randomLootCategory(row.name);
+        if (/^случайн\S* рун/iu.test(row.name)) {
+          const runes = UPGRADES.filter(entry => entry.id.startsWith("rune."));
+          for (let i = 0; i < quantity; i++) {
+            const entry = runes[(await quantityRoll(`1d${runes.length}`)) - 1];
+            const source = await foundry.utils.fromUuid(`Compendium.${SYSTEM_ID}.equipment.Item.${entry.documentId}`);
+            if (!source) throw new Error(`Руна недоступна: ${entry.name}. Добыча не изменена.`);
+            creates.push(copyPhysical(source, 1)); report.push(entry.name);
+          }
+          continue;
+        }
+        let category = randomLootCategory(row.name);
+        if (!category && quantity && /^случайн\S* предмет/iu.test(row.name)) {
+          category = await foundry.applications.api.DialogV2.prompt({window:{title:"Случайные предметы"},
+            content:'<p>Блок существа не задаёт категорию личных вещей. Выберите таблицу для бросков.</p><select name="category"><option value="ordinary">Обычные</option><option value="strange">Странные</option><option value="occult">Оккультные</option></select>',
+            ok:{label:"Бросить",callback:(_event,button)=>button.form.elements.category.value},rejectClose:false});
+          if (!category) return;
+        }
         if (category) { await personalBelongings(category, quantity); continue; }
         if (quantity) creates.push({ name: row.name, type: "equipment", img: "icons/svg/item-bag.svg",
           system: { description: "<p>Добыча. Конкретные предметы выбирает ведущий.</p>", quantity } });

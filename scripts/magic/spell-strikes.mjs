@@ -2,6 +2,7 @@ import { SYSTEM_ID } from "../config.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { attackerToken, tokenGap, tokenDocument } from "../combat/attack-target.mjs";
 import { SPELL_DEFENSES } from "../data/spells.mjs";
+import { createYrdenZone, spellMentalImmunity } from "../combat/creature-spirits.mjs";
 
 // Core p.168 «Выбор целей для магии»: a direct spell works like a ranged attack against each target; an area
 // spell makes everyone in it defend against the same casting check; with no defense (or a willing target) the
@@ -22,7 +23,9 @@ export function spellDefenses(system) {
 // Core p.166 «Магические ранения»: magic that works through a physical force (wind, ice, stone) can cause
 // critical wounds like a weapon. Fire and pure (mixed) magic are treated as non-physical here.
 const PHYSICAL = new Set(["earth", "air", "water"]);
-export const spellTraits = element => ({ types: element === "fire" ? ["elemental"] : [], piercing: "none", silver: false, silverDice: "", nonLethal: false });
+const ELECTRICITY = new Set(["spell.static-storm", "spell.alzur-thunder", "spell.storm"]);
+export const spellTraits = (element, ruleId = "") => ({ types: element === "fire" ? ["elemental"] : [], physical: PHYSICAL.has(element) && !ELECTRICITY.has(ruleId),
+  electricity: ELECTRICITY.has(ruleId), piercing: "none", silver: false, silverDice: "", nonLethal: false });
 
 /** Spells that act on others: anything but «на себя». */
 export const targetsOthers = system => !["self"].includes(system.range?.kind);
@@ -34,8 +37,8 @@ export function strikeAttack(item, caster, target, { total = null, spellSource =
     charge: false, push: false, dual: false, base: total, count: 1, damage: system.damage || null, location: "random", multiplier: 1, body: 0, bonus: 0,
     target: target.uuid, attacker: caster.uuid, parts: [], ranged: true, band: "normal", dc: null, thrown: false,
     combat: game.combat?.started ? { id: game.combat.id, round: game.combat.round } : null, strike: 0, damageTypes: "",
-    ...(spellSource ? { spellSource } : {}), defenses, ...(unaware ? { unaware } : {}), traits: spellTraits(system.element),
-    noCritical: !PHYSICAL.has(system.element) || (!defenses.length && !unaware?.willTriple) };
+    ...(spellSource ? { spellSource } : {}), defenses, ...(unaware ? { unaware } : {}), traits: spellTraits(system.element, system.ruleId),
+    noCritical: !spellTraits(system.element, system.ruleId).physical || (!defenses.length && !unaware?.willTriple) };
 }
 
 /** Spell casts that can still reach targets: a spell, sign or invocation that did not fail, aimed at others. */
@@ -51,6 +54,12 @@ export function strikeable(message) {
  */
 export async function createSpellStrikes(actor, item, source, { total = null } = {}) {
   const system = item.system, targets = Array.from(game.user.targets ?? []).map(tokenDocument);
+  if(system.ruleId === "sign.yrden") {
+    const caster = attackerToken(actor);
+    const power = source.flags?.[SYSTEM_ID]?.magicCast?.powerCost ?? system.cost ?? 1;
+    const zone = await createYrdenZone(actor, caster, source, power);
+    return { created: 1, skipped: [], zone };
+  }
   if (!targets.length || !targetsOthers(system)) return { created: 0, skipped: [] };
   let caster;
   try { caster = attackerToken(actor); } catch { ui.notifications.warn("Нет токена заклинателя на сцене: цели не назначены."); return { created: 0, skipped: [] }; }
@@ -59,6 +68,8 @@ export async function createSpellStrikes(actor, item, source, { total = null } =
   const valid = [];
   for (const target of targets) {
     if (!target.actor || target.parent?.id !== caster.parent?.id) { skipped.push(`${target.name}: на другой сцене`); continue; }
+    const immunity = spellMentalImmunity(target.actor, system);
+    if(immunity) { skipped.push(`${target.name}: ${immunity}`); continue; }
     const distance = target.uuid === caster.uuid ? 0 : tokenGap(caster, target);
     if (reach && distance != null && distance > reach) { skipped.push(`${target.name}: ${distance} м — дальше дистанции ${reach} м`); continue; }
     valid.push({ target, distance });
@@ -85,13 +96,16 @@ export function registerSpellStrikes() {
   Hooks.on("renderChatMessageHTML", (message, html) => {
     const item = strikeable(message);
     if (!item || message.flags[SYSTEM_ID]?.weaponAttack || !message.speakerActor?.isOwner) return;
+    const yrden = item.system.ruleId === "sign.yrden";
+    if (yrden && (message.flags[SYSTEM_ID].yrdenRegion || message.flags[SYSTEM_ID].yrdenRequest)) return;
     const box = document.createElement("div");
     box.className = "witcher-spell-target";
-    box.innerHTML = `<button type="button"><i class="fa-solid fa-crosshairs"></i> Атаковать выбранные цели (T)</button><small>Выберите цели клавишей T: каждая защищается от этой проверки (${esc(spellDefenses(item.system).label)}).</small>`;
+    box.innerHTML = yrden ? `<button type="button"><i class="fa-solid fa-circle"></i> Разместить круг Ирдена</button><small>Выделите токен заклинателя: круг радиусом 3 м останется на месте на 5 раундов.</small>`
+      : `<button type="button"><i class="fa-solid fa-crosshairs"></i> Атаковать выбранные цели (T)</button><small>Выберите цели клавишей T: каждая защищается от этой проверки (${esc(spellDefenses(item.system).label)}).</small>`;
     box.querySelector("button").addEventListener("click", async event => {
       event.currentTarget.disabled = true;
       try {
-        if (!game.user.targets.size) throw new Error("Сначала выберите цели клавишей T.");
+        if (!yrden && !game.user.targets.size) throw new Error("Сначала выберите цели клавишей T.");
         await createSpellStrikes(message.speakerActor, item, message, { total: message.rolls[0]?.total ?? null });
       } catch (error) { ui.notifications.warn(error.message); event.currentTarget.disabled = false; }
     });

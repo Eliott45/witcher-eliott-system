@@ -10,17 +10,23 @@ import { conditionModifiers } from "./condition-definitions.mjs";
 import { ENHANCED_SENSES, witcherSensesSuppressed } from "./visor.mjs";
 import { environmentModifiers } from "../combat/environment.mjs";
 import { dimeritiumModifiers } from "../magic/dimeritium.mjs";
+import { creatureModeModifiers, creatureIsAmphibian, creatureProfile, creatureMovementMode } from "./creature-modes.mjs";
+import { hagModifiers } from "./hag-circle.mjs";
 
 export const ATTRIBUTE_KEYS = ["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"];
 
 const WOUNDED_ATTRIBUTES = new Set(["intelligence", "reflex", "dexterity", "will"]);
 
 /** Use base BODY/WILL for resource limits: wound penalties must not lower their own threshold. */
-export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, mutations = [], vigor = 0, reputation = {}, creature = null }, { dying = false, dead = false, abilityIds = [], items = [], effects = [], environment = null, dimeritium = null } = {}) {
+export function deriveStatistics({ attributes, health, details = {}, abilityState = {}, lifepath = {}, mutations = [], vigor = 0, reputation = {}, creature = null, parent = null, skills = {} }, { dying = false, dead = false, abilityIds = [], items = [], effects = [], environment = null, dimeritium = null } = {}) {
+  const creatureActor = { id: parent?.id, _id: parent?._id, name: parent?.name, uuid: parent?.uuid, _stats: parent?._stats, flags: parent?.flags,
+    isToken: parent?.isToken, token: parent?.token, getActiveTokens: parent?.getActiveTokens?.bind(parent), system: { attributes, health, creature, skills }, items, effects };
+  const creatureEnvironment = creatureIsAmphibian(creatureActor) && ["water", "underwater"].includes(environment?.terrain?.id)
+    ? { ...environment, terrain: { ...environment.terrain, modifiers: [] } } : environment;
   const background = backgroundModifiers(details, abilityIds).filter(modifier =>
     modifier.source !== ENHANCED_SENSES || !witcherSensesSuppressed(details, items));
   const modifiers = [...background, ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(wearerBonuses), ...conditionModifiers(effects),
-    ...environmentModifiers(environment, { items, effects, senses: background.some(modifier => modifier.source === ENHANCED_SENSES) || Array.from(items).some(item => item.type === "ability" && item.system?.ruleId === "creature.night-vision") }), ...dimeritiumModifiers(dimeritium)];
+    ...environmentModifiers(creatureEnvironment, { items, effects, senses: background.some(modifier => modifier.source === ENHANCED_SENSES) || Array.from(items).some(item => item.type === "ability" && item.system?.ruleId === "creature.night-vision") }), ...dimeritiumModifiers(dimeritium), ...creatureModeModifiers(creatureActor, environment), ...hagModifiers(creatureActor)];
   const reputationBonus = modifierTotal(modifiers, "reputation");
   const reputationTotal = reputationLevel(reputation.value, reputationBonus);
   modifiers.push(...reputationModifiers(reputation, reputationTotal));
@@ -35,7 +41,7 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const counted = modifiers.filter(modifier => !modifier.resourceNeutral);
   const limitValue = key => attributes[key] === null ? null
     : Math.floor((attributes[key] + modifierTotal(counted, `attributes.${key}`)) * modifierFactor(counted, `attributes.${key}`));
-  for (const key of ATTRIBUTE_KEYS) if (adjusted[key] !== null && modifiers.some(modifier=>modifier.category==="effect"&&modifier.target===`attributes.${key}`)) adjusted[key]=Math.max(0,adjusted[key]);
+  for (const key of ATTRIBUTE_KEYS) if (adjusted[key] !== null && modifiers.some(modifier=>["effect","creature"].includes(modifier.category)&&modifier.target===`attributes.${key}`)) adjusted[key]=Math.max(0,adjusted[key]);
   for (const key of ["reflex", "dexterity"]) if (ev && adjusted[key] !== null) adjusted[key] = Math.max(1, adjusted[key]);
   if (modifiers.some(modifier => modifier.source === "witcher.dulled-emotions") && adjusted.empathy !== null) adjusted.empathy = Math.min(6, Math.max(1, adjusted.empathy));
   const { body, will } = adjusted;
@@ -60,7 +66,8 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const { speed } = effective;
   // Printed creature exceptions (bird RUN 10, fiend REC 11) override the ordinary formulas.
   // Movement still follows changes to SPEED, and recovery still receives its own effect modifiers.
-  const run = speed === null ? null : creature?.runBase > 0 && attributes.speed > 0 ? Math.floor(creature.runBase * speed / attributes.speed) : speed * 3;
+  const flyingBird = creatureProfile(creatureActor)?.id === "bird" && creatureMovementMode(creatureActor, environment) === "flying";
+  const run = speed === null ? null : !flyingBird && creature?.runBase > 0 && attributes.speed > 0 ? Math.floor(creature.runBase * speed / attributes.speed) : speed * 3;
   const recoveryBase = creature?.recoveryBase > 0 ? creature.recoveryBase : physical;
   return {
     healthMax, staminaMax, resolveMax, meleeDamageBonus: modifierTotal(modifiers, "meleeDamage"), physicalDamageBonus: modifierTotal(modifiers, "physicalDamage"), encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),

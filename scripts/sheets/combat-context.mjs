@@ -25,8 +25,10 @@ import { MONSTER_CATEGORIES } from "../data/monster-categories.mjs";
 import { applyOil } from "../workshop/upgrades.mjs";
 import { duelOf, VERBAL_ATTACKS, VERBAL_LEVERS, VERBAL_DEFENSES, TORTURE, verbalAttack } from "../combat/verbal-duel.mjs";
 import { healingContext, healingPatient, stabilizePatientWound, treatPatientWound, startNaturalHealing, restDay, stabilizeDying } from "../combat/healing.mjs";
+import { creatureHasInfiniteStamina } from "../data/creature-modes.mjs";
 
 export function combatContext(actor,options={}) {
+  const infiniteStamina=creatureHasInfiniteStamina(actor);
   const fastPending=actor.flags?.[SYSTEM_ID]?.fastStrike?.round===(actionRoundKey(actor)||"free");
   const quickDraw=Boolean(statusEffect(actor,"quick-draw"));
   const extra=Boolean(actor.system.combatAction?.extra),key=actionRoundKey(actor),used=Boolean(key&&actor.system.combatAction?.lastExtraRound===key);
@@ -51,18 +53,18 @@ export function combatContext(actor,options={}) {
   const hasOils=Array.from(actor.items??[]).some(entry=>entry.system?.alchemy?.category==="oil"&&available(entry));
   const bombs=actor.type==="npc"?[]:Array.from(actor.items??[]).filter(item=>isBomb(item)&&(item.system.quantity??0)>0&&item.system.carried!==false).map(item=>{const profile=bombProfile(item),body=actor.system.statistics.effective.body??0;
     return {id:item.id,name:item.name,img:item.img,quantity:item.system.quantity,summary:[`радиус ${profile.radius} м`,profile.damage?`урон ${profile.damage}`:"",`дальность ${body*4} м`].filter(Boolean).join(" · "),properties:item.system.properties??""};});
-  return { duel, healing:healingContext(actor), unarmed, bombs, environment:environmentSummary(environmentState), snow:environmentState?.terrain.id==="snow", feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"auto",modifier:options.modifier??0,
+  return { duel, infiniteStamina, healing:healingContext(actor), unarmed, bombs, environment:environmentSummary(environmentState), snow:environmentState?.terrain.id==="snow", feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"auto",modifier:options.modifier??0,
     grapple:(()=>{const state=grappleState(actor);return {options:grappleOptions(actor),holding:state.holding?{name:state.holding.name,pinned:state.holding.pinned,choking:state.holding.choking}:null,heldBy:state.heldBy?{name:state.heldBy.name}:null};})(),
     fullTurn,defenses,quickDraw,canQuickDraw:canAct&&Boolean(globalThis.game?.combat?.started&&Array.from(globalThis.game.combat.combatants).some(entry=>entry.actor?.uuid===actor.uuid)),ambush:{active:Boolean(ambush),targets:ambushTargets,count:ambushTargets.length,
       canPrepare:Boolean(canAct&&ambusher&&!encounter.started&&!tacticsFlags(ambusher).tacticRequest),pending:Boolean(tacticsFlags(ambusher).tacticRequest)},
-    repeat:!fullTurn.activeDodge&&Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
+    repeat:!fullTurn.activeDodge&&!infiniteStamina&&Boolean(options.repeat),defenseModifier:options.defenseModifier??0,
     incoming:INCOMING_ATTACKS.map(entry=>({...entry,selected:entry.id===(options.incoming??"melee")})),
     locations:ATTACK_LOCATIONS.map(entry=>({...entry,selected:entry.id===(options.location??"random")})),
     ranges:RANGED_BANDS.map(entry=>({...entry,selected:entry.id===(options.range??"auto")})),
     weapons:Array.from(actor.items ?? []).filter(item=>item.type==="weapon").map(item=>{
       const modes=attackModes(actor,item).map(mode=>{
         const quote=weaponAttack(actor,item,{...options,mode:mode.id,extraPenalty:extra?-3:0});
-        const reason=quote.blocked||(!canAct?"Нельзя действовать":extra&&(used||actor.system.stamina.value<3)?"Дополнительное действие недоступно":"");
+        const reason=quote.blocked||(!canAct?"Нельзя действовать":extra&&(used||!infiniteStamina&&actor.system.stamina.value<3)?"Дополнительное действие недоступно":"");
         const second=mode.pair&&fastPending&&actor.flags[SYSTEM_ID].fastStrike.extra===extra;
         const label=mode.pair?(second?"Быстрая · удар 2/2":"Быстрая · удар 1/2"):mode.name;
         const pairHint=mode.pair?(second?"Второй удар той же быстрой атаки: можно по другой цели, нового действия не нужно. ":"Быстрая атака — два удара за одно действие. Каждый удар бросается отдельно. "):"";
@@ -135,7 +137,7 @@ export const combatActions={
       const ammoId=target.closest(".witcher-attack-card")?.querySelector("[data-bolt-choice]")?.value||"";
       const {ammo,items}=loadUpdate(this.actor,item,ammoId),quote=actionQuote(this.actor);
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor:this.actor}),
-        content:`<p>${esc(item.name)} заряжен: ${esc(ammo.name)} — действие${quote.extra?"; дополнительно, 3 ВЫН":""}.</p>`,flags:{[SYSTEM_ID]:{skipLuck:true}}},game.settings.get("core","messageMode")));
+        content:`<p>${esc(item.name)} заряжен: ${esc(ammo.name)} — действие${quote.extra?`; дополнительно, ${quote.stamina} ВЫН`:""}.</p>`,flags:{[SYSTEM_ID]:{skipLuck:true}}},game.settings.get("core","messageMode")));
       if(message){await this.actor.update({...actionUpdate(this.actor,quote),items});await consumeAiming(this.actor);}
     });
   }),
@@ -153,7 +155,7 @@ export const combatActions={
       const quote=actionQuote(this.actor);if(!quote.extra)return;
       await this.actor.update(actionUpdate(this.actor,quote));
       await consumeAiming(this.actor);
-      ui.notifications.info("Дополнительное действие без проверки: потрачено 3 ВЫН.");
+      ui.notifications.info(`Дополнительное действие без проверки: потрачено ${quote.stamina} ВЫН.`);
     });
   })
 };

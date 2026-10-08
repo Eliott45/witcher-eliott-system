@@ -3,7 +3,12 @@ import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { actionQuote, actionNote, actionUpdate } from "./action-economy.mjs";
 import { weaponAttack, signed, hitLocation } from "./weapon-rules.mjs";
-import { damageTypeLabel } from "./damage-rules.mjs";
+import { damageTypeLabel, weaponDamageTraits } from "./damage-rules.mjs";
+import { weaponHitTraits } from "./weapon-hit-effects.mjs";
+import { chooseArrow, ammunitionWeapon } from "./bow-ammo.mjs";
+import { useCreatureAction } from "./creature-actions.mjs";
+import { creatureInvisible } from "../data/creature-modes.mjs";
+import { afterCreatureAttack } from "./creature-modes.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { consumeAiming } from "./full-turn-rules.mjs";
 import { selectedAttackTarget } from "./attack-target.mjs";
@@ -26,6 +31,9 @@ export function attackModifierMarkup(parts) {
 
 const pending = new WeakMap();
 export function rollWeaponAttack(actor,itemId,options={}) {
+  const creatureWeapon=actor.items.get(itemId)?.system.ruleId;
+  if(creatureWeapon==="creature.weapon.endrega-drone.1")return useCreatureAction(actor,"needles",options);
+  if(creatureWeapon==="creature.weapon.arachas.1")return useCreatureAction(actor,"web",options);
   if(pending.has(actor))return pending.get(actor);
   const work=inventoryWrite(actor,async()=>{
     const targetContext=selectedAttackTarget(actor,options),combat=options.combatId?game.combats.get(options.combatId):globalThis.game?.combat;
@@ -41,6 +49,11 @@ export function rollWeaponAttack(actor,itemId,options={}) {
     // Unarmed strikes (core p.163) share the attack card; the second blow of a joint attack is part of the same action.
     const quote=options.unarmed?unarmedAttack(actor,options.unarmed,attackOptions):weaponAttack(actor,item,attackOptions);
     if(quote.blocked)throw new Error(quote.blocked);
+    const arrow = await chooseArrow(actor,item,quote.attack.count,options.ammoId);
+    if (arrow === false) return;
+    const bolt=loadedBolt(item), projectile=arrow || bolt;
+    quote.weapon=ammunitionWeapon(quote.weapon,projectile);
+    if (projectile && /несмертельн/iu.test(projectile.properties ?? "")) quote.nonLethal=true;
     if(options.free){action.stamina=0;}
     // The second strike of a fast attack belongs to the same action: no new STA for an extra action.
     const pair=fastPair(actor,quote.attack,action),strike=pair?(pair.second?2:1):0;
@@ -51,8 +64,7 @@ export function rollWeaponAttack(actor,itemId,options={}) {
       for(let i=0;i<quote.attack.count;i++)rolls.push(await new foundry.dice.Roll(`1d10wc + ${quote.total}`,{}, {flavor:`${quote.name} · ${i+1}/${quote.attack.count}`}).evaluate({allowInteractive:messageMode!=="blind"}));
       const math=quote.parts.filter(part=>part.value||part.label==="Основа навыка").map(part=>`${part.label}: ${signed(part.value)}`).join("; ");
       const types=damageTypeLabel(quote.weapon.damageType);
-      const bolt=loadedBolt(item);
-      const notes=[quote.ranged&&quote.band.distance!=null?`${quote.band.name} (дальность оружия ${quote.range} м).`:"",bolt?`Болт: ${bolt.name}${bolt.properties?` (${bolt.properties})`:""}.`:"",quote.nonLethal?"Несмертельный урон: отнимает Выносливость.":"",quote.attack.charge?"С разбега: полный ход. Если удар заблокируют — Сила против Силы, чтобы сбить с ног.":"",
+      const notes=[quote.ranged&&quote.band.distance!=null?`${quote.band.name} (дальность оружия ${quote.range} м).`:"",projectile?`${arrow?"Стрелы":"Болт"}: ${projectile.name}${projectile.properties?` (${projectile.properties})`:""}.`:"",quote.nonLethal?"Несмертельный урон: отнимает Выносливость.":"",quote.attack.charge?"С разбега: полный ход. Если удар заблокируют — Сила против Силы, чтобы сбить с ног.":"",
         quote.attack.push?"Толчок: цель отлетает на ТЕЛ/3 м.":"",quote.attack.dual?"Парная атака: блок и парирование — только с двумя оружиями или оружием и щитом.":"",quote.attack.hint&&quote.attack.special?quote.attack.hint:""].filter(Boolean);
       const flavor=`<section class="witcher-attack-chat"><h3>${esc(quote.name)} · ${esc(quote.attack.name)}${strike?` ${strike}/2`:""}</h3>${notes.map(note=>`<p class="witcher-attack-note">${esc(note)}</p>`).join("")}${types?`<p class="witcher-damage-type">Урон: ${esc(types)}</p>`:""}<p data-tooltip="${esc(math)}">База проверки <b>${signed(quote.total)}</b> · ${quote.attack.count} ${quote.attack.count===1?"бросок":"броска"}</p>`
         +(targetContext?`<p>Цель: <b>${esc(targetContext.target.name)}</b></p>`:"<small>Цель не выбрана — направление взгляда не учтено.</small>")
@@ -65,8 +77,8 @@ export function rollWeaponAttack(actor,itemId,options={}) {
         +`<small>Каждое попадание — отдельный урон и зона. Сравните атаку с защитой цели.</small></section>`;
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls,flavor,
         flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId:itemId??null,name:quote.name,mode:quote.attack.id,unarmed:options.unarmed??null,nonLethal:Boolean(quote.nonLethal),
-          special:quote.attack.special??null,charge:Boolean(quote.attack.charge),push:Boolean(quote.attack.push),dual:Boolean(quote.attack.dual),base:quote.total,count:quote.attack.count,
-          damage:quote.damage,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
+          special:quote.attack.special??null,attackingInvisible:creatureInvisible(actor),charge:Boolean(quote.attack.charge),push:Boolean(quote.attack.push),dual:Boolean(quote.attack.dual),base:quote.total,count:quote.attack.count,
+          damage:quote.damage,traits:weaponDamageTraits(quote.weapon),hitTraits:weaponHitTraits(quote.weapon,actor),ammunition:projectile?{name:projectile.name,ruleId:projectile.ruleId}:null,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
           target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,ranged:quote.ranged,band:quote.band.id,dc:quote.band.dc??null,thrown:quote.weapon.category==="thrown",combat:combat?.started?{id:combat.id,round:combat.round}:null,strike,damageTypes:damageTypeLabel(quote.weapon.damageType)}}}},messageMode));
       if(!message)return;
       await display.wait(message);
@@ -74,7 +86,9 @@ export function rollWeaponAttack(actor,itemId,options={}) {
       if(pair&&!pair.second){delete update["system.combatAction.extra"];delete update["system.combatAction.lastExtraRound"];}
       if(!options.free)update[`flags.${SYSTEM_ID}.fastStrike`]=pair&&!pair.second?{round:pair.key,extra:action.extra,itemId:itemId??""}:null;
       if(bolt)update.items=[firedUpdate(item)];
+      if(arrow)update.items=[...(update.items??[]),{_id:arrow.item.id,"system.quantity":arrow.item.system.quantity-arrow.count}];
       if(Object.keys(update).length)await actor.update(update);
+      await afterCreatureAttack(actor);
       await consumeAiming(actor);
       await consumeFeint(actor);
       return message;

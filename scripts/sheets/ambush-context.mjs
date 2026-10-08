@@ -39,7 +39,7 @@ export function groupCardContext(combat, sessionId, user = game.user) {
   });
   const groups = ROLE_GROUPS.map(group => ({...group,rows:rows.filter(row => row.role === group.role)})).filter(group => group.rows.length);
   const observers = rows.filter(row => row.role === "awareness");
-  const matrix = ambushMatrix(session).filter(row => visible(row)).map(row => {
+  const matrix = ambushMatrix(session,combat).filter(row => visible(row)).map(row => {
     const own = rows.find(entry => entry.id === row.id);
     const cells = row.cells.filter(cell => observers.some(observer => observer.id === cell.observer)).map(cell => {
       const observer = observers.find(entry => entry.id === cell.observer);
@@ -48,7 +48,7 @@ export function groupCardContext(combat, sessionId, user = game.user) {
         status:cell.unseen === null ? "ждём бросок" : cell.unseen ? "не заметил" : "заметил",
         hint:cell.unseen === null ? "Ожидается проверка" : cell.unseen ? "Не заметил · +5 к атакам" : "Заметил · без бонуса"};
     });
-    return {name:own.name,img:own.img,total:own.rolled ? own.total : null,cells,unseenCount:cells.filter(cell => cell.unseen).length};
+    return {name:own.name,img:own.img,total:row.effectiveTotal,sharedStealth:row.sharedStealth,cells,unseenCount:cells.filter(cell => cell.unseen).length};
   });
   const phase = combat.round > 1 ? "Первый раунд завершён" : combat.started ? "Бой начался · бонусы до конца первого раунда"
     : ({checks:"Участники выполняют проверки",ready:"Проверки завершены",opening:"Проверки завершены",initiative:"Бросаем инициативу",cancelled:"Засада отменена"})[session.status];

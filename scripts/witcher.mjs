@@ -5,6 +5,7 @@ import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from 
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
 import { migrateBestiaryContent,migrateBestiaryCreatures,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
 import { migrateBestiaryCorrections } from "./migrations/bestiary-corrections.mjs";
+import { migrateBestiaryAutomation } from "./migrations/bestiary-automation.mjs";
 import { migratePregenContent,registerPregenMigration } from "./migrations/pregen-content.mjs";
 import { registerWeaponChat } from "./combat/weapon-rolls.mjs";
 import { registerGroupAmbush } from "./chat/group-ambush.mjs";
@@ -34,6 +35,10 @@ import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
 import { registerRollBreakdown } from "./chat/roll-breakdown.mjs";
 import { registerAttackExchange } from "./combat/attack-exchange.mjs";
+import { registerCreatureSpirits } from "./combat/creature-spirits.mjs";
+import { registerHagActions } from "./combat/hag-actions.mjs";
+import { registerCreatureActions } from "./combat/creature-actions.mjs";
+import { registerCreatureModes } from "./combat/creature-modes.mjs";
 import { registerTokenEffectsPanel } from "./canvas/token-effects-panel.mjs";
 import { registerMovementEffects } from "./combat/movement-effects.mjs";
 import { registerQuickDraw } from "./combat/quick-draw.mjs";
@@ -115,6 +120,10 @@ Hooks.once("init", async () => {
   registerStubbornnessChat();
   registerRollBreakdown();
   registerAttackExchange();
+  registerCreatureSpirits();
+  registerHagActions();
+  registerCreatureActions();
+  registerCreatureModes();
   registerTokenEffectsPanel();
   registerMovementEffects();
   registerQuickDraw();
@@ -216,7 +225,7 @@ Hooks.once("ready", async () => {
     console.error(`${SYSTEM_ID} | Could not update vision defaults`, error);
     ui.notifications.error(game.i18n.localize("WITCHER.Token.MigrationFailed"));
   });
-  migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
+  migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).then(migrateBestiaryAutomation).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
   migrateSpellContent().catch(error=>{
     console.error(`${SYSTEM_ID} | Could not update magic content`,error);
     ui.notifications.error("Не удалось обновить каталог магии. Подробности в консоли.");

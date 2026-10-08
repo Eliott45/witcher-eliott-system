@@ -6771,6 +6771,52 @@
     "flags": {}
   },
   {
+    "_id": "bombMoonDust0001",
+    "name": "Бомба «Лунная пыль»",
+    "type": "equipment",
+    "img": "icons/svg/explosion.svg",
+    "system": {
+      "ruleId": "bomb.moon-dust",
+      "kind": "gear",
+      "weight": 1,
+      "price": 199,
+      "damageType": "С",
+      "properties": "Бомба; Радиус 8 м; Подавление невидимости, бесплотности, регенерации и превращений — 20 раундов",
+      "source": "Базовая книга, стр. 254",
+      "description": "<p>Бросок — Атлетика; дальность ТЕЛ × 4 м. Все невидимые или неосязаемые существа в радиусе 8 м становятся видимыми и осязаемыми на 20 раундов. Попавшие под действие чудовища не могут регенерировать или превращаться до окончания эффекта, даже покинув место взрыва. Прямого урона нет.</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "bombDimeritium01",
+    "name": "Двимеритовая бомба",
+    "type": "equipment",
+    "img": "icons/svg/explosion.svg",
+    "system": {
+      "ruleId": "bomb.dimeritium",
+      "kind": "gear",
+      "weight": 1,
+      "price": 264,
+      "damageType": "С",
+      "properties": "Бомба; Радиус 8 м; Зона без магии — 20 раундов",
+      "source": "Базовая книга, стр. 254",
+      "description": "<p>Бросок — Атлетика; дальность ТЕЛ × 4 м. В радиусе 8 м от взрыва нельзя использовать магию в течение 20 раундов. Запрет действует только внутри зоны; прямого урона нет.</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "bombSamum0000001",
     "name": "Бомба «Самум»",
     "type": "equipment",
