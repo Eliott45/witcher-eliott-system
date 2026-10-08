@@ -99,6 +99,29 @@ test("casting reuses effective skill including armor, native exploding d10 and c
     assert.deepEqual(events,["roll","message","update"]);
   }
 });
+test("NPC mage casts Aenye with focus 2, spends three stamina and accumulates magic only within the current round",async()=>{
+  const {actor,spell,messages}=fixture();
+  actor.type="npc";actor.system.details.profession="mage";
+  actor.system.vigor=10;actor.system.stamina.value=30;actor.system.skills.spellCasting=7;
+  actor.items.push({id:"iron-staff",name:"Железный посох",type:"weapon",system:{ruleId:"weapon.iron-staff",properties:"Длинное; Фокусирующее (2)",
+    quantity:1,carried:true,equipped:true,containerId:"",reliability:{value:15,max:15}}});
+  game.combat={id:"npc-fight",started:true,round:1,combatants:[{actor}]};
+  const item=spell("aenye");
+  await castSpell(actor,item.id,{focusId:"iron-staff"});
+  assert.equal(messages[0].roll.formula,"1d10wc + 15");
+  assert.match(messages[0].flavor,/5 − 2 = 3 ВЫН/u);
+  assert.equal(actor.system.stamina.value,27);assert.equal(actor.system.magic.spent,3);
+  await castSpell(actor,item.id,{focusId:"iron-staff"});
+  assert.equal(actor.system.stamina.value,24);assert.equal(actor.system.magic.spent,6);
+  assert.equal(actor.system.magic.roundKey,"npc-fight:1");
+  game.combat.round=2;
+  await castSpell(actor,item.id,{focusId:"iron-staff"});
+  assert.equal(actor.system.stamina.value,21);assert.equal(actor.system.magic.spent,3);
+  assert.equal(actor.system.magic.roundKey,"npc-fight:2");
+  assert.equal(actor.system.health.value,40);
+  assert.deepEqual(messages.map(message=>message.flags[SYS].magicCast.stamina),[3,3,3]);
+});
+
 test("blocked, unknown, unaffordable and unconfirmed overload casts never roll or debit",async()=>{
   const {actor,spell,events}=fixture(),item=spell("aenye");
   actor.system.stamina.value=4;await assert.rejects(castSpell(actor,item.id),/Недостаточно/);

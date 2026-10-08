@@ -73,7 +73,7 @@ export function bindSpellFilters(root,filters={},onChange=()=>{}) {
 }
 
 export function bindMagic(sheet) {
-  const root=sheet.element.querySelector("[data-tab=magic].witcher-character-content");
+  const root=sheet.element.querySelector("[data-tab=magic].witcher-magic-page");
   bindSpellFilters(root,sheet.magicFilters,state=>{sheet.magicFilters=state;});
   sheet.openSpells??=new Set();
   for(const row of root.querySelectorAll("[data-spell-row]")) {

@@ -16,6 +16,7 @@ import { itemPresentation,toggleItemDescription,postItem,searchItemTrait } from 
 import { chooseContainer,toggleContainer,dropPhysicalItem } from "./container-actions.mjs";
 import { viewSheetItem,removeSheetItem,createAbility,browseAbilities } from "./sheet-items.mjs";
 import { combatContext,combatActions,bindCombat } from "./combat-context.mjs";
+import { magicContext,magicActions,bindMagic,learnSpell } from "./magic-context.mjs";
 import { effectActions,effectsContext } from "./effects-context.mjs";
 import { workshopActorActions, workshopActorContext } from "./workshop-actor-context.mjs";
 import { rollActionCheck } from "../combat/action-economy.mjs";
@@ -34,7 +35,7 @@ const guard=fn=>async function(...args){try{return await fn.apply(this,args);}ca
 export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
   editing=false;
   static DEFAULT_OPTIONS={classes:["witcher-eliott","npc-sheet"],position:{width:820,height:820},window:{resizable:true},form:{submitOnChange:true,closeOnSubmit:false},actions:{
-    ...combatActions,...effectActions,...workshopActorActions,...consumptionActions,
+    ...combatActions,...magicActions,...effectActions,...workshopActorActions,...consumptionActions,
     equipItem,dropToGround,toggleVisor,changeGrip,createInventoryItem,browseEquipment,addCatalogItem,changeInventoryQuantity,toggleCarried,toggleInventoryGroup,
     toggleItemDescription,postItem,searchItemTrait,chooseContainer,toggleContainer,viewSheetItem,removeSheetItem,createAbility,browseAbilities,
     editCreature:guard(async function(){if(this.isEditable){this.editing=!this.editing;await this.render();}}),
@@ -65,14 +66,16 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     removeCreatureRow:guard(async function(_e,target){if(!this.isEditable)return;const key=target.dataset.list;if(!["loot","lore"].includes(key))return;await this.actor.update({[`system.creature.${key}`]:this.actor.system.creature[key].filter((_r,i)=>i!==Number(target.dataset.index))});})
   }};
   static PARTS={content:{template:`systems/${SYSTEM_ID}/templates/npc-sheet.hbs`,scrollable:[".witcher-npc-body"]}};
-  static TABS={creature:{initial:"combat",tabs:[{id:"combat",label:"Бой",icon:"fa-solid fa-swords"},{id:"inventory",label:"Инвентарь",icon:"fa-solid fa-sack"},{id:"lore",label:"Сведения",icon:"fa-solid fa-book-open"},{id:"effects",label:"Эффекты",icon:"fa-solid fa-person-rays"}]}};
+  static TABS={creature:{initial:"combat",tabs:[{id:"combat",label:"Бой",icon:"fa-solid fa-swords"},{id:"magic",label:"Магия",icon:"fa-solid fa-sparkles"},{id:"inventory",label:"Инвентарь",icon:"fa-solid fa-sack"},{id:"lore",label:"Сведения",icon:"fa-solid fa-book-open"},{id:"effects",label:"Эффекты",icon:"fa-solid fa-person-rays"}]}};
   async _prepareContext(options) {
     const context=await super._prepareContext(options),actor=this.actor,system=actor.system,stats=system.statistics,editing=this.isEditable&&this.editing;
+    const magic=await magicContext(actor);
+    magic.canCast&&=this.isEditable;magic.canMaintain&&=this.isEditable;
     const inventory=inventoryContext(actor,sheetPreferences(actor.uuid));
     await Promise.all(inventory.items.map(async row=>{row.containerOpen=!this.collapsedContainers?.has(row.id);row.expanded=this.expandedInventoryItems?.has(row.id)??false;row.presentation=row.expanded?await itemPresentation(actor.items.get(row.id),{secrets:actor.isOwner}):null;}));
     const i18n={localize:key=>game.i18n.localize(key),format:(key,data)=>game.i18n.format(key,data)};
     const abilities=await Promise.all(actor.items.filter(item=>item.type==="ability").map(async item=>({id:item.id,name:item.name,img:item.img,description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:actor.isOwner,relativeTo:item})})));
-    return {...context,actor,system,stats,editing,inventory,abilities,workshop:await workshopActorContext(actor,{editing}),isGM:game.user.isGM,conditions:conditionRules(actor),combat:combatContext(actor,this.combatOptions),effects:await effectsContext(this),
+    return {...context,actor,system,stats,editing,inventory,abilities,magic,workshop:await workshopActorContext(actor,{editing}),isGM:game.user.isGM,conditions:conditionRules(actor),combat:combatContext(actor,this.combatOptions),effects:await effectsContext(this),
       empty:!actor.items.size&&ATTRIBUTE_KEYS.every(key=>system.attributes[key]===null),regeneration:creatureRegeneration(actor),
       canRestoreItems:!actor.items.size&&Boolean(bestiaryPreset(actor)),
       categories:MONSTER_CATEGORIES.map(entry=>({...entry,selected:entry.id===system.creature.category})),category:MONSTER_CATEGORIES.find(c=>c.id===system.creature.category)?.name,
@@ -85,7 +88,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
       defenses:["resistMagic","endurance"].map(key=>({key,name:i18n.localize(`WITCHER.Skills.Entries.${key}.Label`),total:skillValue(system,key).total??"—"}))};
   }
   async _onRender(context,options) {
-    await super._onRender(context,options);bindInventory(this);bindCombat(this);
+    await super._onRender(context,options);bindInventory(this);bindCombat(this);bindMagic(this);
     // The model caps HP/STA anyway; clamp the field too, otherwise an unchanged value keeps showing the typed number.
     for(const field of this.element.querySelectorAll("[data-clamp-max]"))field.addEventListener("change",()=>{
       const max=Number(field.dataset.clampMax);if(Number.isFinite(max)&&Number(field.value)>max)field.value=max;
@@ -106,6 +109,6 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
       }).catch(error=>ui.notifications.error(error.message));
     });
   }
-  _toggleDisabled(disabled){super._toggleDisabled(disabled);for(const control of this.element.querySelectorAll('[data-action="tab"],[data-action="viewSheetItem"],[data-action="toggleItemDescription"],[data-inventory-search],[data-action="toggleInventoryGroup"],[data-action="toggleContainer"]'))control.disabled=false;}
-  async _onDropItem(event,item){if(!this.isEditable)return null;if(item.parent?.type==="loot")return void await takeLootByDrop(this.actor,item).catch(error=>ui.notifications.warn(error.message));if(item.type==="effect")return applyEffectItem(this.actor,item);if(isPhysical(item))return dropPhysicalItem(this,event,item);return super._onDropItem(event,item);}
+  _toggleDisabled(disabled){super._toggleDisabled(disabled);for(const control of this.element.querySelectorAll('[data-action="tab"],[data-action="viewSheetItem"],[data-action="toggleItemDescription"],[data-inventory-search],[data-action="toggleInventoryGroup"],[data-action="toggleContainer"],[data-action="browseSpells"],[data-magic-search],[data-magic-tradition],[data-magic-element],[data-magic-grade]'))control.disabled=false;}
+  async _onDropItem(event,item){if(!this.isEditable)return null;if(item.parent?.type==="loot")return void await takeLootByDrop(this.actor,item).catch(error=>ui.notifications.warn(error.message));if(item.type==="effect")return applyEffectItem(this.actor,item);if(isPhysical(item))return dropPhysicalItem(this,event,item);if(item.type==="spell"){await learnSpell(this.actor,item);return null;}return super._onDropItem(event,item);}
 }

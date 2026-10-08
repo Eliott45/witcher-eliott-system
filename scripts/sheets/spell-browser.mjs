@@ -14,7 +14,7 @@ export async function browseSpells(actor,{study=false}={}) {
   const spells=await Promise.all(documents.map(async item=>({...spellEntry(item),id:item.uuid,
     description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:false,relativeTo:item})})));
   const content=await foundry.applications.handlebars.renderTemplate(`systems/${SYSTEM_ID}/templates/spell-browser.hbs`,{
-    spells,study,actorName:actor.name,traditions:Object.entries(MAGIC_CATEGORIES).map(([id,label])=>({id,label})),elements:Object.entries(SPELL_ELEMENTS).map(([id,label])=>({id,label})),grades:Object.entries(SPELL_GRADES).map(([id,label])=>({id,label}))});
+    spells,study,isNPC:actor.type==="npc",actorName:actor.name,traditions:Object.entries(MAGIC_CATEGORIES).map(([id,label])=>({id,label})),elements:Object.entries(SPELL_ELEMENTS).map(([id,label])=>({id,label})),grades:Object.entries(SPELL_GRADES).map(([id,label])=>({id,label}))});
   const subscriptions=[];
   try {return await foundry.applications.api.DialogV2.wait({classes:["witcher-picker","witcher-spell-browser"],window:{title:"Каталог магии",resizable:true},position:{width:840,height:700},content,
     buttons:[{action:"close",label:"Закрыть"}],render:(_event,dialog)=>{

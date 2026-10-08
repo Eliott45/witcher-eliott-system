@@ -46,6 +46,21 @@ test("dimeritium lowers Vigor by 1 per unit within 5 m and to 0 on contact; witc
   assert.match(castingComponents(4), /слова/); assert.match(castingComponents(8), /только пассы/); assert.match(castingComponents(10), /любой частью тела/);
 });
 
+test("a bestiary mage's dimeritium vulnerability is a description, not carried metal lowering Vigor", async () => {
+  const { dimeritiumState, isDimeritium } = await import("../scripts/magic/dimeritium.mjs");
+  const { bestiarySources } = await import("../scripts/data/bestiary.mjs");
+  const { deriveStatistics } = await import("../scripts/data/statistics.mjs");
+  const mage = bestiarySources().find(source => source.name === "Маг");
+  assert.ok(mage.items.some(item => item.type === "ability" && /Двимерит/u.test(item.name)));
+  assert.equal(dimeritiumState(mage), null);
+  assert.equal(deriveStatistics(mage.system, { items: mage.items, dimeritium: dimeritiumState(mage) }).vigor, 10);
+  for (const type of ["ability", "spell", "recipe"]) assert.equal(isDimeritium({ type, name: "Двимерит", system: { ruleId: "dimeritium" } }), false);
+  for (const type of ["weapon", "armor", "equipment"]) assert.equal(isDimeritium({ type, name: "Двимеритовый предмет", system: { kind: "container" } }), true);
+  mage.items.push({ type: "equipment", name: "Слиток", system: { ruleId: "material.dimeritium", quantity: 2, carried: true } });
+  assert.deepEqual(dimeritiumState(mage), { nearby: 2, touching: false });
+  assert.equal(deriveStatistics(mage.system, { items: mage.items, dimeritium: dimeritiumState(mage) }).vigor, 8);
+});
+
 test("magical fumble rows follow the table on p.166", async () => {
   const { fumbleRow, ELEMENT_STATUS } = await import("../scripts/magic/magic-fumble.mjs");
   assert.equal(fumbleRow(0), null);

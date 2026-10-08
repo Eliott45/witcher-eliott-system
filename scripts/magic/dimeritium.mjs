@@ -1,12 +1,14 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { tokenGap } from "../combat/attack-target.mjs";
+import { isPhysical } from "../data/physical-items.mjs";
 
 // Core p.167 «Двимерит, погибель магов». Every unit of dimeritium within 5 m lowers a magic adept's Vigor by 1;
 // touching it drops Vigor to 0 and calls for an Endurance check (DC 16) on the dimeritium table, repeated
 // every half hour of contact. Witchers are not magic adepts (p.166 sidebar) and are not affected.
 export const DIMERITIUM_RANGE = 5;
 export const DIMERITIUM_CONTACT = "dimeritium-contact";
-export const isDimeritium = item => item?.type !== "recipe" && (/dimeritium/u.test(item?.system?.ruleId ?? "") || /двимерит/iu.test(item?.name ?? ""));
+export const isDimeritium = item => Boolean(item && isPhysical(item) && item.type !== "recipe"
+  && (/dimeritium/u.test(item.system?.ruleId ?? "") || /двимерит/iu.test(item.name ?? "")));
 const units = item => Math.max(0, item.system?.quantity ?? 1);
 const carried = item => item.system?.carried !== false;
 
