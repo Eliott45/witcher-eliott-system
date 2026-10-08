@@ -1111,6 +1111,20 @@ for (const [collection, pack] of game.packs) {
 const referenceSheet = new WitcherItemSheet();
 referenceSheet.isEditable = false;
 const itemTemplate = handlebars.compile(await readFile(new URL("../templates/item-sheet.hbs", import.meta.url), "utf8"), { strict: true });
+for (const [ruleId, dc, sp, zones] of [["armor.raven", 14, 12, "torso-legs"], ["armor.mountain-folk", 16, 24, "all"], ["armor.draug", 18, 36, "all"]]) {
+  const relic = [...documents.values()].find(item => item.system?.ruleId === ruleId);
+  assert.ok(relic, `${ruleId}: missing catalog armor`);
+  assert.equal(relic.system.stoppingPower.max, sp);
+  assert.equal(relic.system.zone, zones);
+  assert.equal(relic.system.enhancementSlots, 3);
+  referenceSheet.item = relic;
+  const context = await referenceSheet._prepareContext({});
+  assert.equal(context.relicLore.dc, dc);
+  const html = itemTemplate(context);
+  assert.match(html, /data-action="rollRelicLore"/);
+  assert.ok(html.includes(`Образование СЛ ${dc}`));
+  assert.doesNotMatch(html.match(/<button[^>]*data-action="rollRelicLore"[^>]*>/)?.[0] ?? "", /disabled/);
+}
 const nativeLinenDiagram = [...documents.values()].find(item => item.system?.ruleId === "diagram.material.linen");
 referenceSheet.item = await foundry.utils.fromUuid(nativeLinenDiagram.uuid);
 const nativeRecipeContext = await referenceSheet._prepareContext({});

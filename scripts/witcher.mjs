@@ -34,6 +34,7 @@ import { migrateEffectContent, registerEffectContentMigration } from "./migratio
 import { registerEffectDurationChat } from "./chat/effect-duration.mjs";
 import { registerStubbornnessChat } from "./chat/stubbornness.mjs";
 import { registerRollBreakdown } from "./chat/roll-breakdown.mjs";
+import { registerRelicLore } from "./sheets/relic-lore.mjs";
 import { registerAttackExchange } from "./combat/attack-exchange.mjs";
 import { registerCreatureSpirits } from "./combat/creature-spirits.mjs";
 import { registerHagActions } from "./combat/hag-actions.mjs";
@@ -120,6 +121,7 @@ Hooks.once("init", async () => {
   registerStubbornnessChat();
   registerRollBreakdown();
   registerAttackExchange();
+  registerRelicLore();
   registerCreatureSpirits();
   registerHagActions();
   registerCreatureActions();

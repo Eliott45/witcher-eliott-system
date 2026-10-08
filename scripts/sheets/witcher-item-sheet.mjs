@@ -17,9 +17,12 @@ import { itemDescriptionSource } from "../data/item-lore.mjs";
 import { consumptionActions } from "./consumption-actions.mjs";
 import { consumableContext } from "../data/consumables.mjs";
 import { recipeDetailsContext } from "./recipe-details-context.mjs";
+import { relicArmorLore } from "../data/relic-armor.mjs";
+import { rollRelicLore } from "./relic-lore.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const effectItemActions={
+  rollRelicLore:workshopAction(async function(){await rollRelicLore(this.item);}),
   editItemEffect:workshopAction(async function(_event,target){await this.item.effects.get(target.dataset.effectId)?.sheet.render({force:true});}),
   editItemEffectDuration:workshopAction(async function(_event,target){if(this.isEditable)await editEffectDuration(this.item.effects.get(target.dataset.effectId));}),
   addItemEffect:workshopAction(async function(){if(this.isEditable)await this.item.createEmbeddedDocuments("ActiveEffect",[initialEffectTemplate(this.item)]);})
@@ -48,6 +51,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     super._toggleDisabled(disabled);
     for (const button of this.element.querySelectorAll('[data-action="searchItemTrait"]')) button.disabled = false;
     for (const button of this.element.querySelectorAll('[data-action="tab"]')) button.disabled = false;
+    for (const button of this.element.querySelectorAll('[data-action="rollRelicLore"]')) button.disabled = false;
   }
 
   async _onRender(context, options) {
@@ -88,6 +92,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     }));
     return Object.assign(context, {
       workshop, recipeDetails, spell, hasDetails, hasActions, isEffectItem,
+      relicLore: relicArmorLore(this.item),
       consumption: this.item.actor ? consumableContext(this.item) : { enabled: false },
       effectTemplates:isEffectItem?await Promise.all(this.item.effects.map(async effect=>({id:effect.id,uuid:effect.uuid,name:effect.name,description:effect.description,enriched:await enrich(effect.description),duration:effectDurationLabel(effect)}))):[],
       itemTabs:visible.map(id=>context.tabs[id]),

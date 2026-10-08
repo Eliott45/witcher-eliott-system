@@ -16,11 +16,15 @@ import { materialDescriptionUpdate } from "./material-descriptions.mjs";
 import { recipeDetailsUpdate } from "./recipe-details.mjs";
 import { RECIPES } from "../data/workshop-recipes.mjs";
 import { PURE_SUBSTANCES } from "../data/workshop-materials.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 22;
+import { relicArmorContentUpdate } from "./relic-armor-content.mjs";
+export const EQUIPMENT_CONTENT_VERSION = 23;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {
   const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item), ...toolDescriptionUpdate(item), ...generalGearDescriptionUpdate(item), ...specialEquipmentDescriptionUpdate(item), ...materialDescriptionUpdate(item), ...recipeDetailsUpdate(item) };
+  // Description migrations compose in order so a legacy cleanup is not lost to the new legend.
+  Object.assign(update, relicArmorContentUpdate({ ...item, system: { ...item.system,
+    description: update["system.description"] ?? item.system?.description } }));
   return Object.keys(update).length ? [{ _id: item.id ?? item._id, ...update }] : [];
 });
 

@@ -15,6 +15,7 @@ import { inventoryWrite } from "../data/inventory-writes.mjs";
 export { inventoryWrite } from "../data/inventory-writes.mjs";
 import { EQUIPMENT_CATEGORIES, equipmentCategory, equipmentEntry } from "../data/equipment-search.mjs";
 import { sheetPreferences, updateSheetPreferences, reportPreferencesError } from "./sheet-preferences.mjs";
+import { relicArmorLore } from "../data/relic-armor.mjs";
 
 // Display groups reuse Item types/kinds. They are not a second item classification.
 const GROUPS = [
@@ -126,7 +127,8 @@ export async function equipItem(_event, target) {
       // Up to three layers per zone, at most one medium and one heavy (core pp.154–155, errata).
       const plan = layeringPlan(item, equippedItems(this.actor.items));
       if (plan.blocked) return void ui.notifications.warn(plan.blocked);
-      for (const id of plan.replace) updates.push({ _id: id, "system.equipped": false });
+      const duplicates = relicArmorLore(item) ? Array.from(this.actor.items).filter(other => other.id !== item.id && other.system.ruleId === item.system.ruleId && other.system.equipped).map(other => other.id) : [];
+      for (const id of new Set([...plan.replace, ...duplicates])) updates.push({ _id: id, "system.equipped": false });
       if (plan.note) ui.notifications.info(plan.note);
     }
     updates.push({ _id: item.id, "system.equipped": !item.system.equipped, "system.carried": true, "system.containerId": "" });

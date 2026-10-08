@@ -18,6 +18,7 @@
   {{#if consumption.enabled}}<div class="witcher-consume-controls"><button type="button" data-action="useConsumable" {{disabled (or (not editable) (not consumption.canUse))}}><i class="fa-solid fa-hand-sparkles"></i> Использовать</button><span>Осталось применений: {{consumption.remaining}}</span></div>{{/if}}
   {{{alchemyDetails}}}
   {{{materialDetails}}}
+  {{#if relicLore}}<div class="witcher-consume-controls"><button type="button" data-action="rollRelicLore"><i class="fa-solid fa-book-open"></i> Вспомнить легенду · Образование СЛ {{relicLore.dc}}</button></div>{{/if}}
   {{#if recipeDetails}}{{#if recipeDetails.isRecipe}}{{> "systems/witcher-eliott-system/templates/recipe-details.hbs"}}{{/if}}{{/if}}
   {{#if isEffectItem}}
   <p class="witcher-effects-hint">Перетащите этот предмет на лист персонажа или существа, чтобы наложить эффект. Длительность и модификаторы настраиваются во вкладке «Подробности».</p>

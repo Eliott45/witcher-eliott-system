@@ -2,6 +2,7 @@ import { layeringEncumbrance } from "./armor-layers.mjs";
 import { effectiveItem } from "./workshop.mjs";
 import { isCarried, containerParent } from "./containers.mjs";
 import { EQUIPMENT_ICONS } from "./item-icons.mjs";
+import { relicArmorLore } from "./relic-armor.mjs";
 export const PHYSICAL_TYPES = ["equipment", "weapon", "armor", "recipe"];
 export const isPhysical = item => PHYSICAL_TYPES.includes(item.type);
 export const isAmmunition = item => item.type === "equipment" && item.system.kind === "ammunition";
@@ -17,7 +18,19 @@ export function carriedWeight(items = []) {
   return Math.round(all.filter(item => isPhysical(item) && isCarried(item, all)).reduce((sum, item) => sum + itemWeight(item), 0) * 1000) / 1000;
 }
 export const conditionKey = item => (item.type === "weapon" && !item.system.natural) || isAmmunition(item) ? "reliability" : item.type === "armor" ? "stoppingPower" : null;
-export const equippedItems = items => Array.from(items ?? []).filter(item => isPhysical(item) && item.system.equipped && isCarried(item, items) && !containerParent(item, items) && item.system.quantity > 0);
+export function equippedItems(items) {
+  const relics = new Set();
+  return Array.from(items ?? []).filter(item => {
+    if (!isPhysical(item) || !item.system.equipped || !isCarried(item, items) || containerParent(item, items) || !(item.system.quantity > 0)) return false;
+    // Imported or edited inventories can contain several equipped copies of one unique suit.
+    // Count the suit once for its armor, wearer bonuses, encumbrance and equipment wear.
+    if (relicArmorLore(item)) {
+      if (relics.has(item.system.ruleId)) return false;
+      relics.add(item.system.ruleId);
+    }
+    return true;
+  });
+}
 export function armorEncumbrance(items, reduction = 0) {
   const worn = equippedItems(items);
   return Math.max(0, worn.reduce((sum, item) => sum + (item.system.encumbrance ?? 0), 0) + layeringEncumbrance(worn) + reduction);

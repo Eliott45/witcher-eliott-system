@@ -1,4 +1,5 @@
 import { effectiveItem } from "./workshop.mjs";
+import { relicArmorLore } from "./relic-armor.mjs";
 
 // Core pp.154–155 with errata v4 «Layering Table»: up to three layers on a body part, at most one
 // medium and one heavy. SP combines by the bonus table; EV sums plus +1 per medium and +2 per heavy layer.
@@ -12,13 +13,15 @@ export function layeringPlan(item, worn) {
   const others = worn.filter(other => isArmor(other) && other.id !== item.id);
   const zones = ZONES(item), cls = item.system.armorClass ?? "light";
   // A second medium or heavy layer on a shared zone replaces the old one, as before.
-  const replace = cls === "light" ? [] : others.filter(other => (other.system.armorClass ?? "light") === cls && ZONES(other).some(zone => zones.includes(zone)));
+  const duplicate = other => relicArmorLore(item) && other.system.ruleId === item.system.ruleId;
+  const replace = others.filter(other => duplicate(other) || cls !== "light" && (other.system.armorClass ?? "light") === cls && ZONES(other).some(zone => zones.includes(zone)));
   const remaining = others.filter(other => !replace.includes(other));
   for (const zone of zones) {
     const count = remaining.filter(other => ZONES(other).includes(zone)).length + 1;
     if (count > MAX_LAYERS) return { replace: [], blocked: `На зоне уже ${MAX_LAYERS} слоя брони. Снимите один, чтобы надеть «${item.name}».` };
   }
-  return { replace: replace.map(other => other.id), blocked: "", note: replace.length ? `Можно носить только один слой ${CLASS_NAMES[cls]} брони на зоне.` : "" };
+  return { replace: replace.map(other => other.id), blocked: "", note: replace.some(duplicate) ? "Повторная копия этой реликвии заменяет надетую; её эффекты не складываются."
+    : replace.length ? `Можно носить только один слой ${CLASS_NAMES[cls]} брони на зоне.` : "" };
 }
 
 /** Layered pieces and the EV each adds: +1 for a medium, +2 for a heavy piece sharing a zone with another worn piece. */

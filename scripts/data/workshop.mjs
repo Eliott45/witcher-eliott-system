@@ -11,7 +11,8 @@ export const equipmentUuid = id => `Compendium.witcher-eliott-system.equipment.I
 export const WORKSHOP_BONUS_LABELS = {
   meleeDamage: "Урон в ближнем бою", "attributes.body": "Телосложение", "attributes.reflex": "Реакция",
   healthMax: "Максимум ПЗ", vigor: "Предел магии", reliability: "Надёжность", stoppingPower: "ПБ",
-  accuracy: "Точность", weight: "Вес", "skills.stealth": "Скрытность", "skills.courage": "Храбрость", staminaMax: "Максимум Выносливости"
+  accuracy: "Точность", weight: "Вес", "skills.stealth": "Скрытность", "skills.courage": "Храбрость", staminaMax: "Максимум Выносливости",
+  "skills.resistMagic": "Сопротивление магии", "skills.spellCasting": "Сотворение заклинаний"
 };
 export const available = item => isCarried(item) && item.system.quantity > 0;
 export const sameItem = (item, reference) => Boolean(reference && (item.uuid === reference.uuid || (reference.system.ruleId && item.system.ruleId === reference.system.ruleId) || item._stats?.compendiumSource === reference.uuid));
