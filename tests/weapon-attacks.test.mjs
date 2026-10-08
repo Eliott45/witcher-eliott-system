@@ -73,6 +73,8 @@ test("damage preserves attack snapshot and private recipients without spending L
   actor.items[0].system.damage="99d6";
   await rollWeaponDamage(message);
   assert.equal(result.formula,"(2d6+2) * 2");assert.deepEqual(result.data.whisper,["original-player"]);assert.equal(result.options.messageMode,"gm");assert.equal(result.data.flags[SYSTEM_ID].skipLuck,true);
+  message.flags[SYSTEM_ID].weaponAttack.adrenalineDice=2;
+  await rollWeaponDamage(message);assert.equal(result.formula,"(2d6+2) * 2 + 2d6");
   message.isContentVisible=false;result=null;await rollWeaponDamage(message);assert.equal(result,null);
 });
 
@@ -151,4 +153,22 @@ test("distance bands are measured from the target automatically or chosen by han
   assert.equal(unawareDC({ranged:true,dc:20},target("small")).dc,22);
   assert.equal(unawareDC({ranged:true,dc:25},target("huge")).dc,21);
   assert.equal(unawareDC({ranged:true,dc:15},{system:{}}).dc,15);
+});
+
+test("throwable melee relics keep melee attacks and add one Athletics projectile with BODY-based bands",()=>{
+  const actor=fixture(),weapon=actor.items[0];actor.system.skills.athletics=6;
+  Object.assign(weapon.system,{rangeBodyMultiplier:2,skill:"smallBlades",hands:1});
+  const quote=weaponAttack(actor,weapon,{mode:"throw",targetContext:{distance:12,target:{actor:null},parts:[]}});
+  assert.equal(quote.skill.key,"athletics");assert.equal(quote.total,10);assert.equal(quote.range,18);
+  assert.equal(quote.ranged,true);assert.equal(quote.weapon.category,"thrown");assert.equal(quote.band.id,"long");
+  assert.equal(quote.attack.count,1);assert.equal(quote.attack.pair,undefined);assert.equal(quote.attack.multiplier,1);
+  assert.equal(quote.damage,"(2d6+2 + 6)");assert.equal(weapon.system.category,"melee");
+  assert.equal(weaponAttack(actor,weapon).ranged,false);
+  assert.match(weaponAttack(actor,weapon,{mode:"throw",targetContext:{distance:37,parts:[]}}).blocked,/предельной/);
+  actor.type="npc";weapon.system.attackRate=3;
+  assert.deepEqual(attackModes(actor,weapon).map(mode=>[mode.id,mode.count]),[["npc",3],["throw",1]]);
+  actor.isToken=true;actor.token={parent:{flags:{[SYSTEM_ID]:{environment:{terrain:"underwater"}}}}};
+  assert.match(weaponAttack(actor,weapon,{mode:"throw"}).blocked,/Под водой/);
+  weapon.name="Страж Бездны";weapon.system.skill="staffSpear";
+  assert.equal(weaponAttack(actor,weapon,{mode:"throw"}).blocked,"", "a spear retains its underwater exception");
 });

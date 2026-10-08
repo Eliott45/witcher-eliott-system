@@ -18,7 +18,7 @@ export function consumptionFields() {
 export function consumableContext(item) {
   const s = item.system, mode = s.consumption?.mode ?? "auto";
   const supported = ["equipment", "weapon", "armor"].includes(item.type);
-  const enabled = supported && mode !== "none" && (mode === "consume" || ["alchemy", "mutagen", "ammunition"].includes(s.kind) || s.ruleId?.startsWith("bomb.") || expendableGear.has(s.ruleId));
+  const enabled = supported && mode !== "none" && (mode === "consume" || ["alchemy", "mutagen", "ammunition"].includes(s.kind) || /^(?:bomb|trap)\./u.test(s.ruleId ?? "") || expendableGear.has(s.ruleId));
   const uses = Math.max(1, s.consumption?.usesPerItem || bottleUses[s.ruleId] || 1);
   const spent = Math.min(uses - 1, Math.max(0, s.consumption?.spentUses ?? 0));
   const remaining = Math.max(0, (s.quantity ?? 1) * uses - spent);

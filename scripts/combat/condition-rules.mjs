@@ -15,7 +15,7 @@ export function conditionRules(actor) {
   return {
     ordinaryStun, exhausted, unconscious, dead, required, ready,
     remaining: Math.max(0, required - value),
-    canMove: !blocked, canAct: !blocked, canDefend: !blocked,
+    canMove: !blocked && !actor.effects.some(effect=>!effect.disabled&&!effect.isSuppressed&&!effect.duration?.expired&&effectRules(effect).immobilized), canAct: !blocked, canDefend: !blocked,
     canRecover: !dead && !incapacitated && (exhausted || (!ordinaryStun && !unconscious)),
     canStunSave: !dead && !unconscious && !incapacitated && (!exhausted || ready)
   };

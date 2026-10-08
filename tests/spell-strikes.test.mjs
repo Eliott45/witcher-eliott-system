@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { spellDefenses, spellTraits, targetsOthers } from "../scripts/magic/spell-strikes.mjs";
+import { spellDefenses, spellTraits, targetsOthers, createSpellStrikes, strikeable } from "../scripts/magic/spell-strikes.mjs";
 import { defenseQuote } from "../scripts/combat/defense-rolls.mjs";
 import { unawareDC } from "../scripts/combat/attack-exchange.mjs";
 
@@ -68,4 +68,34 @@ test("magical fumble rows follow the table on p.166", async () => {
   assert.equal(fumbleRow(7).id, "backfire"); assert.equal(fumbleRow(9).id, "backfire");
   assert.equal(fumbleRow(10).id, "explosion");
   assert.deepEqual(ELEMENT_STATUS, { earth: "stunned", fire: "burning", water: "frozen" });
+});
+
+test("extra spell targets inherit the source's private audience; hidden results cannot assign targets", async () => {
+  const SYS = "witcher-eliott-system", messages = [];
+  const actor = { uuid: "Actor.mage", isOwner: true, isToken: true, effects: [], items: [], system: {} };
+  const scene = { id: "scene", grid: { size: 100, distance: 2 } };
+  const token = (id, x, owner = { effects: [], items: [], system: {} }) => ({ uuid: `Scene.scene.Token.${id}`, x, y: 0,
+    parent: scene, actor: owner, getSize: () => ({ width: 100, height: 100 }) });
+  actor.token = token("mage", 0, actor);
+  const targets = [token("first", 100), token("second", 200)];
+  const item = { id: "spell", name: "Аэни", system: { ruleId: "spell.aenye", element: "fire", damage: "4d6", defense: ["dodge"], range: { kind: "distance", value: 20 } } };
+  globalThis.game = { user: { targets: new Set(targets) }, combat: null };
+  globalThis.foundry = { documents: { ChatMessage: { getSpeaker: () => ({ actor: "mage" }), create: async data => { messages.push(data); return data; } } } };
+  for (const mode of [{ whisper: ["gm"], blind: true }, { whisper: ["player", "gm"], blind: false }, { whisper: [], blind: false }]) {
+    const source = { id: "cast", speakerActor: actor, isContentVisible: true, ...mode,
+      flags: { [SYS]: { magicCast: { adrenalineDice: 2 } } },
+      async update(changes) { this.flags[SYS].weaponAttack = changes[`flags.${SYS}.weaponAttack`]; } };
+    const result = await createSpellStrikes(actor, item, source, { total: 23 });
+    assert.equal(result.created, 2);
+    const secondary = messages.at(-1);
+    assert.deepEqual(secondary.whisper, mode.whisper); assert.equal(secondary.blind, mode.blind);
+    assert.equal(source.flags[SYS].weaponAttack.adrenalineDice, 2);
+    assert.equal(secondary.flags[SYS].weaponAttack.adrenalineDice, 0);
+    source.isContentVisible = false;
+    assert.equal(strikeable(source), null);
+    await assert.rejects(createSpellStrikes(actor, item, source), /Нет доступа/);
+  }
+  actor.isOwner = false;
+  await assert.rejects(createSpellStrikes(actor, item, { isContentVisible: true }), /Нет доступа/);
+  assert.equal(messages.length, 3);
 });

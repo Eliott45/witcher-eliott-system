@@ -5,6 +5,7 @@ import { dose, temporaryHealth } from "../workshop/witcher-elixirs.mjs";
 import { activeEffect } from "../data/effect-counters.mjs";
 import { immuneToCondition } from "../data/creatures.mjs";
 import { creatureEffectImmunity } from "./creature-spirits.mjs";
+import { adrenalineAbsorptionPlan } from "./adrenaline.mjs";
 
 const flags=document=>document?.flags?.[SYSTEM_ID]??{};
 /** The same damage reactions as sufferDamage, committed with armor/effects and an idempotency receipt. */
@@ -26,7 +27,10 @@ export function applyCreatureDamage(actor,result,key,{effects=[]}={}) {
       const griffin=dose(actor,"decoction.griffin");if(griffin&&total>5)reaction(griffin,{armor:(flags(griffin).elixirState?.armor??0)+2});
       const wyvern=dose(actor,"decoction.wyvern");if(wyvern&&flags(wyvern).elixirState?.bonus)reaction(wyvern,{bonus:0});
     }
-    actorUpdate["system.health.value"]=actor.system.health.value-total+absorbed;
+    const adrenaline=adrenalineAbsorptionPlan(actor,total-absorbed);
+    Object.assign(actorUpdate,adrenaline.actorUpdate);
+    absorbed+=adrenaline.absorbed;
+    actorUpdate["system.health.value"]=actor.system.health.value-adrenaline.remaining;
     const effectCreates=effects.filter(source=>!immuneToCondition(actor,source.statuses??[])&&!creatureEffectImmunity(actor,source)
       &&!actor.effects.some(effect=>activeEffect(effect)&&Array.from(source.statuses??[]).some(status=>effect.statuses.has(status))));
     await inventoryTransaction(actor,{updates,effectUpdates,effectCreates,actorUpdate});

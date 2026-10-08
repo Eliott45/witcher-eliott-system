@@ -7,13 +7,14 @@ import { RECIPES } from "../scripts/data/workshop-recipes.mjs";
 import { CORE_EQUIPMENT, CORE_WEAPONS, CORE_ARMOR } from "../scripts/data/core-equipment.mjs";
 import { ELDER_EQUIPMENT } from "../scripts/data/elder-equipment.mjs";
 import { WITCHER_SPECIAL_EQUIPMENT } from "../scripts/data/witcher-special-equipment.mjs";
+import { EXPERIMENTAL_DEVICES } from "../scripts/data/experimental-devices.mjs";
 import { materialPlan, repairRecipe, effectiveItem, freeSlots, oilDamage, mutationModifiers, equipmentUuid } from "../scripts/data/workshop.mjs";
 import { carriedWeight, conditionUpdate } from "../scripts/data/physical-items.mjs";
 import { deriveStatistics } from "../scripts/data/statistics.mjs";
 const physical=(id,ruleId,quantity,extra={})=>({id,uuid:`Actor.a.Item.${id}`,type:"equipment",system:{ruleId,quantity,carried:true,weight:.1,price:1,...extra}});
 
 test("workshop catalog has unique canonical identities and every recipe resolves real ingredients and result",()=>{
- const catalog=[...CORE_EQUIPMENT,...MATERIALS,...ALCHEMY,...MUTAGENS,...UPGRADES,...RECIPES,...WITCHER_SPECIAL_EQUIPMENT];
+ const catalog=[...CORE_EQUIPMENT,...MATERIALS,...ALCHEMY,...MUTAGENS,...UPGRADES,...RECIPES,...WITCHER_SPECIAL_EQUIPMENT,...EXPERIMENTAL_DEVICES];
  assert.equal(new Set(catalog.map(x=>x.id)).size,catalog.length);
  assert.equal(new Set(catalog.map(x=>x.documentId)).size,catalog.length);
  const uuids=new Map(catalog.map(x=>[equipmentUuid(x.documentId),x]));

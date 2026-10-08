@@ -3,6 +3,8 @@ import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { attackerToken, tokenGap, tokenDocument } from "../combat/attack-target.mjs";
 import { SPELL_DEFENSES } from "../data/spells.mjs";
 import { createYrdenZone, spellMentalImmunity } from "../combat/creature-spirits.mjs";
+import { spellDamageWithGlyph } from "../data/rune-glyphs.mjs";
+import { furyTargetError } from "../combat/experimental-effects.mjs";
 
 // Core p.168 «Выбор целей для магии»: a direct spell works like a ranged attack against each target; an area
 // spell makes everyone in it defend against the same casting check; with no defense (or a willing target) the
@@ -30,19 +32,30 @@ export const spellTraits = (element, ruleId = "") => ({ types: element === "fire
 /** Spells that act on others: anything but «на себя». */
 export const targetsOthers = system => !["self"].includes(system.range?.kind);
 
+// These spells have a distance to a placed area or a line, rather than a radius in the Range field.
+const DISTANT_AREAS = new Set(["spell.tanio-ilchar","spell.curse-sedna","spell.ice-slick","spell.stammelford-tremor","spell.alzur-thunder"]);
+export function furySpellTargetError(actor,item,targets=Array.from(globalThis.game?.user?.targets??[])) {
+  const system=item.system;
+  const offensive=Boolean(system.damage)||(system.defense??[]).some(kind=>["dodge","block","resistMagic","willTriple"].includes(kind));
+  if(!offensive||!targetsOthers(system)||["radius","cone"].includes(system.range?.kind)||DISTANT_AREAS.has(system.ruleId))return "";
+  return Array.from(targets).map(tokenDocument).map(target=>furyTargetError(actor,target)).find(Boolean)??"";
+}
+
 /** The weaponAttack flags of a spell against one token; `spellSource` is set on extra cards only. */
-export function strikeAttack(item, caster, target, { total = null, spellSource = null } = {}) {
+export function strikeAttack(item, caster, target, { total = null, spellSource = null, glyph = null, effectDC = 0, adrenalineDice = 0 } = {}) {
   const system = item.system, { defenses, unaware } = spellDefenses(system);
+  const damage=spellDamageWithGlyph(system.damage,glyph??{});
   return { itemId: item.id, name: item.name, mode: "spell", spell: true, unarmed: null, nonLethal: false, special: null,
-    charge: false, push: false, dual: false, base: total, count: 1, damage: system.damage || null, location: "random", multiplier: 1, body: 0, bonus: 0,
+    charge: false, push: false, dual: false, base: total, count: 1, damage, adrenalineDice, location: "random", multiplier: 1, body: 0, bonus: 0,
     target: target.uuid, attacker: caster.uuid, parts: [], ranged: true, band: "normal", dc: null, thrown: false,
     combat: game.combat?.started ? { id: game.combat.id, round: game.combat.round } : null, strike: 0, damageTypes: "",
-    ...(spellSource ? { spellSource } : {}), defenses, ...(unaware ? { unaware } : {}), traits: spellTraits(system.element, system.ruleId),
+    ...(spellSource ? { spellSource } : {}), glyph, effectDC, defenses, ...(unaware ? { unaware } : {}), traits: spellTraits(system.element, system.ruleId),
     noCritical: !spellTraits(system.element, system.ruleId).physical || (!defenses.length && !unaware?.willTriple) };
 }
 
 /** Spell casts that can still reach targets: a spell, sign or invocation that did not fail, aimed at others. */
 export function strikeable(message) {
+  if (message.isContentVisible === false) return null;
   const cast = message.flags?.[SYSTEM_ID]?.magicCast, item = message.speakerActor?.items.get(cast?.spellId);
   if (!cast || cast.maintenance || ["ritual", "hex"].includes(cast.kind) || cast.fumble?.failed || !item || !targetsOthers(item.system)) return null;
   return item;
@@ -53,7 +66,10 @@ export function strikeable(message) {
  * every further target gets its own card that reads the casting check from the source.
  */
 export async function createSpellStrikes(actor, item, source, { total = null } = {}) {
+  if (!actor.isOwner || source.isContentVisible === false) throw new Error("Нет доступа к результату сотворения.");
   const system = item.system, targets = Array.from(game.user.targets ?? []).map(tokenDocument);
+  const frenzy=furySpellTargetError(actor,item,targets);if(frenzy)throw new Error(frenzy);
+  const {glyph=null,effectDC=0,adrenalineDice=0}=source.flags?.[SYSTEM_ID]?.magicCast??{};
   if(system.ruleId === "sign.yrden") {
     const caster = attackerToken(actor);
     const power = source.flags?.[SYSTEM_ID]?.magicCast?.powerCost ?? system.cost ?? 1;
@@ -77,14 +93,15 @@ export async function createSpellStrikes(actor, item, source, { total = null } =
   let created = 0;
   for (const [index, { target, distance }] of valid.entries()) {
     if (index === 0 && !source.flags?.[SYSTEM_ID]?.weaponAttack) {
-      await source.update({ [`flags.${SYSTEM_ID}.weaponAttack`]: strikeAttack(item, caster, target, { total }) });
+      await source.update({ [`flags.${SYSTEM_ID}.weaponAttack`]: strikeAttack(item, caster, target, { total, glyph, effectDC, adrenalineDice }) });
       created++; continue;
     }
     const content = `<section class="witcher-attack-chat witcher-spell-strike"><h3><i class="fa-solid fa-wand-sparkles"></i> ${esc(item.name)} → ${esc(target.name)}</h3>`
       + `<p>Проверка сотворения — из сообщения выше${total != null ? ` (${total})` : ""}. Защита: ${esc(label)}.</p>`
       + (distance != null && target.uuid !== caster.uuid ? `<small>Расстояние ${distance} м${reach ? ` из ${reach} м` : ""}.</small>` : "") + `</section>`;
     await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), content,
-      flags: { [SYSTEM_ID]: { skipLuck: true, weaponAttack: strikeAttack(item, caster, target, { total, spellSource: source.id }) } } });
+      whisper: [...(source.whisper ?? [])], blind: Boolean(source.blind),
+      flags: { [SYSTEM_ID]: { skipLuck: true, weaponAttack: strikeAttack(item, caster, target, { total, spellSource: source.id, glyph, effectDC }) } } });
     created++;
   }
   if (skipped.length) ui.notifications.warn(`Не все цели: ${skipped.join("; ")}.`);

@@ -1,5 +1,5 @@
 import { COMBAT_ACTOR_TYPES, SYSTEM_ID } from "../config.mjs";
-import { relicArmorLore } from "../data/relic-armor.mjs";
+import { relicLore } from "../data/relic-lore.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { rollActionCheck } from "../combat/action-economy.mjs";
 import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
@@ -29,7 +29,7 @@ export async function chooseRelicScholar(item) {
 export function rollRelicLore(item, { actor = null } = {}) {
   if (pending.has(item)) return pending.get(item);
   const work = (async () => {
-    const lore = relicArmorLore(item);
+    const lore = relicLore(item);
     if (!lore || item.testUserPermission && !item.testUserPermission(game.user, "LIMITED")) return;
     actor ??= await chooseRelicScholar(item);
     if (!actor) return;

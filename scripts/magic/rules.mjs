@@ -2,6 +2,7 @@ import { equippedItems } from "../data/physical-items.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
 import { getToolRules } from "../data/tool-rules.mjs";
 import { learningFields } from "../data/magic-learning-fields.mjs";
+import { greaterFocusFor } from "../data/rune-glyphs.mjs";
 
 export function magicFields() {
   const {SchemaField,StringField,NumberField,ArrayField}=foundry.data.fields;
@@ -50,15 +51,16 @@ export function focusRating(item) {
   return getToolRules(item)?.focus??Number(properties.match(/Фокусирующее\s*\((\d+)\)/iu)?.[1]??0);
 }
 /** Core p.166: on a fumble above 9 every focus the caster carries explodes, held or not. */
-export const carriedFocuses = actor => Array.from(actor.items??[]).filter(item=>item.system?.carried!==false&&(item.system?.quantity??1)>0&&focusRating(item)>0);
-export function focusOptions(actor) {
-  if (!["mage","priest"].includes(actor.system.details.profession)) return [];
+export const carriedFocuses = actor => Array.from(actor.items??[]).filter(item=>item.system?.carried!==false&&(item.system?.quantity??1)>0&&(focusRating(item)>0||greaterFocusFor(effectiveItem(item).properties)));
+export function focusOptions(actor,spell=null) {
+  const discounts=["mage","priest"].includes(actor.system.details.profession);
   return equippedItems(actor.items).flatMap(item=>{
     const effective=effectiveItem(item);
     const properties=effective.properties??item.system.properties??"";
-    const rating=getToolRules(item)?.focus??Number(properties.match(/Фокусирующее\s*\((\d+)\)/iu)?.[1]??0);
-    if(!rating || (item.type==="weapon" && effective.reliability?.value===0))return [];
-    return [{id:item.id,name:item.name,rating,greater:/Улучшенное фокусирующее/iu.test(properties)}];
+    const rating=discounts?(getToolRules(item)?.focus??Number(properties.match(/Фокусирующее\s*\((\d+)\)/iu)?.[1]??0)):0;
+    const greater=greaterFocusFor(properties,spell);
+    if((!rating&&!greater) || (item.type==="weapon" && effective.reliability?.value===0))return [];
+    return [{id:item.id,name:item.name,rating,greater}];
   });
 }
 

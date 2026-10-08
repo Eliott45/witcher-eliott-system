@@ -7,6 +7,7 @@ import { readFile } from "node:fs/promises";
 import { CORE_AMMUNITION } from "../scripts/data/core-ammunition.mjs";
 import { ELDER_EQUIPMENT } from "../scripts/data/elder-equipment.mjs";
 import { WITCHER_SPECIAL_EQUIPMENT } from "../scripts/data/witcher-special-equipment.mjs";
+import { EXPERIMENTAL_DEVICES, EXPERIMENTAL_RECIPES } from "../scripts/data/experimental-devices.mjs";
 import { compendiumData, compendiumFolders } from "../tools/compendium-data.mjs";
 import { equipmentEntry, filterEquipment } from "../scripts/data/equipment-search.mjs";
 import { inventoryContext } from "../scripts/sheets/inventory-context.mjs";
@@ -22,6 +23,7 @@ const sources = compendiumData(translations).equipment;
 const folders = compendiumFolders(translations).equipment;
 const diagrams = sources.filter(item => item.type === "recipe" && item.system.recipe.category === "diagram");
 const pureSubstances = sources.filter(item => item.system.ruleId?.startsWith("substance."));
+const experiments = sources.filter(item => [...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES.filter(entry => entry.system.recipe.category === "formula")].some(entry => entry.id === item.system.ruleId));
 
 test("four ammunition records reproduce the supplied table and remain separate from weapons", () => {
   const ammunition = sources.filter(item => CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId));
@@ -58,6 +60,7 @@ function migrationFixture({ fail = false, locked = true, startVersion = 0, elder
   const gm = {}, writes = [], index = new Map(), packFolders = new Map();
   let version = startVersion;
   for (const item of diagrams) index.set(item._id, structuredClone(item));
+  for (const item of experiments) index.set(item._id, structuredClone(item));
   if (substances) for (const item of pureSubstances) index.set(item._id, structuredClone(item));
   if (elder) for (const item of sources.filter(item=>ELDER_EQUIPMENT.some(entry=>entry.id===item.system.ruleId))) index.set(item._id,structuredClone(item));
   if(transport) for(const item of sources.filter(item=>[...CORE_TRANSPORT,...CORE_TACK].some(entry=>entry.id===item.system.ruleId)))index.set(item._id,structuredClone(item));
@@ -98,9 +101,33 @@ test("content update appends only missing ammunition, keeps edited entries and r
   game.user = state.gm;
   await migrateEquipmentContent();
   assert.deepEqual(state.writes, [["lock", false], ["folders", 1], ["items", 3], ["lock", true]]);
-  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 52 + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length);
+  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 52 + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length);
   assert.equal(state.index.get("custom-canonical").system.price, 999);
   await migrateEquipmentContent(); assert.equal(state.writes.length, 4);
+});
+
+test("content v24 adds experimental devices, all 17 exact recipes and the missing relic weapons once", async () => {
+  const state = migrationFixture({ startVersion: 23 });
+  for (const item of sources.filter(item => CORE_AMMUNITION.some(entry => entry.id === item.system.ruleId))) state.index.set(item._id, structuredClone(item));
+  const additions = sources.filter(item => [...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES].some(entry => entry.id === item.system.ruleId)
+    || item.type === "weapon" && /Реликвия/u.test(item.system.properties ?? "") && !["weapon.wolf", "weapon.moon-blade"].includes(item.system.ruleId));
+  assert.equal(additions.length, 39);
+  for (const item of additions) state.index.delete(item._id);
+  const customized = structuredClone(additions.find(item => item.system.ruleId === "weapon.caroline"));
+  customized._id = "ownCaroline00001"; customized.name = "Мой меч"; customized.system.reliability.value = 2;
+  customized.system.description = "<p>Запись игрока</p>";
+  state.index.set(customized._id, customized);
+  const before = structuredClone(customized);
+  await migrateEquipmentContent();
+  assert.equal(state.writes.find(([kind]) => kind === "items")[1], 38);
+  assert.deepEqual(state.index.get(customized._id), before);
+  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
+  for (const item of EXPERIMENTAL_RECIPES) {
+    const created = state.index.get(item.documentId);
+    assert.equal(created.system.recipe.time, 1800);
+    assert.ok(created.system.recipe.components.every(row => row.uuid && !row.substance));
+  }
+  const count = state.writes.length; await migrateEquipmentContent(); assert.equal(state.writes.length, count);
 });
 
 function applyUpdate(item, update) {
@@ -317,7 +344,7 @@ test("version-one worlds repair pack, world, actor and unlinked token copies wit
     assert.equal(item.system.quantity, 10); assert.equal(item.system.weight, .05); assert.equal(item.system.price, 1);
     assert.equal(item.img, CORE_AMMUNITION[0].img); assert.equal(item.name, "Стандартные боеприпасы");
   }
-  assert.equal(state.index.size, 52 + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
+  assert.equal(state.index.size, 52 + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
   assert.ok(Array.from(state.index.values()).filter(item=>item.system.kind==="ammunition").every(item => item.img === CORE_AMMUNITION[0].img));
   await migrateEquipmentContent(); assert.equal(worldActor.items[0].system.quantity, 10);
 });
@@ -349,7 +376,7 @@ test("version-three worlds append all thirty Elder Folk items without recreating
   const state=migrationFixture({startVersion:3,elder:false});
   for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
   await migrateEquipmentContent();
-  assert.equal(state.index.size,52 + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length);
+  assert.equal(state.index.size,52 + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length);
   assert.equal(state.writes.find(([key])=>key==="items")[1],30);
   assert.equal(state.version,EQUIPMENT_CONTENT_VERSION);
 });
@@ -373,7 +400,7 @@ test("creating or dropping an old pack normalizes once while new individual stac
 test("version-five worlds append transport and tack once with their own folders",async()=>{
  const state=migrationFixture({startVersion:5,transport:false});
  for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
- await migrateEquipmentContent();assert.equal(state.index.size,52 + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length);
+ await migrateEquipmentContent();assert.equal(state.index.size,52 + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length);
  assert.equal(state.writes.find(([key])=>key==="items")[1],18);
  assert.equal(state.writes.find(([key])=>key==="folders")[1],2);
  const count=state.writes.length;await migrateEquipmentContent();assert.equal(state.writes.length,count);

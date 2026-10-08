@@ -166,6 +166,7 @@ export function useConsumable(item) {
   if (pending.has(actor)) return pending.get(actor);
   // Core p.165: a bomb is thrown, not drunk.
   if (String(item.system.ruleId ?? "").startsWith("bomb.")) return import("../combat/bombs.mjs").then(({ throwBomb }) => throwBomb(actor, item));
+  if (String(item.system.ruleId ?? "").startsWith("trap.")) return import("../combat/experimental-traps.mjs").then(({ installTrap }) => installTrap(actor, item));
   const work = usageDialog(item).finally(() => pending.delete(actor));
   pending.set(actor, work);
   return work;

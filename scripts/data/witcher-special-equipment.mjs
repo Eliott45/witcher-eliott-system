@@ -1,5 +1,6 @@
 import { weaponRecord } from "./equipment-records.mjs";
 import { AMMUNITION_ICON } from "./core-ammunition.mjs";
+import { RELIC_WEAPONS } from "./relic-weapons.mjs";
 
 const unpriced = { "witcher-eliott-system": { priceUnavailable: true } };
 const specialWeapon = (id, row, page, description) => {
@@ -17,12 +18,7 @@ export const WITCHER_SPECIAL_EQUIPMENT = [
   specialWeapon("witchSilvSword01", ["witcher-silver-sword", "Серебряный ведьмачий меч", "swordsmanship", "К/Р", 0, "u", "1d6+2", 10, 1, 0, 0, "none", 2, 1.5, 0,
     "Серебряное (3d6)"], 247,
     "Серебряный клинок для охоты на чудовищ. Мягкий металл наносит меньше обычного урона, но по существам, уязвимым к серебру, дополнительно наносит [[/r 3d6]] серебряного урона."),
-  specialWeapon("relicWolf0000001", ["wolf", "Волк", "swordsmanship", "Р/К", 2, "u", "7d6", 15, 2, 0, 0, "none", 3, 4, 0,
-    "Реликвия; Пробивающее броню; Кровопускающее (75%)"], 258,
-    "Стальной полуторный меч с островов Скеллиге, связанный с легендой об Уффе Кровавобородом. Историю можно вспомнить Образованием СЛ 16. Игнорирует сопротивление брони типу урона; при нанесении урона вызывает кровотечение с вероятностью 75%."),
-  specialWeapon("relicMoonBlade01", ["moon-blade", "Лунный клинок", "swordsmanship", "Р/К", 1, "u", "3d6", 10, 2, 0, 0, "none", 3, 4, 0,
-    "Реликвия; Серебряное (7d6+4); Улучшенное фокусирующее"], 263,
-    "Серебряный полуторный меч из легенды о ведьмаке Олеке и демоне из Элландера. История: Образование СЛ 18. По уязвимым к серебру чудовищам дополнительно наносит [[/r 7d6+4]] серебряного урона. Улучшенное фокусирующее повышает на 2 СЛ проверок против заклинаний, сотворённых с этим оружием (стр. 72). Серебряный урон применяется отдельно от обычного."),
+  ...RELIC_WEAPONS,
   { id: "armor.raven", documentId: "relicRavenArmor1", name: "Доспехи Ворона", type: "armor", source: "armor", flags: unpriced,
     system: { zone: "torso-legs", armorClass: "light", stoppingPower: { value: 12, max: 12 }, enhancementSlots: 3,
       encumbrance: 0, weight: 12, price: 0, rarity: "unique", resistances: "Яд; Кровотечение",

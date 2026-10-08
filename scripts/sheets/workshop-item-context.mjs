@@ -4,6 +4,7 @@ import { durationLabel, craftDialog, findRepairDiagram } from "../workshop/craft
 import { chooseReference } from "./reference-picker.mjs";
 import { isRepairable } from "../workshop/repair.mjs";
 import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
+import { installUpgradeFromSource } from "../workshop/upgrades.mjs";
 export async function workshopItemContext(item, recipeDetails) {
   if(!isPhysical(item)) return null;
   const recipe=item.system.recipe;
@@ -21,6 +22,7 @@ export async function workshopItemContext(item, recipeDetails) {
     canOil:Boolean(item.actor&&item.type==="weapon"&&item.system.category!=="shield"),
     canPrepare:Boolean(item.actor&&available(item)&&!item.system.mutagen.prepared),
     canApply:Boolean(item.actor&&available(item)&&(item.actor.system.mutations??[]).length<2),
+    canInstallRuneGlyph:Boolean(item.actor&&available(item)&&item.system.kind==="upgrade"&&["rune","glyph"].includes(item.system.upgrade?.category)),
     isMutagen:item.system.kind==="mutagen", isOil:item.system.alchemy?.category==="oil", isUpgrade:item.system.kind==="upgrade" };
 }
 export async function selectCatalogItem(title, predicate = ()=>true) {
@@ -31,6 +33,7 @@ export async function selectCatalogItem(title, predicate = ()=>true) {
 const safe = fn => async function(...args) { try { return await fn.apply(this,args); } catch(error) { console.error(error); ui.notifications.error(error.message); } };
 const bonusPath = item => ["mutagen","upgrade"].includes(item.system.kind)?`${item.system.kind}.bonuses`:item.type!=="recipe"?"wearerBonuses":"";
 export const workshopItemActions = {
+ installRuneGlyph:safe(async function(){if(this.isEditable)return installUpgradeFromSource(this.item);}),
  addWorkshopBonus:safe(async function(){
    if(!this.isEditable||!isPhysical(this.item)||!bonusPath(this.item))return;
    const kind=this.item.system.kind;

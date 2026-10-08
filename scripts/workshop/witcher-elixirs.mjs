@@ -17,6 +17,16 @@ export function temporaryHealth(actor) {
   const effect = dose(actor, "potion.full-moon");
   return effect ? Math.max(0, state(effect).temporary ?? FULL_MOON_HP) : 0;
 }
+/** Temporary HP also absorb periodic/backlash damage without turning those events into weapon hits. */
+export function temporaryHealthAbsorptionPlan(actor,total) {
+  const moon=dose(actor,"potion.full-moon"),absorbed=moon?Math.min(temporaryHealth(actor),Math.max(0,total)):0;
+  return {absorbed,effectUpdates:absorbed?[{_id:moon.id,[`flags.${SYSTEM_ID}.elixirState`]:{...state(moon),temporary:temporaryHealth(actor)-absorbed}}]:[]};
+}
+export async function absorbTemporaryHealth(actor,total) {
+  const {absorbed}=temporaryHealthAbsorptionPlan(actor,total);
+  if(absorbed)await setState(dose(actor,"potion.full-moon"),{temporary:temporaryHealth(actor)-absorbed});
+  return {absorbed};
+}
 
 /** Bonus SP on every location (Griffin: +2 per hit over 5 damage; Arachas: +2 per 10 free carry). */
 export function elixirArmor(actor) {
@@ -61,13 +71,7 @@ export async function settleRegeneration(actor) {
 
 /** Damage taken (before HP): temporary HP absorb it; Griffin hardens, Wyvern resets, Swallow pauses. */
 export async function onDamaged(actor, total) {
-  let absorbed = 0;
-  const moon = dose(actor, "potion.full-moon");
-  if (moon && total > 0) {
-    const temporary = temporaryHealth(actor);
-    absorbed = Math.min(temporary, total);
-    if (absorbed) await setState(moon, { temporary: temporary - absorbed });
-  }
+  const {absorbed}=await absorbTemporaryHealth(actor,total);
   if (total <= 0) return { absorbed };
   const swallow = dose(actor, "potion.swallow");
   if (swallow) await setState(swallow, { hitSince: true });

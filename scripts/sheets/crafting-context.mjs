@@ -16,7 +16,7 @@ const RECIPE_SECTIONS = category => [
   { id: "unavailable", label: category === "formula" ? "Формулы не при себе" : "Чертежи не при себе", icon: "fa-box-archive", recipes: [] }
 ];
 const hasTool = (actor, id) => actor.items.some(item => available(item) && item.system.ruleId === id);
-const ALCHEMY_KINDS = { substance: "Алхимия", potion: "Эликсир", oil: "Масло", decoction: "Отвар" };
+const ALCHEMY_KINDS = { substance: "Алхимия", potion: "Эликсир", oil: "Масло", decoction: "Отвар", bomb: "Бомба" };
 
 /** Substance units of a formula as signs; the first carried units are lit, the missing ones are hollow. */
 function substanceSigns(preview) {
@@ -44,7 +44,7 @@ export async function recipeCards(actor, category) {
     const ready = preview?.plan.complete && total !== null && canAct && !preview.needsTools;
     const formula = category === "formula";
     // Formulas filter by what they brew, diagrams by grade; both reuse one card and one filter.
-    const kind = formula ? result?.system?.alchemy?.category ?? "" : recipe.grade ?? "";
+    const kind = formula ? result?.system?.ruleId?.startsWith("bomb.") ? "bomb" : result?.system?.alchemy?.category ?? "" : recipe.grade ?? "";
     const typeLabel = formula ? ALCHEMY_KINDS[kind] ?? "Формула" : "Чертёж";
     return {
       id: item.id, name: item.name.replace(/^(Формула|Чертёж):\s*/, ""), search: item.name.toLocaleLowerCase("ru"), physical, memorized, category, kind,
@@ -55,7 +55,7 @@ export async function recipeCards(actor, category) {
       materials: preview?.materials ?? [], facilities: preview?.tools ?? [], forge: recipe.forge, needsForge: preview?.needsForge,
       signs: substanceSigns(preview), extras: (preview?.materials ?? []).filter((_row, i) => !preview.plan.rows[i].substance).map(row => ({ ...row, many: row.quantity > 1 })),
       status: error || (total === null ? "Укажите РЕМ и навык" : !canAct ? "Персонаж не может действовать" : !preview.plan.complete
-        ? (category === "formula" ? "Не хватает субстанций" : "Не хватает материалов")
+          ? (category === "formula" && recipe.components.every(row=>row.substance) ? "Не хватает субстанций" : "Не хватает материалов")
         : preview.needsTools ? "Материалы собраны · нужны инструменты" : (category === "formula" ? "Ингредиенты собраны" : "Материалы собраны")),
       unavailable: !(preview?.plan.complete && total !== null && canAct), toolsOnly: Boolean(preview?.plan.complete && preview.needsTools), ready,
       error: Boolean(error), rememberDisabled: !memorized && recipeMemory(actor).full,

@@ -6,6 +6,7 @@ import { chooseReference } from "../sheets/reference-picker.mjs";
 import { workshopCheck, workshopBase, workshopNotice } from "./check.mjs";
 import { inventoryTransaction, copyPhysical } from "./transaction.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { applyWeaponWear } from "../combat/weapon-wear.mjs";
 
 export function canInstall(target, source) {
   return available(source) && source.system.kind==="upgrade" && source.system.upgrade.target===target.type && freeSlots(target)>0
@@ -21,9 +22,9 @@ async function toolsAvailable(actor) {
   if(actor.items.some(item=>available(item)&&item.system.ruleId==="gear.crafting-tools"))return true;
   return foundry.applications.api.DialogV2.confirm({window:{title:"Инструменты ремесленника"},content:"<p>Нужны инструменты ремесленника. Они доступны вам в мастерской или взяты у союзника?</p>",rejectClose:false});
 }
-export async function installUpgrade(target, { withoutCheck = false } = {}) {
+export async function installUpgrade(target, { withoutCheck = false, source: selectedSource = null } = {}) {
   const actor=target.actor;if(!actor?.isOwner)return;
-  const source=await chooseOwned(actor,"Установить улучшение",item=>canInstall(target,item));if(!source)return;
+  const source=selectedSource??await chooseOwned(actor,"Установить улучшение",item=>canInstall(target,item));if(!source)return;
   const category=source.system.upgrade.category;
   const confirmed=await foundry.applications.api.DialogV2.confirm({window:{title:"Установка улучшения"},content:`<p><b>${esc(source.name)}</b> → ${esc(target.name)}</p><p>${esc(source.system.properties)}</p><p>${category==="armor"?`${withoutCheck?"Установка без проверки и инструментов.":"Полный раунд, Изготовление СЛ 14."} Накладка занимает слот; остальные части комплекта остаются в инвентаре.`:"Руна / глиф расходуется и устанавливается НАВСЕГДА. Снять её нельзя."}</p>`,rejectClose:false});
   if(!confirmed)return;
@@ -32,6 +33,7 @@ export async function installUpgrade(target, { withoutCheck = false } = {}) {
 /** Manual installation keeps ownership, slots and material accounting; only the crafting check/tools are bypassed. */
 export async function installOwnedUpgrade(target, source, { withoutCheck = false } = {}) {
   const actor=target.actor;if(!actor?.isOwner)return;
+  if(source.actor!==actor)throw new Error("Улучшение должно находиться в инвентаре того же персонажа.");
   const category=source.system.upgrade.category;
   if(category==="armor"&&!withoutCheck&&!await toolsAvailable(actor))return;
   return inventoryWrite(actor,async()=>{
@@ -40,7 +42,7 @@ export async function installOwnedUpgrade(target, source, { withoutCheck = false
     if(category==="armor" && !withoutCheck && !(await workshopCheck(actor,{name:"Установка накладки",skill:"crafting",dc:14})).success)return;
     if(!canInstall(target,source))throw new Error("Свободные слоты или предметы изменились.");
     const zone=category==="armor"?target.system.zone:"";
-    const installation={id:foundry.utils.randomID(),name:source.name,sourceUuid:source._stats.compendiumSource||source.uuid,category,zone,properties:source.system.properties,
+    const installation={id:foundry.utils.randomID(),name:source.name,sourceUuid:source._stats.compendiumSource||source.uuid,ruleId:source.system.ruleId??"",category,zone,properties:source.system.properties,
       bonuses:foundry.utils.deepClone(source.system.upgrade.bonuses),weight:category==="armor"?source.system.weight*armorZones(target).length/3:0};
     const updates=[{_id:target.id,"system.installations":[...target.system.installations,installation]}], creates=[];
     const key=conditionKey(target), conditionBonus=installation.bonuses.filter(b=>b.target===key).reduce((sum,b)=>sum+b.value,0);
@@ -53,6 +55,12 @@ export async function installOwnedUpgrade(target, source, { withoutCheck = false
     await inventoryTransaction(actor,{expenses:[{itemId:source.id,quantity:1}],updates,creates});
     await workshopNotice(actor,`<p>${esc(source.name)} установлено на ${esc(target.name)}.</p>`);
   });
+}
+/** Applying an owned rune/glyph directly from its card uses the same permanent installation transaction. */
+export async function installUpgradeFromSource(source) {
+  const actor=source.actor;if(!actor?.isOwner)return;
+  const target=await chooseOwned(actor,"Предмет для руны / глифа",item=>canInstall(item,source)&&available(item)&&item.system.quantity===1);
+  if(target)return installUpgrade(target,{source});
 }
 export async function removeArmorUpgrade(target,id) {
   const actor=target.actor;if(!actor?.isOwner || !await toolsAvailable(actor))return;
@@ -82,7 +90,7 @@ export async function augmentItem(target) {
     if(!check.success){
       // Initial natural 1 defines a fumble, regardless of Luck and the final check total.
       const die=check.roll.dice[0];
-      if(die?.results[0]?.result===1){const damage=Math.abs(die.total);await target.update({[`system.${key}.value`]:Math.max(0,target.system[key].value-damage)});}
+      if(die?.results[0]?.result===1){const damage=Math.abs(die.total);if(key==="reliability")await applyWeaponWear(target,damage);else await target.update({[`system.${key}.value`]:Math.max(0,target.system[key].value-damage)});}
       return;
     }
     const bonus=entry.bonuses.filter(b=>b.target===key).reduce((sum,b)=>sum+b.value,0);

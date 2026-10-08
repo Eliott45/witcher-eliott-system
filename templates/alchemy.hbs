@@ -12,7 +12,7 @@
 </div>
 <ol class="witcher-workshop-steps">
   <li><b>1</b><div><strong>Формула</strong><span>Записанная перед глазами формула даёт <em>+2</em> к проверке.</span></div></li>
-  <li><b>2</b><div><strong>Ингредиенты</strong><span>Важна только субстанция и её количество, а не сырьё.</span></div></li>
+  <li><b>2</b><div><strong>Ингредиенты</strong><span>Для обычных составов важны субстанции; для бомб нужны конкретные компоненты формулы.</span></div></li>
   <li><b>3</b><div><strong>Проверка Алхимии</strong><span>Против СЛ формулы. Провал — состав ни на что не годен.</span></div></li>
 </ol>
 <section class="witcher-stock-panel" aria-labelledby="{{rootId}}-substances">
@@ -29,7 +29,7 @@
 </section>
 <div class="witcher-crafting-filters">
   <label><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" data-recipe-search placeholder="Найти формулу…" aria-label="Найти формулу"></label>
-  <select data-recipe-kind aria-label="Вид состава"><option value="">Все составы</option><option value="substance">Алхимия</option><option value="potion">Эликсиры</option><option value="oil">Масла</option><option value="decoction">Отвары</option></select>
+  <select data-recipe-kind aria-label="Вид состава"><option value="">Все составы</option><option value="substance">Алхимия</option><option value="potion">Эликсиры</option><option value="oil">Масла</option><option value="decoction">Отвары</option><option value="bomb">Бомбы</option></select>
 </div>
 {{#if alchemy.empty}}<div class="witcher-crafting-empty"><i class="fa-solid fa-flask-vial" aria-hidden="true"></i><h3>Начните с формулы</h3><p>Запомните формулу из каталога или добавьте её записанную копию в инвентарь. Здесь появятся нужные субстанции, время приготовления и проверка Алхимии.</p></div>{{/if}}
 <p data-recipe-no-results hidden role="status">Подходящих формул не найдено.</p>
@@ -41,4 +41,4 @@
   </div>
 </section>
 {{/each}}
-<aside class="witcher-crafting-recycling"><i class="fa-solid fa-recycle" aria-hidden="true"></i><div><h3>Переработка после неудачи</h3><p>Ингредиенты тратятся и при провале. Сразу после провала можно ещё раз проверить Алхимию со СЛ формулы: при успехе одна из затраченных субстанций возвращается в чистом виде и подходит для любой формулы.</p></div></aside>
+<aside class="witcher-crafting-recycling"><i class="fa-solid fa-recycle" aria-hidden="true"></i><div><h3>Переработка после неудачи</h3><p>Ингредиенты тратятся и при провале. Для формул на субстанциях сразу можно ещё раз проверить Алхимию со СЛ формулы: при успехе одна затраченная субстанция возвращается в чистом виде. Точные компоненты бомб нельзя заменить чистой субстанцией.</p></div></aside>

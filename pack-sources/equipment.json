@@ -6593,6 +6593,88 @@
     }
   },
   {
+    "_id": "relicDevin000001",
+    "name": "Девин",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.devin",
+      "skill": "swordsmanship",
+      "damageType": "К/Р",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "10d6",
+      "reliability": {
+        "value": 20,
+        "max": 20
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 2,
+      "price": 0,
+      "properties": "Реликвия; Улучшенное фокусирующее (магия воздуха); Дезориентирующее (−2); Пробивающее броню; Метеоритное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 257; официальная errata v4",
+      "description": "<p>Цинтрийский лорд Седрик потребовал от придворного мага привязать к мечу джинна. Маг вернулся с клинком из метеоритной стали, чьи руны сияли, а вокруг лезвия клубился ветер. Но джинн подчинил самого создателя меча и, дождавшись удобного случая, вырвался на свободу и убил лорда. Маг исчез вместе с Девином.</p><p>Легенду можно вспомнить проверкой Образования СЛ 18.</p><p>Улучшенное фокусирующее действует на магию воздуха: +2 к устанавливаемой заклинанием СЛ для противника, без снижения стоимости заклинания. Дезориентирующее (−2) при попадании в голову или туловище вызывает испытание Устойчивости с этим штрафом. Пробивающее броню игнорирует сопротивление типу урона, но не ПБ. Бонус надёжности метеоритного оружия уже включён в Н 20.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicHeadtaker01",
+    "name": "Сорвишапка",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.headtaker",
+      "skill": "swordsmanship",
+      "damageType": "К/Р",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "8d6+2",
+      "reliability": {
+        "value": 20,
+        "max": 20
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 3,
+      "price": 0,
+      "properties": "Реликвия; Пробивающее броню; Сбалансированное (+5); Метеоритное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 257; официальная errata v4",
+      "description": "<p>Темерский наёмник Ульстер Шапка получил чёрный метеоритный меч за уничтожение разбойников. Он прославился, стал рыцарем и встретил нильфгаардское вторжение с оружием в руках. После его гибели клинок переходил от владельца к владельцу. Позднее северный торговец неверно перевёл надпись на лезвии, и за мечом закрепилось имя Сорвишапка.</p><p>Легенду можно вспомнить проверкой Образования СЛ 16.</p><p>Пробивающее броню игнорирует сопротивление типу урона; ПБ продолжает защищать цель. Особое свойство «Сбалансированное (+5)» влияет на определение критического ранения. Бонус надёжности метеоритного оружия уже включён в Н 20.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
     "_id": "relicWolf0000001",
     "name": "Волк",
     "type": "weapon",
@@ -6619,7 +6701,398 @@
       "category": "melee",
       "encumbrance": 0,
       "source": "Базовая книга, стр. 258; официальная errata v4",
-      "description": "<p>Стальной полуторный меч с островов Скеллиге, связанный с легендой об Уффе Кровавобородом. Историю можно вспомнить Образованием СЛ 16. Игнорирует сопротивление брони типу урона; при нанесении урона вызывает кровотечение с вероятностью 75%.</p>"
+      "description": "<p>Скеллигский налётчик Уффе навлёк на себя проклятие женщины, которой причинил зло, и превратился в волколака. Его товарищ Надим взял меч Уффе, выследил чудовище в горах и пронзил ему сердце. Надим назвал клинок Волком; говорят, часть убитого оборотня до сих пор живёт в стали.</p><p>Легенду можно вспомнить проверкой Образования СЛ 16.</p><p>Пробивающее броню игнорирует сопротивление типу урона, но не ПБ. При нанесении проникающего урона меч вызывает кровотечение с вероятностью 75%.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicCaroline001",
+    "name": "Каролина",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.caroline",
+      "skill": "swordsmanship",
+      "damageType": "К/Р",
+      "accuracy": 3,
+      "rarity": "unique",
+      "damage": "9d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 3,
+      "price": 0,
+      "properties": "Реликвия; Улучшенное фокусирующее (магия воды); +25 ПЗ; Сбалансированное; Кровопускающее (75%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 258; официальная errata v4",
+      "description": "<p>Узнав о гибели мужа-моряка, Каролина взяла его родовой меч и поплыла к Скеллиге мстить налётчикам. В море её подобрал тот самый корабль, что погубил мужа. По легенде, морская дева поддержала её силы, и Каролина перебила пиратов. Захватив судно, она собрала собственную команду и стала защищать торговые пути Цидариса.</p><p>Легенду можно вспомнить проверкой Образования СЛ 20.</p><p>Пока меч экипирован, максимум ПЗ увеличен на 25; текущие ПЗ от этого не восстанавливаются. Улучшенное фокусирующее действует только на магию воды и повышает установленную заклинанием СЛ для противника на 2. Сбалансированное оружие; кровотечение при нанесении проникающего урона — 75%.</p>",
+      "wearerBonuses": [
+        {
+          "target": "healthMax",
+          "value": 25
+        }
+      ]
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicThorn000001",
+    "name": "Шип",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.thorn",
+      "skill": "smallBlades",
+      "damageType": "К/Р",
+      "accuracy": 3,
+      "rarity": "unique",
+      "damage": "3d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 2,
+      "concealment": "small",
+      "enhancementSlots": 3,
+      "weight": 0.5,
+      "price": 0,
+      "properties": "Реликвия; Кровопускающее (75%); Отравление (100%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 259; официальная errata v4",
+      "description": "<p>Вердэнский рыцарь Генрих из Орта пленил дриаду, но недооценил её связь с природой. Она превратила деревянную стойку кровати в острый, прочный кинжал, освободилась и поразила похитителя. Невзрачный Шип сохранил смертоносную магию своей создательницы.</p><p>Легенду можно вспомнить проверкой Образования СЛ 15.</p><p>Кинжал можно метнуть на расстояние ТЕЛ × 2 м. Проникающий урон вызывает кровотечение с вероятностью 75% и отравление с вероятностью 100%; иммунитеты цели сохраняются.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicBeheader001",
+    "name": "Обезглавливатель",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.beheader",
+      "skill": "melee",
+      "damageType": "Р",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "10d6",
+      "reliability": {
+        "value": 20,
+        "max": 20
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 4,
+      "price": 0,
+      "properties": "Реликвия; Сбалансированное; Кровопускающее (100%); Метеоритное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 259; официальная errata v4",
+      "description": "<p>Метеоритный топор нильфгаардского палача Тааветти был подарком императора. Его хозяин прославился жестокостью и безумием, а после гибели оставил о себе множество страшных историй. Одни считают, что в топоре живёт его дух; другие рассказывают о ведьмином проклятии, высосавшем жизнь из самого палача.</p><p>Легенду можно вспомнить проверкой Образования СЛ 14.</p><p>Сбалансированное оружие. Проникающий урон вызывает кровотечение с вероятностью 100%, если цель не обладает иммунитетом. Бонус надёжности метеоритного оружия уже включён в Н 20.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicOghyr000001",
+    "name": "Огх’р",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.oghyr",
+      "skill": "melee",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "10d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 5,
+      "price": 0,
+      "properties": "Реликвия; Дезориентирующее (−4); Сбалансированное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 260; официальная errata v4",
+      "description": "<p>Краснолюд Йорат выковал огромный молот с тролльей мордой, чтобы отомстить за друга и освободить захваченные шахты. Тролль Рогар соглашался лишь на состязание в бодании, но Йорат убедил его, что железная голова молота тоже считается головой. Одного удара хватило; затем оружие долго передавалось среди краснолюдских семей.</p><p>Легенду можно вспомнить проверкой Образования СЛ 17.</p><p>Сбалансированное оружие. Дезориентирующее (−4): попадание в голову или туловище требует испытания Устойчивости со штрафом −4; провал вызывает дезориентацию.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicAbyssWard01",
+    "name": "Страж Бездны",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.abyss-warden",
+      "skill": "staffSpear",
+      "damageType": "К/Д",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "7d6+4",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 2,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 4,
+      "price": 0,
+      "properties": "Реликвия; Замораживание (75%); Улучшенное фокусирующее (магия воды); Длинное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 260; официальная errata v4",
+      "description": "<p>Этот древний гарпун покрыт светящимися рунами, знакомыми жрицам Владычицы Озера. Поиски его происхождения привели к затонувшему городу Ису и огромному скелету в глубинах Седниной Бездны. Предание приписывает оружие воину, погибшему при защите города от морского чудовища.</p><p>Легенду можно вспомнить проверкой Образования СЛ 18.</p><p>Длинное оружие; можно метать на ТЕЛ × 2 м. Замораживание с вероятностью 75%. Улучшенное фокусирующее действует только на магию воды: +2 к устанавливаемой заклинанием СЛ для противника, без снижения стоимости.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicSuccubus001",
+    "name": "Посох суккуба",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.succubus-staff",
+      "skill": "staffSpear",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "3d6+2",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 2,
+      "price": 0,
+      "properties": "Реликвия; Длинное; Горение (25%); +2 к Соблазнению; Улучшенное фокусирующее (магия огня); Фокусирующее (5)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 261; официальная errata v4",
+      "description": "<p>Суккуб Нерис очаровала молодого мага из Бан Арда и заставила его создать посох, усиливающий её чары. Она считала свою власть над смертными непреодолимой. Но жена обманутого пастуха выманила Нерис, убила её серебряной шпилькой и забрала посох как трофей.</p><p>Легенду можно вспомнить проверкой Образования СЛ 20.</p><p>Длинное оружие; горение с вероятностью 25%. Экипированный посох даёт +2 к Соблазнению. Фокусирующее (5) уменьшает стоимость заклинания на 5 ВЫН, минимум до 1. Улучшенное фокусирующее повышает установленную для противника СЛ на 2 только у магии огня.</p>",
+      "wearerBonuses": [
+        {
+          "target": "skills.seduction",
+          "value": 2
+        }
+      ]
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicMoonBow0001",
+    "name": "Лунный лук",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.moon-bow",
+      "skill": "archery",
+      "damageType": "К",
+      "accuracy": 1,
+      "rarity": "unique",
+      "damage": "8d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 200,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 2,
+      "price": 0,
+      "properties": "Реликвия; Замораживание (75%); Сбалансированное; +3 урона призракам",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 261; официальная errata v4",
+      "description": "<p>Эльфская охотница Адерин получила Лунный лук от Девы Полей и очищала леса от призраков, оставшихся после войн людей со Старшими Народами. Но каждая новая смерть порождала ещё один дух. Осознав, что месть лишь продолжает этот круг, Адерин оставила охоту и исчезла.</p><p>Легенду можно вспомнить проверкой Образования СЛ 17.</p><p>Длинный лук, дальность 200 м. Сбалансированное оружие; замораживание с вероятностью 75%. Наносит дополнительно 3 урона призракам.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicRedDeath001",
+    "name": "Красная Смерть",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.red-death",
+      "skill": "crossbow",
+      "damageType": "К",
+      "accuracy": 2,
+      "rarity": "unique",
+      "damage": "10d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 300,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 2.5,
+      "price": 0,
+      "properties": "Реликвия; Отравление (100%); +3 к Наведению порчи; +3 к Сопротивлению магии",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 262; официальная errata v4",
+      "description": "<p>Во время Бича Катрионы хирург из Гвиндефа создал мощный арбалет и расстреливал заражённых, пытаясь остановить эпидемию. Среди погибших оказались и невиновные. Легенда гласит, что оружие впитало их страдания, а его хозяин сошёл с ума от голосов и кошмаров и исчез, оставив Красную Смерть.</p><p>Легенду можно вспомнить проверкой Образования СЛ 16.</p><p>Арбалет, дальность 300 м. Проникающий урон отравляет цель с вероятностью 100%, если она не обладает иммунитетом. Пока оружие экипировано, Наведение порчи и Сопротивление магии получают +3.</p>",
+      "wearerBonuses": [
+        {
+          "target": "skills.hexWeaving",
+          "value": 3
+        },
+        {
+          "target": "skills.resistMagic",
+          "value": 3
+        }
+      ]
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicFate0000001",
+    "name": "Судьба",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.fate",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 3,
+      "rarity": "unique",
+      "damage": "2d6+1",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 4,
+      "price": 0,
+      "properties": "Реликвия; Серебряное (6d6+4); Улучшенное фокусирующее (магия воды и огня); Ошеломление (75%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 262; официальная errata v4",
+      "description": "<p>Краснолюду Владову Варге предсказали скорую смерть от ночной красавицы. Устав скрываться, старый мечник выковал серебряный клинок и назвал его Судьбой. Когда брукса Эссилит напала, он удерживал её на расстоянии до восхода солнца. Так Владов сам выковал свою судьбу и пережил предсказание.</p><p>Легенду можно вспомнить проверкой Образования СЛ 19.</p><p>По уязвимым к серебру существам наносит дополнительно [[/r 6d6+4]] серебряного урона. Улучшенное фокусирующее повышает установленную заклинанием СЛ для противника на 2 только у магии воды или огня. Ошеломление с вероятностью 75%.</p>"
     },
     "effects": [],
     "folder": "gearFolderWeapon",
@@ -6660,7 +7133,48 @@
       "category": "melee",
       "encumbrance": 0,
       "source": "Базовая книга, стр. 263; официальная errata v4",
-      "description": "<p>Серебряный полуторный меч из легенды о ведьмаке Олеке и демоне из Элландера. История: Образование СЛ 18. По уязвимым к серебру чудовищам дополнительно наносит [[/r 7d6+4]] серебряного урона. Улучшенное фокусирующее повышает на 2 СЛ проверок против заклинаний, сотворённых с этим оружием. Серебряный урон применяется отдельно от обычного.</p>"
+      "description": "<p>Когда призванный в Элландере дьявол начал переходить из тела в тело, ведьмак Олек из школы Волка взялся остановить его. Кузнецы изготовили серебряный меч, а жрицы лунной богини Лилвани благословили его. Олек вынудил дьявола покинуть очередного носителя и рассёк тварь этим клинком.</p><p>Легенду можно вспомнить проверкой Образования СЛ 18.</p><p>По уязвимым к серебру чудовищам дополнительно наносит [[/r 7d6+4]] серебряного урона. Улучшенное фокусирующее повышает на 2 СЛ проверок против заклинаний, сотворённых с этим оружием, без ограничения стихии и без снижения стоимости заклинания. Серебряный урон применяется отдельно от обычного.</p>"
+    },
+    "effects": [],
+    "folder": "gearFolderWeapon",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "relicMogrim00001",
+    "name": "Могрим",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.mogrim",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "2d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 6,
+      "price": 0,
+      "properties": "Реликвия; Серебряное (6d6+4); Улучшенное фокусирующее (магия земли и воды); Сбалансированное; Замораживание (75%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Базовая книга, стр. 263; официальная errata v4",
+      "description": "<p>Чародейка Эйдра Ледяная Песнь создала огромного зверя Могрима и угрожала захваченной Нильфгаардом Темерии. Ведьмак Геррин из школы Змеи не смог одолеть чудовище обычной парой клинков и укрылся в старой краснолюдской шахте. Там он выковал второй серебряный меч, а наутро вернулся с головами чародейки и её создания.</p><p>Легенду можно вспомнить проверкой Образования СЛ 22.</p><p>По уязвимым к серебру существам дополнительно наносит [[/r 6d6+4]] серебряного урона. Улучшенное фокусирующее повышает установленную для противника СЛ на 2 только у магии земли или воды. Сбалансированное оружие; замораживание с вероятностью 75%.</p>"
     },
     "effects": [],
     "folder": "gearFolderWeapon",
@@ -7013,6 +7527,244 @@
       "properties": "Взрыв; Радиус 2 м; Урон 4d6 по всем частям тела",
       "source": "Базовая книга, стр. 254–255; параметры за один снаряд",
       "description": "<p>Стрела или арбалетный болт с сосудом реактивной смеси. При ударе сосуд разбивается и взрывается: [[/r 4d6]] урона по всем частям тела каждого существа в пределах 2 м.</p>"
+    },
+    "effects": [],
+    "folder": "gearAmmo00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "exdv000000000001",
+    "name": "Бомба «Танцующая звезда»",
+    "type": "equipment",
+    "img": "icons/svg/explosion.svg",
+    "system": {
+      "ruleId": "bomb.dancing-star",
+      "kind": "gear",
+      "weight": 1,
+      "price": 162,
+      "damageType": "С",
+      "properties": "Бомба; Радиус 4 м; Урон 5d6; Горение (100%)",
+      "source": "Базовая книга, стр. 254–255",
+      "description": "<p>Горение (100%).</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "exdv000000000002",
+    "name": "Бомба «Сон дракона»",
+    "type": "equipment",
+    "img": "icons/svg/explosion.svg",
+    "system": {
+      "ruleId": "bomb.dragon-dream",
+      "kind": "gear",
+      "weight": 1,
+      "price": 177,
+      "damageType": "С",
+      "properties": "Бомба; Радиус 8 м; Горючее облако на 3 хода; при контакте с пламенем: Урон 5d6; Горение (75%)",
+      "source": "Базовая книга, стр. 254–255",
+      "description": "<p>Горючее облако на 3 хода; при контакте с пламенем: Урон 5d6; Горение (75%).</p><p>Облако перемещается в случайном направлении и рассеивается через три хода. При появлении любого источника пламени весь газ взрывается. Скорость смещения определяет ведущий: книга её не задаёт.</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "exdv000000000003",
+    "name": "Ловушка «Кусач»",
+    "type": "equipment",
+    "img": "icons/svg/trap.svg",
+    "system": {
+      "ruleId": "trap.biter",
+      "kind": "gear",
+      "weight": 2,
+      "price": 144,
+      "damageType": "К",
+      "properties": "Ловушка; Радиус 4 м; Урон 7d6",
+      "source": "Базовая книга, стр. 254–255",
+      "description": "<p>Взрыв наносит урон всем частям тела каждого существа в радиусе..</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "exdv000000000004",
+    "name": "Ловушка «Когтезуб»",
+    "type": "equipment",
+    "img": "icons/svg/trap.svg",
+    "system": {
+      "ruleId": "trap.claw",
+      "kind": "gear",
+      "weight": 2,
+      "price": 111,
+      "damageType": "Р",
+      "properties": "Ловушка; Радиус 4 м; Урон 5d6; Кровотечение (60%)",
+      "source": "Базовая книга, стр. 254–255",
+      "description": "<p>Кровотечение (60%).</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "exdv000000000005",
+    "name": "Ловушка «Пожарище»",
+    "type": "equipment",
+    "img": "icons/svg/trap.svg",
+    "system": {
+      "ruleId": "trap.conflagration",
+      "kind": "gear",
+      "weight": 2,
+      "price": 121,
+      "damageType": "С",
+      "properties": "Ловушка; Радиус 4 м; Урон 5d6; Горение (75%)",
+      "source": "Базовая книга, стр. 254–255",
+      "description": "<p>Горение (75%).</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "exdv000000000006",
+    "name": "Ловушка «Бешенство»",
+    "type": "equipment",
+    "img": "icons/svg/trap.svg",
+    "system": {
+      "ruleId": "trap.fury",
+      "kind": "gear",
+      "weight": 2,
+      "price": 114,
+      "damageType": "С",
+      "properties": "Ловушка; Радиус 8 м; Стойкость СЛ 18; при провале атакует ближайшее существо до успешной проверки",
+      "source": "Базовая книга, стр. 254–255",
+      "description": "<p>Стойкость СЛ 18; при провале атакует ближайшее существо до успешной проверки.</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "exdv000000000007",
+    "name": "Ловушка «Метка»",
+    "type": "equipment",
+    "img": "icons/svg/trap.svg",
+    "system": {
+      "ruleId": "trap.marker",
+      "kind": "gear",
+      "weight": 2,
+      "price": 57,
+      "damageType": "С",
+      "properties": "Ловушка; Радиус 8 м; Краска и запах на 1 день: +5 к выслеживанию и обнаружению цели",
+      "source": "Базовая книга, стр. 254–255",
+      "description": "<p>Краска и запах на 1 день: +5 к выслеживанию и обнаружению цели.</p><p>Три полных раунда мытья в крупном водоёме снижают зрительный бонус до +2. Запах не смывается, но духи, одеколон или грязь снижают бонус выслеживания по запаху до +2.</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "exdv000000000008",
+    "name": "Ловушка «Талгарская зима»",
+    "type": "equipment",
+    "img": "icons/svg/trap.svg",
+    "system": {
+      "ruleId": "trap.talgar-winter",
+      "kind": "gear",
+      "weight": 2,
+      "price": 126,
+      "damageType": "С",
+      "properties": "Ловушка; Радиус 4 м; Замораживание на месте; Сила СЛ 18 или удар освобождают, иначе длится 8 раундов; атака наносит дополнительно 2d6",
+      "source": "Базовая книга, стр. 254–255",
+      "description": "<p>Замораживание на месте; Сила СЛ 18 или удар освобождают, иначе длится 8 раундов; атака наносит дополнительно 2d6.</p>"
+    },
+    "effects": [],
+    "folder": "gearAlchemy00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "exdv000000000009",
+    "name": "Разделяющиеся боеприпасы",
+    "type": "equipment",
+    "img": "icons/weapons/ammunition/arrow-simple.webp",
+    "system": {
+      "ruleId": "ammunition.split",
+      "kind": "ammunition",
+      "weight": 0.1,
+      "price": 54,
+      "damageType": "К",
+      "properties": "Разделяющееся: до трёх попаданий по случайным частям тела",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>За каждый пункт превышения защиты цели, максимум 3, нанесите полный урон оружия случайной части тела. В инвентаре учитывается один боеприпас.</p>"
+    },
+    "effects": [],
+    "folder": "gearAmmo00000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "exdv000000000010",
+    "name": "Выслеживающие боеприпасы",
+    "type": "equipment",
+    "img": "icons/weapons/ammunition/arrow-simple.webp",
+    "system": {
+      "ruleId": "ammunition.tracking",
+      "kind": "ammunition",
+      "weight": 0.1,
+      "price": 22,
+      "damageType": "К",
+      "properties": "Выслеживание по запаху без проверки, если следу менее половины суток",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Пока боеприпас остаётся в теле цели, выслеживание по запаху не требует проверки, если следу менее 12 часов. Извлечение боеприпаса прекращает эффект.</p>"
     },
     "effects": [],
     "folder": "gearAmmo00000001",
@@ -23793,6 +24545,1104 @@
     "flags": {
       "witcher-eliott-system": {
         "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000001",
+    "name": "Формула: Бомба «Танцующая звезда»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.bomb.dancing-star",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "formula",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.exdv000000000001",
+        "quantity": 1,
+        "dc": 20,
+        "time": 1800,
+        "investment": 108,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000046",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000166",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000144",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000002",
+    "name": "Формула: Бомба «Чёртов гриб»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.bomb.devils-puffball",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "formula",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.bombDevilsPuf001",
+        "quantity": 1,
+        "dc": 16,
+        "time": 1800,
+        "investment": 92,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000046",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000143",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000245",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000003",
+    "name": "Формула: Двимеритовая бомба",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.bomb.dimeritium",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "formula",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.bombDimeritium01",
+        "quantity": 1,
+        "dc": 20,
+        "time": 1800,
+        "investment": 176,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000046",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000165",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000143",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000004",
+    "name": "Формула: Бомба «Сон дракона»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.bomb.dragon-dream",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "formula",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.exdv000000000002",
+        "quantity": 1,
+        "dc": 16,
+        "time": 1800,
+        "investment": 118,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000046",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000140",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000205",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000005",
+    "name": "Формула: Бомба «Картечь»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.bomb.grapeshot",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "formula",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.bombGrapeshot001",
+        "quantity": 1,
+        "dc": 20,
+        "time": 1800,
+        "investment": 106,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000046",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000037",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000103",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000006",
+    "name": "Формула: Бомба «Лунная пыль»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.bomb.moon-dust",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "formula",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.bombMoonDust0001",
+        "quantity": 1,
+        "dc": 16,
+        "time": 1800,
+        "investment": 133,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000046",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000146",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000166",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000007",
+    "name": "Формула: Бомба «Северный ветер»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.bomb.northern-wind",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "formula",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.bombNorthernW001",
+        "quantity": 1,
+        "dc": 20,
+        "time": 1800,
+        "investment": 118,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000046",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000161",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000224",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000008",
+    "name": "Формула: Бомба «Самум»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.bomb.samum",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "formula",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.bombSamum0000001",
+        "quantity": 1,
+        "dc": 18,
+        "time": 1800,
+        "investment": 98,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000046",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000120",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000205",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000009",
+    "name": "Чертёж: Ловушка «Кусач»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.trap.biter",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.exdv000000000003",
+        "quantity": 1,
+        "dc": 16,
+        "time": 1800,
+        "investment": 96,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "substance": "",
+            "quantity": 7
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000037",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000046",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000010",
+    "name": "Чертёж: Ловушка «Когтезуб»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.trap.claw",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.exdv000000000004",
+        "quantity": 1,
+        "dc": 16,
+        "time": 1800,
+        "investment": 74,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000044",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000247",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000002",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000011",
+    "name": "Чертёж: Ловушка «Пожарище»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.trap.conflagration",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.exdv000000000005",
+        "quantity": 1,
+        "dc": 18,
+        "time": 1800,
+        "investment": 81,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000263",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000012",
+    "name": "Чертёж: Ловушка «Бешенство»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.trap.fury",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.exdv000000000006",
+        "quantity": 1,
+        "dc": 16,
+        "time": 1800,
+        "investment": 76,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000008",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000125",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000013",
+    "name": "Чертёж: Ловушка «Метка»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.trap.marker",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.exdv000000000007",
+        "quantity": 1,
+        "dc": 14,
+        "time": 1800,
+        "investment": 38,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000166",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000143",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000001",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000014",
+    "name": "Чертёж: Ловушка «Талгарская зима»",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.trap.talgar-winter",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.exdv000000000008",
+        "quantity": 1,
+        "dc": 18,
+        "time": 1800,
+        "investment": 84,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000181",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000106",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000015",
+    "name": "Чертёж: Взрывные боеприпасы ×5",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.ammunition.explosive",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.ammoExplosive001",
+        "quantity": 5,
+        "dc": 20,
+        "time": 1800,
+        "investment": 362,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000008",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000046",
+            "substance": "",
+            "quantity": 4
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000016",
+    "name": "Чертёж: Разделяющиеся боеприпасы ×5",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.ammunition.split",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.exdv000000000009",
+        "quantity": 5,
+        "dc": 18,
+        "time": 1800,
+        "investment": 181,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000004",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "exrc000000000017",
+    "name": "Чертёж: Выслеживающие боеприпасы ×5",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.ammunition.tracking",
+      "price": 0,
+      "source": "Базовая книга, стр. 255",
+      "description": "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>",
+      "recipe": {
+        "category": "diagram",
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.exdv000000000010",
+        "quantity": 5,
+        "dc": 14,
+        "time": 1800,
+        "investment": 76,
+        "grade": "novice",
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000009",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000030",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      }
+    },
+    "effects": [],
+    "folder": "gearRecipes00001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true,
+        "exactComponents": true
       }
     }
   }

@@ -7,6 +7,7 @@ import { workshopCheck, workshopBase, workshopNotice } from "./check.mjs";
 import { inventoryTransaction, copyPhysical } from "./transaction.mjs";
 import { diagramIndex, diagramFor, isRepairable } from "./repair.mjs";
 import { PURE_SUBSTANCES } from "../data/workshop-materials.mjs";
+import { SYSTEM_ID } from "../config.mjs";
 
 export async function resolveRequirements(recipe) {
   const refs = new Map();
@@ -31,7 +32,7 @@ function requireRecipe(actor, item, repair) {
   if (!repair && recipe.category === "diagram" && ["master", "grandmaster"].includes(recipe.grade) && workshopBase(actor, "profession.craftsman.master-crafting") === null)
     throw new Error("Для чертежа мастера или великого мастера нужна изученная способность «Мастерская работа».");
   if (!recipe.resultUuid || !recipe.components.length || recipe.dc <= 0 || recipe.time <= 0) throw new Error("Заполните результат, компоненты, сложность и время рецепта.");
-  if (recipe.category === "diagram" && recipe.components.some(row => !row.uuid || row.substance)) throw new Error("Для чертежа нужны конкретные материалы, а не алхимические субстанции.");
+  if ((recipe.category === "diagram" || item.flags?.[SYSTEM_ID]?.exactComponents) && recipe.components.some(row => !row.uuid || row.substance)) throw new Error("Для этого рецепта нужны указанные материалы; замена алхимическими субстанциями недоступна.");
 }
 const toolNames = {"gear.crafting-tools":"Инструменты ремесленника","gear.alchemy-tools":"Инструменты алхимика"};
 export function craftingFacilities(actor, recipe) {

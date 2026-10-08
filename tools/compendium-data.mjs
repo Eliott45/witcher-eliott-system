@@ -16,6 +16,7 @@ import { INFLUENTIAL_FRIENDS } from "../scripts/data/influential-friends.mjs";
 import { LANGUAGES } from "../scripts/data/languages.mjs";
 import { CORE_EQUIPMENT, LEGACY_GEAR_STATS } from "../scripts/data/core-equipment.mjs";
 import { WITCHER_SPECIAL_EQUIPMENT } from "../scripts/data/witcher-special-equipment.mjs";
+import { EXPERIMENTAL_DEVICES } from "../scripts/data/experimental-devices.mjs";
 import { generalGearContent } from "../scripts/data/general-gear.mjs";
 import { defaultItemIcon } from "../scripts/data/item-icons.mjs";
 import { itemLore, stripPageReferences } from "../scripts/data/item-lore.mjs";
@@ -79,7 +80,7 @@ export function compendiumData(translations) {
       gear.system.description ||= itemLore(gear);
       return gear;
     }),
-      ...[...CORE_EQUIPMENT, ...WITCHER_SPECIAL_EQUIPMENT, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: stripPageReferences(entry.system.description ?? "") || itemLore(entry) }),
+      ...[...CORE_EQUIPMENT, ...WITCHER_SPECIAL_EQUIPMENT, ...EXPERIMENTAL_DEVICES, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: stripPageReferences(entry.system.description ?? "") || itemLore(entry) }),
         img: entry.img ?? defaultItemIcon(entry) }))],
     "influential-friends": INFLUENTIAL_FRIENDS.map(entry => item(entry.documentId, "influence", entry, {
       region: entry.group, roll: entry.roll,

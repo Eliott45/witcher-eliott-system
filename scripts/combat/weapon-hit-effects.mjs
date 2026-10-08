@@ -2,6 +2,8 @@ import { immuneToCondition } from "../data/creatures.mjs";
 import { setStatus } from "./status-effects.mjs";
 import { EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions.mjs";
 import { creatureGolemSlowed } from "../data/creature-modes.mjs";
+import { stunSucceeded } from "../data/statistics.mjs";
+import { fullTurnStart } from "./full-turn-rules.mjs";
 
 /** Core p.72: bleed requires injury; ablating damages armor on a hit, even when SP holds. */
 export function weaponHitTraits(weapon = {}, actor = null) {
@@ -11,6 +13,10 @@ export function weaponHitTraits(weapon = {}, actor = null) {
     bleeding: chance(/(?:кровопускающ\S*|кровотечение)\s*\((\d+)\s*%\)/iu),
     poisoned: chance(/(?:отравление|яд|отравляющ\S*)\s*\((\d+)\s*%\)/iu),
     burning: chance(/(?:горение|поджигающ\S*)\s*\((\d+)\s*%\)/iu),
+    frozen: chance(/заморажива\S*\s*\((\d+)\s*%\)/iu),
+    staggered: chance(/ошеломлени\S*\s*\((\d+)\s*%\)/iu),
+    stunModifier: /дезориентирующ/iu.test(text) ? Number(text.match(/дезориентирующ\S*\s*\(([−-]?\d+)\)/iu)?.[1]?.replace("−", "-") ?? 0) : null,
+    specterDamage: Number(text.match(/\+(\d+)\s+урона\s+призракам/iu)?.[1] ?? 0),
     ablating: /разрушающ/iu.test(text),
     wearMultiplier: !creatureGolemSlowed(actor) && /двойной урон (?:оружию|снаряжению)/iu.test(text) ? 2 : 1,
     noParry: !creatureGolemSlowed(actor) && /нельзя парировать/iu.test(text)
@@ -19,8 +25,8 @@ export function weaponHitTraits(weapon = {}, actor = null) {
 
 export function weaponConditionChances(traits, result, { nonLethal = false } = {}) {
   if (result.immune) return [];
-  return ["bleeding", "poisoned", "burning"].filter(id => traits?.[id] > 0
-    && (id === "burning" || !nonLethal && result.total > 0 && result.penetrated))
+  return ["bleeding", "poisoned", "burning", "frozen", "staggered"].filter(id => traits?.[id] > 0
+    && (["burning", "frozen", "staggered"].includes(id) || !nonLethal && result.total > 0 && result.penetrated))
     .map(id => ({ id, chance: traits[id] }));
 }
 
@@ -34,11 +40,30 @@ export async function rollWeaponConditions(actor, traits, result, options = {}) 
     effects.push({ ...entry, immune, roll: roll?.total ?? null, applied: !immune && (!roll || roll.total <= entry.chance),
       ...(entry.id === "bleeding" && options.ammunition?.ruleId === "ammunition.elven-burrowing" ? {burrowing:true} : {}) });
   }
+  // Stun (core p.72) is a save on a head/torso hit, even if armor stopped the damage.
+  if (!result.immune && traits?.stunModifier != null && ["head", "torso"].includes(options.location)) {
+    const target = actor.system?.statistics?.stun;
+    if (Number.isFinite(target)) {
+      const roll = await new foundry.dice.Roll("1d10").evaluate({ allowInteractive: !options.blind });
+      rolls.push(roll);
+      effects.push({ id: "stunned", save: true, target: target + traits.stunModifier, modifier: traits.stunModifier,
+        roll: roll.total, applied: !stunSucceeded(roll.total, target + traits.stunModifier) });
+    }
+  }
   return { rolls, effects };
 }
 
 export async function applyWeaponConditions(actor, effects) {
   for (const effect of effects) if (effect.applied) {
+    if (effect.id === "staggered") {
+      const source = conditionSource(EFFECT_TEMPLATES.find(entry => entry.key === "staggered")); delete source._id;
+      source.start = fullTurnStart(actor);
+      source.duration = { value: 1, units: "rounds", expiry: "turnStart", expired: false };
+      const existing = Array.from(actor.effects).find(entry => entry.statuses.has("staggered"));
+      if (existing) await existing.update(source);
+      else await actor.createEmbeddedDocuments("ActiveEffect", [source]);
+      continue;
+    }
     if (!effect.burrowing) { await setStatus(actor, effect.id, true); continue; }
     const source=conditionSource(EFFECT_TEMPLATES.find(entry=>entry.key==="burrowing")); delete source._id;
     const existing=Array.from(actor.effects).find(entry=>entry.statuses.has("bleeding"));
@@ -47,5 +72,7 @@ export async function applyWeaponConditions(actor, effects) {
   }
 }
 
-export const weaponConditionLabel = id => ({ bleeding: "Кровотечение", poisoned: "Отравление", burning: "Горение" })[id] ?? id;
-export const weaponConditionReport = effects => effects.map(effect => `${weaponConditionLabel(effect.id)} ${effect.chance}%: ${effect.immune ? "иммунитет" : `${effect.roll === null ? "" : `${effect.roll} — `}${effect.applied ? "наложено" : "не сработало"}`}`).join("; ");
+export const weaponConditionLabel = id => ({ bleeding: "Кровотечение", poisoned: "Отравление", burning: "Горение", frozen: "Замораживание", staggered: "Ошеломление", stunned: "Дезориентация" })[id] ?? id;
+export const weaponConditionReport = effects => effects.map(effect => effect.save
+  ? `Испытание УСТ ${effect.modifier}: ${effect.roll} против ${effect.target} — ${effect.applied ? "дезориентация" : "успех"}`
+  : `${weaponConditionLabel(effect.id)} ${effect.chance}%: ${effect.immune ? "иммунитет" : `${effect.roll === null ? "" : `${effect.roll} — `}${effect.applied ? "наложено" : "не сработало"}`}`).join("; ");

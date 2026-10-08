@@ -1126,6 +1126,29 @@ for (const [ruleId, dc, sp, zones] of [["armor.raven", 14, 12, "torso-legs"], ["
   assert.doesNotMatch(html.match(/<button[^>]*data-action="rollRelicLore"[^>]*>/)?.[0] ?? "", /disabled/);
 }
 const nativeLinenDiagram = [...documents.values()].find(item => item.system?.ruleId === "diagram.material.linen");
+const { RELIC_WEAPON_LORE } = await import('../scripts/data/relic-weapons.mjs');
+assert.equal(Object.keys(RELIC_WEAPON_LORE).length,14);
+for(const [ruleId,lore] of Object.entries(RELIC_WEAPON_LORE)) {
+  const relic=[...documents.values()].find(item=>item.system?.ruleId===ruleId);
+  assert.ok(relic,`${ruleId}: missing relic weapon`);referenceSheet.item=relic;
+  const context=await referenceSheet._prepareContext({}),html=itemTemplate(context);
+  assert.equal(context.relicLore.dc,lore.dc);assert.match(html,/data-action="rollRelicLore"/);
+  assert.ok(html.includes(`Образование СЛ ${lore.dc}`));assert.equal(relic.flags[game.system.id].priceUnavailable,true);
+}
+const { EXPERIMENTAL_RECIPES } = await import('../scripts/data/experimental-devices.mjs');
+for(const definition of EXPERIMENTAL_RECIPES) {
+  const recipe=[...documents.values()].find(item=>item.system?.ruleId===definition.id);
+  assert.ok(recipe,`${definition.id}: missing experimental recipe`);referenceSheet.item=recipe;
+  const context=await referenceSheet._prepareContext({}),html=itemTemplate(context);
+  assert.equal(recipe.system.recipe.time,1800);assert.match(html,/30 мин\./);
+  assert.equal(recipe.flags[game.system.id].priceUnavailable,true);assert.equal(recipe.system.price,0);
+  assert.equal(context.recipeDetails.investment,definition.system.recipe.investment);
+  for(const uuid of [recipe.system.recipe.resultUuid,...recipe.system.recipe.components.map(component=>component.uuid)]) {
+    assert.ok(documents.has(uuid),`${definition.id}: unresolved ${uuid}`);
+    assert.ok(html.includes(`data-uuid="${uuid}"`),`${definition.id}: missing clickable component/result`);
+  }
+}
+console.log('Relics and experiments: 14 weapon legends and 17 exact linked recipes render in strict item templates');
 referenceSheet.item = await foundry.utils.fromUuid(nativeLinenDiagram.uuid);
 const nativeRecipeContext = await referenceSheet._prepareContext({});
 const nativeRecipeHTML = itemTemplate(nativeRecipeContext);
@@ -1828,6 +1851,7 @@ assert.ok(!tacticsHTML.match(/data-action="openAmbush"[^>]*disabled/));
 assert.ok(tacticsHTML.includes('Бонус действует до конца первого раунда'));
 assert.ok(!tacticsHTML.includes('Первая атака'));
 console.log('Combat tactics: native effects, core icons and active ambush controls OK');
+await (await import('./native-experimental.mjs')).checkNativeExperimental(tacticsTemplate,alchemyPartial,documents);
 
 const {ambushWindowContext,groupCardContext}=await import('../scripts/sheets/ambush-context.mjs');
 const ambushTemplate=handlebars.compile(await readFile(new URL('../templates/ambush-window.hbs',import.meta.url),'utf8'),{strict:true});

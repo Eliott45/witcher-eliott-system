@@ -43,6 +43,32 @@ test("poison deals three HP once at the actor's next turn and posts the actual l
   await startTurnPoison(f.combat,f.combatant,{...f.context,round:1});assert.equal(f.messages.length,1);
   await startTurnPoison(f.combat,f.combatant,{...f.context,round:3});assert.equal(f.actor.system.health.value,4);
 });
+test("periodic poison spends adrenaline HP with the turn receipt, and a failed write keeps the pool",async()=>{
+  const f=fixture(false);f.combat.id="c";game.combat=f.combat;
+  f.actor.flags[SYSTEM_ID]={adrenaline:{combatId:"c",dice:0,temporaryHP:5,emergencyHP:0,damageDice:0,events:[]}};
+  const update=f.actor.update.bind(f.actor);let reject=true;
+  f.actor.update=async changes=>{if(reject){reject=false;throw new Error("failed HP");}return update(changes);};
+  await assert.rejects(startTurnPoison(f.combat,f.combatant,f.context),/failed HP/);
+  assert.equal(f.actor.flags[SYSTEM_ID].adrenaline.temporaryHP,5);
+  await startTurnPoison(f.combat,f.combatant,f.context);
+  assert.equal(f.actor.system.health.value,10);assert.equal(f.actor.flags[SYSTEM_ID].adrenaline.temporaryHP,2);
+  assert.match(f.messages[0].content,/Временные ПЗ поглотили 3/);
+  await startTurnPoison(f.combat,f.combatant,{...f.context,round:3});assert.equal(f.actor.system.health.value,9);
+});
+test("Full Moon absorbs periodic damage before adrenaline, and is refunded if the HP transaction fails",async()=>{
+  const f=fixture(false);f.combat.id="c";game.combat=f.combat;
+  const moon={id:"moon",statuses:new Set(),flags:{[SYSTEM_ID]:{consumable:{ruleId:"potion.full-moon"},elixirState:{temporary:2}}}};
+  f.actor.effects.push(moon);f.actor.effects.get=id=>f.actor.effects.find(row=>row.id===id);
+  f.actor.flags[SYSTEM_ID]={adrenaline:{combatId:"c",dice:0,temporaryHP:5,emergencyHP:0,damageDice:0,events:[]}};
+  foundry.utils={deepClone:structuredClone,getProperty:(object,path)=>path.split(".").reduce((value,key)=>value?.[key],object)};
+  f.actor.updateEmbeddedDocuments=async(_type,changes)=>{for(const change of changes)patch(f.actor.effects.get(change._id),Object.fromEntries(Object.entries(change).filter(([key])=>key!=="_id")));};
+  const update=f.actor.update.bind(f.actor);let reject=true;
+  f.actor.update=async changes=>{if(reject){reject=false;throw new Error("failed HP");}return update(changes);};
+  await assert.rejects(startTurnPoison(f.combat,f.combatant,f.context),/failed HP/);
+  assert.equal(moon.flags[SYSTEM_ID].elixirState.temporary,2);assert.equal(f.actor.flags[SYSTEM_ID].adrenaline.temporaryHP,5);
+  await startTurnPoison(f.combat,f.combatant,f.context);
+  assert.equal(moon.flags[SYSTEM_ID].elixirState.temporary,0);assert.equal(f.actor.flags[SYSTEM_ID].adrenaline.temporaryHP,4);assert.equal(f.actor.system.health.value,10);
+});
 
 test("creature regeneration heals once per turn up to maximum, pauses under suppression and never revives the dead",async()=>{
   const f=fixture(false);f.actor.type="npc";f.actor.effects=[];

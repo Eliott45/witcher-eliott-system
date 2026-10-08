@@ -69,6 +69,16 @@ test("creature actions preserve identities on renamed imports and reject another
   game.user={id:"other-gm",isGM:true};assert.ok(creatureActions(arachas).every(action=>action.disabled));
   await assert.rejects(useCreatureAction(arachas,"web"),/активный ведущий/);
 });
+test("creature hits consume adrenaline and HP in the same transaction and do not replay receipts",async()=>{
+  const f=setup(),actor=f.actor("Маг");f.token(actor);f.combat();
+  actor.flags[SYSTEM_ID]={...(actor.flags[SYSTEM_ID]??{}),adrenaline:{combatId:"combat",dice:0,temporaryHP:5,emergencyHP:0,damageDice:0,events:[]}};
+  const before=actor.system.health.value;actor.failHealth=true;
+  await assert.rejects(applyCreatureDamage(actor,{total:8,ablate:[]},"test-adrenaline"),/health failed/);
+  assert.equal(actor.flags[SYSTEM_ID].adrenaline.temporaryHP,5);
+  await applyCreatureDamage(actor,{total:8,ablate:[]},"test-adrenaline");
+  assert.equal(actor.system.health.value,before-3);assert.equal(actor.flags[SYSTEM_ID].adrenaline.temporaryHP,0);
+  assert.equal(await applyCreatureDamage(actor,{total:8,ablate:[]},"test-adrenaline"),false);assert.equal(actor.system.health.value,before-3);
+});
 
 test("fixed needle DC, strict minimum distances and printed charge profiles",()=>{
   assert.deepEqual([20,15,14,10,-2].map(needleDice),[0,0,1,5,17]);

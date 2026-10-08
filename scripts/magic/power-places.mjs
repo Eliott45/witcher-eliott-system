@@ -9,6 +9,9 @@ import { setStatus } from "../combat/status-effects.mjs";
 import { ELEMENTAL_MISHAPS } from "./rules.mjs";
 import { powerVisit,powerBenefitSource,POWER_ELEMENTS } from "./power-place-rules.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { adrenalineAbsorptionPlan } from "../combat/adrenaline.mjs";
+import { temporaryHealthAbsorptionPlan } from "../workshop/witcher-elixirs.mjs";
+import { inventoryTransaction } from "../workshop/transaction.mjs";
 
 const pending=new WeakMap();
 export function drawPower(actor,place,{prepared=false,reward="blessing"}={}) {
@@ -46,7 +49,8 @@ export function drawPower(actor,place,{prepared=false,reward="blessing"}={}) {
       const visits=actor.system.magic.powerVisits.map(row=>({...row}));
       const updated={placeUuid:place.uuid,draws:visit.draws+1,saves:visit.saves+(visit.dc&&succeeded?1:0),lastDraw:now};
       const index=visits.findIndex(row=>row.placeUuid===place.uuid);if(index<0)visits.push(updated);else visits[index]=updated;
-      const change={"system.magic.powerVisits":visits,"system.magic.improvementPoints":actor.system.magic.improvementPoints+10,"system.health.value":actor.system.health.value-damage};
+      const moon=temporaryHealthAbsorptionPlan(actor,damage),adrenaline=adrenalineAbsorptionPlan(actor,damage-moon.absorbed);
+      const change={...adrenaline.actorUpdate,"system.magic.powerVisits":visits,"system.magic.improvementPoints":actor.system.magic.improvementPoints+10,"system.health.value":actor.system.health.value-adrenaline.remaining};
       if(essence)change.items=[essence];
       else {
         const effect=powerBenefitSource(place,now);
@@ -57,7 +61,7 @@ export function drawPower(actor,place,{prepared=false,reward="blessing"}={}) {
       // One actor write awards restricted IP, material/effect and the visit ledger together.
       // TODO(core p.122 / errata): neither source says a failed save cancels the
       // reward, or that essence replaces the separate IP award. Keep both explicit.
-      const saved=await actor.update(change);if(!saved)throw new Error("Не удалось сохранить получение силы.");
+      await inventoryTransaction(actor,{effectUpdates:moon.effectUpdates,actorUpdate:change});
       try {
         if(damage){const status={earth:"stunned",fire:"burning",water:"frozen"}[element];if(status)await setStatus(actor,status,true);}
         await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker,content:`<section class="witcher-magic-chat"><h3>${esc(place.name)} · ${POWER_ELEMENTS[element].name}</h3><p>${esc(actor.name)}: +10 магических О.У.; ${reward==="essence"?"пятая эссенция ×5":"+5 Энергии и +2 к Сотворению этой стихии на 1 час"}.</p>${visit.dc?`<p>Стойкость: ${succeeded?"успех":"провал"}${damage?`; ${damage} урона ПЗ`:""}.</p>`:""}</section>`,flags:{[SYSTEM_ID]:{skipLuck:true}}},mode));

@@ -5,6 +5,7 @@ import { UPGRADES } from "./workshop-upgrades.mjs";
 import { equipmentUuid } from "./workshop.mjs";
 import { DIAGRAM_INVESTMENTS } from "./diagram-investments.mjs";
 import { WITCHER_SPECIAL_EQUIPMENT } from "./witcher-special-equipment.mjs";
+import { EXPERIMENTAL_RECIPES } from "./experimental-devices.mjs";
 
 // Core pp. 130–139. Result references point to existing canonical equipment.
 // Append new rows: the array positions form persistent compendium document IDs.
@@ -140,3 +141,4 @@ RECIPES.push(...ALCHEMY.map((result,i)=>{
  if(recipe.mutagenUuid) components.push({uuid:recipe.mutagenUuid,quantity:1,substance:""},{uuid:equipmentUuid(CORE_EQUIPMENT.find(item=>item.id==="gear.spirits").documentId),quantity:1,substance:""});
  return {id:`formula.${result.id}`,documentId:`recp${String(i+501).padStart(12,"0")}`,type:"recipe",source:"recipes",name:`Формула: ${result.name}`,flags:recipe.price === undefined ? structuredClone(result.flags) : {},system:{price:recipe.price??0,source:result.system.source,recipe:{category:"formula",resultUuid:equipmentUuid(result.documentId),dc:recipe.dc,time:recipe.time,quantity:1,grade:recipe.grade??"novice",tools:["gear.alchemy-tools"],components}}};
 }));
+RECIPES.push(...EXPERIMENTAL_RECIPES);

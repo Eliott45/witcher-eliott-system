@@ -1,5 +1,6 @@
 {{#if workshop}}
 <section class="witcher-workshop-item">
+{{#if workshop.canInstallRuneGlyph}}<p>Руна или глиф занимает один слот и устанавливается навсегда. Камень расходуется; установленное свойство продолжает действовать.</p><button type="button" data-action="installRuneGlyph" {{disabled (not editable)}}><i class="fa-solid fa-gem"></i> Установить на предмет</button>{{/if}}
 {{#if workshop.condition}}<p>{{workshop.condition.label}}: {{workshop.condition.value}} / {{workshop.condition.max}} · с улучшениями</p>{{/if}}
 {{#if workshop.bonusPath}}<h3>{{workshop.bonusHeading}}</h3>{{#each workshop.bonuses}}<p>{{label}}: {{value}} <button type="button" data-action="removeWorkshopBonus" data-index="{{index}}" {{disabled (not ../editable)}} aria-label="Удалить бонус"><i class="fa-solid fa-xmark"></i></button></p>{{/each}}<button type="button" data-action="addWorkshopBonus" {{disabled (not editable)}}>Добавить бонус</button>{{/if}}
 {{#if workshop.recipe}}

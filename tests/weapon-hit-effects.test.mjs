@@ -26,7 +26,7 @@ test("bleed and poison need penetrating injury; burning can ignite armor; incorp
   assert.equal(weaponConditionChances(traits,{total:5,penetrated:true}).length,3);
   assert.equal(weaponConditionChances(traits,{total:5,penetrated:true},{nonLethal:true}).length,1);
   assert.deepEqual(weaponConditionChances(traits,{total:0,penetrated:false,immune:true}),[]);
-  assert.deepEqual(weaponHitTraits({properties:"Разрушающее; нельзя парировать; двойной урон оружию, щиту или броне"}),{bleeding:0,poisoned:0,burning:0,ablating:true,noParry:true,wearMultiplier:2});
+  assert.deepEqual(weaponHitTraits({properties:"Разрушающее; нельзя парировать; двойной урон оружию, щиту или броне"}),{bleeding:0,poisoned:0,burning:0,frozen:0,staggered:0,stunModifier:null,specterDamage:0,ablating:true,noParry:true,wearMultiplier:2});
 });
 
 test("percentile effects respect chance boundaries, immunity, blind dice and guaranteed elf bleeding",async t=>{
@@ -61,4 +61,24 @@ test("burrowing arrows create the DC16 First Aid bleeding variant and upgrade ex
   let update;actor.effects=[{statuses:new Set(["bleeding"]),async update(data){update=data;}}];
   await applyWeaponConditions(actor,[{id:"bleeding",applied:true,burrowing:true}]);
   assert.equal(sources.length,1);assert.equal(update.flags[SYSTEM_ID].condition.save.dc,16);
+});
+
+test("relic and rune freezing/stagger chances affect an armored hit; stun is a separate head/torso save", async t => {
+  const before = globalThis.foundry; t.after(() => { globalThis.foundry = before; });
+  const values = [75, 76, 4, 3], formulas = [];
+  globalThis.foundry = { dice: { Roll: class {
+    constructor(formula) { this.formula = formula; }
+    async evaluate(options) { assert.equal(options.allowInteractive, false); formulas.push(this.formula); this.total = values.shift(); return this; }
+  } } };
+  const actor = { items: [], effects: [], system: { statistics: { stun: 6 } } };
+  const traits = weaponHitTraits({ properties: "Замораживание (75%); Ошеломление (75%); Дезориентирующее (−2)" });
+  const result = { total: 0, penetrated: false };
+  const hit = await rollWeaponConditions(actor, traits, result, { location: "torso", blind: true });
+  assert.deepEqual(hit.effects.map(effect => [effect.id, effect.applied]), [["frozen", true], ["staggered", false], ["stunned", true]]);
+  assert.equal(hit.effects.at(-1).target, 4, "an equal stun roll fails");
+  const head = await rollWeaponConditions(actor, { stunModifier: -2 }, result, { location: "head", blind: true });
+  assert.equal(head.effects[0].applied, false);
+  assert.deepEqual((await rollWeaponConditions(actor, { stunModifier: -2 }, result, { location: "leftArm" })).effects, []);
+  assert.deepEqual((await rollWeaponConditions(actor, traits, { ...result, immune: true }, { location: "torso" })).effects, []);
+  assert.deepEqual(formulas, ["1d100", "1d100", "1d10", "1d10"]);
 });

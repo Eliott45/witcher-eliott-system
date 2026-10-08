@@ -31,6 +31,24 @@ function fixture() {
   return {actor,spell,source,state,events,messages};
 }
 
+test("Fury forbids a farther direct spell target before rolling and when assigning targets later, but keeps area casts",async()=>{
+  const {actor,spell,events}=fixture(),item=spell("aenye");
+  actor.effects.push({statuses:new Set(),flags:{[SYS]:{experimental:{kind:"fury"}}}});
+  const scene={id:"fury",grid:{size:100,distance:2},tokens:[]};
+  const token=(id,x,target)=>({uuid:`Scene.fury.Token.${id}`,id,x,y:0,width:1,height:1,parent:scene,actor:target,getSize:()=>({width:100,height:100})});
+  const source=token("source",0,actor),near=token("near",200,{effects:[]}),far=token("far",500,{effects:[]});
+  scene.tokens=[source,near,far];actor.isToken=true;actor.token=source;
+  game.user.targets=new Set([{document:far}]);
+  await assert.rejects(castSpell(actor,item.id),/ближайшее/);assert.deepEqual(events,[]);assert.equal(actor.system.stamina.value,40);
+  const {createSpellStrikes}=await import("../scripts/magic/spell-strikes.mjs");
+  await assert.rejects(createSpellStrikes(actor,item,{}),/ближайшее/);
+  game.user.targets=new Set([{document:near}]);assert.equal(castingQuote(actor,item).stamina,5);
+  game.user.targets.add({document:far});assert.throws(()=>castingQuote(actor,item),/ближайшее/);
+  item.system.range.kind="radius";assert.equal(castingQuote(actor,item).stamina,5);
+  assert.equal(castingQuote(actor,spell("tanio-ilchar")).stamina,3);
+  assert.equal(castingQuote(actor,spell("magic-healing")).stamina,5);
+});
+
 test("all 65 core spells have unique identities, structured fields and stable grade folders",()=>{
   assert.equal(CORE_SPELLS.length,65);assert.equal(new Set(CORE_SPELLS.map(s=>s.id)).size,65);
   assert.deepEqual(Object.keys(SPELL_GRADES).map(grade=>CORE_SPELLS.filter(s=>s.system.grade===grade).length),[40,15,10,0]);
@@ -82,12 +100,12 @@ test("invocation upkeep and mixed fumbles reuse magic state and do not spend ext
   await castSpell(actor,spell("invocation.cleansing-fire").id);
   assert.equal(actor.effects.length,0);assert.equal(messages[2].flags[SYS].magicCast.element,"mixed");assert.equal(messages[2].flags[SYS].magicCast.elemental,true);
 });
-test("focus comes from one equipped carried item, excludes broken/in-container gear and non-magic-users",()=>{
+test("focus comes from one equipped carried item; only mage/priest get its stamina discount",()=>{
   const {actor}=fixture();
   const staff=(id,rating,extra={})=>({id,type:"weapon",name:id,system:{properties:`Фокусирующее (${rating}); Улучшенное фокусирующее`,quantity:1,carried:true,equipped:true,containerId:"",reliability:{value:10,max:10},...extra}});
   actor.items.push(staff("wood",1),staff("crystal",3),staff("broken",4,{reliability:{value:0,max:10}}),staff("packed",5,{equipped:false}));
   assert.deepEqual(focusOptions(actor).map(f=>[f.id,f.rating,f.greater]),[["wood",1,true],["crystal",3,true]]);
-  actor.system.details.profession="witcher";assert.deepEqual(focusOptions(actor),[]);
+  actor.system.details.profession="witcher";assert.deepEqual(focusOptions(actor).map(f=>[f.id,f.rating,f.greater]),[["wood",0,true],["crystal",0,true]]);
 });
 test("casting reuses effective skill including armor, native exploding d10 and chat privacy, then spends once",async()=>{
   for(const mode of ["public","self","gm","blind"]){const {actor,spell,state,messages,events}=fixture();state.mode=mode;
@@ -98,6 +116,18 @@ test("casting reuses effective skill including armor, native exploding d10 and c
     assert.equal(actor.system.stamina.value,35);assert.equal(actor.system.magic.spent,5);assert.equal(actor.system.health.value,40);
     assert.deepEqual(events,["roll","message","update"]);
   }
+});
+test("each cast snapshots the selected glyph; only worn matching glyphs affect damage/DC and upkeep receives no new bonus",async()=>{
+  const {actor,spell,messages}=fixture();
+  actor.items.push({id:"coat",type:"armor",name:"Куртка",system:{quantity:1,carried:true,equipped:true,encumbrance:0,installations:[{ruleId:"glyph.fire",category:"glyph",name:"Огонь",bonuses:[]}]}});
+  const fire=spell("aenye");fire.system.description="<p>Погасить огонь: СЛ 14.</p>";
+  const damage=castingQuote(actor,fire,{glyphChoice:"damage"});assert.equal(damage.glyph.damageDice,1);assert.equal(damage.effectDC,0);
+  await castSpell(actor,fire.id,{glyphChoice:"dc"});
+  assert.equal(messages[0].flags[SYS].magicCast.glyph.dc,3);assert.match(messages[0].flavor,/СЛ 17/);
+  assert.equal(messages[0].roll.formula,"1d10wc + 14");
+  assert.equal(castingQuote(actor,spell("zephyr"),{glyphChoice:"damage"}).glyph.damageDice,0);
+  actor.items[0].system.equipped=false;
+  assert.equal(castingQuote(actor,fire,{glyphChoice:"dc"}).effectDC,0);
 });
 test("NPC mage casts Aenye with focus 2, spends three stamina and accumulates magic only within the current round",async()=>{
   const {actor,spell,messages}=fixture();

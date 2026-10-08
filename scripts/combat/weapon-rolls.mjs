@@ -16,6 +16,9 @@ import { ambushAttack, ambushState, tacticsFlags } from "./tactics-rules.mjs";
 import { unarmedAttack, consumeFeint } from "./brawling.mjs";
 import { loadedBolt, firedUpdate } from "./crossbow-ammo.mjs";
 import { actorEnvironment, rollFooting } from "./environment.mjs";
+import { adrenalineDamage, consumeAdrenalineDamage } from "./adrenaline.mjs";
+import { experimentalEffectContext, furyTargetError } from "./experimental-effects.mjs";
+import { thrownWeaponPlan, settleThrownWeapon } from "./thrown-weapons.mjs";
 
 /** Pair state of a fast attack: the second click in the same round (and extra-action status) is strike 2/2. */
 export function fastPair(actor,attack,action) {
@@ -37,6 +40,9 @@ export function rollWeaponAttack(actor,itemId,options={}) {
   if(pending.has(actor))return pending.get(actor);
   const work=inventoryWrite(actor,async()=>{
     const targetContext=selectedAttackTarget(actor,options),combat=options.combatId?game.combats.get(options.combatId):globalThis.game?.combat;
+    if (experimentalEffectContext(actor).fury && !targetContext?.target) throw new Error("Бешенство: выберите ближайшую цель (T).");
+    const furyError = furyTargetError(actor, targetContext?.target);
+    if (furyError) throw new Error(furyError);
     const group=tacticsFlags(combat).groupAmbush;
     const actorCombatants=Array.from(combat?.combatants??[]).filter(entry=>entry.actor?.uuid===actor.uuid);
     if(group?.status==="checks"&&!combat.started&&group.entries.some(row=>actorCombatants.some(entry=>entry.id===row.id))) {
@@ -53,11 +59,13 @@ export function rollWeaponAttack(actor,itemId,options={}) {
     if (arrow === false) return;
     const bolt=loadedBolt(item), projectile=arrow || bolt;
     quote.weapon=ammunitionWeapon(quote.weapon,projectile);
+    const thrown = thrownWeaponPlan(actor, item, quote, { targetContext, point: options.point });
     if (projectile && /несмертельн/iu.test(projectile.properties ?? "")) quote.nonLethal=true;
     if(options.free){action.stamina=0;}
     // The second strike of a fast attack belongs to the same action: no new STA for an extra action.
     const pair=fastPair(actor,quote.attack,action),strike=pair?(pair.second?2:1):0;
     if(pair?.second)action.stamina=0;
+    const adrenalineDice = adrenalineDamage(actor);
     const display=trackRollDisplay(),messageMode=game.settings.get("core","messageMode");
     try {
       const rolls=[];
@@ -76,11 +84,13 @@ export function rollWeaponAttack(actor,itemId,options={}) {
         +(actorEnvironment(actor)?.terrain.id==="snow"?'<button type="button" data-snow-footing><i class="fa-solid fa-person-falling"></i> Лёд и снег: Атлетика СЛ 14</button>':"")
         +`<small>Каждое попадание — отдельный урон и зона. Сравните атаку с защитой цели.</small></section>`;
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls,flavor,
-        flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{itemId:itemId??null,name:quote.name,mode:quote.attack.id,unarmed:options.unarmed??null,nonLethal:Boolean(quote.nonLethal),
+        flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{...thrown,itemId:itemId??null,name:quote.name,mode:quote.attack.id,unarmed:options.unarmed??null,nonLethal:Boolean(quote.nonLethal),
           special:quote.attack.special??null,attackingInvisible:creatureInvisible(actor),charge:Boolean(quote.attack.charge),push:Boolean(quote.attack.push),dual:Boolean(quote.attack.dual),base:quote.total,count:quote.attack.count,
-          damage:quote.damage,traits:weaponDamageTraits(quote.weapon),hitTraits:weaponHitTraits(quote.weapon,actor),ammunition:projectile?{name:projectile.name,ruleId:projectile.ruleId}:null,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
+          damage:quote.damage,adrenalineDice,weaponProperties:quote.weapon.properties,traits:weaponDamageTraits(quote.weapon),hitTraits:weaponHitTraits(quote.weapon,actor),ammunition:projectile?{name:projectile.name,ruleId:projectile.ruleId}:null,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
           target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,ranged:quote.ranged,band:quote.band.id,dc:quote.band.dc??null,thrown:quote.weapon.category==="thrown",combat:combat?.started?{id:combat.id,round:combat.round}:null,strike,damageTypes:damageTypeLabel(quote.weapon.damageType)}}}},messageMode));
       if(!message)return;
+      if(thrown)try{await settleThrownWeapon(actor,item,message);}catch(error){ui.notifications.error(error.message);}
+      if(adrenalineDice)await consumeAdrenalineDamage(actor);
       await display.wait(message);
       const update=options.free?{}:actionUpdate(actor,action);
       if(pair&&!pair.second){delete update["system.combatAction.extra"];delete update["system.combatAction.lastExtraRound"];}
@@ -103,7 +113,8 @@ export async function rollWeaponDamage(message) {
   const actor=message.speakerActor,attack=message.flags[SYSTEM_ID]?.weaponAttack;
   if(!actor?.isOwner||!message.isContentVisible||!attack)return;
   const mode=message.blind?"blind":message.whisper?.length?"gm":"public";
-  const roll=await new foundry.dice.Roll(attack.damage).evaluate({allowInteractive:!message.blind});
+  const formula=attack.adrenalineDice?`${attack.damage} + ${attack.adrenalineDice}d6`:attack.damage;
+  const roll=await new foundry.dice.Roll(formula).evaluate({allowInteractive:!message.blind});
   // Use the attack snapshot: changing grip/stats after the attack cannot change its damage.
   return roll.toMessage({speaker:{...message.speaker},whisper:[...message.whisper],blind:message.blind,
     flavor:`<h3>${esc(attack.name)} · урон</h3><p>До вычета брони. ${attack.location==="random"?"Определите место попадания (1d10).":`После брони примените множитель зоны ×${attack.multiplier}.`}</p><small>ПЗ цели и повреждение брони изменяются вручную.</small>`,

@@ -10,6 +10,8 @@ import { conditionRules } from "../combat/condition-rules.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { textField,numberField,choiceField,formFields } from "../data/structured-fields.mjs";
 import { escapeTooltip as escape } from "./statistics-tooltips.mjs";
+import { equippedItems } from "../data/physical-items.mjs";
+import { matchingGlyphs } from "../data/rune-glyphs.mjs";
 
 export const SPELL_ICONS={mixed:"fa-solid fa-sparkles",earth:"fa-solid fa-mountain",air:"fa-solid fa-wind",fire:"fa-solid fa-fire",water:"fa-solid fa-droplet"};
 const MAGIC_GROUPS=[
@@ -86,18 +88,19 @@ async function castDialog(actor,item,maintenance=false) {
   if(!actor.isOwner)return;
   // TODO(Dispel): no specific odd-cost rounding was found in core/errata/Sage. Let
   // the table supply an integer cost rather than silently truncate Actor resources.
-  const focuses=focusOptions(actor),cost=maintenance?maintenanceCost(item.system,actor.system.magic.sustainedCost):item.system.cost,ritual=item.system.kind==="ritual"&&!maintenance;
+  const focuses=focusOptions(actor,item),glyphs=maintenance?[]:matchingGlyphs(equippedItems(actor.items),item),cost=maintenance?maintenanceCost(item.system,actor.system.magic.sustainedCost):item.system.cost,ritual=item.system.kind==="ritual"&&!maintenance;
   const content=`<div class="witcher-cast-dialog"><p>${escape(item.name)} · ${escape(spellDuration(item.system.duration))}</p>`
     +`<small>Воля + ${CASTING_SKILL_LABELS[castingSkill(item.system)]}</small>`
     +(ritual?`<section class="witcher-ritual-setup"><strong>Подготовка: ${item.system.ritual.preparationRounds} раундов</strong><p>${escape(ritualComponents(item.system))}</p><p>${escape(item.system.ritual.requirements)}</p>${item.system.ritual.dc?`<div class="witcher-cast-grid"><label>СЛ<input name="ritualDC" type="number" min="1" step="1" value="${item.system.ritual.dc}"></label><label>Помощники (до 4)<input name="helpers" type="number" min="0" max="4" step="1" value="0"></label></div><small>${escape(item.system.ritual.dcHint)}</small>`:"<p>Без проверки и без расхода Удачи.</p>"}<label class="witcher-cast-confirm"><input name="prepared" type="checkbox"> Подготовка завершена, ингредиенты учтены вручную</label><small>Расходуются и при неудаче; телекоммуникатор сохраняется. Предметы из инвентаря автоматически не списываются.</small></section>`:"")
     +(item.system.kind==="hex"?"<small>Нужна личная ненависть к цели. При натуральной 1: отдельный 1d100, 01–50 — порча на заклинателя вместо цели.</small>":"")
     +(!maintenance&&item.system.variableCost?`<label>Стоимость сотворения, ВЫН<input name="variableCost" type="number" min="${Math.max(1,cost)}" step="${item.system.costStep??1}" ${item.system.costMax?`max="${item.system.costMax}"`:""} value="${Math.max(1,cost)}" required></label><small>${escape(item.system.costHint||(item.system.ruleId==="spell.dispel"?"Рассеивание: половина исходной стоимости. Укажите согласованную с ведущим целую стоимость.":"Выберите стоимость по описанию магии."))}</small>`:"")
-    +(!maintenance?`<label>Фокус в руках<select name="focus"><option value="">Без фокуса</option>${focuses.map(f=>`<option value="${f.id}">${escape(f.name)} · −${f.rating} ВЫН</option>`).join("")}</select></label>`:"")
+    +(!maintenance?`<label>Фокус в руках<select name="focus"><option value="">Без фокуса</option>${focuses.map(f=>`<option value="${f.id}">${escape(f.name)}${f.rating?` · −${f.rating} ВЫН`:""}${f.greater?" · +2 к СЛ эффекта":""}</option>`).join("")}</select></label>`:"")
+    +(glyphs.length?`<label>Глиф · бонус на это сотворение<select name="glyphChoice"><option value="dc">+3 к устанавливаемой заклинанием СЛ</option>${item.system.damage?'<option value="damage">+1d6 урона</option>':""}</select></label><small>${escape(glyphs.map(entry=>`${entry.name} (${entry.itemName})`).join(", "))}. Одинаковые глифы не складываются.</small>`:"")
     +'<output data-cast-quote></output><label class="witcher-overload-confirm" data-overload-row hidden><input type="checkbox" name="overload"> Сотворить с перегрузкой и получить урон</label><p data-cast-error role="alert"></p></div>';
   return foundry.applications.api.DialogV2.wait({window:{title:maintenance?"Поддержание магии":ritual?"Проведение ритуала":"Сотворение магии"},classes:["witcher-picker"],position:{width:520},content,
     buttons:[{action:"cast",label:maintenance?"Оплатить поддержание":"Сотворить",default:true,callback:async(_e,button)=>{
       const form=button.form;
-      await castSpell(actor,item.id,{maintenance,cost:item.system.variableCost&&!maintenance?Number(form.elements.variableCost.value):cost,focusId:form.elements.focus?.value??"",allowOverexertion:form.elements.overload.checked,prepared:form.elements.prepared?.checked??false,dc:form.elements.ritualDC?Number(form.elements.ritualDC.value):undefined,helpers:Number(form.elements.helpers?.value??0)});
+      await castSpell(actor,item.id,{maintenance,cost:item.system.variableCost&&!maintenance?Number(form.elements.variableCost.value):cost,focusId:form.elements.focus?.value??"",glyphChoice:form.elements.glyphChoice?.value??"dc",allowOverexertion:form.elements.overload.checked,prepared:form.elements.prepared?.checked??false,dc:form.elements.ritualDC?Number(form.elements.ritualDC.value):undefined,helpers:Number(form.elements.helpers?.value??0)});
     }},{action:"cancel",label:"Отмена"}],render:(_event,dialog)=>{
       const root=dialog.element,form=root.querySelector("form")??root;
       const refresh=()=>{
@@ -106,7 +109,7 @@ async function castDialog(actor,item,maintenance=false) {
         const base=item.system.variableCost&&!maintenance?Number(root.querySelector('[name="variableCost"]').value):cost;
         try {
           const dcInput=root.querySelector('[name="ritualDC"]'),helpers=Number(root.querySelector('[name="helpers"]')?.value??0);
-          const preview=castingQuote(actor,item,{cost:base,focusId,maintenance,dc:dcInput?Number(dcInput.value):undefined,helpers});
+          const preview=castingQuote(actor,item,{cost:base,focusId,maintenance,glyphChoice:form.elements.glyphChoice?.value??"dc",dc:dcInput?Number(dcInput.value):undefined,helpers});
           root.querySelector("[data-cast-quote]").textContent=`${base} − ${preview.focus?.rating??0} = ${preview.stamina} ВЫН (минимум 1)\nЗа раунд: ${preview.after} / ${preview.vigor}${preview.damage?`\nПерегрузка: ${preview.excess} × 5 = ${preview.damage} урона ПЗ + стихийный эффект`:""}${preview.difficulty?.target?`\nСЛ: ${preview.difficulty.base} − ${helpers} = ${preview.difficulty.target}`:""}\n${signPotency(item.system,base)}`;
           root.querySelector("[data-overload-row]").hidden=!preview.damage;
           if(preview.power.label)root.querySelector("[data-cast-quote]").textContent+=`\n${preview.power.label}: +${preview.power.vigor} к пределу, +${preview.power.casting} к Сотворению этой стихии`;

@@ -5,6 +5,9 @@ import { actionQuote, actionUpdate } from "./action-economy.mjs";
 import { attackerToken, tokenCenter, tokenGap } from "./attack-target.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
 import { parseDamageTypes } from "./damage-rules.mjs";
+import { adrenalineAbsorptionPlan } from "./adrenaline.mjs";
+import { temporaryHealthAbsorptionPlan } from "../workshop/witcher-elixirs.mjs";
+import { inventoryTransaction } from "../workshop/transaction.mjs";
 
 import { isGraveHag as hag } from "../data/hag-circle.mjs";
 const circleOf = actor => actor.flags?.[SYSTEM_ID]?.hagCircle;
@@ -48,9 +51,10 @@ export function useHagAction(actor,id,options={}) {
 export async function severHagTongue(actor,attackingItem,parryingItem) {
   if (!actor?.isOwner || !hag(actor) || attackingItem?.name!=="Язык" || actor.flags?.[SYSTEM_ID]?.severedTongue) return false;
   if (!parseDamageTypes(parryingItem?.system.damageType).some(type=>["slashing","piercing"].includes(type))) return false;
-  await actor.update({"system.health.value":actor.system.health.value-5,[`flags.${SYSTEM_ID}.severedTongue`]:true});
+  const moon=temporaryHealthAbsorptionPlan(actor,5),adrenaline=adrenalineAbsorptionPlan(actor,5-moon.absorbed);
+  await inventoryTransaction(actor,{effectUpdates:moon.effectUpdates,actorUpdate:{...adrenaline.actorUpdate,"system.health.value":actor.system.health.value-adrenaline.remaining,[`flags.${SYSTEM_ID}.severedTongue`]:true}});
   await attackingItem.update({"system.equipped":false});
-  await post(actor,"<p>Острый клинок отрубил язык: −5 ПЗ, атака языком больше недоступна.</p>");
+  await post(actor,`<p>Острый клинок отрубил язык: −${adrenaline.remaining} ПЗ${5-adrenaline.remaining?`; временные ПЗ поглотили ${5-adrenaline.remaining}`:""}, атака языком больше недоступна.</p>`);
   return true;
 }
 

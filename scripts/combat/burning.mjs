@@ -3,6 +3,7 @@ import { equippedItems } from "../data/physical-items.mjs";
 import { immuneToCondition } from "../data/creatures.mjs";
 import { ATTACK_LOCATIONS, bodyPlanOf } from "./weapon-rules.mjs";
 import { armorAt, resolveDamage, monsterResistant, fireVulnerable } from "./damage-rules.mjs";
+import { applyWeaponWear } from "./weapon-wear.mjs";
 
 // Core p.161 «Горение»: 5 damage to every body part each turn; armor absorbs it (fire resistance halves
 // the rest, fire vulnerability doubles it), and the fire deals 1 damage to the armor and weapons every turn.
@@ -34,8 +35,9 @@ export async function burnEquipment(actor) {
     const key = item.type === "armor" ? "stoppingPower" : item.type === "weapon" && !item.system.natural ? "reliability" : null;
     const from = key && item.system[key]?.value;
     if (!(from > 0)) continue;
-    await item.update({ [`system.${key}.value`]: from - 1 });
-    notes.push(`${item.name}: ${key === "stoppingPower" ? "ПБ" : "надёжность"} ${from} → ${from - 1}`);
+    const wear=key==="reliability"?await applyWeaponWear(item,1):null;
+    if(!wear)await item.update({ [`system.${key}.value`]: from - 1 });
+    notes.push(`${item.name}: ${key === "stoppingPower" ? "ПБ" : "надёжность"} ${from} → ${wear?.to??from - 1}${wear?.protectedByRune?" (Чернобог)":""}`);
   }
   return notes;
 }

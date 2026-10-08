@@ -1,5 +1,7 @@
 import { SYSTEM_ID, COMBAT_ACTOR_TYPES } from "../config.mjs";
-import { regenerationAtStart, settleRegeneration } from "../workshop/witcher-elixirs.mjs";
+import { regenerationAtStart, settleRegeneration, temporaryHealthAbsorptionPlan } from "../workshop/witcher-elixirs.mjs";
+import { inventoryTransaction } from "../workshop/transaction.mjs";
+import { adrenalineAbsorptionPlan } from "./adrenaline.mjs";
 import { activeEffect } from "../data/effect-counters.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
@@ -60,20 +62,22 @@ export function startTurnPoison(combat, combatant, context) {
       const suffocation = choking ? 3 : 0;
       const acid = acidAtStart;
       const damage = poison + bleeding + burning + suffocation + acid, before = actor.system.health.value;
+      const moon=temporaryHealthAbsorptionPlan(actor,damage),adrenaline=adrenalineAbsorptionPlan(actor,damage-moon.absorbed);
+      const hpDamage=adrenaline.remaining,absorbed=moon.absorbed+adrenaline.absorbed;
       // Swallow, Troll and Grave Hag (core pp.247–248) heal at the start of the turn, never above the maximum.
-      const regen = regenerationAtStart(actor), heal = Math.max(0, Math.min(regen.total, actor.system.health.max - (before - damage)));
-      const after = before - damage + heal;
+      const regen = regenerationAtStart(actor), heal = Math.max(0, Math.min(regen.total, actor.system.health.max - (before - hpDamage)));
+      const after = before - hpDamage + heal;
       // Record even a healthy turn: applying poison later in that turn is not a new tick.
-      await actor.update({[`flags.${SYSTEM_ID}.poisonTurns`]:{combat:combat.uuid,rounds},
-        ...(damage || heal ? {"system.health.value":after} : {})});
+      await inventoryTransaction(actor,{effectUpdates:moon.effectUpdates,actorUpdate:{...adrenaline.actorUpdate,[`flags.${SYSTEM_ID}.poisonTurns`]:{combat:combat.uuid,rounds},
+        ...(damage || heal ? {"system.health.value":after} : {})}});
       if (regen.swallow) await settleRegeneration(actor);
       // The fire scorches gear every turn even when the armor stopped all of its damage.
       const scorched = burn ? await burnEquipment(actor) : [];
       if (!damage && !burn && !regen.parts.length) return;
       const messageMode = combatant.hidden ? "gm" : game.settings.get("core", "messageMode");
       await foundry.documents.ChatMessage.create({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),
-        content:`<section class="witcher-poison-damage"><h3>${[poison ? "Отравление" : "", bleeding ? "Кровотечение" : "", burn ? "Горение" : "", suffocation ? "Удушье" : "", acid ? "Рана в живот" : "", regen.parts.length ? "Регенерация" : ""].filter(Boolean).join(", ")} · начало хода</h3><p><strong>${esc(actor.name)}</strong>: ${damage ? `−${damage}` : ""}${heal ? ` +${heal}` : ""} ПЗ (${before} → ${after}).</p>${regen.parts.length ? `<small>${esc(regen.parts.map(part => `${part.label}${part.value ? ` +${part.value}` : ""}`).join("; "))}.</small>` : ""}${burn ? `<small>Горение: ${burning} (по ${5} в каждую часть тела, минус ПБ зоны${burn.vulnerable ? "; уязвимость к огню ×2" : ""}): ${burn.parts.map(part => `${esc(part.name)} ${part.total}${part.sp ? ` (ПБ ${part.sp})` : ""}`).join(", ")}.</small>${scorched.length ? `<small>Огонь портит снаряжение: ${esc(scorched.join("; "))}.</small>` : ""}<small>Потушить: потратить ход на обливание водой или на то, чтобы упасть и сбить пламя.</small>` : ""}${suffocation ? `<small>Удушье: ${suffocation}, броня не защищает.</small>` : ""}${acid ? `<small>Рана в живот: ${acid} урона кислотой, броня не защищает.</small>` : ""}${poison ? `<small>Отравление: ${poison}${poison < 3 ? " (сопротивление яду: половина урона)" : ""}.</small>` : ""}${bleeding ? `<small>Кровотечение: ${bleeding}${bleeding < 2 ? " (сопротивление кровотечению: половина урона)" : ""}. Броня не защищает.</small>` : ""}</section>`,
-        flags:{[SYSTEM_ID]:{skipLuck:true,poisonDamage:{combat:combat.uuid,combatant:combatant.id,round:context.round,damage,poison,bleeding,burning,before,after}}}}, {messageMode});
+        content:`<section class="witcher-poison-damage"><h3>${[poison ? "Отравление" : "", bleeding ? "Кровотечение" : "", burn ? "Горение" : "", suffocation ? "Удушье" : "", acid ? "Рана в живот" : "", regen.parts.length ? "Регенерация" : ""].filter(Boolean).join(", ")} · начало хода</h3><p><strong>${esc(actor.name)}</strong>: ${hpDamage ? `−${hpDamage}` : ""}${heal ? ` +${heal}` : ""} ПЗ (${before} → ${after}).</p>${absorbed ? `<small>Временные ПЗ поглотили ${absorbed} урона.</small>` : ""}${regen.parts.length ? `<small>${esc(regen.parts.map(part => `${part.label}${part.value ? ` +${part.value}` : ""}`).join("; "))}.</small>` : ""}${burn ? `<small>Горение: ${burning} (по ${5} в каждую часть тела, минус ПБ зоны${burn.vulnerable ? "; уязвимость к огню ×2" : ""}): ${burn.parts.map(part => `${esc(part.name)} ${part.total}${part.sp ? ` (ПБ ${part.sp})` : ""}`).join(", ")}.</small>${scorched.length ? `<small>Огонь портит снаряжение: ${esc(scorched.join("; "))}.</small>` : ""}<small>Потушить: потратить ход на обливание водой или на то, чтобы упасть и сбить пламя.</small>` : ""}${suffocation ? `<small>Удушье: ${suffocation}, броня не защищает.</small>` : ""}${acid ? `<small>Рана в живот: ${acid} урона кислотой, броня не защищает.</small>` : ""}${poison ? `<small>Отравление: ${poison}${poison < 3 ? " (сопротивление яду: половина урона)" : ""}.</small>` : ""}${bleeding ? `<small>Кровотечение: ${bleeding}${bleeding < 2 ? " (сопротивление кровотечению: половина урона)" : ""}. Броня не защищает.</small>` : ""}</section>`,
+        flags:{[SYSTEM_ID]:{skipLuck:true,poisonDamage:{combat:combat.uuid,combatant:combatant.id,round:context.round,damage,hpDamage,absorbed,poison,bleeding,burning,before,after}}}}, {messageMode});
     });
   });
 }

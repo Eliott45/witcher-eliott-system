@@ -17,7 +17,7 @@ import { itemDescriptionSource } from "../data/item-lore.mjs";
 import { consumptionActions } from "./consumption-actions.mjs";
 import { consumableContext } from "../data/consumables.mjs";
 import { recipeDetailsContext } from "./recipe-details-context.mjs";
-import { relicArmorLore } from "../data/relic-armor.mjs";
+import { relicLore } from "../data/relic-lore.mjs";
 import { rollRelicLore } from "./relic-lore.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -92,7 +92,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     }));
     return Object.assign(context, {
       workshop, recipeDetails, spell, hasDetails, hasActions, isEffectItem,
-      relicLore: relicArmorLore(this.item),
+      relicLore: relicLore(this.item),
       consumption: this.item.actor ? consumableContext(this.item) : { enabled: false },
       effectTemplates:isEffectItem?await Promise.all(this.item.effects.map(async effect=>({id:effect.id,uuid:effect.uuid,name:effect.name,description:effect.description,enriched:await enrich(effect.description),duration:effectDurationLabel(effect)}))):[],
       itemTabs:visible.map(id=>context.tabs[id]),

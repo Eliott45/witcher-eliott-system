@@ -26,6 +26,10 @@ import { applyOil } from "../workshop/upgrades.mjs";
 import { duelOf, VERBAL_ATTACKS, VERBAL_LEVERS, VERBAL_DEFENSES, TORTURE, verbalAttack } from "../combat/verbal-duel.mjs";
 import { healingContext, healingPatient, stabilizePatientWound, treatPatientWound, startNaturalHealing, restDay, stabilizeDying } from "../combat/healing.mjs";
 import { creatureHasInfiniteStamina } from "../data/creature-modes.mjs";
+import { experimentalDeviceContext, experimentalDeviceActions } from "../combat/experimental-traps.mjs";
+import { experimentalEffectContext, mitigateMarker, rollMarkedTarget } from "../combat/experimental-effects.mjs";
+import { adrenalineContext, adrenalineDialog } from "../combat/adrenaline.mjs";
+import { trackingAmmunitionState, removeTrackingProjectile, trackByAmmunition } from "../combat/experimental-ammunition.mjs";
 
 export function combatContext(actor,options={}) {
   const infiniteStamina=creatureHasInfiniteStamina(actor);
@@ -53,7 +57,7 @@ export function combatContext(actor,options={}) {
   const hasOils=Array.from(actor.items??[]).some(entry=>entry.system?.alchemy?.category==="oil"&&available(entry));
   const bombs=actor.type==="npc"?[]:Array.from(actor.items??[]).filter(item=>isBomb(item)&&(item.system.quantity??0)>0&&item.system.carried!==false).map(item=>{const profile=bombProfile(item),body=actor.system.statistics.effective.body??0;
     return {id:item.id,name:item.name,img:item.img,quantity:item.system.quantity,summary:[`радиус ${profile.radius} м`,profile.damage?`урон ${profile.damage}`:"",`дальность ${body*4} м`].filter(Boolean).join(" · "),properties:item.system.properties??""};});
-  return { duel, infiniteStamina, healing:healingContext(actor), unarmed, bombs, environment:environmentSummary(environmentState), snow:environmentState?.terrain.id==="snow", feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"auto",modifier:options.modifier??0,
+  return { duel, infiniteStamina, adrenaline:adrenalineContext(actor), devices:experimentalDeviceContext(actor), experimentalEffects:experimentalEffectContext(actor), trackingAmmunition:trackingAmmunitionState(actor), healing:healingContext(actor), unarmed, bombs, environment:environmentSummary(environmentState), snow:environmentState?.terrain.id==="snow", feint:{disabled:!canAct,hint:"Обман вместо первого удара быстрой атаки: если цель провалит встречную проверку Внимания, второй удар получает +3 (стр. 164). Выберите цель (T)."}, extra,used,canAct,location:options.location??"random",range:options.range??"auto",modifier:options.modifier??0,
     grapple:(()=>{const state=grappleState(actor);return {options:grappleOptions(actor),holding:state.holding?{name:state.holding.name,pinned:state.holding.pinned,choking:state.holding.choking}:null,heldBy:state.heldBy?{name:state.heldBy.name}:null};})(),
     fullTurn,defenses,quickDraw,canQuickDraw:canAct&&Boolean(globalThis.game?.combat?.started&&Array.from(globalThis.game.combat.combatants).some(entry=>entry.actor?.uuid===actor.uuid)),ambush:{active:Boolean(ambush),targets:ambushTargets,count:ambushTargets.length,
       canPrepare:Boolean(canAct&&ambusher&&!encounter.started&&!tacticsFlags(ambusher).tacticRequest),pending:Boolean(tacticsFlags(ambusher).tacticRequest)},
@@ -87,6 +91,10 @@ export function combatContext(actor,options={}) {
 const guard=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){ui.notifications.warn(error.message);}};
 const healingPatientOf=sheet=>healingPatient(sheet.actor);
 export const combatActions={
+  useAdrenaline:guard(async function(){if(!this.isEditable)return;await adrenalineDialog(this.actor);await this.render();}),
+  trackingAmmunition:guard(async function(_event,button){if(!this.isEditable)return;if(button.dataset.kind==="remove")await removeTrackingProjectile(this.actor);else await trackByAmmunition(this.actor,{trailHours:Number(button.closest("[data-tracking-ammunition]").querySelector("[data-trail-hours]").value)});await this.render();}),
+  ...experimentalDeviceActions,
+  experimentalMarker:guard(async function(_event,button){if(!this.isEditable)return;const kind=button.dataset.kind;if(["wash","scent"].includes(kind))await mitigateMarker(this.actor,kind);else await rollMarkedTarget(this.actor,kind==="track"?"scent":"sight");await this.render();}),
   healStabilize:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await stabilizePatientWound(this.actor,healingPatientOf(this),target.dataset.effectId);}finally{await this.render();}}),
   healDying:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await stabilizeDying(this.actor,healingPatientOf(this));}finally{await this.render();}}),
   healTreat:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await treatPatientWound(this.actor,healingPatientOf(this),target.dataset.effectId);}finally{await this.render();}}),

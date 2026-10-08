@@ -76,12 +76,42 @@ export async function processLootRequest(actor, request, user) {
   if (request.action === "drop") {
     const item = actor.items.get(request.itemId), scene = game.scenes.get(request.scene), quantity = Math.max(1, Math.floor(request.quantity ?? 1));
     if (!item || !isPhysical(item) || !scene) throw new Error("Предмет или сцена недоступны.");
+    if (!Number.isFinite(request.point?.x) || !Number.isFinite(request.point?.y)) throw new Error("Укажите точку на сцене.");
     if (item.system.natural) throw new Error("Естественное или призрачное оружие нельзя отделить от существа и забрать как добычу.");
     if (actor.items.some(other => other.system?.containerId === item.id)) throw new Error("Сначала выложите вещи из контейнера.");
-    const amount = Math.min(quantity, item.system.quantity ?? 1);
-    await placeOnGround(scene, request.point, [itemSource(item, amount)], item.name);
-    await reduce(actor, item, amount);
-    return chat(actor, `${actor.name} бросает на землю: ${item.name}${amount > 1 ? ` ×${amount}` : ""}.`, request.silent);
+    const attack = request.thrownAttack ? globalThis.fromUuidSync?.(request.thrownAttack) : null;
+    if (request.thrownAttack && (!attack || attack.speakerActor?.uuid !== actor.uuid || attack.flags?.[SYSTEM_ID]?.weaponAttack?.itemId !== item.id)) throw new Error("Сообщение метательной атаки недоступно.");
+    if (attack?.flags?.[SYSTEM_ID]?.weaponAttack?.thrownDrop?.state === "complete") return null;
+    const amount = Math.min(quantity, item.system.quantity ?? 1), original = item.toObject();
+    const transferId = `${actor.uuid}:${request.id ?? foundry.utils.randomID()}`, source = itemSource(item, amount);
+    source.flags = { ...source.flags, [SYSTEM_ID]: { ...source.flags?.[SYSTEM_ID], lootTransfer: { id: transferId, sourceActor: actor.uuid, sourceItem: item.id, attack: request.thrownAttack ?? "" } } };
+    const priorTokens = new Set(scene.tokens.map(token => token.id));
+    let pile;
+    try {
+      pile = await placeOnGround(scene, request.point, [source], item.name);
+      await reduce(actor, item, amount);
+      if (attack) {
+        const groundItem = pile.actor.items.find(entry => entry.flags?.[SYSTEM_ID]?.lootTransfer?.id === transferId);
+        if (!groundItem) throw new Error("Не удалось найти брошенное оружие на земле.");
+        await attack.update({ [`flags.${SYSTEM_ID}.weaponAttack.groundWeaponUuid`]: groundItem.uuid,
+          [`flags.${SYSTEM_ID}.weaponAttack.thrownDrop.state`]: "complete" });
+      }
+    } catch (error) {
+      // Only this transfer's copies are removed: another simultaneous drop into the same cell is preserved.
+      try {
+        const current = actor.items.get(item.id);
+        if (!current) await actor.createEmbeddedDocuments("Item", [original], { keepId: true });
+        else if (current.system.quantity !== original.system.quantity) await current.update({ "system.quantity": original.system.quantity });
+        for (const token of scene.tokens.filter(token => token.actor?.type === "loot")) {
+          const copied = token.actor.items.filter(entry => entry.flags?.[SYSTEM_ID]?.lootTransfer?.id === transferId);
+          if (copied.length) await token.actor.deleteEmbeddedDocuments("Item", copied.map(entry => entry.id));
+          if (!priorTokens.has(token.id) && !(token.actor.items.size ?? token.actor.items.length) && token.actor.system.removeWhenEmpty) await token.delete();
+        }
+      } catch (rollbackError) { console.error(`${SYSTEM_ID} | Drop rollback failed`, rollbackError); ui.notifications.error("Не удалось отменить перенос. Проверьте предмет в инвентаре и на земле перед повтором."); }
+      throw error;
+    }
+    await chat(actor, `${actor.name} бросает на землю: ${item.name}${amount > 1 ? ` ×${amount}` : ""}.`, request.silent);
+    return pile;
   }
   if (request.action === "take" || request.action === "crowns") {
     // A pile is a token (synthetic actor); a GM's chest may also be a world actor.
@@ -122,10 +152,10 @@ export async function scatterItem(actor, item, meters, direction) {
 }
 
 /** Drop an owned item in front of the actor's token (inventory button). */
-export async function dropItemToGround(actor, item, { quantity = null, point = null, silent = false } = {}) {
+export async function dropItemToGround(actor, item, { quantity = null, point = null, silent = false, sceneId = null, thrownAttack = null } = {}) {
   if (item.system.natural) throw new Error("Естественное или призрачное оружие нельзя бросить на землю.");
   const token = actor.token ?? actor.getActiveTokens?.()[0]?.document;
-  const scene = token?.parent ?? globalThis.canvas?.scene;
+  const scene = sceneId ? game.scenes.get(sceneId) : token?.parent ?? globalThis.canvas?.scene;
   if (!scene) throw new Error("Откройте сцену, чтобы бросить предмет.");
   let amount = quantity ?? 1;
   if (quantity == null && (item.system.quantity ?? 1) > 1) {
@@ -135,7 +165,7 @@ export async function dropItemToGround(actor, item, { quantity = null, point = n
     if (!amount) return;
   }
   const where = point ?? (token ? frontOf(token) : { x: scene.dimensions.width / 2, y: scene.dimensions.height / 2 });
-  return requestLoot(actor, { action: "drop", itemId: item.id, quantity: amount, scene: scene.id, point: where, silent });
+  return requestLoot(actor, { action: "drop", itemId: item.id, quantity: amount, scene: scene.id, point: where, silent, ...(thrownAttack ? { thrownAttack } : {}) });
 }
 
 /** An item dragged out of loot onto a character sheet or token is taken (whole stack) by that character. */
