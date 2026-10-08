@@ -4,6 +4,7 @@ import { registerEffectExpiry } from "./combat/effect-expiry.mjs";
 import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from "./settings.mjs";
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
 import { migrateBestiaryContent,migrateBestiaryCreatures,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
+import { migrateBestiaryCorrections } from "./migrations/bestiary-corrections.mjs";
 import { migratePregenContent,registerPregenMigration } from "./migrations/pregen-content.mjs";
 import { registerWeaponChat } from "./combat/weapon-rolls.mjs";
 import { registerGroupAmbush } from "./chat/group-ambush.mjs";
@@ -215,7 +216,7 @@ Hooks.once("ready", async () => {
     console.error(`${SYSTEM_ID} | Could not update vision defaults`, error);
     ui.notifications.error(game.i18n.localize("WITCHER.Token.MigrationFailed"));
   });
-  migrateBestiaryContent().then(migrateBestiaryCreatures).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось восстановить предметы бестиария. Подробности в консоли.");});
+  migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
   migrateSpellContent().catch(error=>{
     console.error(`${SYSTEM_ID} | Could not update magic content`,error);
     ui.notifications.error("Не удалось обновить каталог магии. Подробности в консоли.");

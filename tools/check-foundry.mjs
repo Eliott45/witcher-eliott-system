@@ -1332,7 +1332,7 @@ const peggy = createRequire(new URL("package.json", app))("peggy");
 foundry.dice = { Roll: CoreRoll, terms: diceTerms,
   RollGrammar: peggy.generate(await readFile(new URL("client/dice/grammar.pegjs", app), "utf8")) };
 CONFIG.debug = {};
-CONFIG.Dice = { parser: RollParser, rolls: [CoreRoll], termTypes: diceTerms,
+CONFIG.Dice = { parser: RollParser, rolls: [CoreRoll], termTypes: diceTerms, functions: {},
   terms: { d: diceTerms.Die, c: diceTerms.Coin, f: diceTerms.FateDie },
   fulfillment: { methods: {} }, randomUniform: Math.random };
 const { prepareMessageLuck, settleMessageLuck, releaseMessageLuck } = await import("../scripts/chat/luck-rolls.mjs");
@@ -1535,6 +1535,17 @@ for(const source of bestiarySources()) {
   const actor=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(initial.toObject())));
   Object.defineProperty(actor,'isOwner',{value:true});actor.system.prepareDerivedData();
   assert.equal(actor.system.health.value,source.system.health.value);assert.equal(actor.system.stamina.max,source.system.stamina.max);
+  for(const item of actor.items.filter(item=>item.type==='weapon'&&item.system.equipped)) {
+    const attack=weaponAttack(actor,item,{mode:'npc'});
+    assert.equal(attack.blocked,'',`${actor.name}: ${item.name} must be ready to attack`);
+    assert.ok(Number.isFinite(attack.total),`${actor.name}: ${item.name} needs a numeric attack base`);
+    assert.ok(CoreRoll.validate(attack.damage),`${actor.name}: ${item.name} needs a valid damage formula`);
+  }
+  if(source.name==='Птица') {
+    assert.equal(actor.system.statistics.run,10);assert.equal(actor.system.statistics.leap,2);
+    assert.equal(actor.system.creature.hasTailOrWings,true);
+  }
+  if(source.name==='Бес')assert.equal(actor.system.statistics.recovery,11);
   for(const item of actor.items)assert.equal(item.system.ruleId,initial.items.get(item.id).system.ruleId);
   const npcSheet=new WitcherNPCSheet();npcSheet.actor=actor;npcSheet.isEditable=true;
   for(const editing of [false,true]) {
@@ -1546,6 +1557,8 @@ for(const source of bestiarySources()) {
     assert.ok(!rendered.includes('data-action="rollLocation"'));
     assert.equal(rendered.includes('name="system.creature.hasTailOrWings"'),editing);
     assert.equal((rendered.match(/name="system\.creature\.category"/g)??[]).length,editing?1:0);
+    assert.equal(rendered.includes('name="system.creature.runBase"'),editing);
+    assert.equal(rendered.includes('name="system.creature.recoveryBase"'),editing);
     assert.ok(rendered.includes(view.creatureClass.description));
     assert.ok(rendered.includes(handlebars.escapeExpression(source.name)));assert.ok(rendered.includes('data-action="attackWeapon"'));assert.ok(!rendered.includes('data-mode="strong"'));
     assert.equal((rendered.match(/aria-label="Добыча существа"/g)??[]).length,1,'NPC loot has one home in inventory');

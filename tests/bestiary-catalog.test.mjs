@@ -8,9 +8,29 @@ import { ALCHEMY } from "../scripts/data/workshop-alchemy.mjs";
 import { ELDER_EQUIPMENT } from "../scripts/data/elder-equipment.mjs";
 import { CORE_MAGIC } from "../scripts/data/spells.mjs";
 import { focusOptions } from "../scripts/magic/rules.mjs";
+import { deriveStatistics } from "../scripts/data/statistics.mjs";
+import { hitLocation } from "../scripts/combat/weapon-rules.mjs";
 
 const equipment = [...CORE_EQUIPMENT, ...MATERIALS, ...ALCHEMY, ...ELDER_EQUIPMENT];
 const equipmentUuid = entry => `Compendium.witcher-eliott-system.equipment.Item.${entry.documentId}`;
+
+test("audited creature exceptions preserve book statistics and the tail or wing hit location", () => {
+  const sources=bestiarySources(),get=name=>sources.find(source=>source.name===name);
+  const chief=get("Накер-вожак"),chiefStats=deriveStatistics(chief.system);
+  assert.equal(chief.system.attributes.body,4);
+  assert.equal(chiefStats.stun,4);assert.equal(chiefStats.recovery,4);assert.equal(chiefStats.carryMax,40);
+  assert.equal(chiefStats.healthMax,20);assert.equal(chiefStats.staminaMax,20);
+  const bird=get("Птица"),birdStats=deriveStatistics(bird.system);
+  assert.equal(birdStats.run,10);assert.equal(birdStats.leap,2);
+  const fiendStats=deriveStatistics(get("Бес").system);
+  assert.equal(fiendStats.recovery,11);assert.equal(fiendStats.stun,10);
+  assert.equal(get("Скальный тролль").system.creature.sizeClass,"large");
+  for(const name of ["Сирена","Эндриага-воин","Птица"]) {
+    const anatomy=get(name).system.creature;
+    assert.equal(hitLocation(10,"monster",anatomy).id,"tail",name);
+  }
+  assert.equal(hitLocation(10,"monster",get("Эндриага-рабочий").system.creature).id,"leftArm");
+});
 
 test("the complete bestiary is a stable flat set of 32 distinct NPCs with distinct embedded IDs", () => {
   const sources = bestiarySources();

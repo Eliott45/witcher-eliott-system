@@ -1,7 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { SYSTEM_ID } from "../scripts/config.mjs";
-import { creatureSkillAttribute } from "../scripts/data/creatures.mjs";
+import { creatureSkillAttribute, immuneToCondition } from "../scripts/data/creatures.mjs";
+import { bestiarySources } from "../scripts/data/bestiary.mjs";
+import { poisonDamage, bleedingDamage } from "../scripts/combat/poison-damage.mjs";
+import { burningDamage } from "../scripts/combat/burning.mjs";
+import { resolveDamage } from "../scripts/combat/damage-rules.mjs";
 import { deriveStatistics, ATTRIBUTE_KEYS } from "../scripts/data/statistics.mjs";
 import { actorEnvironment } from "../scripts/combat/environment.mjs";
 import { creatureRegeneration } from "../scripts/data/creature-regeneration.mjs";
@@ -40,4 +44,33 @@ test("creature regeneration respects suppression, katakan sunlight and death wit
   delete actor.items[0].flags[SYSTEM_ID].regenerationSunlight;
   assert.equal(creatureRegeneration(actor).options.some(option=>option.id==="sunlight"),false);
   actor.items=[];assert.equal(creatureRegeneration(actor).available,false);
+});
+
+test("construct immunity blocks only the printed physical conditions, even without a separate poison trait",()=>{
+  const golem=bestiarySources().find(actor=>actor.name==="Голем");
+  golem.effects=[];
+  golem.items=golem.items.filter(item=>item.system.ruleId!=="creature.poison-immunity");
+  for(const status of ["bleeding","burning","poisoned"])assert.equal(immuneToCondition(golem,new Set([status])),true,status);
+  for(const status of ["prone","unconscious","stunned","blind"])assert.equal(immuneToCondition(golem,[status]),false,status);
+  // Merely calling an Item a construct does not create an immunity.
+  const imitation={effects:[],items:[{name:"Конструкция",type:"equipment",system:{ruleId:"creature.construct"}}]};
+  assert.equal(immuneToCondition(imitation,["burning"]),false);
+});
+
+test("pre-existing poison, bleeding and burning cannot damage a construct with worn-away armor",()=>{
+  const golem=bestiarySources().find(actor=>actor.name==="Голем");
+  golem.system.creature.naturalArmor=0;
+  golem.effects=["poisoned","bleeding","burning"].map(status=>({statuses:new Set([status])}));
+  assert.equal(poisonDamage(golem),0);
+  assert.equal(bleedingDamage(golem),0);
+  assert.equal(burningDamage(golem),null,"no burning tick also prevents the periodic equipment-burning branch");
+  // Immunity to the burning condition must not absorb a spell's direct fire damage.
+  const direct=resolveDamage({base:20,location:"torso",multiplier:1,traits:{types:["elemental"],piercing:"none",silver:false},
+    armor:{sp:0,layers:[],resistances:[],ablate:[]},monster:true});
+  assert.equal(direct.total,20);
+  golem.items=golem.items.filter(item=>!["creature.construct","creature.poison-immunity"].includes(item.system.ruleId));
+  golem.system.creature.resistances="Р, К, кровотечение, яд";
+  assert.equal(poisonDamage(golem),1,"the original poison resistance still applies to a non-construct");
+  assert.equal(bleedingDamage(golem),1,"bleeding resistance is not immunity");
+  assert.ok(burningDamage(golem).total>0,"ordinary monsters with the same states still burn");
 });

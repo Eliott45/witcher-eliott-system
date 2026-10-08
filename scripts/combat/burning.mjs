@@ -1,5 +1,6 @@
 import { activeEffect } from "../data/effect-counters.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
+import { immuneToCondition } from "../data/creatures.mjs";
 import { ATTACK_LOCATIONS, bodyPlanOf } from "./weapon-rules.mjs";
 import { armorAt, resolveDamage, monsterResistant, fireVulnerable } from "./damage-rules.mjs";
 
@@ -17,7 +18,7 @@ export const isBurning = actor => actor.effects.some(effect => activeEffect(effe
 
 /** Damage per part against the current armor; no location multipliers — every part takes its own 5. */
 export function burningDamage(actor) {
-  if (!isBurning(actor)) return null;
+  if (!isBurning(actor) || immuneToCondition(actor, ["burning"])) return null;
   const monster = monsterResistant(actor), vulnerable = fireVulnerable(actor);
   const parts = burningParts(actor).map(id => {
     const armor = armorAt(actor, id), result = resolveDamage({ base: BURN_PER_PART, location: id, multiplier: 1, traits: FIRE, armor, monster, vulnerableToFire: vulnerable });

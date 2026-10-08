@@ -58,11 +58,14 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
     return [key, value !== null && wounded && WOUNDED_ATTRIBUTES.has(key) ? Math.floor(value / 2) : value];
   }));
   const { speed } = effective;
-  const run = speed === null ? null : speed * 3;
+  // Printed creature exceptions (bird RUN 10, fiend REC 11) override the ordinary formulas.
+  // Movement still follows changes to SPEED, and recovery still receives its own effect modifiers.
+  const run = speed === null ? null : creature?.runBase > 0 && attributes.speed > 0 ? Math.floor(creature.runBase * speed / attributes.speed) : speed * 3;
+  const recoveryBase = creature?.recoveryBase > 0 ? creature.recoveryBase : physical;
   return {
     healthMax, staminaMax, resolveMax, meleeDamageBonus: modifierTotal(modifiers, "meleeDamage"), physicalDamageBonus: modifierTotal(modifiers, "physicalDamage"), encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),
     stun: physical === null ? null : Math.max(0, Math.min(10, physical) + modifierTotal(modifiers, "stun")),
-    recovery: physical === null ? null : Math.max(0, scale(physical + modifierTotal(modifiers, "recovery"), "recovery")), woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
+    physical, recovery: recoveryBase === null ? null : Math.max(0, scale(recoveryBase + modifierTotal(modifiers, "recovery"), "recovery")), woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
     reputationBonus, reputation: reputationTotal, naturalArmor: modifierTotal(modifiers, "naturalArmor"),
     skillBonuses: Object.fromEntries([...new Set(modifiers.filter(modifier => modifier.target.startsWith("skills.")).map(modifier => modifier.target))]
       .map(target => [target.slice(7), modifierTotal(modifiers, target, abilityState.trustEnabled ? ["humanTarget"] : [])])),

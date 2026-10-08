@@ -24,7 +24,7 @@ export function poisonDamage(actor) {
 
 /** Core p.161: bleeding deals 2 a turn, ignoring armor; resistance halves it; a clotting powder suspends it. */
 export function bleedingDamage(actor) {
-  if (actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("dead"))) return 0;
+  if (immuneToCondition(actor, ["bleeding"]) || actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("dead"))) return 0;
   if (!actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("bleeding"))) return 0;
   if (actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("clotting"))) return 0;
   // Treated Heart Damage (errata v4, p.160): +2 bleeding damage per round, permanently.

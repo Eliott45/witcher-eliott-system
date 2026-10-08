@@ -24,6 +24,6 @@ export function stunTooltip(system, { localize, format }) {
   const statistics = system.statistics;
   return [localize("WITCHER.Statistics.StunDescription"), format("WITCHER.Statistics.StunFormula", {
     body: statistics.adjusted?.body ?? "—", will: statistics.adjusted?.will ?? "—",
-    physical: statistics.recovery ?? "—", stun: statistics.stun ?? "—"
+    physical: statistics.physical ?? statistics.recovery ?? "—", stun: statistics.stun ?? "—"
   }), localize("WITCHER.Statistics.StunNoLuck")].join("<br><br>");
 }

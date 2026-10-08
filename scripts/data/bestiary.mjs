@@ -108,6 +108,7 @@ function coreCreature(entry, index) {
   actor.system.creature = { category: entry.category, difficulty: entry.difficulty, reward: entry.reward, size: entry.size, weight: entry.weight, habitat: entry.habitat,
     intellect: entry.intellect, group: entry.group, source: `Базовая книга, стр. ${entry.page}–${entry.page + 1}`, description: entry.description, tactics: entry.tactics,
     naturalArmor: entry.armor ?? 0, resistances: entry.resistances ?? "", healthMax: entry.hp, staminaMax: entry.sta, hasTailOrWings: Boolean(entry.hasTailOrWings),
+    runBase: entry.runBase ?? 0, recoveryBase: entry.recoveryBase ?? 0,
     sizeClass: entry.size_class ?? "medium", lore: (entry.lore ?? []).map(([name, skill, dc, text]) => ({ name, skill, dc, text })), loot, lootGenerated: false };
   actor.system.harvest = harvest;
   const ability = (ruleId, name, description, flags = {}) => ({ _id: itemId(), name, type: "ability", img: "icons/svg/aura.svg", system: { ruleId, description: `<p>${description}</p>` }, flags });

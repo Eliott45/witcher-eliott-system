@@ -38,6 +38,28 @@ test("witcher senses ignore dim light; the Cat potion ignores darkness; heat cut
   assert.equal(worksUnderwater({ category: "thrown", skill: "staffSpear", name: "Копьё" }), true);
 });
 
+test("amphibious creatures ignore water penalties by trait ID, retaining darkness, swamp and heat", () => {
+  const items = [{ type: "ability", name: "Любое имя", system: { ruleId: "creature.amphibian" } }];
+  for (const terrain of ["water", "underwater"]) {
+    const state = actorEnvironment(who(), scene({ terrain }));
+    assert.deepEqual(environmentModifiers(state, { items }), []);
+    for (const impostor of [
+      { type: "ability", name: "Земноводный", system: { ruleId: "" } },
+      { type: "equipment", system: { ruleId: "creature.amphibian" } }
+    ]) assert.equal(environmentModifiers(state, { items: [impostor] }).length, 3);
+  }
+  assert.deepEqual(targets(environmentModifiers(actorEnvironment(who(), scene({ terrain: "underwater", light: "dark" })), { items })),
+    ["skills.awareness-4", "combat.attack-2", "combat.defense-2"]);
+  assert.deepEqual(targets(environmentModifiers(actorEnvironment(who(), scene({ terrain: "swamp" })), { items })),
+    ["skills.dodgeEscape-2", "skills.athletics-2"]);
+  const hotWater = actorEnvironment(who(), scene({ terrain: "underwater", heat: true }));
+  assert.deepEqual(targets(environmentModifiers(hotWater, { items })), ["staminaMax×0.67"]);
+  assert.deepEqual(targets(environmentModifiers(hotWater, { items: [...items, { type: "armor", system: { equipped: true, armorClass: "medium" } }] })), ["staminaMax×0.50"]);
+  const attributes = { intelligence: 1, reflex: 7, dexterity: 7, body: 6, speed: 6, empathy: 1, craft: 1, will: 4, luck: 0 };
+  const statistics = deriveStatistics({ attributes, health: { value: 25, max: 25 } }, { items, environment: hotWater });
+  assert.deepEqual(targets(statistics.modifiers.filter(modifier => modifier.source === "environment")), ["staminaMax×0.67"]);
+});
+
 const bomb = (properties, extra = {}) => ({ type: "equipment", system: { ruleId: "bomb.x", properties, damageType: "К", description: "", quantity: 2, ...extra } });
 
 test("bomb properties give radius, damage and effects", () => {

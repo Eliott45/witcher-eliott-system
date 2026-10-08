@@ -605,6 +605,8 @@
         "healthMax": 30,
         "staminaMax": 30,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -1306,6 +1308,8 @@
         "healthMax": 25,
         "staminaMax": 25,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -1699,6 +1703,8 @@
         "healthMax": 25,
         "staminaMax": 25,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -1936,6 +1942,8 @@
         "healthMax": 60,
         "staminaMax": 30,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -2204,6 +2212,8 @@
         "healthMax": 25,
         "staminaMax": 25,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -2469,6 +2479,8 @@
         "healthMax": 80,
         "staminaMax": 40,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -2720,6 +2732,8 @@
         "healthMax": 20,
         "staminaMax": 20,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -2896,6 +2910,8 @@
         "healthMax": 30,
         "staminaMax": 30,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -3078,6 +3094,8 @@
         "healthMax": 60,
         "staminaMax": 30,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -3323,7 +3341,9 @@
         "resistances": "",
         "healthMax": 35,
         "staminaMax": 35,
-        "hasTailOrWings": false,
+        "hasTailOrWings": true,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -3586,6 +3606,8 @@
         "healthMax": 100,
         "staminaMax": 50,
         "hasTailOrWings": true,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "large",
         "lore": [
           {
@@ -3844,6 +3866,8 @@
         "healthMax": 35,
         "staminaMax": 35,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -4078,7 +4102,9 @@
         "resistances": "Р, кровотечение",
         "healthMax": 35,
         "staminaMax": 35,
-        "hasTailOrWings": false,
+        "hasTailOrWings": true,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -4337,6 +4363,8 @@
         "healthMax": 35,
         "staminaMax": 35,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -4596,6 +4624,8 @@
         "healthMax": 90,
         "staminaMax": 45,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "large",
         "lore": [
           {
@@ -4884,6 +4914,8 @@
         "healthMax": 80,
         "staminaMax": 999,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "large",
         "lore": [
           {
@@ -5158,6 +5190,8 @@
         "healthMax": 110,
         "staminaMax": 55,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 11,
         "sizeClass": "huge",
         "lore": [
           {
@@ -5466,6 +5500,8 @@
         "healthMax": 15,
         "staminaMax": 15,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "small",
         "lore": [
           {
@@ -5597,7 +5633,7 @@
         "intelligence": 2,
         "reflex": 6,
         "dexterity": 8,
-        "body": 7,
+        "body": 4,
         "speed": 7,
         "empathy": 2,
         "craft": 2,
@@ -5643,6 +5679,8 @@
         "healthMax": 20,
         "staminaMax": 20,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "small",
         "lore": [
           {
@@ -5830,7 +5868,9 @@
         "healthMax": 80,
         "staminaMax": 40,
         "hasTailOrWings": false,
-        "sizeClass": "medium",
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "large",
         "lore": [
           {
             "name": "Предрассудки простолюдинов",
@@ -6080,6 +6120,8 @@
         "healthMax": 80,
         "staminaMax": 40,
         "hasTailOrWings": true,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "large",
         "lore": [
           {
@@ -6396,6 +6438,8 @@
         "healthMax": 80,
         "staminaMax": 40,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [
           {
@@ -6699,6 +6743,8 @@
         "healthMax": 10,
         "staminaMax": 10,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "small",
         "lore": [],
         "loot": [],
@@ -6900,6 +6946,8 @@
         "healthMax": 20,
         "staminaMax": 20,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "small",
         "lore": [],
         "loot": [],
@@ -7064,7 +7112,9 @@
         "resistances": "",
         "healthMax": 10,
         "staminaMax": 10,
-        "hasTailOrWings": false,
+        "hasTailOrWings": true,
+        "runBase": 10,
+        "recoveryBase": 0,
         "sizeClass": "small",
         "lore": [],
         "loot": [],
@@ -7241,6 +7291,8 @@
         "healthMax": 10,
         "staminaMax": 10,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "small",
         "lore": [],
         "loot": [],
@@ -7406,6 +7458,8 @@
         "healthMax": 40,
         "staminaMax": 40,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "large",
         "lore": [],
         "loot": [],
@@ -7551,6 +7605,8 @@
         "healthMax": 50,
         "staminaMax": 50,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "large",
         "lore": [],
         "loot": [],
@@ -7696,6 +7752,8 @@
         "healthMax": 50,
         "staminaMax": 50,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "large",
         "lore": [],
         "loot": [],
@@ -7875,6 +7933,8 @@
         "healthMax": 45,
         "staminaMax": 45,
         "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
         "sizeClass": "large",
         "lore": [],
         "loot": [],

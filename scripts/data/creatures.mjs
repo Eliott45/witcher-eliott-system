@@ -12,7 +12,7 @@ export function creatureFields() {
   const {SchemaField,ArrayField,BooleanField}=foundry.data.fields;
   return new SchemaField({category:itemText("humanoid",{choices:MONSTER_CATEGORIES.map(c=>c.id)}),difficulty:itemText("Простые / обычные"),reward:itemNumber(),
     habitat:itemText(),size:itemText(),sizeClass:itemText("medium",{choices:SIZE_CLASSES.map(entry=>entry.id)}),weight:itemText(),intellect:itemText(),group:itemText(),source:itemText(),
-    naturalArmor:itemNumber(),resistances:itemText(),healthMax:itemNumber(),staminaMax:itemNumber(),description:itemText(),tactics:itemText(),
+    naturalArmor:itemNumber(),resistances:itemText(),healthMax:itemNumber(),staminaMax:itemNumber(),runBase:itemNumber(),recoveryBase:itemNumber(),description:itemText(),tactics:itemText(),
     regenerationMode:itemText("normal",{choices:["normal","suppressed","sunlight"]}),
     hasTailOrWings:new BooleanField({initial:false}),
     lore:new ArrayField(new SchemaField({name:itemText(),skill:itemText("education"),dc:itemNumber(),text:itemText()})),
@@ -38,5 +38,8 @@ export function creatureSkillAttribute(system,key) {
   return {value:stats.dying||stats.dead?Math.floor(instinct/3):stats.wounded?Math.floor(instinct/2):instinct,label:`Дикий: ИНТ ${instinct} для Внимания и Выживания`};
 }
 export function immuneToCondition(actor,statuses) {
-  return potionImmunity(actor,statuses) || Array.from(statuses).includes("poisoned")&&(actor.items??[]).some(item=>item.type==="ability"&&item.system.ruleId==="creature.poison-immunity");
+  const ids=new Set(statuses),traits=new Set((actor.items??[]).filter(item=>item.type==="ability").map(item=>item.system.ruleId));
+  return potionImmunity(actor,ids)
+    || ids.has("poisoned")&&traits.has("creature.poison-immunity")
+    || traits.has("creature.construct")&&["bleeding","burning","poisoned"].some(id=>ids.has(id));
 }

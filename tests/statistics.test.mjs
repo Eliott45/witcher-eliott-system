@@ -32,6 +32,21 @@ test("physical average rounds down before multiplying; Stun alone caps at 10", (
   assert.equal(high.leap, 60);
 });
 
+test("printed NPC movement and recovery overrides preserve ordinary formulas and effect scaling", () => {
+  const data=actor({body:15,will:9,speed:2});
+  data.creature={runBase:10,recoveryBase:11};
+  assert.equal(data.statistics.run,10);assert.equal(data.statistics.leap,2);
+  assert.equal(data.statistics.recovery,11);assert.equal(data.statistics.physical,12);
+  assert.equal(data.statistics.stun,10,"A recovery override must not change Stun");
+  const effects=[{statuses:new Set(),flags:{"witcher-eliott-system":{condition:{modifiers:[
+    {target:"attributes.speed",factor:0.5},{target:"recovery",value:2},{target:"recovery",factor:0.5}
+  ]}}}}];
+  const reduced=deriveStatistics(data,{effects});
+  assert.equal(reduced.run,5);assert.equal(reduced.leap,1);assert.equal(reduced.recovery,6);
+  data.creature={runBase:0,recoveryBase:0};
+  assert.equal(data.statistics.run,6);assert.equal(data.statistics.recovery,12);
+});
+
 test("wounds apply strictly below the threshold and do not change resource limits or base stats", () => {
   const data = actor({ body: 10, will: 10, reflex: 9, intelligence: 7, dexterity: 8, speed: 9 }, { value: 10, max: 50 });
   assert.equal(data.statistics.wounded, false);
