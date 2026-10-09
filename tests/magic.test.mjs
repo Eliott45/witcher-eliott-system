@@ -307,3 +307,16 @@ test("magic consequences wait for both chat and Dice So Nice, and display listen
     }finally{delete globalThis.Hooks;}
   }
 });
+
+test("direct magic can be aimed: the location's penalty lowers the casting check and the blow lands there",async()=>{
+  const {actor,spell}=fixture(),aenye=spell("aenye"),zephyr=spell("zephyr");
+  game.user.targets=new Set();
+  const plain=castingQuote(actor,aenye),aimed=castingQuote(actor,aenye,{aim:"head"});
+  assert.equal(aimed.skill.total,plain.skill.total-6);assert.deepEqual(aimed.aim,{id:"head",name:"Голова",penalty:-6});
+  assert.throws(()=>castingQuote(actor,zephyr,{aim:"head"}),/не областью/);
+  const {strikeAttack}=await import("../scripts/magic/spell-strikes.mjs");
+  assert.equal(strikeAttack(aenye,{uuid:"T.c"},{uuid:"T.t"},{aim:"head"}).location,"head");
+  assert.equal(strikeAttack(aenye,{uuid:"T.c"},{uuid:"T.t"}).location,"random");
+  const igni=spell("sign.igni");
+  assert.equal(strikeAttack(igni,{uuid:"T.c"},{uuid:"T.t"}).location,"torso","Igni normally strikes the torso");
+});

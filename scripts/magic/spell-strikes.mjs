@@ -6,7 +6,7 @@ import { createYrdenZone, spellMentalImmunity } from "../combat/creature-spirits
 import { spellDamageWithGlyph } from "../data/rune-glyphs.mjs";
 import { furyTargetError } from "../combat/experimental-effects.mjs";
 import { spellArea } from "./spell-areas.mjs";
-import { spellStrikeDamage } from "./spell-effects.mjs";
+import { spellStrikeDamage, spellDefaultLocation } from "./spell-effects.mjs";
 import { isCadfan } from "./cadfan.mjs";
 
 // Core p.168 «Выбор целей для магии»: a direct spell works like a ranged attack against each target; an area
@@ -45,12 +45,13 @@ export function furySpellTargetError(actor,item,targets=Array.from(globalThis.ga
 }
 
 /** The weaponAttack flags of a spell against one token; `spellSource` is set on extra cards only. */
-export function strikeAttack(item, caster, target, { total = null, spellSource = null, glyph = null, effectDC = 0, adrenalineDice = 0, power = 0 } = {}) {
+export function strikeAttack(item, caster, target, { total = null, spellSource = null, glyph = null, effectDC = 0, adrenalineDice = 0, power = 0, aim = "random" } = {}) {
   const system = item.system, { defenses, unaware } = spellDefenses(system);
   // Igni and Firestream deal 1d6 per Stamina put into the sign (core p.114).
   const damage=spellDamageWithGlyph(spellStrikeDamage(system,power),glyph??{});
   return { itemId: item.id, name: item.name, mode: "spell", spell: true, unarmed: null, nonLethal: false, special: null,
-    charge: false, push: false, dual: false, base: total, count: 1, damage, adrenalineDice, location: "random", multiplier: 1, body: 0, bonus: 0,
+    // An aimed cast (penalty already in the casting check) lands where it was aimed; Igni defaults to the torso.
+    charge: false, push: false, dual: false, base: total, count: 1, damage, adrenalineDice, location: aim && aim !== "random" ? aim : spellDefaultLocation(system), multiplier: 1, body: 0, bonus: 0,
     target: target.uuid, attacker: caster.uuid, parts: [], ranged: true, band: "normal", dc: null, thrown: false,
     combat: game.combat?.started ? { id: game.combat.id, round: game.combat.round } : null, strike: 0, damageTypes: "",
     ...(spellSource ? { spellSource } : {}), glyph, effectDC, defenses, ruleId: system.ruleId ?? "", power: power || system.cost || 1, spellUuid: item.uuid ?? "",
@@ -78,7 +79,7 @@ export async function createSpellStrikes(actor, item, source, { total = null } =
   if (!actor.isOwner || source.isContentVisible === false) throw new Error("Нет доступа к результату сотворения.");
   const system = item.system, targets = Array.from(game.user.targets ?? []).map(tokenDocument);
   const frenzy=furySpellTargetError(actor,item,targets);if(frenzy)throw new Error(frenzy);
-  const {glyph=null,effectDC=0,adrenalineDice=0,powerCost:power=0}=source.flags?.[SYSTEM_ID]?.magicCast??{};
+  const {glyph=null,effectDC=0,adrenalineDice=0,powerCost:power=0,aim="random"}=source.flags?.[SYSTEM_ID]?.magicCast??{};
   if(system.ruleId === "sign.yrden") {
     const caster = attackerToken(actor);
     const power = source.flags?.[SYSTEM_ID]?.magicCast?.powerCost ?? system.cost ?? 1;
@@ -102,7 +103,7 @@ export async function createSpellStrikes(actor, item, source, { total = null } =
   let created = 0;
   for (const [index, { target, distance }] of valid.entries()) {
     if (index === 0 && !source.flags?.[SYSTEM_ID]?.weaponAttack) {
-      await source.update({ [`flags.${SYSTEM_ID}.weaponAttack`]: strikeAttack(item, caster, target, { total, glyph, effectDC, adrenalineDice, power }) });
+      await source.update({ [`flags.${SYSTEM_ID}.weaponAttack`]: strikeAttack(item, caster, target, { total, glyph, effectDC, adrenalineDice, power, aim }) });
       created++; continue;
     }
     const content = `<section class="witcher-attack-chat witcher-spell-strike"><h3><i class="fa-solid fa-wand-sparkles"></i> ${esc(item.name)} → ${esc(target.name)}</h3>`
@@ -110,7 +111,7 @@ export async function createSpellStrikes(actor, item, source, { total = null } =
       + (distance != null && target.uuid !== caster.uuid ? `<small>Расстояние ${distance} м${reach ? ` из ${reach} м` : ""}.</small>` : "") + `</section>`;
     await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), content,
       whisper: [...(source.whisper ?? [])], blind: Boolean(source.blind),
-      flags: { [SYSTEM_ID]: { skipLuck: true, weaponAttack: strikeAttack(item, caster, target, { total, spellSource: source.id, glyph, effectDC, power }) } } });
+      flags: { [SYSTEM_ID]: { skipLuck: true, weaponAttack: strikeAttack(item, caster, target, { total, spellSource: source.id, glyph, effectDC, power, aim }) } } });
     created++;
   }
   if (skipped.length) ui.notifications.warn(`Не все цели: ${skipped.join("; ")}.`);

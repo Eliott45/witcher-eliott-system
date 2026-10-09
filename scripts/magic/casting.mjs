@@ -14,8 +14,9 @@ import { createSpellStrikes, furySpellTargetError } from "./spell-strikes.mjs";
 import { creatureSuppression } from "../combat/creature-spirits.mjs";
 import { DIMERITIUM_RESISTED } from "./dimeritium.mjs";
 import { spellArea, placeSpellArea } from "./spell-areas.mjs";
-import { applySelfEffect, selfEffectOf } from "./spell-effects.mjs";
+import { applySelfEffect, selfEffectOf, spellStrikeDamage } from "./spell-effects.mjs";
 import { isCadfan, heatItem } from "./cadfan.mjs";
+import { ATTACK_LOCATIONS } from "../combat/weapon-rules.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { matchingGlyphs, glyphBonus, spellDescriptionWithDC } from "../data/rune-glyphs.mjs";
 import { adrenalineDamage, consumeAdrenalineDamage, adrenalineAbsorptionPlan } from "../combat/adrenaline.mjs";
@@ -35,7 +36,11 @@ export async function learnSpell(actor,source) {
   });
 }
 
-export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,helpers=0,glyphChoice="dc"}={}) {
+/** Magic that can be aimed (core p.168): a direct blow with damage, cast at others, not an area. */
+export function spellAimable(system) {
+  return Boolean(spellStrikeDamage(system,1))&&!["ritual","hex"].includes(system.kind)&&!["self","radius","cone"].includes(system.range?.kind)&&!spellArea(system)&&!isCadfan(system);
+}
+export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,helpers=0,glyphChoice="dc",aim="random"}={}) {
   if(item?.type!=="spell"||item.parent!==actor)throw new Error("Сначала добавьте заклинание в книгу персонажа.");
   if(!maintenance){const frenzy=furySpellTargetError(actor,item);if(frenzy)throw new Error(frenzy);}
   // A mage who passed «Устойчивость к двимериту» keeps the ability to cast (core p.66).
@@ -64,7 +69,11 @@ export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,he
   const quote=castingCost({cost:base,focus:focus?.rating??0,spent:roundSpent(actor.system.magic,roundKey),vigor:actor.system.statistics.vigor+power.vigor});
   if(quote.stamina>actor.system.stamina.value)throw new Error(`Недостаточно Выносливости: нужно ${quote.stamina}, доступно ${actor.system.stamina.value}.`);
   const action = maintenance ? {extra:false,penalty:0,stamina:0,roundKey:""} : actionQuote(actor,{cost:quote.stamina});
-  return {...quote,action,roundKey,skill:{...poweredSkill,total:poweredSkill.total+action.penalty},skillKey,focus,glyph,effectDC:glyph.dc+(focus?.greater?2:0),power,difficulty:item.system.kind==="ritual"?ritualDifficulty(item.system,{dc,helpers}):null};
+  const aimAt=!maintenance&&aim!=="random"?ATTACK_LOCATIONS.find(entry=>entry.id===aim):null;
+  if(aimAt&&!spellAimable(item.system))throw new Error("Прицелиться можно только прямой магией с уроном, не областью.");
+  if(!maintenance&&aim!=="random"&&!aimAt)throw new Error("Неизвестная часть тела.");
+  const aimPenalty=aimAt?.penalty??0;
+  return {...quote,action,roundKey,aim:aimAt?{id:aimAt.id,name:aimAt.name,penalty:aimPenalty}:null,skill:{...poweredSkill,total:poweredSkill.total+action.penalty+aimPenalty},skillKey,focus,glyph,effectDC:glyph.dc+(focus?.greater?2:0),power,difficulty:item.system.kind==="ritual"?ritualDifficulty(item.system,{dc,helpers}):null};
 }
 
 const pendingCasts=new WeakMap();
@@ -129,6 +138,7 @@ function performCast(actor,itemId,options) {
 
       if(quote.focus?.greater)summary.push("Улучшенное фокусирующее: +2 к устанавливаемой заклинанием СЛ для противника (не к броску атаки).");
       if(quote.glyph.sources.length)summary.push(`Глиф: ${quote.glyph.dc?"+3 к устанавливаемой заклинанием СЛ":"+1d6 урона"}. Бонус выбран для этого сотворения.`);
+      if(quote.aim)summary.push(`Прицел: ${quote.aim.name} (${quote.aim.penalty}); без броска места попадания.`);
       if(adrenaline)summary.push(`Адреналин: +${adrenaline}d6 урона первого попадания; кости и ВЫН уже потрачены до действия.`);
       const flavor=`<section class="witcher-magic-chat"><h3>${title}: ${escape(item.name)}</h3>`
         +`<p data-tooltip="${escape(calc)}">Воля + ${CASTING_SKILL_LABELS[quote.skillKey]}: ${quote.skill.total}</p>`
@@ -137,7 +147,7 @@ function performCast(actor,itemId,options) {
         +`<ul>${summary.map(line=>`<li>${escape(line)}</li>`).join("")}</ul>`
         +`<details><summary>Действие магии</summary>${await foundry.applications.ux.TextEditor.implementation.enrichHTML(spellDescriptionWithDC(item.system.description,quote.effectDC),{secrets:false,relativeTo:item})}${hex?`<p>Снятие: ${escape(item.system.hex.lifting)}</p>`:""}</details></section>`;
       const flags={[SYSTEM_ID]:{...display.flags[SYSTEM_ID],...(!roll?{skipLuck:true}:{}),
-        magicCast:{kind,element,elemental,spellId:item.id,spellName:item.name,roundKey:quote.roundKey,stamina:quote.stamina,powerCost:quote.base,overload:quote.damage,fumble,fumbleDamage,reflected,difficulty:quote.difficulty,glyph:quote.glyph,effectDC:quote.effectDC,adrenalineDice:adrenaline,maintenance:Boolean(options.maintenance)}}};
+        magicCast:{aim:quote.aim?.id??"random",kind,element,elemental,spellId:item.id,spellName:item.name,roundKey:quote.roundKey,stamina:quote.stamina,powerCost:quote.base,overload:quote.damage,fumble,fumbleDamage,reflected,difficulty:quote.difficulty,glyph:quote.glyph,effectDC:quote.effectDC,adrenalineDice:adrenaline,maintenance:Boolean(options.maintenance)}}};
       const data={speaker:foundry.documents.ChatMessage.getSpeaker({actor}),flavor,flags};
       posted=backlash?await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({...data,rolls:[roll,backlash]},messageMode))
         :roll?await roll.toMessage(data,{messageMode}):await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({...data,content:options.maintenance?"Поддержание оплачено.":"Ритуал без проверки."},messageMode));

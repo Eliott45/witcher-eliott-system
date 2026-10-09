@@ -33,6 +33,11 @@ const HIT = {
 const PER_POWER = { "sign.igni": "d6", "sign.firestream": "d6" };
 
 export const spellHitProfile = system => HIT[system?.ruleId] ?? null;
+
+// Core p.168: direct magic works like a ranged attack, so it can be aimed at a body part with the usual penalty.
+// Areas and magic without damage have no single blow to place. Igni normally strikes the torso (core p.114).
+const DEFAULT_LOCATION = { "sign.igni": "torso" };
+export const spellDefaultLocation = system => DEFAULT_LOCATION[system?.ruleId] ?? "random";
 export function spellStrikeDamage(system, power = 0) {
   const die = PER_POWER[system?.ruleId];
   return die && power > 0 ? `${power}${die}` : system?.damage ?? "";
