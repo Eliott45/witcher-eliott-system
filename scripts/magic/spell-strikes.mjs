@@ -5,6 +5,7 @@ import { SPELL_DEFENSES } from "../data/spells.mjs";
 import { createYrdenZone, spellMentalImmunity } from "../combat/creature-spirits.mjs";
 import { spellDamageWithGlyph } from "../data/rune-glyphs.mjs";
 import { furyTargetError } from "../combat/experimental-effects.mjs";
+import { spellArea } from "./spell-areas.mjs";
 
 // Core p.168 «Выбор целей для магии»: a direct spell works like a ranged attack against each target; an area
 // spell makes everyone in it defend against the same casting check; with no defense (or a willing target) the
@@ -112,7 +113,8 @@ export async function createSpellStrikes(actor, item, source, { total = null } =
 export function registerSpellStrikes() {
   Hooks.on("renderChatMessageHTML", (message, html) => {
     const item = strikeable(message);
-    if (!item || message.flags[SYSTEM_ID]?.weaponAttack || !message.speakerActor?.isOwner) return;
+    // Area magic gets the «Разместить область» button from spell-areas.mjs instead.
+    if (!item || message.flags[SYSTEM_ID]?.weaponAttack || !message.speakerActor?.isOwner || spellArea(item.system)) return;
     const yrden = item.system.ruleId === "sign.yrden";
     if (yrden && (message.flags[SYSTEM_ID].yrdenRegion || message.flags[SYSTEM_ID].yrdenRequest)) return;
     const box = document.createElement("div");

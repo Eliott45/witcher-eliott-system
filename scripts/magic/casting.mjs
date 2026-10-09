@@ -13,6 +13,7 @@ import { SPELL_DEFENSES, spellRange, spellDuration } from "../data/spells.mjs";
 import { createSpellStrikes, furySpellTargetError } from "./spell-strikes.mjs";
 import { creatureSuppression } from "../combat/creature-spirits.mjs";
 import { DIMERITIUM_RESISTED } from "./dimeritium.mjs";
+import { spellArea, placeSpellArea } from "./spell-areas.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { matchingGlyphs, glyphBonus, spellDescriptionWithDC } from "../data/rune-glyphs.mjs";
 import { adrenalineDamage, consumeAdrenalineDamage, adrenalineAbsorptionPlan } from "../combat/adrenaline.mjs";
@@ -68,11 +69,18 @@ const pendingCasts=new WeakMap();
 /** Repeated clicks while the same cast is pending share its result instead of casting twice. */
 export function castSpell(actor,itemId,options={}) {
   if(pendingCasts.has(actor))return pendingCasts.get(actor);
-  const work=performCast(actor,itemId,options);
+  const work=performCast(actor,itemId,options).then(posted=>{startAreaPlacement(actor,itemId,posted,options);return posted;});
   pendingCasts.set(actor,work);
   const clear=()=>{if(pendingCasts.get(actor)===work)pendingCasts.delete(actor);};
   work.then(clear,clear);
   return work;
+}
+
+/** Area magic (core p.168): after the cast the caster places its template; this runs outside the actor write queue. */
+function startAreaPlacement(actor,itemId,posted,options) {
+  const item=actor.items.get(itemId),cast=posted?.flags?.[SYSTEM_ID]?.magicCast;
+  if(options.maintenance||!item||!cast||cast.fumble?.failed||(cast.kind==="ritual"&&!cast.succeeded)||!spellArea(item.system)||!globalThis.canvas?.ready)return;
+  placeSpellArea(actor,item,posted).catch(error=>ui.notifications.warn(`${error.message} Область можно разместить кнопкой в чате.`));
 }
 
 /** Post first, settle after Dice So Nice: exhaustion and fumble states appear after the result. */
@@ -145,7 +153,8 @@ function performCast(actor,itemId,options) {
       }
       if(!options.maintenance)await consumeAiming(actor);
       // Core p.168: each targeted token defends against this casting check (a failed spell reaches nobody).
-      if(!options.maintenance&&!ritual&&!hex&&roll&&!fumble.failed)await createSpellStrikes(actor,item,posted,{total:posted.rolls[0]?.total??roll.total});
+      // Area magic chooses its targets by the placed template instead of earlier T targets.
+      if(!options.maintenance&&!ritual&&!hex&&roll&&!fumble.failed&&!spellArea(item.system))await createSpellStrikes(actor,item,posted,{total:posted.rolls[0]?.total??roll.total});
       return posted;
     } catch(error) {
       if(posted)ui.notifications.error("Результат уже в чате, но расход магии не завершён. Проверьте ПЗ, Выносливость и состояния перед повторным броском.");
