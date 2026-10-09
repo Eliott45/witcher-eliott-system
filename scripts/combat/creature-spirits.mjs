@@ -71,12 +71,23 @@ export async function setSlipIncorporeal(actor) {
   return true;
 }
 
-export function spiritSuppressionSource(actor, { kind, rounds = kind === "moon-dust" ? 20 : 5, zoneUuid = "", penalty = 0 } = {}) {
+const escapeText = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+/** What the state does, who made it and a link to the sign, so the effect explains itself on the sheet. */
+export function spiritSuppressionDescription(kind, { penalty = 0, zone = null } = {}) {
+  const who = zone?.casterName ? ` Сотворил: ${escapeText(zone.casterName)}.` : "";
+  const link = zone?.spellUuid ? `<p>Источник: @UUID[${zone.spellUuid}]{${escapeText(zone.spellName || "Ирден")}}</p>` : "";
+  if (kind === "yrden") return `<p>Ведьмачий знак Ирден — магический круг на земле.${who} Пока персонаж внутри круга: −${penalty} к РЕА и СКОР; бестелесные существа становятся материальными. Эффект пропадает, как только персонаж выходит из круга, и возвращается при входе. Сам заклинатель на свой круг не реагирует. Круг держится 5 раундов.</p>${link}`;
+  if (kind === "dimeritium") return "<p>Облако двимеритовой бомбы: внутри нельзя сотворять заклинания (маг, прошедший «Устойчивость к двимериту», может). Голем в облаке замедлен. Эффект пропадает при выходе из зоны.</p>";
+  return "<p>Лунная пыль: невидимые и бесплотные существа становятся видимыми и осязаемыми, чудовища не могут регенерировать и превращаться. Действует 20 раундов, даже если существо покинуло облако.</p>";
+}
+
+export function spiritSuppressionSource(actor, { kind, rounds = kind === "moon-dust" ? 20 : 5, zoneUuid = "", penalty = 0, zone = null } = {}) {
   if (!["moon-dust", "yrden", "dimeritium"].includes(kind)) throw new Error("Неизвестный источник подавления.");
   const name = { "moon-dust": "Лунная пыль", yrden: "Ирден", dimeritium: "Двимеритовая бомба" }[kind];
   const modifiers = kind === "yrden" && penalty ? [{ target: "attributes.reflex", value: -penalty }, { target: "attributes.speed", value: -penalty }]
     : [];
   return { name, type: "base", img: kind === "moon-dust" ? "icons/svg/sun.svg" : "icons/svg/aura.svg", statuses: [`creature-${kind}`],
+    description: spiritSuppressionDescription(kind, { penalty, zone }), ...(zone?.spellUuid ? { origin: zone.spellUuid } : {}),
     start: fullTurnStart(actor), duration: { value: zoneUuid ? null : rounds, units: "rounds", expiry: zoneUuid ? null : "turnEnd", expired: false },
     flags: { [SYSTEM_ID]: { creatureSuppression: { kind, zoneUuid }, condition: { ...(zoneUuid ? {} : { rounds, expiry: "turnEnd" }), modifiers } } } };
 }
@@ -88,31 +99,41 @@ export function spiritZoneExpired(zone, now = clock()) {
   return now.worldTime >= zone.endTime;
 }
 const actorTokens = actor => actor?.isToken ? [actor.token] : Array.from(actor?.getActiveTokens?.(false, true) ?? []).map(token => token.document ?? token);
+// Core v14 animates a moving token's prepared x/y: right after a move they still hold the old cell. Region tests
+// must read the source position, which is what TokenDocument#testInsideRegion does.
+function insideZone(token, region) {
+  if (typeof token.testInsideRegion === "function" && region.parent && token.parent === region.parent) return token.testInsideRegion(region);
+  const size = token.parent?.grid?.size ?? 100, source = token._source ?? token;
+  const x = source.x + (source.width ?? 1) * size / 2, y = source.y + (source.height ?? 1) * size / 2;
+  return region.shapes.some(shape => shape.type === "ellipse" && shape.radiusX > 0 && shape.radiusY > 0
+    && ((x - shape.x) / shape.radiusX) ** 2 + ((y - shape.y) / shape.radiusY) ** 2 <= 1 + 1e-7);
+}
+/** Circles made before the caster was stored still name it through their casting message. */
+const yrdenCaster = zone => zone.caster || (zone.sourceUuid && globalThis.fromUuidSync?.(zone.sourceUuid, { strict: false })?.speakerActor?.uuid) || "";
 export function spiritZonesAt(actor) {
   const out = [];
   for (const token of actorTokens(actor)) {
-    const scene = token.parent, size = scene?.grid?.size ?? 100;
-    const x = token.x + (token.width ?? 1) * size / 2, y = token.y + (token.height ?? 1) * size / 2;
+    const scene = token.parent, owner = actor?.uuid ?? token.actor?.uuid;
     for (const region of scene?.regions ?? []) {
       const zone = region.flags?.[SYSTEM_ID]?.creatureZone;
       if (!zone || spiritZoneExpired(zone)) continue;
-      const inside = region.shapes.some(shape => shape.type === "ellipse" && shape.radiusX > 0 && shape.radiusY > 0
-        && ((x - shape.x) / shape.radiusX) ** 2 + ((y - shape.y) / shape.radiusY) ** 2 <= 1 + 1e-7);
-      if (inside) out.push({ ...zone, uuid: region.uuid });
+      // The witcher's own Yrden does not slow the witcher.
+      if (zone.kind === "yrden" && yrdenCaster(zone) === owner) continue;
+      if (insideZone(token, region)) out.push({ ...zone, uuid: region.uuid });
     }
   }
   return out;
 }
 
 /** A visible, timed circle on the scene; immediate lookups prevent stale defenses while effects refresh. */
-export async function createSpiritZone(scene, point, { kind, radius, rounds, penalty = 0, sourceUuid = "" }) {
+export async function createSpiritZone(scene, point, { kind, radius, rounds, penalty = 0, sourceUuid = "", caster = "", casterName = "", spellUuid = "", spellName = "" }) {
   const existing = sourceUuid && Array.from(scene.regions ?? []).find(region => {
     const zone = region.flags?.[SYSTEM_ID]?.creatureZone;
     return zone?.sourceUuid === sourceUuid && zone.kind === kind;
   });
   if (existing) return existing;
   const { worldTime, combat } = clock();
-  const creatureZone = { kind, penalty, sourceUuid, endTime: worldTime + rounds * ROUND_SECONDS,
+  const creatureZone = { kind, penalty, sourceUuid, ...(caster ? { caster, casterName, spellUuid, spellName } : {}), endTime: worldTime + rounds * ROUND_SECONDS,
     ...(combat?.started ? { combatId: combat.id, endRound: combat.round + rounds, endTurn: combat.turn ?? 0 } : {}) };
   const pixels = radius / scene.grid.distance * scene.grid.size;
   const [zone] = await scene.createEmbeddedDocuments("Region", [{ name: kind === "yrden" ? "Ирден" : "Двимеритовая бомба",
@@ -127,8 +148,10 @@ export async function createSpiritZone(scene, point, { kind, radius, rounds, pen
 export async function createYrdenZone(actor, caster, source, power) {
   if (globalThis.game?.user?.isGM) {
     const size = caster.parent.grid.size;
-    const zone = await createSpiritZone(caster.parent, { x: caster.x + caster.width * size / 2, y: caster.y + caster.height * size / 2 },
-      { kind: "yrden", radius: 3, rounds: 5, penalty: Math.min(4, 1 + Math.floor((power - 1) / 2)), sourceUuid: source.uuid });
+    const position = caster._source ?? caster, spell = actor.items?.get?.(source.flags?.[SYSTEM_ID]?.magicCast?.spellId);
+    const zone = await createSpiritZone(caster.parent, { x: position.x + position.width * size / 2, y: position.y + position.height * size / 2 },
+      { kind: "yrden", radius: 3, rounds: 5, penalty: Math.min(4, 1 + Math.floor((power - 1) / 2)), sourceUuid: source.uuid,
+        caster: actor.uuid, casterName: caster.name ?? actor.name, spellUuid: spell?.uuid ?? "", spellName: spell?.name ?? "Ирден" });
     if (source.update) await source.update({ [`flags.${SYSTEM_ID}.yrdenRegion`]: zone.uuid });
     return zone;
   }
@@ -164,7 +187,7 @@ export function refreshSpiritZones(scene) {
         const zone = zones.filter(entry => entry.kind === kind).sort((a, b) => b.penalty - a.penalty)[0];
         const existing = Array.from(actor.effects ?? []).filter(effect => effect.flags?.[SYSTEM_ID]?.creatureSuppression?.kind === kind && effect.flags[SYSTEM_ID].creatureSuppression.zoneUuid);
         if (!zone) { if (existing.length) await actor.deleteEmbeddedDocuments("ActiveEffect", existing.map(effect => effect.id)); continue; }
-        const source = spiritSuppressionSource(actor, { kind, zoneUuid: zone.uuid, penalty: zone.penalty });
+        const source = spiritSuppressionSource(actor, { kind, zoneUuid: zone.uuid, penalty: zone.penalty, zone });
         if (existing.length === 1 && existing[0].flags[SYSTEM_ID].creatureSuppression.zoneUuid === zone.uuid) continue;
         if (existing.length) await actor.deleteEmbeddedDocuments("ActiveEffect", existing.map(effect => effect.id));
         await actor.createEmbeddedDocuments("ActiveEffect", [source]);

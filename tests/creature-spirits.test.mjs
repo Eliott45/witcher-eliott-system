@@ -227,3 +227,25 @@ test("a human-form werewolf loses natural armor and monster resistance but retai
   wolf.items.push({ id: "coat", type: "armor", name: "Обычный доспех", system: { zone: "torso", equipped: true, carried: true, quantity: 1, stoppingPower: { value: 5, max: 5 } } });
   assert.equal(armorAt(wolf, "torso").sp, 5); assert.deepEqual(armorAt(wolf, "torso").ablate, ["coat"]);
 });
+
+test("Yrden reads where a moving token ends up, spares its caster and explains itself", async () => {
+  runtime();
+  const bandit = actor(), scene = sceneFor(bandit);
+  // Core v14 animates prepared x/y; right after the move only the source holds the new cell.
+  bandit.token.x = 600; bandit.token._source = { x: 0, y: 0, width: 1, height: 1 };
+  const witcher = actor(); witcher.uuid = "Actor.geralt"; witcher.name = "Геральт";
+  const sign = { id: "sign", uuid: "Actor.geralt.Item.sign", name: "Ирден" };
+  witcher.items.push(sign);
+  const witcherToken = { uuid: "Scene.s.Token.geralt", parent: scene, actor: witcher, name: "Геральт", x: 0, y: 0, width: 1, height: 1 };
+  scene.tokens.push(witcherToken); witcher.isToken = true; witcher.token = witcherToken;
+  const { createYrdenZone } = await import("../scripts/combat/creature-spirits.mjs");
+  await createYrdenZone(witcher, witcherToken, { uuid: "Chat.y", flags: { [SYSTEM_ID]: { magicCast: { spellId: "sign" } } } }, 3);
+  assert.equal(bandit.effects.length, 1, "the bandit who just stepped in is slowed at once");
+  assert.equal(witcher.effects.length, 0, "the caster is not slowed by the own circle");
+  assert.equal(creatureSuppression(witcher).yrden, false);
+  const effect = bandit.effects[0];
+  assert.match(effect.description, /Сотворил: Геральт/); assert.match(effect.description, /−2 к РЕА и СКОР/);
+  assert.match(effect.description, /@UUID\[Actor\.geralt\.Item\.sign\]\{Ирден\}/); assert.equal(effect.origin, "Actor.geralt.Item.sign");
+  bandit.token._source.x = 600; await refreshSpiritZones(scene);
+  assert.equal(bandit.effects.length, 0, "leaving the circle ends the slow at once");
+});
