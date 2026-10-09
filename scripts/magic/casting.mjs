@@ -15,6 +15,7 @@ import { creatureSuppression } from "../combat/creature-spirits.mjs";
 import { DIMERITIUM_RESISTED } from "./dimeritium.mjs";
 import { spellArea, placeSpellArea } from "./spell-areas.mjs";
 import { applySelfEffect, selfEffectOf } from "./spell-effects.mjs";
+import { isCadfan, heatItem } from "./cadfan.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { matchingGlyphs, glyphBonus, spellDescriptionWithDC } from "../data/rune-glyphs.mjs";
 import { adrenalineDamage, consumeAdrenalineDamage, adrenalineAbsorptionPlan } from "../combat/adrenaline.mjs";
@@ -84,6 +85,7 @@ function startAreaPlacement(actor,itemId,posted,options) {
   if(selfEffectOf(item.system))applySelfEffect(actor,item,cast.powerCost??item.system.cost).then(effect=>{
     if(effect)globalThis.ui?.notifications?.info?.(`${item.name}: эффект на ${actor.name} — ${effect.name}.`);
   }).catch(error=>globalThis.ui?.notifications?.warn?.(`${item.name}: эффект не наложен — ${error.message}`));
+  if(isCadfan(item.system)&&game.user.targets?.size)heatItem(actor,item,posted).catch(error=>globalThis.ui?.notifications?.warn?.(`${error.message} Раскалить можно кнопкой в чате.`));
   if(!spellArea(item.system)||!globalThis.canvas?.ready)return;
   placeSpellArea(actor,item,posted).catch(error=>globalThis.ui?.notifications?.warn?.(`${error.message} Область можно разместить кнопкой в чате.`));
 }
@@ -162,7 +164,7 @@ function performCast(actor,itemId,options) {
         await actor.createEmbeddedDocuments("ActiveEffect",[hexEffect({ruleId:item.system.ruleId,name:item.name,spellUuid:item.uuid,spellText:item.system.description,hex:item.system.hex})]);}
       // Core p.168: each targeted token defends against this casting check (a failed spell reaches nobody).
       // Area magic chooses its targets by the placed template instead of earlier T targets.
-      if(!options.maintenance&&!ritual&&!(hex&&reflected)&&roll&&!fumble.failed&&!spellArea(item.system))await createSpellStrikes(actor,item,posted,{total:posted.rolls[0]?.total??roll.total});
+      if(!options.maintenance&&!ritual&&!(hex&&reflected)&&roll&&!fumble.failed&&!spellArea(item.system)&&!isCadfan(item.system))await createSpellStrikes(actor,item,posted,{total:posted.rolls[0]?.total??roll.total});
       return posted;
     } catch(error) {
       if(posted)ui.notifications.error("Результат уже в чате, но расход магии не завершён. Проверьте ПЗ, Выносливость и состояния перед повторным броском.");

@@ -35,6 +35,7 @@ import { applyWeaponWear } from "./weapon-wear.mjs";
 import { experimentalFrozen, clearExperimentalFreeze } from "./experimental-effects.mjs";
 import { adrenalineAbsorptionPlan, awardAdrenaline } from "./adrenaline.mjs";
 import { magicShieldPlan, absorbWithMagicShield, applySpellHit } from "../magic/spell-effects.mjs";
+import { heatedWeapon } from "../magic/cadfan.mjs";
 import { igniteDragonClouds } from "./dragon-clouds.mjs";
 import { tokenCenter } from "./attack-target.mjs";
 import { experimentalAmmoReplacesDamage, experimentalAttackRolls, experimentalExchangeOutcome, resolveExperimentalAmmunition, experimentalAmmoHTML } from "./experimental-ammunition.mjs";
@@ -228,7 +229,7 @@ export function rollExchangeDamage(message, index) {
     const traits = attack.traits ?? weaponDamageTraits(weapon), monster = target ? monsterResistant(target) : false;
     const options = { allowInteractive: !message.blind };
     const rolls = [await new foundry.dice.Roll(attack.damage).evaluate(options)];
-    const hitTraits = attack.hitTraits ?? weaponHitTraits(weapon,actor);
+    let hitTraits = attack.hitTraits ?? weaponHitTraits(weapon,actor);
     const ablation = hitTraits.ablating ? await new foundry.dice.Roll("floor(1d6 / 2)").evaluate(options) : null;
     if (ablation) rolls.push(ablation);
     const silver = traits.silverDice && monster ? await new foundry.dice.Roll(traits.silverDice).evaluate(options) : null;
@@ -262,6 +263,12 @@ export function rollExchangeDamage(message, index) {
     if (attack.adrenalineDice > 0 && index === 0) {
       const adrenaline = await new foundry.dice.Roll(`${attack.adrenalineDice}d6`).evaluate(options); rolls.push(adrenaline);
       extras.push({ label: "Адреналин", value: adrenaline.total });
+    }
+    // Cadfan's Grasp (core p.103): a heated weapon deals +2d6 and burns with 50%.
+    if (heatedWeapon(actor, attack.itemId)) {
+      const heat = await new foundry.dice.Roll("2d6").evaluate(options); rolls.push(heat);
+      extras.push({ label: "Раскалено (Хватка Кадфана)", value: heat.total });
+      hitTraits = { ...hitTraits, burning: Math.max(hitTraits.burning ?? 0, 50) };
     }
     const specter = specterDamageBonus(hitTraits, target);
     if (specter) extras.push({ label: "Лунный лук: против призрака", value: specter });

@@ -7,6 +7,7 @@ import { spellDamageWithGlyph } from "../data/rune-glyphs.mjs";
 import { furyTargetError } from "../combat/experimental-effects.mjs";
 import { spellArea } from "./spell-areas.mjs";
 import { spellStrikeDamage } from "./spell-effects.mjs";
+import { isCadfan } from "./cadfan.mjs";
 
 // Core p.168 «Выбор целей для магии»: a direct spell works like a ranged attack against each target; an area
 // spell makes everyone in it defend against the same casting check; with no defense (or a willing target) the
@@ -64,6 +65,8 @@ export function strikeable(message) {
   const cast = message.flags?.[SYSTEM_ID]?.magicCast, item = message.speakerActor?.items.get(cast?.spellId);
   // A hex reaches its victim like a spell (the victim resists); a reflected hex lands on the caster instead.
   if (!cast || cast.maintenance || cast.kind === "ritual" || (cast.kind === "hex" && cast.reflected) || cast.fumble?.failed || !item || !targetsOthers(item.system)) return null;
+  // Cadfan's Grasp heats an item: it has no defense and no hit location (core p.103).
+  if (isCadfan(item.system)) return null;
   return item;
 }
 

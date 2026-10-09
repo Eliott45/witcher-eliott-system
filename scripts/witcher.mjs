@@ -32,6 +32,7 @@ import { registerBombs } from "./combat/bombs.mjs";
 import { registerSpellStrikes } from "./magic/spell-strikes.mjs";
 import { registerSpellAreas } from "./magic/spell-areas.mjs";
 import { registerSpellEffects } from "./magic/spell-effects.mjs";
+import { registerCadfan } from "./magic/cadfan.mjs";
 import { registerMagicFumble } from "./magic/magic-fumble.mjs";
 import { registerWitcherElixirs } from "./workshop/witcher-elixirs.mjs";
 import { registerVerbalDuel } from "./combat/verbal-duel.mjs";
@@ -124,6 +125,7 @@ Hooks.once("init", async () => {
   registerSpellStrikes();
   registerSpellAreas();
   registerSpellEffects();
+  registerCadfan();
   registerMagicFumble();
   registerWitcherElixirs();
   registerVerbalDuel();
