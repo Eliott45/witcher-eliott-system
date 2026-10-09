@@ -5,6 +5,12 @@ import { selectedLuck } from "../data/luck.mjs";
 import { deathTarget } from "../data/death.mjs";
 import { deathTooltip } from "../chat/death-result.mjs";
 
+/** Sheet icons for the eight rolled attributes and the derived rows of the sidebar. */
+const ATTRIBUTE_ICONS = { intelligence: "fa-brain", reflex: "fa-person-running", dexterity: "fa-feather-pointed", body: "fa-hand-fist",
+  speed: "fa-angles-right", empathy: "fa-eye", craft: "fa-hammer", will: "fa-shield-halved" };
+const ROW_ICONS = { Initiative: "fa-bolt", Movement: "fa-shoe-prints", Run: "fa-person-running", Leap: "fa-angles-up",
+  Recovery: "fa-bed", WoundThreshold: "fa-droplet" };
+
 /** Keep the displayed arithmetic alongside the same derived values used by tokens and rolls. */
 export function statisticsContext(system, { localize, format }) {
   const statistics = system.statistics;
@@ -20,7 +26,7 @@ export function statisticsContext(system, { localize, format }) {
   };
   const tooltip = (key, formula) => [description(key), format(`WITCHER.Statistics.${formula}Formula`, base)].join("<br><br>");
   const row = (key, number, formula, unit = "") => ({
-    key, label: `WITCHER.Statistics.${key}`, value: value(number),
+    key, label: `WITCHER.Statistics.${key}`, value: value(number), icon: `fa-solid ${ROW_ICONS[key]}`,
     tooltip: tooltip(key, formula), unit: unit ? localize(`WITCHER.Statistics.${unit}`) : ""
   });
   const physicalReady = statistics.healthMax !== null;
@@ -43,7 +49,7 @@ export function statisticsContext(system, { localize, format }) {
       valueTooltip: attributeTooltip(system, "luck", { localize, format }),
       tooltip: localize("WITCHER.Attributes.luck.Description"), rollHint: rollHint("luck"), unset: system.attributes.luck === null },
     attributes: ATTRIBUTE_KEYS.filter(key => key !== "luck").map(key => ({
-      key, value: system.attributes[key], label: `WITCHER.Attributes.${key}.Label`,
+      key, value: system.attributes[key], label: `WITCHER.Attributes.${key}.Label`, icon: `fa-solid ${ATTRIBUTE_ICONS[key]}`,
       short: `WITCHER.Attributes.${key}.Short`, tooltip: localize(`WITCHER.Attributes.${key}.Description`),
       valueTooltip: attributeTooltip(system, key, { localize, format }),
       reduced: statistics.effective[key] < system.attributes[key], modified: statistics.effective[key] !== system.attributes[key],

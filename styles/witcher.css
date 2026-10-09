@@ -1149,3 +1149,178 @@ b.witcher-gm-only::after, span.witcher-gm-only::after { display:none; }
 .witcher-advancement-training { width:100%; margin:8px 0; }
 .witcher-belongings-card ul { margin:4px 0 6px; padding-left:18px; }
 .witcher-belongings-card li { margin:1px 0; }
+
+/* ── Character sheet theme: night sidebar, blood-red header, parchment pages ── */
+.witcher-character-layout {
+  --ws-serif: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --ws-ink: #2b221c; --ws-ink-soft: #6e5c48; --ws-blood: #7a1f1f; --ws-gold: #c9a45f;
+  --ws-paper-line: #cdbb9a; --ws-field: #fbf6eacc;
+  --ws-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .2 0 0 0 0 .1 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  grid-template-columns: 200px minmax(0, 1fr);
+  background: var(--ws-grain), radial-gradient(120% 90% at 60% 40%, #f3ebda, #e2d4b8);
+}
+
+/* Sidebar */
+.witcher-character-layout .witcher-character-sidebar { padding: 16px 14px 18px; border-right: 1px solid #6d5634; background: var(--ws-grain), radial-gradient(130% 50% at 50% 0%, #2c1d1b, transparent 70%), linear-gradient(180deg, #1b1514, #110d0d); box-shadow: inset -10px 0 18px -14px #000; scrollbar-color: #6d5634 transparent; }
+.witcher-character-layout .witcher-character-sidebar .witcher-resources { gap: 6px; }
+.witcher-character-layout .witcher-character-sidebar .witcher-resource { padding: 4px 0 10px; border: 0; border-bottom: 1px solid #ffffff12; }
+.witcher-character-layout .witcher-character-sidebar .witcher-resource legend { display: flex; align-items: center; gap: 8px; width: 100%; padding: 0; color: #ead6aa; font: 600 14px/1.2 var(--ws-serif); white-space: nowrap; }
+.witcher-resource-emblem { --tone: #c3413a; display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%; font-size: 12px; color: color-mix(in srgb, var(--tone) 70%, white); background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--tone) 55%, #000), #120d0d 75%); border: 1px solid color-mix(in srgb, var(--tone) 60%, #6d5634); box-shadow: 0 0 10px color-mix(in srgb, var(--tone) 35%, transparent); }
+.witcher-resource.stamina .witcher-resource-emblem { --tone: #d0a046; }
+.witcher-resource.resolve .witcher-resource-emblem { --tone: #6f8fd6; }
+.witcher-resource-caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.witcher-character-layout .witcher-character-sidebar .witcher-resource-values { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 4px; margin-top: 4px; }
+.witcher-character-layout .witcher-character-sidebar .witcher-resource-values > span { line-height: 1; color: #8f7a58; font: 22px var(--ws-serif); }
+.witcher-character-layout .witcher-character-sidebar .witcher-resource-values input,
+.witcher-character-layout .witcher-character-sidebar .witcher-resource-values output { height: 40px; margin: 0; padding: 0; line-height: 40px; border: 0; border-bottom: 1px dashed transparent; border-radius: 0; background: transparent; color: #fff2d6; font: 600 32px var(--ws-serif); text-align: center; font-variant-numeric: lining-nums tabular-nums; text-shadow: 0 2px 6px #000; }
+.witcher-character-layout .witcher-character-sidebar .witcher-resource-values label:last-child :is(input, output) { color: #c9b591; font-size: 24px; font-weight: 400; }
+.witcher-character-layout .witcher-character-sidebar .witcher-resource-values input:hover:not(:disabled) { border-bottom-color: #c9a45f66; }
+.witcher-character-layout .witcher-character-sidebar .witcher-resource-values input:focus { border-bottom: 1px solid var(--ws-gold); box-shadow: none; }
+.witcher-character-layout .witcher-meter { height: 6px; margin: 6px 0 0; border-radius: 3px; background: #000000a0; box-shadow: inset 0 1px 2px #000, 0 1px #ffffff0d; }
+.witcher-character-layout .witcher-meter.is-health > span { background: linear-gradient(90deg, #7c1e1b, #d0473b); box-shadow: 0 0 8px #d0473b88; }
+.witcher-character-layout .witcher-meter.is-stamina > span { background: linear-gradient(90deg, #8a6420, #e2b45a); box-shadow: 0 0 8px #e2b45a77; }
+.witcher-character-layout .witcher-meter.is-stamina.is-low > span { background: linear-gradient(90deg, #6b3d1a, #b8702f); }
+.witcher-character-layout .witcher-meter.is-resolve > span { background: linear-gradient(90deg, #2e4785, #6f8fd6); box-shadow: 0 0 8px #6f8fd677; }
+
+/* Sidebar rows: an icon, the label, the number on the right. */
+.witcher-character-layout .witcher-character-sidebar .witcher-resource-detail { margin: 2px 0 0; min-height: 0; padding: 2px 0 6px; }
+.witcher-character-layout .witcher-stat-row { align-items: center; min-height: 30px; padding: 3px 0; color: #cdb995; font-size: 12.5px; }
+.witcher-character-layout .witcher-stat-row strong, .witcher-character-layout .witcher-stat-entry-value output { color: #fff0d0; font: 600 18px var(--ws-serif); font-variant-numeric: lining-nums tabular-nums; }
+.witcher-character-layout .witcher-character-sidebar [data-tooltip] > i.witcher-stat-icon { width: 18px; margin-right: 8px; color: #b08d55; font-size: 13px; opacity: 1; text-align: center; }
+.witcher-character-layout .witcher-character-sidebar [data-tooltip] > i.fa-circle-question { margin-left: 2px; }
+.witcher-character-layout .witcher-character-sidebar .witcher-derived { margin-top: 10px; padding-top: 6px; border-top: 1px solid #ffffff12; }
+.witcher-character-layout .witcher-derived > .witcher-stat-row + .witcher-stat-row { border-top: 1px solid #ffffff08; }
+.witcher-character-layout .witcher-character-sidebar .witcher-stun-block { margin: 8px 0 10px; padding: 0 0 10px; border-top: 0; border-bottom: 1px solid #ffffff12; }
+.witcher-character-layout .witcher-character-sidebar .witcher-stun-roll { height: 28px; margin: 4px 0 6px; border: 1px solid #6d5634; border-radius: 3px; background: linear-gradient(180deg, #2a201c, #1c1615); color: #e3cf9f; font-size: 11.5px; letter-spacing: .02em; box-shadow: inset 0 1px #ffffff0d; }
+.witcher-character-layout .witcher-character-sidebar .witcher-stun-roll:hover:not(:disabled) { border-color: var(--ws-gold); color: #fff3d6; background: linear-gradient(180deg, #3a2a22, #241b18); }
+.witcher-character-layout .witcher-stat-entry > label, .witcher-character-layout .witcher-stat-entry > span { display: block; color: #cdb995; font-size: 12.5px; }
+.witcher-character-layout .witcher-vigor-total { border: 1px solid #6d5634; border-left: 3px solid var(--ws-gold); background: linear-gradient(100deg, #c9a45f22, #c9a45f05); }
+.witcher-character-layout .witcher-vigor-total output { font: 600 26px var(--ws-serif); color: #fff0d0; }
+
+/* Toxicity bar in the same style as the resource meters. */
+.witcher-character-layout .witcher-sidebar-toxicity { margin: 10px 0 0; padding: 4px 0 10px; border-bottom: 1px solid #ffffff12; color: #dfe4c9; }
+.witcher-character-layout .witcher-toxicity-heading > span { display: flex; align-items: center; gap: 9px; font: 600 15px var(--ws-serif); color: #ead6aa; }
+.witcher-character-layout .witcher-toxicity-heading > span > i { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-size: 12px; color: #b7d79a; background: radial-gradient(circle at 35% 30%, #2f4a25, #120d0d 75%); border: 1px solid #5f7f45; box-shadow: 0 0 10px #7fb06944; }
+.witcher-character-layout .witcher-toxicity-heading output { font: 600 28px var(--ws-serif); color: #fff2d6; }
+.witcher-character-layout .witcher-sidebar-toxicity progress { appearance: none; height: 6px; margin: 6px 0; border: 0; border-radius: 3px; background: #000000a0; overflow: hidden; }
+.witcher-character-layout .witcher-sidebar-toxicity progress::-webkit-progress-bar { background: #000000a0; border-radius: 3px; }
+.witcher-character-layout .witcher-sidebar-toxicity progress::-webkit-progress-value { background: linear-gradient(90deg, #3d6b3a, #8fc06f); border-radius: 3px; }
+.witcher-character-layout .witcher-sidebar-toxicity progress::-moz-progress-bar { background: linear-gradient(90deg, #3d6b3a, #8fc06f); border-radius: 3px; }
+.witcher-character-layout .witcher-sidebar-toxicity.is-overloaded progress::-webkit-progress-value { background: linear-gradient(90deg, #8a3a1c, #ee9f74); }
+.witcher-character-layout .witcher-sidebar-toxicity.is-overloaded progress::-moz-progress-bar { background: linear-gradient(90deg, #8a3a1c, #ee9f74); }
+.witcher-character-layout .witcher-toxicity-caption { color: #a99878; }
+
+/* Header: wolf medallion behind the name, framed portrait, gold counters. */
+.witcher-character-layout .witcher-character-name { position: relative; isolation: isolate; overflow: hidden; column-gap: 18px; padding: 14px 18px; border-bottom: 1px solid #8f7444; background: var(--ws-grain), radial-gradient(70% 140% at 62% 40%, #8b2a26aa, transparent 70%), linear-gradient(100deg, #2a1214, #571b1c 55%, #341314); box-shadow: inset 0 -12px 20px -16px #000; }
+.witcher-character-layout .witcher-character-name::before { content: ""; position: absolute; z-index: -1; top: 50%; right: 260px; width: 200px; height: 200px; background: #f0b27a; opacity: .09; transform: translateY(-50%) rotate(-6deg); -webkit-mask: url("../assets/ui/wolf-medallion.svg") center / contain no-repeat; mask: url("../assets/ui/wolf-medallion.svg") center / contain no-repeat; pointer-events: none; }
+.witcher-character-layout .witcher-character-name > .witcher-portrait-frame { width: 96px; padding: 3px; border: 1px solid #c9a45f; background: linear-gradient(135deg, #3a2618, #120c0c); box-shadow: 0 4px 14px #000a, 0 0 0 3px #1b1010, 0 0 0 4px #8f744488; }
+.witcher-character-layout .witcher-character-name .witcher-portrait-button { border: 0; border-radius: 0; }
+.witcher-eliott .witcher-character-layout .witcher-character-name .witcher-portrait { height: 110px; }
+.witcher-character-layout .witcher-character-name .witcher-edit-portrait { right: -8px; bottom: -8px; border-color: var(--ws-gold); background: #2a1214; }
+.witcher-character-layout .witcher-character-name > input { height: 42px; color: #f7e6c4; font: 700 34px/1.1 var(--ws-serif); letter-spacing: .01em; text-shadow: 0 2px 8px #000c; border-bottom: 1px dashed transparent; }
+.witcher-character-layout .witcher-character-name > input:hover:not(:disabled) { border-bottom-color: #c9a45f55; }
+.witcher-character-layout .witcher-character-name > input:focus { border-bottom: 1px solid var(--ws-gold); box-shadow: none; }
+.witcher-character-layout .witcher-character-subtitle { margin-top: 2px; color: #dcc49a; font: 15px var(--ws-serif); letter-spacing: .02em; }
+.witcher-character-layout .witcher-character-subtitle span + span::before { content: "•"; margin: 0 9px; color: #b58c55; font-size: 10px; vertical-align: 2px; }
+.witcher-character-layout .witcher-luck { margin-top: 8px; }
+.witcher-character-layout .witcher-luck-heading { gap: 10px; }
+.witcher-character-layout .witcher-luck-heading > label { color: #e5cfa1; font: 15px var(--ws-serif); }
+.witcher-character-layout .witcher-luck-remaining { color: #f3e2bd; font: 600 15px var(--ws-serif); }
+.witcher-character-layout .witcher-luck-heading > button { width: 30px; height: 30px; border: 1px solid #8f744488; border-radius: 4px; background: #1a0d0e66; color: #e5cfa1; }
+.witcher-character-layout .witcher-luck-heading > button:hover:not(:disabled) { border-color: var(--ws-gold); color: #fff3d6; background: #c9a45f22; }
+.witcher-character-layout .witcher-luck-points { gap: 6px; margin-top: 7px; }
+.witcher-character-layout .witcher-luck-points .witcher-luck-point { flex-basis: 28px; width: 28px; height: 28px; border-color: #b8925a; background: radial-gradient(circle at 35% 30%, #4a2a22, #1d1011); color: #f1dcb0; font: 600 12px/26px var(--ws-serif); box-shadow: inset 0 1px #ffffff14, 0 1px 3px #0008; }
+.witcher-character-layout .witcher-luck-points .witcher-luck-point:hover:not(:disabled) { border-color: #f0cf8a; color: #fff; }
+.witcher-character-layout .witcher-luck-points .witcher-luck-point.selected { color: #edfff0; background: radial-gradient(circle at 35% 30%, #3f8a55, #1b3d26); border-color: #8bc79b; box-shadow: 0 0 8px #6fbf8566; }
+.witcher-character-layout .witcher-character-counters { grid-template-columns: repeat(2, 112px); gap: 6px; }
+.witcher-character-layout .witcher-header-counter { padding: 6px 6px 0; border: 1px solid #8f744499; border-radius: 3px; background: linear-gradient(180deg, #1a0c0dcc, #2a1214aa); box-shadow: inset 0 1px #ffffff0d, 0 2px 8px #0006; color: #e5cfa1; }
+.witcher-character-layout .witcher-experience-heading { padding-left: 4px; color: #e5cfa1; font: 13px var(--ws-serif); }
+.witcher-character-layout .witcher-experience-heading button { opacity: .55; }
+.witcher-character-layout .witcher-experience-heading button:hover, .witcher-character-layout .witcher-experience-heading button[aria-checked=true] { opacity: 1; }
+.witcher-character-layout .witcher-header-counter > strong, .witcher-character-layout .witcher-header-counter > input { height: 38px; color: #fff2d6; font: 600 32px/38px var(--ws-serif); text-shadow: 0 2px 6px #000; }
+.witcher-character-layout .witcher-header-counter .witcher-experience-open { width: calc(100% + 12px); height: 28px; margin: 4px -6px 0; border-top: 1px solid #8f744455; color: #e5cfa1; font-size: 11px; }
+.witcher-character-layout .witcher-reputation-bonus { border: 1px solid #8f744477; border-radius: 3px; background: #1a0c0d99; }
+.witcher-character-layout .witcher-reputation-bonus button { height: 28px; font-size: 11px; color: #e0c999; }
+.witcher-character-layout .witcher-reputation-bonus.active { background: #2f4b2f99; border-color: #8fb17f88; }
+
+/* Tabs: a dark leather strip with a gold rule; the active tab lifts out of it. */
+.witcher-character-layout .witcher-character-tabs.tabs { position: relative; z-index: 1; background: linear-gradient(180deg, #211918, #151010); border-bottom: 1px solid #8f7444; box-shadow: 0 3px 8px -4px #000a; }
+.witcher-character-layout .witcher-character-tabs button { color: #b8a684; font-family: var(--ws-serif); }
+.witcher-character-layout .witcher-character-tabs button:not(.witcher-manage-tabs) + button { border-left: 1px solid #ffffff08; }
+.witcher-character-layout .witcher-character-tabs button:hover { color: #f3e2bd; background: #ffffff0a; }
+.witcher-character-layout .witcher-character-tabs button i { color: #a88a58; transition: color .15s; }
+.witcher-character-layout .witcher-character-tabs button:hover i { color: #e2b768; }
+.witcher-character-layout .witcher-character-tabs button.active { color: #fbe9c4; background: linear-gradient(180deg, #4a3326, #2c201b); box-shadow: inset 0 -2px var(--ws-gold), inset 0 1px #ffffff14; }
+.witcher-character-layout .witcher-character-tabs button.active i { color: #f0c46f; text-shadow: 0 0 8px #f0c46f88; }
+@container witcher-sheet (min-width: 900px) {
+  .witcher-character-layout .witcher-character-tabs button:not(.witcher-manage-tabs), .witcher-character-layout .witcher-character-tabs button:not(.active):not(.witcher-manage-tabs) { height: 54px; gap: 5px; }
+  .witcher-character-layout .witcher-character-tabs .witcher-tab-label, .witcher-character-layout .witcher-character-tabs button:not(.active) .witcher-tab-label { font: 11px/1.1 var(--ws-serif); letter-spacing: -.01em; }
+  .witcher-character-layout .witcher-character-tabs i { font-size: 17px; }
+  .witcher-character-layout .witcher-character-tabs .witcher-manage-tabs { height: 54px; }
+}
+
+/* Page sections: blood-red serif titles trailing a gold rule. */
+.witcher-character-layout .witcher-panel-title { display: flex; align-items: center; gap: 14px; margin: 0 0 12px; color: var(--ws-blood); font: 700 21px/1.2 var(--ws-serif); text-shadow: 0 1px #fff8; }
+.witcher-character-layout .witcher-panel-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #a8864f, #a8864f00); }
+.witcher-character-layout .witcher-parameters-heading .witcher-panel-title { flex: 1; margin: 0; }
+.witcher-character-layout .witcher-character-content[data-tab=main] { position: relative; isolation: isolate; padding: 16px 20px 20px; }
+.witcher-character-layout .witcher-character-content[data-tab=main]::after { content: ""; position: absolute; z-index: -1; top: 14px; right: 0; width: 230px; height: 230px; background: #5a3a20; opacity: .07; -webkit-mask: url("../assets/ui/wolf-medallion.svg") center / contain no-repeat; mask: url("../assets/ui/wolf-medallion.svg") center / contain no-repeat; pointer-events: none; }
+
+/* Identity: label beside its field, two columns. */
+.witcher-identity-panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 28px; }
+.witcher-identity-panel > .witcher-panel-title { grid-column: 1 / -1; margin-bottom: 2px; }
+.witcher-identity-panel :is(.witcher-character-hero, .witcher-character-references, .witcher-demographics) { display: contents; }
+.witcher-identity-panel :is(.witcher-reference-field, .witcher-profession-choice, .witcher-demographics > label) { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 10px; margin: 0; }
+.witcher-character-layout .witcher-identity-panel :is(.witcher-field-label, .witcher-demographics > label) { color: var(--ws-ink-soft); font: 400 14px/1.2 var(--ws-serif); text-transform: none; letter-spacing: 0; }
+.witcher-character-layout .witcher-identity-panel .witcher-reference-value { margin: 0; border: 1px solid var(--ws-paper-line); border-radius: 3px; background: var(--ws-field); box-shadow: inset 0 1px 2px #3a28140f; }
+.witcher-eliott .witcher-character-layout .witcher-identity-panel .witcher-select-reference { min-height: 34px; padding: 4px 10px; color: var(--ws-ink); font: 16px var(--ws-serif); }
+.witcher-character-layout .witcher-identity-panel .witcher-demographics input { height: 36px; margin: 0; padding: 4px 10px; border: 1px solid var(--ws-paper-line); border-radius: 3px; background: var(--ws-field); color: var(--ws-ink); font: 16px var(--ws-serif); box-shadow: inset 0 1px 2px #3a28140f; }
+.witcher-character-layout .witcher-identity-panel .witcher-reference-value:hover, .witcher-character-layout .witcher-identity-panel .witcher-demographics input:hover:not(:disabled) { border-color: #a8864f; }
+.witcher-character-layout .witcher-identity-panel .witcher-demographics input:focus { border-color: #8a6436; box-shadow: 0 0 0 2px #c9a45f44; }
+
+/* Attributes: emblem on the left, code, name and value stacked, die in the corner. */
+.witcher-character-layout .witcher-parameters { margin-top: 18px; padding-top: 0; border-top: 0; }
+.witcher-character-layout .witcher-parameters-heading { gap: 14px; margin-bottom: 12px; }
+.witcher-character-layout .witcher-parameters-heading .witcher-edit-attributes { height: 28px; padding: 0 10px; border: 1px solid #5a4430; border-radius: 3px; background: linear-gradient(180deg, #3a2a22, #241b18); color: #ecd9b0; font-size: 12px; }
+.witcher-character-layout .witcher-parameters-heading .witcher-edit-attributes i { font-size: 15px; }
+.witcher-character-layout .witcher-parameters-heading .witcher-edit-attributes[aria-checked=true] { border-color: #6c8f5f; background: linear-gradient(180deg, #34502f, #22351f); color: #e3f3d6; }
+.witcher-character-layout .witcher-attribute-grid { gap: 10px; }
+.witcher-character-layout .witcher-attribute { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-areas: "icon short" "icon name" "icon value"; align-items: center; column-gap: 6px; padding: 8px 10px 6px 8px; text-align: center; border: 1px solid #cdb995; border-radius: 4px; background: linear-gradient(180deg, #fcf8ef, #f0e6d2); box-shadow: inset 0 1px #fff, 0 2px 4px #3a28140f; transition: border-color .15s, box-shadow .15s; }
+.witcher-character-layout .witcher-attribute:hover { border-color: #a8864f; box-shadow: inset 0 1px #fff, 0 3px 10px #3a281422; }
+.witcher-attribute-emblem { grid-area: icon; color: #6d5235; font-size: 26px; opacity: .85; filter: drop-shadow(0 1px #fff); }
+.witcher-character-layout .witcher-attribute-short { grid-area: short; color: var(--ws-blood); font: 700 18px/1.1 var(--ws-serif); letter-spacing: .05em; }
+.witcher-character-layout .witcher-attribute-name { grid-area: name; justify-self: center; margin: 0; color: var(--ws-ink-soft); font-size: 11px; line-height: 15px; }
+.witcher-character-layout .witcher-attribute-value { grid-area: value; margin: 2px 0 0; }
+.witcher-character-layout .witcher-attribute-value output { min-width: 0; color: var(--ws-ink); font: 700 26px/30px var(--ws-serif); font-variant-numeric: lining-nums; }
+.witcher-character-layout .witcher-attribute-value input { width: 54px; height: 30px; border-color: var(--ws-paper-line); border-radius: 3px; background: #fffaf0; font: 700 21px var(--ws-serif); }
+.witcher-character-layout .witcher-attribute-value button { position: absolute; right: 5px; bottom: 5px; width: 24px; height: 24px; color: #8a6436; font-size: 17px; }
+.witcher-character-layout .witcher-attribute-value button:hover:not(:disabled) { color: var(--ws-blood); text-shadow: 0 0 8px #c9a45f99; }
+.witcher-character-layout .witcher-effective { grid-column: 1 / -1; margin-top: 2px; }
+.witcher-character-layout .witcher-attribute.reduced { border-color: #b0443a; background: linear-gradient(180deg, #fbf1ea, #f2ddd2); box-shadow: inset 0 0 0 1px #b0443a33, 0 2px 6px #7a1f1f22; }
+.witcher-character-layout .witcher-attribute.reduced :is(.witcher-attribute-emblem, .witcher-attribute-value output) { color: #a32b26; }
+
+@container witcher-sheet (max-width: 700px) {
+  .witcher-character-layout { grid-template-columns: 165px minmax(0, 1fr); }
+  .witcher-character-layout .witcher-character-sidebar .witcher-resource-values :is(input, output) { font-size: 26px; }
+  .witcher-identity-panel { grid-template-columns: minmax(0, 1fr); }
+}
+@container witcher-sheet (max-width: 690px) {
+  .witcher-character-layout .witcher-character-name::before { display: none; }
+  .witcher-character-layout .witcher-character-name > input { font-size: 24px; }
+  .witcher-character-layout .witcher-character-name > .witcher-portrait-frame { width: 60px; }
+  .witcher-eliott .witcher-character-layout .witcher-character-name .witcher-portrait { height: 68px; }
+  .witcher-character-layout .witcher-character-counters { grid-template-columns: repeat(2, 96px); }
+}
+@container witcher-sheet (max-width: 980px) {
+  .witcher-character-layout .witcher-character-name { column-gap: 14px; padding: 12px 14px; }
+  .witcher-character-layout .witcher-character-name > .witcher-portrait-frame { width: 76px; }
+  .witcher-eliott .witcher-character-layout .witcher-character-name .witcher-portrait { height: 88px; }
+  .witcher-character-layout .witcher-character-name > input { font-size: 28px; }
+  .witcher-character-layout .witcher-character-subtitle { font-size: 13px; }
+  .witcher-character-layout .witcher-character-counters { grid-template-columns: repeat(2, 94px); }
+  .witcher-character-layout .witcher-header-counter > strong, .witcher-character-layout .witcher-header-counter > input { font-size: 26px; }
+  .witcher-character-layout .witcher-luck-points { gap: 4px; }
+  .witcher-character-layout .witcher-luck-points .witcher-luck-point { flex-basis: 24px; width: 24px; height: 24px; font-size: 11px; line-height: 22px; }
+  .witcher-character-layout .witcher-attribute { grid-template-columns: minmax(0, 1fr); grid-template-areas: "short" "name" "value"; padding: 8px 6px 6px; }
+  .witcher-character-layout .witcher-attribute-emblem { position: absolute; top: 8px; left: 8px; font-size: 16px; opacity: .45; }
+}

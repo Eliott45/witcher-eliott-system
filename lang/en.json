@@ -193,6 +193,7 @@
       "Name": "Name",
       "Age": "Age, years",
       "Gender": "Gender",
+      "BasicInfo": "Basic information",
       "Race": "Race",
       "RaceUnset": "Choose race",
       "RacialAbilities": "Racial abilities",

@@ -2,14 +2,14 @@
   <aside class="witcher-character-sidebar">
     <section class="witcher-resources" aria-label="{{localize 'WITCHER.Sheet.Resources'}}">
     <fieldset class="witcher-resource health">
-      <legend><span data-tooltip="{{stats.healthTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Sheet.Health"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></legend>
+      <legend><i class="witcher-resource-emblem fa-solid fa-heart" aria-hidden="true"></i><span data-tooltip="{{stats.healthTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Sheet.Health"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></legend>
       <div class="witcher-resource-values">
-        <label for="{{rootId}}-health-value">{{localize "WITCHER.Sheet.Current"}}
+        <label for="{{rootId}}-health-value"><span class="witcher-resource-caption">{{localize "WITCHER.Sheet.Current"}}</span>
           <input id="{{rootId}}-health-value" type="number" name="system.health.value"
                  value="{{system.health.value}}" step="1" {{disabled (not editable)}}>
         </label>
         <span aria-hidden="true">/</span>
-        <label for="{{rootId}}-health-max">{{localize "WITCHER.Sheet.Maximum"}}
+        <label for="{{rootId}}-health-max"><span class="witcher-resource-caption">{{localize "WITCHER.Sheet.Maximum"}}</span>
           {{#if stats.physicalReady}}
           <output id="{{rootId}}-health-max">{{system.health.max}}</output>
           {{else}}
@@ -21,7 +21,7 @@
     <div class="witcher-meter is-health {{#if meters.health.low}}is-low{{/if}}" aria-hidden="true"><span style="width:{{meters.health.percent}}%"></span></div>
     </fieldset>
     <div class="witcher-stat-row witcher-resource-detail">
-      <span data-tooltip="{{stats.woundThreshold.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize stats.woundThreshold.label}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
+      <span data-tooltip="{{stats.woundThreshold.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0"><i class="witcher-stat-icon {{stats.woundThreshold.icon}}" aria-hidden="true"></i>{{localize stats.woundThreshold.label}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
       <strong>{{stats.woundThreshold.value}}</strong>
     </div>
     {{#if stats.wounded}}<p class="witcher-wound-notice" role="status">{{localize stats.woundNotice}}</p>{{/if}}
@@ -52,7 +52,7 @@
     {{/if}}
     <div class="witcher-derived witcher-stun-block" aria-label="{{localize 'WITCHER.Statistics.Physical'}}">
       <div class="witcher-stat-row">
-        <span data-tooltip="{{stats.stunTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Statistics.Stun"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span><strong>{{stats.stunValue}}</strong>
+        <span data-tooltip="{{stats.stunTooltip}}" data-tooltip-direction="RIGHT" tabindex="0"><i class="witcher-stat-icon fa-solid fa-star-of-life" aria-hidden="true"></i>{{localize "WITCHER.Statistics.Stun"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span><strong>{{stats.stunValue}}</strong>
       </div>
       <button type="button" class="witcher-stun-roll" data-action="rollStun"
               {{#if conditions.stunUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}>
@@ -60,14 +60,14 @@
       </button>
     </div>
     <fieldset class="witcher-resource stamina">
-      <legend><span data-tooltip="{{stats.staminaTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Sheet.Stamina"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></legend>
+      <legend><i class="witcher-resource-emblem fa-solid fa-wind" aria-hidden="true"></i><span data-tooltip="{{stats.staminaTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Sheet.Stamina"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></legend>
       <div class="witcher-resource-values">
-        <label for="{{rootId}}-stamina-value">{{localize "WITCHER.Sheet.Current"}}
+        <label for="{{rootId}}-stamina-value"><span class="witcher-resource-caption">{{localize "WITCHER.Sheet.Current"}}</span>
           <input id="{{rootId}}-stamina-value" type="number" name="system.stamina.value"
                  value="{{system.stamina.value}}" min="0" step="1" {{disabled (not editable)}}>
         </label>
         <span aria-hidden="true">/</span>
-        <label for="{{rootId}}-stamina-max">{{localize "WITCHER.Sheet.Maximum"}}
+        <label for="{{rootId}}-stamina-max"><span class="witcher-resource-caption">{{localize "WITCHER.Sheet.Maximum"}}</span>
           {{#if stats.physicalReady}}
           <output id="{{rootId}}-stamina-max">{{system.stamina.max}}</output>
           {{else}}
@@ -79,7 +79,7 @@
     <div class="witcher-meter is-stamina {{#if meters.stamina.low}}is-low{{/if}}" aria-hidden="true"><span style="width:{{meters.stamina.percent}}%"></span></div>
     </fieldset>
     <div class="witcher-stat-row witcher-resource-detail">
-      <span data-tooltip="{{stats.recovery.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize stats.recovery.label}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
+      <span data-tooltip="{{stats.recovery.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0"><i class="witcher-stat-icon {{stats.recovery.icon}}" aria-hidden="true"></i>{{localize stats.recovery.label}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
       <strong>{{stats.recovery.value}}</strong>
     </div>
     <button type="button" class="witcher-stun-roll" data-action="recoverStamina" title="{{conditions.recoveryHint}}"
@@ -93,14 +93,14 @@
     <p class="witcher-exhaustion-notice">{{localize "WITCHER.Effects.Unconscious"}}</p>
     {{/if}}
     <fieldset class="witcher-resource resolve {{#if verbalDuel}}is-dueling{{/if}}">
-      <legend><span data-tooltip="Решительность (стр. 176): заменяет ПЗ в словесной дуэли. (ВОЛЯ + ИНТ) / 2 × 5. На 0 персонаж проигрывает дуэль и делает то, чего хотел противник." data-tooltip-direction="RIGHT" tabindex="0">Решительность <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></legend>
+      <legend><i class="witcher-resource-emblem fa-solid fa-brain" aria-hidden="true"></i><span data-tooltip="Решительность (стр. 176): заменяет ПЗ в словесной дуэли. (ВОЛЯ + ИНТ) / 2 × 5. На 0 персонаж проигрывает дуэль и делает то, чего хотел противник." data-tooltip-direction="RIGHT" tabindex="0">Решительность <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></legend>
       <div class="witcher-resource-values">
-        <label for="{{rootId}}-resolve-value">{{localize "WITCHER.Sheet.Current"}}
+        <label for="{{rootId}}-resolve-value"><span class="witcher-resource-caption">{{localize "WITCHER.Sheet.Current"}}</span>
           <input id="{{rootId}}-resolve-value" type="number" name="system.resolve.value"
                  value="{{system.resolve.value}}" min="0" step="1" {{disabled (not editable)}}>
         </label>
         <span aria-hidden="true">/</span>
-        <label for="{{rootId}}-resolve-max">{{localize "WITCHER.Sheet.Maximum"}}
+        <label for="{{rootId}}-resolve-max"><span class="witcher-resource-caption">{{localize "WITCHER.Sheet.Maximum"}}</span>
           <output id="{{rootId}}-resolve-max">{{system.resolve.max}}</output>
         </label>
       </div>
@@ -121,17 +121,17 @@
     <section class="witcher-derived" aria-label="{{localize 'WITCHER.Statistics.Combat'}}">
       {{#each stats.movementRows as |stat|}}
       <div class="witcher-stat-row">
-        <span data-tooltip="{{stat.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize stat.label}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span><strong>{{stat.value}} {{stat.unit}}</strong>
+        <span data-tooltip="{{stat.tooltip}}" data-tooltip-direction="RIGHT" tabindex="0"><i class="witcher-stat-icon {{stat.icon}}" aria-hidden="true"></i>{{localize stat.label}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span><strong>{{stat.value}} {{stat.unit}}</strong>
       </div>
       {{/each}}
       <div class="witcher-stat-entry">
-        <span data-tooltip="{{stats.carryTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Statistics.Carry"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
+        <span data-tooltip="{{stats.carryTooltip}}" data-tooltip-direction="RIGHT" tabindex="0"><i class="witcher-stat-icon fa-solid fa-weight-hanging" aria-hidden="true"></i>{{localize "WITCHER.Statistics.Carry"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span>
         <div class="witcher-stat-entry-value">
           <output id="{{rootId}}-weight">{{stats.carriedWeight}} / {{stats.carryMax}} {{localize "WITCHER.Statistics.Kilograms"}}</output>
         </div>
       </div>
       <div class="witcher-stat-entry">
-        <label for="{{rootId}}-vigor"><span data-tooltip="{{stats.vigorTooltip}}" data-tooltip-direction="RIGHT" tabindex="0">{{localize "WITCHER.Statistics.Vigor"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></label>
+        <label for="{{rootId}}-vigor"><span data-tooltip="{{stats.vigorTooltip}}" data-tooltip-direction="RIGHT" tabindex="0"><i class="witcher-stat-icon fa-solid fa-wand-sparkles" aria-hidden="true"></i>{{localize "WITCHER.Statistics.Vigor"}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i></span></label>
         <div class="witcher-vigor-total"><span>{{localize "WITCHER.Statistics.Total"}}</span><output data-tooltip="{{stats.vigorTooltip}}" tabindex="0">{{stats.vigorTotal}}</output></div>
         <label class="witcher-vigor-base" for="{{rootId}}-vigor"><span>{{localize "WITCHER.Statistics.Base"}}</span><input id="{{rootId}}-vigor" name="system.vigor" type="number" min="0" step="1" value="{{system.vigor}}" {{disabled (not editable)}}></label>
       </div>
@@ -209,6 +209,8 @@
     </nav>
     <section id="{{rootId}}-main" class="witcher-character-content tab {{tabs.main.cssClass}}" data-group="character" data-tab="main"
              aria-label="{{localize 'WITCHER.Sheet.Main'}}">
+      <section class="witcher-identity-panel" aria-labelledby="{{rootId}}-identity-title">
+      <h2 id="{{rootId}}-identity-title" class="witcher-panel-title">{{localize "WITCHER.Sheet.BasicInfo"}}</h2>
       <div class="witcher-character-hero">
         <div class="witcher-character-references">
           <div class="witcher-reference-field">
@@ -281,9 +283,10 @@
                  value="{{system.details.age}}" placeholder="—" {{disabled (not editable)}}>
         </label>
       </div>
+      </section>
       <section class="witcher-parameters" aria-label="{{localize 'WITCHER.Statistics.Primary'}}">
       <div class="witcher-parameters-heading">
-        <h2>{{localize "WITCHER.Statistics.Primary"}}</h2>
+        <h2 class="witcher-panel-title">{{localize "WITCHER.Statistics.Primary"}}</h2>
         <button type="button" class="witcher-edit-attributes" data-action="toggleAttributes" role="switch" aria-checked="{{editingAttributes}}"
                 title="{{localize 'WITCHER.Statistics.Edit'}}" {{disabled (not editable)}}>
           <i class="fa-solid {{#if editingAttributes}}fa-toggle-on{{else}}fa-toggle-off{{/if}}" aria-hidden="true"></i>
@@ -293,7 +296,8 @@
       {{#if editingAttributes}}<p class="witcher-base-hint">{{localize "WITCHER.Statistics.EditHint"}}</p>{{/if}}
       <div class="witcher-attribute-grid">
         {{#each stats.attributes as |attribute|}}
-        <div class="witcher-attribute {{#if attribute.reduced}}reduced{{/if}}">
+        <div class="witcher-attribute {{#if attribute.reduced}}reduced{{/if}}" data-attribute="{{attribute.key}}">
+          <i class="witcher-attribute-emblem {{attribute.icon}}" aria-hidden="true"></i>
           <span class="witcher-attribute-short">{{localize attribute.short}}</span>
           <label class="witcher-attribute-name" for="{{../rootId}}-attribute-{{attribute.key}}" data-tooltip="{{attribute.tooltip}}" tabindex="0">
             {{localize attribute.label}} <i class="fa-regular fa-circle-question" aria-hidden="true"></i>
