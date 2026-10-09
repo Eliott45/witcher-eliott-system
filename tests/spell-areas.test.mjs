@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { CORE_MAGIC } from "../scripts/data/spells.mjs";
-import { spellArea, areaShape, areaLabel, facing, tokensInArea, expiredSpellAreas, placeSpellArea, SPELL_CONE_ANGLE } from "../scripts/magic/spell-areas.mjs";
+import { spellArea, areaShape, areaLabel, facing, tokensInArea, expiredSpellAreas, placeSpellArea, relationTo, AREA_TARGET_PICKS, SPELL_CONE_ANGLE } from "../scripts/magic/spell-areas.mjs";
 
 const magic = id => CORE_MAGIC.find(entry => entry.id === id).system;
 
@@ -47,32 +47,58 @@ test("instant templates end with the turn, concentration templates with the conc
   assert.deepEqual(expiredSpellAreas(scene, { combat: null }).map(entry => entry.id), ["instant"], "the combat ended");
   const actors = new Map([["Actor.m", { system: { magic: { sustainedId: "" } } }]]);
   assert.deepEqual(expiredSpellAreas(scene, { combat, actors }).map(entry => entry.id), ["held"]);
+  const timed = { regions: [region("timed", { instant: true, combat: null, expiresAt: 1000 })] };
+  assert.deepEqual(expiredSpellAreas(timed, { now: 999 }), []);
+  assert.deepEqual(expiredSpellAreas(timed, { now: 1000 }).map(entry => entry.id), ["timed"], "the GM removes it when time is up");
+});
+
+test("allies share the caster's disposition; the quick picks choose all, enemies or allies", () => {
+  const caster = { disposition: 1 };
+  assert.equal(relationTo(caster, { disposition: 1 }), "ally");
+  assert.equal(relationTo(caster, { disposition: -1 }), "enemy");
+  assert.equal(relationTo(caster, { disposition: 0 }), "neutral");
+  assert.equal(relationTo({ disposition: -1 }, { disposition: 1 }), "enemy", "a hostile caster sees the party as enemies");
+  assert.deepEqual(["ally", "enemy", "neutral"].filter(AREA_TARGET_PICKS.enemies), ["enemy"]);
+  assert.deepEqual(["ally", "enemy", "neutral"].filter(AREA_TARGET_PICKS.allies), ["ally"]);
+  assert.deepEqual(["ally", "enemy", "neutral"].filter(AREA_TARGET_PICKS.all), ["ally", "enemy", "neutral"]);
 });
 
 test("placement turns a cone towards the cursor, refuses a zone beyond reach and targets the tokens inside", async () => {
   const notices = [];
-  const caster = { id: "caster", x: 0, y: 0, rotation: 0, hidden: false, level: null, getSize: () => ({ width: 100, height: 100 }) };
-  const victim = { id: "victim", name: "Бандит", actor: {}, hidden: false, testInsideRegion: () => true };
-  const scene = { id: "s", grid: { distance: 2 }, regions: [], tokens: [caster, victim] };
+  const caster = { id: "caster", x: 0, y: 0, rotation: 0, hidden: false, level: null, disposition: 1, getSize: () => ({ width: 100, height: 100 }) };
+  const victim = { id: "victim", name: "Бандит", actor: {}, hidden: false, disposition: -1, testInsideRegion: () => true };
+  const friend = { id: "friend", name: "Геральт", actor: {}, hidden: false, disposition: 1, testInsideRegion: () => true };
+  const scene = { id: "s", grid: { distance: 2 }, regions: [], tokens: [caster, victim, friend] };
+  let offered = null;
   caster.parent = scene;
   let targets = null, placed = null;
   globalThis.CONST = { REGION_VISIBILITY: { ALWAYS: 2 }, DOCUMENT_OWNERSHIP_LEVELS: { OWNER: 3 } };
   globalThis.ui = { notifications: { info: text => notices.push(text), warn: text => notices.push(`warn: ${text}`) } };
-  globalThis.game = { user: { id: "u", color: { css: "#fff" } }, combat: null };
+  globalThis.game = { user: { id: "u", color: { css: "#fff" } }, combat: null, settings: { get: () => 0 } };
+  globalThis.foundry = { applications: { api: { DialogV2: { prompt: async ({ content }) => { offered = content; return ["victim"]; } } } } };
   globalThis.canvas = { ready: true, scene, dimensions: { distancePixels: 50 }, tokens: { controlled: [{ actor: { uuid: "Actor.a" }, document: caster }], setTargets: ids => { targets = ids; } },
     regions: { placeRegion: async (data, options) => {
       placed = data;
-      const shape = { ...data.shapes[0], updateSource(changes) { Object.assign(this, changes); } };
-      assert.equal(options.onMove({ shape, position: { x: 50, y: 300 } }), false);
-      assert.equal(shape.x, 50); assert.equal(shape.rotation, 90, "the cone points at the cursor");
+      const shape = { ...data.shapes[0], updateSource(changes) { Object.assign(this, changes); }, move(position) { Object.assign(this, position); } };
+      assert.equal(options.onMove({ shape, position: { x: 50, y: 300 }, snap: true }), false);
+      assert.deepEqual([shape.x, shape.y], [50, 300], "the apex follows the cursor");
+      assert.equal(shape.rotation, 90, "and the cone looks away from the caster");
+      options.onRotate({}); shape.rotation = 45;
+      options.onMove({ shape, position: { x: 300, y: 50 }, snap: true });
+      assert.equal(shape.rotation, 45, "a cone turned by the wheel keeps its direction");
       return { parent: scene, flags: {} };
     } } };
   const actor = { uuid: "Actor.a", isToken: false };
   const item = { id: "i", name: "Аард", system: { ...magic("sign.aard"), defense: ["none"], damage: "" } };
   const result = await placeSpellArea(actor, item, { id: "m", flags: {}, rolls: [] });
   assert.equal(placed.shapes[0].type, "cone"); assert.equal(placed.flags["witcher-eliott-system"].spellArea.instant, true);
-  assert.deepEqual(targets, ["victim"]); assert.equal(result.strikes, null, "no defense printed: targets only");
+  assert.match(offered, /Бандит/); assert.match(offered, /Геральт/); assert.match(offered, /союзник/);
+  assert.deepEqual(targets, ["victim"], "only the ticked tokens become targets"); assert.equal(result.strikes, null, "no defense printed: targets only");
   assert.match(notices.at(-1), /Бандит/);
+  foundry.applications.api.DialogV2.prompt = async () => null;
+  targets = "untouched";
+  assert.deepEqual((await placeSpellArea(actor, item, { id: "m3", flags: {}, rolls: [] })).targets, [], "closing the list assigns nobody");
+  assert.equal(targets, "untouched");
 
   const zone = { id: "z", name: "Танио Ильхар", system: magic("spell.tanio-ilchar") };
   canvas.regions.placeRegion = async (_data, options) => {

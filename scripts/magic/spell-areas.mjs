@@ -59,10 +59,58 @@ export function tokensInArea(region, caster) {
 const offensive = system => Boolean(system.damage) || (system.defense ?? []).some(kind => ["dodge", "block", "resistMagic", "willTriple", "spellCasting"].includes(kind));
 const areaRegions = (scene, messageId) => Array.from(scene?.regions ?? []).filter(region => region.flags?.[SYSTEM_ID]?.spellArea?.message === messageId);
 
+/** Friend or foe as seen from the caster: the same disposition is an ally, neutral stays neutral. */
+export function relationTo(caster, token) {
+  if (token.disposition === caster.disposition) return "ally";
+  return token.disposition === 0 ? "neutral" : "enemy";
+}
+const RELATION_LABELS = { ally: "союзник", enemy: "враг", neutral: "нейтральный" };
+export const AREA_TARGET_PICKS = { all: () => true, enemies: relation => relation === "enemy", allies: relation => relation === "ally", none: () => false };
+
 /**
- * PF2e-style placement with the core Region tool: the shape follows the cursor (or turns around the caster),
- * left click confirms, right click or Esc cancels. Tokens inside become targets; offensive magic then sends its
- * casting check to each of them like a weapon attack.
+ * The book makes everyone in the area defend (p.168). The caster still confirms who is affected: all of them,
+ * only enemies or only allies, or any hand-picked set. Resolves to the chosen tokens, or null when cancelled.
+ */
+export async function chooseAreaTargets(item, caster, inside, { attack = false } = {}) {
+  if (!inside.length) return [];
+  const rows = inside.map(token => ({ token, relation: relationTo(caster, token) }));
+  const content = `<div class="witcher-area-targets"><p>В области: ${rows.length}. По книге защищаются все, кто в зоне; снимите отметки с тех, кого магия не затронет.</p>`
+    + `<div class="witcher-area-picks">${[["all", "Все"], ["enemies", "Только враги"], ["allies", "Только союзники"], ["none", "Никого"]]
+      .map(([id, label]) => `<button type="button" data-pick="${id}">${label}</button>`).join("")}</div>`
+    + `<ul>${rows.map(({ token, relation }) => `<li><label><input type="checkbox" name="target" value="${token.id}" data-relation="${relation}" checked>`
+      + ` <b>${esc(token.name)}</b> <small class="witcher-area-${relation}">${RELATION_LABELS[relation]}</small></label></li>`).join("")}</ul></div>`;
+  const chosen = await foundry.applications.api.DialogV2.prompt({ classes: ["witcher-area-target-dialog"],
+    window: { title: `${item.name}: кто в области` }, position: { width: 420 }, content, rejectClose: false,
+    ok: { label: attack ? "Атаковать выбранных" : "Назначить цели", callback: (_event, button) =>
+      Array.from(button.form.querySelectorAll('[name="target"]:checked'), input => input.value) },
+    render: (_event, dialog) => {
+      for (const button of dialog.element.querySelectorAll("[data-pick]")) button.addEventListener("click", () => {
+        const pick = AREA_TARGET_PICKS[button.dataset.pick];
+        for (const input of dialog.element.querySelectorAll('[name="target"]')) input.checked = pick(input.dataset.relation);
+      });
+    } });
+  return chosen ? rows.filter(({ token }) => chosen.includes(token.id)).map(({ token }) => token) : null;
+}
+
+/** Seconds an instant template stays on the map (world setting; 0 = until the turn passes or it is removed). */
+const lifetime = () => { try { return Number(game.settings.get(SYSTEM_ID, "spellAreaLifetime")) || 0; } catch { return 60; } };
+const timers = new Map();
+/** Remove a template when its time is up. Every owner and the GM schedule it; whoever is first deletes it. */
+export function scheduleAreaExpiry(region) {
+  const expiresAt = region.flags?.[SYSTEM_ID]?.spellArea?.expiresAt;
+  if (!expiresAt || timers.has(region.uuid) || !(region.isOwner || game.users.activeGM?.isSelf)) return;
+  const remove = async () => {
+    timers.delete(region.uuid);
+    if (region.parent?.regions.has(region.id)) await region.delete().catch(() => {});
+  };
+  timers.set(region.uuid, setTimeout(remove, Math.max(0, expiresAt - Date.now())));
+}
+
+/**
+ * PF2e-style placement with the core Region tool. A cone or a line has its apex at the cursor and turns away from
+ * the caster until the mouse wheel turns it by hand; a zone at a distance follows the cursor within range; an area
+ * around the caster stays on the caster. Left click places, right click or Esc cancels. The caster then confirms the
+ * targets; offensive magic sends its casting check to each of them like a weapon attack.
  */
 export async function placeSpellArea(actor, item, message) {
   const area = spellArea(item.system);
@@ -73,7 +121,8 @@ export async function placeSpellArea(actor, item, message) {
   const scene = caster.parent, px = metres => metres * canvas.dimensions.distancePixels, center = tokenCenter(caster);
   for (const old of areaRegions(scene, message.id)) if (old.isOwner) await old.delete();
   const shape = areaShape(area, center, px, scene.grid.distance);
-  const instant = item.system.duration?.kind === "instant";
+  const instant = item.system.duration?.kind === "instant", seconds = instant ? lifetime() : 0;
+  const directed = ["cone", "line"].includes(area.type), fixed = area.origin === "caster" && !directed;
   const data = { name: `${item.name} · ${areaLabel(area)}`, color: game.user.color?.css ?? "#8d48bd", shapes: [shape],
     visibility: CONST.REGION_VISIBILITY.ALWAYS, displayMeasurements: true, highlightMode: "coverage",
     ownership: { default: 0, [game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER },
@@ -82,16 +131,21 @@ export async function placeSpellArea(actor, item, message) {
       combat: game.combat?.started ? { id: game.combat.id, round: game.combat.round, turn: game.combat.turn } : null } } } };
   // A lasting aura around the caster moves with the token.
   if (area.attach) Object.assign(data, { attachment: { token: caster.id }, levels: caster.level ? [caster.level] : [], hidden: caster.hidden });
-  ui.notifications.info(area.origin === "point"
-    ? `${item.name}: выберите место (до ${area.reach} м от заклинателя). Колесо мыши поворачивает, Esc — отмена.`
-    : `${item.name}: ${["cone", "line"].includes(area.type) ? "наведите направление" : "подтвердите область"} кликом, Esc — отмена.`);
+  ui.notifications.info(directed ? `${item.name}: курсор — вершина ${area.type === "cone" ? "конуса" : "линии"}, она сама смотрит от заклинателя. Повернуть: Ctrl + колесо (по 5°) или Shift + колесо (по 15°). Клик — поставить, Esc — отмена.`
+    : area.origin === "point" ? `${item.name}: выберите место (до ${area.reach} м от заклинателя). Повернуть: Ctrl или Shift + колесо. Клик — поставить, Esc — отмена.`
+    : `${item.name}: область вокруг заклинателя — подтвердите кликом, Esc — отмена.`);
+  let turnedByHand = false;
   const region = await canvas.regions.placeRegion(data, {
-    allowRotation: area.type === "rectangle",
-    onMove: ({ shape: placed, position }) => {
-      if (area.origin !== "caster") return true;
-      placed.updateSource({ x: center.x, y: center.y, ...(["cone", "line"].includes(area.type) ? { rotation: facing(center, position) } : {}) });
+    allowRotation: !fixed,
+    onMove: ({ shape: placed, position, snap }) => {
+      if (fixed) { placed.updateSource({ x: center.x, y: center.y }); return false; }
+      if (!directed) return true;
+      placed.move(position, { snap });
+      // Pointing outward from the caster is what a cone or a bolt almost always does.
+      if (!turnedByHand && Math.hypot(placed.x - center.x, placed.y - center.y) > 1) placed.updateSource({ rotation: facing(center, placed) });
       return false;
     },
+    onRotate: () => { turnedByHand = true; return true; },
     preConfirm: ({ shape: placed }) => {
       if (area.origin !== "point") return true;
       const distance = Math.hypot(placed.x - center.x, placed.y - center.y) / canvas.dimensions.distancePixels;
@@ -101,22 +155,30 @@ export async function placeSpellArea(actor, item, message) {
     }
   });
   if (!region) return null;
-  const inside = tokensInArea(region, caster);
-  canvas.tokens.setTargets(inside.map(token => token.id));
+  const attack = offensive(item.system) && !message.flags?.[SYSTEM_ID]?.weaponAttack && !["ritual", "hex"].includes(item.system.kind);
+  const chosen = await chooseAreaTargets(item, caster, tokensInArea(region, caster), { attack });
+  // The countdown starts once the targets are chosen, so everyone sees the final template for the full time.
+  if (seconds && region.parent?.regions.has(region.id)) {
+    await region.setFlag(SYSTEM_ID, "spellArea.expiresAt", Date.now() + seconds * 1000);
+    scheduleAreaExpiry(region);
+  }
+  if (chosen === null) return { region, targets: [], strikes: null };
+  canvas.tokens.setTargets(chosen.map(token => token.id));
   let strikes = null;
-  if (inside.length && offensive(item.system) && !message.flags?.[SYSTEM_ID]?.weaponAttack && !["ritual", "hex"].includes(item.system.kind)) {
+  if (chosen.length && attack) {
     const { createSpellStrikes } = await import("./spell-strikes.mjs");
     strikes = await createSpellStrikes(actor, item, message, { total: message.rolls[0]?.total ?? null });
   }
-  ui.notifications.info(inside.length ? `${item.name}: в области ${inside.length} — ${inside.map(token => token.name).join(", ")}.` : `${item.name}: в области никого нет.`);
-  return { region, targets: inside, strikes };
+  ui.notifications.info(chosen.length ? `${item.name}: цели — ${chosen.map(token => token.name).join(", ")}.` : `${item.name}: целей нет.`);
+  return { region, targets: chosen, strikes };
 }
 
 /** Templates of instant magic vanish when the turn passes; a concentration area ends with the concentration. */
-export function expiredSpellAreas(scene, { combat = null, actors = new Map() } = {}) {
+export function expiredSpellAreas(scene, { combat = null, actors = new Map(), now = Date.now() } = {}) {
   return Array.from(scene?.regions ?? []).filter(region => {
     const flag = region.flags?.[SYSTEM_ID]?.spellArea;
     if (!flag) return false;
+    if (flag.expiresAt && flag.expiresAt <= now) return true;
     if (flag.instant) return Boolean(flag.combat) && (!combat || flag.combat.id !== combat.id || !combat.started
       || flag.combat.round !== combat.round || flag.combat.turn !== combat.turn);
     if (flag.sustained) {
@@ -143,7 +205,7 @@ export function registerSpellAreas() {
     box.className = "witcher-spell-target witcher-spell-area";
     box.innerHTML = `<button type="button" data-place><i class="fa-solid fa-draw-polygon"></i> ${placed ? "Переставить область" : "Разместить область"}</button>`
       + (placed ? `<button type="button" data-remove><i class="fa-solid fa-eraser"></i> Убрать область</button>` : "")
-      + `<small>${esc(areaLabel(area))}. Все в области (кроме заклинателя) становятся целями${offensive(item.system) ? " и защищаются от этой проверки" : ""}.</small>`;
+      + `<small>${esc(areaLabel(area))}. Ctrl или Shift + колесо мыши поворачивают шаблон. После размещения выберите, кого затронет магия: всех, только врагов или только союзников.</small>`;
     box.querySelector("[data-place]").addEventListener("click", async event => {
       event.currentTarget.disabled = true;
       try { await placeSpellArea(actor, item, message); }
@@ -161,11 +223,17 @@ export function registerSpellAreas() {
     const actors = new Map(game.actors.map(actor => [actor.uuid, actor]));
     for (const scene of game.scenes) {
       for (const token of scene.tokens) if (!token.actorLink && token.actor) actors.set(token.actor.uuid, token.actor);
-      const ids = expiredSpellAreas(scene, { combat: game.combat, actors }).map(region => region.id);
+      const ids = expiredSpellAreas(scene, { combat: game.combat, actors }).map(region => region.id).filter(id => scene.regions.has(id));
       if (ids.length) await scene.deleteEmbeddedDocuments("Region", ids).catch(error => console.error(`${SYSTEM_ID} | Spell areas`, error));
     }
   };
   Hooks.on("updateCombat", (_combat, changes) => { if ("turn" in changes || "round" in changes) sweep(); });
   Hooks.on("deleteCombat", sweep);
   Hooks.on("updateActor", (_actor, changes) => { if (foundry.utils.hasProperty(changes, "system.magic.sustainedId")) sweep(); });
+  // The GM also keeps the timer of a template whose player left; a reload catches templates that expired meanwhile.
+  Hooks.on("updateRegion", region => scheduleAreaExpiry(region));
+  Hooks.once("ready", () => {
+    sweep();
+    for (const scene of game.scenes) for (const region of scene.regions) scheduleAreaExpiry(region);
+  });
 }

@@ -1381,6 +1381,8 @@
       "AutomaticFumbleRolls": "Roll fumble consequences automatically",
       "AutomaticFumbleRollsHint": "When enabled, every roll a fumble calls for (reliability damage, hit location, scatter, head damage, Stun save) is made automatically by the player who fumbled. When disabled, the chat card shows a dice button for each consequence.",
       "WaitDiceAnimation": "Sync with Dice So Nice",
+      "SpellAreaLifetime": "Instant magic template, seconds",
+      "SpellAreaLifetimeHint": "Seconds after placement before the template of instant area magic (Aard cone, Zephyr circle…) removes itself. 0 keeps it until the turn changes or «Remove area» is pressed.",
       "WaitDiceAnimationHint": "On: results (defense, damage, consequences) appear after the 3D dice land. Off: results show at once while the animation plays. Per-computer setting.",
       "ConcealAttackRolls": "Hide attack rolls until a defense is chosen",
       "ConcealAttackRollsHint": "Enemy attacks (hostile or secret tokens without a player owner): players cannot see the attack total, its dice (Dice So Nice shows ghost dice), criticals or fumbles until they pick a defense. The GM's rolls for allies and player characters are not hidden.",

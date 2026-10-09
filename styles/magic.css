@@ -103,3 +103,12 @@
 .witcher-magic-fumble .witcher-exchange-actions button { flex:0 0 auto; width:auto; }
 .witcher-dimeritium { flex-wrap:wrap; }
 .witcher-dimeritium div { min-width:240px; gap:2px; }
+.witcher-area-targets ul { list-style:none; margin:8px 0 0; padding:0; max-height:260px; overflow:auto; }
+.witcher-area-targets li { padding:3px 0; border-bottom:1px solid #d8cdb6; }
+.witcher-area-picks { display:flex; flex-wrap:wrap; gap:6px; }
+.witcher-area-picks button { flex:1 1 auto; width:auto; }
+.witcher-area-targets small { display:inline-block; margin-left:4px; padding:0 6px; border-radius:8px; font-size:11px; line-height:16px; color:#fff; }
+.witcher-area-targets .witcher-area-enemy { background:#a8392b; }
+.witcher-area-targets .witcher-area-ally { background:#3f7a3c; }
+.witcher-area-targets .witcher-area-neutral { background:#6b604e; }
+.witcher-spell-area button { margin:2px 0; }

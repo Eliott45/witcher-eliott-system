@@ -18,6 +18,10 @@ export function registerSystemSettings() {
     name:"WITCHER.Settings.WaitDiceAnimation",hint:"WITCHER.Settings.WaitDiceAnimationHint",
     scope:"client",config:true,type:Boolean,default:true
   });
+  game.settings.register(SYSTEM_ID,"spellAreaLifetime",{
+    name:"WITCHER.Settings.SpellAreaLifetime",hint:"WITCHER.Settings.SpellAreaLifetimeHint",
+    scope:"world",config:true,type:Number,default:60,range:{min:0,max:600,step:10}
+  });
   game.settings.register(SYSTEM_ID,"automaticFumbleRolls",{
     name:"WITCHER.Settings.AutomaticFumbleRolls",hint:"WITCHER.Settings.AutomaticFumbleRollsHint",
     scope:"world",config:true,type:Boolean,default:false
