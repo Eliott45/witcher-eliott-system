@@ -16,7 +16,7 @@
 .witcher-magic-active { display:flex; align-items:center; gap:10px; padding:12px; border:1px solid #a697b0; background:#e6dfe9; border-radius:5px; margin-bottom:12px; color:#594165; }
 .witcher-magic-active>div { flex:1; display:flex; flex-direction:column; gap:3px; }
 .witcher-magic-active small { font-size:11px; }
-.witcher-magic-filters { display:grid; grid-template-columns:minmax(0,1.6fr) 1fr 1fr 1fr; gap:7px; margin-bottom:12px; }
+.witcher-magic-filters { display:grid; grid-template-columns:minmax(0,1.5fr) repeat(4,minmax(0,1fr)); gap:7px; margin-bottom:12px; }
 .witcher-magic-search { display:flex; align-items:center; gap:8px; border:1px solid #bbaa8d; background:#fcf8ee; border-radius:4px; padding:0 10px; color:#847455; }
 .witcher-magic-search input { width:100%; background:transparent!important; border:0!important; box-shadow:none!important; }
 .witcher-magic-filters :is(input,select) { height:32px; font-size:12px; color:#413a31; }

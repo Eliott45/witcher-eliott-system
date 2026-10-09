@@ -324,6 +324,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "area"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 114; официальная errata",
           "page": 114
@@ -367,6 +370,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "self"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 114; официальная errata",
           "page": 114
@@ -409,6 +415,9 @@
           },
           "defense": [
             "dodge"
+          ],
+          "target": [
+            "area"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 114; официальная errata",
@@ -454,6 +463,9 @@
             "dodge",
             "block"
           ],
+          "target": [
+            "area"
+          ],
           "damage": "1d6",
           "source": "Базовая книга, стр. 114; официальная errata",
           "page": 114
@@ -496,6 +508,9 @@
           },
           "defense": [
             "resistMagic"
+          ],
+          "target": [
+            "creature"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 114; официальная errata",
@@ -541,6 +556,9 @@
             "dodge",
             "block"
           ],
+          "target": [
+            "area"
+          ],
           "damage": "3d6",
           "source": "Базовая книга, стр. 115; официальная errata",
           "page": 115
@@ -585,6 +603,10 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "self",
+            "creature"
+          ],
           "damage": "1d6",
           "source": "Базовая книга, стр. 115; официальная errata",
           "page": 115
@@ -627,6 +649,9 @@
           },
           "defense": [
             "dodge"
+          ],
+          "target": [
+            "area"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 115; официальная errata",
@@ -673,6 +698,9 @@
             "dodge",
             "block"
           ],
+          "target": [
+            "creature"
+          ],
           "damage": "1d6",
           "source": "Базовая книга, стр. 115; официальная errata",
           "page": 115
@@ -715,6 +743,9 @@
           },
           "defense": [
             "resistMagic"
+          ],
+          "target": [
+            "creature"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 115; официальная errata",
@@ -1738,6 +1769,9 @@
           "defense": [
             "spellCasting"
           ],
+          "target": [
+            "magic"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 102; официальная errata",
           "page": 102
@@ -1779,6 +1813,9 @@
           },
           "defense": [
             "none"
+          ],
+          "target": [
+            "self"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 102; официальная errata",
@@ -1822,6 +1859,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "self"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 105; официальная errata",
           "page": 105
@@ -1863,6 +1903,9 @@
           },
           "defense": [
             "none"
+          ],
+          "target": [
+            "creature"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 102; официальная errata",
@@ -1906,6 +1949,9 @@
           "defense": [
             "dodge"
           ],
+          "target": [
+            "creatures"
+          ],
           "damage": "8d6",
           "source": "Базовая книга, стр. 106; официальная errata",
           "page": 106
@@ -1947,6 +1993,9 @@
           },
           "defense": [
             "dodge"
+          ],
+          "target": [
+            "area"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 105; официальная errata",
@@ -1990,6 +2039,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "place"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 107; официальная errata",
           "page": 107
@@ -2031,6 +2083,9 @@
           },
           "defense": [
             "resistMagic"
+          ],
+          "target": [
+            "creature"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 107; официальная errata",
@@ -2078,6 +2133,9 @@
           },
           "defense": [
             "resistMagic"
+          ],
+          "target": [
+            "creature"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 121; официальная errata",
@@ -2146,6 +2204,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "area"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 118; официальная errata",
           "page": 118
@@ -2202,6 +2263,9 @@
           },
           "defense": [
             "none"
+          ],
+          "target": [
+            "object"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 118; официальная errata",
@@ -4921,6 +4985,9 @@
           "defense": [
             "spellCasting"
           ],
+          "target": [
+            "magic"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 102; официальная errata",
           "page": 102
@@ -4962,6 +5029,9 @@
           },
           "defense": [
             "none"
+          ],
+          "target": [
+            "self"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 105; официальная errata",
@@ -5005,6 +5075,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "place"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 107; официальная errata",
           "page": 107
@@ -5046,6 +5119,9 @@
           },
           "defense": [
             "none"
+          ],
+          "target": [
+            "creature"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 102; официальная errata",
@@ -5090,6 +5166,9 @@
             "dodge",
             "block"
           ],
+          "target": [
+            "creature"
+          ],
           "damage": "4d6",
           "source": "Базовая книга, стр. 103; официальная errata",
           "page": 103
@@ -5131,6 +5210,9 @@
           },
           "defense": [
             "dodge"
+          ],
+          "target": [
+            "area"
           ],
           "damage": "2d6",
           "source": "Базовая книга, стр. 106; официальная errata",
@@ -5174,6 +5256,9 @@
           "defense": [
             "dodge"
           ],
+          "target": [
+            "area"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 104; официальная errata",
           "page": 104
@@ -5215,6 +5300,9 @@
           },
           "defense": [
             "none"
+          ],
+          "target": [
+            "area"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 103; официальная errata",
@@ -5293,6 +5381,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "knowledge"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 117; официальная errata",
           "page": 117
@@ -5350,6 +5441,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "object"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 118; официальная errata",
           "page": 118
@@ -5396,6 +5490,9 @@
           },
           "defense": [
             "resistMagic"
+          ],
+          "target": [
+            "creature"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 121; официальная errata",
@@ -8099,6 +8196,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "area"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 114; официальная errata",
           "page": 114
@@ -8142,6 +8242,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "self"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 114; официальная errata",
           "page": 114
@@ -8184,6 +8287,9 @@
           },
           "defense": [
             "dodge"
+          ],
+          "target": [
+            "area"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 114; официальная errata",
@@ -8229,6 +8335,9 @@
             "dodge",
             "block"
           ],
+          "target": [
+            "area"
+          ],
           "damage": "1d6",
           "source": "Базовая книга, стр. 114; официальная errata",
           "page": 114
@@ -8271,6 +8380,9 @@
           },
           "defense": [
             "resistMagic"
+          ],
+          "target": [
+            "creature"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 114; официальная errata",
@@ -8316,6 +8428,9 @@
             "dodge",
             "block"
           ],
+          "target": [
+            "area"
+          ],
           "damage": "3d6",
           "source": "Базовая книга, стр. 115; официальная errata",
           "page": 115
@@ -8360,6 +8475,10 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "self",
+            "creature"
+          ],
           "damage": "1d6",
           "source": "Базовая книга, стр. 115; официальная errata",
           "page": 115
@@ -8402,6 +8521,9 @@
           },
           "defense": [
             "dodge"
+          ],
+          "target": [
+            "area"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 115; официальная errata",
@@ -8448,6 +8570,9 @@
             "dodge",
             "block"
           ],
+          "target": [
+            "creature"
+          ],
           "damage": "1d6",
           "source": "Базовая книга, стр. 115; официальная errata",
           "page": 115
@@ -8490,6 +8615,9 @@
           },
           "defense": [
             "resistMagic"
+          ],
+          "target": [
+            "creature"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 115; официальная errata",

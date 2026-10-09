@@ -3,7 +3,7 @@ import { RITUAL_INTERRUPTIONS } from "../magic/rules.mjs";
 import { actorToken } from "../combat/environment.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { activePowerBenefits } from "../magic/power-place-rules.mjs";
-import { MAGIC_KINDS,MAGIC_CATEGORIES,HEX_DANGERS,magicCategory,MAGIC_TRADITIONS,SPELL_ELEMENTS,SPELL_GRADES,SPELL_DEFENSES,spellRange,spellDuration,SPELL_RANGE_KINDS,SPELL_DURATION_KINDS } from "../data/spells.mjs";
+import { MAGIC_KINDS,MAGIC_CATEGORIES,HEX_DANGERS,magicCategory,MAGIC_TRADITIONS,SPELL_ELEMENTS,SPELL_GRADES,SPELL_DEFENSES,spellRange,spellDuration,SPELL_RANGE_KINDS,SPELL_DURATION_KINDS,SPELL_TARGETS,spellTargetLabel } from "../data/spells.mjs";
 import { focusOptions,magicRoundKey,roundSpent,spellCostLabel,castingSkill,CASTING_SKILL_LABELS,maintenanceCost,ritualComponents,hexIdentification,signPotency } from "../magic/rules.mjs";
 import { castSpell,castingQuote,learnSpell,endConcentration,resetMagicRound } from "../magic/casting.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
@@ -28,8 +28,8 @@ export function spellEntry(item) {
     skillLabel:CASTING_SKILL_LABELS[castingSkill(s)],isRitual:ritual,isHex:hex,
     ritual:ritual?{...s.ritual,dcLabel:s.ritual.dcHint||(s.ritual.dc?`${s.ritual.dc}`:"Без проверки"),components:ritualComponents(s)}:null,
     hex:hex?{...s.hex,educationDC:hexIdentification(s.hex.danger)[0],trainingDC:hexIdentification(s.hex.danger)[1]}:null,
-    defense:s.defense.map(key=>SPELL_DEFENSES[key]).join(" / "),damage:s.damage,durationFormula:s.duration.formula,
-    source:s.source,search:`${item.name} ${s.description} ${SPELL_ELEMENTS[s.element]} ${s.deity??""} ${MAGIC_CATEGORIES[tradition]} ${ritual?ritualComponents(s):""}`.replace(/<[^>]*>/g," ").toLocaleLowerCase("ru")};
+    defense:s.defense.map(key=>SPELL_DEFENSES[key]).join(" / "),target:spellTargetLabel(s.target)||"По описанию",targets:(s.target??[]).join(" "),damage:s.damage,durationFormula:s.duration.formula,
+    source:s.source,search:`${item.name} ${s.description} ${spellTargetLabel(s.target)} ${SPELL_ELEMENTS[s.element]} ${s.deity??""} ${MAGIC_CATEGORIES[tradition]} ${ritual?ritualComponents(s):""}`.replace(/<[^>]*>/g," ").toLocaleLowerCase("ru")};
 }
 export async function magicContext(actor) {
   const roundKey=magicRoundKey(game.combat),spent=roundSpent(actor.system.magic,roundKey),vigor=actor.system.statistics.vigor;
@@ -47,8 +47,9 @@ export async function magicContext(actor) {
     active:active?{...spellEntry(active),duration:`Поддержание · ${maintenanceCost(active.system,actor.system.magic.sustainedCost)} ВЫН/раунд`}:null,canMaintain:canCast&&Boolean(active)&&actor.system.magic.maintainedRound!==roundKey,
     elements:Object.entries(SPELL_ELEMENTS).map(([id,label])=>({id,label,icon:SPELL_ICONS[id]})),
     traditions:Object.entries(MAGIC_CATEGORIES).map(([id,label])=>({id,label})),
-    grades:Object.entries(SPELL_GRADES).map(([id,label])=>({id,label}))};
+    grades:Object.entries(SPELL_GRADES).map(([id,label])=>({id,label})),targets:spellTargetChoices()};
 }
+export const spellTargetChoices=()=>Object.entries(SPELL_TARGETS).map(([id,label])=>({id,label}));
 
 export function bindSpellFilters(root,filters={},onChange=()=>{}) {
   for(const [key,value] of Object.entries(filters))root.querySelector(`[data-magic-${key}]`).value=value;
@@ -56,9 +57,10 @@ export function bindSpellFilters(root,filters={},onChange=()=>{}) {
     const query=root.querySelector("[data-magic-search]").value.trim().toLocaleLowerCase("ru");
     const tradition=root.querySelector("[data-magic-tradition]").value;
     const element=root.querySelector("[data-magic-element]").value,grade=root.querySelector("[data-magic-grade]").value;
+    const target=root.querySelector("[data-magic-target]")?.value??"";
     let count=0;
     for(const row of root.querySelectorAll("[data-spell-row]")) {
-      row.hidden=!(row.dataset.search.includes(query)&&(!tradition||row.dataset.tradition===tradition)&&(!element||row.dataset.element===element)&&(!grade||row.dataset.grade===grade));
+      row.hidden=!(row.dataset.search.includes(query)&&(!tradition||row.dataset.tradition===tradition)&&(!element||row.dataset.element===element)&&(!grade||row.dataset.grade===grade)&&(!target||(row.dataset.targets??"").split(" ").includes(target)));
       if(!row.hidden)count++;
     }
     for(const group of root.querySelectorAll("[data-magic-group]")) {
@@ -68,9 +70,9 @@ export function bindSpellFilters(root,filters={},onChange=()=>{}) {
     }
     root.querySelector("[data-magic-empty]").hidden=count>0;
     root.querySelector("[data-magic-count]").textContent=count;
-    onChange({search:root.querySelector("[data-magic-search]").value,element,grade,tradition});
+    onChange({search:root.querySelector("[data-magic-search]").value,element,grade,tradition,target});
   };
-  for(const input of root.querySelectorAll("[data-magic-search], [data-magic-element], [data-magic-grade], [data-magic-tradition]"))input.addEventListener("input",refresh);
+  for(const input of root.querySelectorAll("[data-magic-search], [data-magic-element], [data-magic-grade], [data-magic-tradition], [data-magic-target]"))input.addEventListener("input",refresh);
   refresh();
 }
 
@@ -157,5 +159,6 @@ export function spellItemContext(item,editable) {
   if(item.system.kind==="ritual")fields.push(numberField("ritual.dc","СЛ (0 — без проверки)"),numberField("ritual.alternateDC","Альтернативная СЛ"),textField("ritual.dcHint","Варианты сложности"),numberField("ritual.preparationRounds","Подготовка, раундов"),textField("ritual.requirements","Дополнительные требования / замена ингредиентов"));
   if(item.system.kind==="hex")fields.push(choiceField("hex.danger","Опасность",choices(HEX_DANGERS)),textField("hex.lifting","Условия снятия"));
   return {...spellEntry(item),components:item.system.ritual?.components.map((c,index)=>({...c,index})),groups:[{title:"Параметры магии",fields:formFields(fields,Object.fromEntries(fields.map(f=>[f.key,foundry.utils.getProperty(item.system,f.key)])),"system.").map(f=>({...f,readOnly:!editable,isBoolean:f.type==="boolean"}))}],
-    defenses:Object.entries(SPELL_DEFENSES).map(([id,label])=>({id,label,selected:item.system.defense.includes(id)}))};
+    defenses:Object.entries(SPELL_DEFENSES).map(([id,label])=>({id,label,selected:item.system.defense.includes(id)})),
+    targetChoices:Object.entries(SPELL_TARGETS).map(([id,label])=>({id,label,selected:(item.system.target??[]).includes(id)}))};
 }

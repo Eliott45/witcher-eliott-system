@@ -1,6 +1,6 @@
 <div class="witcher-magic-catalog"><header class="witcher-magic-heading"><div><span class="witcher-magic-eyebrow">Базовая книга · стр. 99–121</span><h2>Каталог магии <small data-magic-count>{{spells.length}}</small></h2></div><span>{{actorName}}</span></header>
 <p class="witcher-spell-catalog-hint">{{#if study}}Выберите магию для обучения. Перед началом укажите наставника или книгу; стоимость, дни и проверки будут показаны отдельно.{{else}}{{#if isNPC}}Разверните карточку для чтения и добавьте нужную магию в книгу существа.{{else}}Разверните карточку для чтения. Добавляйте уже изученную магию; для обучения откройте «Действия».{{/if}}{{/if}} Знаки, ритуалы и порчи выбираются в фильтре вида магии. Маги не изучают инвокации; верховные инвокации связаны с указанным божеством.</p>
-{{> "systems/witcher-eliott-system/templates/magic-filters.hbs" elements=elements grades=grades traditions=traditions}}
+{{> "systems/witcher-eliott-system/templates/magic-filters.hbs" elements=elements grades=grades traditions=traditions targets=targets}}
 {{> "systems/witcher-eliott-system/templates/magic-spells.hbs" spells=spells catalog=true}}
 <p class="witcher-magic-empty" data-magic-empty><i class="fa-solid fa-book-sparkles"></i> Магия не найдена. Измените поиск или фильтры.</p>
 </div>

@@ -818,6 +818,9 @@
             "dodge",
             "block"
           ],
+          "target": [
+            "creature"
+          ],
           "damage": "4d6",
           "source": "Базовая книга, стр. 103; официальная errata",
           "page": 103
@@ -857,6 +860,9 @@
           },
           "defense": [
             "none"
+          ],
+          "target": [
+            "self"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 102; официальная errata",
@@ -899,6 +905,9 @@
             "dodge",
             "block"
           ],
+          "target": [
+            "creature"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 102; официальная errata",
           "page": 102
@@ -939,6 +948,10 @@
           "defense": [
             "dodge"
           ],
+          "target": [
+            "creature",
+            "object"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 104; официальная errata",
           "page": 104
@@ -978,6 +991,9 @@
           },
           "defense": [
             "none"
+          ],
+          "target": [
+            "self"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 105; официальная errata",
@@ -1064,6 +1080,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "object"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 118; официальная errata",
           "page": 118
@@ -1134,6 +1153,9 @@
           "defense": [
             "none"
           ],
+          "target": [
+            "place"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 117; официальная errata",
           "page": 117
@@ -1179,6 +1201,9 @@
           "defense": [
             "resistMagic"
           ],
+          "target": [
+            "creature"
+          ],
           "damage": "",
           "source": "Базовая книга, стр. 121; официальная errata",
           "page": 121
@@ -1223,6 +1248,9 @@
           },
           "defense": [
             "resistMagic"
+          ],
+          "target": [
+            "creature"
           ],
           "damage": "",
           "source": "Базовая книга, стр. 121; официальная errata",
