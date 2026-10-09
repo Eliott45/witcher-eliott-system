@@ -101,3 +101,5 @@
 .witcher-spell-target small { font-size:11px; opacity:.8; }
 .witcher-magic-fumble .witcher-exchange-actions { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:6px; }
 .witcher-magic-fumble .witcher-exchange-actions button { flex:0 0 auto; width:auto; }
+.witcher-dimeritium { flex-wrap:wrap; }
+.witcher-dimeritium div { min-width:240px; gap:2px; }

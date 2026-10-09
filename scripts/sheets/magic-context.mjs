@@ -1,4 +1,4 @@
-import { dimeritiumState, rollDimeritium, dimeritiumResistance, rollDimeritiumResistance } from "../magic/dimeritium.mjs";
+import { dimeritiumState, rollDimeritium, dimeritiumResistance, rollDimeritiumResistance, dimeritiumBanner, DIMERITIUM_CONTACT } from "../magic/dimeritium.mjs";
 import { RITUAL_INTERRUPTIONS } from "../magic/rules.mjs";
 import { actorToken } from "../combat/environment.mjs";
 import { SYSTEM_ID } from "../config.mjs";
@@ -39,8 +39,7 @@ export async function magicContext(actor) {
     description:await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description,{secrets:actor.isOwner,relativeTo:item})})));
   spells.sort((a,b)=>Object.keys(SPELL_GRADES).indexOf(a.grade)-Object.keys(SPELL_GRADES).indexOf(b.grade)||a.name.localeCompare(b.name,"ru"));
   const groups=MAGIC_GROUPS.map(group=>({...group,spells:spells.filter(spell=>spell.kind===group.id)})).filter(group=>group.spells.length);
-  const exposure=dimeritiumState(actor,actorToken(actor)),resistance=exposure&&dimeritiumResistance(actor);
-  const dimeritium=exposure&&{...exposure,canResist:Boolean(resistance)&&!exposure.resisted,resistBase:resistance?.base??0};
+  const dimeritium=dimeritiumBanner(actor,dimeritiumState(actor,actorToken(actor)));
   const interruptions=spells.some(spell=>spell.kind==="ritual")?RITUAL_INTERRUPTIONS:[];
   return {dimeritium,interruptions,spells,groups,powerBenefits:activePowerBenefits(actor).map(effect=>({name:effect.name,minutes:Math.ceil((effect.flags[SYSTEM_ID].powerPlace.expiresAt-game.time.worldTime)/60)})),count:spells.length,spent,vigor,remaining:Math.max(0,vigor-spent),percent:vigor?Math.min(100,spent/vigor*100):spent?100:0,
     stamina:actor.system.stamina.value,staminaMax:actor.system.stamina.max,casting:skill.total??"—",ritualCasting:skillValue(actor.system,"ritualCrafting").total??"—",hexCasting:skillValue(actor.system,"hexWeaving").total??"—",canCast:canCast&&!active,
@@ -124,6 +123,7 @@ const action=fn=>async function(event,target){try{return await fn.call(this,even
 export const magicActions={
   ritualInterruption:action(async function(_e,target){if(this.isEditable)await (await import("../magic/casting.mjs")).rollRitualInterruption(this.actor,target.dataset.interruption);}),
   rollDimeritium:action(async function(){if(this.isEditable)await rollDimeritium(this.actor);}),
+  toggleDimeritiumContact:action(async function(){if(!this.isEditable)return;const {setStatus}=await import("../combat/status-effects.mjs");await setStatus(this.actor,DIMERITIUM_CONTACT,!this.actor.statuses.has(DIMERITIUM_CONTACT));}),
   resistDimeritium:action(async function(){if(this.isEditable)await rollDimeritiumResistance(this.actor,dimeritiumState(this.actor,actorToken(this.actor)));}),
   browseSpells:action(async function(){return (await import("./spell-browser.mjs")).browseSpells(this.actor);}),
   createSpell:action(async function(){if(!this.isEditable)return;const priest=this.actor.system.details.profession==="priest",witcher=this.actor.system.details.profession==="witcher";const [item]=await this.actor.createEmbeddedDocuments("Item",[{name:witcher?"Новый знак":priest?"Новая инвокация":"Новое заклинание",type:"spell",img:"icons/svg/book.svg",system:{kind:witcher?"sign":"spell",tradition:priest?"priest":"mage"}}]);return item.sheet.render({force:true});}),

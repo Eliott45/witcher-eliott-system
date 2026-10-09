@@ -31,6 +31,7 @@ export const DIMERITIUM_TABLE = [
 ];
 // Table rows that last only while the metal touches the adept. Nausea is the ordinary condition with its own end.
 export const DIMERITIUM_TABLE_STATES = ["dimeritium-spasms", "dimeritium-agony", "dimeritium-burn"];
+const TABLE_NAMES = { "dimeritium-spasms": "спазмы", "dimeritium-agony": "жжение, испытание Устойчивости каждый ход", "dimeritium-burn": "двимерит возжигает магию, 1d6 урона каждый ход" };
 const activeStatus = (actor, id) => Array.from(actor?.effects ?? []).some(effect => !effect.disabled && !effect.isSuppressed && effect.statuses?.has?.(id));
 export const dimeritiumResult = total => DIMERITIUM_TABLE.find(row => total >= row.min);
 
@@ -182,4 +183,18 @@ export function registerDimeritiumResistance() {
   };
   for (const hook of ["updateToken", "createToken", "deleteToken", "createItem", "updateItem", "deleteItem", "createActiveEffect", "deleteActiveEffect",
     "updateRegion", "deleteRegion", "updateCombat", "updateWorldTime"]) Hooks.on(hook, sweep);
+}
+
+/** What the magic tab shows: the exposure, why buttons are (not) there, and the active table row. */
+export function dimeritiumBanner(actor, state) {
+  if (!state) return null;
+  const resistance = dimeritiumResistance(actor);
+  const contactStatus = Boolean(actor.statuses?.has?.(DIMERITIUM_CONTACT));
+  const worn = Array.from(actor.items ?? []).filter(item => isDimeritium(item) && item.system?.equipped).map(item => item.name);
+  const row = DIMERITIUM_TABLE_STATES.find(id => activeStatus(actor, id));
+  return { ...state, contactStatus, byItem: worn.join(", "), canTouch: !state.touching,
+    tableRow: row ? TABLE_NAMES[row] : (activeStatus(actor, "nauseated") && state.touching ? "Тошнота" : ""),
+    canResist: Boolean(resistance) && !state.resisted, resistBase: resistance?.base ?? 0,
+    resistHint: !resistance && actor.system?.details?.profession === "mage" && !state.resisted
+      ? "«Устойчивость к двимериту» (ветка Архимага) не изучена — проверка сопротивления недоступна." : "" };
 }
