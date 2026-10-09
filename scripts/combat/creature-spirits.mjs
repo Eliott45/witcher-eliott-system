@@ -102,7 +102,10 @@ const actorTokens = actor => actor?.isToken ? [actor.token] : Array.from(actor?.
 // Core v14 animates a moving token's prepared x/y: right after a move they still hold the old cell. Region tests
 // must read the source position, which is what TokenDocument#testInsideRegion does.
 function insideZone(token, region) {
-  if (typeof token.testInsideRegion === "function" && region.parent && token.parent === region.parent) return token.testInsideRegion(region);
+  // While a synthetic token actor is still being prepared, the core test cannot run yet: use the same source math.
+  if (typeof token.testInsideRegion === "function" && region.parent && token.parent === region.parent) {
+    try { return token.testInsideRegion(region); } catch { /* fall through */ }
+  }
   const size = token.parent?.grid?.size ?? 100, source = token._source ?? token;
   const x = source.x + (source.width ?? 1) * size / 2, y = source.y + (source.height ?? 1) * size / 2;
   return region.shapes.some(shape => shape.type === "ellipse" && shape.radiusX > 0 && shape.radiusY > 0
@@ -173,6 +176,10 @@ export async function processYrdenRequest(message, userId) {
   return true;
 }
 
+const removeEffects = (actor, effects) => {
+  const ids = effects.map(effect => effect.id).filter(id => !actor.effects?.get || actor.effects.get(id));
+  return ids.length ? actor.deleteEmbeddedDocuments("ActiveEffect", ids).catch(() => {}) : Promise.resolve();
+};
 const pendingScenes = new WeakMap();
 /** Only the active GM writes effects; overlapping circles use the strongest slowing penalty, never stack. */
 export function refreshSpiritZones(scene) {
@@ -186,12 +193,13 @@ export function refreshSpiritZones(scene) {
       for (const kind of ["yrden", "dimeritium"]) {
         const zone = zones.filter(entry => entry.kind === kind).sort((a, b) => b.penalty - a.penalty)[0];
         const existing = Array.from(actor.effects ?? []).filter(effect => effect.flags?.[SYSTEM_ID]?.creatureSuppression?.kind === kind && effect.flags[SYSTEM_ID].creatureSuppression.zoneUuid);
-        if (!zone) { if (existing.length) await actor.deleteEmbeddedDocuments("ActiveEffect", existing.map(effect => effect.id)); continue; }
+        // Another GM tab may have removed it a moment ago: deleting what is already gone is not an error.
+        if (!zone) { if (existing.length) await removeEffects(actor, existing); continue; }
         const source = spiritSuppressionSource(actor, { kind, zoneUuid: zone.uuid, penalty: zone.penalty, zone });
         // Keep one copy for this zone; extra copies (e.g. written by a second GM tab) are removed.
         const keep = existing.find(effect => effect.flags[SYSTEM_ID].creatureSuppression.zoneUuid === zone.uuid);
         const extra = existing.filter(effect => effect !== keep).map(effect => effect.id);
-        if (extra.length) await actor.deleteEmbeddedDocuments("ActiveEffect", extra).catch(() => {});
+        if (extra.length) await removeEffects(actor, existing.filter(effect => effect !== keep));
         if (!keep) await actor.createEmbeddedDocuments("ActiveEffect", [source]);
       }
       actor.reset?.();

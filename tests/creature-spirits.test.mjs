@@ -262,3 +262,14 @@ test("two copies of the same Yrden effect never double the slow and are cleaned 
   await refreshSpiritZones(scene);
   assert.equal(bandit.effects.length, 1);
 });
+
+test("a token actor being prepared falls back to its source position instead of failing", async () => {
+  runtime();
+  const bandit = actor(), scene = sceneFor(bandit);
+  await createSpiritZone(scene, { x: 50, y: 50 }, { kind: "yrden", radius: 3, rounds: 5, penalty: 2 });
+  bandit.token.testInsideRegion = () => { throw new TypeError("Receiver must be an instance of class TokenDocument"); };
+  bandit.token._source = { x: 0, y: 0, width: 1, height: 1 };
+  assert.equal(creatureSuppression(bandit).yrden, true);
+  bandit.token._source.x = 600;
+  assert.equal(creatureSuppression(bandit).yrden, false);
+});
