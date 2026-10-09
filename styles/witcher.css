@@ -1234,8 +1234,9 @@ b.witcher-gm-only::after, span.witcher-gm-only::after { display:none; }
 .witcher-character-layout .witcher-luck-points .witcher-luck-point.selected { color: #edfff0; background: radial-gradient(circle at 35% 30%, #3f8a55, #1b3d26); border-color: #8bc79b; box-shadow: 0 0 8px #6fbf8566; }
 .witcher-character-layout .witcher-character-counters { grid-template-columns: repeat(2, 112px); gap: 6px; }
 .witcher-character-layout .witcher-header-counter { padding: 6px 6px 0; border: 1px solid #8f744499; border-radius: 3px; background: linear-gradient(180deg, #1a0c0dcc, #2a1214aa); box-shadow: inset 0 1px #ffffff0d, 0 2px 8px #0006; color: #e5cfa1; }
-.witcher-character-layout .witcher-experience-heading { padding-left: 4px; color: #e5cfa1; font: 13px var(--ws-serif); }
-.witcher-character-layout .witcher-experience-heading button { opacity: .55; }
+.witcher-character-layout .witcher-experience-heading { gap: 4px; padding-left: 4px; color: #e5cfa1; font: 12px var(--ws-serif); white-space: nowrap; }
+.witcher-character-layout .witcher-experience-heading > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.witcher-character-layout .witcher-experience-heading button { width: 18px; height: 18px; opacity: .55; }
 .witcher-character-layout .witcher-experience-heading button:hover, .witcher-character-layout .witcher-experience-heading button[aria-checked=true] { opacity: 1; }
 .witcher-character-layout .witcher-header-counter > strong, .witcher-character-layout .witcher-header-counter > input { height: 38px; color: #fff2d6; font: 600 32px/38px var(--ws-serif); text-shadow: 0 2px 6px #000; }
 .witcher-character-layout .witcher-header-counter .witcher-experience-open { width: calc(100% + 12px); height: 28px; margin: 4px -6px 0; border-top: 1px solid #8f744455; color: #e5cfa1; font-size: 11px; }
@@ -1324,3 +1325,180 @@ b.witcher-gm-only::after, span.witcher-gm-only::after { display:none; }
   .witcher-character-layout .witcher-attribute { grid-template-columns: minmax(0, 1fr); grid-template-areas: "short" "name" "value"; padding: 8px 6px 6px; }
   .witcher-character-layout .witcher-attribute-emblem { position: absolute; top: 8px; left: 8px; font-size: 16px; opacity: .45; }
 }
+
+/* ── Character sheet tabs: one hand for every page ── */
+.witcher-character-layout .witcher-character-content :is(h2, h3) { font-family: var(--ws-serif); text-shadow: none; }
+/* Page titles: blood-red serif trailing a gold rule, as on the main page. */
+.witcher-character-layout .witcher-character-content h2 { display: flex; align-items: center; gap: 12px; color: var(--ws-blood); font-weight: 700; font-size: 22px; letter-spacing: .01em; }
+.witcher-character-layout .witcher-character-content h2::after { content: ""; flex: 1; min-width: 24px; height: 1px; background: linear-gradient(90deg, #a8864f, #a8864f00); }
+.witcher-character-layout .witcher-character-content .witcher-skills-heading h2, .witcher-character-layout .witcher-character-content .witcher-effects-heading h2 { flex: 1; }
+/* Section heads inside a page. */
+.witcher-character-layout .witcher-skill-group h3, .witcher-character-layout .witcher-magic-group-heading, .witcher-character-layout .witcher-crafting-page h3,
+.witcher-character-layout .witcher-lifepath-heading h3 { color: #5a2a22; font-weight: 700; letter-spacing: .01em; }
+
+/* Dark leather strips instead of the old slate: magic, crafting and alchemy metrics, the mount's banner. */
+.witcher-character-layout .witcher-magic-dashboard { gap: 0; border: 1px solid #6d5634; border-radius: 6px; overflow: hidden; box-shadow: 0 3px 10px #3a281430; }
+.witcher-character-layout .witcher-magic-dashboard > div, .witcher-character-layout .witcher-crafting-metrics, .witcher-character-layout .witcher-transport-hero {
+  background: var(--ws-grain), radial-gradient(130% 120% at 50% 0%, #34241f, transparent 70%), linear-gradient(180deg, #221917, #150f0e); color: #ead6aa; }
+.witcher-character-layout .witcher-magic-dashboard > div + div { border-left: 1px solid #ffffff12; }
+.witcher-character-layout .witcher-crafting-metrics { border: 1px solid #6d5634; box-shadow: 0 3px 10px #3a281430; }
+.witcher-character-layout .witcher-crafting-metrics > div { border-right-color: #ffffff12; }
+.witcher-character-layout .witcher-crafting-metrics span, .witcher-character-layout .witcher-magic-dashboard span { color: #d8c49a; font-family: var(--ws-serif); }
+.witcher-eliott .witcher-character-layout .witcher-crafting-metrics strong, .witcher-character-layout .witcher-magic-dashboard strong { color: #fff2d6; font-family: var(--ws-serif); text-shadow: 0 2px 6px #000; }
+.witcher-eliott .witcher-character-layout .witcher-crafting-metrics small, .witcher-character-layout .witcher-magic-dashboard small { color: #b9a682; }
+.witcher-character-layout .witcher-transport-hero { border: 1px solid #6d5634; border-bottom-color: #8f7444; }
+.witcher-character-layout .witcher-transport-hero h3 { color: #f7e6c4; text-shadow: 0 2px 6px #000; }
+
+/* Skills: every attribute group on its own card. */
+.witcher-character-layout .witcher-skill-group { padding: 10px 12px 6px; border: 1px solid #d6c4a2; border-radius: 6px; background: linear-gradient(180deg, #fffaf0cc, #f4ead8cc); box-shadow: 0 2px 6px #3a281410; }
+.witcher-character-layout .witcher-skill-group h3 { display: flex; align-items: center; gap: 10px; padding-bottom: 6px; border-bottom: 1px solid #d6c4a2; font-size: 17px; }
+.witcher-character-layout .witcher-skills-table tbody tr { transition: background-color .15s; }
+.witcher-character-layout .witcher-skills-table tbody tr:hover { background: #c9a45f1f; }
+.witcher-character-layout .witcher-skills-table td { padding-top: 6px; padding-bottom: 6px; }
+.witcher-character-layout .witcher-skill-label { color: var(--ws-ink); font: 13.5px var(--ws-serif); }
+.witcher-character-layout .witcher-skill-total { color: var(--ws-blood); font: 700 17px var(--ws-serif); }
+.witcher-character-layout .witcher-skills-table button { color: #8a6436; transition: color .15s, transform .15s; }
+.witcher-character-layout .witcher-skills-table button:hover:not(:disabled) { color: var(--ws-blood); background: none; transform: scale(1.15); }
+.witcher-character-layout .witcher-sheet-abilities { border-color: #d6c4a2; border-radius: 6px; background: linear-gradient(180deg, #fffaf0, #f4ead8); box-shadow: 0 2px 6px #3a281410; }
+.witcher-character-layout .witcher-sheet-abilities > summary { font-family: var(--ws-serif); font-weight: 700; }
+.witcher-character-layout .witcher-skills-search { border-radius: 999px; border-color: #cdb995; background: #fffaf0; box-shadow: inset 0 1px 2px #3a28140f; }
+
+/* Inventory: leather group bars, framed armour slots. */
+.witcher-character-layout .witcher-inventory-group-heading { min-height: 30px; padding: 2px 8px; border: 1px solid #5a4430; border-radius: 4px; background: linear-gradient(180deg, #3a2a22, #241b18); color: #ecd9b0;
+  font: 13.5px var(--ws-serif); box-shadow: inset 0 1px #ffffff12; }
+.witcher-character-layout .witcher-inventory-group-heading :is(button, span, small) { color: inherit; }
+.witcher-character-layout .witcher-inventory-bar { border-color: #d6c4a2; border-radius: 6px; background: linear-gradient(180deg, #fffaf0, #f1e7d3); box-shadow: 0 2px 5px #3a281410; }
+.witcher-character-layout .witcher-armor-zone { padding: 9px 6px 7px; border: 1px solid #cdb995; border-radius: 6px; background: linear-gradient(180deg, #fffaf0, #f0e6d2); box-shadow: inset 0 1px #fff, 0 2px 5px #3a281412; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.witcher-character-layout .witcher-armor-zone:hover { border-color: #a8864f; box-shadow: inset 0 1px #fff, 0 4px 12px #3a281424; transform: translateY(-1px); }
+.witcher-character-layout .witcher-armor-zone h3 { color: var(--ws-blood); font: 700 13px var(--ws-serif); }
+.witcher-character-layout .witcher-inventory-row { transition: background-color .15s; }
+.witcher-character-layout .witcher-inventory-row:hover { background: #c9a45f1a; }
+
+/* Biography and family: pages of a journal, ruled for handwriting. */
+.witcher-character-layout .witcher-biography-section { margin-bottom: 14px; padding: 10px 14px 12px; border: 1px solid #d6c4a2; border-left: 3px solid #a8864f; border-radius: 4px; background: linear-gradient(180deg, #fffaf0cc, #f4ead8cc); box-shadow: 0 2px 6px #3a281410; }
+.witcher-character-layout .witcher-biography-section > summary { list-style: none; display: flex; align-items: center; gap: 10px; color: var(--ws-blood); font: 700 18px var(--ws-serif); }
+.witcher-character-layout .witcher-biography-section > summary::-webkit-details-marker { display: none; }
+.witcher-character-layout .witcher-biography-section > summary::before { content: ""; flex: none; width: 7px; height: 7px; border: solid #a8864f; border-width: 2px 2px 0 0; transform: rotate(45deg); transition: transform .2s; }
+.witcher-character-layout .witcher-biography-section[open] > summary::before { transform: rotate(135deg); }
+.witcher-character-layout .witcher-biography textarea { margin-top: 10px; padding: 3px 14px; border: 1px solid #d6c4a2; border-radius: 3px; color: #2e241c; font: 15px/28px var(--ws-serif);
+  background: repeating-linear-gradient(180deg, transparent 0 27px, #dccaa6 27px 28px), linear-gradient(90deg, transparent 0 22px, #e8b9a855 22px 23px, transparent 23px), #fffcf3;
+  background-attachment: local; box-shadow: inset 0 1px 3px #3a281412; }
+.witcher-character-layout .witcher-biography textarea:focus { border-color: #a8864f; box-shadow: 0 0 0 2px #c9a45f33; }
+
+/* Life path: the age badges in leather and gold. */
+.witcher-character-layout .witcher-lifepath-age { border: 1px solid #8f7444; background: linear-gradient(180deg, #4a2a24, #2a1614); color: #f3e2bd; box-shadow: inset 0 1px #ffffff14; }
+.witcher-character-layout .witcher-lifepath-age b { font-family: var(--ws-serif); }
+.witcher-character-layout .witcher-lifepath-entry { border-color: #d6c4a2; box-shadow: 0 2px 6px #3a281412; }
+.witcher-character-layout .witcher-lifepath-entry > summary { background: linear-gradient(180deg, #f1e7d3, #e8dcc4); }
+
+/* Profession nodes and effects: cards that lift a little under the pointer. */
+.witcher-character-layout .witcher-profession-node { background: linear-gradient(180deg, #fffaf0, #f3e9d6); transition: box-shadow .15s, transform .15s; }
+.witcher-character-layout .witcher-profession-node:not(.locked):hover { box-shadow: 0 4px 12px #3a281424; transform: translateY(-1px); }
+.witcher-character-layout .witcher-profession-node.locked { background: linear-gradient(180deg, #ece5d8, #e2d9c8); }
+.witcher-character-layout .witcher-profession-node.defining { background: linear-gradient(180deg, #fffaf0, #f2e3c0); border-top-color: #b8925a; }
+.witcher-character-layout .witcher-effect { border-color: #d6c4a2; border-left-color: #a8864f; border-radius: 5px; background: linear-gradient(180deg, #fffaf0, #f4ead8); box-shadow: 0 2px 6px #3a281412; }
+.witcher-character-layout .witcher-effect h3 { color: var(--ws-blood); }
+.witcher-character-layout .witcher-lifepath-summary { gap: 0; padding: 4px 0; border: 1px solid #d6c4a2; border-left: 3px solid #a8864f; border-radius: 4px; background: linear-gradient(180deg, #fffaf0cc, #f4ead8cc); box-shadow: 0 2px 6px #3a281410; }
+.witcher-character-layout .witcher-lifepath-summary :is(dt, dd) { padding: 7px 12px; border-bottom: 1px solid #e3d5b9; }
+.witcher-character-layout .witcher-lifepath-summary :is(dt, dd):nth-last-child(-n+2) { border-bottom: 0; }
+.witcher-character-layout .witcher-lifepath-summary dt { color: var(--ws-ink-soft); font: 14px var(--ws-serif); }
+.witcher-character-layout .witcher-lifepath-summary dd { color: var(--ws-ink); font: 600 14px var(--ws-serif); }
+.witcher-character-layout .witcher-lifepath-summary small { font: 400 12px var(--ws-serif); }
+
+/* ── Screen effects: dice, criticals, wounds, banners, medallion ── */
+.witcher-dice-spin { display: inline-block; animation: witcher-dice-spin .62s cubic-bezier(.3, .7, .3, 1); }
+@keyframes witcher-dice-spin { 0% { transform: rotate(0) scale(1); } 45% { transform: rotate(420deg) scale(1.35); } 100% { transform: rotate(720deg) scale(1); } }
+
+/* A critical floods the sheet with gold; a fumble cracks it red. */
+.witcher-roll-flash { position: absolute; inset: 0; z-index: 50; display: grid; place-items: center; pointer-events: none; animation: witcher-roll-flash 1.8s ease-out both; }
+.witcher-roll-flash.is-crit { background: radial-gradient(circle at 50% 45%, rgba(255, 226, 140, .55), rgba(240, 180, 60, .18) 40%, transparent 70%);
+  box-shadow: inset 0 0 60px 10px rgba(255, 200, 90, .55); }
+.witcher-roll-flash.is-crit::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(circle, #fff6d0 0 1.5px, transparent 2.5px), radial-gradient(circle, #ffd27a 0 1px, transparent 2px);
+  background-size: 38px 44px, 26px 30px; animation: witcher-sparkle 1.8s ease-out both; }
+.witcher-roll-flash.is-fumble { background: radial-gradient(circle at 50% 45%, transparent 35%, rgba(120, 10, 10, .35) 75%); box-shadow: inset 0 0 70px 14px rgba(140, 10, 10, .6); }
+.witcher-roll-flash svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.witcher-roll-flash path { fill: none; stroke: #9a1010; stroke-width: .6; stroke-linecap: round; filter: drop-shadow(0 0 2px #ff3a2a); stroke-dasharray: 160; stroke-dashoffset: 160; animation: witcher-crack .5s ease-out forwards; vector-effect: non-scaling-stroke; }
+.witcher-roll-flash.is-fumble path { stroke-width: 2.5; }
+.witcher-roll-flash span { font: 700 40px/1 "Palatino Linotype", "Book Antiqua", Georgia, serif; letter-spacing: .06em; animation: witcher-roll-word 1.8s cubic-bezier(.2, .9, .3, 1.2) both; }
+.witcher-roll-flash.is-crit span { color: #fff0b0; -webkit-text-stroke: 1.2px #6a3a08; text-shadow: 0 0 14px #f0b030, 0 0 36px #e09010, 0 3px 4px #3a1e04; }
+.witcher-roll-flash.is-fumble span { color: #ffd6d0; -webkit-text-stroke: 1.2px #4a0404; text-shadow: 0 0 16px #c01010, 0 3px 4px #200202; }
+@keyframes witcher-roll-flash { 0% { opacity: 0; } 12% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes witcher-roll-word { 0% { transform: scale(.4); opacity: 0; } 20% { transform: scale(1.12); opacity: 1; } 32% { transform: scale(1); } 80% { opacity: 1; } 100% { transform: scale(1.04); opacity: 0; } }
+@keyframes witcher-sparkle { from { background-position: 0 0, 0 0; opacity: 1; } to { background-position: 0 -60px, 0 -90px; opacity: 0; } }
+@keyframes witcher-crack { to { stroke-dashoffset: 0; } }
+
+/* The player's own hero in pain: red edges, a heartbeat when dying, grey when dead. */
+#witcher-wound-vignette { position: fixed; inset: 0; z-index: 9000; pointer-events: none; opacity: 0; transition: opacity .8s; }
+#witcher-wound-vignette.is-wounded { opacity: 1; box-shadow: inset 0 0 90px 10px rgba(130, 10, 10, .38); animation: witcher-wound-breath 4.5s ease-in-out infinite; }
+#witcher-wound-vignette.is-dying { opacity: 1; box-shadow: inset 0 0 140px 30px rgba(150, 0, 0, .6); animation: witcher-heartbeat 1.4s ease-in-out infinite; }
+#witcher-wound-vignette.is-dead { opacity: 1; background: radial-gradient(circle, transparent 40%, rgba(10, 8, 10, .55)); box-shadow: inset 0 0 160px 40px rgba(0, 0, 0, .7); }
+#witcher-wound-vignette.is-hit { opacity: 1; box-shadow: inset 0 0 160px 40px rgba(190, 0, 0, .7); animation: none; transition: none; }
+@keyframes witcher-wound-breath { 50% { box-shadow: inset 0 0 110px 16px rgba(140, 10, 10, .5); } }
+@keyframes witcher-heartbeat { 0%, 40%, 100% { box-shadow: inset 0 0 140px 30px rgba(150, 0, 0, .55); } 12%, 28% { box-shadow: inset 0 0 180px 50px rgba(190, 0, 0, .8); } 20% { box-shadow: inset 0 0 150px 34px rgba(160, 0, 0, .6); } }
+
+/* Blood cracks over a wounded portrait. */
+.witcher-character-layout:is(.is-wounded, .is-dying) .witcher-portrait-frame::before { content: ""; position: absolute; inset: 3px; z-index: 2; pointer-events: none; opacity: .85;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%238a0c0c' stroke-linecap='round'%3E%3Cpath stroke-width='1.6' d='M100 12 82 24 86 34 70 46 74 58 60 66'/%3E%3Cpath stroke-width='1' d='M82 24 92 38M70 46 58 42M74 58 88 66'/%3E%3Cpath stroke-width='1.3' d='M0 80 14 74 20 84 34 80'/%3E%3C/g%3E%3Cpath fill='%237a0808' d='M12 0h18l-1 6c0 4-2 9-3 13-1-4-2-7-3-7s-2 6-3 10c-1-6-3-10-4-14z'/%3E%3C/svg%3E") center / 100% 100% no-repeat,
+    radial-gradient(circle at 80% 30%, rgba(120, 0, 0, .25), transparent 55%); }
+.witcher-character-layout.is-dying .witcher-portrait-frame::before { opacity: 1; filter: drop-shadow(0 0 3px #ff2010); }
+
+/* A banner sweeping across the top of the screen. */
+.witcher-banner { position: fixed; left: 50%; top: 88px; z-index: 10000; transform: translateX(-50%); pointer-events: none; padding: 10px 60px; color: #fff3d6;
+  font: 700 26px/1.2 "Palatino Linotype", "Book Antiqua", Georgia, serif; letter-spacing: .08em; text-shadow: 0 2px 8px #000, 0 0 18px #f0b030;
+  background: linear-gradient(90deg, transparent, rgba(40, 22, 14, .92) 18%, rgba(40, 22, 14, .92) 82%, transparent); border-block: 1px solid; border-image: linear-gradient(90deg, transparent, #f0c46f, transparent) 1;
+  animation: witcher-banner 2.4s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes witcher-banner { 0% { opacity: 0; transform: translateX(-50%) scaleX(.2); } 15% { opacity: 1; transform: translateX(-50%) scaleX(1.04); } 25% { transform: translateX(-50%) scaleX(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-10px); } }
+
+/* The medallion trembles over the screen. */
+.witcher-medallion-alarm { position: fixed; left: 50%; top: 22%; z-index: 10000; display: grid; justify-items: center; gap: 10px; transform: translateX(-50%); pointer-events: none; animation: witcher-medallion-fade 3.2s ease-out both; }
+.witcher-medallion-alarm > i { width: 110px; height: 110px; background: radial-gradient(circle at 35% 30%, #ffffff, #cfd8e6 30%, #7e8a9c 70%, #4a5260);
+  -webkit-mask: url("../assets/ui/wolf-medallion.svg") center / contain no-repeat; mask: url("../assets/ui/wolf-medallion.svg") center / contain no-repeat;
+  filter: drop-shadow(0 0 12px rgba(200, 220, 255, .9)); animation: witcher-medallion-shake .09s linear 18 alternate; }
+.witcher-medallion-alarm > span { padding: 4px 14px; border-radius: 999px; background: rgba(10, 12, 18, .75); color: #e8eef8; font: 600 16px "Palatino Linotype", Georgia, serif; text-shadow: 0 0 8px rgba(160, 190, 255, .8); }
+@keyframes witcher-medallion-shake { from { transform: translate(-3px, 1px) rotate(-5deg); } to { transform: translate(3px, -1px) rotate(5deg); } }
+@keyframes witcher-medallion-fade { 0% { opacity: 0; transform: translateX(-50%) scale(.6); } 10% { opacity: 1; transform: translateX(-50%) scale(1.05); } 18% { transform: translateX(-50%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+
+/* A bubbling toxicity bar. */
+.witcher-character-layout .witcher-sidebar-toxicity { position: relative; }
+.witcher-character-layout .witcher-sidebar-toxicity.is-toxic::after { content: ""; position: absolute; left: 0; right: 0; top: 30px; height: 30px; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(170, 230, 120, .75) 0 1.6px, transparent 2.4px), radial-gradient(circle, rgba(170, 230, 120, .5) 0 1.1px, transparent 1.8px);
+  background-size: 23px 26px, 15px 19px; -webkit-mask: linear-gradient(transparent, #000 45%, #000 70%, transparent); mask: linear-gradient(transparent, #000 45%, #000 70%, transparent);
+  animation: witcher-bubbles 2.8s linear infinite; }
+.witcher-character-layout .witcher-sidebar-toxicity.is-overloaded::after { filter: hue-rotate(-70deg) saturate(1.6); animation-duration: 1.6s; }
+@keyframes witcher-bubbles { from { background-position: 0 30px, 7px 30px; } to { background-position: 0 0, 7px 0; } }
+
+/* The combatant whose turn it is glows gold in the tracker. */
+#combat li.combatant.active, .combat-sidebar li.combatant.active { box-shadow: inset 3px 0 0 #f0c46f; background-image: linear-gradient(90deg, rgba(240, 196, 111, .22), transparent 70%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .witcher-dice-spin, .witcher-roll-flash, .witcher-roll-flash *, .witcher-banner, .witcher-medallion-alarm, .witcher-medallion-alarm > i, #witcher-wound-vignette,
+  .witcher-character-layout .witcher-sidebar-toxicity.is-toxic::after { animation: none !important; }
+}
+
+/* A natural 10 or 1 marks its chat card: gold or red. Fresh cards burst; older ones keep a quiet glow. */
+.chat-message.witcher-natural-crit { border-color: #c9a45f; box-shadow: 0 0 0 1px #c9a45f88, 0 0 14px #f0c46f55; }
+.chat-message.witcher-natural-crit .dice-total { border-color: #c9a45f; color: #6a3a08; font-weight: 700;
+  background: linear-gradient(110deg, #fff4cf 20%, #ffe08a 40%, #fff9e6 50%, #ffe08a 60%, #fff4cf 80%); background-size: 250% 100%; box-shadow: inset 0 0 10px #f0b03066, 0 0 12px #f0c46f88; }
+.chat-message.witcher-natural-crit .witcher-chain.critical .witcher-chain-die:first-of-type { border-color: #c9a45f; background: radial-gradient(circle, #fff6d0, #f0c46f); color: #5a3006; box-shadow: 0 0 10px #f0c46f; }
+.chat-message.witcher-natural-crit .witcher-chain.critical > strong { color: #9a6410; text-shadow: 0 0 8px #f0c46f88; }
+.chat-message.witcher-natural-crit.is-fresh { animation: witcher-card-gold 1.6s ease-out; }
+.chat-message.witcher-natural-crit.is-fresh .dice-total { animation: witcher-total-shine 1.4s ease-out 2, witcher-total-pop .7s cubic-bezier(.2, .9, .3, 1.4); }
+.chat-message.witcher-natural-crit.is-fresh .witcher-chain.critical .witcher-chain-die:first-of-type { animation: witcher-die-pulse .9s ease-in-out 3; }
+.chat-message.witcher-natural-fumble { border-color: #a83232; box-shadow: 0 0 0 1px #a8323288, 0 0 14px #c0202044; }
+.chat-message.witcher-natural-fumble .dice-total { border-color: #a83232; color: #7a0c0c; font-weight: 700; box-shadow: inset 0 0 10px #c0202044;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30' preserveAspectRatio='none'%3E%3Cpath d='M0 18 18 14 26 20 40 12 52 17 64 9 78 15 100 11' fill='none' stroke='%23a01818' stroke-width='1.2' opacity='.55'/%3E%3C/svg%3E") center / 100% 100% no-repeat, #fbe8e4; }
+.chat-message.witcher-natural-fumble .witcher-chain.fumble .witcher-chain-die:first-of-type { border-color: #a83232; background: #f6d2cc; color: #7a0c0c; box-shadow: 0 0 8px #c0202088; }
+.chat-message.witcher-natural-fumble.is-fresh { animation: witcher-card-red 1.2s ease-out; }
+.chat-message.witcher-natural-fumble.is-fresh .dice-total { animation: witcher-total-shake .5s ease-in-out 2; }
+@keyframes witcher-card-gold { 0% { box-shadow: 0 0 0 2px #ffe08a, 0 0 40px 10px #f0c46faa; } 100% { box-shadow: 0 0 0 1px #c9a45f88, 0 0 14px #f0c46f55; } }
+@keyframes witcher-card-red { 0% { box-shadow: 0 0 0 2px #e04040, 0 0 36px 8px #c02020aa; } 100% { box-shadow: 0 0 0 1px #a8323288, 0 0 14px #c0202044; } }
+@keyframes witcher-total-shine { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+@keyframes witcher-total-pop { 0% { transform: scale(.85); } 45% { transform: scale(1.12); } 100% { transform: scale(1); } }
+@keyframes witcher-die-pulse { 50% { transform: scale(1.18); box-shadow: 0 0 18px #ffd060; } }
+@keyframes witcher-total-shake { 0%, 100% { transform: none; } 25% { transform: translateX(-4px) rotate(-1deg); } 75% { transform: translateX(4px) rotate(1deg); } }
+@media (prefers-reduced-motion: reduce) { .chat-message:is(.witcher-natural-crit, .witcher-natural-fumble), .chat-message:is(.witcher-natural-crit, .witcher-natural-fumble) * { animation: none !important; } }
+.witcher-banner.is-grey { color: #eef0f4; text-shadow: 0 2px 8px #000, 0 0 16px #8a9ab0; background: linear-gradient(90deg, transparent, rgba(18, 20, 26, .92) 18%, rgba(18, 20, 26, .92) 82%, transparent);
+  border-image: linear-gradient(90deg, transparent, #a8b4c4, transparent) 1; }
+.witcher-inventory-row.witcher-row-broke { animation: witcher-row-broke 1.6s ease-out; }
+.witcher-inventory-row.witcher-row-broke .witcher-broken { animation: witcher-total-shake .45s ease-in-out 3; }
+@keyframes witcher-row-broke { 0% { background-color: #c0202055; box-shadow: inset 4px 0 0 #a83232; } 100% { background-color: transparent; box-shadow: inset 0 0 0 transparent; } }

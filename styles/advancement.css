@@ -1,97 +1,200 @@
-.witcher-advancement { min-width: 660px; min-height: 480px; color: #342d29; }
-.witcher-advancement .window-content { padding: 0; background: #eee9df; overflow: hidden; }
-.witcher-advancement-layout { display: flex; flex-direction: column; height: 100%; min-height: 0; font-size: 13px; }
-.witcher-advancement button { border-radius: 4px; box-shadow: none; transition: background-color 140ms, color 140ms, border-color 140ms, transform 140ms; }
-.witcher-advancement button:active:not(:disabled) { transform: translateY(1px); }
-.witcher-advancement button:focus-visible, .witcher-advancement input:focus-visible { outline: 2px solid #9b752e; outline-offset: 2px; }
-.witcher-advancement-hero { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 20px 26px; background: radial-gradient(ellipse at 90% 100%, #b58d4d30, transparent 65%), linear-gradient(110deg, #301b20, #63292c); color: #f7eedc; border-bottom: 2px solid #b69b64; box-shadow: inset 0 -5px 0 #17151835; }
-.witcher-advancement-hero-title { display:flex; align-items:center; gap:16px; min-width:0; }
-.witcher-advancement-hero-title > i { display:grid; place-items:center; width:48px; height:48px; flex:none; border:1px solid #ba985966; transform:rotate(-8deg); color:#d0ac6e; font-size:23px; border-radius:9px; background:#21131b45; }
-.witcher-advancement-hero h2 { margin: 5px 0 0; font: bold 23px/1.2 Georgia, serif; border: 0; color: inherit; }
-.witcher-advancement-hero-title span { color: #d8be8d; font-size: 10px; letter-spacing: .13em; text-transform:uppercase; }
-.witcher-advancement-balance { display:flex; flex-direction:column; align-items:center; text-align:center; flex:none; min-width:155px; padding-left:24px; border-left:1px solid #b69b6445; }
-.witcher-advancement-balance strong { font: 40px/1 Georgia, serif; font-variant-numeric: tabular-nums; color:#ead19c; text-shadow:0 2px 10px #140c19; }
-.witcher-advancement-balance span { margin-top: 5px; font-size:10px; color:#d8be8d; }
-.witcher-advancement-body { display: grid; grid-template-columns: 174px minmax(0, 1fr); flex: 1; min-height: 0; }
-.witcher-advancement-sidebar { padding: 18px 12px; background: linear-gradient(180deg, #e1d8c7, #ece5d9); border-right: 1px solid #cabda5; overflow-y: auto; }
-.witcher-advancement-sidebar nav { display: flex; flex-direction: column; gap: 5px; }
-.witcher-advancement-sidebar nav button { display: flex; justify-content: flex-start; align-items: center; gap: 10px; padding: 9px 10px; height: auto; color: #635443; border: 1px solid transparent; background: transparent; font-size: 13px; }
-.witcher-advancement-sidebar nav i { width: 18px; text-align: center; }
-.witcher-advancement-sidebar nav button[aria-pressed=true] { color: #f9f1df; background: #35464a; border-color: #35464a; }
-.witcher-advancement-sidebar nav button[aria-pressed=true] i { color:#e0c083; }
-.witcher-advancement-sidebar nav button:hover:not([aria-pressed=true]) { background:#f5eedf; border-color:#c9b89b; }
-.witcher-advancement-rule { margin: 18px 5px 10px; font-size: 12px; line-height: 1.55; color: #614c31; }
-.witcher-advancement-note { margin: 10px 5px; color: #796f63; font-size: 11px; line-height: 1.45; }
-.witcher-advancement-adjust { margin: 18px 5px 0; padding-top: 12px; border-top: 1px solid #c4b69c; font-size: 11px; }
-.witcher-advancement-adjust summary { cursor: pointer; color: #6b4d31; }
-.witcher-advancement-adjust label { display: block; margin: 10px 0 7px; }
-.witcher-advancement input { color: #342d29; background: #fcf9f1; border: 1px solid #c9bca6; border-radius: 4px; box-shadow: none; }
-.witcher-advancement-adjust input { margin-top: 5px; width: 100%; }
-.witcher-advancement-adjust button { width: 100%; background: #f7f0e1; border: 1px solid #b6a387; color: #5c4531; font-size: 11px; }
-.witcher-advancement-catalog { display: flex; flex-direction: column; min-height: 0; min-width:0; padding: 15px 19px 0; background:radial-gradient(ellipse at top, #fffcf6, #eee8dc); }
-.witcher-advancement-search { display: flex; align-items: center; gap: 9px; color: #8c7354; flex: none; }
-.witcher-advancement-search input { flex: 1; height: 32px; font-size: 13px; }
-.witcher-advancement-columns, .witcher-advancement-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px 91px; gap: 10px; align-items: center; }
-.witcher-advancement-columns { color: #87765c; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; margin: 13px 0 5px; padding: 0 8px; }
-.witcher-advancement-columns > :nth-child(n+2) { text-align: center; }
-.witcher-advancement-list { overflow-y: auto; flex: 1; min-height: 0; padding-bottom: 12px; scrollbar-gutter: stable; }
-.witcher-advancement-row { padding: 8px; min-height: 54px; border-bottom: 1px solid #d9d0c1; border-left: 3px solid transparent; border-radius:3px; transition:background-color 160ms,border-color 160ms; }
-.witcher-advancement-row:hover { background:#e4d7c080; }
-.witcher-advancement-row:nth-child(2n) { background: #ded7ca42; }
-.witcher-advancement-row.selected { background: #ede1c6; border-left-color: #ab8844; }
-.witcher-advancement-row[hidden] { display: none; }
-.witcher-advancement-label { min-width: 0; }
-.witcher-advancement-label strong { font-size: 13px; line-height: 1.3; font-weight: 600; display: block; }
-.witcher-advancement-label > span { display: block; font-size: 10px; color: #82705b; margin-top: 3px; }
-.witcher-advancement-label small { font: 10px sans-serif; display: inline-block; border: 1px solid #c6b494; border-radius: 3px; padding: 1px 3px; color: #8a5b32; vertical-align: middle; }
-.witcher-advancement-ranks { display: flex; align-items: center; justify-content: center; gap: 7px; font: 19px Georgia, serif; font-variant-numeric: tabular-nums; }
-.witcher-advancement-ranks i { font-size: 9px; color: #9c885d; }
-.witcher-advancement-ranks strong { color: #376448; }
-.witcher-advancement-controls { display: flex; gap: 5px; }
-.witcher-advancement-controls button { width: 58px; height: 28px; padding: 0 4px; font-size: 11px; background: #fbf7ed; color: #675336; border: 1px solid #bfaa80; white-space: nowrap; }
-.witcher-advancement-controls button:first-child { width: 26px; flex: none; }
-.witcher-advancement-controls button:disabled { opacity: 0.35; cursor: default; }
-.witcher-advancement-controls button:hover:not(:disabled) { background: #d8bd80; color: #302820; }
-.witcher-advancement-footer { padding: 12px 22px 15px; border-top: 1px solid #c9bba2; background: #f8f3e9; flex: none; box-shadow:0 -3px 14px #3629160c; }
-.witcher-advancement-cart { display: flex; flex-wrap: wrap; gap: 5px; max-height: 82px; overflow-y: auto; margin-bottom: 12px; }
-.witcher-advancement-cart > span { border: 1px solid #ccbea4; border-radius: 4px; padding: 5px 7px; font-size: 11px; color: #6c5940; background: #eee6d7; }
-.witcher-advancement-cart b { color: #456344; margin-left: 4px; }
-.witcher-advancement-cart p { margin: 0; font-size: 12px; color: #8a7b66; }
-.witcher-advancement-checkout { display: flex; gap: 16px; align-items: center; }
-.witcher-advancement-checkout > div { display: flex; align-items: center; justify-content: flex-end; gap: 20px; flex: 1; font-size: 11px; color: #82705b; }
-.witcher-advancement-checkout b { display: block; font: bold 22px Georgia, serif; color: #544531; margin-top: 2px; }
-.witcher-advancement-checkout .error b { color: #9c3034; }
-.witcher-advancement-buy { background: #47624d; color: #fff7e6; border: 1px solid #38573e; height: 38px; padding: 0 16px; font-size: 13px; flex: none; }
-.witcher-advancement-buy:disabled { opacity: 0.45; }
-.witcher-advancement-buy:hover:not(:disabled) { background: #344e39; }
-.witcher-advancement-reset { background: transparent; border: 0; color: #8a7251; font-size: 12px; width: auto; padding: 0; }
-.witcher-advancement-notice { margin: 0 0 9px; color: #49614b; font-size: 12px; }
-.witcher-advancement-error { margin: 8px 0 0; color: #9c3034; font-size: 12px; }
-.witcher-advancement-empty { text-align: center; color: #8a7b66; margin: 30px 0; }
+/* ── Advancement: a night sky of constellations ─────────────────────────────── */
+.witcher-advancement { --sky-serif: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif; --sky-ink: #dce8ff; --sky-soft: #9fb4d8;
+  --sky-star: #cfe2ff; --sky-gold: #f3c66a; --sky-glass: linear-gradient(180deg, rgba(22, 36, 74, .72), rgba(8, 14, 34, .8)); --sky-edge: rgba(150, 190, 255, .24);
+  min-width: 720px; min-height: 560px; color: var(--sky-ink); }
+.witcher-advancement .window-content { position: relative; padding: 0; overflow: hidden; background: #050a1c; }
+.witcher-advancement .witcher-starfield { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+.witcher-advancement-layout { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; min-height: 0; font-size: 13px; }
+.witcher-advancement button { border-radius: 6px; box-shadow: none; transition: background-color 160ms, color 160ms, border-color 160ms, transform 160ms, box-shadow 160ms; }
+.witcher-advancement button:focus-visible, .witcher-advancement input:focus-visible { outline: 2px solid var(--sky-gold); outline-offset: 2px; }
+.witcher-advancement input { color: var(--sky-ink); background: rgba(6, 12, 30, .65); border: 1px solid var(--sky-edge); border-radius: 6px; box-shadow: none; }
 
-/* The same profession tree as the sheet, with planned ranks and IP controls. */
-.witcher-advancement-tree-heading { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:12px 0; }
-.witcher-advancement-tree-heading h3 { margin:0; border:0; font:bold 20px Georgia,serif; color:#65332b; text-shadow:none; }
-.witcher-advancement-tree-heading > span { text-align:right; color:#857259; font-size:10px; }
-.witcher-advancement .profession-catalog { padding:3px 5px 12px; }
-.witcher-advancement .witcher-profession-root { width:66%; }
-.witcher-advancement .witcher-profession-node { padding:6px 8px; border-radius:7px; box-shadow:0 2px 5px #39251612; transition:opacity 180ms, border-color 180ms, background-color 180ms; }
-.witcher-advancement .witcher-profession-node-label { min-height:27px; }
-.witcher-advancement .witcher-profession-node .witcher-profession-name { font-size:12px; line-height:1.3; }
-.witcher-advancement .witcher-profession-tree h3 { min-height:28px; }
-.witcher-advancement .witcher-profession-node.selected { background:linear-gradient(135deg,#fcf8e8,#f0e3bf); border-color:#ba9a57; border-top-color:var(--branch-color); }
-.witcher-advancement .witcher-profession-node.locked { background:#e9e3d8; }
-.witcher-advancement .witcher-profession-node.locked .witcher-profession-tier { background:#a1947e; }
-.witcher-advancement .witcher-profession-node.locked.selected { border-color:#b55f47; }
-.witcher-advancement .witcher-profession-node.search-muted { opacity:.38; }
-.witcher-advancement-node-attribute { color:#887459; font-size:9px; flex:none; }
-.witcher-advancement-node-purchase { display:flex; justify-content:space-between; align-items:center; gap:6px; margin-top:2px; }
-.witcher-advancement-node-purchase .witcher-advancement-ranks { justify-content:flex-end; gap:4px; font-size:21px; }
-.witcher-advancement-progress { display:grid; grid-template-columns:repeat(10,1fr); gap:3px; margin-top:6px; }
-.witcher-advancement-progress > span { height:4px; border-radius:1px; background:#c9beab75; }
-.witcher-advancement-progress .filled { background:var(--branch-color); }
-.witcher-advancement-progress .planned { background:#b5974f; box-shadow:0 0 4px #c3a66370; }
+/* Header: the name in silver, the realm buttons as runes, the points as a glowing orb. */
+.witcher-sky-header { flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 16px; padding: 14px 22px 8px; }
+.witcher-sky-title span { color: var(--sky-soft); font: 11px var(--sky-serif); letter-spacing: .32em; text-transform: uppercase; }
+.witcher-sky-title h2 { margin: 2px 0 0; border: 0; color: #f2f6ff; font: 700 26px/1.15 var(--sky-serif); letter-spacing: .02em; text-shadow: 0 0 18px rgba(120, 170, 255, .55); }
+.witcher-sky-nav { display: flex; gap: 6px; padding: 4px; border: 1px solid var(--sky-edge); border-radius: 999px; background: rgba(6, 12, 30, .55); box-shadow: inset 0 0 20px rgba(60, 110, 220, .15); }
+.witcher-sky-nav button { display: flex; align-items: center; gap: 8px; width: auto; height: 34px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--sky-soft); font: 14px var(--sky-serif); letter-spacing: .03em; }
+.witcher-sky-nav button i { color: #7f9ccf; }
+.witcher-sky-nav button:hover { color: #fff; background: rgba(120, 160, 255, .12); }
+.witcher-sky-nav button[aria-pressed=true] { color: #fff; background: radial-gradient(ellipse at 50% 120%, rgba(110, 160, 255, .55), rgba(40, 70, 150, .45)); box-shadow: 0 0 16px rgba(100, 150, 255, .45), inset 0 1px rgba(255, 255, 255, .25); }
+.witcher-sky-nav button[aria-pressed=true] i { color: var(--sky-gold); text-shadow: 0 0 8px rgba(243, 198, 106, .8); }
+.witcher-advancement-balance { justify-self: end; display: grid; grid-template-columns: auto auto; grid-template-areas: "label orb" "magic orb"; align-items: center; column-gap: 10px; cursor: help; }
+.witcher-advancement-balance > span { grid-area: label; align-self: end; color: var(--sky-soft); font: 12px var(--sky-serif); text-align: right; max-width: 110px; line-height: 1.25; }
+.witcher-advancement-balance > small { grid-area: magic; align-self: start; color: #c8a8ff; font-size: 11px; text-align: right; }
+.witcher-sky-orb { grid-area: orb; }
+.witcher-sky-orb { display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; border: 1px solid rgba(190, 215, 255, .5);
+  background: radial-gradient(circle at 38% 32%, rgba(255, 255, 255, .5), rgba(120, 170, 255, .35) 35%, rgba(20, 40, 100, .6) 72%);
+  box-shadow: 0 0 22px rgba(110, 160, 255, .6), inset 0 0 14px rgba(255, 255, 255, .25); animation: witcher-orb 4.5s ease-in-out infinite; }
+.witcher-sky-orb strong { color: #fff; font: 700 26px/1 var(--sky-serif); font-variant-numeric: tabular-nums; text-shadow: 0 0 10px rgba(160, 200, 255, .9); }
+@keyframes witcher-orb { 50% { box-shadow: 0 0 34px rgba(130, 180, 255, .85), inset 0 0 18px rgba(255, 255, 255, .35); } }
+
+/* Tools: search, mentor, the GM's point editor. */
+.witcher-sky-tools { flex: none; display: flex; align-items: center; gap: 8px; padding: 2px 22px 6px; }
+.witcher-advancement-search { display: flex; align-items: center; gap: 9px; flex: 0 1 300px; padding: 0 12px; border: 1px solid var(--sky-edge); border-radius: 999px; background: rgba(6, 12, 30, .55); color: var(--sky-soft); }
+.witcher-advancement-search input { flex: 1; height: 30px; border: 0; background: transparent; font: 13px var(--sky-serif); }
+.witcher-advancement-search input::placeholder { color: #6f86b0; }
+.witcher-advancement .witcher-advancement-training { width: auto; height: 32px; margin: 0; padding: 0 12px; border: 1px solid var(--sky-edge); background: rgba(6, 12, 30, .55); color: var(--sky-ink); font-size: 12px; }
+.witcher-advancement-adjust { position: relative; margin-left: auto; }
+.witcher-advancement-adjust summary { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--sky-edge); border-radius: 50%; background: rgba(6, 12, 30, .55); color: var(--sky-soft); cursor: pointer; list-style: none; }
+.witcher-advancement-adjust summary::-webkit-details-marker { display: none; }
+.witcher-advancement-adjust > div { position: absolute; right: 0; top: 38px; z-index: 5; display: grid; gap: 8px; width: 200px; padding: 12px; border: 1px solid var(--sky-edge); border-radius: 8px; background: var(--sky-glass); backdrop-filter: blur(6px); }
+.witcher-advancement-adjust label { display: grid; gap: 5px; font-size: 11px; color: var(--sky-soft); }
+.witcher-advancement-adjust input { height: 30px; }
+.witcher-advancement-adjust button { height: 30px; border: 1px solid rgba(243, 198, 106, .5); background: rgba(243, 198, 106, .14); color: var(--sky-gold); font-size: 12px; }
+
+/* The stage: one constellation, large. */
+.witcher-sky-main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 14px; padding: 4px 22px 8px; }
+.witcher-advancement-layout[data-category=profession] .witcher-sky-main { grid-template-columns: minmax(0, 1fr); }
+.witcher-sky-stage { position: relative; min-height: 0; border-radius: 14px; }
+.witcher-sky-sign { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%); color: #7fa8ff; font-size: min(46vh, 300px); opacity: .055; filter: blur(1px); pointer-events: none; }
+.witcher-sky-name { position: absolute; left: 6px; top: 2px; z-index: 2; display: flex; align-items: baseline; gap: 12px; margin: 0; border: 0; color: #eaf1ff; font: 700 24px var(--sky-serif); letter-spacing: .22em; text-transform: uppercase; text-shadow: 0 0 16px rgba(120, 170, 255, .7); }
+.witcher-sky-name small { color: var(--sky-soft); font-size: 13px; letter-spacing: .1em; }
+.witcher-sky-lines { position: absolute; inset: 7% 4% 9%; width: 92%; height: 84%; overflow: visible; pointer-events: none; }
+.witcher-sky-lines line { stroke: rgba(150, 185, 255, .22); stroke-width: 1; }
+.witcher-sky-lines line.lit { stroke: rgba(190, 215, 255, .7); stroke-width: 1.6; filter: drop-shadow(0 0 3px rgba(140, 190, 255, .9)); }
+.witcher-sky-lines line.planned { stroke: rgba(243, 198, 106, .75); stroke-width: 1.4; stroke-dasharray: 4 5; animation: witcher-sky-flow 1.2s linear infinite; }
+@keyframes witcher-sky-flow { to { stroke-dashoffset: -9; } }
+
+/* Stars: a core whose size and light grow with the rank, a ring of ten marks (gold for planned ranks). */
+.witcher-star { --size: calc(22px + var(--mag) * 1.7px); position: absolute; left: calc(4% + var(--x) * .92%); top: calc(7% + var(--y) * .84%); z-index: 1;
+  flex: none; width: var(--size); height: var(--size); min-width: 0; min-height: 0; max-width: none; aspect-ratio: 1; line-height: 0; padding: 0; margin: 0; border: 0; border-radius: 50%;
+  background: none; transform: translate(-50%, -50%); cursor: pointer; }
+.witcher-star:hover { transform: translate(-50%, -50%) scale(1.14); z-index: 3; }
+.witcher-star-core { position: absolute; inset: 27%; border-radius: 50%; background: radial-gradient(circle, #fff 0 28%, var(--sky-star) 52%, rgba(150, 190, 255, 0) 74%);
+  box-shadow: 0 0 calc(6px + var(--mag) * 2.4px) rgba(140, 190, 255, calc(.35 + var(--mag) * .06)); animation: witcher-twinkle var(--twinkle) ease-in-out var(--delay) infinite alternate; }
+.witcher-star-ring { position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(var(--sky-star) 0 calc(var(--rank) * 36deg), var(--sky-gold) 0 calc((var(--rank) + var(--plan)) * 36deg), rgba(170, 200, 255, .2) 0 360deg);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)), repeating-conic-gradient(#000 0 31deg, transparent 31deg 36deg);
+  -webkit-mask-composite: source-in; mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px)) intersect, repeating-conic-gradient(#000 0 31deg, transparent 31deg 36deg);
+  filter: drop-shadow(0 0 3px rgba(140, 190, 255, .6)); transition: transform .3s; }
+.witcher-star-label { position: absolute; left: 50%; top: calc(100% + 4px); z-index: 1; transform: translateX(-50%); padding: 1px 8px 2px; border-radius: 999px; background: rgba(5, 10, 28, .62);
+  white-space: nowrap; color: #c6d8f6; font: 12.5px/1.3 var(--sky-serif); letter-spacing: .02em; text-shadow: 0 0 6px #050a1c, 0 0 10px rgba(80, 130, 255, .5); pointer-events: none; }
+.witcher-star-label b { margin-left: 6px; color: #fff; font-weight: 700; }
+.witcher-star.dim .witcher-star-core { opacity: .5; inset: 33%; }
+.witcher-star.dim .witcher-star-label { color: #8ea3c8; }
+.witcher-star.unset { opacity: .45; cursor: default; }
+.witcher-star.planned .witcher-star-core { background: radial-gradient(circle, #fff 0 28%, #ffe2a0 52%, rgba(243, 198, 106, 0) 74%); box-shadow: 0 0 calc(10px + var(--mag) * 2.4px) rgba(243, 198, 106, .75); }
+.witcher-star.planned .witcher-star-label b { color: var(--sky-gold); }
+.witcher-star.chosen { z-index: 2; }
+.witcher-star.chosen .witcher-star-ring { transform: scale(1.18); filter: drop-shadow(0 0 6px rgba(160, 205, 255, 1)); }
+.witcher-star.chosen::after { content: ""; position: absolute; inset: -14px; border-radius: 50%; border: 1px solid rgba(190, 215, 255, .35); animation: witcher-orbit 3s ease-out infinite; pointer-events: none; }
+.witcher-star.chosen .witcher-star-label { color: #fff; font-weight: 700; text-shadow: 0 0 8px rgba(130, 180, 255, 1), 0 0 2px #000; }
+.witcher-star.search-muted { opacity: .18; }
+.witcher-star.search-hit .witcher-star-label { color: var(--sky-gold); }
+.witcher-star.is-flaring .witcher-star-core { animation: witcher-flare 1.6s ease-out; }
+@keyframes witcher-twinkle { from { transform: scale(.9); opacity: .82; } to { transform: scale(1.08); opacity: 1; } }
+@keyframes witcher-orbit { from { transform: scale(.7); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
+@keyframes witcher-flare { 0% { transform: scale(1); } 25% { transform: scale(3.2); box-shadow: 0 0 60px 20px rgba(255, 230, 170, .9); } 100% { transform: scale(1); } }
+
+/* A constellation sweeps in: lines draw themselves, stars light up from left to right. */
+.witcher-sky-stage.is-entering .witcher-sky-sign { animation: witcher-sign-in 1.4s ease-out both; }
+.witcher-sky-stage.is-entering .witcher-sky-name { animation: witcher-fade-in .8s ease-out both; }
+.witcher-sky-stage.is-entering .witcher-star { animation: witcher-star-in .9s cubic-bezier(.2, .9, .25, 1.2) both; animation-delay: calc(var(--x) * 7ms); }
+.witcher-sky-stage.is-entering .witcher-sky-lines { animation: witcher-fade-in 1.2s .35s ease-out both; }
+@keyframes witcher-star-in { from { opacity: 0; transform: translate(-50%, -50%) scale(.2); filter: blur(4px); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: none; } }
+@keyframes witcher-sign-in { from { opacity: 0; transform: translate(-50%, -50%) scale(.8) rotate(-12deg); } to { opacity: .055; transform: translate(-50%, -50%) scale(1) rotate(0); } }
+@keyframes witcher-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* The chosen star's card. */
+.witcher-sky-card { align-self: center; display: flex; flex-direction: column; gap: 8px; padding: 18px; border: 1px solid var(--sky-edge); border-radius: 12px; background: var(--sky-glass);
+  box-shadow: 0 0 34px rgba(60, 110, 240, .2), inset 0 1px rgba(255, 255, 255, .08); backdrop-filter: blur(6px); }
+.witcher-sky-card.is-entering { animation: witcher-card-in .6s ease-out both; }
+@keyframes witcher-card-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+.witcher-sky-card-kind { color: var(--sky-soft); font: 12px var(--sky-serif); letter-spacing: .12em; text-transform: uppercase; }
+.witcher-sky-card-kind span { margin-left: 4px; padding: 0 5px; border: 1px solid rgba(243, 198, 106, .5); border-radius: 4px; color: var(--sky-gold); letter-spacing: 0; cursor: help; }
+.witcher-sky-card h3 { margin: 0; border: 0; color: #fff; font: 700 24px/1.2 var(--sky-serif); text-shadow: 0 0 14px rgba(120, 170, 255, .6); }
+.witcher-sky-card-rank { display: flex; align-items: baseline; gap: 10px; color: var(--sky-soft); }
+.witcher-sky-card-rank strong { color: #fff; font: 700 46px/1 var(--sky-serif); text-shadow: 0 0 14px rgba(140, 190, 255, .7); }
+.witcher-sky-card-rank strong.next { color: var(--sky-gold); text-shadow: 0 0 14px rgba(243, 198, 106, .7); }
+.witcher-sky-card-rank i { color: var(--sky-gold); }
+.witcher-sky-pips i { display: block; height: 8px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--sky-star) calc(var(--n) * 10%), var(--sky-gold) 0 calc((var(--n) + var(--p)) * 10%), rgba(170, 200, 255, .16) 0);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 calc(10% - 3px), transparent 0 10%); mask: repeating-linear-gradient(90deg, #000 0 calc(10% - 3px), transparent 0 10%); box-shadow: 0 0 8px rgba(140, 190, 255, .35); }
+.witcher-sky-card-hint { margin: 2px 0 0; color: #c6d6f2; font: 13px/1.45 var(--sky-serif); }
+.witcher-sky-card-note { margin: 0; color: #c8a8ff; font-size: 12px; }
+.witcher-advancement-controls { display: flex; gap: 6px; margin-top: 4px; }
+.witcher-advancement-controls button { height: 34px; padding: 0 10px; border: 1px solid var(--sky-edge); background: rgba(6, 12, 30, .55); color: var(--sky-ink); font: 13px var(--sky-serif); white-space: nowrap; }
+.witcher-advancement-controls button:first-child { flex: 0 0 38px; }
+.witcher-advancement-controls button:last-child { flex: 1; border-color: rgba(243, 198, 106, .6); background: linear-gradient(180deg, rgba(243, 198, 106, .28), rgba(160, 110, 30, .2)); color: #ffe7b0; box-shadow: 0 0 14px rgba(243, 198, 106, .25); }
+.witcher-advancement-controls button:hover:not(:disabled) { transform: translateY(-1px); color: #fff; box-shadow: 0 0 18px rgba(243, 198, 106, .5); }
+.witcher-advancement-controls button:disabled { opacity: .35; cursor: default; box-shadow: none; }
+
+/* Signs of the other constellations along the bottom. */
+.witcher-sky-signs { flex: none; display: flex; justify-content: center; gap: 8px; padding: 6px 22px 10px; }
+.witcher-sky-signs button { position: relative; display: grid; justify-items: center; gap: 1px; width: 104px; height: auto; padding: 6px 4px 6px; border: 1px solid rgba(150, 190, 255, .16); border-radius: 10px; background: rgba(6, 12, 30, .45); color: var(--sky-soft); }
+.witcher-sky-signs svg { width: 72px; height: 36px; overflow: visible; }
+.witcher-sky-signs line { stroke: rgba(150, 185, 255, .3); stroke-width: 2; }
+.witcher-sky-signs line.lit { stroke: rgba(190, 215, 255, .8); }
+.witcher-sky-signs circle { fill: rgba(170, 200, 255, .45); }
+.witcher-sky-signs circle.lit { fill: #eaf2ff; filter: drop-shadow(0 0 4px rgba(150, 200, 255, .9)); }
+.witcher-sky-signs circle.planned { fill: var(--sky-gold); }
+.witcher-sky-signs span { color: #e6efff; font: 700 13px var(--sky-serif); letter-spacing: .12em; }
+.witcher-sky-signs small { font: 10.5px var(--sky-serif); }
+.witcher-sky-signs button:hover { border-color: rgba(170, 205, 255, .4); background: rgba(40, 70, 150, .3); }
+.witcher-sky-signs button[aria-pressed=true] { border-color: rgba(190, 215, 255, .6); background: radial-gradient(ellipse at 50% 100%, rgba(100, 150, 255, .4), rgba(20, 40, 100, .5)); box-shadow: 0 0 18px rgba(100, 150, 255, .4); }
+.witcher-sky-signs button.search-hit { border-color: rgba(243, 198, 106, .7); }
+.witcher-sky-sign-plan { position: absolute; top: -7px; right: -5px; min-width: 22px; padding: 1px 5px; border-radius: 10px; background: var(--sky-gold); color: #2a1a04; font: 700 11px var(--sky-serif); box-shadow: 0 0 10px rgba(243, 198, 106, .8); }
+
+/* Checkout: a dark glass bar. */
+.witcher-advancement-footer { flex: none; padding: 10px 22px 14px; border-top: 1px solid var(--sky-edge); background: linear-gradient(180deg, rgba(6, 12, 30, .55), rgba(4, 8, 20, .85)); backdrop-filter: blur(4px); }
+.witcher-advancement-cart { display: flex; flex-wrap: wrap; gap: 6px; max-height: 70px; overflow-y: auto; margin-bottom: 10px; }
+.witcher-advancement-cart > span { padding: 4px 9px; border: 1px solid rgba(243, 198, 106, .35); border-radius: 999px; background: rgba(243, 198, 106, .1); color: #f2dfb6; font: 12px var(--sky-serif); }
+.witcher-advancement-cart b { margin-left: 4px; color: var(--sky-gold); }
+.witcher-advancement-cart p { margin: 0; color: var(--sky-soft); font: 12.5px var(--sky-serif); }
+.witcher-sky-session { margin-left: 6px; color: #7f95bd; font-size: 11.5px; }
+.witcher-advancement-checkout { display: flex; gap: 18px; align-items: center; }
+.witcher-advancement-checkout > div { display: flex; flex: 1; align-items: center; justify-content: flex-end; gap: 22px; color: var(--sky-soft); font: 12px var(--sky-serif); }
+.witcher-advancement-checkout b { display: block; margin-top: 2px; color: #fff; font: 700 22px var(--sky-serif); }
+.witcher-advancement-checkout .error b { color: #ff8a8a; }
+.witcher-advancement .witcher-advancement-reset { width: auto; padding: 0; border: 0; background: transparent; color: var(--sky-soft); font: 12.5px var(--sky-serif); text-decoration: underline dotted; }
+.witcher-advancement-buy { flex: none; height: 42px; padding: 0 22px; border: 1px solid rgba(243, 198, 106, .8); background: linear-gradient(180deg, #e6b65a, #a8741e); color: #1e1204; font: 700 15px var(--sky-serif); letter-spacing: .04em;
+  box-shadow: 0 0 22px rgba(243, 198, 106, .45), inset 0 1px rgba(255, 255, 255, .4); }
+.witcher-advancement-buy:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 0 32px rgba(243, 198, 106, .75), inset 0 1px rgba(255, 255, 255, .5); }
+.witcher-advancement-buy:disabled { opacity: .35; box-shadow: none; filter: grayscale(.6); }
+.witcher-advancement-notice { margin: 0 0 8px; color: #b8f0c8; font: 12.5px var(--sky-serif); }
+.witcher-advancement-error { margin: 8px 0 0; color: #ff9a9a; font-size: 12px; }
+.witcher-advancement-note { margin: 6px 0 0; color: var(--sky-soft); font-size: 11.5px; }
+.witcher-advancement-empty { color: var(--sky-soft); margin: 30px 0; text-align: center; font: 14px var(--sky-serif); }
+.witcher-sky-stage .witcher-advancement-empty { position: absolute; inset: auto 0 10px; margin: 0; }
+.witcher-advancement [hidden] { display: none !important; }
+
+/* The profession tree, drawn as glass plates in the same sky. */
+.witcher-sky-profession { display: flex; flex-direction: column; min-height: 0; }
+.witcher-advancement-tree-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 4px 0 10px; }
+.witcher-advancement-tree-heading h3 { margin: 0; border: 0; color: #eaf1ff; font: 700 24px var(--sky-serif); letter-spacing: .14em; text-transform: uppercase; text-shadow: 0 0 16px rgba(120, 170, 255, .7); }
+.witcher-advancement-tree-heading > span { color: var(--sky-soft); font-size: 11px; text-align: right; }
+.witcher-advancement-list { flex: 1; min-height: 0; overflow-y: auto; padding: 3px 5px 12px; scrollbar-color: rgba(150, 190, 255, .35) transparent; }
+.witcher-advancement .witcher-profession-root { width: 62%; }
+.witcher-advancement .witcher-profession-root::after, .witcher-advancement .witcher-profession-branch::before { border-color: rgba(160, 200, 255, .35); }
+.witcher-advancement .witcher-profession-branch[data-branch="0"] { --branch-color: #7fc0e6; }
+.witcher-advancement .witcher-profession-branch[data-branch="1"] { --branch-color: #a6d07a; }
+.witcher-advancement .witcher-profession-branch[data-branch="2"] { --branch-color: #ec8f80; }
+.witcher-advancement .witcher-profession { --branch-color: #e6c27a; }
+.witcher-advancement .witcher-profession-tree h3 { min-height: 28px; color: var(--branch-color); text-shadow: 0 0 10px color-mix(in srgb, var(--branch-color) 60%, transparent); }
+.witcher-advancement .witcher-profession-node { padding: 7px 9px; border: 1px solid var(--sky-edge); border-top: 3px solid var(--branch-color); border-radius: 8px; background: var(--sky-glass);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--branch-color) 18%, transparent); transition: opacity 180ms, border-color 180ms, box-shadow 180ms; }
+.witcher-advancement .witcher-profession-node .witcher-profession-name { color: #eaf1ff; font: 600 12.5px/1.3 var(--sky-serif); }
+.witcher-advancement .witcher-profession-node .witcher-profession-name:hover { color: var(--branch-color); }
+.witcher-advancement .witcher-profession-rank, .witcher-advancement-node-attribute { color: var(--sky-soft); }
+.witcher-advancement .witcher-profession-tier { color: #0a1430; }
+.witcher-advancement .witcher-profession-node.defining { background: linear-gradient(180deg, rgba(60, 46, 20, .7), rgba(14, 12, 30, .85)); border-top-color: var(--sky-gold); box-shadow: 0 0 24px rgba(243, 198, 106, .25); }
+.witcher-advancement .witcher-profession-node.selected { border-color: rgba(243, 198, 106, .7); box-shadow: 0 0 22px rgba(243, 198, 106, .35); }
+.witcher-advancement .witcher-profession-node.locked { opacity: .55; background: rgba(8, 14, 30, .7); }
+.witcher-advancement .witcher-profession-node.locked .witcher-profession-tier { background: #5a6886; }
+.witcher-advancement .witcher-profession-node.search-muted { opacity: .3; }
+.witcher-advancement .witcher-profession-node .witcher-advancement-controls button { height: 26px; font-size: 11.5px; }
+.witcher-advancement .witcher-profession-node .witcher-advancement-controls button:first-child { flex: 0 0 28px; }
+.witcher-advancement-node-purchase { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-top: 3px; }
+.witcher-advancement-node-purchase .witcher-advancement-ranks { display: flex; align-items: center; gap: 4px; color: #fff; font: 700 20px var(--sky-serif); }
+.witcher-advancement-ranks i { font-size: 9px; color: var(--sky-gold); }
+.witcher-advancement-ranks strong { color: var(--sky-gold); }
+.witcher-advancement-progress { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; margin-top: 6px; }
+.witcher-advancement-progress > span { height: 4px; border-radius: 2px; background: rgba(170, 200, 255, .16); }
+.witcher-advancement-progress .filled { background: var(--branch-color); box-shadow: 0 0 5px var(--branch-color); }
+.witcher-advancement-progress .planned { background: var(--sky-gold); box-shadow: 0 0 6px rgba(243, 198, 106, .8); }
+
+@media (max-width: 900px) { .witcher-sky-main { grid-template-columns: minmax(0, 1fr) 220px; } }
 @media (prefers-reduced-motion: reduce) {
-  .witcher-advancement button, .witcher-advancement-row, .witcher-advancement .witcher-profession-node { transition:none; }
-  .witcher-advancement button:active:not(:disabled) { transform:none; }
+  .witcher-advancement *, .witcher-advancement *::after { animation: none !important; transition: none !important; }
 }

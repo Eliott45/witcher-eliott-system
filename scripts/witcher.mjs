@@ -50,6 +50,7 @@ import { registerHagActions } from "./combat/hag-actions.mjs";
 import { registerCreatureActions } from "./combat/creature-actions.mjs";
 import { registerCreatureModes } from "./combat/creature-modes.mjs";
 import { registerTokenEffectsPanel } from "./canvas/token-effects-panel.mjs";
+import { registerCombatEffects } from "./canvas/fx/combat-effects.mjs";
 import { registerMovementEffects } from "./combat/movement-effects.mjs";
 import { registerQuickDraw } from "./combat/quick-draw.mjs";
 import { registerGroupInitiative } from "./combat/group-initiative.mjs";
@@ -145,6 +146,7 @@ Hooks.once("init", async () => {
   registerCreatureActions();
   registerCreatureModes();
   registerTokenEffectsPanel();
+  registerCombatEffects();
   registerMovementEffects();
   registerQuickDraw();
   registerGroupInitiative();

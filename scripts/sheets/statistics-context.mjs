@@ -6,7 +6,7 @@ import { deathTarget } from "../data/death.mjs";
 import { deathTooltip } from "../chat/death-result.mjs";
 
 /** Sheet icons for the eight rolled attributes and the derived rows of the sidebar. */
-const ATTRIBUTE_ICONS = { intelligence: "fa-brain", reflex: "fa-person-running", dexterity: "fa-feather-pointed", body: "fa-hand-fist",
+export const ATTRIBUTE_ICONS = { intelligence: "fa-brain", reflex: "fa-person-running", dexterity: "fa-feather-pointed", body: "fa-hand-fist",
   speed: "fa-angles-right", empathy: "fa-eye", craft: "fa-hammer", will: "fa-shield-halved" };
 const ROW_ICONS = { Initiative: "fa-bolt", Movement: "fa-shoe-prints", Run: "fa-person-running", Leap: "fa-angles-up",
   Recovery: "fa-bed", WoundThreshold: "fa-droplet" };

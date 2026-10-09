@@ -5,6 +5,7 @@ import { SYSTEM_ID } from "../config.mjs";
 import { consumptionActions } from "./consumption-actions.mjs";
 import { applyEffectItem } from "../data/effect-items.mjs";
 import { ATTRIBUTE_KEYS } from "../data/statistics.mjs";
+import { ATTRIBUTE_ICONS } from "./statistics-context.mjs";
 import { SKILLS, skillValue } from "../data/skills.mjs";
 import { MONSTER_CATEGORIES } from "../data/monster-categories.mjs";
 import { SIZE_CLASSES, sizeClassOf } from "../data/creatures.mjs";
@@ -37,6 +38,9 @@ import { liveCreatureWeb } from "../combat/creature-actions-common.mjs";
 import { hagActions, useHagAction } from "../combat/hag-actions.mjs";
 
 const guard=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){ui.notifications.error(error.message);console.error(`${SYSTEM_ID} | Creature sheet`,error);}};
+/** Fill of a resource bar, and whether it has run low (a third or less). */
+const meter=({value,max}={})=>({percent:max>0?Math.max(0,Math.min(100,Math.round(value/max*100))):0,low:max>0&&value/max<=1/3});
+
 export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
   editing=false;
   static DEFAULT_OPTIONS={classes:["witcher-eliott","npc-sheet"],position:{width:820,height:820},window:{resizable:true},form:{submitOnChange:true,closeOnSubmit:false},actions:{
@@ -95,7 +99,8 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
       categories:MONSTER_CATEGORIES.map(entry=>({...entry,selected:entry.id===system.creature.category})),category:MONSTER_CATEGORIES.find(c=>c.id===system.creature.category)?.name,
       creatureClass:MONSTER_CATEGORIES.find(entry=>entry.id===system.creature.category),verbalDuel:Boolean(duelOf(this.actor)),
       sizeClasses:SIZE_CLASSES.map(entry=>({...entry,selected:entry.id===sizeClassOf(this.actor).id,label:`${entry.name} (${entry.examples}) ${entry.modifier>0?"+":entry.modifier<0?"−":""}${Math.abs(entry.modifier)}`})),sizeClass:sizeClassOf(this.actor),
-      attributes:ATTRIBUTE_KEYS.filter(key=>key!=="luck").map(key=>({key,name:i18n.localize(`WITCHER.Attributes.${key}.Short`),label:i18n.localize(`WITCHER.Attributes.${key}.Label`),base:system.attributes[key],value:stats.effective[key]??"—"})),
+      meters:{health:meter(system.health),stamina:meter(system.stamina)},
+      attributes:ATTRIBUTE_KEYS.filter(key=>key!=="luck").map(key=>({key,icon:`fa-solid ${ATTRIBUTE_ICONS[key]}`,name:i18n.localize(`WITCHER.Attributes.${key}.Short`),label:i18n.localize(`WITCHER.Attributes.${key}.Label`),base:system.attributes[key],value:stats.effective[key]??"—"})),
       skills:SKILLS.filter(skill=>skill.key!=="language"&&(editing||system.skills[skill.key]>0)).map(skill=>{const value=skillValue(system,skill.key);return {...value,name:i18n.localize(skill.label),calculation:skillCalculationTooltip(system,value,i18n)};}),
       facts:[{key:"size",label:"Рост"},{key:"weight",label:"Вес тела"},{key:"habitat",label:"Среда обитания"},{key:"intellect",label:"Интеллект"},{key:"group",label:"Численность"}].map(entry=>({...entry,value:system.creature[entry.key]})),
       resistanceList:[...creatureResistances(actor).map(type=>DAMAGE_TYPE_NAMES[type]),...(conditionResistant(actor,"poison")?["яд"]:[]),...(conditionResistant(actor,"bleeding")?["кровотечение"]:[])],

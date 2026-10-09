@@ -18,6 +18,16 @@ export function registerSystemSettings() {
     name:"WITCHER.Settings.WaitDiceAnimation",hint:"WITCHER.Settings.WaitDiceAnimationHint",
     scope:"client",config:true,type:Boolean,default:true
   });
+  game.settings.register(SYSTEM_ID,"combatEffects",{
+    name:"WITCHER.Settings.CombatEffects",hint:"WITCHER.Settings.CombatEffectsHint",
+    scope:"client",config:true,type:Boolean,default:true
+  });
+  game.settings.register(SYSTEM_ID,"combatBlood",{
+    name:"WITCHER.Settings.CombatBlood",hint:"WITCHER.Settings.CombatBloodHint",
+    scope:"client",config:true,type:Boolean,default:true
+  });
+  // Hidden: the GM's broom bumps it so every client wipes blood and other combat leftovers.
+  game.settings.register(SYSTEM_ID,"combatEffectsCleanup",{scope:"world",config:false,type:Number,default:0});
   game.settings.register(SYSTEM_ID,"spellAreaLifetime",{
     name:"WITCHER.Settings.SpellAreaLifetime",hint:"WITCHER.Settings.SpellAreaLifetimeHint",
     scope:"world",config:true,type:Number,default:60,range:{min:0,max:600,step:10}

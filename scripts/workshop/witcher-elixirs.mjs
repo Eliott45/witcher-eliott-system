@@ -114,7 +114,7 @@ async function tremble(token, reason) {
   const actor = token.actor, owners = game.users.filter(user => actor.testUserPermission(user, "OWNER")).map(user => user.id);
   await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ token }), whisper: owners,
     content: `<p><i class="fa-solid fa-circle-dot"></i> <b>Медальон дрожит</b> у ${foundry.utils.escapeHTML(token.name)}: ${foundry.utils.escapeHTML(reason)} в пределах 20 м.</p>`,
-    flags: { [SYSTEM_ID]: { skipLuck: true } } });
+    flags: { [SYSTEM_ID]: { skipLuck: true, medallion: { token: token.uuid, reason } } } });
 }
 
 /** Active GM: check every medallion on the scene after tokens move. */

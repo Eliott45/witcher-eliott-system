@@ -4,12 +4,14 @@ import { purchaseAdvancement, setExperience } from "../data/advancement-purchase
 import { escapeTooltip } from "./statistics-tooltips.mjs";
 import { getProfession } from "../data/professions.mjs";
 import { viewSheetItem } from "./sheet-items.mjs";
+import { buildSky } from "./advancement-sky.mjs";
+import { mountStarfield } from "./advancement-starfield.mjs";
 
 const windows = new Map();
 const categories = { skills: "fa-solid fa-graduation-cap", languages: "fa-solid fa-language", profession: "fa-solid fa-diagram-project", attributes: "fa-solid fa-person" };
 const t = key => game.i18n.localize(`WITCHER.Advancement.${key}`);
 
-export function advancementContext(actor, selection = {}, category = "skills") {
+export function advancementContext(actor, selection = {}, category = "skills", view = {}) {
   const localize = key => game.i18n.localize(key);
   const plan = advancementPlan(actor, selection, localize);
   const rows = plan.entries.filter(row => row.kind === category).map(row => {
@@ -40,7 +42,8 @@ export function advancementContext(actor, selection = {}, category = "skills") {
   const profession = definition ? { name: definition.name, defining: nodes[0], branches: definition.branches.map((name, index) => ({
     name, entries: nodes.filter(node => node.branch === String(index))
   })) } : null;
-  return { ...plan, rows, profession, isProfession: category === "profession", actorName: actor.name, editable: actor.isOwner, canTrain: Boolean(game.user?.isGM),
+  const sky = category === "profession" ? null : buildSky(rows, category, { ...view, localize });
+  return { ...plan, rows, profession, sky, category, isProfession: category === "profession", actorName: actor.name, editable: actor.isOwner, canTrain: Boolean(game.user?.isGM),
     changes: plan.changes.map(row => ({ ...row, calculation: `${row.steps.join(" + ")} = ${row.cost} ${t("Unit")}` })),
     error: plan.errors.length ? t(plan.errors[0]) : "",
     categories: Object.entries(categories).map(([id, icon]) => ({ id, icon, label: `WITCHER.Advancement.Categories.${id}`, active: id === category })),
@@ -51,9 +54,11 @@ export class AdvancementWindow extends foundry.applications.api.HandlebarsApplic
   static DEFAULT_OPTIONS = {
     classes: ["witcher-advancement"],
     window: { title: "WITCHER.Advancement.Title", resizable: true, icon: "fa-solid fa-arrow-trend-up" },
-    position: { width: 960, height: 780 },
+    position: { width: 1060, height: 820 },
     actions: {
       category: AdvancementWindow.#category,
+      group: AdvancementWindow.#group,
+      star: AdvancementWindow.#star,
       increase: AdvancementWindow.#change,
       decrease: AdvancementWindow.#change,
       reset: AdvancementWindow.#reset,
@@ -84,27 +89,51 @@ export class AdvancementWindow extends foundry.applications.api.HandlebarsApplic
       this.selection = {};
       this.snapshot = snapshot;
     }
-    return { ...advancementContext(this.actor, this.selection, this.category), query: this.query, notice: this.notice ?? "" };
+    const context = advancementContext(this.actor, this.selection, this.category, { group: this.group, star: this.star });
+    // Remember where we look, so the sky only sweeps in when the view really changes.
+    const view = `${this.category}:${context.sky?.active.id ?? ""}`;
+    context.entering = view !== this.view;
+    this.view = view;
+    this.group = context.sky?.active.id ?? this.group;
+    this.star = context.sky?.star?.id ?? this.star;
+    return { ...context, query: this.query, notice: this.notice ?? "", flared: this.flared ?? [] };
   }
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    const content = this.element.querySelector(".window-content");
+    if (content && !this.sky?.host?.isConnected) { this.sky?.destroy(); this.sky = { ...mountStarfield(content), host: content }; }
     const search = this.element.querySelector("[data-advancement-search]");
     const filter = () => {
       this.query = search.value;
+      const query = this.query.trim().toLocaleLowerCase();
       let count = 0;
+      // Stars and profession nodes stay in place: what does not match fades back into the sky.
       for (const row of this.element.querySelectorAll("[data-search]")) {
-        const matches = row.dataset.search.includes(this.query.trim().toLocaleLowerCase());
-        // Keep the profession's ancestors and connectors in place during a search.
-        row.hidden = this.category !== "profession" && !matches;
-        row.classList.toggle("search-muted", this.category === "profession" && !matches);
+        const matches = !query || row.dataset.search.includes(query);
+        row.classList.toggle("search-muted", !matches);
+        row.classList.toggle("search-hit", Boolean(query) && matches);
         if (matches) count++;
       }
+      for (const sign of this.element.querySelectorAll("[data-sign-search]"))
+        sign.classList.toggle("search-hit", Boolean(query) && sign.dataset.signSearch.includes(query));
       this.element.querySelector("[data-no-results]").hidden = count > 0 || (this.category === "profession" && !context.profession);
     };
     search.addEventListener("input", filter);
+    // Enter: fly to the first star that matches, in whichever constellation it is.
+    search.addEventListener("keydown", event => {
+      if (event.key !== "Enter" || !this.query.trim()) return;
+      event.preventDefault();
+      const query = this.query.trim().toLocaleLowerCase(), hit = context.sky?.groups.flatMap(group => group.stars).find(star => star.search.includes(query));
+      if (hit) { this.star = hit.id; this.group = ""; this.render({ force: true }); }
+    });
     filter();
     this.animateChanges(context);
+    if (this.flared?.length) {
+      this.sky?.celebrate();
+      for (const id of this.flared) this.element.querySelector(`[data-entry="${CSS.escape(id)}"].witcher-star`)?.classList.add("is-flaring");
+      this.flared = [];
+    }
   }
 
   animateChanges(context) {
@@ -132,6 +161,8 @@ export class AdvancementWindow extends foundry.applications.api.HandlebarsApplic
 
   async close(options) {
     if (this.busy) return this;
+    this.sky?.destroy();
+    this.sky = null;
     for (const [name, id] of this.hooks) Hooks.off(name, id);
     windows.delete(this.actor.uuid);
     return super.close(options);
@@ -141,6 +172,21 @@ export class AdvancementWindow extends foundry.applications.api.HandlebarsApplic
     if (this.busy) return;
     this.category = button.dataset.category;
     this.query = "";
+    this.group = "";
+    this.star = "";
+    return this.render({ force: true });
+  }
+
+  static #group(_event, button) {
+    if (this.busy || button.dataset.group === this.group) return;
+    this.group = button.dataset.group;
+    this.star = "";
+    return this.render({ force: true });
+  }
+
+  static #star(_event, button) {
+    if (this.busy || button.dataset.entry === this.star) return;
+    this.star = button.dataset.entry;
     return this.render({ force: true });
   }
 
@@ -184,6 +230,7 @@ export class AdvancementWindow extends foundry.applications.api.HandlebarsApplic
       });
       if (!approved) return;
       await purchaseAdvancement(this.actor, { ...this.selection }, this.snapshot, key => game.i18n.localize(key));
+      this.flared = Object.keys(this.selection);
       this.selection = {};
       this.snapshot = advancementFingerprint(this.actor);
       this.notice = game.i18n.format("WITCHER.Advancement.Purchased", { cost: plan.cost });

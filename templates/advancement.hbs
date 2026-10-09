@@ -1,61 +1,94 @@
-<div class="witcher-advancement-layout">
-  <header class="witcher-advancement-hero">
-    <div class="witcher-advancement-hero-title"><i class="fa-solid fa-compass-drafting" aria-hidden="true"></i><div><span>{{localize "WITCHER.Advancement.Title"}}</span><h2>{{actorName}}</h2></div></div>
-    <div class="witcher-advancement-balance"><strong>{{points}}</strong><span>{{localize "WITCHER.Advancement.Available"}}</span></div>
+<div class="witcher-advancement-layout" data-category="{{category}}">
+  <header class="witcher-sky-header">
+    <div class="witcher-sky-title"><span>{{localize "WITCHER.Advancement.Title"}}</span><h2>{{actorName}}</h2></div>
+    <nav class="witcher-sky-nav" aria-label="{{localize 'WITCHER.Advancement.Title'}}">
+      {{#each categories}}
+      <button type="button" data-action="category" data-category="{{id}}" aria-pressed="{{active}}"><i class="{{icon}}" aria-hidden="true"></i><span>{{localize label}}</span></button>
+      {{/each}}
+    </nav>
+    <div class="witcher-advancement-balance" data-tooltip="{{rules}}">
+      <div class="witcher-sky-orb"><strong>{{points}}</strong></div>
+      <span>{{localize "WITCHER.Advancement.Available"}}</span>
+      {{#if magicPoints}}<small data-tooltip="Используются первыми для Сотворения, Ритуалов и Порч">+{{magicPoints}} магических</small>{{/if}}
+    </div>
   </header>
-  <div class="witcher-advancement-body">
-    <aside class="witcher-advancement-sidebar">
-      <nav aria-label="{{localize 'WITCHER.Advancement.Title'}}">
-        {{#each categories}}
-        <button type="button" data-action="category" data-category="{{id}}" aria-pressed="{{active}}"><i class="{{icon}}" aria-hidden="true"></i>{{localize label}}</button>
-        {{/each}}
-      </nav>
-      <p class="witcher-advancement-rule">{{rules}}</p>
-      <p class="witcher-advancement-note">{{localize "WITCHER.Advancement.SessionRule"}}</p>
-      {{#if canTrain}}<button type="button" class="witcher-advancement-training" data-action="training"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Обучение у наставника</button>{{/if}}
-      {{#if magicPoints}}<p class="witcher-advancement-note">Магические О.У.: <b>{{magicPoints}}</b>. Используются первыми для Сотворения, Ритуалов и Порч.</p>{{/if}}
-      {{#if editable}}
-      <details class="witcher-advancement-adjust">
-        <summary><i class="fa-solid fa-pen" aria-hidden="true"></i> {{localize "WITCHER.Advancement.Adjust"}}</summary>
-        <label>{{localize "WITCHER.Advancement.Balance"}}<input type="number" min="0" step="1" required value="{{points}}" data-experience-value></label>
-        <button type="button" data-action="savePoints">{{localize "WITCHER.Advancement.Save"}}</button>
-      </details>
-      {{/if}}
-    </aside>
-    <section class="witcher-advancement-catalog">
-      <label class="witcher-advancement-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" value="{{query}}" data-advancement-search placeholder="{{localize 'WITCHER.Advancement.Search'}}" aria-label="{{localize 'WITCHER.Advancement.Search'}}"></label>
-      {{#if isProfession}}
+
+  <div class="witcher-sky-tools">
+    <label class="witcher-advancement-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" value="{{query}}" data-advancement-search placeholder="{{localize 'WITCHER.Advancement.Search'}}" aria-label="{{localize 'WITCHER.Advancement.Search'}}"></label>
+    {{#if canTrain}}<button type="button" class="witcher-advancement-training" data-action="training"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Обучение у наставника</button>{{/if}}
+    {{#if editable}}
+    <details class="witcher-advancement-adjust">
+      <summary data-tooltip="{{localize 'WITCHER.Advancement.Adjust'}}"><i class="fa-solid fa-pen" aria-hidden="true"></i></summary>
+      <div><label>{{localize "WITCHER.Advancement.Balance"}}<input type="number" min="0" step="1" required value="{{points}}" data-experience-value></label>
+      <button type="button" data-action="savePoints">{{localize "WITCHER.Advancement.Save"}}</button></div>
+    </details>
+    {{/if}}
+  </div>
+
+  <main class="witcher-sky-main">
+    {{#if isProfession}}
+    <section class="witcher-sky-profession">
       <div class="witcher-advancement-tree-heading"><h3>{{#if profession}}{{profession.name}}{{else}}{{localize "WITCHER.Professions.Title"}}{{/if}}</h3><span>{{localize "WITCHER.Advancement.TreeHint"}}</span></div>
-      {{else}}
-      <div class="witcher-advancement-columns"><span>{{localize "WITCHER.Advancement.Entry"}}</span><span>{{localize "WITCHER.Advancement.Rank"}}</span><span>{{localize "WITCHER.Advancement.NextRank"}}</span></div>
-      {{/if}}
-      <div class="witcher-advancement-list {{#if isProfession}}profession-catalog{{/if}}">
-        {{#if isProfession}}
-          {{#if profession}}
-          {{> "systems/witcher-eliott-system/templates/profession-tree.hbs" profession=profession editing=false editable=editable advancement=true}}
-          {{else}}<p class="witcher-advancement-empty">{{localize "WITCHER.Professions.Empty"}}</p>{{/if}}
-        {{else}}
-        {{#each rows}}
-        <article class="witcher-advancement-row {{#if selected}}selected{{/if}}" data-search="{{search}}">
-          <div class="witcher-advancement-label"><strong>{{name}} {{#if badge}}<small data-tooltip="{{ruleHint}}">{{badge}}</small>{{/if}}</strong><span>{{detail}}</span>{{#if ranksHint}}<span class="witcher-advancement-origin">{{ranksHint}}</span>{{/if}}</div>
-          <div class="witcher-advancement-ranks"><span>{{displayLevel}}</span>{{#if selected}}<i class="fa-solid fa-arrow-right" aria-hidden="true"></i><strong>{{displayTarget}}</strong>{{/if}}</div>
-          {{> "systems/witcher-eliott-system/templates/advancement-controls.hbs" this}}
-        </article>
-        {{/each}}
-        {{/if}}
+      <div class="witcher-advancement-list profession-catalog">
+        {{#if profession}}
+        {{> "systems/witcher-eliott-system/templates/profession-tree.hbs" profession=profession editing=false editable=editable advancement=true}}
+        {{else}}<p class="witcher-advancement-empty">{{localize "WITCHER.Professions.Empty"}}</p>{{/if}}
         <p class="witcher-advancement-empty" data-no-results>{{localize "WITCHER.Advancement.Empty"}}</p>
       </div>
     </section>
-  </div>
+    {{else}}{{#with sky}}
+    <section class="witcher-sky-stage {{#if ../entering}}is-entering{{/if}}" aria-label="{{active.name}}">
+      <i class="witcher-sky-sign {{active.icon}}" aria-hidden="true"></i>
+      <h3 class="witcher-sky-name">{{active.name}}<small>{{active.learned}} / {{active.stars.length}}</small></h3>
+      <svg class="witcher-sky-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        {{#each active.lines}}<line x1="{{x1}}" y1="{{y1}}" x2="{{x2}}" y2="{{y2}}" class="{{#if lit}}lit{{/if}} {{#if planned}}planned{{/if}}" vector-effect="non-scaling-stroke"/>{{/each}}
+      </svg>
+      {{#each active.stars}}
+      <button type="button" class="witcher-star {{#if chosen}}chosen{{/if}} {{#if plan}}planned{{/if}} {{#if unset}}unset{{/if}} {{#unless rank}}dim{{/unless}}"
+              style="--x:{{x}};--y:{{y}};--rank:{{rank}};--plan:{{plan}};--mag:{{magnitude}};--twinkle:{{twinkle}}s;--delay:{{delay}}s"
+              data-action="star" data-entry="{{id}}" data-search="{{search}}" aria-pressed="{{chosen}}" aria-label="{{name}}: {{displayLevel}}{{#if plan}} → {{displayTarget}}{{/if}}">
+        <span class="witcher-star-ring" aria-hidden="true"></span><span class="witcher-star-core" aria-hidden="true"></span>
+        <span class="witcher-star-label">{{name}}<b>{{#if plan}}{{displayLevel}} → {{/if}}{{displayTarget}}</b></span>
+      </button>
+      {{/each}}
+      <p class="witcher-advancement-empty" data-no-results>{{localize "WITCHER.Advancement.Empty"}}</p>
+    </section>
+
+    {{#with star}}
+    <aside class="witcher-sky-card {{#if ../../entering}}is-entering{{/if}}" aria-live="polite">
+      <small class="witcher-sky-card-kind">{{detail}}{{#if badge}} <span data-tooltip="{{ruleHint}}">{{badge}}</span>{{/if}}</small>
+      <h3>{{name}}</h3>
+      <div class="witcher-sky-card-rank"><strong>{{displayLevel}}</strong>{{#if plan}}<i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i><strong class="next">{{displayTarget}}</strong>{{/if}}<span>/ 10</span></div>
+      <div class="witcher-sky-pips" aria-hidden="true"><i style="--n:{{rank}};--p:{{plan}}"></i></div>
+      <p class="witcher-sky-card-hint">{{hint}}</p>
+      {{#if ranksHint}}<p class="witcher-sky-card-note">{{ranksHint}}</p>{{/if}}
+      {{> "systems/witcher-eliott-system/templates/advancement-controls.hbs" this}}
+    </aside>
+    {{/with}}
+    {{/with}}{{/if}}
+  </main>
+
+  {{#unless isProfession}}{{#unless sky.single}}
+  <nav class="witcher-sky-signs" aria-label="Созвездия">
+    {{#each sky.groups}}
+    <button type="button" data-action="group" data-group="{{id}}" aria-pressed="{{active}}" data-sign-search="{{#each stars}}{{search}} {{/each}}">
+      <svg viewBox="0 0 100 100" aria-hidden="true">{{#each lines}}<line x1="{{x1}}" y1="{{y1}}" x2="{{x2}}" y2="{{y2}}" class="{{#if lit}}lit{{/if}}"/>{{/each}}{{#each stars}}<circle cx="{{x}}" cy="{{y}}" r="{{#if rank}}4.5{{else}}3{{/if}}" class="{{#if plan}}planned{{/if}} {{#if rank}}lit{{/if}}"/>{{/each}}</svg>
+      <span>{{short}}</span><small>{{name}}</small>
+      {{#if planned}}<b class="witcher-sky-sign-plan">+{{planned}}</b>{{/if}}
+    </button>
+    {{/each}}
+  </nav>
+  {{/unless}}{{/unless}}
+
   <footer class="witcher-advancement-footer">
     {{#if notice}}<p class="witcher-advancement-notice" role="status">{{notice}}</p>{{/if}}
     <div class="witcher-advancement-cart">
-      {{#each changes}}<span data-tooltip="{{calculation}}">{{name}} <b>{{level}} → {{to}}</b> · {{cost}} {{localize "WITCHER.Advancement.Unit"}}</span>{{else}}<p>{{localize "WITCHER.Advancement.PlanHint"}}</p>{{/each}}
+      {{#each changes}}<span data-tooltip="{{calculation}}">{{name}} <b>{{level}} → {{to}}</b> · {{cost}} {{localize "WITCHER.Advancement.Unit"}}</span>{{else}}<p>{{localize "WITCHER.Advancement.PlanHint"}} <span class="witcher-sky-session">{{localize "WITCHER.Advancement.SessionRule"}}</span></p>{{/each}}
     </div>
     <div class="witcher-advancement-checkout">
       <button type="button" class="witcher-advancement-reset" data-action="reset">{{localize "WITCHER.Advancement.Reset"}}</button>
       <div><span>{{localize "WITCHER.Advancement.Cost"}} <b>{{cost}}</b></span><span class="{{#if error}}error{{/if}}">{{localize "WITCHER.Advancement.Remaining"}} <b>{{remaining}}</b></span></div>
-      <button type="button" class="witcher-advancement-buy" data-action="purchase" {{disabled (not valid)}} {{disabled (not editable)}}><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> {{localize "WITCHER.Advancement.Buy"}}</button>
+      <button type="button" class="witcher-advancement-buy" data-action="purchase" {{disabled (not valid)}} {{disabled (not editable)}}><i class="fa-solid fa-star" aria-hidden="true"></i> {{localize "WITCHER.Advancement.Buy"}}</button>
     </div>
     {{#if magicSpent}}<p class="witcher-advancement-note">К оплате: {{regularSpent}} обычных + {{magicSpent}} магических О.У. Останется магических: {{magicRemaining}}.</p>{{/if}}
     {{#if error}}<p class="witcher-advancement-error" role="alert">{{error}}</p>{{/if}}
