@@ -20,7 +20,7 @@ import { relicArmorContentUpdate } from "./relic-armor-content.mjs";
 import { EXPERIMENTAL_DEVICES, EXPERIMENTAL_RECIPES } from "../data/experimental-devices.mjs";
 import { relicWeaponContentUpdate } from "./relic-weapon-content.mjs";
 import { experimentalDescriptionUpdate } from "./experimental-descriptions.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 25;
+export const EQUIPMENT_CONTENT_VERSION = 26;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {

@@ -35,10 +35,22 @@ test("migration swaps only shipped text and keeps player notes", async () => {
   assert.deepEqual(experimentalDescriptionUpdate({ system: { ruleId: "rune.veles", description: "" } }),
     { "system.description": canonical("rune.veles") });
   assert.deepEqual(experimentalDescriptionUpdate({ system: { ruleId: "rune.veles", description: "<p>Своя руна</p>" } }), {});
+  assert.deepEqual(experimentalDescriptionUpdate({ system: { ruleId: "glyph.water", description: "<p>Базовая книга, стр. 256</p>" } }),
+    { "system.description": canonical("glyph.water") });
   assert.deepEqual(experimentalDescriptionUpdate({ system: { ruleId: "formula.bomb.samum",
     description: "<p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>" } }),
     { "system.description": canonical("formula.bomb.samum") });
   for (const row of sources.filter(row => experimentalDescriptionUpdate({ system: row.system })["system.description"]))
     assert.fail(`${row.system.ruleId}: the current source should already be canonical`);
   assert.deepEqual(experimentalDescriptionUpdate({ system: { ruleId: "armor-upgrade.mail", description: "" } }), {});
+  for (const entry of [...EXPERIMENTAL_DEVICES, ...stones, ...EXPERIMENTAL_RECIPES])
+    assert.ok(experimentalDescriptionUpdate({ system: { ruleId: entry.id, description: "<p>Базовая книга, стр. 256</p>" } })["system.description"], entry.id);
+});
+
+test("worlds created before the environment conditions receive them in the effects compendium", async () => {
+  const { effectCompendiumSources } = await import("../scripts/migrations/effect-content.mjs");
+  const names = effectCompendiumSources().map(source => source.name);
+  for (const name of ["Против солнца", "Освещён", "На суше", "В воде", "Под водой", "Касается двимерита"]) assert.ok(names.includes(name), name);
+  const sources = JSON.parse(await readFile(new URL("../pack-sources/effects.json", import.meta.url), "utf8"));
+  assert.deepEqual(sources.map(source => source._id).sort(), effectCompendiumSources().map(source => source._id).sort());
 });

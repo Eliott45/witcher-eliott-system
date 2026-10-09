@@ -24,7 +24,12 @@ const LEGACY = {
   "rune.svarog": "<p>Руна небесного кузнеца. Помогает клинку пробивать броню.</p>",
   "rune.triglav": "<p>Руна трёхликого бога. Удар оружием с ней сбивает противника с толку.</p>",
   "rune.veles": "<p>Руна бога-покровителя чародеев. Усиливает фокусирующие свойства оружия.</p>",
-  "rune.zoria": "<p>Руна утренней зари, холодная как иней. Оружие с ней может заморозить цель.</p>"
+  "rune.zoria": "<p>Руна утренней зари, холодная как иней. Оружие с ней может заморозить цель.</p>",
+  "glyph.magic": "<p>Магический знак, нанесённый на броню. Усиливает чары владельца.</p>",
+  "glyph.air": "<p>Знак стихии воздуха, вплетённый в броню. Усиливает заклинания воздуха.</p>",
+  "glyph.earth": "<p>Знак стихии земли, вплетённый в броню. Усиливает заклинания земли.</p>",
+  "glyph.fire": "<p>Знак стихии огня, вплетённый в броню. Усиливает заклинания огня.</p>",
+  "glyph.water": "<p>Знак стихии воды, вплетённый в броню. Усиливает заклинания воды.</p>"
 };
 const plain = html => String(html ?? "").replace(/<[^>]*>/g, " ").replace(/s+/g, " ").trim();
 const CURRENT = new Map([...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES, ...UPGRADES]
@@ -38,6 +43,7 @@ export function experimentalDescriptionUpdate(item) {
   const before = String(item.system.description ?? "");
   // The new prose of split/tracking ammunition still contains its old paragraph.
   if (before.includes(canonical)) return {};
-  const after = !plain(before) || plain(before) === plain(legacy) ? canonical : before.replace(legacy, canonical);
+  // The oldest worlds stored only the page citation («Базовая книга, стр. 256»).
+  const after = !plain(stripPageReferences(before)) || plain(before) === plain(legacy) ? canonical : before.replace(legacy, canonical);
   return after === before ? {} : { "system.description": after };
 }

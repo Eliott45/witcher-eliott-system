@@ -10,7 +10,8 @@ import { stripPageReferences } from "../data/item-lore.mjs";
 // 6: Prone — stand up by spending movement (core p.163).
 // 7: Prone is called «Ничком».
 // 8: Standing spends all movement; refresh existing prone effects as well as the catalog.
-export const EFFECT_CONTENT_VERSION = 8;
+// 9: append environment exceptions (sun, lit, land/water/underwater) and dimeritium contact.
+export const EFFECT_CONTENT_VERSION = 9;
 // Earlier shipped names still count as unedited entries.
 const PREVIOUS_NAMES = { prone: ["Сбит с ног"] };
 const REFRESHED_CONDITIONS = new Set(["burning", "bleeding", "burrowing", "intoxicated", "blinded", "nauseated", "dying", "prone"]);
