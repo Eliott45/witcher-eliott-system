@@ -157,9 +157,12 @@ function performCast(actor,itemId,options) {
         if(status)await setStatus(actor,status,true);
       }
       if(!options.maintenance)await consumeAiming(actor);
+      // Core p.168: on a reflected hex the caster becomes its victim.
+      if(hex&&reflected&&!options.maintenance){const {hexEffect}=await import("./spell-effects.mjs");
+        await actor.createEmbeddedDocuments("ActiveEffect",[hexEffect({ruleId:item.system.ruleId,name:item.name,spellUuid:item.uuid,spellText:item.system.description,hex:item.system.hex})]);}
       // Core p.168: each targeted token defends against this casting check (a failed spell reaches nobody).
       // Area magic chooses its targets by the placed template instead of earlier T targets.
-      if(!options.maintenance&&!ritual&&!hex&&roll&&!fumble.failed&&!spellArea(item.system))await createSpellStrikes(actor,item,posted,{total:posted.rolls[0]?.total??roll.total});
+      if(!options.maintenance&&!ritual&&!(hex&&reflected)&&roll&&!fumble.failed&&!spellArea(item.system))await createSpellStrikes(actor,item,posted,{total:posted.rolls[0]?.total??roll.total});
       return posted;
     } catch(error) {
       if(posted)ui.notifications.error("Результат уже в чате, но расход магии не завершён. Проверьте ПЗ, Выносливость и состояния перед повторным броском.");

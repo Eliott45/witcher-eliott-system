@@ -53,7 +53,8 @@ export function strikeAttack(item, caster, target, { total = null, spellSource =
     target: target.uuid, attacker: caster.uuid, parts: [], ranged: true, band: "normal", dc: null, thrown: false,
     combat: game.combat?.started ? { id: game.combat.id, round: game.combat.round } : null, strike: 0, damageTypes: "",
     ...(spellSource ? { spellSource } : {}), glyph, effectDC, defenses, ruleId: system.ruleId ?? "", power: power || system.cost || 1, spellUuid: item.uuid ?? "",
-    spellText: String(system.description ?? ""), blockable: (system.defense ?? []).includes("block"), ...(unaware ? { unaware } : {}), traits: spellTraits(system.element, system.ruleId),
+    spellText: String(system.description ?? ""), blockable: (system.defense ?? []).includes("block"),
+    ...(system.kind === "hex" ? { hex: { danger: system.hex?.danger ?? "low", lifting: system.hex?.lifting ?? "" } } : {}), ...(unaware ? { unaware } : {}), traits: spellTraits(system.element, system.ruleId),
     noCritical: !spellTraits(system.element, system.ruleId).physical || (!defenses.length && !unaware?.willTriple) };
 }
 
@@ -61,7 +62,8 @@ export function strikeAttack(item, caster, target, { total = null, spellSource =
 export function strikeable(message) {
   if (message.isContentVisible === false) return null;
   const cast = message.flags?.[SYSTEM_ID]?.magicCast, item = message.speakerActor?.items.get(cast?.spellId);
-  if (!cast || cast.maintenance || ["ritual", "hex"].includes(cast.kind) || cast.fumble?.failed || !item || !targetsOthers(item.system)) return null;
+  // A hex reaches its victim like a spell (the victim resists); a reflected hex lands on the caster instead.
+  if (!cast || cast.maintenance || cast.kind === "ritual" || (cast.kind === "hex" && cast.reflected) || cast.fumble?.failed || !item || !targetsOthers(item.system)) return null;
   return item;
 }
 

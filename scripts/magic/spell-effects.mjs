@@ -2,6 +2,8 @@ import { SYSTEM_ID } from "../config.mjs";
 import { CONDITION_BY_ID, conditionSource } from "../data/condition-definitions.mjs";
 import { fullTurnStart } from "../combat/full-turn-rules.mjs";
 import { immuneToCondition } from "../data/creatures.mjs";
+import { SKILL_KEYS } from "../data/skills.mjs";
+import { hexIdentification } from "./rules.mjs";
 
 // What a piece of magic does to a target that failed its defense (or did not defend), read from its effect text
 // (core pp.102–115 and the invocations). Chances are percentages; `blind` is the duration in rounds.
@@ -21,7 +23,11 @@ const HIT = {
   "invocation.cursed-illness": { tiers: [[6, "poisoned"], [4, "stunned"], [2, "staggered"]] },
   // Lasting control or mind effects: a marker with the spell's own text, removed by the GM or by its end.
   "spell.mind-manipulation": { marker: true }, "spell.mental-command": { marker: true }, "spell.talfryn-prison": { marker: true },
-  "sign.puppet": { marker: true, roundsPerPower: true }, "invocation.light-truth": { marker: true }, "invocation.blood-boil": { marker: true }
+  "sign.puppet": { marker: true, roundsPerPower: true }, "invocation.light-truth": { marker: true }, "invocation.blood-boil": { marker: true },
+  // Hexes (core pp.120–121): the victim resists with Resist Magic; a failure leaves the hex until it is lifted.
+  "hex.shadows": { hex: true }, "hex.devils-luck": { hex: true }, "hex.nightmare": { hex: true }, "hex.pestas-kiss": { hex: true }, "hex.beast": { hex: true },
+  // Eternal Itch: −1 to every action. Attacks and defenses are skill checks, so every skill and attribute check gets −1.
+  "hex.eternal-itch": { hex: true, modifiers: [...SKILL_KEYS.map(key => [`skills.${key}`, -1]), ["attributeCheck", -1]] }
 };
 // Damage that grows with the Stamina put into a sign (core p.114): Igni and Firestream deal 1d6 per point.
 const PER_POWER = { "sign.igni": "d6", "sign.firestream": "d6" };
@@ -71,6 +77,10 @@ export async function applySpellHit(actor, attack) {
       else { effects.push(timed(actor, "stunned", 0)); notes.push(`испытание УСТ ${value} (нужно меньше ${target}, штраф ${modifier}): дезориентирован`); }
     }
   }
+  if (profile.hex) {
+    effects.push(hexEffect(attack, profile));
+    notes.push(`порча «${attack.name}» наложена`);
+  }
   if (profile.marker) {
     const rounds = profile.roundsPerPower ? power : 0;
     effects.push({ name: attack.name ?? "Магия", img: "icons/svg/aura.svg", type: "base", description: attack.spellText ?? "",
@@ -81,6 +91,16 @@ export async function applySpellHit(actor, attack) {
   }
   if (effects.length) await actor.createEmbeddedDocuments("ActiveEffect", effects);
   return { notes, effects };
+}
+/** A hex stays until it is lifted: its text, the lifting ritual and the identification DCs (core p.121). */
+export function hexEffect(attack, profile = HIT[attack?.ruleId] ?? {}) {
+  const [education, training] = hexIdentification(attack.hex?.danger);
+  const escape = value => String(value ?? "").replace(/[&<>]/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[char]);
+  return { name: `Порча: ${attack.name}`, img: "icons/svg/skull.svg", type: "base", ...(attack.spellUuid ? { origin: attack.spellUuid } : {}),
+    description: `${attack.spellText ?? ""}${attack.hex?.lifting ? `<p><b>Снятие:</b> ${escape(attack.hex.lifting)}</p>` : ""}`
+      + `<p>Опознать порчу и способ снятия: Образование СЛ ${education} или Подготовка ведьмака СЛ ${training}. Порча действует, пока её не снимут.</p>`
+      + (attack.spellUuid ? `<p>Источник: @UUID[${attack.spellUuid}]{${escape(attack.name)}}</p>` : ""),
+    flags: { [SYSTEM_ID]: { hexEffect: attack.ruleId, condition: { modifiers: (profile.modifiers ?? []).map(([target, value]) => ({ target, value })) } } } };
 }
 const staggered = actor => timed(actor, "staggered", 0, { start: fullTurnStart(actor), duration: { value: 1, units: "rounds", expiry: "turnStart", expired: false } });
 

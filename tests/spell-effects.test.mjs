@@ -102,3 +102,25 @@ test("Magical Healing restores 3 HP at the start of each turn while it lasts", a
   assert.equal(healed.total, 3);
   assert.ok(buffOf(magic("invocation.animal-strength").system));
 });
+
+test("a hex reaches its victim like a spell, and a failed Resist Magic leaves the hex until it is lifted", async () => {
+  const { strikeable } = await import("../scripts/magic/spell-strikes.mjs");
+  const { hexEffect } = await import("../scripts/magic/spell-effects.mjs");
+  const hex = { id: "h", name: "Вечный зуд", uuid: "Actor.m.Item.h", system: magic("hex.eternal-itch").system };
+  const message = cast => ({ flags: { "witcher-eliott-system": { magicCast: { spellId: "h", kind: "hex", ...cast } } }, speakerActor: { items: { get: () => hex } } });
+  assert.equal(strikeable(message({})), hex, "the victim gets a Resist Magic defense");
+  assert.equal(strikeable(message({ reflected: true })), null, "a reflected hex has no victim to strike");
+  runtime();
+  const attack = strikeAttack(hex, { uuid: "T.c" }, { uuid: "T.t" }, { power: 4 });
+  assert.deepEqual(attack.defenses, ["resist"]); assert.ok(!attack.damage); assert.equal(attack.hex.danger, "low");
+  const effect = hexEffect(attack);
+  assert.equal(effect.name, "Порча: Вечный зуд");
+  assert.match(effect.description, /Образование СЛ 16 или Подготовка ведьмака СЛ 14/); assert.match(effect.description, /Снятие:/);
+  const modifiers = effect.flags["witcher-eliott-system"].condition.modifiers;
+  assert.ok(modifiers.every(modifier => modifier.value === -1)); assert.ok(modifiers.some(modifier => modifier.target === "skills.swordsmanship"));
+  assert.ok(modifiers.some(modifier => modifier.target === "attributeCheck"));
+  runtime();
+  const victim = target();
+  await applySpellHit(victim, { ...attack, name: "Вечный зуд" });
+  assert.equal(victim.effects[0].name, "Порча: Вечный зуд");
+});
