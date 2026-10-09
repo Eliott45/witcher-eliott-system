@@ -1143,3 +1143,7 @@ b.witcher-gm-only::after, span.witcher-gm-only::after { display:none; }
 .witcher-loot-items li.draggable:active { cursor:grabbing; }
 
 .witcher-character-sidebar .witcher-stun-block { margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #b39a6740; }
+.witcher-training-preview { min-height:48px; padding:8px 10px; border:1px solid #c9bc9c; border-radius:4px; background:#f7f2e6; font-size:13px; line-height:1.45; }
+.witcher-training-preview p, .witcher-training-card p { margin:2px 0; }
+.witcher-training-error { color:#8c2f22; }
+.witcher-advancement-training { width:100%; margin:8px 0; }

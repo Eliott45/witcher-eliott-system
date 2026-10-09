@@ -11,7 +11,8 @@ import { stripPageReferences } from "../data/item-lore.mjs";
 // 7: Prone is called «Ничком».
 // 8: Standing spends all movement; refresh existing prone effects as well as the catalog.
 // 9: append environment exceptions (sun, lit, land/water/underwater) and dimeritium contact.
-export const EFFECT_CONTENT_VERSION = 9;
+// 10: append the mage's «Устойчивость к двимериту» state (core p.66).
+export const EFFECT_CONTENT_VERSION = 10;
 // Earlier shipped names still count as unedited entries.
 const PREVIOUS_NAMES = { prone: ["Сбит с ног"] };
 const REFRESHED_CONDITIONS = new Set(["burning", "bleeding", "burrowing", "intoxicated", "blinded", "nauseated", "dying", "prone"]);

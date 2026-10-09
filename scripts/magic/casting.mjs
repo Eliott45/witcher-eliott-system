@@ -12,6 +12,7 @@ import { skillCalculationTooltip } from "../sheets/skills-context.mjs";
 import { SPELL_DEFENSES, spellRange, spellDuration } from "../data/spells.mjs";
 import { createSpellStrikes, furySpellTargetError } from "./spell-strikes.mjs";
 import { creatureSuppression } from "../combat/creature-spirits.mjs";
+import { DIMERITIUM_RESISTED } from "./dimeritium.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { matchingGlyphs, glyphBonus, spellDescriptionWithDC } from "../data/rune-glyphs.mjs";
 import { adrenalineDamage, consumeAdrenalineDamage, adrenalineAbsorptionPlan } from "../combat/adrenaline.mjs";
@@ -34,7 +35,8 @@ export async function learnSpell(actor,source) {
 export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,helpers=0,glyphChoice="dc"}={}) {
   if(item?.type!=="spell"||item.parent!==actor)throw new Error("Сначала добавьте заклинание в книгу персонажа.");
   if(!maintenance){const frenzy=furySpellTargetError(actor,item);if(frenzy)throw new Error(frenzy);}
-  if(creatureSuppression(actor).dimeritium)throw new Error("В зоне двимеритовой бомбы нельзя использовать магию.");
+  // A mage who passed «Устойчивость к двимериту» keeps the ability to cast (core p.66).
+  if(creatureSuppression(actor).dimeritium&&!actor.statuses?.has?.(DIMERITIUM_RESISTED))throw new Error("В зоне двимеритовой бомбы нельзя использовать магию. Маг может пройти Устойчивость к двимериту на вкладке «Магия».");
   if(item.system.ruleId==="sign.yrden"&&!game.user.isGM&&!game.users?.activeGM)throw new Error("Для размещения Ирдена нужен подключённый ведущий.");
   const conditions=conditionRules(actor);
   if(!actor.isOwner || !(item.system.ruleId==="spell.dispel"?conditions.canDefend:conditions.canAct))throw new Error("Персонаж сейчас не может творить магию.");

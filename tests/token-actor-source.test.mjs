@@ -12,5 +12,5 @@ test("nearby metal is read from lazy token deltas without preparing their actors
     _source:{delta:{name:"Переименован",items:[{...metal,system:{quantity:2,carried:true}},{_id:"deleted",_tombstone:true}],effects:[],system:{creature:{packId:"wolves"}}}}};
   const view=tokenActorSource(token);assert.equal(view.name,"Переименован");assert.equal(view.system.creature.packId,"wolves");assert.equal(view.items.length,1);assert.equal(view.items[0].system.quantity,2);
   const source={x:0,y:0,width:1,height:1,getSize:()=>({width:100,height:100}),parent:{grid:{size:100,distance:1},tokens:[token]}};token.parent=source.parent;
-  assert.deepEqual(dimeritiumState({type:"npc",system:{},items:[]},source),{nearby:2,touching:false});
+  assert.deepEqual(dimeritiumState({type:"npc",system:{},items:[]},source),{nearby:2,touching:false,zone:false,resisted:false});
 });

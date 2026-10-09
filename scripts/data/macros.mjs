@@ -4,4 +4,7 @@ export const MACRO_SOURCES = [{
 },{
   _id:"foragingGM000001",name:"Собирательство (ГМ)",type:"script",scope:"global",img:"icons/svg/oak.svg",
   command:"await game.system.api.forage();",ownership:{default:0},flags:{}
+},{
+  _id:"trainingGM000001",name:"Обучение (ГМ)",type:"script",scope:"global",img:"icons/svg/book.svg",
+  command:"await game.system.api.train();",ownership:{default:0},flags:{}
 }];

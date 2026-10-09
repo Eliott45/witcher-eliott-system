@@ -1475,6 +1475,36 @@
     }
   },
   {
+    "_id": "efct000000000042",
+    "name": "Устойчивость к двимериту",
+    "img": "icons/svg/mage-shield.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Маг прошёл проверку Устойчивости к двимериту (СЛ 16): кружится голова и мучает дискомфорт, но сохраняется половина Энергии и способность сотворять заклинания, в том числе в зоне двимеритовой бомбы. Таблица эффектов двимерита не применяется. Состояние снимается само, когда воздействие двимерита заканчивается; при новом воздействии нужна новая проверка.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "dimeritium-resisted"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "dimeritium-resisted"
+        }
+      }
+    }
+  },
+  {
     "_id": "efct000000000101",
     "name": "Чёрный яд",
     "img": "icons/svg/poison.svg",

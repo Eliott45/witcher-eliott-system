@@ -10,6 +10,9 @@ export function advancementCost(from, to, multiplier = 1) {
   return Array.from({ length: to - from }, (_, index) => Math.max(1, from + index) * multiplier);
 }
 
+/** IP already invested toward the next rank (core p.59: mentor lessons put points into one skill). */
+export const trainingProgress = (actor, id) => Math.max(0, Math.floor(Number(actor.system.training?.[id] ?? 0)) || 0);
+
 export function advancementEntries(actor, localize = key => key) {
   const system = actor.system;
   const modifiers = system.statistics.modifiers ?? [];
@@ -22,7 +25,7 @@ export function advancementEntries(actor, localize = key => key) {
       .reduce((sum, mod) => sum + mod.value, 0);
     const level = base === null ? null : base + ranks;
     return { id, kind, name, base, ranks, level, multiplier: kind === "attributes" ? 10 : 1,
-      prerequisite: "", detail: "", ...extra };
+      prerequisite: "", detail: "", progress: ["skills", "languages"].includes(kind) ? trainingProgress(actor, id) : 0, ...extra };
   };
   const entries = SKILLS.filter(skill => skill.key !== "language").map(skill => entry(`skill:${skill.key}`, "skills",
     localize(skill.label), system.skills[skill.key], `skills.${skill.key}`,
@@ -48,7 +51,7 @@ export function advancementEntries(actor, localize = key => key) {
 // Only advancement-relevant data: wounds, current pools and dice cannot invalidate a plan.
 export function advancementFingerprint(actor) {
   return JSON.stringify([actor.system.experience ?? 0, actor.system.magic?.improvementPoints??0, actor.system.details.profession,
-    advancementEntries(actor).map(({ id, base, ranks, itemId }) => [id, base, ranks, itemId])]);
+    advancementEntries(actor).map(({ id, base, ranks, itemId, progress }) => [id, base, ranks, itemId, progress])]);
 }
 
 export function advancementPlan(actor, selection, localize) {
@@ -63,6 +66,8 @@ export function advancementPlan(actor, selection, localize) {
       errors.push("Invalid"); continue;
     }
     const steps = advancementCost(row.level, target + row.ranks, row.multiplier);
+    // Points already invested by lessons or study count toward the first rank.
+    if (row.progress) steps[0] = Math.max(0, steps[0] - row.progress);
     if (row.prerequisite) {
       const predecessor = byId.get(`ability:${row.prerequisite}`);
       if (!predecessor || (selection[predecessor.id] ?? predecessor.base) + predecessor.ranks < 5) errors.push("Locked");

@@ -36,10 +36,10 @@ test("dimeritium lowers Vigor by 1 per unit within 5 m and to 0 on contact; witc
   const ingots = { name: "Двимерит", type: "equipment", system: { ruleId: "material.dimeritium", quantity: 3, carried: true } };
   assert.equal(isDimeritium({ name: "Чертёж: Двимерит", type: "recipe", system: {} }), false);
   const mage = items => ({ type: "character", items, statuses: new Set(), system: { details: { race: "human" } } });
-  assert.deepEqual(dimeritiumState(mage([ring, ingots])), { nearby: 4, touching: false });
+  assert.deepEqual(dimeritiumState(mage([ring, ingots])), { nearby: 4, touching: false, zone: false, resisted: false });
   assert.equal(dimeritiumModifiers(dimeritiumState(mage([ring, ingots])))[0].value, -4);
   assert.equal(dimeritiumState(mage([{ ...ring, system: { ...ring.system, equipped: true } }])).touching, true);
-  assert.equal(dimeritiumModifiers({ nearby: 0, touching: true })[0].value, -1000);
+  assert.equal(dimeritiumModifiers({ nearby: 0, touching: true, zone: false, resisted: false })[0].value, -1000);
   assert.equal(dimeritiumState({ ...mage([ring]), system: { details: { race: "witcher" } } }), null);
   assert.equal(dimeritiumState(mage([])), null);
   assert.equal(dimeritiumResult(12).status, "nausea"); assert.equal(dimeritiumResult(9).damage, "1d6"); assert.match(dimeritiumResult(18).text, /чешется/);
@@ -57,7 +57,7 @@ test("a bestiary mage's dimeritium vulnerability is a description, not carried m
   for (const type of ["ability", "spell", "recipe"]) assert.equal(isDimeritium({ type, name: "Двимерит", system: { ruleId: "dimeritium" } }), false);
   for (const type of ["weapon", "armor", "equipment"]) assert.equal(isDimeritium({ type, name: "Двимеритовый предмет", system: { kind: "container" } }), true);
   mage.items.push({ type: "equipment", name: "Слиток", system: { ruleId: "material.dimeritium", quantity: 2, carried: true } });
-  assert.deepEqual(dimeritiumState(mage), { nearby: 2, touching: false });
+  assert.deepEqual(dimeritiumState(mage), { nearby: 2, touching: false, zone: false, resisted: false });
   assert.equal(deriveStatistics(mage.system, { items: mage.items, dimeritium: dimeritiumState(mage) }).vigor, 8);
 });
 

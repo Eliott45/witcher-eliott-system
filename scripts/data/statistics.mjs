@@ -26,7 +26,9 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const background = backgroundModifiers(details, abilityIds).filter(modifier =>
     modifier.source !== ENHANCED_SENSES || !witcherSensesSuppressed(details, items));
   const modifiers = [...background, ...witcherModifiers({ details, lifepath }), ...lifeEventModifiers({ details, lifepath }), ...mutationModifiers(mutations), ...equippedItems(items).flatMap(wearerBonuses), ...conditionModifiers(effects),
-    ...environmentModifiers(creatureEnvironment, { items, effects, senses: background.some(modifier => modifier.source === ENHANCED_SENSES) || Array.from(items).some(item => item.type === "ability" && item.system?.ruleId === "creature.night-vision") }), ...dimeritiumModifiers(dimeritium), ...creatureModeModifiers(creatureActor, environment), ...hagModifiers(creatureActor)];
+    ...environmentModifiers(creatureEnvironment, { items, effects, senses: background.some(modifier => modifier.source === ENHANCED_SENSES) || Array.from(items).some(item => item.type === "ability" && item.system?.ruleId === "creature.night-vision") }), ...creatureModeModifiers(creatureActor, environment), ...hagModifiers(creatureActor)];
+  // Resisting dimeritium keeps half of the Vigor every other source produces.
+  modifiers.push(...dimeritiumModifiers(dimeritium, Math.max(0, vigor + modifierTotal(modifiers, "vigor"))));
   const reputationBonus = modifierTotal(modifiers, "reputation");
   const reputationTotal = reputationLevel(reputation.value, reputationBonus);
   modifiers.push(...reputationModifiers(reputation, reputationTotal));

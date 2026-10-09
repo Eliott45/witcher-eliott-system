@@ -51,6 +51,8 @@ export class WitcherActorData extends foundry.abstract.TypeDataModel {
       carriedWeight: new NumberField({ required: true, nullable: false, min: 0, initial: 0 }),
       crowns: new NumberField({ required: true, nullable: false, min: 0, initial: 0 }),
       experience: new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 }),
+      // Core p.59: IP from lessons or study invested toward the next rank, keyed by advancement entry id.
+      training: new foundry.data.fields.TypedObjectField(new NumberField({ required: true, nullable: false, integer: true, min: 0, initial: 0 })),
       reputation: new SchemaField({
         value: new NumberField({ required: true, nullable: false, integer: true, min: 0, max: 10, initial: 0 }),
         bonusEnabled: new BooleanField({ initial: false }),

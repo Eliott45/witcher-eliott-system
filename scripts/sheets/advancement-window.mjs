@@ -19,11 +19,13 @@ export function advancementContext(actor, selection = {}, category = "skills") {
     const locked = predecessor && (selection[predecessor.id] ?? predecessor.base) + predecessor.ranks < 5;
     const maxed = to !== null && to >= 10;
     const unset = row.base === null || (row.kind === "attributes" && row.base === 0);
-    const price = maxed || unset ? 0 : advancementCost(to, to + 1, row.multiplier)[0];
+    const full = maxed || unset ? 0 : advancementCost(to, to + 1, row.multiplier)[0];
+    // Lesson points count only toward the rank right after the current one.
+    const invested = to === row.level ? Math.min(row.progress, full) : 0, price = full - invested;
     return { ...row, displayLevel: row.level ?? "—", displayTarget: to ?? "—", price,
       unlocked: !locked, prerequisiteName: predecessor?.name ?? "",
       selected: target > row.base, cannotIncrease: Boolean(locked || maxed || unset || !actor.isOwner), cannotDecrease: !(target > row.base) || !actor.isOwner,
-      hint: unset ? t("Unset") : locked ? `${t("Requires")} ${predecessor.name} 5` : maxed ? t("Maximum") : `${price} ${t("Unit")} · ${t("NextRank")}`,
+      hint: unset ? t("Unset") : locked ? `${t("Requires")} ${predecessor.name} 5` : maxed ? t("Maximum") : `${price} ${t("Unit")} · ${t("NextRank")}${invested ? ` · вложено ${invested} из ${full}` : ""}`,
       ruleHint: row.multiplier === 10 ? t("AttributeRule") : row.multiplier === 2 ? t("ComplexRule") : t("SkillRule"),
       ranksHint: row.ranks ? `${t("LifepathRanks")}: +${row.ranks}` : "",
       badge: row.multiplier === 2 ? "×2" : row.multiplier === 10 ? "×10" : "",
@@ -38,7 +40,7 @@ export function advancementContext(actor, selection = {}, category = "skills") {
   const profession = definition ? { name: definition.name, defining: nodes[0], branches: definition.branches.map((name, index) => ({
     name, entries: nodes.filter(node => node.branch === String(index))
   })) } : null;
-  return { ...plan, rows, profession, isProfession: category === "profession", actorName: actor.name, editable: actor.isOwner,
+  return { ...plan, rows, profession, isProfession: category === "profession", actorName: actor.name, editable: actor.isOwner, canTrain: Boolean(game.user?.isGM),
     changes: plan.changes.map(row => ({ ...row, calculation: `${row.steps.join(" + ")} = ${row.cost} ${t("Unit")}` })),
     error: plan.errors.length ? t(plan.errors[0]) : "",
     categories: Object.entries(categories).map(([id, icon]) => ({ id, icon, label: `WITCHER.Advancement.Categories.${id}`, active: id === category })),
@@ -57,6 +59,7 @@ export class AdvancementWindow extends foundry.applications.api.HandlebarsApplic
       reset: AdvancementWindow.#reset,
       purchase: AdvancementWindow.#purchase,
       savePoints: AdvancementWindow.#savePoints,
+      training: AdvancementWindow.#training,
       viewSheetItem
     }
   };
@@ -186,6 +189,11 @@ export class AdvancementWindow extends foundry.applications.api.HandlebarsApplic
       this.notice = game.i18n.format("WITCHER.Advancement.Purchased", { cost: plan.cost });
       this.purchaseSucceeded = true;
     });
+  }
+
+  static async #training() {
+    if (this.busy || !game.user.isGM) return;
+    await game.system.api.train({ student: this.actor });
   }
 
   static #savePoints() {

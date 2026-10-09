@@ -20,6 +20,8 @@ import { registerSpellContentMigration,migrateSpellContent } from "./migrations/
 import { registerOilExpiry } from "./workshop/upgrades.mjs";
 import { registerConsumption } from "./workshop/consumption.mjs";
 import { registerForaging } from "./chat/foraging.mjs";
+import { registerTraining } from "./sheets/training-window.mjs";
+import { registerDimeritiumResistance } from "./magic/dimeritium.mjs";
 import { migratePoisonEffects } from "./migrations/poison-effects.mjs";
 import { registerCriticalWoundHooks } from "./combat/critical-wound-effects.mjs";
 import { registerHealingRequests } from "./combat/healing.mjs";
@@ -105,6 +107,8 @@ Hooks.once("init", async () => {
   registerCombatTactics();
   registerGroupAmbush();
   registerForaging();
+  registerTraining();
+  registerDimeritiumResistance();
   CONFIG.Combat.initiative.formula = INITIATIVE_FORMULA;
   registerStatusEffects();
   registerUniqueStatuses();

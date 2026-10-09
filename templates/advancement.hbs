@@ -12,6 +12,7 @@
       </nav>
       <p class="witcher-advancement-rule">{{rules}}</p>
       <p class="witcher-advancement-note">{{localize "WITCHER.Advancement.SessionRule"}}</p>
+      {{#if canTrain}}<button type="button" class="witcher-advancement-training" data-action="training"><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i> Обучение у наставника</button>{{/if}}
       {{#if magicPoints}}<p class="witcher-advancement-note">Магические О.У.: <b>{{magicPoints}}</b>. Используются первыми для Сотворения, Ритуалов и Порч.</p>{{/if}}
       {{#if editable}}
       <details class="witcher-advancement-adjust">

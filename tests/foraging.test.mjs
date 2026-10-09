@@ -156,7 +156,7 @@ test("GM macro is private by default, installs idempotently, and API refuses a p
   const pack={collection:'witcher-eliott-system.macros',locked:true,index,getIndex:async()=>index,configure:async value=>{pack.locked=value.locked;locks.push(value.locked);}};
   game.users={activeGM:{isSelf:true}};game.packs=new Map([[pack.collection,pack]]);
   foundry.documents.Macro={createDocuments:async data=>{data.forEach(item=>index.set(item._id,item));return data;}};
-  await migrateMacroContent();await migrateMacroContent();assert.equal(index.size,2);assert.deepEqual(locks,[false,true]);
+  await migrateMacroContent();await migrateMacroContent();assert.equal(index.size,MACRO_SOURCES.length);assert.deepEqual(locks,[false,true]);
 });
 
 test("player's chat click rolls Survival on their own client, waits for GM claim, and publishes readiness after the die",async()=>{

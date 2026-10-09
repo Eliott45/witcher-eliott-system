@@ -22,5 +22,17 @@
       "default": 0
     },
     "flags": {}
+  },
+  {
+    "_id": "trainingGM000001",
+    "name": "Обучение (ГМ)",
+    "type": "script",
+    "scope": "global",
+    "img": "icons/svg/book.svg",
+    "command": "await game.system.api.train();",
+    "ownership": {
+      "default": 0
+    },
+    "flags": {}
   }
 ]

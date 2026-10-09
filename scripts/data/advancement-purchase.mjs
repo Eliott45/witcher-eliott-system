@@ -15,6 +15,7 @@ export function purchaseAdvancement(actor, selection, expected, localize = key =
     const update = { "system.experience": plan.remaining };
     if(plan.magicSpent)update["system.magic.improvementPoints"]=plan.magicRemaining;
     for (const row of plan.changes) {
+      if (row.progress) update[`system.training.${row.id}`] = 0;
       if (row.kind === "skills") update[`system.skills.${row.key}`] = row.target;
       else if (row.kind === "attributes") update[`system.attributes.${row.key}`] = row.target;
       else if (row.kind === "languages") {

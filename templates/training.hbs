@@ -1,0 +1,13 @@
+<div class="witcher-foraging-content witcher-training-content">
+  <header><i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i><div><span>Развитие · ведущий</span><h2>Обучение навыку</h2></div></header>
+  <div class="witcher-foraging-fields">
+    <label>Ученик<select name="student" required>{{#each actors}}<option value="{{id}}" {{#if student}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+    <label>Наставник<select name="teacher"><option value="">— без наставника: изучение и практика —</option>{{#each actors}}<option value="{{id}}" {{#if teacher}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+  </div>
+  <div class="witcher-foraging-fields">
+    <label>Навык ученика<select name="entry" required data-training-entries></select></label>
+    <label><span data-training-points-label>О.У. за урок</span><input type="number" name="points" min="1" max="100" step="1" value="3" required></label>
+  </div>
+  <div class="witcher-training-preview" data-training-preview aria-live="polite"></div>
+  <p class="witcher-foraging-hint">С наставником урок обычно даёт 1–5 О.У., продолжительность обучения задаёт ведущий. Наставник доводит навык до среднего между своим уровнем навыка и Передачей знаний, но не выше собственного уровня. Без наставника — 1 О.У. за день изучения, только до уровня 2. О.У. вкладываются в навык сразу; остаток до следующего уровня сохраняется и засчитывается в окне «Развитие».</p>
+</div>
