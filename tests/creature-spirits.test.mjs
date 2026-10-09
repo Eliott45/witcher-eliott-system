@@ -249,3 +249,16 @@ test("Yrden reads where a moving token ends up, spares its caster and explains i
   bandit.token._source.x = 600; await refreshSpiritZones(scene);
   assert.equal(bandit.effects.length, 0, "leaving the circle ends the slow at once");
 });
+
+test("two copies of the same Yrden effect never double the slow and are cleaned up", async () => {
+  runtime();
+  const bandit = actor(), scene = sceneFor(bandit);
+  await createSpiritZone(scene, { x: 50, y: 50 }, { kind: "yrden", radius: 3, rounds: 5, penalty: 2 });
+  const original = bandit.effects[0];
+  const copy = { name: original.name, flags: structuredClone(original.flags), id: "e-copy", statuses: new Set(["creature-yrden"]) };
+  bandit.effects.push(copy);
+  const { conditionModifiers } = await import("../scripts/data/condition-definitions.mjs");
+  assert.deepEqual(conditionModifiers(bandit.effects).map(modifier => modifier.value), [-2, -2], "REF and SPD once, not twice");
+  await refreshSpiritZones(scene);
+  assert.equal(bandit.effects.length, 1);
+});

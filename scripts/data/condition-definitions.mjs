@@ -87,10 +87,19 @@ export function effectRules(effect) {
   const rules = effect.flags?.[SYSTEM_ID]?.condition ?? CONDITION_DEFINITIONS.find(entry=>effect.statuses.has(entry.id))?.rules ?? {};
   return poisonSaveRules(effect, rules);
 }
+const penaltyOf = effect => -Math.min(0, ...(effectRules(effect).modifiers ?? []).map(modifier => modifier.value));
 export function conditionModifiers(effects = []) {
-  const doses = new Set();
-  return Array.from(effects).filter(effect=>{
-    if(effect.disabled||effect.isSuppressed||effect.duration?.expired)return false;
+  const doses = new Set(), active = Array.from(effects).filter(effect => !effect.disabled && !effect.isSuppressed && !effect.duration?.expired);
+  // Yrden, Moon Dust and a dimeritium cloud never stack with themselves: only the strongest copy of each counts,
+  // even if two GM clients wrote the same zone effect at once.
+  const strongest = new Map();
+  for (const effect of active) {
+    const kind = effect.flags?.[SYSTEM_ID]?.creatureSuppression?.kind;
+    if (kind && (!strongest.has(kind) || penaltyOf(effect) > penaltyOf(strongest.get(kind)))) strongest.set(kind, effect);
+  }
+  return active.filter(effect=>{
+    const kind=effect.flags?.[SYSTEM_ID]?.creatureSuppression?.kind;
+    if(kind&&strongest.get(kind)!==effect)return false;
     const ruleId=effect.flags?.[SYSTEM_ID]?.consumable?.ruleId;
     if(ruleId&&doses.has(ruleId))return false;
     if(ruleId)doses.add(ruleId);

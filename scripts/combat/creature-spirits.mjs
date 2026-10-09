@@ -188,9 +188,11 @@ export function refreshSpiritZones(scene) {
         const existing = Array.from(actor.effects ?? []).filter(effect => effect.flags?.[SYSTEM_ID]?.creatureSuppression?.kind === kind && effect.flags[SYSTEM_ID].creatureSuppression.zoneUuid);
         if (!zone) { if (existing.length) await actor.deleteEmbeddedDocuments("ActiveEffect", existing.map(effect => effect.id)); continue; }
         const source = spiritSuppressionSource(actor, { kind, zoneUuid: zone.uuid, penalty: zone.penalty, zone });
-        if (existing.length === 1 && existing[0].flags[SYSTEM_ID].creatureSuppression.zoneUuid === zone.uuid) continue;
-        if (existing.length) await actor.deleteEmbeddedDocuments("ActiveEffect", existing.map(effect => effect.id));
-        await actor.createEmbeddedDocuments("ActiveEffect", [source]);
+        // Keep one copy for this zone; extra copies (e.g. written by a second GM tab) are removed.
+        const keep = existing.find(effect => effect.flags[SYSTEM_ID].creatureSuppression.zoneUuid === zone.uuid);
+        const extra = existing.filter(effect => effect !== keep).map(effect => effect.id);
+        if (extra.length) await actor.deleteEmbeddedDocuments("ActiveEffect", extra).catch(() => {});
+        if (!keep) await actor.createEmbeddedDocuments("ActiveEffect", [source]);
       }
       actor.reset?.();
       if (actor.sheet?.rendered) actor.sheet.render();
@@ -213,6 +215,11 @@ export function registerCreatureSpirits() {
     if (region.flags?.[SYSTEM_ID]?.creatureZone) refresh(region.parent);
   });
   Hooks.on("updateToken", (token, changes) => { if (["x", "y", "elevation"].some(key => key in changes)) refresh(token.parent); });
+  // A zone effect created twice at once (two GM tabs) is cleaned up on the next pass.
+  Hooks.on("createActiveEffect", effect => {
+    const scene = effect.parent?.token?.parent ?? effect.parent?.getActiveTokens?.(false, true)?.[0]?.document?.parent ?? effect.parent?.getActiveTokens?.()?.[0]?.parent;
+    if (effect.flags?.[SYSTEM_ID]?.creatureSuppression?.zoneUuid && scene) refresh(scene);
+  });
   for (const hook of ["updateCombat", "updateWorldTime", "canvasReady"]) Hooks.on(hook, () => {
     for (const scene of globalThis.game?.scenes ?? []) if (Array.from(scene.regions ?? []).some(region => region.flags?.[SYSTEM_ID]?.creatureZone)) refresh(scene);
   });
