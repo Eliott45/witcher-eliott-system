@@ -62,6 +62,9 @@ export function regenerationAtStart(actor) {
   if (creature.available) parts.push({ label: creature.label, value: creature.total });
   const hag = dose(actor, "decoction.grave-hag");
   if (hag && state(hag).kills) parts.push({ label: `Отвар из кладбищенской бабы (${state(hag).kills} убит.)`, value: 2 * state(hag).kills });
+  // Magical Healing / Blessing of Healing: 3 HP at the start of each turn while the magic lasts (core p.103).
+  for (const effect of actor.effects) if (activeEffect(effect) && effect.flags?.[SYSTEM_ID]?.magicHealing > 0)
+    parts.push({ label: effect.name, value: effect.flags[SYSTEM_ID].magicHealing });
   return { total: parts.reduce((sum, part) => sum + part.value, 0), parts, swallow };
 }
 export async function settleRegeneration(actor) {

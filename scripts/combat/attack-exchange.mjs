@@ -34,6 +34,7 @@ import { criticalTableRoll, specterDamageBonus } from "./relic-weapon-rules.mjs"
 import { applyWeaponWear } from "./weapon-wear.mjs";
 import { experimentalFrozen, clearExperimentalFreeze } from "./experimental-effects.mjs";
 import { adrenalineAbsorptionPlan, awardAdrenaline } from "./adrenaline.mjs";
+import { magicShieldPlan, absorbWithMagicShield, applySpellHit } from "../magic/spell-effects.mjs";
 import { igniteDragonClouds } from "./dragon-clouds.mjs";
 import { tokenCenter } from "./attack-target.mjs";
 import { experimentalAmmoReplacesDamage, experimentalAttackRolls, experimentalExchangeOutcome, resolveExperimentalAmmunition, experimentalAmmoHTML } from "./experimental-ammunition.mjs";
@@ -282,7 +283,10 @@ export function damagePreview(message, index) {
   const extraTotal = oil.filter(extra => !freezeExtra(extra)).reduce((sum, entry) => sum + (entry?.value ?? 0), 0);
   const hit = (actor, armorAtZone, base, silver, crit, extra = damageExtrasFor(actor, oil)) => resolveDamage({ base, silver, location: data.location.id, multiplier: multiplierFor(actor),
     traits: data.traits, armor: armorAtZone, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor), critical: crit, extra });
-  const preview = { data, target, armor, result: hit(target, armor, data.base, data.silver, critical), shield: null, prosthesis: null };
+  // Quen and Active Shield take the raw blow before armor (core p.114); unblockable magic goes straight through.
+  const soak = attack.spell && !attack.blockable ? { absorbed: 0 } : magicShieldPlan(target, data.base);
+  const preview = { data, target, armor, result: hit(target, armor, data.base - soak.absorbed, data.silver, critical), shield: null, prosthesis: null,
+    magicShield: soak.absorbed || 0 };
   const wear = (result, armorAtZone = armor) => {
     if (result.immune) return result;
     const amount = ((result.penetrated ? 1 : 0) + (data.ablation ?? 0)) * (data.hitTraits?.wearMultiplier ?? 1);
@@ -290,6 +294,7 @@ export function damagePreview(message, index) {
       steps: amount > 1 ? [...result.steps, {label:"Разрушение брони", value:`ПБ −${amount}`} ] : result.steps };
   };
   preview.result = wear(preview.result);
+  if (preview.magicShield) preview.result = { ...preview.result, steps: [{ label: "Магический щит", value: `−${preview.magicShield}`, detail: "поглощено до брони" }, ...preview.result.steps] };
   // Core p.160: a blow to a prosthesis does not hurt its owner, but knocks the prosthesis off.
   const fitted = prosthesisAt(target, data.location.id);
   if (fitted) {
@@ -363,6 +368,21 @@ export async function sufferDamage(actor, result, { wound = null, level = "", lo
   return worn;
 }
 
+/** A hit by magic without damage: roll and apply its effect once, recorded like an applied blow. */
+const pendingSpellEffects = new Set();
+export function applySpellEffect(message, index) {
+  const attack = flagsOf(message).weaponAttack, target = targetActor(attack), key = `${message.id}:${index}`;
+  if (!attack?.spell || attack.damage || !target?.isOwner || !exchangeOutcome(message, index)?.hit || linkedAny(message.id, index, "applied") || pendingSpellEffects.has(key)) return;
+  pendingSpellEffects.add(key);
+  return inventoryWrite(target, async () => {
+    if (linkedAny(message.id, index, "applied")) return;
+    const { notes } = await applySpellHit(target, attack);
+    return foundry.documents.ChatMessage.implementation.create({ blind: Boolean(message.blind), whisper: [...(message.whisper ?? [])],
+      speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: ${esc(notes.join("; ") || "без последствий")}</p>`,
+      flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: "applied", total: 0, magicNotes: notes, effects: [] } } } });
+  }).finally(() => pendingSpellEffects.delete(key));
+}
+
 export function applyExchangeDamage(message, index, options = {}) {
   if (experimentalAmmoReplacesDamage(flagsOf(message).weaponAttack)) return;
   const target = targetActor(flagsOf(message).weaponAttack);
@@ -379,14 +399,16 @@ async function applyExchangeDamageNow(message, index, { useShield = false, shiel
   const conditions = shield && shield.overflow <= 0 ? {rolls:[],effects:[]} : await rollWeaponConditions(target, data.hitTraits ?? attack.hitTraits, own, {nonLethal, blind: message.blind, ammunition:attack.ammunition, location: data.location.id});
   // Remove only the disorientation that preceded this blow; electricity may cause a new one.
   if (!shield && !own.immune && hasStatus(target, STUNNED)) await setStatus(target, STUNNED, false);
+  if (preview.magicShield && !shield) await absorbWithMagicShield(target, preview.magicShield);
   const worn = await sufferDamage(target, own, {electricity:Boolean(data.traits?.electricity), ...(shield || preview.prosthesis ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location, nonLethal })});
   if (!own.immune && (!shield || shield.overflow > 0) && !preview.prosthesis) await clearExperimentalFreeze(target);
   if (attack.push && !own.immune && own.total >= 0) await pushTarget(attack);
   if (preview.prosthesis) await knockOffProsthesis(target, preview.prosthesis);
   await applyWeaponConditions(target, conditions.effects);
+  const magic = attack.spell && !own.immune ? await applySpellHit(target, attack) : { notes: [] };
   await onCreatureExchangeApplied(message,index,own);
   const exchange = { attack: message.id, index, kind: "applied", total: own.total, steps: own.steps, from: health, nonLethal, immune: Boolean(own.immune), penetrated: Boolean(own.penetrated),
-    effects: conditions.effects, critical: Boolean(data.critical && !own.immune && !nonLethal), ablated: worn.join(", "), armorHeld: !own.penetrated && preview.armor.sp > 0 && !shield };
+    effects: conditions.effects, magicNotes: magic.notes, critical: Boolean(data.critical && !own.immune && !nonLethal), ablated: worn.join(", "), armorHeld: !own.penetrated && preview.armor.sp > 0 && !shield };
   if (shield) {
     const shieldData = { token: shield.token, name: shield.name, ...shield.result, electricity:Boolean(data.traits?.electricity), hitTraits:data.hitTraits??attack.hitTraits, ammunition:attack.ammunition,
       wound: data.critical?.wound ?? null, level: data.critical?.level ?? "", location: data.location, overflow: shield.overflow,
@@ -675,6 +697,14 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
   }
   if (outcome.limbBlock) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-hand"></i> Блок телом: урон атаки приходится в подставленную руку, ПБ учитывается. Критического ранения нет.</p>`;
   if (experimentalAmmoReplacesDamage(attack)) return `<li class="${outcome.hit ? "is-hit" : "is-miss"}">${head}<span>${defenseLine}</span></header>${body}${experimentalAmmoHTML(message, index, outcome)}</li>`;
+  // Magic without damage (Aard, Axii, Blinding Dust…): a hit applies the spell's own effect, no location or damage.
+  if (outcome.hit && attack.spell && !attack.damage) {
+    const applied = linked(message.id, index, "applied");
+    if (applied) body += `<p class="witcher-exchange-applied"><i class="fa-solid fa-wand-sparkles"></i> ${esc(exchangeOf(applied).magicNotes?.join("; ") || "Эффект применён.")}</p>`;
+    else if (target?.isOwner) body += `<div class="witcher-exchange-actions">${button("data-exchange-spell-effect", '<i class="fa-solid fa-wand-sparkles"></i> Применить эффект магии', true)}</div>`;
+    else body += `<p class="witcher-exchange-note">Эффект применяет владелец цели или мастер.</p>`;
+    return `<li class="is-hit">${head}<span>${defenseLine}</span>${verdict}</header>${body}</li>`;
+  }
   if (outcome.hit || outcome.limbBlock) {
     const damage = linked(message.id, index, "damage"), applied = linked(message.id, index, "applied");
     if (!damage && linkedAny(message.id, index, "damage")) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-dice-d6 fa-spin"></i> Урон бросается…</p>`;
@@ -695,6 +725,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
       if (applied) {
         const result = exchangeOf(applied);
         if (result.effects?.length) body += `<p class="witcher-exchange-note">${esc(weaponConditionReport(result.effects))}</p>`;
+        if (result.magicNotes?.length) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-wand-sparkles"></i> ${esc(result.magicNotes.join("; "))}</p>`;
         if (result.shield) body += `<p class="witcher-exchange-applied is-shield" data-tooltip="${esc(stepsHTML(result.shield.steps))}" data-tooltip-class="witcher-roll-tooltip"><i class="fa-solid fa-user-shield"></i> Живой щит ${esc(result.shield.name)}: −${result.shield.total} ПЗ${result.shield.applied ? "" : " <small>(применяет мастер)</small>"}</p>${result.shield.ablated ? `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> ПБ щита −1: ${esc(result.shield.ablated)}</p>` : ""}`;
         const unit = result.nonLethal ? "ВЫН" : "ПЗ";
         if (hideTargetNumbers) body += `<p class="witcher-exchange-applied"><i class="fa-solid fa-heart-crack"></i> −${result.total} ${unit}</p>`;
@@ -747,6 +778,7 @@ export function renderExchange(message, html) {
     run("[data-exchange-location]", () => rollExchangeLocation(message, index));
     run("[data-exchange-damage]", () => rollExchangeDamage(message, index));
     run("[data-exchange-apply]", () => applyExchangeDamage(message, index));
+    run("[data-exchange-spell-effect]", () => applySpellEffect(message, index));
     run("[data-exchange-apply-shield]", () => applyExchangeDamage(message, index, { useShield: true }));
     run("[data-exchange-stun]", () => rollStun(targetActor(attack)));
     run("[data-exchange-charge]", () => chargeContest(message, index) ? null : rollChargeContest(attackerActor(attack, message), targetActor(attack), `${message.id}:${index}`));

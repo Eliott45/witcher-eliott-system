@@ -14,6 +14,7 @@ import { createSpellStrikes, furySpellTargetError } from "./spell-strikes.mjs";
 import { creatureSuppression } from "../combat/creature-spirits.mjs";
 import { DIMERITIUM_RESISTED } from "./dimeritium.mjs";
 import { spellArea, placeSpellArea } from "./spell-areas.mjs";
+import { applySelfEffect, selfEffectOf } from "./spell-effects.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { matchingGlyphs, glyphBonus, spellDescriptionWithDC } from "../data/rune-glyphs.mjs";
 import { adrenalineDamage, consumeAdrenalineDamage, adrenalineAbsorptionPlan } from "../combat/adrenaline.mjs";
@@ -76,11 +77,15 @@ export function castSpell(actor,itemId,options={}) {
   return work;
 }
 
-/** Area magic (core p.168): after the cast the caster places its template; this runs outside the actor write queue. */
+/** After a successful cast: self effects (Quen, Glamour…) land on the caster, area magic places its template. */
 function startAreaPlacement(actor,itemId,posted,options) {
   const item=actor.items.get(itemId),cast=posted?.flags?.[SYSTEM_ID]?.magicCast;
-  if(options.maintenance||!item||!cast||cast.fumble?.failed||(cast.kind==="ritual"&&!cast.succeeded)||!spellArea(item.system)||!globalThis.canvas?.ready)return;
-  placeSpellArea(actor,item,posted).catch(error=>ui.notifications.warn(`${error.message} Область можно разместить кнопкой в чате.`));
+  if(options.maintenance||!item||!cast||cast.fumble?.failed||(cast.kind==="ritual"&&!cast.succeeded))return;
+  if(selfEffectOf(item.system))applySelfEffect(actor,item,cast.powerCost??item.system.cost).then(effect=>{
+    if(effect)globalThis.ui?.notifications?.info?.(`${item.name}: эффект на ${actor.name} — ${effect.name}.`);
+  }).catch(error=>globalThis.ui?.notifications?.warn?.(`${item.name}: эффект не наложен — ${error.message}`));
+  if(!spellArea(item.system)||!globalThis.canvas?.ready)return;
+  placeSpellArea(actor,item,posted).catch(error=>globalThis.ui?.notifications?.warn?.(`${error.message} Область можно разместить кнопкой в чате.`));
 }
 
 /** Post first, settle after Dice So Nice: exhaustion and fumble states appear after the result. */
