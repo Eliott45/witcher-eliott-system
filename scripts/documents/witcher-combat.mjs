@@ -4,6 +4,7 @@ import { startTurnPoison } from "../combat/poison-damage.mjs";
 import { tickNoonDance } from "../combat/creature-actions-dance.mjs";
 import { criticalWoundTurn } from "../combat/critical-wound-effects.mjs";
 import { nauseaTurn } from "../combat/nausea.mjs";
+import { dimeritiumTurn } from "../magic/dimeritium.mjs";
 import { tacticsFlags } from "../combat/tactics-rules.mjs";
 
 export class WitcherCombat extends foundry.documents.Combat {
@@ -23,6 +24,8 @@ export class WitcherCombat extends foundry.documents.Combat {
     catch(error) { console.error(`${SYSTEM_ID} | Start-turn poison`,error); ui.notifications.error("Не удалось завершить обработку отравления. Проверьте ПЗ и сообщение в чате; подробности в консоли."); }
     try { await nauseaTurn(this,combatant,context); }
     catch(error) { console.error(`${SYSTEM_ID} | Nausea`,error); ui.notifications.error("Не удалось бросить проверку тошноты. Бросьте её вручную."); }
+    try { await dimeritiumTurn(this,combatant,context); }
+    catch(error) { console.error(`${SYSTEM_ID} | Dimeritium turn`,error); ui.notifications.error("Не удалось бросить проверку от двимерита. Бросьте её вручную."); }
     try { await criticalWoundTurn(this,combatant,context); }
     catch(error) { console.error(`${SYSTEM_ID} | Critical wound turn`,error); ui.notifications.error("Не удалось провести испытание Устойчивости от критического ранения. Бросьте его вручную."); }
   }

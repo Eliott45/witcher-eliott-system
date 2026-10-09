@@ -171,3 +171,17 @@ test("startup converts legacy zero-STA stun, preserves blank sheets and avoids d
   assert.equal(hasStatus(synthetic, UNCONSCIOUS), true);
   assert.equal(blank.effects.length, 0);
 });
+
+test("a stun test (critical wound, fumble, dimeritium) makes a failure stunned and leaves a success unchanged", async () => {
+  reset(); game.user.isGM = true;
+  const tested = actor({ value: 30 });
+  total = 10;
+  await rollStun(tested, { test: true });
+  assert.equal(hasStatus(tested, STUNNED), true, "10 is not below STUN 10");
+  total = 3;
+  await rollStun(tested, { test: true });
+  assert.equal(hasStatus(tested, STUNNED), true, "a passed test is not a recovery save");
+  const steady = actor({ value: 30 });
+  await rollStun(steady, { test: true });
+  assert.equal(hasStatus(steady, STUNNED), false);
+});

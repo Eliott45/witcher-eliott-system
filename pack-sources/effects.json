@@ -1505,6 +1505,107 @@
     }
   },
   {
+    "_id": "efct000000000043",
+    "name": "Двимерит: спазмы",
+    "img": "icons/svg/daze.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Кожа чешется, подташнивает, тело периодически скручивают спазмы. Каждые 1d6 ходов в начале хода — проверка Стойкости СЛ 15, при провале персонаж ошеломлён. Длится, пока персонаж касается двимерита.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "dimeritium-spasms"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "dimeritium-spasms",
+          "dimeritium": {
+            "kind": "spasms",
+            "every": "1d6"
+          }
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000044",
+    "name": "Двимерит: жжение",
+    "img": "icons/svg/fire-shield.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Кожа словно в огне, персонаж едва может сосредоточиться: в начале каждого хода — испытание Устойчивости, при провале он дезориентирован. Длится, пока персонаж касается двимерита.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "dimeritium-agony"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "dimeritium-agony",
+          "dimeritium": {
+            "kind": "stun"
+          }
+        }
+      }
+    }
+  },
+  {
+    "_id": "efct000000000045",
+    "name": "Двимерит возжигает магию",
+    "img": "icons/svg/explosion.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>Двимерит возжигает магию в теле: в начале каждого хода персонаж получает 1d6 урона, пока касается двимерита. Броня этот урон не поглощает.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "dimeritium-burn"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "dimeritium-burn",
+          "dimeritium": {
+            "kind": "damage",
+            "formula": "1d6"
+          }
+        }
+      }
+    }
+  },
+  {
     "_id": "efct000000000101",
     "name": "Чёрный яд",
     "img": "icons/svg/poison.svg",

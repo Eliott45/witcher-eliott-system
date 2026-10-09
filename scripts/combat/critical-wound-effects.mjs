@@ -277,7 +277,7 @@ export async function criticalWoundTurn(combat, combatant, context) {
     if (next !== null && context.round < next) continue;
     const interval = (await new foundry.dice.Roll(every).evaluate()).total;
     await effect.update({ [`flags.${SYSTEM_ID}.criticalWound.nextStun`]: { combat: combat.uuid, round: context.round + interval } });
-    if (next !== null) await rollStun(actor);
+    if (next !== null) await rollStun(actor, { test: true });
   }
 }
 

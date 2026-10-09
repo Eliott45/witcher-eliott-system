@@ -59,6 +59,10 @@ export const CONDITION_DEFINITIONS = [
   entry("dimeritium-contact", "Касается двимерита", "padlock", "Кандалы, цепи или оружие из двимерита касаются адепта магии: Энергия 0. Стойкость СЛ 16 по таблице двимерита каждые полчаса контакта."),
   // Core p.66: the mage's «Устойчивость к двимериту» succeeded for the current exposure.
   entry("dimeritium-resisted", "Устойчивость к двимериту", "mage-shield", "Маг прошёл проверку Устойчивости к двимериту (СЛ 16): кружится голова и мучает дискомфорт, но сохраняется половина Энергии и способность сотворять заклинания, в том числе в зоне двимеритовой бомбы. Таблица эффектов двимерита не применяется. Состояние снимается само, когда воздействие двимерита заканчивается; при новом воздействии нужна новая проверка."),
+  // Core p.167, dimeritium table: lasts while the contact does; a later half-hour check replaces it.
+  entry("dimeritium-spasms", "Двимерит: спазмы", "daze", "Кожа чешется, подташнивает, тело периодически скручивают спазмы. Каждые 1d6 ходов в начале хода — проверка Стойкости СЛ 15, при провале персонаж ошеломлён. Длится, пока персонаж касается двимерита.", { dimeritium: { kind: "spasms", every: "1d6" } }),
+  entry("dimeritium-agony", "Двимерит: жжение", "fire-shield", "Кожа словно в огне, персонаж едва может сосредоточиться: в начале каждого хода — испытание Устойчивости, при провале он дезориентирован. Длится, пока персонаж касается двимерита.", { dimeritium: { kind: "stun" } }),
+  entry("dimeritium-burn", "Двимерит возжигает магию", "explosion", "Двимерит возжигает магию в теле: в начале каждого хода персонаж получает 1d6 урона, пока касается двимерита. Броня этот урон не поглощает.", { dimeritium: { kind: "damage", formula: "1d6" } })
 ];
 export const CONDITION_BY_ID = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,entry]));
 // Variants share the status ID: poison/drunkenness cannot stack with themselves.

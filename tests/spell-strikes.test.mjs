@@ -42,7 +42,7 @@ test("dimeritium lowers Vigor by 1 per unit within 5 m and to 0 on contact; witc
   assert.equal(dimeritiumModifiers({ nearby: 0, touching: true, zone: false, resisted: false })[0].value, -1000);
   assert.equal(dimeritiumState({ ...mage([ring]), system: { details: { race: "witcher" } } }), null);
   assert.equal(dimeritiumState(mage([])), null);
-  assert.equal(dimeritiumResult(12).status, "nausea"); assert.equal(dimeritiumResult(9).damage, "1d6"); assert.match(dimeritiumResult(18).text, /чешется/);
+  assert.equal(dimeritiumResult(12).status, "nauseated"); assert.equal(dimeritiumResult(9).damage, "1d6"); assert.match(dimeritiumResult(18).text, /чешется/);
   assert.match(castingComponents(4), /слова/); assert.match(castingComponents(8), /только пассы/); assert.match(castingComponents(10), /любой частью тела/);
 });
 

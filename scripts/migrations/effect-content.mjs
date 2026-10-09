@@ -12,7 +12,8 @@ import { stripPageReferences } from "../data/item-lore.mjs";
 // 8: Standing spends all movement; refresh existing prone effects as well as the catalog.
 // 9: append environment exceptions (sun, lit, land/water/underwater) and dimeritium contact.
 // 10: append the mage's «Устойчивость к двимериту» state (core p.66).
-export const EFFECT_CONTENT_VERSION = 10;
+// 11: append the dimeritium table rows: spasms, agony and burning magic (core p.167).
+export const EFFECT_CONTENT_VERSION = 11;
 // Earlier shipped names still count as unedited entries.
 const PREVIOUS_NAMES = { prone: ["Сбит с ног"] };
 const REFRESHED_CONDITIONS = new Set(["burning", "bleeding", "burrowing", "intoxicated", "blinded", "nauseated", "dying", "prone"]);

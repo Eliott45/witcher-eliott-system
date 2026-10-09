@@ -24,11 +24,14 @@ const carried = item => item.system?.carried !== false;
 export const DIMERITIUM_TABLE = [
   { min: 18, text: "Кожа чешется: дискомфорт, но не более." },
   { min: 16, text: "Кожа чешется, слегка подташнивает, но в целом всё в порядке." },
-  { min: 14, text: "Кожа чешется, подташнивает, тело периодически скручивают спазмы: каждые 1d6 ходов — Стойкость СЛ 15, иначе ошеломление." },
-  { min: 12, text: "Кожа горит, желудок крутит: тошнота.", status: "nausea" },
-  { min: 10, text: "Кожа словно в огне, едва может сосредоточиться: испытание Устойчивости каждый раунд." },
-  { min: -Infinity, text: "Двимерит возжигает магию в теле: 1d6 урона каждый раунд, пока касается двимерита.", damage: "1d6" }
+  { min: 14, text: "Кожа чешется, подташнивает, тело периодически скручивают спазмы: каждые 1d6 ходов — Стойкость СЛ 15, иначе ошеломление.", status: "dimeritium-spasms" },
+  { min: 12, text: "Кожа горит, желудок крутит: тошнота.", status: "nauseated" },
+  { min: 10, text: "Кожа словно в огне, едва может сосредоточиться: испытание Устойчивости каждый раунд.", status: "dimeritium-agony" },
+  { min: -Infinity, text: "Двимерит возжигает магию в теле: 1d6 урона каждый раунд, пока касается двимерита.", damage: "1d6", status: "dimeritium-burn" }
 ];
+// Table rows that last only while the metal touches the adept. Nausea is the ordinary condition with its own end.
+export const DIMERITIUM_TABLE_STATES = ["dimeritium-spasms", "dimeritium-agony", "dimeritium-burn"];
+const activeStatus = (actor, id) => Array.from(actor?.effects ?? []).some(effect => !effect.disabled && !effect.isSuppressed && effect.statuses?.has?.(id));
 export const dimeritiumResult = total => DIMERITIUM_TABLE.find(row => total >= row.min);
 
 /** Units nearby and contact for one actor (null when the rule does not apply). */
@@ -88,19 +91,27 @@ export async function rollDimeritiumResistance(actor, state) {
   if (success) {
     const { setStatus } = await import("../combat/status-effects.mjs");
     await setStatus(actor, DIMERITIUM_RESISTED, true);
+    // Resisting replaces the table: only dizziness and discomfort remain.
+    for (const id of DIMERITIUM_TABLE_STATES) await setStatus(actor, id, false);
   }
   return success;
 }
 
-/** Active GM: an exposure ended, so the next one needs a fresh check (core p.66). */
-export async function clearEndedDimeritiumResistance(actors, tokenOf) {
+const TRACKED = [DIMERITIUM_RESISTED, ...DIMERITIUM_TABLE_STATES];
+const tracked = actor => TRACKED.some(id => actor?.statuses?.has?.(id));
+
+/** Active GM: an exposure ended, so the next one needs a fresh check (core p.66); table rows end with the contact. */
+export async function clearEndedDimeritiumEffects(actors, tokenOf) {
   const { setStatus } = await import("../combat/status-effects.mjs");
   for (const actor of actors) {
-    if (actor?.statuses?.has?.(DIMERITIUM_RESISTED) && !dimeritiumState(actor, tokenOf(actor))) await setStatus(actor, DIMERITIUM_RESISTED, false);
+    if (!tracked(actor)) continue;
+    const state = dimeritiumState(actor, tokenOf(actor));
+    if (!state && actor.statuses.has(DIMERITIUM_RESISTED)) await setStatus(actor, DIMERITIUM_RESISTED, false);
+    if (!state?.touching || state.resisted) for (const id of DIMERITIUM_TABLE_STATES) if (actor.statuses.has(id)) await setStatus(actor, id, false);
   }
 }
 
-/** Endurance DC 16 against the dimeritium table; nausea is applied, the rest is described. */
+/** Endurance DC 16 against the dimeritium table. The rolled row replaces the row of an earlier half-hour check. */
 export async function rollDimeritium(actor) {
   const { skillValue } = await import("../data/skills.mjs");
   const endurance = skillValue(actor.system, "endurance");
@@ -108,11 +119,50 @@ export async function rollDimeritium(actor) {
   const row = dimeritiumResult(roll.total);
   await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), flags: { [SYSTEM_ID]: { skipLuck: true } },
     flavor: `<section class="witcher-magic-chat"><h3>Двимерит · Стойкость СЛ 16</h3><p>Энергия снижена до 0, пока длится касание. Проверка повторяется каждые полчаса контакта.</p><p><strong>${roll.total}</strong>: ${row.text}</p></section>` });
-  if (row.status) {
-    const { setStatus } = await import("../combat/status-effects.mjs");
-    await setStatus(actor, row.status, true);
-  }
+  const { setStatus } = await import("../combat/status-effects.mjs");
+  for (const id of DIMERITIUM_TABLE_STATES) if (id !== row.status) await setStatus(actor, id, false);
+  if (row.status) await setStatus(actor, row.status, true);
   return row;
+}
+
+/** The < 10 row: 1d6 a turn while touching, unless resisted. Read by the start-turn damage step. */
+export function dimeritiumBurnActive(actor, token = null) {
+  if (!activeStatus(actor, "dimeritium-burn") || activeStatus(actor, "dead")) return false;
+  const state = dimeritiumState(actor, token);
+  return Boolean(state?.touching && !state.resisted);
+}
+
+/** Start of the adept's turn (active GM): spasms every 1d6 turns (Endurance DC 15 or staggered); agony each round. */
+export async function dimeritiumTurn(combat, combatant, context) {
+  const actor = combatant?.actor;
+  if (!actor || game.user !== game.users.activeGM || !combat.started || context.skipped || context.round < 1 || activeStatus(actor, "dead")) return;
+  const state = dimeritiumState(actor, combatant.token ?? null);
+  if (!state?.touching || state.resisted) return;
+  const messageMode = combatant.hidden ? "gm" : game.settings.get("core", "messageMode");
+  const spasms = Array.from(actor.effects).find(effect => !effect.disabled && !effect.isSuppressed && effect.statuses?.has?.("dimeritium-spasms"));
+  if (spasms) {
+    const stored = spasms.flags?.[SYSTEM_ID]?.dimeritiumSpasms, next = stored?.combat === combat.uuid ? stored.round : null;
+    if (next === null || context.round >= next) {
+      const interval = (await new foundry.dice.Roll("1d6").evaluate()).total;
+      await spasms.update({ [`flags.${SYSTEM_ID}.dimeritiumSpasms`]: { combat: combat.uuid, round: context.round + interval } });
+      // The first check comes after a full interval, like other periodic conditions.
+      if (next !== null) {
+        const { skillValue } = await import("../data/skills.mjs");
+        const roll = await new foundry.dice.Roll(`1d10wc + ${skillValue(actor.system, "endurance")?.total ?? 0}`).evaluate();
+        const failed = roll.total < 15;
+        await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), flags: { [SYSTEM_ID]: { skipLuck: true } },
+          flavor: `<section class="witcher-magic-chat"><h3>Двимерит: спазмы · Стойкость СЛ 15</h3><p><strong>${roll.total}</strong>: ${failed ? "спазм скручивает тело — персонаж ошеломлён." : "удалось перетерпеть."}</p></section>` }, { messageMode });
+        if (failed) {
+          const { applyWeaponConditions } = await import("../combat/weapon-hit-effects.mjs");
+          await applyWeaponConditions(actor, [{ id: "staggered", applied: true }]);
+        }
+      }
+    }
+  }
+  if (activeStatus(actor, "dimeritium-agony")) {
+    const { rollStun } = await import("../combat/stun-roll.mjs");
+    await rollStun(actor, { test: true, messageMode });
+  }
 }
 
 /** Sweep after anything that can end an exposure: movement, dropping or unequipping metal, the zone expiring. */
@@ -122,14 +172,14 @@ export function registerDimeritiumResistance() {
     if (!game.users?.activeGM?.isSelf) return;
     clearTimeout(timer);
     timer = setTimeout(async () => {
-      const actors = new Set(game.actors.filter(actor => actor.statuses?.has?.(DIMERITIUM_RESISTED)));
+      const actors = new Set(game.actors.filter(tracked));
       for (const scene of game.scenes) for (const token of scene.tokens)
-        if (!token.actorLink && token.actor?.statuses?.has?.(DIMERITIUM_RESISTED)) actors.add(token.actor);
+        if (!token.actorLink && tracked(token.actor)) actors.add(token.actor);
       if (!actors.size) return;
       const { actorToken } = await import("../combat/environment.mjs");
-      await clearEndedDimeritiumResistance(actors, actorToken).catch(error => console.error(`${SYSTEM_ID} | Dimeritium resistance`, error));
+      await clearEndedDimeritiumEffects(actors, actorToken).catch(error => console.error(`${SYSTEM_ID} | Dimeritium`, error));
     }, 300);
   };
-  for (const hook of ["updateToken", "createToken", "deleteToken", "createItem", "updateItem", "deleteItem", "deleteActiveEffect",
+  for (const hook of ["updateToken", "createToken", "deleteToken", "createItem", "updateItem", "deleteItem", "createActiveEffect", "deleteActiveEffect",
     "updateRegion", "deleteRegion", "updateCombat", "updateWorldTime"]) Hooks.on(hook, sweep);
 }

@@ -556,7 +556,7 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
       if (item) await blockWeapon(actor, item, "stuck", `Оружие застряло: ${item.name}`, `${item.name} застряло в ближайшем предмете. Пока его не достанете (это действие), им нельзя атаковать и блокировать.`, null);
       notes.push(`${item?.name ?? "Оружие"} застряло: достать — действие`);
     }
-    if (step.id === "stun") { await rollStun(actor); notes.push("испытание Устойчивости брошено"); }
+    if (step.id === "stun") { await rollStun(actor, { test: true }); notes.push("испытание Устойчивости брошено"); }
     return await post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls, whisper: [...(message.whisper ?? [])], blind: Boolean(message.blind), content: `<p>Провал: ${esc(notes.join("; "))}</p>`,
       flags: { [SYSTEM_ID]: { skipLuck: true, exchange: { attack: message.id, index, kind: stepKind(role, step.id), notes, ...extra } } } }, message.blind ? "blind" : message.whisper?.length ? "gm" : "public");
   } finally { pendingRolls.delete(key); }

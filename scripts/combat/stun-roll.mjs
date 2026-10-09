@@ -5,7 +5,11 @@ import { SYSTEM_ID } from "../config.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { stunTooltip, escapeTooltip } from "../sheets/statistics-tooltips.mjs";
 
-export async function rollStun(actor, { messageMode = game.settings.get("core", "messageMode"), messageData = {} } = {}) {
+/**
+ * A stun save. As a recovery save (default) success ends Stunned. As a test (`test: true`: critical wounds,
+ * fumbles, dimeritium) failure makes the character stunned and success leaves the state unchanged.
+ */
+export async function rollStun(actor, { messageMode = game.settings.get("core", "messageMode"), messageData = {}, test = false } = {}) {
   if (!actor.isOwner) return;
   const conditions = conditionRules(actor);
   if (!conditions.canStunSave) {
@@ -38,6 +42,10 @@ export async function rollStun(actor, { messageMode = game.settings.get("core", 
       })
     }, { messageMode });
     await display.wait(message);
+    if (message && test) {
+      if (!stunSucceeded(roll.total, target) && !hasStunned(actor)) await setStunned(actor, true).catch(reportEffectError);
+      return message;
+    }
     if (message && stunSucceeded(roll.total, target) && hasStunned(actor)) {
       const current = conditionRules(actor);
       if (current.canStunSave && actor.system.exhaustionEpisode === exhaustionEpisode) {
