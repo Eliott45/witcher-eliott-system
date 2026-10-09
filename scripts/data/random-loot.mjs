@@ -62,6 +62,16 @@ const references = {
 };
 const catalogue = [...CORE_EQUIPMENT, ...EQUIPMENT, ...MATERIALS];
 const labels = { ordinary: "Обычные", strange: "Странные", occult: "Оккультные" };
+export const RANDOM_LOOT_LABELS = labels;
+export const RANDOM_LOOT_SOURCE = "Базовая книга, стр. 223, «Случайные личные вещи»";
+// Shown on the sheet. A paragraph that is only a page citation is hidden there, so the page lives in system.source.
+const prose = {
+  ordinary: "Обычная личная вещь — такую можно найти в кармане или сумке путника, горожанина или наёмника.",
+  strange: "Странная вещь: зачем её носили с собой, можно только гадать.",
+  occult: "Оккультная вещь, связанная с тёмными обрядами, суевериями или чёрной магией. Такая находка может навести на след ведьмы, культа или чудовища."
+};
+/** Shipped before the item prose existed; migrations recognise it. */
+export const legacyRandomLootDescription = (category, name) => `<p>${RANDOM_LOOT_SOURCE}: ${labels[category].toLowerCase()}. ${name}.</p>`;
 export const RANDOM_LOOT_TABLES = Object.fromEntries(Object.entries(labels).map(([category, label], column) => [category,
   rows.map((row, index) => {
     const name = row[column], ruleId = references[name];
@@ -69,7 +79,7 @@ export const RANDOM_LOOT_TABLES = Object.fromEntries(Object.entries(labels).map(
     return {
       min: index * 3 + 1, max: index === rows.length - 1 ? 100 : index * 3 + 3,
       name, quantity: 1,
-      description: `Базовая книга, стр. 223, «Случайные личные вещи»: ${label.toLowerCase()}. ${name}.`,
+      description: `<p>${prose[category]} Ценность и подробности определяет ведущий.</p>`, source: `${RANDOM_LOOT_SOURCE} (${label.toLowerCase()})`,
       ...(linked ? { ruleId: linked.id, documentId: linked.documentId } : {})
     };
   })

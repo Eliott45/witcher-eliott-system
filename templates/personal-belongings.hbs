@@ -1,0 +1,9 @@
+<div class="witcher-foraging-content witcher-belongings-content">
+  <header><i class="fa-solid fa-sack-xmark" aria-hidden="true"></i><div><span>Добыча · ведущий</span><h2>Случайные личные вещи</h2></div></header>
+  <div class="witcher-foraging-fields">
+    <label>Таблица<select name="category" required>{{#each categories}}<option value="{{id}}">{{label}}</option>{{/each}}</select></label>
+    <label>Сколько вещей<input name="formula" type="text" value="1" placeholder="Например: 1, 3 или 1d6" required></label>
+  </div>
+  <label>Кому выдать<select name="recipient"><option value="">— никому, только результат в чат —</option>{{#each actors}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+  <p class="witcher-foraging-hint">На каждую вещь бросается d100 по выбранному столбцу таблицы. Совпадающие результаты складываются в одну стопку. Вещи с аналогом в каталоге (зеркальце, воровские инструменты, палатка, светящаяся руда…) берутся из компендиума, остальные создаются простыми предметами с описанием.</p>
+</div>

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { RANDOM_LOOT_TABLES, randomLootCategory, randomLootEntry } from "../scripts/data/random-loot.mjs";
+import { stripPageReferences } from "../scripts/data/item-lore.mjs";
 
 test("all three p.223 tables cover each percentile result exactly once", () => {
   assert.deepEqual(Object.keys(RANDOM_LOOT_TABLES), ["ordinary", "strange", "occult"]);
@@ -14,7 +15,9 @@ test("all three p.223 tables cover each percentile result exactly once", () => {
     }
     assert.deepEqual(entries.at(-1).min, 97);
     assert.deepEqual(entries.at(-1).max, 100);
-    assert.ok(entries.every(entry => entry.quantity === 1 && entry.description.includes("223")));
+    assert.ok(entries.every(entry => entry.quantity === 1 && entry.source.includes("223")));
+    // The sheet hides citation-only paragraphs: the prose must survive that.
+    for (const entry of entries) assert.ok(stripPageReferences(entry.description).replace(/<[^>]*>/g, "").trim().length > 40, entry.name);
   }
   for (const roll of [0, 101, -1, NaN, Infinity, 1.5, "1"]) assert.equal(randomLootEntry("ordinary", roll), null);
   assert.equal(randomLootEntry("unknown", 1), null);

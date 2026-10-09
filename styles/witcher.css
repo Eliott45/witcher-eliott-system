@@ -1147,3 +1147,5 @@ b.witcher-gm-only::after, span.witcher-gm-only::after { display:none; }
 .witcher-training-preview p, .witcher-training-card p { margin:2px 0; }
 .witcher-training-error { color:#8c2f22; }
 .witcher-advancement-training { width:100%; margin:8px 0; }
+.witcher-belongings-card ul { margin:4px 0 6px; padding-left:18px; }
+.witcher-belongings-card li { margin:1px 0; }

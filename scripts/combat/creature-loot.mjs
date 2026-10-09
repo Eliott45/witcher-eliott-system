@@ -1,7 +1,8 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
-import { randomLootCategory, randomLootEntry } from "../data/random-loot.mjs";
+import { randomLootCategory } from "../data/random-loot.mjs";
+import { rollPersonalBelongings } from "../loot/personal-belongings.mjs";
 import { inventoryTransaction, copyPhysical } from "../workshop/transaction.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
@@ -52,24 +53,8 @@ export function generateCreatureLoot(actor) {
         return Math.max(0, Math.floor(roll.total));
       };
       const personalBelongings = async (category, quantity) => {
-        const selected = new Map();
-        for (let i = 0; i < quantity; i++) {
-          const result = await quantityRoll("1d100"), entry = randomLootEntry(category, result);
-          if (!entry) throw new Error(`Не найден результат ${result} в таблице личных вещей.`);
-          const key = `${entry.min}-${entry.max}`;
-          const existing = selected.get(key);
-          if (existing) { existing.system.quantity += entry.quantity; continue; }
-          let item;
-          if (entry.documentId) {
-            const uuid = `Compendium.${SYSTEM_ID}.equipment.Item.${entry.documentId}`;
-            const source = await foundry.utils.fromUuid(uuid);
-            if (!source || !isPhysical(source)) throw new Error(`Предмет случайной добычи недоступен: ${entry.name}.`);
-            item = copyPhysical(source, entry.quantity);
-          } else item = { name: entry.name, type: "equipment", img: "icons/svg/item-bag.svg",
-            system: { quantity: entry.quantity, description: `<p>${esc(entry.description)}</p>` } };
-          selected.set(key, item);
-        }
-        for (const item of selected.values()) { creates.push(item); report.push(`${item.name}: ${item.system.quantity}`); }
+        const { items } = await rollPersonalBelongings(category, quantity, () => quantityRoll("1d100"));
+        for (const item of items) { creates.push(item); report.push(`${item.name}: ${item.system.quantity}`); }
       };
       if (!generated) for (const row of actor.system.creature.loot) {
         const quantity = await quantityRoll(row.formula);

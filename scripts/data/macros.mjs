@@ -7,4 +7,7 @@ export const MACRO_SOURCES = [{
 },{
   _id:"trainingGM000001",name:"Обучение (ГМ)",type:"script",scope:"global",img:"icons/svg/book.svg",
   command:"await game.system.api.train();",ownership:{default:0},flags:{}
+},{
+  _id:"belongingsGM0001",name:"Случайные личные вещи (ГМ)",type:"script",scope:"global",img:"icons/svg/item-bag.svg",
+  command:"await game.system.api.personalBelongings();",ownership:{default:0},flags:{}
 }];

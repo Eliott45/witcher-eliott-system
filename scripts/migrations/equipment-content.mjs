@@ -21,11 +21,12 @@ import { EXPERIMENTAL_DEVICES, EXPERIMENTAL_RECIPES } from "../data/experimental
 import { relicWeaponContentUpdate } from "./relic-weapon-content.mjs";
 import { experimentalDescriptionUpdate } from "./experimental-descriptions.mjs";
 import { dimeritiumDescriptionUpdate } from "./dimeritium-descriptions.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 28;
+import { personalBelongingsDescriptionUpdate } from "./personal-belongings-descriptions.mjs";
+export const EQUIPMENT_CONTENT_VERSION = 29;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {
-  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item), ...toolDescriptionUpdate(item), ...generalGearDescriptionUpdate(item), ...specialEquipmentDescriptionUpdate(item), ...materialDescriptionUpdate(item), ...recipeDetailsUpdate(item), ...experimentalDescriptionUpdate(item), ...dimeritiumDescriptionUpdate(item) };
+  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item), ...toolDescriptionUpdate(item), ...generalGearDescriptionUpdate(item), ...specialEquipmentDescriptionUpdate(item), ...materialDescriptionUpdate(item), ...recipeDetailsUpdate(item), ...experimentalDescriptionUpdate(item), ...dimeritiumDescriptionUpdate(item), ...personalBelongingsDescriptionUpdate(item) };
   // Description migrations compose in order so a legacy cleanup is not lost to the new legend.
   Object.assign(update, relicArmorContentUpdate({ ...item, system: { ...item.system,
     description: update["system.description"] ?? item.system?.description } }));

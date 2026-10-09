@@ -34,5 +34,17 @@
       "default": 0
     },
     "flags": {}
+  },
+  {
+    "_id": "belongingsGM0001",
+    "name": "Случайные личные вещи (ГМ)",
+    "type": "script",
+    "scope": "global",
+    "img": "icons/svg/item-bag.svg",
+    "command": "await game.system.api.personalBelongings();",
+    "ownership": {
+      "default": 0
+    },
+    "flags": {}
   }
 ]
