@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { bestiarySources } from "../scripts/data/bestiary.mjs";
 import { deriveStatistics } from "../scripts/data/statistics.mjs";
-import { creatureProfile, creatureModeModifiers, creatureInvisible, creaturePackBonus, creatureGolemSlowed, creatureHasInfiniteStamina, creatureAttackParts, creatureDefenseParts } from "../scripts/data/creature-modes.mjs";
+import { creatureProfile, creatureModeModifiers, creatureInvisible, creaturePackBonus, creatureLeaderPresence, creatureGolemSlowed, creatureHasInfiniteStamina, creatureAttackParts, creatureDefenseParts } from "../scripts/data/creature-modes.mjs";
 import { creatureRegeneration } from "../scripts/data/creature-regeneration.mjs";
 import { immuneToCondition } from "../scripts/data/creatures.mjs";
 import { SKILL_KEYS } from "../scripts/data/skills.mjs";
@@ -242,4 +242,32 @@ test("successful detection persists only the current invisibility epoch with an 
   const before = record.epoch;
   await afterCreatureAttack(actor); await setCreatureMode(actor, "invisible", true);
   assert.notEqual(actor.system.creature.invisibilityEpoch, before);
+});
+
+test("barghests match the Monster Hunter's Journal statblocks and a living leader emboldens them by +3", () => {
+  const barghest = fixture("Баргест").actor, leader = fixture("Баргест-вожак").actor, kai = fixture("Кай").actor;
+  const base = (actor, attribute, skill) => actor.system.attributes[attribute] + actor.system.skills[skill];
+  // Printed bite/defense values: the leaders already include their own presence.
+  assert.deepEqual([barghest, leader, kai].map(actor => base(actor, "reflex", "brawling") + creatureLeaderPresence(actor)), [12, 15, 18]);
+  assert.deepEqual([barghest, leader, kai].map(actor => base(actor, "reflex", "dodgeEscape") + creatureLeaderPresence(actor)), [11, 14, 16]);
+  assert.deepEqual([barghest, leader, kai].map(actor => base(actor, "intelligence", "awareness")), [12, 13, 18]);
+  assert.deepEqual([barghest, leader, kai].map(actor => actor.system.creature.runBase), [0, 27, 0]);
+  assert.equal(kai.items.find(item => item.name === "Укус").system.attackRate, 2);
+  // A barghest alone gets nothing; a living leader of the scene (any pack, unless both are named) gives +3, never stacking.
+  globalThis.canvas = { scene: { tokens: [{ actor: barghest }] } };
+  assert.equal(creatureLeaderPresence(barghest), 0);
+  canvas.scene.tokens.push({ actor: leader }, { actor: kai });
+  assert.equal(creatureLeaderPresence(barghest), 3);
+  const bonus = barghest.system.statistics.modifiers.filter(mod => mod.label === "Присутствие вожака");
+  assert.deepEqual(bonus.map(mod => [mod.target, mod.value]), [["combat.attack", 3], ["combat.defense", 3]]);
+  leader.effects.push({ statuses: new Set(["dead"]) }); kai.effects.push({ statuses: new Set(["dead"]) });
+  assert.equal(creatureLeaderPresence(barghest), 0);
+  kai.effects = []; barghest.system.creature.packId = "Пустошь"; kai.system.creature.packId = "Болото";
+  assert.equal(creatureLeaderPresence(barghest), 0);
+  kai.system.creature.packId = "Пустошь";
+  assert.equal(creatureLeaderPresence(barghest), 3);
+  delete globalThis.canvas;
+  // Fire immunity also keeps them from burning.
+  assert.equal(immuneToCondition(barghest, ["burning"]), true);
+  assert.equal(immuneToCondition(fixture("Волк").actor, ["burning"]), false);
 });

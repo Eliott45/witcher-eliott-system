@@ -3,7 +3,7 @@ import { WitcherEffectItemData } from "./data/witcher-effect-item-data.mjs";
 import { registerEffectExpiry } from "./combat/effect-expiry.mjs";
 import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from "./settings.mjs";
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
-import { migrateBestiaryContent,migrateBestiaryCreatures,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
+import { migrateBestiaryContent,migrateBestiaryCreatures,migrateBestiaryJournalCreatures,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
 import { migrateBestiaryCorrections } from "./migrations/bestiary-corrections.mjs";
 import { migrateBestiaryAutomation } from "./migrations/bestiary-automation.mjs";
 import { migratePregenContent,registerPregenMigration } from "./migrations/pregen-content.mjs";
@@ -247,7 +247,7 @@ Hooks.once("ready", async () => {
     console.error(`${SYSTEM_ID} | Could not update vision defaults`, error);
     ui.notifications.error(game.i18n.localize("WITCHER.Token.MigrationFailed"));
   });
-  migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).then(migrateBestiaryAutomation).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
+  migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).then(migrateBestiaryAutomation).then(migrateBestiaryJournalCreatures).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
   migrateSpellContent().catch(error=>{
     console.error(`${SYSTEM_ID} | Could not update magic content`,error);
     ui.notifications.error("Не удалось обновить каталог магии. Подробности в консоли.");

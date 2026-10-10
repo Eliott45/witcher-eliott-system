@@ -49,5 +49,6 @@ export function immuneToCondition(actor,statuses) {
     || spiritConditionImmune(actor,ids)
     || ids.has("exhausted-stun")&&creatureHasInfiniteStamina(actor)
     || ids.has("poisoned")&&traits.has("creature.poison-immunity")
+    || ids.has("burning")&&traits.has("creature.fire-immunity")
     || traits.has("creature.construct")&&["bleeding","burning","poisoned"].some(id=>ids.has(id));
 }

@@ -58,7 +58,9 @@ const EXTRA_TRAITS = {
   flying: ["Летающее", "Может перемещаться по воздуху; правила сбивания — в способности «Полёт»."],
   fearless: ["Бесстрашие", "Его нельзя запугать, с ним нельзя договориться."],
   construct: ["Конструкция", "Не кровоточит, не горит, невосприимчив к ядам и магии разума."],
-  massive: ["Массивный", "Невосприимчив к Аард и эффектам, сбивающим с ног."]
+  massive: ["Массивный", "Невосприимчив к Аард и эффектам, сбивающим с ног."],
+  "fire-immunity": ["Невосприимчивость к огню", "Огонь не причиняет ему урона; не может загореться."],
+  "disease-immunity": ["Невосприимчивость к болезням", "Не заражается болезнями."]
 };
 // Loot names of the book that differ from the catalog names.
 const LOOT_ALIASES = { "Когти гуля": "material.ghoul-claw", "Перо грифона": "material.griffin-feathers", "Глаза беса": "material.fiend-eye", "Когти накера": "material.nekker-claw",
@@ -78,14 +80,14 @@ function catalogItem(source, id, overrides = {}) {
     system: { ...structuredClone(source.system), ruleId: source.id, ...overrides },
     flags: { ...structuredClone(source.flags ?? {}), core: { sourceId: `Compendium.${SYSTEM_ID}.equipment.Item.${source.documentId}` } } };
 }
-function creatureWeapon(weapon, id, page) {
+function creatureWeapon(weapon, id, page, book = null) {
   const source = weapon.natural ? null : CORE_EQUIPMENT.find(entry => entry.id === WEAPON_ALIASES[weapon.name] || entry.name === weapon.name);
   if (!weapon.natural && !source) throw new Error(`Missing bestiary weapon: ${weapon.name}`);
   const system = { category: weapon.category ?? "melee", skill: weapon.skill, damage: weapon.damage, natural: Boolean(weapon.natural), damageIncludesBody: true,
     ...(weapon.natural ? { damageType: weapon.damageType ?? NATURAL_DAMAGE_TYPES[weapon.name] ?? "Д" } : {}),
     equipped: true, attackRate: weapon.rate ?? 1, accuracy: weapon.accuracy ?? source?.system.accuracy ?? 0, range: weapon.range ?? source?.system.range ?? 0,
     ...(weapon.range !== undefined ? { rangeBodyMultiplier: 0 } : {}),
-    hands: weapon.hands ?? source?.system.hands ?? 1, quantity: 1, carried: true, source: `Базовая книга, стр. ${page + 1}` };
+    hands: weapon.hands ?? source?.system.hands ?? 1, quantity: 1, carried: true, source: book ? `${book}, стр. ${page}` : `Базовая книга, стр. ${page + 1}` };
   // Catalog properties keep reach, damage types and durability; the statblock supplies its own damage and rate.
   const properties = [...new Set([source?.system.properties, weapon.properties].filter(Boolean).flatMap(text => text.split(/;\s*/u)))].join("; ");
   system.properties = properties;
@@ -111,7 +113,7 @@ function coreCreature(entry, index) {
       formula: fixed ? "" : formula.replace("/", " / "), skill: "", dc: 0, attempted: false });
   }
   actor.system.creature = { category: entry.category, difficulty: entry.difficulty, reward: entry.reward, size: entry.size, weight: entry.weight, habitat: entry.habitat,
-    intellect: entry.intellect, group: entry.group, source: `Базовая книга, стр. ${entry.page}–${entry.page + 1}`, description: entry.description, tactics: entry.tactics,
+    intellect: entry.intellect, group: entry.group, source: entry.book ? `${entry.book}, стр. ${entry.page}` : `Базовая книга, стр. ${entry.page}–${entry.page + 1}`, description: entry.description, tactics: entry.tactics,
     naturalArmor: entry.armor ?? 0, resistances: entry.resistances ?? "", healthMax: entry.hp, staminaMax: entry.sta, hasTailOrWings: Boolean(entry.hasTailOrWings),
     runBase: entry.runBase ?? 0, recoveryBase: entry.recoveryBase ?? 0,
     sizeClass: entry.size_class ?? "medium", lore: (entry.lore ?? []).map(([name, skill, dc, text]) => ({ name, skill, dc, text })), loot, lootGenerated: false };
@@ -121,7 +123,7 @@ function coreCreature(entry, index) {
   const ability = (ruleId, name, description, flags = {}) => ({ _id: itemId(), name, type: "ability", img: "icons/svg/aura.svg", system: { ruleId, description: `<p>${description}</p>` }, flags });
   const items = [];
   for (const weapon of entry.weapons ?? []) {
-    const item = creatureWeapon(weapon, itemId(), entry.id === "warg" ? 286 : entry.page);
+    const item = creatureWeapon(weapon, itemId(), entry.id === "warg" ? 286 : entry.page, entry.book);
     if (weapon.natural) item.system.ruleId = `creature.weapon.${entry.id}.${items.length}`;
     items.push(item);
   }

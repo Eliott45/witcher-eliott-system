@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { bestiarySources } from "../scripts/data/bestiary.mjs";
-import { migrateBestiaryCreatures } from "../scripts/migrations/bestiary-content.mjs";
+import { migrateBestiaryCreatures, migrateBestiaryJournalCreatures } from "../scripts/migrations/bestiary-content.mjs";
 
 const SYSTEM_ID = "witcher-eliott-system";
 function fixture({ locked = true, allPresent = false } = {}) {
@@ -24,11 +24,11 @@ function fixture({ locked = true, allPresent = false } = {}) {
   return { state, pack, sources };
 }
 
-test("bestiary v2 appends thirty missing creatures, preserving existing edits and pack lock", async () => {
+test("bestiary v2 appends every missing creature, preserving existing edits and pack lock", async () => {
   const { state, pack, sources } = fixture(), saved = structuredClone(state.original);
   await migrateBestiaryCreatures();
   assert.equal(state.version, 2);
-  assert.equal(state.index.size, 32);
+  assert.equal(state.index.size, 35);
   assert.deepEqual(state.original, saved);
   assert.deepEqual(state.calls[0].options, { pack: pack.collection, keepId: true });
   assert.deepEqual(state.calls[0].documents.map(source => source._id), sources.slice(2).map(source => source._id));
@@ -49,10 +49,22 @@ test("partial bestiary creation stays retryable and only missing actors are retr
   const firstId = state.calls[0].documents[0]._id;
   state.limit = Infinity;
   await migrateBestiaryCreatures();
-  assert.equal(state.calls[1].documents.length, 29);
+  assert.equal(state.calls[1].documents.length, 32);
   assert.ok(state.calls[1].documents.every(source => source._id !== firstId));
   assert.equal(state.version, 2);
-  assert.equal(state.index.size, 32);
+  assert.equal(state.index.size, 35);
+});
+
+test("bestiary v5 adds the barghests to a world already at v4, leaving older creatures alone", async () => {
+  const { state, sources } = fixture({ allPresent: true });
+  for (const source of sources.slice(-3)) state.index.delete(source._id);
+  state.version = 4;
+  await migrateBestiaryCreatures();
+  assert.equal(state.calls.length, 0);
+  await migrateBestiaryJournalCreatures();
+  assert.deepEqual(state.calls[0].documents.map(source => source.name), ["Баргест", "Баргест-вожак", "Кай"]);
+  assert.equal(state.version, 5);
+  assert.equal(state.index.size, 35);
 });
 
 test("failed writes relock the bestiary and never mark v2 complete", async () => {

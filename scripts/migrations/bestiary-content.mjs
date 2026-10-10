@@ -23,8 +23,12 @@ export async function migrateBestiaryContent() {
 }
 
 /** Version 2 (core pp.270–313): append creatures the world pack does not have yet; existing ones stay as edited. */
-export async function migrateBestiaryCreatures() {
-  if(game.user!==game.users.activeGM||game.settings.get(SYSTEM_ID,"bestiaryContentVersion")>=2)return;
+export const migrateBestiaryCreatures = () => appendMissingCreatures(2);
+/** Version 5 (Monster Hunter's Journal p.26): barghests, the barghest leader and Kai. */
+export const migrateBestiaryJournalCreatures = () => appendMissingCreatures(5);
+
+async function appendMissingCreatures(version) {
+  if(game.user!==game.users.activeGM||game.settings.get(SYSTEM_ID,"bestiaryContentVersion")>=version)return;
   const pack=game.packs.get(`${SYSTEM_ID}.bestiary`);if(!pack)return;
   const index=await pack.getIndex(),locked=pack.locked;
   const missing=bestiarySources().filter(source=>!index.has(source._id));
@@ -35,7 +39,7 @@ export async function migrateBestiaryCreatures() {
       const createdIds=new Set(created.map(actor=>actor.id));
       if(missing.some(source=>!createdIds.has(source._id)))throw new Error("Не удалось добавить всех существ бестиария. Повторная загрузка продолжит миграцию.");
     }
-    await game.settings.set(SYSTEM_ID,"bestiaryContentVersion",2);
+    await game.settings.set(SYSTEM_ID,"bestiaryContentVersion",version);
     if(missing.length)ui.notifications.info(`Бестиарий: добавлено существ — ${missing.length}.`);
   } finally {if(locked&&missing.length)await pack.configure({locked:true});}
 }

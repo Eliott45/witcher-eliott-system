@@ -17,7 +17,7 @@ export function creatureProfile(actor) {
   if (byId) return byId;
   const rules = Array.from(actor.items ?? []).filter(item => item.type === "ability").map(item => item.system?.ruleId ?? "");
   return CORE_BESTIARY.find(entry => rules.some(rule => rule.startsWith(`creature.${entry.id}.`)))
-    ?? CORE_BESTIARY.find(entry => entry.name === actor.name && actor.system?.creature?.source === `Базовая книга, стр. ${entry.page}–${entry.page + 1}`) ?? null;
+    ?? CORE_BESTIARY.find(entry => entry.name === actor.name && actor.system?.creature?.source === (entry.book ? `${entry.book}, стр. ${entry.page}` : `Базовая книга, стр. ${entry.page}–${entry.page + 1}`)) ?? null;
 }
 export const creatureHasInfiniteStamina = actor => creatureProfile(actor)?.id === "golem" || creatureHasTrait(actor, "infinite-stamina");
 export const creatureIsMassive = actor => creatureHasTrait(actor, "massive");
@@ -47,6 +47,19 @@ export function creaturePackBonus(actor) {
   return actors.some(other => other && !same(other, actor) && creatureProfile(other)?.id === leader
     && other.system.creature?.packId?.trim() === pack && !statuses(other).has("dead")) ? 4 : 0;
 }
+const BARGHEST_LEADERS = ["barghest-leader", "kai"];
+/** Monster Hunter's Journal p.26: a leader is always emboldened; a barghest is while a living leader of its pack shares the scene. */
+export function creatureLeaderPresence(actor) {
+  const id = creatureProfile(actor)?.id;
+  if (BARGHEST_LEADERS.includes(id)) return 3;
+  if (id !== "barghest") return 0;
+  const pack = actor.system?.creature?.packId?.trim() ?? "";
+  const token = actor.isToken ? actor.token : actor.getActiveTokens?.(false, true)?.[0]?.document;
+  const scene = token?.parent ?? globalThis.canvas?.scene;
+  const actors = scene ? Array.from(scene.tokens ?? []).map(tokenActorSource) : [];
+  return actors.some(other => other && !same(other, actor) && BARGHEST_LEADERS.includes(creatureProfile(other)?.id) && !statuses(other).has("dead")
+    && (!pack || !other.system.creature?.packId?.trim() || other.system.creature.packId.trim() === pack)) ? 3 : 0;
+}
 /** Passive modifiers join the ordinary statistic pipeline, so skills and attack rolls use the same numbers. */
 export function creatureModeModifiers(actor, environment = null) {
   const profile = creatureProfile(actor), out = [], add = (target, value, label) => { if (value) out.push({ target, value, source: "creature.mode", category: "creature", label }); };
@@ -60,6 +73,9 @@ export function creatureModeModifiers(actor, environment = null) {
   if (creatureInvisible(actor)) { add("skills.stealth", 10, "Невидимость"); add("combat.attack", 5, "Атака из невидимости"); }
   if (profile?.id === "arachas" && state.camouflage) add("skills.stealth", 10, "Неподвижный камуфляж");
   add("skills.courage", creaturePackBonus(actor), "Живой вожак стаи");
+  const presence = creatureLeaderPresence(actor);
+  add("combat.attack", presence, "Присутствие вожака");
+  add("combat.defense", presence, "Присутствие вожака");
   if (profile?.id === "noonwraith" && state.moonlight) {
     for (const key of Object.keys(actor.system.skills ?? {})) add(`skills.${key}`, -2, "Лунный свет");
     add("attributeCheck", -2, "Лунный свет");
@@ -83,7 +99,7 @@ export function creatureModeContext(actor) {
   if (profile?.id === "werewolf") check("transformed", "Облик волколака", true);
   if (["wraith", "noonwraith", "katakan", "werewolf"].includes(profile?.id)) select("spiritMode", "Подавление способностей", [["normal", "По эффектам Ирдена и Лунной пыли"], ["suppressed", "Подавлено ведущим"]], "normal");
   if (profile?.id === "noonwraith") check("moonlight", "Под лунным светом");
-  if (["wolf", "warg", "nekker", "nekker-chief"].includes(profile?.id)) fields.push({ key: "packId", label: "Название стаи", text: true, value: state.packId ?? "" });
-  const notes = [creatureRaging(actor) ? "Ярость: +3 ПЗ в начале хода; необходимо двигаться и атаковать." : "", creatureHasInfiniteStamina(actor) ? "Конструкция: Выносливость не расходуется." : "", creaturePackBonus(actor) ? "Живой вожак в этой стае: +4 к Храбрости." : "", creatureInvisible(actor) ? "Невидим: +10 Скрытности, +5 к атаке; после атаки станет видим." : ""].filter(Boolean);
+  if (["wolf", "warg", "nekker", "nekker-chief", "barghest", ...BARGHEST_LEADERS].includes(profile?.id)) fields.push({ key: "packId", label: "Название стаи", text: true, value: state.packId ?? "" });
+  const notes = [creatureRaging(actor) ? "Ярость: +3 ПЗ в начале хода; необходимо двигаться и атаковать." : "", creatureHasInfiniteStamina(actor) ? "Конструкция: Выносливость не расходуется." : "", creaturePackBonus(actor) ? "Живой вожак в этой стае: +4 к Храбрости." : "", creatureLeaderPresence(actor) ? "Присутствие вожака: +3 к атаке и защите." : "", creatureInvisible(actor) ? "Невидим: +10 Скрытности, +5 к атаке; после атаки станет видим." : ""].filter(Boolean);
   return { fields, notes, available: fields.length > 0 || notes.length > 0 || profile?.id === "cat", infiniteStamina: creatureHasInfiniteStamina(actor), lycanthropy: profile?.id === "werewolf", detectMagic: profile?.id === "katakan", senseMagic: profile?.id === "cat", sirenIllusion: profile?.id === "siren" && state.illusion, falling: (state.fallRemaining ?? 0) > 0, fallRemaining: state.fallRemaining ?? 0 };
 }

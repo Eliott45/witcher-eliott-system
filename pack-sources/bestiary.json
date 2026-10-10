@@ -8196,5 +8196,767 @@
         "flags": {}
       }
     ]
+  },
+  {
+    "_id": "bstr000000000031",
+    "name": "Баргест",
+    "type": "npc",
+    "img": "icons/svg/terror.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Баргест",
+      "texture": {
+        "src": "icons/svg/terror.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 5,
+        "dexterity": 7,
+        "body": 5,
+        "speed": 8,
+        "empathy": 1,
+        "craft": 1,
+        "will": 5,
+        "luck": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25
+      },
+      "stamina": {
+        "value": 25,
+        "max": 25
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 5,
+        "brawling": 7,
+        "awareness": 11,
+        "wildernessSurvival": 13,
+        "intimidation": 6,
+        "physique": 2,
+        "stealth": 6,
+        "resistMagic": 8,
+        "endurance": 5,
+        "dodgeEscape": 6
+      },
+      "creature": {
+        "category": "specter",
+        "difficulty": "",
+        "reward": 0,
+        "size": "",
+        "weight": "",
+        "habitat": "",
+        "intellect": "",
+        "group": "Стая",
+        "source": "Дневник охотника на чудовищ, стр. 26",
+        "description": "Проклятый призрачный пёс, охотящийся стаей и дышащий зелёным пламенем.",
+        "tactics": "Окружает цель вместе со стаей, кусает и выдыхает зелёный огонь; засветившись, бросается призрачным рывком сквозь врага и ослепляет его.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 25,
+        "staminaMax": 25,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "medium",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 14,
+            "text": "В народе баргестов считают гончими Дикой Охоты, проклятыми собаками или карой богов. Говорят, они охотятся стаями и рвут или сжигают тех, кто без крепкой брони."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "monsterLore",
+            "dc": 14,
+            "text": "Баргест рождается, как любое проклятие, из сгустка злой воли: одни преследуют лишь проклятого, другие бросаются на всех. Стая ловко окружает врага и плюётся зелёным огнём. Светящийся полупрозрачный баргест готовит призрачный рывок, ослепляющий жертву, — Ирден и Лунная пыль его срывают, помогает масло против духов."
+          }
+        ],
+        "loot": [
+          {
+            "name": "Эссенция баргеста",
+            "formula": "1d6",
+            "currency": false
+          }
+        ],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "barghest-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000182",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst031i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "brawling",
+          "damage": "2d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ, стр. 26",
+          "properties": "",
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.barghest.0"
+        }
+      },
+      {
+        "_id": "bst031i000000002",
+        "name": "Адское дыхание",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "brawling",
+          "damage": "3d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "С",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ, стр. 26",
+          "properties": "Горение (50%)",
+          "description": "<p>Горение (50%) СА 1.</p>",
+          "ruleId": "creature.weapon.barghest.1"
+        }
+      },
+      {
+        "_id": "bst031i000000003",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst031i000000004",
+        "name": "Невосприимчивость к огню",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fire-immunity",
+          "description": "<p>Огонь не причиняет ему урона; не может загореться.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst031i000000005",
+        "name": "Невосприимчивость к болезням",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.disease-immunity",
+          "description": "<p>Не заражается болезнями.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst031i000000006",
+        "name": "Бесстрашие",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fearless",
+          "description": "<p>Его нельзя запугать, с ним нельзя договориться.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst031i000000007",
+        "name": "Призрачная атака с разбега",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.barghest.6",
+          "description": "<p>Действие полного хода. Рывок не дальше 8 м сквозь одну цель на пути: Атлетика против Уклонения или Смены позиции цели. При провале цель слепнет до конца своего следующего хода. Знак Ирден или бомба «Лунная пыль» блокируют этот рывок.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst031i000000008",
+        "name": "Адское дыхание",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.barghest.7",
+          "description": "<p>Действие полного хода. Поток зелёного пламени в цель на дистанции ближнего боя: атака Борьбой; при провале защиты 3d6 огненного урона в случайную часть тела и Горение (50%). Не наносит критических ранений.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst031i000000009",
+        "name": "Присутствие вожака",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.barghest.8",
+          "description": "<p>Пока рядом жив вожак своей стаи (баргест-вожак или Кай), получает +3 ко всем атакам и защитам, включая Адское дыхание и Призрачную атаку. Бонусы разных вожаков не складываются.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst031i000000010",
+        "name": "Масло против духов",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.specter-oil",
+          "description": "<p>Уязвимость: масло против духов добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst031i000000011",
+        "name": "Уязвимость: Лунная пыль и Ирден",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.barghest.10",
+          "description": "<p>бомба «Лунная пыль» и знак Ирден блокируют Призрачную атаку с разбега.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000032",
+    "name": "Баргест-вожак",
+    "type": "npc",
+    "img": "icons/svg/terror.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Баргест-вожак",
+      "texture": {
+        "src": "icons/svg/terror.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 2,
+        "reflex": 5,
+        "dexterity": 7,
+        "body": 6,
+        "speed": 8,
+        "empathy": 1,
+        "craft": 1,
+        "will": 6,
+        "luck": 0
+      },
+      "health": {
+        "value": 30,
+        "max": 30
+      },
+      "stamina": {
+        "value": 30,
+        "max": 30
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 5,
+        "brawling": 7,
+        "awareness": 11,
+        "wildernessSurvival": 13,
+        "intimidation": 6,
+        "physique": 2,
+        "stealth": 6,
+        "resistMagic": 8,
+        "endurance": 5,
+        "dodgeEscape": 6
+      },
+      "creature": {
+        "category": "specter",
+        "difficulty": "",
+        "reward": 0,
+        "size": "",
+        "weight": "",
+        "habitat": "",
+        "intellect": "",
+        "group": "Стая",
+        "source": "Дневник охотника на чудовищ, стр. 26",
+        "description": "Крупный баргест, ведущий стаю и усиливающий её своим присутствием.",
+        "tactics": "Держится в центре стаи: пока он жив, все баргесты рядом бьют и защищаются лучше. Убейте его первым.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 30,
+        "staminaMax": 30,
+        "hasTailOrWings": false,
+        "runBase": 27,
+        "recoveryBase": 0,
+        "sizeClass": "medium",
+        "lore": [],
+        "loot": [
+          {
+            "name": "Эссенция баргеста",
+            "formula": "1d6",
+            "currency": false
+          }
+        ],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "barghest-leader-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000182",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst032i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "brawling",
+          "damage": "3d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ, стр. 26",
+          "properties": "",
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.barghest-leader.0"
+        }
+      },
+      {
+        "_id": "bst032i000000002",
+        "name": "Адское дыхание",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "brawling",
+          "damage": "3d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "С",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ, стр. 26",
+          "properties": "Горение (50%)",
+          "description": "<p>Горение (50%) СА 1.</p>",
+          "ruleId": "creature.weapon.barghest-leader.1"
+        }
+      },
+      {
+        "_id": "bst032i000000003",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst032i000000004",
+        "name": "Невосприимчивость к огню",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fire-immunity",
+          "description": "<p>Огонь не причиняет ему урона; не может загореться.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst032i000000005",
+        "name": "Невосприимчивость к болезням",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.disease-immunity",
+          "description": "<p>Не заражается болезнями.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst032i000000006",
+        "name": "Бесстрашие",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fearless",
+          "description": "<p>Его нельзя запугать, с ним нельзя договориться.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst032i000000007",
+        "name": "Призрачная атака с разбега",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.barghest-leader.6",
+          "description": "<p>Действие полного хода. Рывок не дальше 9 м сквозь одну цель на пути: Атлетика против Уклонения или Смены позиции цели. При провале цель слепнет до конца своего следующего хода. Знак Ирден или бомба «Лунная пыль» блокируют этот рывок.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst032i000000008",
+        "name": "Адское дыхание",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.barghest-leader.7",
+          "description": "<p>Действие полного хода. Поток зелёного пламени в цель на дистанции ближнего боя: атака Борьбой; при провале защиты 3d6 огненного урона в случайную часть тела и Горение (50%). Не наносит критических ранений.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst032i000000009",
+        "name": "Присутствие вожака",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.barghest-leader.8",
+          "description": "<p>Постоянно. Все баргесты рядом с ним получают +3 ко всем атакам и защитам, включая Адское дыхание и Призрачную атаку; бонусы разных вожаков не складываются. Сам вожак тоже получает этот бонус.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst032i000000010",
+        "name": "Масло против духов",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.specter-oil",
+          "description": "<p>Уязвимость: масло против духов добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst032i000000011",
+        "name": "Уязвимость: Лунная пыль и Ирден",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.barghest-leader.10",
+          "description": "<p>бомба «Лунная пыль» и знак Ирден блокируют Призрачную атаку с разбега.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000033",
+    "name": "Кай",
+    "type": "npc",
+    "img": "icons/svg/terror.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Кай",
+      "texture": {
+        "src": "icons/svg/terror.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 3,
+        "reflex": 7,
+        "dexterity": 8,
+        "body": 7,
+        "speed": 10,
+        "empathy": 5,
+        "craft": 1,
+        "will": 7,
+        "luck": 0
+      },
+      "health": {
+        "value": 70,
+        "max": 70
+      },
+      "stamina": {
+        "value": 35,
+        "max": 35
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 7,
+        "brawling": 8,
+        "awareness": 15,
+        "wildernessSurvival": 15,
+        "intimidation": 7,
+        "physique": 3,
+        "stealth": 6,
+        "resistMagic": 8,
+        "endurance": 5,
+        "dodgeEscape": 6
+      },
+      "creature": {
+        "category": "specter",
+        "difficulty": "",
+        "reward": 0,
+        "size": "",
+        "weight": "",
+        "habitat": "",
+        "intellect": "",
+        "group": "Стая",
+        "source": "Дневник охотника на чудовищ, стр. 26",
+        "description": "Особый проклятый баргест, связанный со своим хозяином и возрождающийся, пока их останки не погребены.",
+        "tactics": "Ведёт стаю, кусает дважды за ход и выжигает конусом красного пламени тех, кто сгрудился рядом. Чтобы покончить с ним, нужно похоронить его останки.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 70,
+        "staminaMax": 35,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "medium",
+        "lore": [],
+        "loot": [
+          {
+            "name": "Эссенция баргеста",
+            "formula": "1d6",
+            "currency": false
+          }
+        ],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "kai-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000182",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst033i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "brawling",
+          "damage": "4d6+4",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ, стр. 26",
+          "properties": "",
+          "description": "<p>Эффектов нет. СА 2.</p>",
+          "ruleId": "creature.weapon.kai.0"
+        }
+      },
+      {
+        "_id": "bst033i000000002",
+        "name": "Адское пламя",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "brawling",
+          "damage": "4d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "С",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ, стр. 26",
+          "properties": "Горение (50%)",
+          "description": "<p>Горение (50%) СА 1.</p>",
+          "ruleId": "creature.weapon.kai.1"
+        }
+      },
+      {
+        "_id": "bst033i000000003",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst033i000000004",
+        "name": "Невосприимчивость к огню",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fire-immunity",
+          "description": "<p>Огонь не причиняет ему урона; не может загореться.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst033i000000005",
+        "name": "Невосприимчивость к болезням",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.disease-immunity",
+          "description": "<p>Не заражается болезнями.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst033i000000006",
+        "name": "Бесстрашие",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fearless",
+          "description": "<p>Его нельзя запугать, с ним нельзя договориться.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst033i000000007",
+        "name": "Призрачная атака с разбега",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.kai.6",
+          "description": "<p>Действие полного хода. Рывок не дальше 10 м сквозь одну цель на пути: Атлетика против Уклонения или Смены позиции цели. При провале цель слепнет до конца своего следующего хода. Знак Ирден или бомба «Лунная пыль» блокируют этот рывок.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst033i000000008",
+        "name": "Адское пламя",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.kai.7",
+          "description": "<p>Действие. Конус красного пламени на 3 м: атака Борьбой против каждой цели; при провале защиты 4d6 огненного урона в туловище и Горение (50%). Не наносит критических ранений.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst033i000000009",
+        "name": "Присутствие вожака",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.kai.8",
+          "description": "<p>Постоянно. Все баргесты рядом с Каем получают +3 ко всем атакам и защитам, включая Адское пламя и Призрачную атаку; бонусы разных вожаков не складываются. Сам Кай тоже получает этот бонус.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst033i000000010",
+        "name": "Узы проклятья",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.kai.9",
+          "description": "<p>Постоянно. Если останки Кая и его хозяина не преданы земле, через 7 дней после уничтожения Кай возрождается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst033i000000011",
+        "name": "Масло против духов",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.specter-oil",
+          "description": "<p>Уязвимость: масло против духов добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst033i000000012",
+        "name": "Уязвимость: Лунная пыль и Ирден",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.kai.11",
+          "description": "<p>бомба «Лунная пыль» и знак Ирден блокируют Призрачную атаку с разбега.</p>"
+        },
+        "flags": {}
+      }
+    ]
   }
 ]

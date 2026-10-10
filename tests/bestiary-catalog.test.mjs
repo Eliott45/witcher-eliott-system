@@ -32,11 +32,11 @@ test("audited creature exceptions preserve book statistics and the tail or wing 
   assert.equal(hitLocation(10,"monster",get("Эндриага-рабочий").system.creature).id,"leftArm");
 });
 
-test("the complete bestiary is a stable flat set of 32 distinct NPCs with distinct embedded IDs", () => {
+test("the complete bestiary is a stable flat set of 35 distinct NPCs with distinct embedded IDs", () => {
   const sources = bestiarySources();
-  assert.equal(sources.length, 32);
-  assert.equal(new Set(sources.map(source => source._id)).size, 32);
-  assert.equal(new Set(sources.map(source => source.name)).size, 32);
+  assert.equal(sources.length, 35);
+  assert.equal(new Set(sources.map(source => source._id)).size, 35);
+  assert.equal(new Set(sources.map(source => source.name)).size, 35);
   assert.deepEqual(sources.slice(0, 2).map(source => source._id), ["bestiaryBandit01", "bestiaryDrowner1"]);
   for (const source of sources) {
     assert.equal(source.type, "npc");
@@ -50,7 +50,9 @@ test("the complete bestiary is a stable flat set of 32 distinct NPCs with distin
 
 test("every specific harvested item resolves to the real catalog; only random loot and currency stay generic", () => {
   const catalog = new Set(equipment.map(equipmentUuid));
-  const generic = new Set(["Кроны", "Обычные предметы", "Странные предметы", "Странные вещи", "Случайные предметы", "Случайная руна"]);
+  const generic = new Set(["Кроны", "Обычные предметы", "Странные предметы", "Странные вещи", "Случайные предметы", "Случайная руна",
+    // Monster Hunter's Journal p.26 names this essence without a price or substance, so it has no catalog item.
+    "Эссенция баргеста"]);
   for (const source of bestiarySources()) {
     for (const row of source.system.harvest ?? []) {
       assert.ok(catalog.has(row.uuid), `${source.name}: ${row.uuid}`);

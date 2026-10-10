@@ -53,7 +53,13 @@ export function conditionResistant(actor, kind) {
 export const LOCATION_ZONE = { head: "head", torso: "torso", rightArm: "torso", leftArm: "torso", rightLeg: "legs", leftLeg: "legs", tail: "torso" };
 
 /** Armor protecting one hit location: worn layers, or a creature's natural armor when nothing is worn there. */
-export function armorAt(actor, location, { weakSpot = actor.system?.creature?.weakSpot ?? false } = {}) {
+/** Armor at a location; `fireImmune` marks creatures fire cannot harm (Monster Hunter's Journal: barghests). */
+export function armorAt(actor, location, options = {}) {
+  const armor = locationArmor(actor, location, options);
+  if (hasAbility(actor, "creature.fire-immunity")) armor.fireImmune = true;
+  return armor;
+}
+function locationArmor(actor, location, { weakSpot = actor.system?.creature?.weakSpot ?? false } = {}) {
   const zone = LOCATION_ZONE[location] ?? "torso";
   const items = equippedItems(actor.items).filter(item => item.type === "armor" && armorZones(item).includes(zone));
   const worn = items.map(item => ({ item, sp: Math.max(0, effectiveItem(item).stoppingPower?.value ?? 0), resistances: itemResistances(item) }));
@@ -104,6 +110,8 @@ export function resolveDamage({ base, silver = 0, location, multiplier, traits, 
   const fire = traits.types.includes("elemental");
   const physical = traits.physical ?? !fire;
   if (armor.incorporeal && physical) return { total: 0, steps: [{ label: "Бесплотность: физическая атака не действует", value: 0 }],
+    penetrated: false, ablate: [], location, immune: true };
+  if (armor.fireImmune && fire && !physical) return { total: 0, steps: [{ label: "Невосприимчивость к огню", value: 0 }],
     penetrated: false, ablate: [], location, immune: true };
   const silverApplies = monster && silver > 0;
   let damage = base + (silverApplies ? silver : 0);

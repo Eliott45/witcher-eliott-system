@@ -5,7 +5,7 @@ import { creatureSkillAttribute, immuneToCondition } from "../scripts/data/creat
 import { bestiarySources } from "../scripts/data/bestiary.mjs";
 import { poisonDamage, bleedingDamage } from "../scripts/combat/poison-damage.mjs";
 import { burningDamage } from "../scripts/combat/burning.mjs";
-import { resolveDamage } from "../scripts/combat/damage-rules.mjs";
+import { armorAt, resolveDamage } from "../scripts/combat/damage-rules.mjs";
 import { deriveStatistics, ATTRIBUTE_KEYS } from "../scripts/data/statistics.mjs";
 import { actorEnvironment } from "../scripts/combat/environment.mjs";
 import { creatureRegeneration } from "../scripts/data/creature-regeneration.mjs";
@@ -73,4 +73,15 @@ test("pre-existing poison, bleeding and burning cannot damage a construct with w
   assert.equal(poisonDamage(golem),1,"the original poison resistance still applies to a non-construct");
   assert.equal(bleedingDamage(golem),1,"bleeding resistance is not immunity");
   assert.ok(burningDamage(golem).total>0,"ordinary monsters with the same states still burn");
+});
+
+test("barghests take no fire damage and never burn, but bites and blades still hurt them",()=>{
+  const barghest=bestiarySources().find(actor=>actor.name==="Баргест");
+  barghest.effects=[{statuses:new Set(["burning"])}];
+  assert.equal(burningDamage(barghest),null);
+  const armor=armorAt(barghest,"torso"),hit=types=>resolveDamage({base:20,location:"torso",multiplier:1,traits:{types,piercing:"none",silver:false},armor,monster:true});
+  assert.equal(armor.fireImmune,true);
+  assert.deepEqual([hit(["elemental"]).total,hit(["elemental"]).immune],[0,true]);
+  assert.equal(hit(["slashing"]).total,10,"a steel blade is still halved by monster resistance");
+  assert.equal(armorAt(bestiarySources().find(actor=>actor.name==="Волк"),"torso").fireImmune,undefined);
 });
