@@ -29,7 +29,7 @@ import { attackConcealed, creatureDetailsHidden, enemyAttackHidden, creatureDeta
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
 import { hitLocation, bodyPlanOf, ATTACK_LOCATIONS, weaponAttack, attackModes } from "./weapon-rules.mjs";
 import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
-import { criticalWoundByRoll, aimedCriticalRoll, ORGAN_WOUNDS, ANATOMY_FREE_BONUS } from "../data/critical-wounds.mjs";
+import { criticalWoundByRoll, aimedCriticalRoll, criticalWoundLocation, criticalWoundNeedsSide, ORGAN_WOUNDS, ANATOMY_FREE_BONUS } from "../data/critical-wounds.mjs";
 import { criticalTableRoll, specterDamageBonus } from "./relic-weapon-rules.mjs";
 import { applyWeaponWear } from "./weapon-wear.mjs";
 import { experimentalFrozen, clearExperimentalFreeze } from "./experimental-effects.mjs";
@@ -196,17 +196,21 @@ async function rollAttackStep(message, index, kind, prepare) {
   } finally { display.close(); pendingRolls.delete(key); }
 }
 
+/** Core p.158: an unaimed critical takes its location from the wound table, not from 1d10. Old cards rolled their location before the attack. */
+const criticalPicksLocation = (attack, outcome) => Boolean(outcome?.critical) && (attack.location === "random" || Boolean(attack.locationRoll));
+
 function exchangeLocation(message, index) {
-  const attack = flagsOf(message).weaponAttack;
+  const attack = flagsOf(message).weaponAttack, outcome = exchangeOutcome(message, index);
   // A body block takes the blow on the blocking arm (core p.164); no location roll.
-  if (exchangeOutcome(message, index)?.limbBlock) return ATTACK_LOCATIONS.find(entry => entry.id === "leftArm");
+  if (outcome?.limbBlock) return ATTACK_LOCATIONS.find(entry => entry.id === "leftArm");
+  if (criticalPicksLocation(attack, outcome)) return null;
   return attack.location === "random" ? exchangeOf(linked(message.id, index, "location"))?.location
     : ATTACK_LOCATIONS.find(entry => entry.id === attack.location);
 }
 
 export function rollExchangeLocation(message, index) {
-  return rollAttackStep(message, index, "location", async attack => {
-    if (attack.location !== "random") return;
+  return rollAttackStep(message, index, "location", async (attack, outcome) => {
+    if (attack.location !== "random" || criticalPicksLocation(attack, outcome)) return;
     const target = targetActor(attack), plan = bodyPlanOf(target);
     const roll = await new foundry.dice.Roll("1d10").evaluate({ allowInteractive: !message.blind });
     const { id, name, multiplier } = hitLocation(roll.total, plan, { hasTailOrWings: target?.system.creature?.hasTailOrWings ?? false });
@@ -223,8 +227,9 @@ const damageExtrasFor = (actor, extras = []) => (extras ?? []).filter(extra => !
 
 export function rollExchangeDamage(message, index) {
   return rollAttackStep(message, index, "damage", async (attack, outcome, actor) => {
-    const location = exchangeLocation(message, index);
-    if (!location) return;
+    const woundPicksLocation = criticalPicksLocation(attack, outcome);
+    let location = exchangeLocation(message, index);
+    if (!location && !woundPicksLocation) return;
     const target = targetActor(attack), item = attackItem(attack, actor), weapon = attack.weaponSnapshot?.system ?? (item ? effectiveItem(item) : {});
     const traits = attack.traits ?? weaponDamageTraits(weapon), monster = target ? monsterResistant(target) : false;
     const options = { allowInteractive: !message.blind };
@@ -236,14 +241,20 @@ export function rollExchangeDamage(message, index) {
     if (silver) rolls.push(silver);
     let critical = null;
     if (outcome.critical) {
-      // Older cards may contain a random location rolled before the attack, not an aimed strike.
-      const aimed = attack.location !== "random" && !attack.locationRoll;
+      const aimed = !woundPicksLocation;
       const critRoll = await new foundry.dice.Roll(aimed && ["head", "torso"].includes(location.id) ? "1d6" : aimed ? "0" : "2d6").evaluate(options);
       if (critRoll.dice.length) rolls.push(critRoll);
       // Katakan decoction (core p.248): +3 to the critical location roll, within the table.
       const rolled = criticalTableRoll(critRoll.total, { weapon: attack.weaponProperties == null ? weapon : { properties: attack.weaponProperties },
-        aimed, location: location.id, extra: criticalLocationBonus(actor) });
+        aimed, location: location?.id, extra: criticalLocationBonus(actor) });
       const tableRoll = aimed ? aimedCriticalRoll(location.id, rolled) : rolled;
+      if (!aimed) {
+        // The wound names the part struck; a limb's side is a coin toss.
+        const side = criticalWoundNeedsSide(tableRoll) ? await new foundry.dice.Roll("1d2").evaluate(options) : null;
+        if (side) rolls.push(side);
+        const id = criticalWoundLocation(tableRoll, bodyPlanOf(target), side?.total);
+        location = ATTACK_LOCATIONS.find(entry => entry.id === id);
+      }
       let wound = criticalWoundByRoll(outcome.critical.id, tableRoll), bonus = outcome.critical.bonus;
       if (wound && anatomyFree(target) && ORGAN_WOUNDS.has(wound.id)) { bonus += ANATOMY_FREE_BONUS[outcome.critical.id]; wound = null; }
       if (attack.nonLethal) wound = null;
@@ -717,7 +728,10 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
     if (!damage && linkedAny(message.id, index, "damage")) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-dice-d6 fa-spin"></i> Урон бросается…</p>`;
     else if (!damage) {
       const location = exchangeLocation(message, index), locationMessage = linkedAny(message.id, index, "location");
-      if (!location) {
+      if (criticalPicksLocation(attack, outcome)) {
+        body += `<p class="witcher-exchange-location"><i class="fa-solid fa-burst"></i> ${esc(outcome.critical.name)} критическое ранение: место попадания определит рана (2d6), а не 1d10</p>`;
+        body += message.speakerActor?.isOwner ? `<div class="witcher-exchange-actions">${button("data-exchange-damage", `<i class="fa-solid fa-dice-d6"></i> Урон ${esc(attack.damage)} и критическая рана`, true)}</div>` : `<p class="witcher-exchange-note">Ждём бросок урона и критической раны.</p>`;
+      } else if (!location) {
         if (locationMessage) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-dice-d10 fa-spin"></i> Бросается место попадания…</p>`;
         else body += message.speakerActor?.isOwner ? `<div class="witcher-exchange-actions">${button("data-exchange-location", '<i class="fa-solid fa-dice-d10"></i> Место попадания · 1d10', true)}</div>` : `<p class="witcher-exchange-note">Ждём бросок места попадания.</p>`;
       } else {

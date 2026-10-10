@@ -42,6 +42,19 @@ export const ANATOMY_FREE_BONUS = { light: 5, medium: 10, severe: 15, deadly: 20
 
 export const criticalWoundByRoll = (level, total) => CRITICAL_WOUNDS[level]?.find(entry => total >= entry.min && total <= entry.max) ?? null;
 
+/**
+ * Core p.158: an unaimed critical skips the 1d10 location roll; the wound rolled on the 2d6 table names the part struck.
+ * Limb wounds need a side (`side` 1 = right, 2 = left); a monster's legs are its limbs.
+ */
+export const criticalWoundNeedsSide = tableRoll => tableRoll <= 5;
+export function criticalWoundLocation(tableRoll, bodyPlan = "humanoid", side = 1) {
+  if (tableRoll >= 11) return "head";
+  if (tableRoll >= 6) return "torso";
+  const right = side !== 2;
+  if (tableRoll >= 4 || bodyPlan === "monster") return right ? "rightArm" : "leftArm";
+  return right ? "rightLeg" : "leftLeg";
+}
+
 /** Errata p.158 «Aimed Criticals»: no table roll; head/torso choose lesser or greater with 1d6. */
 export function aimedCriticalRoll(location, d6) {
   if (location === "head") return d6 >= 5 ? 12 : 11;

@@ -226,17 +226,30 @@ test("aimed attacks skip the random location step and keep their critical table"
   assert.deepEqual(f.evaluated.map(row => row.formula), ["2d6+2", "1d6"]);
 });
 
-test("a randomly rolled head retains an unaimed critical; blind rolls keep their audience", async t => {
-  const f = fixture(t, { totals: [17], results: [1, 8, 7] });
+test("an unaimed critical skips the 1d10 location: the wound names the part struck; blind rolls keep their audience", async t => {
+  const f = fixture(t, { totals: [17], results: [8, 3, 2] });
   f.message.blind = true; f.message.whisper = ["gm"];
-  const location = await rollExchangeLocation(f.message, 0);
+  assert.equal(await rollExchangeLocation(f.message, 0), undefined);
+  assert.doesNotMatch(exchangeRowHTML(f.message, 0), /data-exchange-location/);
+  assert.match(exchangeRowHTML(f.message, 0), /место попадания определит рана[\s\S]*data-exchange-damage/);
   const damage = await rollExchangeDamage(f.message, 0);
   assert.equal(exchange(damage).critical.aimed, false);
-  assert.deepEqual(f.evaluated.map(row => row.formula), ["1d10", "2d6+2", "2d6"]);
-  for (const step of [location, damage]) {
-    assert.equal(step.blind, true); assert.deepEqual(step.whisper, ["gm"]);
-  }
+  // 2d6 = 3 on the light table is a sprained leg, so the blow lands in a leg; 1d2 = 2 picks the left one.
+  assert.equal(exchange(damage).critical.wound.id, "sprained-leg");
+  assert.deepEqual(exchange(damage).location, { id: "leftLeg", name: "Левая нога", multiplier: 0.5 });
+  assert.deepEqual(f.evaluated.map(row => row.formula), ["2d6+2", "2d6", "1d2"]);
+  assert.equal(damage.blind, true); assert.deepEqual(damage.whisper, ["gm"]);
   assert.ok(f.evaluated.every(row => row.options.allowInteractive === false));
+});
+
+test("an unaimed critical on the head or torso rolls no side, and a monster's leg wound strikes a limb", async t => {
+  const head = fixture(t, { totals: [17], results: [8, 11] });
+  assert.equal(exchange(await rollExchangeDamage(head.message, 0)).location.id, "head");
+  assert.deepEqual(head.evaluated.map(row => row.formula), ["2d6+2", "2d6"]);
+  const monster = fixture(t, { totals: [17], category: "necrophage", results: [8, 2, 1] });
+  const damage = exchange(await rollExchangeDamage(monster.message, 0));
+  assert.equal(damage.critical.wound.id, "sprained-leg");
+  assert.equal(damage.location.id, "rightArm");
 });
 
 test("misses, unresolved defenses, invisible attacks and non-owners cannot roll follow-up steps", async t => {
@@ -421,12 +434,12 @@ test("damage after throwing keeps the captured relic, oil and silver although th
 test("Balanced changes the actual critical wound table without changing its severity", async t => {
   for (const [properties, expectedRoll, wound] of [["Сбалансированное", 9, "cracked-ribs"], ["Сбалансированное (+5)", 12, "cracked-jaw"]]) {
     await t.test(properties, async t => {
-      const f = fixture(t, { totals: [17], results: [2, 8, 7] }); f.attack.weaponProperties = properties;
-      await rollExchangeLocation(f.message, 0);
+      const f = fixture(t, { totals: [17], results: [8, 7] }); f.attack.weaponProperties = properties;
       const damage = exchange(await rollExchangeDamage(f.message, 0));
       assert.equal(damage.critical.level, "light"); assert.equal(damage.critical.bonus, 3);
       assert.equal(damage.critical.roll, expectedRoll); assert.equal(damage.critical.wound.id, wound);
-      assert.deepEqual(f.evaluated.map(row => row.formula), ["1d10", "2d6+2", "2d6"]);
+      assert.equal(damage.location.id, expectedRoll === 12 ? "head" : "torso", "the shifted wound also moves the blow");
+      assert.deepEqual(f.evaluated.map(row => row.formula), ["2d6+2", "2d6"]);
     });
   }
 });
