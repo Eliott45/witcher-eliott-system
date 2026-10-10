@@ -1,0 +1,39 @@
+name: Release
+
+# Push a tag such as v0.3.0 (matching "version" in system.json) to publish a Foundry release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the tag matches the manifest
+        run: |
+          version=$(jq -r .version system.json)
+          package=$(jq -r .version package.json)
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match system.json $version"; exit 1; }
+          test "$version" = "$package" || { echo "package.json $package differs from system.json $version"; exit 1; }
+
+      - name: Point the download at this release
+        run: |
+          url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/witcher-eliott-system.zip"
+          jq --arg url "$url" '.download = $url' system.json > system.tmp && mv system.tmp system.json
+
+      - name: Build the system archive
+        # Only what Foundry loads at runtime: no tests, tools or audits.
+        run: zip -r -q witcher-eliott-system.zip system.json README.md assets lang pack-sources packs scripts styles templates -x "packs/*/LOCK" "packs/*/LOG" "packs/*/LOG.old"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            system.json
+            witcher-eliott-system.zip

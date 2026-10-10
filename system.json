@@ -3,6 +3,9 @@
   "title": "The Witcher — Eliott",
   "description": "Неофициальная система для The Witcher TRPG. Разработка начинается с удобства боя и листов персонажей.",
   "version": "0.3.0",
+  "url": "https://github.com/Eliott45/witcher-eliott-system",
+  "manifest": "https://github.com/Eliott45/witcher-eliott-system/releases/latest/download/system.json",
+  "download": "https://github.com/Eliott45/witcher-eliott-system/releases/download/v0.3.0/witcher-eliott-system.zip",
   "compatibility": {
     "minimum": "14",
     "verified": "14.368",
