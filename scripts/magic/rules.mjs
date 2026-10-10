@@ -52,6 +52,16 @@ export function focusRating(item) {
 }
 /** Core p.166: on a fumble above 9 every focus the caster carries explodes, held or not. */
 export const carriedFocuses = actor => Array.from(actor.items??[]).filter(item=>item.system?.carried!==false&&(item.system?.quantity??1)>0&&(focusRating(item)>0||greaterFocusFor(effectiveItem(item).properties)));
+/**
+ * Gear that focuses magic and is worn rather than wielded: an amulet, a ring (core p.102). It has to be put on to count,
+ * so the inventory lets it be equipped like a weapon or armour. Runes are excluded: they go into a weapon.
+ */
+export function isFocusItem(item) {
+  if (item?.type !== "equipment" || item.system?.kind === "upgrade") return false;
+  const properties = effectiveItem(item).properties ?? item.system.properties ?? "";
+  return Boolean(getToolRules(item)?.focus) || /фокусирующ/iu.test(properties);
+}
+
 export function focusOptions(actor,spell=null) {
   const discounts=["mage","priest"].includes(actor.system.details.profession);
   return equippedItems(actor.items).flatMap(item=>{

@@ -16,6 +16,7 @@ export { inventoryWrite } from "../data/inventory-writes.mjs";
 import { EQUIPMENT_CATEGORIES, equipmentCategory, equipmentEntry } from "../data/equipment-search.mjs";
 import { sheetPreferences, updateSheetPreferences, reportPreferencesError } from "./sheet-preferences.mjs";
 import { relicArmorLore } from "../data/relic-armor.mjs";
+import { isFocusItem } from "../magic/rules.mjs";
 
 // Display groups reuse Item types/kinds. They are not a second item classification.
 const GROUPS = [
@@ -58,7 +59,7 @@ export function inventoryContext(actor, preferences = {}) {
     isContainer: isContainer(item), parentId: containerParent(item, items)?.id ?? "", children: [], containerOpen: true,
     isRecipe: item.type === "recipe", oil: activeOil(item, globalThis.game?.time?.worldTime ?? 0),
     isWeapon: item.type === "weapon" && !item.system.natural, grip: gripOf(item),
-    category: equipmentCategory(item), search: equipmentEntry(item).search, canEquip: ["weapon", "armor"].includes(item.type),
+    category: equipmentCategory(item), search: equipmentEntry(item).search, canEquip: ["weapon", "armor"].includes(item.type) || isFocusItem(item),
     condition: conditionKey(item) ? effectiveItem(item)[conditionKey(item)] : null, conditionLabel: item.type === "armor" ? "ПБ" : "Н",
     crossbow: isCrossbow(item) ? { loaded: item.system.loaded !== false, bolt: loadedBolt(item)?.name ?? "" } : null,
     broken: isBroken(item), fittedOn: fittedLimbs(actor, item.id).join(", "),

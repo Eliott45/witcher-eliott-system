@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import {test} from "node:test";
 import {CORE_MAGIC,CORE_SIGNS,CORE_RITUALS,CORE_HEXES,CORE_SPELLS,CORE_INVOCATIONS,spellSources,spellFolders,spellRange,spellDuration,SPELL_ELEMENTS,SPELL_GRADES} from "../scripts/data/spells.mjs";
-import {castingCost,focusOptions,magicFumble,roundSpent,magicRoundKey,maintenanceCost,ritualDifficulty,signPotency,hexIdentification} from "../scripts/magic/rules.mjs";
+import {castingCost,focusOptions,isFocusItem,magicFumble,roundSpent,magicRoundKey,maintenanceCost,ritualDifficulty,signPotency,hexIdentification} from "../scripts/magic/rules.mjs";
 import {prepareMagicResult} from "../scripts/chat/magic-result.mjs";
 import {castSpell,castingQuote,learnSpell,endConcentration,resetMagicRound} from "../scripts/magic/casting.mjs";
 import {deriveStatistics,ATTRIBUTE_KEYS} from "../scripts/data/statistics.mjs";
@@ -106,6 +106,17 @@ test("focus comes from one equipped carried item; only mage/priest get its stami
   actor.items.push(staff("wood",1),staff("crystal",3),staff("broken",4,{reliability:{value:0,max:10}}),staff("packed",5,{equipped:false}));
   assert.deepEqual(focusOptions(actor).map(f=>[f.id,f.rating,f.greater]),[["wood",1,true],["crystal",3,true]]);
   actor.system.details.profession="witcher";assert.deepEqual(focusOptions(actor).map(f=>[f.id,f.rating,f.greater]),[["wood",0,true],["crystal",0,true]]);
+});
+test("a worn amulet focuses magic once it is put on; runes are not worn",()=>{
+  const {actor}=fixture();
+  const amulet={id:"amulet",type:"equipment",name:"Простой амулет",system:{kind:"tool",properties:"Фокусирующее (1)",quantity:1,carried:true,equipped:false,containerId:""}};
+  const rune={id:"veles",type:"equipment",name:"Руна Велес",system:{kind:"upgrade",properties:"Улучшенное фокусирующее",quantity:1,carried:true,containerId:""}};
+  actor.items.push(amulet,rune);
+  assert.equal(isFocusItem(amulet),true);assert.equal(isFocusItem(rune),false);
+  assert.equal(isFocusItem({type:"equipment",system:{kind:"tool",properties:""}}),false);
+  assert.deepEqual(focusOptions(actor).map(f=>f.id),[],"An amulet in the pack does not focus");
+  amulet.system.equipped=true;
+  assert.deepEqual(focusOptions(actor).map(f=>[f.id,f.rating]),[["amulet",1]]);
 });
 test("casting reuses effective skill including armor, native exploding d10 and chat privacy, then spends once",async()=>{
   for(const mode of ["public","self","gm","blind"]){const {actor,spell,state,messages,events}=fixture();state.mode=mode;
