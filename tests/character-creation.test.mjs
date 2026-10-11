@@ -237,3 +237,21 @@ test("the three core tongues always exist on a sheet: stored entries win, the ot
   const actor = { languages: [], abilityState: {}, statistics: { effective: { intelligence: 6 }, modifiers: [] } };
   assert.equal(skillValue(actor, "language", "language.common").total, 6);
 });
+
+test("pickup points may go into other tongues (×2), never into the native one or the profession's", async () => {
+  const { withMinimumRanks, skillRanks, PICKUP_LANGUAGE } = await import("../scripts/data/character-creation.mjs");
+  const state = withMinimumRanks({ ...blankCreation(), profession: "bard", origin: "redania", attributes: points(even) });
+  state.skills.pickup = { [`${PICKUP_LANGUAGE}language.dwarven`]: 3, awareness: 2 };
+  assert.equal(skillState(state).pickupSpent, 3 * 2 + 2);
+  assert.deepEqual(skillState(state).errors.filter(error => /Освоенные|Родной язык и/u.test(error)), []);
+  assert.deepEqual(skillRanks(state).languages, [{ id: "language.common", level: 8 }, { id: "language.elder", level: 1 }, { id: "language.dwarven", level: 3 }]);
+  assert.equal(skillRanks(state).skills.awareness, 2);
+  const tongues = creationContext({ ...state, step: "skills" }, {}).skills.groups.find(group => group.attribute === "language");
+  assert.deepEqual(tongues.skills.map(row => [row.key, row.level]), [[`${PICKUP_LANGUAGE}language.dwarven`, 3]], "native and profession tongues are not offered");
+  // Points put into the native tongue are refused, and dropped once a tongue joins the profession.
+  state.skills.pickup[`${PICKUP_LANGUAGE}language.common`] = 1;
+  assert.ok(skillState(state).errors.some(error => /Родной язык и язык профессии/u.test(error)));
+  state.skills.languages = ["language.dwarven"];
+  withMinimumRanks(state);
+  assert.deepEqual(Object.keys(state.skills.pickup), ["awareness"]);
+});

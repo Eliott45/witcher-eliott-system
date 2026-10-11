@@ -208,7 +208,9 @@ export function derivedPreview(values) {
 /* -------------------------------------------- */
 
 export const PROFESSION_POINTS = 44, CREATION_SKILL_MAX = 6, NATIVE_LANGUAGE_LEVEL = 8;
-const complexSkill = key => SKILLS.find(skill => skill.key === key)?.complex ?? false;
+/** Pickup points may also go into a tongue: `language:<id>`, a difficult skill like every language. */
+export const PICKUP_LANGUAGE = "language:";
+const complexSkill = key => String(key).startsWith(PICKUP_LANGUAGE) || (SKILLS.find(skill => skill.key === key)?.complex ?? false);
 /** Difficult skills (2) cost two points a rank, at creation as later. */
 export const skillCost = (key, level) => (complexSkill(key) ? 2 : 1) * Math.max(0, level);
 /** The eleven profession slots: the defining skill, its skills, chosen languages and, for the man-at-arms, five combat skills. */
@@ -241,6 +243,8 @@ export function withMinimumRanks(state) {
       languages[slot.index] = LANGUAGES.map(language => language.id).find(id => id !== native && !taken.includes(id)) ?? "";
   }
   skills.languages = languages;
+  // The native tongue and the profession's tongues take no pickup points.
+  for (const id of [native, ...languages]) if (skills.pickup) delete skills.pickup[`${PICKUP_LANGUAGE}${id}`];
   for (const slot of slots) if (!(Number(skills.ranks[slot.id]) >= 1)) skills.ranks[slot.id] = 1;
   return state;
 }
@@ -268,6 +272,8 @@ export function skillState(state) {
   for (const [key, level] of Object.entries(pickup)) {
     if (!level) continue;
     if (taken.has(key)) { errors.push("Освоенные навыки нельзя вкладывать в навыки профессии."); break; }
+    const tongue = key.startsWith(PICKUP_LANGUAGE) ? key.slice(PICKUP_LANGUAGE.length) : "";
+    if (tongue && (tongue === nativeLanguage(state.origin) || languages.includes(tongue))) { errors.push("Родной язык и язык профессии не берут очки освоенных навыков."); break; }
     pickupSpent += skillCost(key, level);
   }
   if (pickupSpent > pickupBudget) errors.push(`Освоенные навыки: потрачено ${pickupSpent} из ${pickupBudget} (ИНТ + РЕА).`);
@@ -463,7 +469,11 @@ export function skillRanks(state) {
     else if (slot.language) languages.push({ id: state.skills.languages[slot.index], level });
     else if (slot.key) skills[slot.key] = level;
   }
-  for (const [key, level] of Object.entries(state.skills?.pickup ?? {})) if (level > 0) skills[key] = level;
+  for (const [key, level] of Object.entries(state.skills?.pickup ?? {})) {
+    if (!(level > 0)) continue;
+    if (key.startsWith(PICKUP_LANGUAGE)) languages.push({ id: key.slice(PICKUP_LANGUAGE.length), level });
+    else skills[key] = level;
+  }
   return { skills, languages, defining };
 }
 

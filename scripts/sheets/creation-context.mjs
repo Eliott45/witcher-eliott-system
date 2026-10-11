@@ -14,7 +14,7 @@ import {
   ATTRIBUTE_ORDER, POINT_LEVELS, ATTRIBUTE_MAX, CREATION_SKILL_MAX, NATIVE_LANGUAGE_LEVEL, PROFESSION_GEAR, PROFESSION_FIXED_GEAR,
   PROFESSION_FIXED_NOTES, WITCHER_FORMULAS, PROFESSION_MAGIC, STARTING_CROWNS, familyGroup, nativeLanguage, regionOfOrigin, professionAllowed,
   attributeState, chosenAttributes, derivedPreview, skillState, stepErrors, lifeEventCount, pendingAges, gearChoiceCount, gearCrowns, lifepathCrowns,
-  nameSamples, magicMatches, biographyText
+  nameSamples, magicMatches, biographyText, PICKUP_LANGUAGE
 } from "../data/character-creation.mjs";
 
 const loc = key => globalThis.game?.i18n?.localize(key) ?? key;
@@ -154,6 +154,13 @@ function skillsStep(state) {
       return { key: skill.key, name: skillName(skill.key), level, complex: skill.complex, total: total(skill.key, level),
         canIncrease: level < CREATION_SKILL_MAX && step <= info.pickupRemaining, canDecrease: level > 0, pips: Array.from({ length: CREATION_SKILL_MAX }, (_, i) => ({ on: i < level })) };
     }) })).filter(group => group.skills.length);
+  // Other tongues take pickup points too (×2, INT); the native one and the profession's are not here.
+  const pickupTongues = LANGUAGES.filter(language => language.id !== native && !chosenLanguages.includes(language.id)).map(language => {
+    const key = `${PICKUP_LANGUAGE}${language.id}`, level = Number(pickup[key]) || 0;
+    return { key, name: loc(language.name), level, complex: true, total: values.intelligence > 0 ? effective("intelligence") + level : "—",
+      canIncrease: level < CREATION_SKILL_MAX && 2 <= info.pickupRemaining, canDecrease: level > 0, pips: Array.from({ length: CREATION_SKILL_MAX }, (_, i) => ({ on: i < level })) };
+  });
+  if (pickupTongues.length) groups.push({ attribute: "language", name: "Языки", value: effective("intelligence"), skills: pickupTongues });
   return { ...info, slots, groups, attributesPending: attributeState(state.attributes).errors.length > 0, nativeLanguage: loc(LANGUAGES.find(language => language.id === native)?.name ?? ""), nativeLevel: NATIVE_LANGUAGE_LEVEL, over: info.remaining < 0, pickupOver: info.pickupRemaining < 0 };
 }
 
