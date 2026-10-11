@@ -121,7 +121,7 @@ export function throwBomb(actor, item) {
         ${actionNote(action)}
         ${victims.length || profile.dimeritium || profile.gas ? `<button type="button" data-bomb-apply><i class="fa-solid fa-burst"></i> ${profile.gas ? "Создать облако" : "Применить взрыв"}</button><small>Урон и эффекты применяет мастер.</small>` : ""}</section>`;
       const message = await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls: [roll], content,
-        flags: { [SYSTEM_ID]: { skipLuck: true, bomb: { name: item.name, profile, victims, sceneUuid: scene.uuid, point, applied: false } } } });
+        flags: { [SYSTEM_ID]: { skipLuck: true, bomb: { name: item.name, ruleId: item.system.ruleId ?? "", profile, victims, sceneUuid: scene.uuid, point, aim, thrower: thrower.uuid, applied: false } } } });
       if (!message) return;
       const quantity = (item.system.quantity ?? 1) - 1;
       await actor.update({ ...actionUpdate(actor, action), items: [{ _id: item.id, "system.quantity": Math.max(0, quantity) }] });

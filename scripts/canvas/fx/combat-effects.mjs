@@ -2,7 +2,8 @@ import { SYSTEM_ID } from "../../config.mjs";
 import { canPlay, diceLanded, teardownStage, settleTokens, speakerToken, seen, placedToken } from "./fx-core.mjs";
 import { bodySilhouette, registerBattleFx } from "./battle-fx.mjs";
 import { heatRay } from "./spell-fx.mjs";
-import { playExchange, playDamage, clearStains } from "./combat-fx.mjs";
+import { playExchange, playDamage, clearStains, blastWound } from "./combat-fx.mjs";
+import { bombThrow, explode, blastStyle, clearPins } from "./ranged-fx.mjs";
 import { castFlourish, registerSignFx } from "./sign-fx.mjs";
 import { registerScreenFx } from "./screen-fx.mjs";
 import { registerTableFx } from "./table-fx.mjs";
@@ -25,6 +26,7 @@ async function animate(message) {
     if (holder && seen(holder)) heatRay(speakerToken(message), holder);
     return;
   }
+  if (flags.bomb && !flags.bomb.applied) return playBomb(message);
   if (kind !== "defense" && kind !== "applied" && kind !== "location" && !flags.magicCast) return;
   await diceLanded(message);
   if (!canPlay()) return;
@@ -41,9 +43,29 @@ async function animate(message) {
   return castFlourish(message);
 }
 
+/** A thrown bomb flies from the thrower (hopping on after a miss) and bursts; a trap or device just bursts. */
+async function playBomb(message) {
+  const bomb = message.flags[SYSTEM_ID].bomb, point = bomb.point;
+  if (!point || (bomb.sceneUuid && bomb.sceneUuid !== canvas.scene?.uuid)) return;
+  await diceLanded(message);
+  if (!canPlay()) return;
+  const style = blastStyle(bomb.ruleId, bomb.profile), thrower = placedToken(bomb.thrower);
+  if (thrower && bomb.aim && seen(thrower)) await bombThrow({ thrower, aim: bomb.aim, point, style });
+  await explode(point, { style, radius: bomb.profile?.radius ?? 4 });
+}
+
+/** When the GM applies a blast, everyone caught in it is thrown back and bleeds by the damage taken. */
+function playBlastVictims(message, changes) {
+  if (changes.flags?.[SYSTEM_ID]?.bomb?.applied !== true || !canPlay() || !message.visible || message.isContentVisible === false) return;
+  const bomb = message.flags[SYSTEM_ID].bomb, fire = Boolean(bomb.profile?.traits?.types?.includes("elemental"));
+  if (!bomb.point || (bomb.sceneUuid && bomb.sceneUuid !== canvas.scene?.uuid)) return;
+  for (const victim of bomb.victims ?? []) if (victim.result) blastWound(placedToken(victim.uuid), bomb.point, { total: victim.result.total, before: victim.before, fire });
+}
+
 /** Blood and leftovers of past blows go away; Yrden circles and Quen shields stay, they follow real effects. */
 export function clearLeftovers() {
   clearStains();
+  clearPins();
   settleTokens();
 }
 
@@ -59,6 +81,7 @@ async function sweep() {
 
 export function registerCombatEffects() {
   Hooks.on("createChatMessage", message => { animate(message).catch(error => console.error(`${SYSTEM_ID} | FX`, error)); });
+  Hooks.on("updateChatMessage", (message, changes) => { try { playBlastVictims(message, changes); } catch (error) { console.error(`${SYSTEM_ID} | FX`, error); } });
   Hooks.on("canvasTearDown", () => teardownStage());
   // The first sweep creates the setting document, later ones update it.
   for (const hook of ["createSetting", "updateSetting"]) Hooks.on(hook, setting => { if (setting.key === `${SYSTEM_ID}.combatEffectsCleanup`) clearLeftovers(); });

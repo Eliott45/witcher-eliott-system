@@ -220,8 +220,9 @@ function attackStyle(attack, message) {
   const item = attack.weaponSnapshot ?? message.speakerActor?.items.get(attack.itemId), system = item?.system ?? {};
   const blow = types.includes("реж") ? "slash" : types.includes("кол") ? "pierce" : types.includes("дроб") ? "blunt" : "slash";
   if (attack.unarmed || system.skill === "brawling" || attack.special === "brawl") return { kind: "fist", blow: "blunt" };
-  if (attack.thrown) return { kind: "thrown", blow };
-  if (attack.ranged) return { kind: system.skill === "crossbow" ? "bolt" : "arrow", blow: "pierce" };
+  if (attack.thrown) return { kind: "thrown", blow, item };
+  if (attack.ranged) return { kind: system.skill === "crossbow" ? "bolt" : "arrow", blow: "pierce", ammo: attack.ammunition?.ruleId ?? "", weapon: system.ruleId ?? "",
+    long: /long|war-bow|длинн|армейск/u.test(`${system.ruleId ?? ""} ${item?.name ?? ""}`.toLocaleLowerCase("ru")) };
   return { kind: "melee", blow, claws: Boolean(system.natural) && blow === "slash", trail: weaponTrail(message.speakerActor, attack, item) };
 }
 
@@ -338,8 +339,18 @@ export async function playExchange(defenseMessage) {
     return stream;
   }
 
-  const from = { x: g.a.x + g.ux * tokenRadius(attacker) * 0.7, y: g.a.y + g.uy * tokenRadius(attacker) * 0.7 };
   const stops = hit || mode === "block" || mode === "parry" || mode === "resist" || mode === "counter";
+  // Bows, crossbows and thrown weapons have their own flight, look and leftovers.
+  if (["arrow", "bolt", "thrown"].includes(style.kind)) {
+    const { shoot, toss, projectileLook, thrownShape } = await import("./ranged-fx.mjs");
+    const onNear = () => { if (!hit && ["dodge", "reposition", "slip"].includes(mode)) answer(); };
+    if (style.kind === "thrown") await toss({ attacker, target, shape: thrownShape(style.item), hit, stops, onNear });
+    else await shoot({ attacker, target, look: projectileLook(style), long: style.long, hit, stops, deflect: !hit && (mode === "block" || mode === "parry"), onNear });
+    if (hit) { calledShot(target, attack); recoil(target, g.ux, g.uy); flashTint(target, 0xff5a4a); }
+    else if (!["dodge", "reposition", "slip"].includes(mode)) answer();
+    return;
+  }
+  const from = { x: g.a.x + g.ux * tokenRadius(attacker) * 0.7, y: g.a.y + g.uy * tokenRadius(attacker) * 0.7 };
   const to = stops ? { x: g.b.x - g.ux * r * 0.55, y: g.b.y - g.uy * r * 0.55 } : { x: g.b.x + g.ux * gridSize() * 1.6, y: g.b.y + g.uy * gridSize() * 1.6 };
   recoil(attacker, -g.ux, -g.uy, gridSize() * 0.06, 220);
   await fly(style.kind === "spell" ? "orb" : style.kind, from, to, { colors: style.colors, stick: hit && style.kind !== "thrown",
@@ -518,6 +529,24 @@ function scorch(target, { amount, critical }) {
   for (let i = 0; i < 2 + Math.round(amount * 3 + (critical ? 1 : 0)); i++)
     dropDecal(c.x + rand(-r, r) * 0.7, c.y + rand(-r, r) * 0.7, r * rand(1.6, 2.6), rand(0, Math.PI * 2), 0x1e1814,
       { elevation: target.document.elevation, layer: SCORCH_LAYER, alpha: 0.55, grow: 600 });
+}
+
+/** A blast victim: thrown back from the centre, blood or a burn by the damage taken, and the number. */
+export function blastWound(target, center, { total = 0, before = null, fire = false } = {}) {
+  if (!target || target.destroyed || !seen(target)) return;
+  const c = target.center, r = tokenRadius(target), s = scaleOf(), angle = Math.atan2(c.y - center.y, c.x - center.x);
+  const push = gridSize() * 0.22;
+  nudge(target, 420, thereAndBack(Math.cos(angle) * push, Math.sin(angle) * push, 0.25));
+  const text = (content, fill, size = 30) => canvas.interface.createScrollingText({ x: c.x, y: c.y - r * 0.5 }, content, {
+    anchor: CONST.TEXT_ANCHOR_POINTS.TOP, direction: CONST.TEXT_ANCHOR_POINTS.TOP, jitter: 0.3, duration: 2000, distance: r * 1.1,
+    fontSize: size * s, fill, stroke: 0x140808, strokeThickness: 5 * s, fontFamily: "Palatino Linotype, Book Antiqua, Georgia, serif", fontWeight: "bold" });
+  if (!(total > 0)) { text("0", 0xd8e0ea, 24); return; }
+  const max = Math.max(1, target.actor?.system?.health?.max ?? 30), amount = Math.min(1, total / (max * 0.5));
+  const kill = Number.isFinite(before) && before > 0 && before - total <= 0;
+  if (fire) scorch(target, { amount, critical: false });
+  bleed(target, null, angle, { amount: fire ? amount * 0.5 : amount, critical: false, blow: "blunt", palette: paletteOf(target.actor), kill });
+  flashTint(target, fire ? 0xff7a2a : 0xd02a20, 450);
+  text(`−${total}`, 0xff5a4a, 32);
 }
 
 /** HP actually lost: blood (or ichor, ectoplasm, stone chips) thrown away from the attacker, and a falling number. */
