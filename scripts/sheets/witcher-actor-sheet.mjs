@@ -10,6 +10,7 @@ import { transportContext, transportActions, bindTransport } from "./transport-c
 import { workshopActorContext, workshopActorActions } from "./workshop-actor-context.mjs";
 import { craftingContext, alchemyContext, craftingActions, bindCrafting } from "./crafting-context.mjs";
 import { openAdvancement } from "./advancement-window.mjs";
+import { openCharacterCreation } from "./character-creation-window.mjs";
 import { setExperience } from "../data/advancement-purchase.mjs";
 import { setReputationValue } from "../data/reputation.mjs";
 import { reputationContext, configureReputationBonus } from "./reputation-context.mjs";
@@ -65,7 +66,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
     actions: {
       ...effectActions, ...transportActions, ...magicActions, ...learningActions, ...combatActions, ...consumptionActions, changeGrip,
       ...workshopActorActions, ...craftingActions,
-      openAdvancement,
+      openAdvancement, openCharacterCreation,
       toggleExperience: WitcherActorSheet.#onToggleExperience,
       toggleReputation: WitcherActorSheet.#onToggleReputation,
       rollReputation: WitcherActorSheet.#onRollReputation,
@@ -143,6 +144,9 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       row.presentation = row.expanded ? await itemPresentation(this.actor.items.get(row.id), { secrets: this.actor.isOwner }) : null;
     }));
     return Object.assign(context, {
+      // A blank hero (no race, profession or parameters) is invited to the creation wizard.
+      needsCreation: this.isEditable && !this.actor.system.details.race && !this.actor.system.details.profession
+        && Object.values(this.actor.system.attributes ?? {}).every(value => value === null || value === 0),
       combat: combatContext(this.actor,this.combatOptions),
       conditions,
       lifepath: lifepathContext(this.actor, preferences),

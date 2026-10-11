@@ -1,0 +1,377 @@
+<div class="wcr" data-step="{{stepId}}">
+  <aside class="wcr-rail">
+    <header class="wcr-brand">
+      <span class="wcr-brand-kicker">Книга судьбы</span>
+      <h2>{{#if state.name}}{{state.name}}{{else}}Новый герой{{/if}}</h2>
+      <div class="wcr-progress" style="--p:{{progress}}"><span>{{progress}}%</span></div>
+    </header>
+    <nav class="wcr-steps" aria-label="Шаги создания">
+      {{#each steps}}
+      <button type="button" class="wcr-step {{#if active}}is-active{{/if}} {{#if done}}is-done{{/if}}" data-action="goStep" data-step="{{id}}" aria-current="{{#if active}}step{{else}}false{{/if}}"
+              {{#unless done}}data-tooltip="{{#each errors}}{{this}} {{/each}}"{{/unless}}>
+        <span class="wcr-step-sigil"><i class="{{icon}}" aria-hidden="true"></i></span>
+        <span class="wcr-step-name"><small>{{index}}</small>{{name}}</span>
+        {{#if done}}<i class="fa-solid fa-check wcr-step-check" aria-hidden="true"></i>{{/if}}
+      </button>
+      {{/each}}
+    </nav>
+    <section class="wcr-log" aria-label="Броски">
+      <h3><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> Броски</h3>
+      <ol class="witcher-creation-log">
+        {{#each log}}<li><span>{{label}}</span><b data-tooltip="{{formula}}{{#if dice}}: {{dice}}{{/if}}">{{total}}</b></li>{{else}}<li class="is-empty">Пока ничего не брошено.</li>{{/each}}
+      </ol>
+    </section>
+  </aside>
+
+  <main class="wcr-main">
+    <header class="wcr-head">
+      <div><small>Шаг {{step.index}} из {{steps.length}}</small><h1><i class="{{step.icon}}" aria-hidden="true"></i> {{step.name}}</h1></div>
+      <button type="button" class="wcr-ghost" data-action="restart" data-tooltip="Очистить черновик"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i></button>
+    </header>
+
+    <div class="witcher-creation-body">
+
+      {{!-- 1. Race --}}
+      {{#if is.race}}
+      <p class="wcr-lead">Раса определяет особые способности героя и то, как к нему относятся. Ведьмак — и раса, и профессия одновременно.</p>
+      <div class="wcr-cards is-races">
+        {{#each races}}
+        <button type="button" class="wcr-card {{#if chosen}}is-chosen{{/if}}" data-action="pickRace" data-race="{{id}}" data-flash="race:{{id}}" aria-pressed="{{chosen}}">
+          <span class="wcr-card-emblem"><i class="{{icon}}" aria-hidden="true"></i></span>
+          <strong class="wcr-card-title">{{name}}</strong>
+          {{#if note}}<small class="wcr-card-note">{{note}}</small>{{/if}}
+          <ul class="wcr-perks">{{#each perks}}<li><b>{{name}}</b><span>{{text}}</span></li>{{/each}}</ul>
+          <span class="wcr-seal" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+        </button>
+        {{/each}}
+      </div>
+      {{/if}}
+
+      {{!-- 2. Homeland and family --}}
+      {{#if is.origin}}
+      {{#with origin}}
+      {{#if witcher}}
+      <p class="wcr-lead">Путь ведьмака определяется отдельными таблицами (стр. 238–240). Родину можно выбрать для истории — бонусов она ведьмаку не даёт.</p>
+      <div class="wcr-toolbar"><button type="button" class="wcr-roll is-big" data-action="rollWitcherAll"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> Бросить все таблицы</button></div>
+      <div class="wcr-tables">
+        {{#each witcherTables}}
+        <section class="wcr-table" data-flash="witcher:{{key}}">
+          <header><h3>{{name}}</h3>{{#if chosen}}<span class="wcr-pill is-gold">{{chosen}}</span>{{/if}}
+            <button type="button" class="wcr-roll" data-action="rollWitcher" data-table="{{key}}" aria-label="Бросить: {{name}}"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button></header>
+          {{#if hint}}<p class="wcr-hint">{{hint}}</p>{{/if}}
+          <ol class="wcr-rows">{{#each rows}}<li><button type="button" class="{{#if chosen}}is-chosen{{/if}}" data-action="pickWitcher" data-table="{{../key}}" data-id="{{id}}"><b>{{name}}</b>{{#if text}}<span>{{text}}</span>{{/if}}</button></li>{{/each}}</ol>
+        </section>
+        {{/each}}
+      </div>
+      {{else}}
+      <p class="wcr-lead">Откуда герой родом и в какой семье вырос. Каждую таблицу можно бросить (d10) или выбрать строку самому.</p>
+      <div class="wcr-toolbar"><button type="button" class="wcr-roll is-big" data-action="rollFamilyAll"><i class="fa-solid fa-dice" aria-hidden="true"></i> Бросить всё по порядку</button></div>
+      {{/if}}
+
+      <section class="wcr-panel" data-flash="origin:{{../state.origin}}">
+        <header><h3><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> Родина</h3>
+          <button type="button" class="wcr-roll" data-action="rollHomeland"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> Бросить</button></header>
+        {{#if nonhuman}}<p class="wcr-hint">Нелюди обычно родом из земель Старших Народов, но можно выбрать и другую родину.</p>{{/if}}
+        {{#if origin}}<div class="wcr-chosen"><strong>{{origin.name}}</strong>{{#unless witcher}}<span>{{origin.bonus}}</span>{{/unless}}<span>Родной язык: {{origin.language}} (8)</span></div>{{/if}}
+        <div class="wcr-regions">
+          {{#each origins}}
+          <div class="wcr-region {{#if active}}is-active{{/if}}"><h4>{{name}}</h4>
+            {{#each entries}}<button type="button" class="wcr-chip {{#if chosen}}is-chosen{{/if}}" data-action="pickOrigin" data-origin="{{id}}" data-tooltip="{{bonus}}">{{#if roll}}<small>{{roll}}</small>{{/if}}{{name}}</button>{{/each}}
+          </div>
+          {{/each}}
+        </div>
+      </section>
+
+      {{#unless witcher}}
+      <div class="wcr-split">
+        <section class="wcr-panel" data-flash="family:alive">
+          <header><h3><i class="fa-solid fa-people-roof" aria-hidden="true"></i> Судьба семьи</h3>
+            <button type="button" class="wcr-roll" data-action="rollFamily" data-roll="alive"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button></header>
+          <div class="wcr-toggle">
+            <button type="button" class="{{#if family.aliveKnown}}{{#if family.alive}}is-chosen{{/if}}{{/if}}" data-action="pickFamily" data-field="alive" data-value="true">Кто-то из семьи жив</button>
+            <button type="button" class="{{#if family.aliveKnown}}{{#unless family.alive}}is-chosen is-grim{{/unless}}{{/if}}" data-action="pickFamily" data-field="alive" data-value="false">С семьёй что-то случилось</button>
+          </div>
+          {{#if family.aliveKnown}}{{#unless family.alive}}
+          <div class="wcr-subhead" data-flash="family:fate"><span>Что случилось ({{groupName}})</span><button type="button" class="wcr-roll" data-action="rollFamily" data-roll="fate"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button></div>
+          <ol class="wcr-rows is-numbered">{{#each family.fateRows}}<li><button type="button" class="{{#if chosen}}is-chosen is-grim{{/if}}" data-action="pickFamily" data-field="fate" data-value="{{index}}"><small>{{index}}</small><span>{{text}}</span></button></li>{{/each}}</ol>
+          {{/unless}}{{/if}}
+        </section>
+
+        <section class="wcr-panel" data-flash="family:parents">
+          <header><h3><i class="fa-solid fa-user-group" aria-hidden="true"></i> Родители</h3>
+            <button type="button" class="wcr-roll" data-action="rollFamily" data-roll="parents"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button></header>
+          <div class="wcr-toggle">
+            <button type="button" class="{{#if family.parentsKnown}}{{#if family.parentsAlive}}is-chosen{{/if}}{{/if}}" data-action="pickFamily" data-field="parentsAlive" data-value="true">Родители живы</button>
+            <button type="button" class="{{#if family.parentsKnown}}{{#unless family.parentsAlive}}is-chosen is-grim{{/unless}}{{/if}}" data-action="pickFamily" data-field="parentsAlive" data-value="false">С родителями что-то случилось</button>
+          </div>
+          {{#if family.parentsKnown}}{{#unless family.parentsAlive}}
+          <div class="wcr-subhead" data-flash="family:whichParent"><span>Кто из родителей</span><button type="button" class="wcr-roll" data-action="rollFamily" data-roll="whichParent"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button></div>
+          <div class="wcr-toggle is-three">{{#each family.parentChoices}}<button type="button" class="{{#if chosen}}is-chosen{{/if}}" data-action="pickFamily" data-field="whichParent" data-value="{{name}}">{{name}}</button>{{/each}}</div>
+          <div class="wcr-subhead" data-flash="family:parentFate"><span>Что случилось ({{groupName}})</span><button type="button" class="wcr-roll" data-action="rollFamily" data-roll="parentFate"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button></div>
+          <ol class="wcr-rows is-numbered">{{#each family.parentRows}}<li><button type="button" class="{{#if chosen}}is-chosen is-grim{{/if}}" data-action="pickFamily" data-field="parentFate" data-value="{{index}}"><small>{{index}}</small><span>{{text}}</span></button></li>{{/each}}</ol>
+          {{/unless}}{{/if}}
+        </section>
+      </div>
+
+      <section class="wcr-panel" data-flash="family:status">
+        <header><h3><i class="fa-solid fa-landmark" aria-hidden="true"></i> Положение семьи · {{groupName}}</h3>
+          <button type="button" class="wcr-roll" data-action="rollFamily" data-roll="status"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> Бросить</button></header>
+        <div class="wcr-cards is-compact">
+          {{#each family.statuses}}
+          <button type="button" class="wcr-card is-small {{#if chosen}}is-chosen{{/if}}" data-action="pickFamily" data-field="status" data-value="{{id}}">
+            <small class="wcr-card-roll">{{roll}}</small><strong class="wcr-card-title">{{name}}</strong><span class="wcr-card-text">{{text}}</span><em>{{reward}}</em>
+          </button>
+          {{/each}}
+        </div>
+      </section>
+
+      <section class="wcr-panel" data-flash="family:friend">
+        <header><h3><i class="fa-solid fa-handshake" aria-hidden="true"></i> Друг, оказавший влияние</h3>
+          <button type="button" class="wcr-roll" data-action="rollFamily" data-roll="friend"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> Бросить</button></header>
+        <ol class="wcr-rows is-numbered is-columns">{{#each family.friends}}<li><button type="button" class="{{#if chosen}}is-chosen{{/if}}" data-action="pickFamily" data-field="friend" data-value="{{id}}"><small>{{roll}}</small><b>{{name}}</b><span>{{text}}</span></button></li>{{/each}}</ol>
+      </section>
+
+      <section class="wcr-panel" data-flash="family:siblings">
+        <header><h3><i class="fa-solid fa-children" aria-hidden="true"></i> Братья и сёстры</h3>
+          <span class="wcr-pill">{{#if family.siblingsKnown}}{{#if family.siblingCount}}{{family.siblingCount}}{{else}}Единственный ребёнок{{/if}}{{else}}не определено{{/if}}</span>
+          <button type="button" class="wcr-roll" data-action="rollFamily" data-roll="siblings"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> Бросить</button></header>
+        <div class="wcr-count">{{#each family.countChoices}}<button type="button" class="{{#if chosen}}is-chosen{{/if}}" data-action="pickFamily" data-field="siblingCount" data-value="{{count}}">{{#if count}}{{count}}{{else}}Нет{{/if}}</button>{{/each}}</div>
+        <div class="wcr-siblings">
+          {{#each family.siblings}}
+          <article class="wcr-sibling" data-flash="sibling:{{index}}">
+            <header><input type="text" value="{{name}}" placeholder="Имя брата или сестры" data-field="family.siblings.{{index}}.name" aria-label="Имя">
+              <button type="button" class="wcr-roll" data-action="rollSibling" data-index="{{index}}" aria-label="Бросить всё о нём"><i class="fa-solid fa-dice" aria-hidden="true"></i></button></header>
+            {{#each columns}}
+            <label><span>{{title}}</span><select data-field="family.siblings.{{../index}}.{{key}}" data-type="number" data-rerender>
+              <option value="0">—</option>{{#each rows}}<option value="{{index}}" {{#if chosen}}selected{{/if}}>{{index}}. {{text}}</option>{{/each}}</select>
+              <button type="button" class="wcr-roll is-tiny" data-action="rollSibling" data-index="{{../index}}" data-column="{{key}}" aria-label="Бросить: {{title}}"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button></label>
+            {{/each}}
+          </article>
+          {{/each}}
+        </div>
+      </section>
+      {{/unless}}
+      {{/with}}
+      {{/if}}
+
+      {{!-- 3. Lifepath --}}
+      {{#if is.events}}
+      {{#with events}}
+      <p class="wcr-lead">{{#if witcher}}С 20–29 лет ведьмак странствует по Пути. За каждые 10 лет выберите риск и узнайте исход десятилетия (стр. 241–245).{{else}}За каждые полные 10 лет жизни — одно важное событие (стр. 31–35). Этот шаг можно пропустить.{{/if}}</p>
+      <div class="wcr-panel wcr-ages">
+        <label>Возраст<input type="number" min="1" step="1" value="{{../state.age}}" data-field="age" data-type="number" data-rerender></label>
+        {{#if witcher}}
+        <label>Начало Пути<input type="number" min="20" max="29" step="1" value="{{pathStartAge}}" data-field="witcher.pathStartAge" data-type="number" data-rerender></label>
+        <label>Образ жизни<select data-field="decadeRisk" data-rerender>{{#each risks}}<option value="{{id}}" {{#if chosen}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+        {{/if}}
+        <div class="wcr-counter {{#if missing}}is-open{{else}}is-full{{/if}}"><strong>{{count}}</strong><span>из {{expected}}</span></div>
+        <button type="button" class="wcr-roll is-big" data-action="rollEvents" {{#unless missing}}disabled{{/unless}}><i class="fa-solid fa-dice" aria-hidden="true"></i> Бросить недостающие{{#if missing}} ({{missing}}){{/if}}</button>
+        <button type="button" class="wcr-ghost" data-action="editEvent" data-index="-1"><i class="fa-solid fa-plus" aria-hidden="true"></i> Вручную</button>
+      </div>
+      <ol class="wcr-timeline" data-flash="events">
+        {{#each entries}}
+        <li class="is-{{tone}}"><span class="wcr-age">{{age}}</span>
+          <div><strong>{{title}}</strong><span>{{text}}</span></div>
+          <button type="button" class="wcr-ghost" data-action="editEvent" data-index="{{index}}" aria-label="Уточнить"><i class="fa-solid fa-pen" aria-hidden="true"></i></button>
+          <button type="button" class="wcr-ghost" data-action="removeEvent" data-index="{{index}}" aria-label="Удалить"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </li>
+        {{else}}<li class="is-empty">Событий пока нет.</li>{{/each}}
+      </ol>
+      {{#if extra}}<p class="wcr-hint">Событий больше, чем десятилетий: лишние можно удалить.</p>{{/if}}
+      {{/with}}
+      {{/if}}
+
+      {{!-- 4. Style --}}
+      {{#if is.style}}
+      <p class="wcr-lead">Как героя узнают с первого взгляда и что для него важно (стр. 36). По одному броску на каждый столбец.</p>
+      <div class="wcr-toolbar"><button type="button" class="wcr-roll is-big" data-action="rollStyleAll"><i class="fa-solid fa-dice" aria-hidden="true"></i> Бросить всё</button></div>
+      <div class="wcr-styles">
+        {{#each style}}
+        <section class="wcr-style" data-flash="style:{{key}}">
+          <header><h3>{{name}}</h3><button type="button" class="wcr-roll" data-action="rollStyle" data-table="{{key}}" aria-label="Бросить: {{name}}"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button></header>
+          <strong class="wcr-style-value">{{#if value}}{{value}}{{else}}—{{/if}}</strong>
+          <select data-field="style.{{key}}" data-type="number" data-rerender aria-label="{{name}}"><option value="0">Выбрать…</option>{{#each rows}}<option value="{{index}}" {{#if chosen}}selected{{/if}}>{{index}}. {{text}}</option>{{/each}}</select>
+        </section>
+        {{/each}}
+      </div>
+      {{/if}}
+
+      {{!-- 5. Profession --}}
+      {{#if is.profession}}
+      <p class="wcr-lead">Профессия даёт определяющий навык, набор навыков, магию и стартовое снаряжение. Она не запрещает учиться чему-то ещё.</p>
+      <div class="wcr-cards is-professions">
+        {{#each professions}}
+        <button type="button" class="wcr-card {{#if chosen}}is-chosen{{/if}} {{#unless allowed}}is-locked{{/unless}}" data-action="pickProfession" data-profession="{{id}}" data-flash="profession:{{id}}" aria-pressed="{{chosen}}"
+                {{#unless allowed}}data-tooltip="Недоступно для этой расы"{{/unless}}>
+          <span class="wcr-card-emblem"><i class="{{icon}}" aria-hidden="true"></i></span>
+          <strong class="wcr-card-title">{{name}}</strong>
+          <small class="wcr-card-note">{{defining}} · Энергия {{vigor}}</small>
+          <span class="wcr-seal" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
+        </button>
+        {{/each}}
+      </div>
+      {{#each professions}}{{#if chosen}}
+      <section class="wcr-panel wcr-profession">
+        <header><h3><i class="{{icon}}" aria-hidden="true"></i> {{name}}</h3><span class="wcr-pill is-gold">{{crowns}}</span></header>
+        <div class="wcr-profession-grid">
+          <div><h4>Определяющий навык — {{defining}}</h4><p>{{definingText}}</p><h4>Магия</h4><p>{{magic}}</p></div>
+          <div><h4>Навыки</h4><ul class="wcr-chips">{{#each skills}}<li>{{this}}</li>{{/each}}</ul><h4>Снаряжение</h4><p>{{gear}}</p></div>
+        </div>
+      </section>
+      {{/if}}{{/each}}
+      {{/if}}
+
+      {{!-- 6. Attributes --}}
+      {{#if is.attributes}}
+      {{#with attributes}}
+      <div class="wcr-toggle is-mode">
+        <button type="button" class="{{#if points}}is-chosen{{/if}}" data-action="attrMode" data-mode="points"><i class="fa-solid fa-coins" aria-hidden="true"></i> Распределить очки</button>
+        <button type="button" class="{{#if rolled}}is-chosen{{/if}}" data-action="attrMode" data-mode="roll"><i class="fa-solid fa-dice" aria-hidden="true"></i> Бросить 9d10</button>
+      </div>
+      {{#if points}}
+      <div class="wcr-panel wcr-budget">
+        <label>Уровень игры<select data-field="attributes.level" data-rerender>{{#each levels}}<option value="{{id}}" {{#if chosen}}selected{{/if}}>{{name}} — {{points}}</option>{{/each}}</select></label>
+        <div class="wcr-orb {{#if over}}is-over{{/if}}"><strong>{{remaining}}</strong><span>осталось из {{budget}}</span></div>
+        <p class="wcr-hint">Каждый параметр — от 1 до 10. Расовые черты и мутации позволяют превзойти предел.</p>
+      </div>
+      {{else}}
+      <div class="wcr-panel wcr-pool" data-flash="attributes:pool">
+        <button type="button" class="wcr-roll is-big" data-action="rollAttributes"><i class="fa-solid fa-dice" aria-hidden="true"></i> {{#if hasPool}}Перебросить{{else}}Бросить{{/if}} 9d10</button>
+        <div class="wcr-dice">{{#each pool}}<button type="button" class="wcr-die {{#if used}}is-used{{/if}} {{#if selected}}is-selected{{/if}}" data-action="pickPool" data-index="{{index}}">{{value}}</button>{{/each}}</div>
+        {{#if hasPool}}<button type="button" class="wcr-ghost" data-action="autoAssign"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Распределить</button>{{/if}}
+        <p class="wcr-hint">Результаты 1 и 2 перебрасываются. Выберите кость, затем параметр, чтобы поставить значение.</p>
+      </div>
+      {{/if}}
+      <div class="wcr-attrs">
+        {{#each rows}}
+        <div class="wcr-attr {{#if assigned}}is-assigned{{/if}}" data-flash="attr:{{key}}">
+          <span class="wcr-attr-short" data-tooltip="{{text}}">{{short}}</span>
+          <span class="wcr-attr-name">{{name}}</span>
+          <span class="wcr-bar"><i style="width:{{fill}}%"></i></span>
+          {{#if ../points}}
+          <span class="wcr-stepper"><button type="button" data-action="attrChange" data-key="{{key}}" data-delta="-1" {{#unless canDecrease}}disabled{{/unless}} aria-label="Меньше">−</button><b>{{value}}</b><button type="button" data-action="attrChange" data-key="{{key}}" data-delta="1" {{#unless canIncrease}}disabled{{/unless}} aria-label="Больше">+</button></span>
+          {{else}}
+          <button type="button" class="wcr-slot" data-action="assignAttr" data-key="{{key}}">{{#if assigned}}{{value}}{{else}}?{{/if}}</button>
+          {{/if}}
+          <span class="wcr-attr-final">{{#if bonusLabel}}<small data-tooltip="Раса">{{bonusLabel}}</small>{{/if}}{{effective}}</span>
+        </div>
+        {{/each}}
+      </div>
+      <div class="wcr-derived">
+        <span><i class="fa-solid fa-heart" aria-hidden="true"></i> ПЗ <b>{{derived.health}}</b></span><span><i class="fa-solid fa-bolt" aria-hidden="true"></i> ВЫН <b>{{derived.stamina}}</b></span>
+        <span>Отдых <b>{{derived.recovery}}</b></span><span>УСТ <b>{{derived.stun}}</b></span><span>Бег <b>{{derived.run}}</b></span><span>Прыжок <b>{{derived.leap}}</b></span><span>Вес <b>{{derived.carry}}</b></span>
+      </div>
+      {{/with}}
+      {{/if}}
+
+      {{!-- 7. Skills --}}
+      {{#if is.skills}}
+      {{#if skills}}{{#with skills}}
+      <div class="wcr-split">
+        <section class="wcr-panel wcr-skillset">
+          <header><h3><i class="fa-solid fa-briefcase" aria-hidden="true"></i> Навыки профессии</h3><div class="wcr-orb is-small {{#if over}}is-over{{/if}}"><strong>{{remaining}}</strong><span>из {{budget}}</span></div></header>
+          <p class="wcr-hint">В каждый — хотя бы 1, при создании не выше 6. Навыки ×2 стоят вдвое.</p>
+          {{#each slots}}
+          <div class="wcr-skill {{#if defining}}is-defining{{/if}}" data-flash="slot:{{id}}">
+            {{#if combatOptions}}<select class="wcr-skill-name" data-field="skills.combat.{{index}}" data-rerender aria-label="Боевой навык"><option value="">Боевой навык…</option>{{#each combatOptions}}<option value="{{key}}" {{#if chosen}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+            {{else if languageOptions}}<select class="wcr-skill-name" data-field="skills.languages.{{index}}" data-rerender aria-label="Язык"><option value="">Язык…</option>{{#each languageOptions}}<option value="{{id}}" {{#if chosen}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+            {{else}}<span class="wcr-skill-name">{{name}}{{#if cost}}<em>{{cost}}</em>{{/if}}<small>{{label}}</small></span>{{/if}}
+            <span class="wcr-pips">{{#each pips}}<i class="{{#if on}}is-on{{/if}}"></i>{{/each}}</span>
+            <span class="wcr-stepper"><button type="button" data-action="skillChange" data-slot="{{id}}" data-delta="-1" {{#unless canDecrease}}disabled{{/unless}} aria-label="Меньше">−</button><b>{{level}}</b><button type="button" data-action="skillChange" data-slot="{{id}}" data-delta="1" {{#unless canIncrease}}disabled{{/unless}} aria-label="Больше">+</button></span>
+            <span class="wcr-total">{{total}}</span>
+          </div>
+          {{/each}}
+          <p class="wcr-native"><i class="fa-solid fa-language" aria-hidden="true"></i> Родной язык — {{nativeLanguage}}: {{nativeLevel}} бесплатно.</p>
+        </section>
+        <section class="wcr-panel wcr-skillset">
+          <header><h3><i class="fa-solid fa-seedling" aria-hidden="true"></i> Освоенные навыки</h3><div class="wcr-orb is-small {{#if pickupOver}}is-over{{/if}}"><strong>{{pickupRemaining}}</strong><span>из {{pickupBudget}}</span></div></header>
+          <p class="wcr-hint">Очков столько, сколько ИНТ + РЕА. Нельзя вкладывать в навыки профессии.</p>
+          {{#each groups}}
+          <h4 class="wcr-group">{{name}} <small>{{value}}</small></h4>
+          {{#each skills}}
+          <div class="wcr-skill is-pickup {{#if level}}is-taken{{/if}}" data-flash="pickup:{{key}}">
+            <span class="wcr-skill-name">{{name}}{{#if complex}}<em>×2</em>{{/if}}</span>
+            <span class="wcr-pips">{{#each pips}}<i class="{{#if on}}is-on{{/if}}"></i>{{/each}}</span>
+            <span class="wcr-stepper"><button type="button" data-action="pickupChange" data-key="{{key}}" data-delta="-1" {{#unless canDecrease}}disabled{{/unless}} aria-label="Меньше">−</button><b>{{level}}</b><button type="button" data-action="pickupChange" data-key="{{key}}" data-delta="1" {{#unless canIncrease}}disabled{{/unless}} aria-label="Больше">+</button></span>
+            <span class="wcr-total">{{total}}</span>
+          </div>
+          {{/each}}
+          {{/each}}
+        </section>
+      </div>
+      {{/with}}{{else}}<p class="wcr-empty">Сначала выберите профессию.</p>{{/if}}
+      {{/if}}
+
+      {{!-- 8. Gear --}}
+      {{#if is.gear}}
+      {{#with gear}}
+      <div class="wcr-split is-gear">
+        <section class="wcr-panel">
+          <header><h3><i class="fa-solid fa-toolbox" aria-hidden="true"></i> Снаряжение профессии</h3><span class="wcr-pill {{#if full}}is-gold{{/if}}">{{picked}} / {{need}}</span></header>
+          <div class="wcr-picks">
+            {{#each options}}<button type="button" class="wcr-pick {{#if chosen}}is-chosen{{/if}} {{#if locked}}is-locked{{/if}}" data-action="gearToggle" data-index="{{index}}" aria-pressed="{{chosen}}"><i class="fa-solid {{#if chosen}}fa-square-check{{else}}fa-square{{/if}}" aria-hidden="true"></i>{{name}}{{#if money}}<small>{{money}}</small>{{/if}}</button>{{/each}}
+          </div>
+          {{#if fixed.length}}<h4>Всегда с собой</h4><ul class="wcr-chips">{{#each fixed}}<li>{{this}}</li>{{/each}}</ul>{{/if}}
+          {{#if fixedNote}}<p class="wcr-hint">{{fixedNote}}</p>{{/if}}
+          {{#each formulas}}
+          <h4>{{name}}</h4>
+          <div class="wcr-selects">{{#each slots}}<select data-field="gear.formulas.{{../key}}.{{slot}}" data-rerender><option value="">Выбрать…</option>{{#each options}}<option value="{{ruleId}}" {{#if chosen}}selected{{/if}}>{{name}}</option>{{/each}}</select>{{/each}}</div>
+          {{/each}}
+          {{#if keepsakes.length}}<h4>Памятные вещи</h4><ul class="wcr-keepsakes">{{#each keepsakes}}<li><b>{{name}}</b><span>{{text}}</span></li>{{/each}}</ul>{{/if}}
+        </section>
+        <section class="wcr-panel wcr-purse" data-flash="crowns">
+          <header><h3><i class="fa-solid fa-coins" aria-hidden="true"></i> Стартовый капитал</h3></header>
+          <div class="wcr-coin {{#if crownsRolled}}is-rolled{{/if}}"><strong>{{#if crownsRolled}}{{totalCrowns}}{{else}}?{{/if}}</strong><span>крон</span></div>
+          <p class="wcr-hint">{{crownsFormula}}{{#if bonusCrowns}} + {{bonusCrowns}} (жизненный путь и снаряжение){{/if}}</p>
+          <button type="button" class="wcr-roll is-big" data-action="rollCrowns"><i class="fa-solid fa-dice" aria-hidden="true"></i> {{#if crownsRolled}}Перебросить{{else}}Бросить{{/if}} 2d6</button>
+          <p class="wcr-hint">Остальное покупается за кроны на листе персонажа.</p>
+        </section>
+      </div>
+      {{#each magic}}
+      <section class="wcr-panel wcr-magic">
+        <header><h3><i class="fa-solid fa-wand-sparkles" aria-hidden="true"></i> {{name}}</h3><span class="wcr-pill {{#if full}}is-gold{{/if}}">{{picked}} / {{count}}</span></header>
+        <div class="wcr-spells">{{#each entries}}<button type="button" class="wcr-spell {{#if chosen}}is-chosen{{/if}} {{#if locked}}is-locked{{/if}}" data-action="magicToggle" data-group="{{../key}}" data-rule="{{ruleId}}" data-tooltip="{{text}}">{{name}}</button>{{/each}}</div>
+      </section>
+      {{/each}}
+      {{/with}}
+      {{/if}}
+
+      {{!-- 9. Summary --}}
+      {{#if is.summary}}
+      {{#with summary}}
+      <div class="wcr-scroll">
+        <div class="wcr-names">
+          <label class="wcr-name">Имя<input type="text" value="{{../state.name}}" data-field="name" data-rerender placeholder="Как зовут героя?"></label>
+          <button type="button" class="wcr-ghost" data-action="randomName" data-tooltip="Случайное имя из книги"><i class="fa-solid fa-shuffle" aria-hidden="true"></i></button>
+          <label>Пол<input type="text" value="{{../state.gender}}" data-field="gender" placeholder="—"></label>
+        </div>
+        <p class="wcr-hint">Примеры имён: {{#each names}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.</p>
+        <dl class="wcr-facts">
+          <dt>Раса</dt><dd>{{race}}</dd><dt>Профессия</dt><dd>{{profession}}</dd><dt>Родина</dt><dd>{{origin}}</dd>
+          {{#if status}}<dt>Семья</dt><dd>{{status}}</dd>{{/if}}{{#if friend}}<dt>Друг</dt><dd>{{friend}}</dd>{{/if}}
+          <dt>Возраст</dt><dd>{{../state.age}} · событий: {{events}}</dd>
+        </dl>
+        <div class="wcr-attr-row">{{#each attributes}}<span><small>{{short}}</small><b>{{value}}</b></span>{{/each}}</div>
+        <div class="wcr-derived"><span>ПЗ <b>{{derived.health}}</b></span><span>ВЫН <b>{{derived.stamina}}</b></span><span>УСТ <b>{{derived.stun}}</b></span><span>Бег <b>{{derived.run}}</b></span></div>
+        {{#if bio.history}}<p><b>Семья.</b> {{bio.history}} {{bio.parents}}</p>{{/if}}
+        {{#if bio.siblings}}<p class="wcr-pre"><b>Братья и сёстры.</b> {{bio.siblings}}</p>{{/if}}
+        {{#if bio.appearance}}<p><b>Внешность.</b> {{bio.appearance}}</p>{{/if}}
+        {{#if bio.personality}}<p>{{bio.personality}}.</p>{{/if}}
+      </div>
+      <div class="wcr-finale">
+        <button type="button" class="wcr-seal-button" data-action="finish" {{#unless ../ready}}disabled{{/unless}} {{#if ../busy}}disabled{{/if}}>
+          <span class="wcr-wax"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i></span><span>{{#if ../busy}}Записываем…{{else}}Скрепить печатью{{/if}}</span>
+        </button>
+        {{#unless ../ready}}<p class="wcr-hint">Чтобы завершить, исправьте шаги без отметки.</p>{{/unless}}
+      </div>
+      {{/with}}
+      {{/if}}
+    </div>
+
+    <footer class="wcr-foot">
+      {{#if prev}}<button type="button" class="wcr-nav" data-action="prevStep"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {{prev.name}}</button>{{else}}<span></span>{{/if}}
+      <p class="wcr-errors" role="status">{{#each errors}}<span>{{this}}</span>{{/each}}</p>
+      {{#if next}}<button type="button" class="wcr-nav is-next" data-action="nextStep">{{next.name}} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>{{/if}}
+    </footer>
+  </main>
+</div>
