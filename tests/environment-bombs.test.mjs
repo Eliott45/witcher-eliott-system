@@ -86,8 +86,11 @@ test("the blast hits every body part against its own armor and finds tokens in t
   const rolls = { head: 10, torso: 10, rightArm: 10, leftArm: 10, rightLeg: 10, leftLeg: 10 };
   const blast = blastDamage(target, rolls, { types: ["piercing"], piercing: "none", silver: false });
   assert.equal(blast.parts.length, 6); assert.equal(blast.total, 30 + 10 + 4 * 5, "head ×3, torso ×1, limbs ×½");
-  const scene = { grid: { size: 100, distance: 2 }, tokens: [{ actor: {}, x: 0, y: 0, width: 1, height: 1, getSize: () => ({ width: 100, height: 100 }) },
-    { actor: {}, x: 400, y: 0, width: 1, height: 1, getSize: () => ({ width: 100, height: 100 }) }] };
+  const creature = { type: "npc", system: { health: { value: 20, max: 20 } } };
+  const scene = { grid: { size: 100, distance: 2 }, tokens: [{ actor: creature, x: 0, y: 0, width: 1, height: 1, getSize: () => ({ width: 100, height: 100 }) },
+    { actor: creature, x: 400, y: 0, width: 1, height: 1, getSize: () => ({ width: 100, height: 100 }) },
+    // A thrown dagger lying on the ground is a loot pile: no health, never a victim.
+    { actor: { type: "loot", system: {} }, x: 100, y: 0, width: 1, height: 1, getSize: () => ({ width: 100, height: 100 }) }] };
   assert.equal(tokensInBlast(scene, { x: 50, y: 50 }, 4).length, 1);
   assert.equal(tokensInBlast(scene, { x: 250, y: 50 }, 4).length, 2);
 });

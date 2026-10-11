@@ -46,10 +46,15 @@ const grid = scene => scene.grid;
 const metres = (scene, a, b) => grid(scene).measurePath?.([a, b])?.distance ?? Math.hypot(b.x - a.x, b.y - a.y) / grid(scene).size * grid(scene).distance;
 const halfSize = (scene, token) => Math.max(token.width ?? 1, token.height ?? 1) / 2 * grid(scene).distance;
 
+/** Only creatures take a blast: loot piles, shops and places of power on the map are not hurt. */
+export const blastable = actor => ["character", "npc"].includes(actor?.type) && actor.system?.health?.value !== undefined;
 /** Tokens whose body is inside the blast circle. */
 export function tokensInBlast(scene, point, radius) {
-  return Array.from(scene.tokens).filter(token => token.actor && metres(scene, point, tokenCenter(token)) - halfSize(scene, token) <= radius);
+  return Array.from(scene.tokens).filter(token => blastable(token.actor) && metres(scene, point, tokenCenter(token)) - halfSize(scene, token) <= radius);
 }
+/** Where a scatter result sends the bomb, as the thrower sees it (core «Разброс»). */
+export const SCATTER_WORDS = { 1: "перелёт", 2: "перелёт вправо", 3: "перелёт", 4: "перелёт влево", 5: "вправо", 6: "влево",
+  7: "недолёт вправо", 8: "недолёт", 9: "недолёт влево", 10: "недолёт" };
 
 /** Waits for one click on the map; resolves to the scene point. */
 function pickPoint() {
@@ -115,7 +120,7 @@ export function throwBomb(actor, item) {
         profile.dimeritium ? "зона без магии на 20 раундов" : "", profile.gas ? "горючий газ на 3 хода; пламя вызывает взрыв 5d6 и горение 75%" : ""].filter(Boolean);
       const content = `<section class="witcher-attack-chat witcher-bomb-card"><h3><i class="fa-solid fa-bomb"></i> ${esc(item.name)}</h3>
         <p>Бросок Атлетики <b>${roll.total}</b> против СЛ ${quote.dc} (${esc(quote.band.name)}, дальность ${quote.range} м): <strong>${hit ? "точно в цель" : "мимо"}</strong>.</p>
-        ${scatter ? `<p>Разброс: направление ${scatter.direction} по таблице, ${scatter.metres} м от точки прицеливания.</p>` : ""}
+        ${scatter ? `<p>Разброс: ${scatter.direction} — <b>${SCATTER_WORDS[scatter.direction]}</b>, на ${scatter.metres} м от точки прицеливания.</p>` : ""}
         <p>Радиус ${profile.radius} м${profile.damage ? ` · урон ${esc(profile.damage)} — отдельный бросок на каждую часть тела, минус ПБ части, затем множитель зоны` : ""}${effects.length ? ` · ${esc(effects.join("; "))}` : ""}.</p>
         ${victims.length ? `<ul class="witcher-bomb-victims">${victims.map(v => `<li>${esc(v.name)}${v.burning ? " · загорается" : ""}${v.poisoned ? " · отравлен" : ""}</li>`).join("")}</ul>` : "<p>В радиусе никого нет.</p>"}
         ${actionNote(action)}
@@ -208,7 +213,8 @@ async function applyBlastNow(message) {
   for (const victim of data.victims) {
     if (victim.applied) continue;
     const token = fromUuidSync(victim.uuid), actor = token?.actor;
-    if (!actor) continue;
+    // Older cards may list a loot pile caught in the circle: it has nothing to hurt.
+    if (!blastable(actor)) { victim.applied = true; continue; }
     if (data.profile.damage) {
       const { destroyNoonCopy } = await import("./creature-actions-dance.mjs");
       if (await destroyNoonCopy(token)) {
@@ -273,8 +279,47 @@ async function applyBlastNow(message) {
     content: `<section class="witcher-attack-chat"><h3><i class="fa-solid fa-burst"></i> ${esc(data.name)} · взрыв</h3><ul class="witcher-bomb-victims">${lines.join("")}</ul></section>` });
 }
 
+let outline = null;
+function hideBlast() { if (outline && !outline.destroyed) outline.destroy(); outline = null; }
+/** The blast circle on the map (and, on request, the camera taken there with a ping). */
+function showBlast(data, { pan = false } = {}) {
+  hideBlast();
+  if (!canvas?.ready || (data.sceneUuid && data.sceneUuid !== canvas.scene?.uuid)) {
+    if (pan) ui.notifications.info("Взрыв был на другой сцене.");
+    return;
+  }
+  const px = (data.profile?.radius ?? 4) / canvas.dimensions.distance * canvas.grid.size, g = new PIXI.Graphics();
+  g.lineStyle(4, 0xff7a2a, 0.9).beginFill(0xff7a2a, 0.12).drawCircle(data.point.x, data.point.y, px).endFill();
+  if (data.aim && Math.hypot(data.aim.x - data.point.x, data.aim.y - data.point.y) > 4) {
+    // A miss: from the aim point (a cross) to where it landed.
+    const { x, y } = data.aim, k = canvas.grid.size * 0.2;
+    g.lineStyle(3, 0xffffff, 0.8).moveTo(x - k, y - k).lineTo(x + k, y + k).moveTo(x + k, y - k).lineTo(x - k, y + k);
+    g.lineStyle(2, 0xffffff, 0.6).moveTo(x, y).lineTo(data.point.x, data.point.y);
+  }
+  g.eventMode = "none";
+  canvas.interface.addChild(g);
+  outline = g;
+  if (pan) {
+    canvas.animatePan({ x: data.point.x, y: data.point.y, duration: 450 });
+    canvas.ping?.(data.point);
+    setTimeout(() => { if (outline === g) hideBlast(); }, 3500);
+  }
+}
+
 export function registerBombs() {
   Hooks.on("renderChatMessageHTML", (message, html) => {
+    const data = message.flags[SYSTEM_ID]?.bomb;
+    if (data?.point && !html.querySelector("[data-bomb-locate]")) {
+      // Everyone can find where it fell: the camera goes there and pings; hovering the card outlines the blast.
+      const locate = document.createElement("button");
+      locate.type = "button";
+      locate.dataset.bombLocate = "";
+      locate.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Показать место';
+      locate.addEventListener("click", () => showBlast(data, { pan: true }));
+      (html.querySelector(".witcher-bomb-card") ?? html.querySelector(".message-content"))?.append(locate);
+      html.addEventListener("mouseenter", () => showBlast(data));
+      html.addEventListener("mouseleave", hideBlast);
+    }
     for (const button of html.querySelectorAll("[data-bomb-apply]")) {
       const data = message.flags[SYSTEM_ID]?.bomb;
       button.disabled = !game.user.isGM || Boolean(data?.applied);

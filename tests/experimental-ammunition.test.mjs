@@ -24,7 +24,7 @@ function setup() {
   };
   function actor(name = "Персонаж") {
     const actor = { id: id(), uuid: `Actor.${id()}`, name, type: "character", isOwner: true, flags: {}, items: collection([]), effects: collection([]),
-      system: { stamina: { value: 20, max: 20 }, combatAction: { extra: false }, statistics: { effective: { intelligence: 7 }, modifiers: [] }, skills: { wildernessSurvival: 3 } }, update,
+      system: { health: { value: 30, max: 30 }, stamina: { value: 20, max: 20 }, combatAction: { extra: false }, statistics: { effective: { intelligence: 7 }, modifiers: [] }, skills: { wildernessSurvival: 3 } }, update,
       async createEmbeddedDocuments(type, sources) { assert.equal(type, "ActiveEffect"); if (this.failEffect) { this.failEffect = false; throw new Error("effect failed"); }
         const effects = sources.map(source => ({ ...structuredClone(source), id: id(), statuses: new Set(source.statuses ?? []) })); this.effects.push(...effects); return effects; },
       async deleteEmbeddedDocuments(type, ids) { assert.equal(type, "ActiveEffect"); this.effects.splice(0, this.effects.length, ...this.effects.filter(effect => !ids.includes(effect.id))); }
