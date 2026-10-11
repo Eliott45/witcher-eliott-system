@@ -1,5 +1,5 @@
 import { cappedSkillModifiers, modifierFactor } from "./background-modifiers.mjs";
-import { languageForEntry } from "./languages.mjs";
+import { languageForEntry, getLanguage } from "./languages.mjs";
 import { creatureSkillAttribute } from "./creatures.mjs";
 // Stable IDs match background-modifiers.mjs; language is a template for named entries.
 const groups = {
@@ -18,10 +18,21 @@ export const SKILLS = Object.entries(groups).flatMap(([attribute, keys]) => keys
 })));
 export const SKILL_KEYS = SKILLS.filter(skill => skill.key !== "language").map(skill => skill.key);
 
+/**
+ * The actor's entry for a language. The three core tongues always exist on a sheet: one never learned
+ * reads as level 0 until it is written, so no compendium drop is needed.
+ */
+export function languageEntry(system, languageId) {
+  const core = getLanguage(languageId);
+  const stored = system.languages?.find(entry => entry.id === languageId) ?? (core ? system.languages?.find(entry => languageForEntry(entry)?.id === core.id) : null);
+  if (stored) return stored;
+  return core ? { id: core.id, name: globalThis.game?.i18n?.localize(core.name) ?? core.id, level: 0, virtual: true } : null;
+}
+
 export function skillValue(system, key, languageId = "") {
   const skill = SKILLS.find(entry => entry.key === key);
   if (!skill) return null;
-  const language = key === "language" ? system.languages.find(entry => entry.id === languageId) : null;
+  const language = key === "language" ? languageEntry(system, languageId) : null;
   if (key === "language" && !language) return null;
   const level = language ? language.level : system.skills[key];
   const statistics = system.statistics;

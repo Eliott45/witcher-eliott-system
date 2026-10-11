@@ -134,15 +134,19 @@ function skillsStep(state) {
   // No total until the parameter itself is distributed: a bare rank would look like the final value.
   const total = (key, level) => { const skill = SKILLS.find(entry => entry.key === key); return skill && values[skill.attribute] > 0 ? effective(skill.attribute) + level + modifierTotal(modifiers, `skills.${key}`) : "—"; };
   const native = nativeLanguage(state.origin), professionKeys = new Set(info.slots.map(slot => slot.key));
-  const languageOptions = (index) => LANGUAGES.filter(language => language.id !== native).map(language => ({ id: language.id, name: loc(language.name), chosen: state.skills?.languages?.[index] === language.id }));
+  const chosenLanguages = Object.values(state.skills?.languages ?? {});
+  const languageName = id => loc(LANGUAGES.find(language => language.id === id)?.name ?? "");
+  // A language slot shows its tongue; the other non-native tongues not yet taken can replace it.
+  const swapOptions = index => LANGUAGES.filter(language => language.id !== native && !chosenLanguages.includes(language.id))
+    .map(language => ({ index, id: language.id, name: loc(language.name) }));
   const slots = info.slots.map(slot => {
     const level = Number(ranks[slot.id]) || 0;
-    return { ...slot, level, name: slot.defining ? slot.name : slot.language ? "Язык" : slot.combat ? "Боевой навык" : skillName(slot.key),
-      label: slot.defining ? "Определяющий навык" : slot.combat ? skillName(slot.key) : slot.language ? "" : loc(`WITCHER.Attributes.${SKILLS.find(skill => skill.key === slot.key)?.attribute}.Short`),
+    return { ...slot, level, name: slot.defining ? slot.name : slot.language ? languageName(chosenLanguages[slot.index]) || "Язык" : slot.combat ? "Боевой навык" : skillName(slot.key),
+      label: slot.defining ? "Определяющий навык" : slot.combat ? skillName(slot.key) : slot.language ? "Язык профессии · ИНТ" : loc(`WITCHER.Attributes.${SKILLS.find(skill => skill.key === slot.key)?.attribute}.Short`),
       total: slot.defining || slot.language || !slot.key ? "" : total(slot.key, level), cost: slot.complex ? "×2" : "",
-      canIncrease: level < CREATION_SKILL_MAX && (slot.complex ? 2 : 1) <= info.remaining, canDecrease: level > 1 || (level > 0 && !slot.defining),
+      canIncrease: level < CREATION_SKILL_MAX && (slot.complex ? 2 : 1) <= info.remaining, canDecrease: level > 1,
       combatOptions: slot.combat ? COMBAT_SKILLS.filter(key => !professionKeys.has(key) || key === slot.key).map(key => ({ key, name: skillName(key), chosen: key === slot.key })) : null,
-      languageOptions: slot.language ? languageOptions(slot.index) : null, pips: Array.from({ length: CREATION_SKILL_MAX }, (_, i) => ({ on: i < level })) };
+      swapOptions: slot.language ? swapOptions(slot.index) : null, pips: Array.from({ length: CREATION_SKILL_MAX }, (_, i) => ({ on: i < level })) };
   });
   const groups = SKILL_GROUPS.map(attribute => ({ attribute, name: loc(`WITCHER.Attributes.${attribute}.Label`), value: effective(attribute),
     skills: SKILLS.filter(skill => skill.attribute === attribute && skill.key !== "language" && !professionKeys.has(skill.key)).map(skill => {

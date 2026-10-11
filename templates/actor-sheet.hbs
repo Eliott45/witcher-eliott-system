@@ -404,14 +404,15 @@
         {{#each skills.languages as |skill|}}
         <div class="witcher-language-row" data-skill-name="{{skill.searchName}}" {{#unless skill.visible}}hidden{{/unless}}>
           {{#if ../skills.editing}}
-          <input type="text" data-language-field="name" data-language-id="{{skill.languageId}}" value="{{skill.label}}" aria-label="{{localize 'WITCHER.Skills.LanguageName'}}" required>
+          {{#if skill.core}}<span class="witcher-language-name">{{skill.label}}{{#if skill.native}} <small class="witcher-language-native">родной</small>{{/if}}</span>
+          {{else}}<input type="text" data-language-field="name" data-language-id="{{skill.languageId}}" value="{{skill.label}}" aria-label="{{localize 'WITCHER.Skills.LanguageName'}}" required>{{/if}}
           <input type="number" data-language-field="level" data-language-id="{{skill.languageId}}" value="{{skill.level}}" min="0" step="1" aria-label="{{skill.label}} — {{localize 'WITCHER.Skills.Level'}}">
-          {{else}}<span>{{skill.label}}</span><span>{{localize "WITCHER.Skills.Level"}} {{skill.level}}</span>{{/if}}
+          {{else}}<span class="witcher-language-name">{{skill.label}}{{#if skill.native}} <small class="witcher-language-native">родной</small>{{/if}}</span><span>{{localize "WITCHER.Skills.Level"}} {{skill.level}}</span>{{/if}}
           <output class="witcher-skill-total" data-tooltip="{{skill.calculation}}" tabindex="0">{{skill.total}}</output>
           <button type="button" data-action="rollSkill" data-skill="language" data-language-id="{{skill.languageId}}" title="{{skill.rollHint}}" aria-label="{{skill.rollHint}}" {{#if skill.rollUnavailable}}disabled{{else}}{{disabled (not ../editable)}}{{/if}}><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button>
-          {{#if ../skills.editing}}<button type="button" data-action="removeLanguage" data-language-id="{{skill.languageId}}" title="{{localize 'WITCHER.Skills.RemoveLanguage'}}" aria-label="{{localize 'WITCHER.Skills.RemoveLanguage'}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>{{/if}}
+          {{#if ../skills.editing}}{{#unless skill.core}}<button type="button" data-action="removeLanguage" data-language-id="{{skill.languageId}}" title="{{localize 'WITCHER.Skills.RemoveLanguage'}}" aria-label="{{localize 'WITCHER.Skills.RemoveLanguage'}}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>{{/unless}}{{/if}}
         </div>
-        {{else}}<p class="witcher-drop-hint">{{localize "WITCHER.Skills.LanguageEmpty"}}</p>{{/each}}
+        {{/each}}
       </div>
       <p class="witcher-drop-hint" data-no-skills {{#unless skills.empty}}hidden{{/unless}}>{{localize "WITCHER.Skills.NoResults"}}</p>
     </section>

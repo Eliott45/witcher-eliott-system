@@ -212,3 +212,28 @@ test("an empty profession slot does not stop the count: every slot is paid ranks
   assert.equal(context.skills.slots.find(slot => slot.id === "business").canIncrease, false, "no room left to raise anything");
   assert.equal(creationContext({ ...state, attributes: points({}) }, {}).skills.slots.find(slot => slot.id === "charisma").total, "—", "no total before parameters");
 });
+
+test("profession skills start at their minimum of 1 and language slots take the non-native tongues", async () => {
+  const { withMinimumRanks } = await import("../scripts/data/character-creation.mjs");
+  const bard = withMinimumRanks({ ...blankCreation(), profession: "bard", origin: "redania", attributes: points(even) });
+  assert.deepEqual(Object.values(bard.skills.ranks), Array(11).fill(1));
+  assert.deepEqual(bard.skills.languages, ["language.elder"], "a northerner's first non-native tongue");
+  assert.equal(skillState(bard).spent, 12, "ten slots at 1 and the language (2) at 1");
+  const merchant = withMinimumRanks({ ...blankCreation(), profession: "merchant", origin: "mahakam", attributes: points(even) });
+  assert.deepEqual(merchant.skills.languages, ["language.common", "language.elder"]);
+  // Raised ranks stay; a slot that clashes with a new native tongue is replaced.
+  merchant.skills.ranks.charisma = 5; merchant.origin = "redania";
+  withMinimumRanks(merchant);
+  assert.equal(merchant.skills.ranks.charisma, 5);
+  assert.deepEqual(merchant.skills.languages.toSorted(), ["language.dwarven", "language.elder"]);
+});
+
+test("the three core tongues always exist on a sheet: stored entries win, the others read as level 0", async () => {
+  const { languageEntry, skillValue } = await import("../scripts/data/skills.mjs");
+  const system = { languages: [{ id: "lang000000000002", name: "Старшая Речь", level: 4 }] };
+  assert.equal(languageEntry(system, "language.elder").level, 4, "a compendium id still matches the core tongue");
+  assert.deepEqual({ ...languageEntry(system, "language.dwarven"), name: "" }, { id: "language.dwarven", name: "", level: 0, virtual: true });
+  assert.equal(languageEntry(system, "custom-tongue"), null);
+  const actor = { languages: [], abilityState: {}, statistics: { effective: { intelligence: 6 }, modifiers: [] } };
+  assert.equal(skillValue(actor, "language", "language.common").total, 6);
+});

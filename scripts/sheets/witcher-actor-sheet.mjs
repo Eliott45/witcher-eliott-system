@@ -47,6 +47,7 @@ import { abilitiesContext } from "./abilities-context.mjs";
 import { hasAbility, adjustStubbornness } from "../data/abilities.mjs";
 import { viewSheetItem, createAbility, browseAbilities, browseLanguages, removeSheetItem } from "./sheet-items.mjs";
 import { addLanguageFromItem, updateLanguages } from "../data/languages.mjs";
+import { languageEntry } from "../data/skills.mjs";
 import { SHEET_TABS, sheetPreferences, visibleSheetTabs, updateSheetPreferences, chooseVisibleTabs, reportPreferencesError } from "./sheet-preferences.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
@@ -247,8 +248,10 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       const { languageId, languageField } = input.dataset;
       const value = languageField === "level" ? Math.max(0, Math.trunc(Number(input.value) || 0)) : input.value.trim();
       if (languageField === "name" && !value) { input.value = this.actor.system.languages.find(entry => entry.id === languageId).name; return; }
-      this.#languageWrites = updateLanguages(this.actor, entries => entries.map(entry => entry.id === languageId
-        ? { ...entry, [languageField]: value } : entry)).catch(reportPreferencesError);
+      // A core tongue not yet on the actor is written on its first level change.
+      this.#languageWrites = updateLanguages(this.actor, entries => entries.some(entry => entry.id === languageId)
+        ? entries.map(entry => entry.id === languageId ? { ...entry, [languageField]: value } : entry)
+        : [...entries, { ...languageEntry(this.actor.system, languageId), [languageField]: value, virtual: undefined }]).catch(reportPreferencesError);
     });
     for (const details of this.element.querySelectorAll("details[data-biography-section]")) {
       let wasOpen = details.open;

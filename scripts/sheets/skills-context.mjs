@@ -1,3 +1,5 @@
+import { LANGUAGES, languageForEntry } from "../data/languages.mjs";
+import { nativeLanguage } from "../data/character-creation.mjs";
 import { SKILLS, SKILL_GROUPS, skillValue } from "../data/skills.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { escapeTooltip, attributeTooltip } from "./statistics-tooltips.mjs";
@@ -40,7 +42,13 @@ export function skillsContext(actor, i18n, { query = "", editing = false } = {})
     attribute, label: `WITCHER.Attributes.${attribute}.Label`,
     rows: SKILLS.filter(skill => skill.attribute === attribute && skill.key !== "language").map(skill => row(skill.key))
   })).map(group => ({ ...group, visible: group.rows.some(skill => skill.visible) }));
-  const languages = actor.system.languages.map(language => row("language", language.id));
+  // Core tongues first (the native one marked), then any custom language the player added.
+  const native = actor.system.details?.race === "witcher" ? "language.common" : nativeLanguage(actor.system.details?.origin ?? "");
+  const stored = actor.system.languages;
+  const languages = [...LANGUAGES.map(language => {
+    const entry = stored.find(item => languageForEntry(item)?.id === language.id);
+    return { ...row("language", entry?.id ?? language.id), core: true, native: language.id === native };
+  }), ...stored.filter(item => !languageForEntry(item)).map(item => ({ ...row("language", item.id), core: false, native: false }))];
   return { query, editing, groups, languages, empty: !groups.some(group => group.visible) && !languages.some(skill => skill.visible),
     languageTooltip: skillTooltip("language", localize) };
 }

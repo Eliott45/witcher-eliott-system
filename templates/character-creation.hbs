@@ -283,7 +283,7 @@
           {{#each slots}}
           <div class="wcr-skill {{#if defining}}is-defining{{/if}}" data-flash="slot:{{id}}">
             {{#if combatOptions}}<select class="wcr-skill-name" data-field="skills.combat.{{index}}" data-rerender aria-label="Боевой навык"><option value="">Боевой навык…</option>{{#each combatOptions}}<option value="{{key}}" {{#if chosen}}selected{{/if}}>{{name}}</option>{{/each}}</select>
-            {{else if languageOptions}}<select class="wcr-skill-name" data-field="skills.languages.{{index}}" data-rerender aria-label="Язык"><option value="">Язык…</option>{{#each languageOptions}}<option value="{{id}}" {{#if chosen}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+            {{else if language}}<span class="wcr-skill-name">{{name}}{{#if cost}}<em>{{cost}}</em>{{/if}}<small>{{label}}{{#each swapOptions}} · <button type="button" class="wcr-link" data-action="pickLanguage" data-index="{{index}}" data-id="{{id}}">сменить на {{name}}</button>{{/each}}</small></span>
             {{else}}<span class="wcr-skill-name">{{name}}{{#if cost}}<em>{{cost}}</em>{{/if}}<small>{{label}}</small></span>{{/if}}
             <span class="wcr-pips">{{#each pips}}<i class="{{#if on}}is-on{{/if}}"></i>{{/each}}</span>
             <span class="wcr-stepper"><button type="button" data-action="skillChange" data-slot="{{id}}" data-delta="-1" {{#unless canDecrease}}disabled{{/unless}} aria-label="Меньше">−</button><b>{{level}}</b><button type="button" data-action="skillChange" data-slot="{{id}}" data-delta="1" {{#unless canIncrease}}disabled{{/unless}} aria-label="Больше">+</button></span>

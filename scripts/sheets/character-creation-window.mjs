@@ -11,7 +11,7 @@ import { creationContext } from "./creation-context.mjs";
 import {
   CREATION_STEPS, STYLE_TABLES, SIBLING_COLUMNS, WITCHER_ROLL_TABLES, ATTRIBUTE_ORDER, ATTRIBUTE_ROLL, ATTRIBUTE_MAX, CREATION_SKILL_MAX, PROFESSION_MAGIC,
   blankCreation, regionForRoll, homelandForRoll, regionOfOrigin, familyGroup, evenAlive, whichParent, familyStatusForRoll, friendForRoll, siblingCount,
-  witcherRow, professionAllowed, gearChoiceCount, crownsFormula, pendingAges, creationErrors, creationUpdate, creationItems, magicRuleIds, nameSamples
+  witcherRow, professionAllowed, gearChoiceCount, crownsFormula, pendingAges, withMinimumRanks, creationErrors, creationUpdate, creationItems, magicRuleIds, nameSamples
 } from "../data/character-creation.mjs";
 
 const windows = new Map();
@@ -38,7 +38,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
       pickProfession: CharacterCreationWindow.#pickProfession,
       attrMode: CharacterCreationWindow.#attrMode, attrChange: CharacterCreationWindow.#attrChange, rollAttributes: CharacterCreationWindow.#rollAttributes,
       pickPool: CharacterCreationWindow.#pickPool, assignAttr: CharacterCreationWindow.#assignAttr, autoAssign: CharacterCreationWindow.#autoAssign,
-      skillChange: CharacterCreationWindow.#skillChange, pickupChange: CharacterCreationWindow.#pickupChange,
+      skillChange: CharacterCreationWindow.#skillChange, pickLanguage: CharacterCreationWindow.#pickLanguage, pickupChange: CharacterCreationWindow.#pickupChange,
       gearToggle: CharacterCreationWindow.#gearToggle, magicToggle: CharacterCreationWindow.#magicToggle, rollCrowns: CharacterCreationWindow.#rollCrowns,
       randomName: CharacterCreationWindow.#randomName, finish: CharacterCreationWindow.#finish, restart: CharacterCreationWindow.#restart
     }
@@ -70,6 +70,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
   }
 
   async _prepareContext() {
+    withMinimumRanks(this.draft);
     const context = creationContext(this.draft, await this.catalogs());
     return { ...context, flash: this.flash ?? null, busy: Boolean(this.busy), editable: this.actor.isOwner };
   }
@@ -375,8 +376,13 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
   }
   static #skillChange(_event, target) {
     const ranks = this.draft.skills.ranks, slot = target.dataset.slot, delta = Number(target.dataset.delta);
-    ranks[slot] = Math.max(0, Math.min(CREATION_SKILL_MAX, (Number(ranks[slot]) || 0) + delta));
+    // A profession skill never drops below its minimum of 1.
+    ranks[slot] = Math.max(1, Math.min(CREATION_SKILL_MAX, (Number(ranks[slot]) || 0) + delta));
     return this.commit(`slot:${slot}`);
+  }
+  static #pickLanguage(_event, target) {
+    this.draft.skills.languages[Number(target.dataset.index)] = target.dataset.id;
+    return this.commit(`slot:language${target.dataset.index}`);
   }
   static #pickupChange(_event, target) {
     const pickup = this.draft.skills.pickup, key = target.dataset.key;

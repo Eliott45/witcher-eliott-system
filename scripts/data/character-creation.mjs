@@ -4,6 +4,7 @@ import { getOrigin } from "./origins.mjs";
 import { getProfession, COMBAT_SKILLS } from "./professions.mjs";
 import { SKILLS } from "./skills.mjs";
 import { WITCHER_TABLES, witcherTrialModifier } from "./witcher-lifepath.mjs";
+import { LANGUAGES } from "./languages.mjs";
 
 // Character creation, core pp.20–49, 71 and 237–241 (Russian edition). Table texts are short paraphrases.
 // Every table row is stored by its 1–10 index or by a stable id, so a draft survives translation changes.
@@ -223,6 +224,27 @@ export function professionSlots(professionId, skills = {}) {
   if (profession.id === "man-at-arms") for (let i = 0; i < 5; i++) slots.push({ id: `combat${i}`, key: skills.combat?.[i] ?? "", combat: true, index: i, complex: complexSkill(skills.combat?.[i]) });
   return slots;
 }
+/**
+ * Every profession slot starts at its minimum of 1, and language slots take the non-native tongues in order,
+ * so the player only adds points. Returns the same draft, adjusted in place.
+ */
+export function withMinimumRanks(state) {
+  if (!getProfession(state.profession)) return state;
+  const skills = (state.skills ??= { ranks: {}, pickup: {}, combat: [], languages: [] });
+  skills.ranks ??= {};
+  const native = nativeLanguage(state.origin), slots = professionSlots(state.profession, skills);
+  const languages = Object.values(skills.languages ?? {});
+  for (const slot of slots.filter(entry => entry.language)) {
+    const current = languages[slot.index];
+    const taken = languages.filter((id, index) => index !== slot.index);
+    if (!current || current === native || taken.includes(current))
+      languages[slot.index] = LANGUAGES.map(language => language.id).find(id => id !== native && !taken.includes(id)) ?? "";
+  }
+  skills.languages = languages;
+  for (const slot of slots) if (!(Number(skills.ranks[slot.id]) >= 1)) skills.ranks[slot.id] = 1;
+  return state;
+}
+
 export function skillState(state) {
   const skills = state.skills ?? {}, ranks = skills.ranks ?? {}, pickup = skills.pickup ?? {};
   const slots = professionSlots(state.profession, skills), errors = [];
