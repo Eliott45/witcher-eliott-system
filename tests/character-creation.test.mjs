@@ -196,3 +196,19 @@ test("each decade is its own slot: the ages that open them, and which are still 
   assert.deepEqual(pendingAges({ race: "witcher", age: 62, witcher: { pathStartAge: 20 }, decades: [{ age: 30 }] }), [20, 40, 50]);
   assert.deepEqual(pendingAges({ race: "elf", age: 25, events: [{ age: 10 }, { age: 20 }] }), []);
 });
+
+test("an empty profession slot does not stop the count: every slot is paid ranks × (difficult ? 2 : 1)", () => {
+  // The doctor from the bug report: Business left at 0 in the middle of the list.
+  const state = { ...blankCreation(), profession: "doctor", origin: "redania", attributes: points(even) };
+  state.skills.ranks = { defining: 6, resistCoercion: 6, charisma: 6, socialEtiquette: 6, courage: 6, humanPerception: 6, wildernessSurvival: 6,
+    business: 0, deduction: 2, smallBlades: 5, alchemy: 3 };
+  const info = skillState(state);
+  assert.equal(info.spent, 42 + 2 + 5 + 3 * 2);
+  assert.equal(info.remaining, -11);
+  assert.ok(info.errors.some(error => /хотя бы 1/u.test(error)));
+  assert.ok(info.errors.some(error => /55 из 44/u.test(error)));
+  const context = creationContext({ ...state, step: "skills" }, {});
+  assert.equal(context.skills.over, true);
+  assert.equal(context.skills.slots.find(slot => slot.id === "business").canIncrease, false, "no room left to raise anything");
+  assert.equal(creationContext({ ...state, attributes: points({}) }, {}).skills.slots.find(slot => slot.id === "charisma").total, "—", "no total before parameters");
+});

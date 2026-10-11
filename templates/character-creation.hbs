@@ -275,6 +275,7 @@
       {{!-- 7. Skills --}}
       {{#if is.skills}}
       {{#if skills}}{{#with skills}}
+      {{#if attributesPending}}<p class="wcr-warn"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Параметры ещё не распределены: итоговые значения навыков и очки освоенных навыков (ИНТ + РЕА) появятся после шага «Параметры».</p>{{/if}}
       <div class="wcr-split">
         <section class="wcr-panel wcr-skillset">
           <header><h3><i class="fa-solid fa-briefcase" aria-hidden="true"></i> Навыки профессии</h3><div class="wcr-orb is-small {{#if over}}is-over{{/if}}"><strong>{{remaining}}</strong><span>из {{budget}}</span></div></header>

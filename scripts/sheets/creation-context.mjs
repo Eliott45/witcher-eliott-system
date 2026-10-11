@@ -131,7 +131,8 @@ function skillsStep(state) {
   const values = chosenAttributes(state.attributes), modifiers = backgroundModifiers(details(state));
   const effective = key => values[key] + modifierTotal(modifiers, `attributes.${key}`);
   const skillName = key => key ? loc(`WITCHER.Skills.Entries.${key}.Label`) : "—";
-  const total = (key, level) => { const skill = SKILLS.find(entry => entry.key === key); return skill ? effective(skill.attribute) + level + modifierTotal(modifiers, `skills.${key}`) : null; };
+  // No total until the parameter itself is distributed: a bare rank would look like the final value.
+  const total = (key, level) => { const skill = SKILLS.find(entry => entry.key === key); return skill && values[skill.attribute] > 0 ? effective(skill.attribute) + level + modifierTotal(modifiers, `skills.${key}`) : "—"; };
   const native = nativeLanguage(state.origin), professionKeys = new Set(info.slots.map(slot => slot.key));
   const languageOptions = (index) => LANGUAGES.filter(language => language.id !== native).map(language => ({ id: language.id, name: loc(language.name), chosen: state.skills?.languages?.[index] === language.id }));
   const slots = info.slots.map(slot => {
@@ -149,7 +150,7 @@ function skillsStep(state) {
       return { key: skill.key, name: skillName(skill.key), level, complex: skill.complex, total: total(skill.key, level),
         canIncrease: level < CREATION_SKILL_MAX && step <= info.pickupRemaining, canDecrease: level > 0, pips: Array.from({ length: CREATION_SKILL_MAX }, (_, i) => ({ on: i < level })) };
     }) })).filter(group => group.skills.length);
-  return { ...info, slots, groups, nativeLanguage: loc(LANGUAGES.find(language => language.id === native)?.name ?? ""), nativeLevel: NATIVE_LANGUAGE_LEVEL, over: info.remaining < 0, pickupOver: info.pickupRemaining < 0 };
+  return { ...info, slots, groups, attributesPending: attributeState(state.attributes).errors.length > 0, nativeLanguage: loc(LANGUAGES.find(language => language.id === native)?.name ?? ""), nativeLevel: NATIVE_LANGUAGE_LEVEL, over: info.remaining < 0, pickupOver: info.pickupRemaining < 0 };
 }
 
 function gearStep(state, catalogs) {

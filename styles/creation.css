@@ -62,6 +62,7 @@
 .wcr-lead { margin: 0 0 14px; color: var(--wcr-soft); font: italic 14px/1.5 var(--wcr-serif); }
 .wcr-hint { margin: 6px 0; color: var(--wcr-dim); font-size: 12px; line-height: 1.4; }
 .wcr-empty { color: var(--wcr-dim); font-style: italic; }
+.wcr-warn { margin: 0 0 12px; padding: 8px 12px; color: #f1c9a8; font-size: 12px; background: rgba(184, 57, 47, .18); border: 1px solid rgba(224, 104, 90, .45); border-radius: 8px; }
 .wcr-foot { flex: none; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 24px;
   border-top: 1px solid var(--wcr-edge); background: rgba(10, 7, 4, .45); }
 .wcr-errors { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; margin: 0; color: #e7a184; font-size: 12px; }

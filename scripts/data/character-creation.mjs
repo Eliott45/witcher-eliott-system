@@ -227,11 +227,9 @@ export function skillState(state) {
   const skills = state.skills ?? {}, ranks = skills.ranks ?? {}, pickup = skills.pickup ?? {};
   const slots = professionSlots(state.profession, skills), errors = [];
   let spent = 0;
-  for (const slot of slots) {
-    const level = Number(ranks[slot.id]) || 0;
-    spent += slot.complex ? level * 2 : level;
-    if (level < 1) { errors.push("В каждый навык профессии нужно вложить хотя бы 1 очко."); break; }
-  }
+  // Every slot is paid for, empty ones included: cost = ranks × (difficult ? 2 : 1).
+  for (const slot of slots) spent += (slot.complex ? 2 : 1) * Math.max(0, Number(ranks[slot.id]) || 0);
+  if (slots.some(slot => (Number(ranks[slot.id]) || 0) < 1)) errors.push("В каждый навык профессии нужно вложить хотя бы 1 очко.");
   if (slots.some(slot => (Number(ranks[slot.id]) || 0) > CREATION_SKILL_MAX) || Object.values(pickup).some(level => level > CREATION_SKILL_MAX))
     errors.push(`При создании навык не выше ${CREATION_SKILL_MAX}.`);
   if (spent > PROFESSION_POINTS) errors.push(`Очки профессии: потрачено ${spent} из ${PROFESSION_POINTS}.`);
