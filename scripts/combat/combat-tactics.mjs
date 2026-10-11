@@ -3,14 +3,10 @@ import { conditionRules } from "./condition-rules.mjs";
 import { ambushState, delayedOrder, isDelayed, tacticsFlags, tacticalEffect } from "./tactics-rules.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 
-const queues = new Map();
-export function tacticsWrite(combat, work) {
-  const job = (queues.get(combat.id) ?? Promise.resolve()).catch(() => {}).then(work);
-  queues.set(combat.id, job);
-  const clear = () => { if (queues.get(combat.id) === job) queues.delete(combat.id); };
-  job.then(clear, clear);
-  return job;
-}
+import { serialQueue } from "../data/serial-queue.mjs";
+const tacticsQueue = serialQueue();
+/** One write at a time per combat; a stalled one stops blocking the next request after a while. */
+export const tacticsWrite = (combat, work) => tacticsQueue(combat.id, work);
 const activeGM = () => game.users.activeGM?.isSelf;
 const effectsFor = (combat, combatant, kind) => combatant.actor?.effects.filter(effect => {
   const state = tacticsFlags(effect).tactic;

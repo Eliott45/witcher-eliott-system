@@ -132,7 +132,7 @@ export async function rollGroupParticipant(combatant, sessionId) {
         else if (row?.claim?.id === nonce && row.claim.user === game.user.id) resolve(row);
         else if (row?.claim || Number.isFinite(row?.total)) reject(new Error("Бросок уже выполняется другим владельцем."));
       });
-      timer = setTimeout(() => reject(new Error("Мастер не подтвердил бросок. Повторите запрос.")),15000);
+      timer = setTimeout(() => reject(new Error("Мастер не ответил на запрос: проверьте, что ведущий в игре и его вкладка не свёрнута, и нажмите ещё раз.")),30000);
     });
     granted.catch(() => {});
     let row;

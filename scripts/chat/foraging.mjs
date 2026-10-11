@@ -3,14 +3,13 @@ import { foragingState, saveForaging, resolveForaging } from "../workshop/foragi
 import { workshopCheck } from "../workshop/check.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { serialQueue } from "../data/serial-queue.mjs";
 
-const queues = new Map(), rolling = new Set();
-export function foragingWrite(card, work) {
-  const job = (queues.get(card.id) ?? Promise.resolve()).catch(()=>{}).then(work);
-  queues.set(card.id,job);
-  const clear = () => {if (queues.get(card.id) === job) queues.delete(card.id);};
-  job.then(clear,clear); return job;
-}
+const queue = serialQueue(), rolling = new Set();
+/** One write at a time per card; a stalled one stops blocking the next request after a while. */
+export const foragingWrite = (card, work) => queue(card.id, work);
+/** How long the owner waits for the GM to take the request: the GM may still be showing a previous roll. */
+export const CLAIM_TIMEOUT = 30000;
 const postedRoll = (card, nonce) => game.messages.find(message => {
   const check = message.flags[SYSTEM_ID]?.foragingRoll;
   const state = foragingState(card);
@@ -51,7 +50,7 @@ export async function rollForagingRequest(card) {
         if (current?.status === "rolling" && current.claim?.id === nonce && current.claim.user === game.user.id) resolve();
         else if (current?.status !== "waiting") reject(new Error("Эта проверка уже выполняется."));
       });
-      timer = setTimeout(()=>reject(new Error("Мастер не подтвердил проверку. Повторите запрос.")),15000);
+      timer = setTimeout(()=>reject(new Error("Мастер не ответил на запрос: проверьте, что ведущий в игре и его вкладка не свёрнута, и нажмите ещё раз.")),CLAIM_TIMEOUT);
     });
     granted.catch(()=>{});
     try { await signal(actor,card,"claim",nonce); await granted; }

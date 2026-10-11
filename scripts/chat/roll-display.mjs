@@ -30,7 +30,8 @@ export function trackRollDisplay() {
     async wait(message) {
       if (!message) return;
       messageId = message.id;
-      if (ui.chat?.rendered && message.visible) await renderReady;
+      // The log may never draw it (collapsed sidebar, another tab): wait a moment, never forever.
+      if (ui.chat?.rendered && message.visible) await Promise.race([renderReady, new Promise(resolve => setTimeout(resolve, 4000))]);
       // DSN's public wait method skips animations when "immediately display chat"
       // is enabled. Its completion hook handles that mode and interactive throws too.
       // A paused animation (hidden tab, minimised window) must not block the action forever.
