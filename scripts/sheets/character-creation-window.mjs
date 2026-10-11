@@ -11,7 +11,7 @@ import { creationContext } from "./creation-context.mjs";
 import {
   CREATION_STEPS, STYLE_TABLES, SIBLING_COLUMNS, WITCHER_ROLL_TABLES, ATTRIBUTE_ORDER, ATTRIBUTE_ROLL, ATTRIBUTE_MAX, CREATION_SKILL_MAX, PROFESSION_MAGIC,
   blankCreation, regionForRoll, homelandForRoll, regionOfOrigin, familyGroup, evenAlive, whichParent, familyStatusForRoll, friendForRoll, siblingCount,
-  witcherRow, professionAllowed, gearChoiceCount, crownsFormula, lifeEventCount, creationErrors, creationUpdate, creationItems, magicRuleIds, nameSamples
+  witcherRow, professionAllowed, gearChoiceCount, crownsFormula, pendingAges, creationErrors, creationUpdate, creationItems, magicRuleIds, nameSamples
 } from "../data/character-creation.mjs";
 
 const windows = new Map();
@@ -33,7 +33,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
       rollFamily: CharacterCreationWindow.#rollFamily, pickFamily: CharacterCreationWindow.#pickFamily, rollFamilyAll: CharacterCreationWindow.#rollFamilyAll,
       rollSibling: CharacterCreationWindow.#rollSibling, pickSibling: CharacterCreationWindow.#pickSibling,
       rollWitcher: CharacterCreationWindow.#rollWitcher, pickWitcher: CharacterCreationWindow.#pickWitcher, rollWitcherAll: CharacterCreationWindow.#rollWitcherAll,
-      rollEvents: CharacterCreationWindow.#rollEvents, editEvent: CharacterCreationWindow.#editEvent, removeEvent: CharacterCreationWindow.#removeEvent,
+      rollEvents: CharacterCreationWindow.#rollEvents, rollEvent: CharacterCreationWindow.#rollEvent, rerollEvent: CharacterCreationWindow.#rerollEvent, editEvent: CharacterCreationWindow.#editEvent, removeEvent: CharacterCreationWindow.#removeEvent,
       rollStyle: CharacterCreationWindow.#rollStyle, rollStyleAll: CharacterCreationWindow.#rollStyleAll, pickStyle: CharacterCreationWindow.#pickStyle,
       pickProfession: CharacterCreationWindow.#pickProfession,
       attrMode: CharacterCreationWindow.#attrMode, attrChange: CharacterCreationWindow.#attrChange, rollAttributes: CharacterCreationWindow.#rollAttributes,
@@ -238,21 +238,36 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
 
   /** Rolls every missing decade: an event each 10 years, or a witcher's decade on the Path. */
   static async #rollEvents() {
-    const witcher = this.draft.race === "witcher", list = witcher ? this.draft.decades : this.draft.events;
-    const missing = lifeEventCount(this.draft) - list.length;
-    if (missing <= 0) return ui.notifications.info("Все десятилетия уже определены.");
-    for (let i = 0; i < missing; i++) {
-      const rolls = [];
-      const draw = async faces => { const roll = await new foundry.dice.Roll(`1d${faces}`).evaluate({ allowInteractive: false }); rolls.push(roll); return roll.total; };
-      const entry = witcher
-        ? await generateDecade((Number(this.draft.witcher.pathStartAge) || 20) + list.length * 10, this.draft.decadeRisk ?? "normal", draw)
-        : await generateLifeEvent((list.length + 1) * 10, draw);
-      if (rolls[0]) await showDice(rolls[0]);
-      this.draft.log.push({ label: witcher ? `Десятилетие ${entry.age}–${entry.age + 9}` : `Событие в ${entry.age} лет`, formula: `${rolls.length}×d10`, total: rolls[0]?.total ?? 0,
-        dice: rolls.map(roll => roll.total).join(", ") });
-      list.push({ ...entry, id: foundry.utils.randomID() });
-    }
+    const ages = pendingAges(this.draft);
+    if (!ages.length) return ui.notifications.info("Все десятилетия уже определены.");
+    for (const age of ages) this.lifeList().push(await this.generateEntry(age));
+    this.lifeList().sort((a, b) => a.age - b.age);
     return this.commit("events");
+  }
+  lifeList() { return this.draft.race === "witcher" ? this.draft.decades : this.draft.events; }
+  /** One decade: an important event, or a witcher's decade at the risk chosen for it. */
+  async generateEntry(age, risk = null) {
+    const witcher = this.draft.race === "witcher", rolls = [];
+    const draw = async faces => { const roll = await new foundry.dice.Roll(`1d${faces}`).evaluate({ allowInteractive: false }); rolls.push(roll); return roll.total; };
+    const entry = witcher ? await generateDecade(age, risk ?? this.draft.decadeRisks?.[age] ?? this.draft.decadeRisk ?? "normal", draw) : await generateLifeEvent(age, draw);
+    if (rolls[0]) await showDice(rolls[0]);
+    this.draft.log.push({ label: witcher ? `Десятилетие ${age}–${age + 9}` : `Событие в ${age} лет`, formula: `${rolls.length}×d10`, total: rolls[0]?.total ?? 0,
+      dice: rolls.map(roll => roll.total).join(", ") });
+    return { ...entry, id: foundry.utils.randomID() };
+  }
+  static async #rollEvent(_event, target) {
+    const age = Number(target.dataset.age), list = this.lifeList();
+    if (list.some(entry => Number(entry.age) === age)) return;
+    list.push(await this.generateEntry(age));
+    list.sort((a, b) => a.age - b.age);
+    return this.commit(`event:${age}`);
+  }
+  static async #rerollEvent(_event, target) {
+    const list = this.lifeList(), index = Number(target.dataset.index), old = list[index];
+    if (!old) return;
+    const age = Number(old.age);
+    list[index] = { ...await this.generateEntry(age, this.draft.decadeRisks?.[age] ?? old.risk), id: old.id };
+    return this.commit(`event:${age}`);
   }
   static async #editEvent(_event, target) {
     const witcher = this.draft.race === "witcher", list = witcher ? this.draft.decades : this.draft.events, index = Number(target.dataset.index);
@@ -514,4 +529,35 @@ export async function openCharacterCreation() {
   if (!app) { app = new CharacterCreationWindow(actor); windows.set(actor.uuid, app); }
   await app.render({ force: true });
   app.bringToFront();
+}
+
+/** Macro and directory entry: pick one of your characters or start a new one. */
+export async function createCharacter(actor = null) {
+  if (actor) return openCharacterCreation.call({ actor });
+  const own = game.actors.filter(entry => entry.type === "character" && entry.isOwner).sort((a, b) => a.name.localeCompare(b.name, "ru"));
+  const canCreate = game.user.can("ACTOR_CREATE");
+  if (!own.length && !canCreate) return ui.notifications.warn("Нет своих персонажей, а создавать новых вам не разрешено — попросите ведущего.");
+  const esc = foundry.utils.escapeHTML;
+  const choice = await foundry.applications.api.DialogV2.prompt({ window: { title: "Создание персонажа", icon: "fa-solid fa-feather-pointed" },
+    content: `<label>Для кого<select name="actor">${canCreate ? `<option value="">Новый персонаж</option>` : ""}${own.map(entry =>
+      `<option value="${entry.id}" ${entry.id === game.user.character?.id && !canCreate ? "selected" : ""}>${esc(entry.name)}</option>`).join("")}</select></label>`,
+    ok: { label: "Открыть", callback: (_event, button) => button.form.elements.actor.value }, rejectClose: false });
+  if (choice === null || choice === undefined) return;
+  const target = choice ? game.actors.get(choice) : await Actor.implementation.create({ name: "Новый герой", type: "character" });
+  if (target) return openCharacterCreation.call({ actor: target });
+}
+
+export function registerCharacterCreation() {
+  game.system.api = { ...game.system.api, createCharacter };
+  Hooks.on("renderActorDirectory", (_app, html) => {
+    const root = html instanceof HTMLElement ? html : html[0];
+    const actions = root?.querySelector(".header-actions");
+    if (!actions || actions.querySelector("[data-witcher-creation]")) return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.witcherCreation = "";
+    button.innerHTML = `<i class="fa-solid fa-feather-pointed" aria-hidden="true"></i> Создать персонажа`;
+    button.addEventListener("click", event => { event.preventDefault(); createCharacter().catch(error => ui.notifications.error(error.message)); });
+    actions.append(button);
+  });
 }

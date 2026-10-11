@@ -162,20 +162,28 @@
         <label>Возраст<input type="number" min="1" step="1" value="{{../state.age}}" data-field="age" data-type="number" data-rerender></label>
         {{#if witcher}}
         <label>Начало Пути<input type="number" min="20" max="29" step="1" value="{{pathStartAge}}" data-field="witcher.pathStartAge" data-type="number" data-rerender></label>
-        <label>Образ жизни<select data-field="decadeRisk" data-rerender>{{#each risks}}<option value="{{id}}" {{#if chosen}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+        <label>Риск по умолчанию<select data-field="decadeRisk" data-rerender>{{#each risks}}<option value="{{id}}" {{#if chosen}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
         {{/if}}
         <div class="wcr-counter {{#if missing}}is-open{{else}}is-full{{/if}}"><strong>{{count}}</strong><span>из {{expected}}</span></div>
-        <button type="button" class="wcr-roll is-big" data-action="rollEvents" {{#unless missing}}disabled{{/unless}}><i class="fa-solid fa-dice" aria-hidden="true"></i> Бросить недостающие{{#if missing}} ({{missing}}){{/if}}</button>
+        <button type="button" class="wcr-roll is-big" data-action="rollEvents" {{#unless missing}}disabled{{/unless}}><i class="fa-solid fa-dice" aria-hidden="true"></i> Бросить все{{#if missing}} ({{missing}}){{/if}}</button>
         <button type="button" class="wcr-ghost" data-action="editEvent" data-index="-1"><i class="fa-solid fa-plus" aria-hidden="true"></i> Вручную</button>
       </div>
-      <ol class="wcr-timeline" data-flash="events">
+      <ol class="wcr-timeline">
         {{#each entries}}
-        <li class="is-{{tone}}"><span class="wcr-age">{{age}}</span>
-          <div><strong>{{title}}</strong><span>{{text}}</span></div>
-          <button type="button" class="wcr-ghost" data-action="editEvent" data-index="{{index}}" aria-label="Уточнить"><i class="fa-solid fa-pen" aria-hidden="true"></i></button>
-          <button type="button" class="wcr-ghost" data-action="removeEvent" data-index="{{index}}" aria-label="Удалить"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        {{#if pending}}
+        <li class="is-pending" data-flash="event:{{rollAge}}"><span class="wcr-age">{{age}}</span>
+          <div><strong>Ещё не определено</strong>{{#if risks}}<label class="wcr-risk">Образ жизни<select data-field="decadeRisks.{{rollAge}}" data-rerender>{{#each risks}}<option value="{{id}}" {{#if chosen}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>{{/if}}</div>
+          <button type="button" class="wcr-roll" data-action="rollEvent" data-age="{{rollAge}}"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> Бросить</button>
         </li>
-        {{else}}<li class="is-empty">Событий пока нет.</li>{{/each}}
+        {{else}}
+        <li class="is-{{tone}}" data-flash="event:{{sortAge}}"><span class="wcr-age">{{age}}</span>
+          <div><strong>{{title}}</strong><span>{{text}}</span>{{#if risk}}<small>Образ жизни: {{risk}}</small>{{/if}}</div>
+          <button type="button" class="wcr-ghost" data-action="rerollEvent" data-index="{{index}}" data-tooltip="Перебросить"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i></button>
+          <button type="button" class="wcr-ghost" data-action="editEvent" data-index="{{index}}" data-tooltip="Уточнить"><i class="fa-solid fa-pen" aria-hidden="true"></i></button>
+          <button type="button" class="wcr-ghost" data-action="removeEvent" data-index="{{index}}" data-tooltip="Удалить"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </li>
+        {{/if}}
+        {{else}}<li class="is-empty">Событий пока нет — героя ещё нет и десяти лет.</li>{{/each}}
       </ol>
       {{#if extra}}<p class="wcr-hint">Событий больше, чем десятилетий: лишние можно удалить.</p>{{/if}}
       {{/with}}

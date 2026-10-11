@@ -10,4 +10,7 @@ export const MACRO_SOURCES = [{
 },{
   _id:"belongingsGM0001",name:"Случайные личные вещи (ГМ)",type:"script",scope:"global",img:"icons/svg/item-bag.svg",
   command:"await game.system.api.personalBelongings();",ownership:{default:0},flags:{}
+},{
+  _id:"createCharactr01",name:"Создание персонажа",type:"script",scope:"global",img:"icons/svg/mystery-man.svg",
+  command:"await game.system.api.createCharacter();",ownership:{default:2},flags:{}
 }];

@@ -153,7 +153,6 @@
         </div>
       <label class="witcher-sr-only" for="{{rootId}}-name">{{localize "WITCHER.Sheet.Name"}}</label>
       <input id="{{rootId}}-name" name="name" type="text" value="{{actor.name}}" required {{disabled (not editable)}}>
-      {{#if editable}}<button type="button" class="witcher-creation-open" data-action="openCharacterCreation" data-tooltip="Создание персонажа по правилам" aria-label="Создание персонажа"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i></button>{{/if}}
       <p class="witcher-character-subtitle">{{#if selectedRace}}<span>{{localize selectedRace.label}}</span>{{/if}}{{#if profession}}<span>{{profession.name}}</span>{{/if}}{{#if system.details.age}}<span>{{system.details.age}} лет</span>{{/if}}</p>
       <div class="witcher-character-counters">
       <div class="witcher-header-counter witcher-experience">

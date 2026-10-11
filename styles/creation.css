@@ -98,13 +98,15 @@
 .wcr-pill.is-gold { color: #1b140d; background: linear-gradient(180deg, var(--wcr-gold-hi), var(--wcr-gold)); border-color: var(--wcr-gold); }
 .wcr-rows { display: flex; flex-direction: column; gap: 3px; margin: 0; padding: 0; list-style: none; }
 .wcr-rows.is-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.wcr-rows.is-columns button { flex-wrap: wrap; align-items: baseline; height: 100%; }
-.wcr-rows.is-columns button span { flex-basis: 100%; padding-left: 34px; font-size: 11px; }
-.wcr-rows button { display: flex; align-items: baseline; justify-content: flex-start; gap: 8px; width: 100%; min-height: 0; margin: 0; padding: 5px 8px; color: var(--wcr-ink); text-align: left;
+.wcr-rows.is-columns button { height: 100%; }
+.wcr-rows.is-columns button span { font-size: 11px; }
+.wcr-rows button { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: baseline; justify-content: stretch; gap: 1px 8px; width: 100%; height: auto; min-height: 0; margin: 0; padding: 5px 8px; color: var(--wcr-ink); text-align: left;
   font-size: 12px; line-height: 1.35; background: rgba(0, 0, 0, .18); border: 1px solid transparent; border-radius: 6px; }
 .wcr-rows button:hover { background: rgba(228, 182, 92, .1); border-color: var(--wcr-edge); }
-.wcr-rows button small { flex: none; min-width: 26px; color: var(--wcr-gold); font: 600 12px var(--wcr-serif); text-align: center; }
-.wcr-rows button b { flex: none; color: var(--wcr-gold-hi); font-weight: 600; }
+.wcr-rows button:not(:has(small)) { column-gap: 0; }
+.wcr-rows button b, .wcr-rows button span { grid-column: 2; }
+.wcr-rows button small { grid-row: span 2; min-width: 26px; color: var(--wcr-gold); font: 600 12px var(--wcr-serif); text-align: center; }
+.wcr-rows button b { color: var(--wcr-gold-hi); font-weight: 600; }
 .wcr-rows button span { color: var(--wcr-soft); }
 .wcr-rows button.is-chosen { background: linear-gradient(90deg, rgba(228, 182, 92, .28), rgba(228, 182, 92, .06)); border-color: var(--wcr-edge-hi); box-shadow: inset 3px 0 0 var(--wcr-gold); }
 .wcr-rows button.is-chosen span { color: var(--wcr-ink); }
@@ -112,7 +114,7 @@
 .wcr-tables { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
 .wcr-table { padding: 12px; background: var(--wcr-panel); border: 1px solid var(--wcr-edge); border-radius: 10px; }
 .wcr-toggle { display: flex; gap: 6px; }
-.wcr-toggle button { flex: 1; width: auto; min-height: 32px; margin: 0; color: var(--wcr-soft); font-size: 12px; background: rgba(0, 0, 0, .25); border: 1px solid var(--wcr-edge); border-radius: 6px; }
+.wcr-toggle button { flex: 1; width: auto; height: auto; min-height: 32px; margin: 0; color: var(--wcr-soft); font-size: 12px; background: rgba(0, 0, 0, .25); border: 1px solid var(--wcr-edge); border-radius: 6px; }
 .wcr-toggle button:hover { color: var(--wcr-ink); border-color: var(--wcr-edge-hi); }
 .wcr-toggle button.is-chosen { color: #1b140d; background: linear-gradient(180deg, var(--wcr-gold-hi), var(--wcr-gold)); border-color: var(--wcr-gold-hi); }
 .wcr-toggle button.is-chosen.is-grim { color: #fff1ea; background: linear-gradient(180deg, #c9483c, #8c231c); border-color: #e0685a; }
@@ -191,6 +193,12 @@
 .wcr-timeline li.is-misfortune .wcr-age, .wcr-timeline li.is-enemy .wcr-age, .wcr-timeline li.is-danger .wcr-age { color: #fff; background: var(--wcr-blood); }
 .wcr-timeline li.is-romance .wcr-age { background: #d98aa8; } .wcr-timeline li.is-ally .wcr-age { background: #8fc27d; }
 .wcr-timeline li.is-empty { color: var(--wcr-dim); font-style: italic; }
+.wcr-timeline li > div small { color: var(--wcr-dim); font-size: 11px; }
+.wcr-timeline li.is-pending > div { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px 14px; background: rgba(0, 0, 0, .2); border-style: dashed; }
+.wcr-timeline li.is-pending strong { color: var(--wcr-dim); font-style: italic; font-weight: 400; }
+.wcr-timeline li.is-pending .wcr-age { color: var(--wcr-gold); background: #1b140d; border: 1px dashed var(--wcr-gold); }
+.wcr-risk { display: flex; align-items: center; gap: 6px; color: var(--wcr-soft); font-size: 11px; white-space: nowrap; }
+.wcr-risk select { min-width: 210px; }
 
 /* Style. */
 .wcr-styles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
@@ -263,7 +271,7 @@
 
 /* Gear and purse. */
 .wcr-picks { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
-.wcr-pick { display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; min-height: 34px; margin: 0; padding: 4px 10px; color: var(--wcr-ink); font-size: 12px; text-align: left;
+.wcr-pick { display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; height: auto; min-height: 34px; margin: 0; padding: 4px 10px; color: var(--wcr-ink); font-size: 12px; text-align: left;
   background: rgba(0, 0, 0, .25); border: 1px solid var(--wcr-edge); border-radius: 6px; }
 .wcr-pick i { color: var(--wcr-dim); }
 .wcr-pick small { margin-left: auto; color: var(--wcr-gold); }
@@ -335,4 +343,4 @@
   background: linear-gradient(90deg, rgba(80, 56, 28, .92), rgba(40, 28, 16, .92)); border: 1px solid rgba(228, 182, 92, .5); border-radius: 10px; box-shadow: 0 0 20px rgba(228, 182, 92, .2); }
 .witcher-creation-banner p { flex: 1; margin: 0; font: 13px/1.35 "Palatino Linotype", "Book Antiqua", Georgia, serif; }
 .witcher-creation-banner button { flex: none; width: auto; padding: 4px 14px; color: #1b140d; background: linear-gradient(180deg, #ffd98a, #e4b65c); border: 0; border-radius: 16px; }
-.witcher-creation-open { width: auto; min-width: 0; padding: 0 8px; }
+[data-witcher-creation] { flex: 1 0 100%; }

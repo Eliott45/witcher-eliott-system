@@ -366,6 +366,16 @@ export function lifeEventCount(state) {
   if (state.race === "witcher") return Math.max(0, Math.floor(((Number(state.age) || 0) - (Number(state.witcher?.pathStartAge) || 20)) / 10));
   return Math.floor((Number(state.age) || 0) / 10);
 }
+/** The age that opens each decade: 10, 20… for an event; the start of the Path, +10… for a witcher. */
+export function decadeAges(state) {
+  const first = state.race === "witcher" ? Number(state.witcher?.pathStartAge) || 20 : 10;
+  return Array.from({ length: lifeEventCount(state) }, (_, index) => first + index * 10);
+}
+/** Decades that have no record yet. */
+export function pendingAges(state) {
+  const list = (state.race === "witcher" ? state.decades : state.events) ?? [];
+  return decadeAges(state).filter(age => !list.some(entry => Number(entry.age) === age));
+}
 
 export function stepErrors(state, step) {
   const errors = [];

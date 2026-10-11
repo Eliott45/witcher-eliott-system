@@ -9,6 +9,7 @@ import { migrateBestiaryAutomation } from "./migrations/bestiary-automation.mjs"
 import { migratePregenContent,registerPregenMigration } from "./migrations/pregen-content.mjs";
 import { registerWeaponChat } from "./combat/weapon-rolls.mjs";
 import { registerGroupAmbush } from "./chat/group-ambush.mjs";
+import { registerCharacterCreation } from "./sheets/character-creation-window.mjs";
 import { migrateMacroContent } from "./migrations/macro-content.mjs";
 import { registerCombatTactics } from "./combat/combat-tactics.mjs";
 import { WitcherPowerPlaceData } from "./data/witcher-power-place-data.mjs";
@@ -111,6 +112,7 @@ Hooks.once("init", async () => {
   registerWeaponChat();
   registerCombatTactics();
   registerGroupAmbush();
+  registerCharacterCreation();
   registerForaging();
   registerTraining();
   registerPersonalBelongings();

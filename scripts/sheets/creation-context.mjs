@@ -13,7 +13,7 @@ import {
   CREATION_STEPS, REGIONS, HOMELAND_ROWS, FAMILY_FATE, PARENT_FATE, SIBLING_TABLE, SIBLING_COLUMNS, STYLE_TABLES, WITCHER_ROLL_TABLES,
   ATTRIBUTE_ORDER, POINT_LEVELS, ATTRIBUTE_MAX, CREATION_SKILL_MAX, NATIVE_LANGUAGE_LEVEL, PROFESSION_GEAR, PROFESSION_FIXED_GEAR,
   PROFESSION_FIXED_NOTES, WITCHER_FORMULAS, PROFESSION_MAGIC, STARTING_CROWNS, familyGroup, nativeLanguage, regionOfOrigin, professionAllowed,
-  attributeState, chosenAttributes, derivedPreview, skillState, stepErrors, lifeEventCount, gearChoiceCount, gearCrowns, lifepathCrowns,
+  attributeState, chosenAttributes, derivedPreview, skillState, stepErrors, lifeEventCount, pendingAges, gearChoiceCount, gearCrowns, lifepathCrowns,
   nameSamples, magicMatches, biographyText
 } from "../data/character-creation.mjs";
 
@@ -78,11 +78,18 @@ function decadeTitle(decade) {
 }
 function eventsStep(state) {
   const witcher = state.race === "witcher", expected = lifeEventCount(state);
-  const list = (witcher ? state.decades : state.events) ?? [];
-  return { witcher, expected, count: list.length, missing: Math.max(0, expected - list.length), extra: list.length > expected,
-    pathStartAge: state.witcher?.pathStartAge ?? 20, risks: WITCHER_RISKS.map(risk => ({ id: risk.id, name: `${risk.name} · опасность ${risk.danger}%`, chosen: (state.decadeRisk ?? "normal") === risk.id })),
-    entries: list.map((entry, index) => ({ index, age: witcher ? `${entry.age}–${Number(entry.age) + 9}` : entry.age, ...(witcher ? decadeTitle(entry) : eventTitle(entry)),
-      tone: witcher ? (entry.danger?.kind && entry.danger.kind !== "none" ? "danger" : entry.outcome) : entry.kind })) };
+  const list = (witcher ? state.decades : state.events) ?? [], pending = pendingAges(state);
+  const fallback = state.decadeRisk ?? "normal";
+  const riskOptions = chosen => WITCHER_RISKS.map(risk => ({ id: risk.id, name: `${risk.name} · опасность ${risk.danger}%`, chosen: chosen === risk.id }));
+  const label = age => witcher ? `${age}–${Number(age) + 9}` : age;
+  const entries = list.map((entry, index) => ({ index, sortAge: Number(entry.age), age: label(entry.age), ...(witcher ? decadeTitle(entry) : eventTitle(entry)),
+    risk: witcher ? WITCHER_RISKS.find(risk => risk.id === entry.risk)?.name ?? "" : "",
+    tone: witcher ? (entry.danger?.kind && entry.danger.kind !== "none" ? "danger" : entry.outcome) : entry.kind }));
+  // Empty decades stay in the timeline, each with its own roll and, for a witcher, its own risk.
+  const slots = pending.map(age => ({ pending: true, sortAge: age, rollAge: age, age: label(age), risks: witcher ? riskOptions(state.decadeRisks?.[age] ?? fallback) : null }));
+  return { witcher, expected, count: list.length, missing: pending.length, extra: list.length > expected,
+    pathStartAge: state.witcher?.pathStartAge ?? 20, risks: riskOptions(fallback),
+    entries: [...entries, ...slots].sort((a, b) => a.sortAge - b.sortAge) };
 }
 
 function styleStep(state) {

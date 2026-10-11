@@ -188,3 +188,11 @@ test("every starting item exists in the equipment compendium sources", async () 
   wanted.push(...FAMILY_STATUSES.flatMap(entry => entry.equipment), ...INFLUENTIAL_FRIENDS.flatMap(entry => entry.equipment));
   assert.deepEqual([...new Set(wanted)].filter(id => !known.has(id)), []);
 });
+
+test("each decade is its own slot: the ages that open them, and which are still empty", async () => {
+  const { decadeAges, pendingAges } = await import("../scripts/data/character-creation.mjs");
+  assert.deepEqual(decadeAges({ race: "human", age: 34 }), [10, 20, 30]);
+  assert.deepEqual(decadeAges({ race: "witcher", age: 62, witcher: { pathStartAge: 20 } }), [20, 30, 40, 50]);
+  assert.deepEqual(pendingAges({ race: "witcher", age: 62, witcher: { pathStartAge: 20 }, decades: [{ age: 30 }] }), [20, 40, 50]);
+  assert.deepEqual(pendingAges({ race: "elf", age: 25, events: [{ age: 10 }, { age: 20 }] }), []);
+});
