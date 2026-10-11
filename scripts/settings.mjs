@@ -26,6 +26,11 @@ export function registerSystemSettings() {
     name:"WITCHER.Settings.CombatBlood",hint:"WITCHER.Settings.CombatBloodHint",
     scope:"client",config:true,type:Boolean,default:true
   });
+  // How long blood and scorch marks stay, for every client; 0 keeps them until the broom.
+  game.settings.register(SYSTEM_ID,"bloodLifetime",{
+    name:"WITCHER.Settings.BloodLifetime",hint:"WITCHER.Settings.BloodLifetimeHint",
+    scope:"world",config:true,type:Number,default:0,range:{min:0,max:60,step:1}
+  });
   // Hidden: the GM's broom bumps it so every client wipes blood and other combat leftovers.
   game.settings.register(SYSTEM_ID,"combatEffectsCleanup",{scope:"world",config:false,type:Number,default:0});
   game.settings.register(SYSTEM_ID,"spellAreaLifetime",{

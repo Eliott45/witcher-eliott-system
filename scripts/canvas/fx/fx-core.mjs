@@ -6,6 +6,12 @@ import { SYSTEM_ID } from "../../config.mjs";
 const setting = key => { try { return game.settings.get(SYSTEM_ID, key) !== false; } catch { return true; } };
 export const fxEnabled = () => setting("combatEffects");
 export const goreEnabled = () => setting("combatBlood");
+/** Milliseconds a stain stays before it fades; Infinity when the world keeps stains until the broom. */
+export function stainLifetime() {
+  let minutes = 0;
+  try { minutes = Number(game.settings.get(SYSTEM_ID, "bloodLifetime")) || 0; } catch { /* settings not ready: keep */ }
+  return minutes > 0 ? minutes * 60000 : Infinity;
+}
 export const canPlay = () => fxEnabled() && Boolean(globalThis.canvas?.ready) && !document.hidden;
 export const gridSize = () => canvas.grid?.size ?? 100;
 

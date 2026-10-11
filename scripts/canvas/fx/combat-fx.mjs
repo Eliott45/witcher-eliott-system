@@ -5,7 +5,7 @@ import { heatedWeapon } from "../../magic/cadfan.mjs";
 import { activeOil } from "../../data/workshop.mjs";
 import {
   topLayer, groundLayer, particles, glow, tween, loop, wait, rand, ease, gridSize,
-  nudge, thereAndBack, flashTint, fadeArtwork, afterimage, placedToken, speakerToken, seen, tokenRadius, geometry, goreEnabled, texture, SPLATS
+  nudge, thereAndBack, flashTint, fadeArtwork, afterimage, placedToken, speakerToken, seen, tokenRadius, geometry, goreEnabled, stainLifetime, texture, SPLATS
 } from "./fx-core.mjs";
 
 const ADD = () => PIXI.BLEND_MODES.ADD;
@@ -371,15 +371,16 @@ function paletteOf(actor) {
 /* Floor stains: blood under the glyphs (540), scorch marks under the blood (535). The broom wipes both. */
 const decals = [];
 export const STAIN_LAYER = 540, SCORCH_LAYER = 535;
-const DECAL_LIMIT = 180, DECAL_LIFE = 90000;
-export function dropDecal(x, y, size, rotation, tint, { elevation = 0, layer = STAIN_LAYER, alpha = 0.92, grow = 140, life = DECAL_LIFE } = {}) {
+// Stains that never fade pile up; past the limit the oldest one goes.
+const DECAL_LIMIT = 300;
+export function dropDecal(x, y, size, rotation, tint, { elevation = 0, layer = STAIN_LAYER, alpha = 0.92, grow = 140, life = stainLifetime() } = {}) {
   const sprite = new PIXI.Sprite(texture(`splat${Math.floor(Math.random() * SPLATS)}`));
   sprite.anchor.set(0.5); sprite.position.set(x, y); sprite.rotation = rotation; sprite.tint = tint; sprite.alpha = alpha;
   groundLayer(elevation, layer).addChild(sprite);
   decals.push(sprite);
   while (decals.length > DECAL_LIMIT) forget(decals[0]);
   tween(grow, e => { if (!sprite.destroyed) sprite.scale.set(size / 256 * (0.5 + 0.5 * e)); }, ease.out);
-  setTimeout(() => {
+  if (Number.isFinite(life)) setTimeout(() => {
     if (sprite.destroyed) return;
     tween(4000, e => { if (!sprite.destroyed) sprite.alpha = alpha * (1 - e); }).finally(() => forget(sprite));
   }, life);
@@ -393,7 +394,7 @@ function forget(sprite) {
 
 /* Stains on the tokens themselves: they ride along with the artwork and dry off after a while. */
 const marked = new Map();
-const MARKS_PER_TOKEN = 14, MARK_LIFE = 60000;
+const MARKS_PER_TOKEN = 14;
 let markLoop = false;
 let markLayer = null;
 function markContainer() {
@@ -411,13 +412,15 @@ export function stainToken(token, count, angle, tint, { spread = 0.8, size = 0.6
     const sprite = new PIXI.Sprite(texture(`splat${Math.floor(Math.random() * SPLATS)}`));
     sprite.anchor.set(0.5); sprite.tint = tint; sprite.alpha = 0; sprite.visible = false; sprite.rotation = a + rand(-0.5, 0.5);
     markContainer().addChild(sprite);
-    entry.marks.push({ sprite, dx: Math.cos(a) * d, dy: Math.sin(a) * d, size: r * rand(0.5, 1.1) * size, age: -rand(60, 260), life: MARK_LIFE * rand(0.8, 1.2) });
+    entry.marks.push({ sprite, dx: Math.cos(a) * d, dy: Math.sin(a) * d, size: r * rand(0.5, 1.1) * size, age: -rand(60, 260), life: stainLifetime() * rand(0.8, 1.2) });
   }
   while (entry.marks.length > MARKS_PER_TOKEN) entry.marks.shift().sprite.destroy();
   if (markLoop) return;
   markLoop = true;
   loop(dt => {
     for (const [id, item] of marked) {
+      // Foundry redraws a token on some updates: follow the new placeable instead of losing the stains.
+      if (item.token.destroyed) { const fresh = fromUuidSync(id)?.object; if (fresh && !fresh.destroyed) item.token = fresh; }
       const mesh = item.token.mesh, alive = !item.token.destroyed && mesh && !mesh.destroyed;
       for (const mark of item.marks) {
         mark.age += dt;
@@ -486,7 +489,7 @@ function bleed(target, attacker, angle, { amount, critical, blow, palette, kill 
     setTimeout(() => dropDecal(c.x + ux * along - uy * aside, c.y + uy * along + ux * aside, r * rand(0.35, 0.8), angle + rand(-0.3, 0.3), palette.decal, { elevation }), rand(220, 480));
   }
   if (kill) setTimeout(() => dropDecal(c.x + rand(-r, r) * 0.15, c.y + rand(-r, r) * 0.15, r * 6, rand(0, Math.PI * 2), palette.decal,
-    { elevation, alpha: 0.95, grow: 2600, life: DECAL_LIFE * 2 }), 300);
+    { elevation, alpha: 0.95, grow: 2600, life: stainLifetime() * 2 }), 300);
   if (!palette.stains) return;
   // The wound itself, the side of the body the blood flies to, and whoever stands close in the spray.
   stainToken(target, 1 + Math.round(amount * 3 + (critical ? 2 : 0)), angle, palette.decal, { spread: 1.1, size: 0.7, reach: 0.55 });
@@ -543,8 +546,10 @@ export async function playDamage(appliedMessage) {
   }
   const health = target.actor?.system?.health, max = Math.max(1, health?.max ?? 30), amount = Math.min(1, total / (max * 0.5));
   const kill = Number.isFinite(link.from) && link.from > 0 && link.from - total <= 0;
-  if (style.kind === "spell" && style.element === "fire") scorch(target, { amount, critical: Boolean(link.critical) });
-  else bleed(target, attacker, angle, { amount, critical: Boolean(link.critical), blow: style.blow ?? (style.kind === "spell" ? "blunt" : "slash"),
+  // Fire chars the ground and still opens wounds, only less blood than a blade.
+  const fire = style.kind === "spell" && style.element === "fire";
+  if (fire) scorch(target, { amount, critical: Boolean(link.critical) });
+  bleed(target, attacker, angle, { amount: fire ? amount * 0.5 : amount, critical: Boolean(link.critical), blow: style.blow ?? (style.kind === "spell" ? "blunt" : "slash"),
     palette: paletteOf(target.actor), kill });
   flashTint(target, style.element === "fire" ? 0xff7a2a : 0xd02a20, 450);
   if (link.critical) {
