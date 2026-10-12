@@ -29,7 +29,7 @@ import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
 import { attackConcealed, creatureDetailsHidden, enemyAttackHidden, creatureDetailsSecret } from "../chat/concealment.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
 import { hitLocation, bodyPlanOf, attackLocation, weaponAttack, attackModes } from "./weapon-rules.mjs";
-import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
+import { weaponDamageTraits, armorAt, monsterMaterial, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
 import { criticalWoundByRoll, aimedCriticalRoll, criticalWoundLocation, criticalWoundNeedsSide, ORGAN_WOUNDS, ANATOMY_FREE_BONUS } from "../data/critical-wounds.mjs";
 import { criticalTableRoll, specterDamageBonus } from "./relic-weapon-rules.mjs";
 import { applyWeaponWear } from "./weapon-wear.mjs";
@@ -233,13 +233,13 @@ export function rollExchangeDamage(message, index) {
     let location = exchangeLocation(message, index);
     if (!location && !woundPicksLocation) return;
     const target = targetActor(attack), item = attackItem(attack, actor), weapon = attack.weaponSnapshot?.system ?? (item ? effectiveItem(item) : {});
-    const traits = attack.traits ?? weaponDamageTraits(weapon), monster = target ? monsterResistant(target) : false;
+    const traits = attack.traits ?? weaponDamageTraits(weapon), material = target ? monsterMaterial(target) : null;
     const options = { allowInteractive: !message.blind };
     const rolls = [await evaluateRoll(attack.damage,options)];
     let hitTraits = attack.hitTraits ?? weaponHitTraits(weapon,actor);
     const ablation = hitTraits.ablating ? await evaluateRoll("floor(1d6 / 2)",options) : null;
     if (ablation) rolls.push(ablation);
-    const silver = traits.silverDice && monster ? await evaluateRoll(traits.silverDice,options) : null;
+    const silver = traits.silverDice && material === "silver" ? await evaluateRoll(traits.silverDice,options) : null;
     if (silver) rolls.push(silver);
     let critical = null;
     if (outcome.critical) {
@@ -302,7 +302,7 @@ export function damagePreview(message, index) {
   const oil = data.extras ?? (data.oil ? [{ label: `Масло: ${data.oil.name}`, value: data.oil.bonus }] : []);
   const extraTotal = oil.filter(extra => !freezeExtra(extra)).reduce((sum, entry) => sum + (entry?.value ?? 0), 0);
   const hit = (actor, armorAtZone, base, silver, crit, extra = damageExtrasFor(actor, oil)) => resolveDamage({ base, silver, location: data.location.id, multiplier: multiplierFor(actor),
-    traits: data.traits, armor: armorAtZone, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor), critical: crit, extra });
+    traits: data.traits, armor: armorAtZone, monsterMaterial: monsterMaterial(actor), vulnerableToFire: fireVulnerable(actor), critical: crit, extra });
   // Quen and Active Shield take the raw blow before armor (core p.114); unblockable magic goes straight through.
   const soak = attack.spell && !attack.blockable ? { absorbed: 0 } : magicShieldPlan(target, data.base);
   const preview = { data, target, armor, result: hit(target, armor, data.base - soak.absorbed, data.silver, critical), shield: null, prosthesis: null,
@@ -461,7 +461,7 @@ export async function applyShieldShare(message) {
       const data = share.freezeDamage, armor = armorAt(actor, data.location.id);
       const multiplier = data.location.multiplier + (data.location.id === "head" ? modifierTotal(actor.system.statistics?.modifiers ?? [], "damage.headMultiplier") : 0);
       result = resolveDamage({ base: data.base, silver: data.silver, traits: data.traits, location: data.location.id, multiplier, armor,
-        monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor), critical: data.critical,
+        monsterMaterial: monsterMaterial(actor), vulnerableToFire: fireVulnerable(actor), critical: data.critical,
         extra: damageExtrasFor(actor, data.extras) });
       const wear = ((result.penetrated ? 1 : 0) + (data.ablation ?? 0)) * (data.hitTraits?.wearMultiplier ?? 1);
       Object.assign(result, { wear, ablate: !result.immune && wear > 0 ? armor.ablate : [] });
@@ -566,7 +566,7 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
       const where = hitLocation((await roll("1d10")).total, plan), damage = await roll(weaponDamageFormula(actor, item, attack, role));
       if (step.id === "self") {
         const armor = armorAt(actor, where.id), traits = role === "attack" && attack?.weaponSnapshot ? weaponDamageTraits(attack.weaponSnapshot.system) : weaponDamageTraits(item ? effectiveItem(item) : {});
-        const result = resolveDamage({ base: damage.total, location: where.id, multiplier: where.multiplier, traits, armor, monster: monsterResistant(actor), vulnerableToFire: fireVulnerable(actor) });
+        const result = resolveDamage({ base: damage.total, location: where.id, multiplier: where.multiplier, traits, armor, monsterMaterial: monsterMaterial(actor), vulnerableToFire: fireVulnerable(actor) });
         const worn = await sufferDamage(actor, result);
         notes.push(`${where.name}: урон ${damage.total} → −${result.total} ПЗ${worn.length ? `; ПБ −1: ${worn.join(", ")}` : ""}`);
       } else {
@@ -612,7 +612,7 @@ export async function applyFumbleToTarget({ message, index, role, actor }) {
   if (!token) throw new Error("Выберите цель (T): союзника, в которого попал удар.");
   const victim = token.actor, armor = armorAt(victim, ally.location.id);
   const result = resolveDamage({ base: ally.damage, location: ally.location.id, multiplier: ally.location.multiplier, traits: ally.traits, armor,
-    monster: monsterResistant(victim), vulnerableToFire: fireVulnerable(victim) });
+    monsterMaterial: monsterMaterial(victim), vulnerableToFire: fireVulnerable(victim) });
   const share = { token: token.uuid, name: token.name, total: result.total, steps: result.steps, ablate: result.ablate, applied: false };
   if (victim.isOwner) { share.ablated = (await sufferDamage(victim, result)).join(", "); share.applied = true; }
   return post({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), content: `<p>Провал: ${esc(token.name)} получает −${result.total} ПЗ (${esc(ally.location.name)})</p>`,

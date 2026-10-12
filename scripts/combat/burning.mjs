@@ -2,7 +2,7 @@ import { activeEffect } from "../data/effect-counters.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { immuneToCondition } from "../data/creatures.mjs";
 import { ATTACK_LOCATIONS, bodyPlanOf } from "./weapon-rules.mjs";
-import { armorAt, resolveDamage, monsterResistant, fireVulnerable } from "./damage-rules.mjs";
+import { armorAt, resolveDamage, monsterMaterial, fireVulnerable } from "./damage-rules.mjs";
 import { applyWeaponWear } from "./weapon-wear.mjs";
 
 // Core p.161 «Горение»: 5 damage to every body part each turn; armor absorbs it (fire resistance halves
@@ -20,9 +20,9 @@ export const isBurning = actor => actor.effects.some(effect => activeEffect(effe
 /** Damage per part against the current armor; no location multipliers — every part takes its own 5. */
 export function burningDamage(actor) {
   if (!isBurning(actor) || immuneToCondition(actor, ["burning"])) return null;
-  const monster = monsterResistant(actor), vulnerable = fireVulnerable(actor);
+  const material = monsterMaterial(actor), vulnerable = fireVulnerable(actor);
   const parts = burningParts(actor).map(id => {
-    const armor = armorAt(actor, id), result = resolveDamage({ base: BURN_PER_PART, location: id, multiplier: 1, traits: FIRE, armor, monster, vulnerableToFire: vulnerable });
+    const armor = armorAt(actor, id), result = resolveDamage({ base: BURN_PER_PART, location: id, multiplier: 1, traits: FIRE, armor, monsterMaterial: material, vulnerableToFire: vulnerable });
     return { id, name: ATTACK_LOCATIONS.find(entry => entry.id === id)?.name ?? id, sp: armor.sp, total: result.total, resisted: armor.resistances.includes("elemental") };
   });
   return { total: parts.reduce((sum, part) => sum + part.total, 0), parts, vulnerable };

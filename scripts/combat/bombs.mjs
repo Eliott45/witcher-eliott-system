@@ -8,7 +8,7 @@ import { conditionRules } from "./condition-rules.mjs";
 import { actionQuote, actionUpdate, actionNote } from "./action-economy.mjs";
 import { attackerToken, tokenCenter } from "./attack-target.mjs";
 import { bandFor, combatModifierParts, signed, ATTACK_LOCATIONS } from "./weapon-rules.mjs";
-import { armorAt, resolveDamage, monsterResistant, fireVulnerable, weaponDamageTraits } from "./damage-rules.mjs";
+import { armorAt, resolveDamage, monsterMaterial, fireVulnerable, weaponDamageTraits } from "./damage-rules.mjs";
 import { burningParts } from "./burning.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
 import { scatterOffset } from "../canvas/scatter-overlay.mjs";
@@ -166,10 +166,10 @@ export async function postBlast(actor, scene, point, { name, radius, damage, int
 
 /** Damage of one blast on one actor: a separate roll per body part, minus its SP, then the location multiplier. */
 export function blastDamage(actor, rolls, traits) {
-  const monster = monsterResistant(actor), vulnerable = fireVulnerable(actor);
+  const material = monsterMaterial(actor), vulnerable = fireVulnerable(actor);
   const parts = burningParts(actor).map(id => {
     const base = rolls[id] ?? 0, location = ATTACK_LOCATIONS.find(entry => entry.id === id);
-    const armor = armorAt(actor, id), result = resolveDamage({ base, location: id, multiplier: location?.multiplier ?? 1, traits, armor, monster, vulnerableToFire: vulnerable });
+    const armor = armorAt(actor, id), result = resolveDamage({ base, location: id, multiplier: location?.multiplier ?? 1, traits, armor, monsterMaterial: material, vulnerableToFire: vulnerable });
     return { id, name: location?.name ?? id, roll: base, sp: armor.sp, multiplier: location?.multiplier ?? 1, total: result.total, ablate: result.ablate };
   });
   // A piece of armor covering several parts wears once per blast.

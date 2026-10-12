@@ -5,6 +5,7 @@
 @import url("advancement.css");
 @import url("creation.css");
 @import url("services.css");
+@import url("settings.css");
 .witcher-zone-icon { width:22px; height:22px; border:0; vertical-align:middle; object-fit:contain; }
 
 .witcher-eliott.actor-sheet, .witcher-eliott.reference-sheet {

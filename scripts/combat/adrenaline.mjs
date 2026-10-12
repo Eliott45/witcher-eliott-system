@@ -110,7 +110,7 @@ export async function adrenalineDialog(actor) {
 }
 
 export function registerAdrenaline() {
-  game.settings.register(SYSTEM_ID, "adrenalineRules", { name: "Адреналин (дополнительное правило)", hint: "Стр.175: за критическое ранение — кость d6 (с Перуном +1). Расход: 10 ВЫН за кость на урон или временные ПЗ. Включает счётчик на листе.", scope: "world", config: true, type: Boolean, default: false });
+  game.settings.register(SYSTEM_ID, "adrenalineRules", { name: "WITCHER.Settings.Adrenaline", hint: "WITCHER.Settings.AdrenalineHint", scope: "world", config: true, type: Boolean, default: false });
   const end = async combat => {
     if (!game.user.isActiveGM) return;
     const actors = new Map(Array.from(combat.combatants ?? []).filter(row => row.actor).map(row => [row.actor.uuid, row.actor]));

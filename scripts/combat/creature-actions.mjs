@@ -11,7 +11,7 @@ import { conditionRules } from "./condition-rules.mjs";
 import { tokenGap, tokenCenter, withinFacing, facingModifiers } from "./attack-target.mjs";
 import { weaponAttack, combatModifierParts } from "./weapon-rules.mjs";
 import { weaponHitTraits } from "./weapon-hit-effects.mjs";
-import { weaponDamageTraits, armorAt, resolveDamage, monsterResistant, fireVulnerable } from "./damage-rules.mjs";
+import { weaponDamageTraits, armorAt, resolveDamage, monsterMaterial, fireVulnerable } from "./damage-rules.mjs";
 import { defenseChoices } from "./attack-exchange.mjs";
 import { rollDefense } from "./defense-rolls.mjs";
 import { spiritState, creatureSuppression, creatureMentalImmunity, creatureEffectImmunity } from "./creature-spirits.mjs";
@@ -203,7 +203,7 @@ export function resolveCreatureArea(message,index,{mode="dodge",itemId=""}={}) {
         if(combat?.started)await target.update({[`flags.${SYSTEM_ID}.defenses`]:{combat:combat.id,round:combat.round,count:repeat?mark.count+1:1}});
         const dice=needleDice(defense.rolls[0].total),damage=dice?await creatureRoll(`${dice}d6`):null;
         const immune=spiritState(target).incorporeal,armor=armorAt(target,"torso"),calculated=damage&&!immune?resolveDamage({base:damage.total,location:"torso",multiplier:1,traits:{types:["piercing"],piercing:"none",silver:false},armor,
-          monster:monsterResistant(target),vulnerableToFire:fireVulnerable(target)}):{total:0,ablate:[],steps:[]};
+          monsterMaterial:monsterMaterial(target),vulnerableToFire:fireVulnerable(target)}):{total:0,ablate:[],steps:[]};
         result={success:!dice,roll:defense.rolls[0].total,dice,damage:calculated,immune};
         await creaturePost(target,{title:"Иглы трутня: защита СЛ 15",text:`Защита ${result.roll}: ${dice?immune?"иглы проходят сквозь бесплотное существо.":`${dice}d6, урон после брони ${calculated.total}; отравление.`:"успех, урона нет."}`,rolls:damage?[damage]:[]});
       }

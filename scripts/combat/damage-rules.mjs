@@ -4,6 +4,7 @@ import { equippedItems, armorZones } from "../data/physical-items.mjs";
 import { layeredStoppingPower } from "../data/armor-layers.mjs";
 import { spiritState } from "./creature-spirits.mjs";
 import { creatureProfile, creatureHumanForm } from "../data/creature-modes.mjs";
+import { bookMonstersEnabled } from "../settings.mjs";
 
 // Core pp.153–162 with errata v4: SP first, then resistance, then the location multiplier.
 // Critical bonus damage ignores armor and never ablates it (Sage's Answers 2 and 20).
@@ -21,6 +22,7 @@ export function weaponDamageTraits(weapon = {}) {
     piercing: /улучшенное пробивающее броню/.test(properties) ? "improved" : /пробивающее броню/.test(properties) ? "normal" : "none",
     silverDice: properties.match(/серебрян\S*\s*\(([^)]+)\)/u)?.[1]?.trim() ?? "",
     silver: /серебрян/.test(properties),
+    meteorite: /метеоритн/.test(properties),
     nonLethal: /несмертельн/.test(properties)
   };
 }
@@ -90,6 +92,13 @@ export function monsterResistant(actor) {
   if (hasAbility(actor, "creature.monster-resistance")) return true;
   return !["beast", "humanoid"].includes(actor.system.creature?.category ?? "humanoid");
 }
+const METEORITE_CATEGORIES = new Set(["beast", "hybrid", "draconid", "insectoid", "ogroid"]);
+/** The metal that bypasses monster resistance under the world's selected rules. */
+export function monsterMaterial(actor) {
+  if (bookMonstersEnabled() && actor.type === "npc" && !creatureHumanForm(actor)
+    && METEORITE_CATEGORIES.has(actor.system.creature?.category)) return "meteorite";
+  return monsterResistant(actor) ? "silver" : null;
+}
 export const fireVulnerable = actor => hasAbility(actor, "creature.fire-vulnerable");
 
 // Core p.158: margin over defense → level and armor-ignoring bonus damage.
@@ -104,8 +113,10 @@ export const criticalLevel = margin => CRITICAL_LEVELS.find(level => margin >= l
 /**
  * Step-by-step damage against one hit location. Every step is recorded so the chat card can explain the result.
  * `base` is the rolled weapon damage (already ×2 for a strong strike); `silver` the separate silver dice total.
+ * `monsterMaterial` selects the effective resistance; legacy `monster: true` means silver.
  */
-export function resolveDamage({ base, silver = 0, location, multiplier, traits, armor, monster = false, vulnerableToFire = false, critical = null, extra = null }) {
+export function resolveDamage({ base, silver = 0, location, multiplier, traits, armor, monster = false,
+  monsterMaterial = monster ? "silver" : null, vulnerableToFire = false, critical = null, extra = null }) {
   const steps = [], note = (label, value, detail = "") => steps.push({ label, value, detail });
   const fire = traits.types.includes("elemental");
   const physical = traits.physical ?? !fire;
@@ -113,7 +124,7 @@ export function resolveDamage({ base, silver = 0, location, multiplier, traits, 
     penetrated: false, ablate: [], location, immune: true };
   if (armor.fireImmune && fire && !physical) return { total: 0, steps: [{ label: "Невосприимчивость к огню", value: 0 }],
     penetrated: false, ablate: [], location, immune: true };
-  const silverApplies = monster && silver > 0;
+  const silverApplies = monsterMaterial === "silver" && silver > 0;
   let damage = base + (silverApplies ? silver : 0);
   note("Бросок урона", base, traits.types.map(type => DAMAGE_TYPE_NAMES[type]).join(" / "));
   if (silverApplies) note("Серебро против чудовища", `+${silver}`);
@@ -129,7 +140,10 @@ export function resolveDamage({ base, silver = 0, location, multiplier, traits, 
   if (resisted && traits.piercing === "none") { damage = Math.floor(damage / 2); note("Сопротивление урону", "½", traits.types.map(type => DAMAGE_TYPE_NAMES[type]).join("/")); }
   else if (resisted) note("Сопротивление урону", "игнорируется", "пробивающее броню");
   if (multiplier !== 1) { damage = Math.floor(damage * multiplier); note("Зона попадания", `×${multiplier === 0.5 ? "½" : multiplier}`); }
-  if (monster && !traits.silver && !fire && damage > 0) { damage = Math.floor(damage / 2); note("Чудовище: не серебро", "½"); }
+  if (monsterMaterial && !traits[monsterMaterial] && !fire && damage > 0) {
+    damage = Math.floor(damage / 2);
+    note(monsterMaterial === "meteorite" ? "Чудовище: не метеоритная сталь" : "Чудовище: не серебро", "½");
+  }
   if (vulnerableToFire && fire && damage > 0) { damage *= 2; note("Уязвимость к огню", "×2"); }
   if (critical) { damage += critical.bonus; note(`Критическое ранение: ${critical.name.toLocaleLowerCase("ru")}`, `+${critical.bonus}`, "броня не блокирует"); }
   return { total: damage, steps, penetrated, ablate: penetrated ? [armor.ablate ?? []].flat() : [], location };

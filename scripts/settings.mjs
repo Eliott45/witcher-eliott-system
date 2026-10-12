@@ -2,6 +2,10 @@ import { SYSTEM_ID } from "./config.mjs";
 
 let languageLoad=Promise.resolve(null),languageData;
 export function registerSystemSettings() {
+  game.settings.register(SYSTEM_ID,"bookMonsters",{
+    name:"WITCHER.Settings.BookMonsters",hint:"WITCHER.Settings.BookMonstersHint",
+    scope:"world",config:true,type:Boolean,default:false
+  });
   game.settings.register(SYSTEM_ID,"automaticCriticalDice",{
     name:"WITCHER.Settings.AutomaticCriticalDice",hint:"WITCHER.Settings.AutomaticCriticalDiceHint",
     scope:"world",config:true,type:Boolean,default:true
@@ -57,4 +61,8 @@ export async function ensureSystemLanguage() {await languageLoad;applyLoadedLang
 export function automaticCriticalDice() {
   // Core schema tests and rolls evaluated before init keep the established automatic behavior.
   try{return globalThis.game?.settings?.get(SYSTEM_ID,"automaticCriticalDice")!==false;}catch{return true;}
+}
+export function bookMonstersEnabled() {
+  // Before settings initialize (including standalone rules checks), use the base rules.
+  try{return globalThis.game?.settings?.get(SYSTEM_ID,"bookMonsters")===true;}catch{return false;}
 }

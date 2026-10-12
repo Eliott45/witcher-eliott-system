@@ -1,0 +1,72 @@
+/* Only the system tab of Foundry's native settings window. */
+#settings-config .witcher-settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 0 22px;
+}
+#settings-config .witcher-settings-group:not(:has(.form-group:not([hidden]))) { display: none; }
+#settings-config .witcher-settings-group > h3 {
+  margin: 0 0 6px;
+  padding: 0 0 9px;
+  border-bottom: 2px solid var(--color-warm-1, #c9593f);
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 700;
+  text-shadow: none;
+}
+#settings-config .witcher-settings-group > h3 i { width: 24px; color: var(--color-warm-1, #c9593f); }
+#settings-config .witcher-setting {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 7px 16px;
+  margin: 0;
+  padding: 14px 4px;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+}
+#settings-config .witcher-setting[hidden] { display: none; }
+#settings-config .witcher-setting > label { line-height: 1.4; font-weight: 600; }
+#settings-config .witcher-setting-scope {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+#settings-config .witcher-setting > .hint { grid-column: 1 / -1; margin: 0; line-height: 1.5; font-size: 13px; white-space: pre-line; }
+#settings-config .witcher-setting .form-fields { min-width: 0; justify-content: flex-end; }
+#settings-config .witcher-setting:has(input:not([type="checkbox"]), select, range-picker) > .form-fields {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+#settings-config .witcher-setting input[type="checkbox"] {
+  appearance: none;
+  position: relative;
+  width: 38px;
+  height: 22px;
+  flex: 0 0 38px;
+  margin: 2px 0 0;
+  border: 1px solid color-mix(in srgb, currentColor 40%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+#settings-config .witcher-setting input[type="checkbox"]::before { display: none; }
+#settings-config .witcher-setting input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  inset: 3px auto auto 3px;
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.8;
+  transform: none;
+  transition: left 0.15s;
+}
+#settings-config .witcher-setting input[type="checkbox"]:checked { background: #934c36; border-color: #b47353; }
+#settings-config .witcher-setting input[type="checkbox"]:checked::after { left: 19px; background: #fff4de; opacity: 1; }
+#settings-config .witcher-setting input[type="checkbox"]:focus-visible { outline: 2px solid var(--color-warm-1, #c9593f); outline-offset: 3px; }

@@ -10,6 +10,8 @@ test("automatic critical rolls are enabled by default and language preference is
   registerSystemSettings();await ensureSystemLanguage();
   assert.equal(registered.get("automaticCriticalDice").default,true);
   assert.equal(registered.get("automaticCriticalDice").scope,"world");
+  assert.equal(registered.get("bookMonsters").default,false);
+  assert.equal(registered.get("bookMonsters").scope,"world");
   assert.equal(registered.get("systemLanguage").scope,"client");
   assert.equal(registered.get("systemLanguage").requiresReload,true);
   assert.equal(game.i18n.translations.WITCHER.Test,"Привет");assert.equal(game.i18n.translations.CORE.label,"Keep");

@@ -68,6 +68,29 @@ function fixture(t, { location = "random", totals = [12], category = "humanoid",
   return { message, attack, actor, target, messages, evaluated, pending };
 }
 
+test("book monsters: silver dice are rolled only for silver targets; meteorite works through damage application", async t => {
+  for (const [category, properties, enabled, dice, expected, extraSilver] of [
+    ["hybrid", "Серебряное (3d6)", true, [8], 4, 0],
+    ["necrophage", "Серебряное (3d6)", true, [8, 9], 17, 9],
+    ["hybrid", "Серебряное (3d6)", false, [8, 9], 17, 9],
+    ["hybrid", "Метеоритное", true, [8], 8, 0],
+    ["beast", "Метеоритное", true, [8], 8, 0],
+    ["beast", "", true, [8], 4, 0],
+    ["beast", "", false, [8], 8, 0]
+  ]) {
+    const f = fixture(t, { location: "torso", category, results: dice });
+    mutableTarget(f);
+    game.settings.get = (_namespace, key) => key === "bookMonsters" ? enabled : "public";
+    f.attack.weaponSnapshot = { type: "weapon", system: { properties, damageType: "Р" } };
+    const damage = exchange(await rollExchangeDamage(f.message, 0));
+    assert.equal(damage.silver, extraSilver, `${category}, ${properties}, ${enabled}`);
+    assert.equal(f.evaluated.length, dice.length);
+    assert.equal(damagePreview(f.message, 0).result.total, expected);
+    await applyExchangeDamage(f.message, 0);
+    assert.equal(f.target.system.health.value, 50 - expected);
+  }
+});
+
 test("ablating and double equipment damage wear armor even when it stops the blow, applied once",async t=>{
   const f=fixture(t,{location:"torso",results:[8,2]});
   f.target.effects=[]; f.target.system.health={value:50,max:50}; f.target.system.creature.naturalArmor=10;
