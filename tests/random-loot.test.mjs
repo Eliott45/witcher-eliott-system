@@ -15,7 +15,7 @@ test("all three p.223 tables cover each percentile result exactly once", () => {
     }
     assert.deepEqual(entries.at(-1).min, 97);
     assert.deepEqual(entries.at(-1).max, 100);
-    assert.ok(entries.every(entry => entry.quantity === 1 && entry.source.includes("223")));
+    assert.ok(entries.every(entry => entry.quantity === 1 && entry.source === "Базовая книга"));
     // The sheet hides citation-only paragraphs: the prose must survive that.
     for (const entry of entries) assert.ok(stripPageReferences(entry.description).replace(/<[^>]*>/g, "").trim().length > 40, entry.name);
   }

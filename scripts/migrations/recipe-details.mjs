@@ -20,7 +20,7 @@ export function recipeDetailsUpdate(item) {
     legacy.some(row => row.uuid === materialUuid(id) && row.quantity === Number(quantity) && !row.substance))) {
     update["system.recipe.components"] = structuredClone(expected.components);
     if (item.system.ruleId === "diagram.armor.head.9" && item.system.source === "Базовая книга, стр. 130–135 / 139; errata v4")
-      update["system.source"] = "Базовая книга, стр. 135";
+      update["system.source"] = "Базовая книга";
   }
   return update;
 }

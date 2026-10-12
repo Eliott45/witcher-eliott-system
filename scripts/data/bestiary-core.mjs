@@ -11,7 +11,7 @@ export const CORE_BESTIARY = [
     weapons: [w("Железный посох", "3d6", 2, "staffSpear", { properties: "Фокусирующее (2)", hands: 2 }), w("Кинжал", "1d6", 2, "smallBlades")],
     spells: ["Энье", "Очарование", "Слепящая пыль", "Рьеви", "Телепортация", "Сосуд заклятия", "Магический ритуал", "Вечный зуд", "Теневая порча"],
     abilities: [["Магия", "Владеет заклинаниями, ритуалами и порчами из книги существа; ведущий может заменить их любыми другими из раздела магии."]],
-    vulnerabilities: ["hanged-man-venom", "Двимерит: пока маг касается двимерита, его Энергия равна 0; действуют эффекты двимерита (стр. 167)."],
+    vulnerabilities: ["hanged-man-venom", "Двимерит: пока маг касается двимерита, его Энергия равна 0; действуют эффекты двимерита."],
     loot: [["Кроны", "5d10", true], ["Обычные предметы", "1d6"], ["Странные предметы", "floor(1d6/2)"], ["Пятая эссенция", "floor(1d6/2)"], ["Инструменты алхимика", "1"], ["Дыхание суккуба", "1"]],
     lore: [["Предрассудки простолюдинов", "education", 12, "В народе магов считают опасными чудаками и приписывают им похищения, опыты и некромантию; уважают их лишь в немногих местах."],
       ["Академические знания", "education", 16, "Маг силён на расстоянии и слаб вблизи: его оружие хрупкое, а без посоха магия обходится дороже. Истощённого мага легко одолеть; умный маг часто сдаётся, но оскорблённый бьётся до конца."]],
@@ -326,7 +326,7 @@ export const CORE_BESTIARY = [
       abilities: [["Плавание", "Плавает с обычной СКОР и может при этом использовать Уклонение/Изворотливость."]],
       loot: [["Сырое мясо", "floor(1d6/2)"], ["Кости животных", "floor(1d6/2)"], ["Экстракт яда", "floor(1d6/2)"]] }
   ].map(animal => ({ category: "beast", difficulty: "Животное", reward: 0, armor: 0, vigor: 0, size: "", weight: "", habitat: "", intellect: "Животный", group: "",
-    vulnerabilities: ["beast-oil"], lore: [], description: "Обычное животное (стр. 310–313).", tactics: "", ...animal })),
+    vulnerabilities: ["beast-oil"], lore: [], description: "Обычное животное.", tactics: "", ...animal })),
 ...[
     { id: "horse", name: "Лошадь", page: 312, attrs: [1, 4, 5, 12, 12, 4, 1, 4, 0], hp: 40, sta: 40, size_class: "large",
       skills: { melee: 6, dodgeEscape: 8, athletics: 6, awareness: 5, stealth: 3, wildernessSurvival: 2, endurance: 6, courage: 6 },
@@ -346,7 +346,7 @@ export const CORE_BESTIARY = [
       weapons: [w("Копыта", "2d6+2", 1, "melee", { natural: true })], traits: ["wild:7"], abilities: [],
       loot: [["Сырое мясо", "1d10"], ["Кости животных", "1d10"]] }
   ].map(animal => ({ category: "beast", difficulty: "Животное", reward: 0, armor: 0, vigor: 0, size: "", weight: "", habitat: "", intellect: "Животный", group: "",
-    vulnerabilities: ["beast-oil"], lore: [], description: "Обычное животное (стр. 312–313).", tactics: "", ...animal })),
+    vulnerabilities: ["beast-oil"], lore: [], description: "Обычное животное.", tactics: "", ...animal })),
 // Monster Hunter's Journal p.26. Appended last: actor ids follow the array index. The statblocks give no difficulty or reward.
 ...[
     { id: "barghest", name: "Баргест", runDistance: 8, attrs: [1, 5, 7, 5, 8, 1, 1, 5, 0], hp: 25, sta: 25, bite: "2d6",

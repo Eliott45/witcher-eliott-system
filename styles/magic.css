@@ -112,3 +112,10 @@
 .witcher-area-targets .witcher-area-ally { background:#3f7a3c; }
 .witcher-area-targets .witcher-area-neutral { background:#6b604e; }
 .witcher-spell-area button { margin:2px 0; }
+.witcher-spell-choices { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+.witcher-spell-choice { display:flex; flex-direction:column; gap:8px; min-width:0; color:#342d26; }
+.witcher-spell-choice > span { line-height:1.4; }
+.witcher-item-tab .witcher-spell-choice select[multiple] { display:block; width:100%; height:auto; min-height:14rem; padding:4px; font:inherit; line-height:1.5; }
+.witcher-spell-choice select[multiple] option { padding:4px 8px; }
+.witcher-spell-choice select[multiple] option:checked { color:#fff5df; background:#536660; }
+.witcher-spell-choice-hint { grid-column:1/-1; margin:0; font-size:.85rem; color:#77664f; }

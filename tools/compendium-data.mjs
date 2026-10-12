@@ -48,7 +48,7 @@ export function compendiumData(translations) {
   const packs = {
     bestiary: bestiarySources(),
     effects: [...EFFECT_TEMPLATES.map(entry=>conditionSource(entry,text=>text.startsWith("WITCHER.")?localize(text):text)), ...structuredClone(CRITICAL_WOUND_SOURCES)],
-    professions: PROFESSIONS.map(entry => item(entry.documentId, "profession", entry, { description: '<p>Базовая книга: стр. ' + entry.page + ', дерево: стр. ' + entry.treePage + '.</p><p>Предел магии: ' + entry.vigor + '. ' + escapeHTML(entry.magic) + '</p><p>' + entry.skills.map(key => localize('WITCHER.Skills.Entries.' + key + '.Label')).join(', ') + '</p><p>Языков на выбор: ' + entry.languageChoices + '. Снаряжение — выберите ' + entry.equipmentChoices + ': ' + escapeHTML(entry.equipment) + '</p><p>' + entry.abilities.map(ability => '@UUID[Compendium.witcher-eliott-system.abilities.Item.' + ability.documentId + ']{' + ability.name + '}').join('<br>') + '</p>' })),
+    professions: PROFESSIONS.map(entry => item(entry.documentId, "profession", entry, { description: '<p>Базовая книга.</p><p>Предел магии: ' + entry.vigor + '. ' + escapeHTML(entry.magic) + '</p><p>' + entry.skills.map(key => localize('WITCHER.Skills.Entries.' + key + '.Label')).join(', ') + '</p><p>Языков на выбор: ' + entry.languageChoices + '. Снаряжение — выберите ' + entry.equipmentChoices + ': ' + escapeHTML(entry.equipment) + '</p><p>' + entry.abilities.map(ability => '@UUID[Compendium.witcher-eliott-system.abilities.Item.' + ability.documentId + ']{' + ability.name + '}').join('<br>') + '</p>' })),
     languages: LANGUAGES.map(language => item(language.documentId, "language", language, {
       description: paragraph(language.description) + paragraph("WITCHER.Languages.Rules")
     })),

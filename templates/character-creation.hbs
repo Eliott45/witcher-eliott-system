@@ -51,7 +51,7 @@
       {{#if is.origin}}
       {{#with origin}}
       {{#if witcher}}
-      <p class="wcr-lead">Путь ведьмака определяется отдельными таблицами (стр. 238–240). Родину можно выбрать для истории — бонусов она ведьмаку не даёт.</p>
+      <p class="wcr-lead">Путь ведьмака определяется отдельными таблицами. Родину можно выбрать для истории — бонусов она ведьмаку не даёт.</p>
       <div class="wcr-toolbar"><button type="button" class="wcr-roll is-big" data-action="rollWitcherAll"><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> Бросить все таблицы</button></div>
       <div class="wcr-tables">
         {{#each witcherTables}}
@@ -157,7 +157,7 @@
       {{!-- 3. Lifepath --}}
       {{#if is.events}}
       {{#with events}}
-      <p class="wcr-lead">{{#if witcher}}С 20–29 лет ведьмак странствует по Пути. За каждые 10 лет выберите риск и узнайте исход десятилетия (стр. 241–245).{{else}}За каждые полные 10 лет жизни — одно важное событие (стр. 31–35). Этот шаг можно пропустить.{{/if}}</p>
+      <p class="wcr-lead">{{#if witcher}}С 20–29 лет ведьмак странствует по Пути. За каждые 10 лет выберите риск и узнайте исход десятилетия.{{else}}За каждые полные 10 лет жизни — одно важное событие. Этот шаг можно пропустить.{{/if}}</p>
       <div class="wcr-panel wcr-ages">
         <label>Возраст<input type="number" min="1" step="1" value="{{../state.age}}" data-field="age" data-type="number" data-rerender></label>
         {{#if witcher}}
@@ -191,7 +191,7 @@
 
       {{!-- 4. Style --}}
       {{#if is.style}}
-      <p class="wcr-lead">Как героя узнают с первого взгляда и что для него важно (стр. 36). По одному броску на каждый столбец.</p>
+      <p class="wcr-lead">Как героя узнают с первого взгляда и что для него важно. По одному броску на каждый столбец.</p>
       <div class="wcr-toolbar"><button type="button" class="wcr-roll is-big" data-action="rollStyleAll"><i class="fa-solid fa-dice" aria-hidden="true"></i> Бросить всё</button></div>
       <div class="wcr-styles">
         {{#each style}}

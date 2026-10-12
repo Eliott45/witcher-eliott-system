@@ -13,5 +13,5 @@ export const CORE_AMMUNITION = [
   flags: id === "standard" ? { [SYSTEM_ID]: { ammunitionUnits: true } } : {},
   system: { kind: "ammunition", quantity: id === "standard" ? 10 : 1, purchaseQuantity: id === "standard" ? 10 : 1, weight, price, rarity, damageType,
     reliability: { value: 10, max: 10 }, concealment: "large", properties,
-    description: `<p>${description}</p><p>Базовая книга, стр. 74.</p>`, source: "Базовая книга, стр. 74" }
+    description: `<p>${description}</p><p>Базовая книга.</p>`, source: "Базовая книга" }
 }));

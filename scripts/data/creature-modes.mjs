@@ -2,6 +2,7 @@ import { CORE_BESTIARY } from "./bestiary-core.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { creatureSuppression } from "../combat/creature-spirits.mjs";
 import { tokenActorSource } from "./token-actor-source.mjs";
+import { bookSource } from "./book-references.mjs";
 
 const profiles = new Map(CORE_BESTIARY.map((entry, index) => [`bstr${String(index + 1).padStart(12, "0")}`, entry]));
 const active = effect => !effect.disabled && !effect.isSuppressed && !effect.duration?.expired;
@@ -17,7 +18,7 @@ export function creatureProfile(actor) {
   if (byId) return byId;
   const rules = Array.from(actor.items ?? []).filter(item => item.type === "ability").map(item => item.system?.ruleId ?? "");
   return CORE_BESTIARY.find(entry => rules.some(rule => rule.startsWith(`creature.${entry.id}.`)))
-    ?? CORE_BESTIARY.find(entry => entry.name === actor.name && actor.system?.creature?.source === (entry.book ? `${entry.book}, стр. ${entry.page}` : `Базовая книга, стр. ${entry.page}–${entry.page + 1}`)) ?? null;
+    ?? CORE_BESTIARY.find(entry => entry.name === actor.name && bookSource(actor.system?.creature?.source) === (entry.book || "Базовая книга")) ?? null;
 }
 export const creatureHasInfiniteStamina = actor => creatureProfile(actor)?.id === "golem" || creatureHasTrait(actor, "infinite-stamina");
 export const creatureIsMassive = actor => creatureHasTrait(actor, "massive");

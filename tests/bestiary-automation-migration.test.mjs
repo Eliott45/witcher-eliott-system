@@ -87,7 +87,7 @@ test("Foundry's empty string defaults are eligible, and legacy Warg source is re
   assert.match(bestiaryAutomationPatch(ghoul).items.find(row => row._id === ghoul.items[0]._id)["system.ruleId"], /creature\.weapon/);
   const warg = actor("Варг"); warg.id = warg._id = "legacyCopy"; game.actors = [warg];
   await migrateBestiaryAutomation();
-  assert.equal(warg.system.creature.source, "Базовая книга, стр. 287"); assert.equal(warg.items[0].system.source, "Базовая книга, стр. 287");
+  assert.equal(warg.system.creature.source, "Базовая книга"); assert.equal(warg.items[0].system.source, "Базовая книга");
 });
 
 test("archer armor conversion carries old SP wear to all three real worn pieces and removes only matching harvest", async () => {

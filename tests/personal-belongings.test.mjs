@@ -17,7 +17,7 @@ test("each d100 picks one row; equal results stack, catalogue matches come from 
   let { items, results } = await rollPersonalBelongings("occult", 2, () => rolls.shift());
   assert.equal(items.length, 1); assert.equal(items[0].system.quantity, 2);
   assert.deepEqual(results.map(row => row.roll), [plain.min, plain.max]);
-  assert.equal(items[0].system.description, plain.description); assert.match(items[0].system.source, /223/);
+  assert.equal(items[0].system.description, plain.description); assert.equal(items[0].system.source, "Базовая книга");
   ({ items } = await rollPersonalBelongings("ordinary", 1, () => catalog.min));
   assert.equal(items[0].name, catalog.name); assert.ok(sourced[0].endsWith(catalog.documentId));
   await assert.rejects(rollPersonalBelongings("ordinary", 1, () => 0), /Не найден/);

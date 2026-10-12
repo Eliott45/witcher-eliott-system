@@ -8,7 +8,7 @@ import { RECIPE_GRADES } from "../data/crafting.mjs";
 const decimal = (key, label) => ({ ...number(key, label), step: "0.001" });
 const bool = (key, label) => ({ key, label, type: "boolean" });
 const COMMON = [number("quantity", "Количество"), decimal("weight", "Вес единицы, кг"), decimal("price", "Цена единицы, кроны"),
-  choice("rarity", "Доступность", RARITIES), bool("carried", "При себе"), bool("equipped", "Экипировано"), text("source", "Источник / страница")];
+  choice("rarity", "Доступность", RARITIES), bool("carried", "При себе"), bool("equipped", "Экипировано"), text("source", "Источник")];
 const DAMAGE_TYPE = text("damageType", "Тип урона: Р / К / Д / С");
 const RELIABILITY = [number("reliability.value", "Надёжность: текущая"), number("reliability.max", "Надёжность: базовый максимум")];
 const CONCEALMENT_FIELD = choice("concealment", "Скрытность", CONCEALMENT);

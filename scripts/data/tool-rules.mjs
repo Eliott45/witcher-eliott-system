@@ -33,7 +33,7 @@ const CONDITION_LABELS = {
   wearingMakeup: "при использовании макияжа", appraisingGoods: "только при оценке товара"
 };
 const SKILL_LABELS = { disguise: "Маскировке", wildernessSurvival: "Выживанию в дикой природе", seduction: "Соблазнению", charisma: "Харизме", business: "Торговле" };
-export const TOOL_SOURCE = "Базовая книга, стр. 92";
+export const TOOL_SOURCE = "Базовая книга";
 export const LEGACY_TOOL_SOURCE = "Базовая книга, стр. 92–93";
 export const getToolRules = item => TOOL_RULES[item.system?.ruleId]?.mechanics ?? null;
 
@@ -49,7 +49,7 @@ export function toolContent(ruleId) {
   const rules = [];
   if (mechanics.activities?.length) rules.push(entry.properties + ".");
   if (mechanics.modifiers) rules.push(...mechanics.modifiers.map(({target,value,condition}) => `+${value} к ${SKILL_LABELS[target.slice(7)]} ${CONDITION_LABELS[condition]}.`));
-  if (mechanics.focus) rules.push(`Фокусирующее (${mechanics.focus}): уменьшает затраты Выносливости на заклинание на ${mechanics.focus}. Это не прибавка к пределу магии. Свойство описано на стр. 72.`);
+  if (mechanics.focus) rules.push(`Фокусирующее (${mechanics.focus}): уменьшает затраты Выносливости на заклинание на ${mechanics.focus}. Это не прибавка к пределу магии.`);
   if (mechanics.missingToolPenalty) rules.push(`Для соответствующей работы без инструментов книга указывает штраф ${mechanics.missingToolPenalty}. Если действие требует оборудования, само наличие штрафа не даёт возможности обойти это требование.`);
   return {
     description: `<p>${entry.description}</p><h3>Применение и правила</h3><ul>${rules.map(rule=>`<li>${rule}</li>`).join("")}</ul><p><small>${TOOL_SOURCE}</small></p>`,

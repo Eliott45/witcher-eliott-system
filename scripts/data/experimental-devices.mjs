@@ -38,15 +38,15 @@ export const EXPERIMENTAL_DEVICES = devices.map(([id, name, damageType, radius, 
   img: id.startsWith("bomb.") ? "icons/svg/explosion.svg" : "icons/svg/trap.svg",
   system: { kind: "gear", weight: id.startsWith("trap.") ? 2 : 1, price, damageType,
     properties: `${id.startsWith("trap.") ? "Ловушка" : "Бомба"}; Радиус ${radius} м${damage ? `; Урон ${damage}` : ""}${effect ? `; ${effect}` : ""}`,
-    source: "Базовая книга, стр. 254–255", description: deviceDescription(id) }
+    source: "Базовая книга", description: deviceDescription(id) }
 }));
 EXPERIMENTAL_DEVICES.push(
   { id: "ammunition.split", documentId: "exdv000000000009", type: "equipment", source: "ammunition", name: "Разделяющиеся боеприпасы", img: "icons/weapons/ammunition/arrow-simple.webp",
     system: { kind: "ammunition", weight: 0.1, price: 54, damageType: "К", properties: "Разделяющееся: до трёх попаданий по случайным частям тела",
-      reliability: { value: 10, max: 10 }, source: "Базовая книга, стр. 255", description: "<p>Несколько стрел или болтов, связанных вместе: при выстреле связка лопается и снаряды разлетаются.</p><p>За каждый пункт превышения защиты цели, максимум 3, нанесите полный урон оружия случайной части тела. В инвентаре учитывается один боеприпас.</p>" } },
+      reliability: { value: 10, max: 10 }, source: "Базовая книга", description: "<p>Несколько стрел или болтов, связанных вместе: при выстреле связка лопается и снаряды разлетаются.</p><p>За каждый пункт превышения защиты цели, максимум 3, нанесите полный урон оружия случайной части тела. В инвентаре учитывается один боеприпас.</p>" } },
   { id: "ammunition.tracking", documentId: "exdv000000000010", type: "equipment", source: "ammunition", name: "Выслеживающие боеприпасы", img: "icons/weapons/ammunition/arrow-simple.webp",
     system: { kind: "ammunition", weight: 0.1, price: 22, damageType: "К", properties: "Выслеживание по запаху без проверки, если следу менее половины суток",
-      reliability: { value: 10, max: 10 }, source: "Базовая книга, стр. 255", description: "<p>Наконечник смазан пахучей смесью, которую легко учуять при выслеживании по запаху.</p><p>Пока боеприпас остаётся в теле цели, выслеживание по запаху не требует проверки, если следу менее 12 часов. Извлечение боеприпаса прекращает эффект.</p>" } }
+      reliability: { value: 10, max: 10 }, source: "Базовая книга", description: "<p>Наконечник смазан пахучей смесью, которую легко учуять при выслеживании по запаху.</p><p>Пока боеприпас остаётся в теле цели, выслеживание по запаху не требует проверки, если следу менее 12 часов. Извлечение боеприпаса прекращает эффект.</p>" } }
 );
 
 const rows = [
@@ -96,7 +96,7 @@ export const EXPERIMENTAL_RECIPES = rows.map(([id, dc, investment, components, q
   return { id: `${formula ? "formula" : "diagram"}.${id}`, documentId: `exrc${String(index + 1).padStart(12, "0")}`, type: "recipe", source: "recipes",
     name: `${formula ? "Формула" : "Чертёж"}: ${result.name}${quantity > 1 ? ` ×${quantity}` : ""}`,
     flags: { [SYSTEM_ID]: { priceUnavailable: true, exactComponents: true } },
-    system: { price: 0, source: "Базовая книга, стр. 255", description: `<p>Результат — ${result.name}${quantity > 1 ? ` (${quantity} шт.)` : ""}. ${RESULT_SUMMARY[id]}.</p><p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>`,
+    system: { price: 0, source: "Базовая книга", description: `<p>Результат — ${result.name}${quantity > 1 ? ` (${quantity} шт.)` : ""}. ${RESULT_SUMMARY[id]}.</p><p>Время изготовления — полчаса. Компоненты указаны точно: замена на другие вещества не допускается. Цена самого рецепта в книге не указана.</p>`,
       recipe: { category: formula ? "formula" : "diagram", resultUuid: equipmentUuid(result.documentId), quantity, dc, time: 1800, investment, grade: "novice", forge: false,
         tools: [formula ? "gear.alchemy-tools" : "gear.crafting-tools"], components: components.split(" ").map(token => { const [id, count] = token.split(":"); return { uuid: materialUuid(id), substance: "", quantity: Number(count) }; }) } }
   };

@@ -7,7 +7,7 @@
     {{else}}<p>Мастер может начать дуэль с выделенными на сцене участниками.</p>{{/if}}
   </div>{{/if}}
   <div class="witcher-attack-options">
-    <label>Модификатор<input type="number" data-combat-option="modifier" value="{{combat.modifier}}" min="-100" max="100" step="1" data-tooltip="Малый 1, средний 3, большой 5 (стр. 177)"></label>
+    <label>Модификатор<input type="number" data-combat-option="modifier" value="{{combat.modifier}}" min="-100" max="100" step="1" data-tooltip="Малый 1, средний 3, большой 5"></label>
     <label>Пытки<select data-combat-option="torture">{{#each combat.duel.torture}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
     <label>Подкуп, крон<input type="number" data-combat-option="crowns" value="{{combat.duel.crowns}}" min="50" step="50"></label>
   </div>

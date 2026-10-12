@@ -96,7 +96,7 @@ test("pp.13–19 profiles reproduce all printed attributes, derived resources an
   assert.equal(packs.pregens.length, 8);
   for (const [id, page, attributes, resources, ranks] of printedProfiles) {
     const actor = hero(id), metadata = actor.flags[SYSTEM_ID].pregen;
-    assert.equal(metadata.source, `Базовая книга, стр. ${page}`);
+    assert.equal(metadata.source, "Базовая книга");
     const stats = deriveStatistics(actor.system);
     assert.deepEqual(Object.values(stats.effective), attributes, actor.name);
     assert.deepEqual([stats.healthMax,stats.staminaMax,stats.stun,stats.recovery,stats.run,stats.leap,stats.carryMax,stats.vigor], resources, actor.name);

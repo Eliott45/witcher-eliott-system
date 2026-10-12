@@ -14,7 +14,7 @@ const icon=type=>`systems/witcher-eliott-system/assets/icons/${type==="mount"?"h
 export const CORE_TRANSPORT=rows.map(([id,name,type,athletics,handling,speed,hp,capacity,price,speedModifier=0],i)=>({
   id:`transport.${id}`,documentId:`trns${String(i+1).padStart(12,"0")}`,name,type:"equipment",source:"transport",img:icon(type),
   system:{kind:"transport",quantity:1,weight:0,capacity,price,transport:{type,athletics,handling,speed,speedModifier,health:{value:hp,max:hp},mountId:""},
-    source:"Базовая книга, стр. 91",description:`<p>${type==="mount"?"Верховое или вьючное животное.":type==="wagon"?"Для движения необходимо запрячь животное.":"Водный транспорт."} Грузоподъёмность — ${capacity} кг.</p>`}
+    source:"Базовая книга",description:`<p>${type==="mount"?"Верховое или вьючное животное.":type==="wagon"?"Для движения необходимо запрячь животное.":"Водный транспорт."} Грузоподъёмность — ${capacity} кг.</p>`}
 }));
 // TODO: object size is not modeled yet; the book small/medium limits remain descriptive.
 const tackRows=[
@@ -31,5 +31,5 @@ const tackRows=[
 export const CORE_TACK=tackRows.map(([id,name,slot,weight,price,rarity,properties,tack={},capacity=0],i)=>({
  id:`tack.${id}`,documentId:`tack${String(i+1).padStart(12,"0")}`,name,type:"equipment",source:"tack",
  img:`systems/witcher-eliott-system/assets/icons/${slot==="barding"?"armor":slot==="bags"?"saddlebags":"saddle"}.svg`,
- system:{kind:slot==="bags"?"container":"tack",quantity:1,weight,price,rarity,capacity,tack:{slot,...tack},properties,source:"Базовая книга, стр. 91",description:`<p>${properties}</p>`}
+ system:{kind:slot==="bags"?"container":"tack",quantity:1,weight,price,rarity,capacity,tack:{slot,...tack},properties,source:"Базовая книга",description:`<p>${properties}</p>`}
 }));

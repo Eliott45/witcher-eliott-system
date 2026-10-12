@@ -1,7 +1,7 @@
 import { weaponRecord } from "./equipment-records.mjs";
 import { AMMUNITION_ICON } from "./core-ammunition.mjs";
 
-const source = "Базовая книга, стр. 83–84 — вооружение Старших Народов";
+const source = "Базовая книга";
 const weapons = [
   ["elven-messer","Эльфский мессер","swordsmanship","К/Р",2,"3d6+4",15,1,0,"large",2,2,595],
   ["vrihedd-blade","Клинок бригады «Врихедд»","swordsmanship","К/Р",3,"4d6+4",15,1,0,"large",0,2.5,745,"Кровопускающее (25%)"],

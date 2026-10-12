@@ -332,7 +332,7 @@ export const PROFESSION_FIXED_GEAR = {
   witcher: [item("gear.witcher-medallion", 1, { equipped: true }), item("weapon.witcher-steel-sword"), item("weapon.witcher-silver-sword")],
   merchant: [item("transport.mule"), item("transport.cart", 1, { cart: true })]
 };
-export const PROFESSION_FIXED_NOTES = { merchant: "Повозка полна обычных и повседневных товаров на 1000 крон (стр. 46)." };
+export const PROFESSION_FIXED_NOTES = { merchant: "Повозка полна обычных и повседневных товаров на 1000 крон." };
 /** The witcher also chooses formulas: two elixirs, two oils and a decoction. */
 export const WITCHER_FORMULAS = [
   { key: "elixir", name: "Формулы эликсиров", count: 2, prefix: "formula.potion." },

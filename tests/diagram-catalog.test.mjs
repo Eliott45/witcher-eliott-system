@@ -54,7 +54,7 @@ test("ammo matches the printed DC, duration, supplement, price, batch size and m
   for (const [id, page, dc, minutes, investment, price, quantity, grade, materials] of rows) {
     const item = diagram(`ammunition.${id}`), recipe = item.system.recipe;
     assert.deepEqual([recipe.dc, recipe.time, recipe.investment, item.system.price, recipe.quantity, recipe.grade], [dc, minutes * 60, investment, price, quantity, grade], id);
-    assert.equal(item.system.source, `Базовая книга, стр. ${page}`);
+    assert.equal(item.system.source, "Базовая книга");
     assert.deepEqual(Object.fromEntries(recipe.components.map(row => [row.uuid, row.quantity])), Object.fromEntries(Object.entries(materials).map(([id, quantity]) => [materialUuid(id), quantity])));
     assert.ok(recipe.components.every(row => row.substance === ""));
     assert.equal(recipe.forge, true);
@@ -83,7 +83,7 @@ test("Elder Folk master/grandmaster rows retain printed hours and prices, includ
   for (const [page, id, dc, hours, investment, price] of rows) {
     const item = diagram(id), recipe = item.system.recipe;
     assert.deepEqual([recipe.dc, recipe.time, recipe.investment, item.system.price, recipe.quantity], [dc, hours * 3600, investment, price, 1], id);
-    assert.equal(item.system.source, `Базовая книга, стр. ${page}`);
+    assert.equal(item.system.source, "Базовая книга");
     assert.equal(recipe.grade, page === 137 || (page === 138 && dc >= 24) ? "grandmaster" : "master");
   }
   assert.equal(diagram("armor.halfling-doublet").system.recipe.forge, false);

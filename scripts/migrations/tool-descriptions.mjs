@@ -6,7 +6,7 @@ export function toolDescriptionUpdate(item) {
   if(item.type!=="equipment" || !entry)return {};
   const content=toolContent(item.system.ruleId), update={};
   const plain=String(item.system.description??"").replace(/<[^>]*>/g,"").trim();
-  if(!plain || [TOOL_SOURCE,LEGACY_TOOL_SOURCE].includes(plain)) {
+  if(!plain || [TOOL_SOURCE,LEGACY_TOOL_SOURCE,"Базовая книга, стр. 92"].includes(plain)) {
     update["system.description"]=content.description;
     // Legacy kits all inherited the default Large concealment rather than the book table.
     if(!item.system.concealment || item.system.concealment==="large")update["system.concealment"]=content.concealment;

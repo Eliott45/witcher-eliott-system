@@ -23,7 +23,7 @@ export function pregenSources(packs) {
   return [{ _id: "pregenGeralt0001", name, type: "character", img: "icons/svg/mystery-man.svg", ownership: { default: 2 },
     prototypeToken: { name, actorLink: true, disposition: 1, texture: { src: "icons/svg/mystery-man.svg" },
       sight: { enabled: true, angle: VISION_ANGLE }, bar1: { attribute: "health" }, bar2: { attribute: "stamina" } },
-    flags: { [SYSTEM_ID]: { pregen: { id: "geralt-of-rivia", source: "Базовая книга, стр. 12", revision: 1 } } },
+    flags: { [SYSTEM_ID]: { pregen: { id: "geralt-of-rivia", source: "Базовая книга", revision: 1 } } },
     system: {
       details: { race: "witcher", profession: "witcher", gender: "Мужской" },
       // Printed values already include racial modifiers: REF +1, DEX +1, EMP −4.
@@ -33,13 +33,13 @@ export function pregenSources(packs) {
         wildernessSurvival: 9, swordsmanship: 11, athletics: 10, smallBlades: 9, melee: 7, deduction: 8,
         crossbow: 6, stealth: 8, intimidation: 9, physique: 6, resistCoercion: 8, resistMagic: 6, endurance: 10 },
       languages: [{ id: "language.common", name: "Всеобщий", level: 8 }],
-      lifepath: { witcher: { school: "wolf", notes: "Ведьмак школы Волка, воспитанный в Каэр Морхене. Отдельные броски тренировок и десятилетий на стр. 12 не заданы и оставлены незаполненными." } },
+      lifepath: { witcher: { school: "wolf", notes: "Ведьмак школы Волка, воспитанный в Каэр Морхене. Отдельные броски тренировок и десятилетий в книге не заданы и оставлены незаполненными." } },
       biography: {
         appearance: "Белые волосы, ведьмачьи глаза, шрамы. За спиной стальной и серебряный мечи; на шее медальон школы Волка.",
         backstory: "Геральт из Ривии, Белый Волк — знаменитый ведьмак и охотник на чудовищ. Участник событий в Вызиме и Лок Муинне. В момент, описанный базовой книгой, путешествует по Северу в поисках Йеннифэр и Цири.",
         allies: "Йеннифэр из Венгерберга; Цири; ведьмаки Каэр Морхена.",
-        sessionNotes: "Преген из базовой книги, стр. 12. Максимум ПЗ 55 = 40 от ТЕЛ/ВОЛИ + 15 от надетых доспехов Ворона. Предел магии 7 записан по блоку персонажа (Магический источник 10). Возраст, кроны, опыт и репутация в блоке не указаны. Всеобщий 8 — родной язык по общему правилу стр. 49. Портрет можно заменить в листе." },
-      notes: "Источник: базовая книга, стр. 12. Снаряжение: стр. 247–248, 254–255, 258, 263–264; официальная errata R. Talsorian v4."
+        sessionNotes: "Преген из базовой книги. Максимум ПЗ 55 = 40 от ТЕЛ/ВОЛИ + 15 от надетых доспехов Ворона. Предел магии 7 записан по блоку персонажа (Магический источник 10). Возраст, кроны, опыт и репутация в блоке не указаны. Всеобщий 8 — родной язык по общему правилу. Портрет можно заменить в листе." },
+      notes: "Источник: Базовая книга."
     },
     items: [
       ...Object.entries(ranks).map(([id, level]) => take("abilities", `profession.witcher.${id}`, { level })),

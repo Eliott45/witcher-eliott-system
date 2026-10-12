@@ -2,7 +2,7 @@ import { weaponRecord } from "./equipment-records.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 
 const relic = (documentId, row, page, dc, legend, rules, wearerBonuses = []) => {
-  const item = weaponRecord(documentId, row, `Базовая книга, стр. ${page}; официальная errata v4`);
+  const item = weaponRecord(documentId, row, "Базовая книга");
   item.flags = { [SYSTEM_ID]: { priceUnavailable: true } };
   item.system.description = `<p>${legend}</p><p>Легенду можно вспомнить проверкой Образования СЛ ${dc}.</p><p>${rules}</p>`;
   if (wearerBonuses.length) item.system.wearerBonuses = wearerBonuses;

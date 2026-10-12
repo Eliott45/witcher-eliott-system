@@ -131,7 +131,7 @@ export const RECIPES = diagrams.map(([id,dc,minutes,price,components,grade="novi
  const materials = components.split(" ").map(token=>{const [material,q]=token.split(":"); return {uuid:materialUuid(material),substance:"",quantity:Number(q)};});
  const forge = components.split(" ").some(token=>/^(iron|steel|dark-iron|dark-steel|silver|gold|dimeritium|mahakaman-steel|mahakaman-dimeritium|tretogor-steel|meteorite):/.test(token));
  return {id:`diagram.${id}`,documentId:`recp${String(i+1).padStart(12,"0")}`,name:`Чертёж: ${result.name}`,type:"recipe",source:"recipes",
-  ...(price === null ? { flags: { "witcher-eliott-system": { priceUnavailable: true } } } : {}),system:{...(DIAGRAM_NOTES[id] ? { description: `<p>${DIAGRAM_NOTES[id]}</p>` } : {}),price:price??0,source:page?`Базовая книга, стр. ${page}`:"Базовая книга, стр. 130–135 / 139; errata v4",recipe:{category:"diagram",resultUuid:equipmentUuid(result.documentId),quantity,dc,time:minutes*60,investment:DIAGRAM_INVESTMENTS[id],grade,forge,tools:["gear.crafting-tools"],components:materials}}};
+  ...(price === null ? { flags: { "witcher-eliott-system": { priceUnavailable: true } } } : {}),system:{...(DIAGRAM_NOTES[id] ? { description: `<p>${DIAGRAM_NOTES[id]}</p>` } : {}),price:price??0,source:"Базовая книга",recipe:{category:"diagram",resultUuid:equipmentUuid(result.documentId),quantity,dc,time:minutes*60,investment:DIAGRAM_INVESTMENTS[id],grade,forge,tools:["gear.crafting-tools"],components:materials}}};
 });
 RECIPES.push(...ALCHEMY.map((result,i)=>{
  const recipe = result.formula;

@@ -8,6 +8,7 @@ import { ALCHEMY } from "./workshop-alchemy.mjs";
 import { CORE_AMMUNITION } from "./core-ammunition.mjs";
 import { ELDER_EQUIPMENT } from "./elder-equipment.mjs";
 import { CORE_MAGIC } from "./spells.mjs";
+import { bookSource } from "./book-references.mjs";
 
 const asset=name=>`systems/witcher-eliott-system/assets/creatures/${name}.svg`;
 const attributes=values=>Object.fromEntries(["intelligence","reflex","dexterity","body","speed","empathy","craft","will","luck"].map((key,i)=>[key,values[i]]));
@@ -23,17 +24,17 @@ const base=(id,name,portrait,values,pool)=>({_id:id,name,type:"npc",img:asset(po
 export function bestiarySources() {
   const bandit=base("bestiaryBandit01","Бандит","bandit",[3,6,5,5,4,3,4,4,0],20);
   bandit.system.skills={swordsmanship:6,crossbow:4,smallBlades:5,brawling:6,dodgeEscape:4,athletics:4,awareness:6,stealth:3,wildernessSurvival:5,resistMagic:4,resistCoercion:5,endurance:5,courage:7};
-  bandit.system.creature={category:"humanoid",difficulty:"Простые / обычные",reward:10,size:"Обычный человеческий рост",weight:"Обычный человеческий вес",habitat:"Тракты и окрестности городов",intellect:"Человеческий",group:"Банда из 3–15 разбойников",source:"Базовая книга, стр. 270–271; официальная errata (Борьба +6, точность арбалета +1)",
+  bandit.system.creature={category:"humanoid",difficulty:"Простые / обычные",reward:10,size:"Обычный человеческий рост",weight:"Обычный человеческий вес",habitat:"Тракты и окрестности городов",intellect:"Человеческий",group:"Банда из 3–15 разбойников",source:"Базовая книга",
     description:"Разбойники, дезертиры и наёмники без нанимателя. Опасны числом и подготовленной засадой; способны договариваться и сдаваться.",
     tactics:"Бойцы с мечами давят в ближнем бою, арбалетчики стреляют из укрытия. Потеря товарищей может спровоцировать ярость; тяжёлые потери обычно заставляют отступить. СА каждого оружия — 1. Для смены оружия выберите его хват.",
     lore:[{name:"Общее мнение",skill:"education",dc:8,text:"Война и голод увеличивают число разбойников. Они подстерегают путников и выбирают удобные места для засады."},{name:"Академические знания",skill:"education",dc:10,text:"Большинство — бывшие солдаты и дезертиры. Обычно ими движут безопасность и деньги; переговоры часто возможны."}],
     loot:[{name:"Кроны",formula:"3d10",currency:true},{name:"Обычные предметы",formula:"1d6"}]};
-  bandit.items=[gear("weapon.iron-longsword",{damageIncludesBody:true}),gear("weapon.dagger",{damage:"1d6",equipped:false,damageIncludesBody:true,source:"Базовая книга, стр. 271: урон кинжала в блоке разбойника 1d6"}),gear("weapon.hand-crossbow",{equipped:false,damageIncludesBody:true}),
+  bandit.items=[gear("weapon.iron-longsword",{damageIncludesBody:true}),gear("weapon.dagger",{damage:"1d6",equipped:false,damageIncludesBody:true,source:"Базовая книга"}),gear("weapon.hand-crossbow",{equipped:false,damageIncludesBody:true}),
     gear("armor.head.2"),gear("armor.torso.2"),gear("armor.legs.2"),
     {...gear("ammunition.standard",{quantity:20,equipped:false}),_id:"banditBolts00001",name:"Болты"},...traits(["hanged-man-venom"])];
   const drowner=base("bestiaryDrowner1","Утопец","drowner",[1,7,7,6,6,1,1,4,0],25);
   drowner.system.skills={melee:6,brawling:6,dodgeEscape:5,athletics:6,awareness:8,stealth:5,wildernessSurvival:6,resistMagic:4,endurance:6,courage:8};
-  drowner.system.creature={category:"necrophage",difficulty:"Простые / обычные",reward:10,size:"Около человеческого роста",weight:"Около человеческого веса",habitat:"Берега рек, озёр и морей",intellect:"Как у рыбы",group:"Стая из 3–6 утопцев",source:"Базовая книга, стр. 276–277",
+  drowner.system.creature={category:"necrophage",difficulty:"Простые / обычные",reward:10,size:"Около человеческого роста",weight:"Около человеческого веса",habitat:"Берега рек, озёр и морей",intellect:"Как у рыбы",group:"Стая из 3–6 утопцев",source:"Базовая книга",
     description:"Земноводный трупоед, появившийся после Сопряжения сфер. Название обманчиво: это не оживший утопленник. Стаи скрываются у воды и нападают на одиноких путников.",
     tactics:"Окружает добычу вместе со стаей, набрасывается и рвёт когтями. Пока не почуял кровь, может отвлечься на блестящую вещь. Горящий утопец продолжает бой, пока ПЗ не опустятся ниже 10.",
     lore:[{name:"Общее мнение",skill:"education",dc:14,text:"Селяне считают утопцев утонувшими злодеями. Их встречают у воды, и лучше не приближаться к стае в одиночку."},{name:"Знания охотника",skill:"monsterLore",dc:10,text:"Это отдельный вид чудовищ с примитивным разумом. Не тонут, не боятся ядов и магии мыслей. Слабости — огонь и масло против трупоедов."}],
@@ -42,7 +43,7 @@ export function bestiarySources() {
     const material=MATERIALS.find(entry=>entry.id===`material.${id}`);
     return {id:`drownerHarvest${index}`,uuid:`Compendium.witcher-eliott-system.equipment.Item.${material.documentId}`,quantity:index===2?0:1,formula:index===2?"floor(1d6 / 2)":"",skill:"",dc:0,attempted:false};
   });
-  drowner.items=[{_id:"drownerClaws0001",name:"Когти",type:"weapon",img:asset("claws"),system:{category:"melee",skill:"melee",damage:"3d6",damageType:"Р",natural:true,damageIncludesBody:true,equipped:true,attackRate:1,description:"<p>Естественное оружие утопца. СА 1; эффектов нет.</p>",source:"Базовая книга, стр. 277"}},...traits(["wild","poison-immunity","amphibian","mindless","fire-vulnerable","necrophage-oil","monster-resistance"])];
+  drowner.items=[{_id:"drownerClaws0001",name:"Когти",type:"weapon",img:asset("claws"),system:{category:"melee",skill:"melee",damage:"3d6",damageType:"Р",natural:true,damageIncludesBody:true,equipped:true,attackRate:1,description:"<p>Естественное оружие утопца. СА 1; эффектов нет.</p>",source:"Базовая книга"}},...traits(["wild","poison-immunity","amphibian","mindless","fire-vulnerable","necrophage-oil","monster-resistance"])];
   return [bandit,drowner,...coreBestiarySources()];
 }
 
@@ -87,7 +88,7 @@ function creatureWeapon(weapon, id, page, book = null) {
     ...(weapon.natural ? { damageType: weapon.damageType ?? NATURAL_DAMAGE_TYPES[weapon.name] ?? "Д" } : {}),
     equipped: true, attackRate: weapon.rate ?? 1, accuracy: weapon.accuracy ?? source?.system.accuracy ?? 0, range: weapon.range ?? source?.system.range ?? 0,
     ...(weapon.range !== undefined ? { rangeBodyMultiplier: 0 } : {}),
-    hands: weapon.hands ?? source?.system.hands ?? 1, quantity: 1, carried: true, source: book ? `${book}, стр. ${page}` : `Базовая книга, стр. ${page + 1}` };
+    hands: weapon.hands ?? source?.system.hands ?? 1, quantity: 1, carried: true, source: book || "Базовая книга" };
   // Catalog properties keep reach, damage types and durability; the statblock supplies its own damage and rate.
   const properties = [...new Set([source?.system.properties, weapon.properties].filter(Boolean).flatMap(text => text.split(/;\s*/u)))].join("; ");
   system.properties = properties;
@@ -113,13 +114,12 @@ function coreCreature(entry, index) {
       formula: fixed ? "" : formula.replace("/", " / "), skill: "", dc: 0, attempted: false });
   }
   actor.system.creature = { category: entry.category, difficulty: entry.difficulty, reward: entry.reward, size: entry.size, weight: entry.weight, habitat: entry.habitat,
-    intellect: entry.intellect, group: entry.group, source: entry.book ? `${entry.book}, стр. ${entry.page}` : `Базовая книга, стр. ${entry.page}–${entry.page + 1}`, description: entry.description, tactics: entry.tactics,
+    intellect: entry.intellect, group: entry.group, source: entry.book || "Базовая книга", description: entry.description, tactics: entry.tactics,
     naturalArmor: entry.armor ?? 0, resistances: entry.resistances ?? "", healthMax: entry.hp, staminaMax: entry.sta, hasTailOrWings: Boolean(entry.hasTailOrWings),
     runBase: entry.runBase ?? 0, recoveryBase: entry.recoveryBase ?? 0,
     sizeClass: entry.size_class ?? "medium", lore: (entry.lore ?? []).map(([name, skill, dc, text]) => ({ name, skill, dc, text })), loot, lootGenerated: false };
   actor.system.harvest = harvest;
   if (armor.length) actor.system.creature.naturalArmor = 0;
-  if (entry.id === "warg") actor.system.creature.source = "Базовая книга, стр. 287";
   const ability = (ruleId, name, description, flags = {}) => ({ _id: itemId(), name, type: "ability", img: "icons/svg/aura.svg", system: { ruleId, description: `<p>${description}</p>` }, flags });
   const items = [];
   for (const weapon of entry.weapons ?? []) {
@@ -161,5 +161,5 @@ export function bestiaryPreset(actor) {
   const origin = actor._stats?.compendiumSource || actor.flags?.core?.sourceId || "";
   const imported = origin.startsWith(prefix) ? sources.find(source => source._id === origin.slice(prefix.length)) : null;
   return imported ?? sources.find(source => source._id === (actor.id ?? actor._id))
-    ?? sources.find(source => source.name === actor.name && source.system.creature.source === actor.system?.creature?.source) ?? null;
+    ?? sources.find(source => source.name === actor.name && source.system.creature.source === bookSource(actor.system?.creature?.source)) ?? null;
 }

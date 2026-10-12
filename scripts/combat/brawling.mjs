@@ -90,7 +90,7 @@ export async function rollFeint(actor) {
   if (!success) return false;
   await actor.deleteEmbeddedDocuments("ActiveEffect", actor.effects.filter(effect => flagsOf(effect)[FEINT]).map(effect => effect.id));
   await actor.createEmbeddedDocuments("ActiveEffect", [{ name: "Финт удался", img: "icons/svg/mystery-man.svg", type: "base", system: {},
-    description: "<p>+3 к следующему удару быстрой атаки (стр. 164). Снимается после атаки.</p>",
+    description: "<p>+3 к следующему удару быстрой атаки. Снимается после атаки.</p>",
     flags: { [SYSTEM_ID]: { [FEINT]: true, condition: { key: FEINT, modifiers: [{ target: "combat.attack", value: 3 }] } } } }]);
   return true;
 }

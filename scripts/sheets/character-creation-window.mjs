@@ -321,7 +321,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
   static #pickProfession(_event, target) {
     const id = target.dataset.profession;
     if (!professionAllowed(this.draft.race, id)) return ui.notifications.warn(this.draft.race === "witcher" || id === "witcher"
-      ? "Раса и профессия ведьмака неразделимы (стр. 37)." : "Магами и жрецами могут быть только люди и эльфы (стр. 37).");
+      ? "Раса и профессия ведьмака неразделимы." : "Магами и жрецами могут быть только люди и эльфы.");
     if (this.draft.profession !== id) {
       this.draft.profession = id;
       this.draft.skills = { ...this.draft.skills, ranks: {}, combat: [], languages: [] };

@@ -147,7 +147,8 @@ function applyUpdate(item, update) {
 test("version-sixteen worlds append the missing p. 132–138 diagrams once and repair only stock helmet components", async () => {
   const state = migrationFixture({ startVersion: 16 });
   for (const item of sources.filter(item => CORE_AMMUNITION.some(entry => entry.id === item.system.ruleId))) state.index.set(item._id, structuredClone(item));
-  const additions = diagrams.filter(item => /^Базовая книга, стр\. (132|136|137|138)$/.test(item.system.source));
+  const additions = diagrams.filter(item => ["diagram.ammunition.armor-piercing", "diagram.ammunition.broadhead"].includes(item.system.ruleId)
+    || ELDER_EQUIPMENT.some(entry => item.system.ruleId === `diagram.${entry.id}`));
   assert.equal(additions.length, 32);
   for (const item of additions) state.index.delete(item._id);
   const custom = structuredClone(additions.find(item => item.system.ruleId === "diagram.ammunition.armor-piercing"));
@@ -187,7 +188,7 @@ test("version-sixteen worlds append the missing p. 132–138 diagrams once and r
   assert.deepEqual(customized, expectedCustomized);
   for (const item of [helmet, world, owned.items[0], token.items[0], pregen.items[0]]) {
     assert.deepEqual(item.system.recipe.components, corrected);
-    assert.equal(item.system.source, "Базовая книга, стр. 135");
+    assert.equal(item.system.source, "Базовая книга");
     assert.equal(item.name, "Личный чертёж шлема");
     assert.equal(item.system.recipe.memorized, true);
     assert.equal(item.system.recipe.investment, 999);

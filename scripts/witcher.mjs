@@ -97,6 +97,7 @@ import { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources, ap
 import { prepareDeathRound, applyDeathRound, syncExistingDeathStates } from "./combat/death-state.mjs";
 import { preventIncapacitatedMovement, preventIncapacitatedPositionUpdate } from "./combat/condition-rules.mjs";
 import { syncExistingExhaustion } from "./combat/exhaustion.mjs";
+import { migrateBookReferences, registerBookReferencesMigration } from "./migrations/book-references.mjs";
 
 Hooks.once("init", async () => {
   registerSystemSettings();
@@ -167,6 +168,7 @@ Hooks.once("init", async () => {
   registerSpellContentMigration();
   registerBestiaryMigration();
   registerPregenMigration();
+  registerBookReferencesMigration();
   registerSheetPreferences();
   for (const type of COMBAT_ACTOR_TYPES) {
     CONFIG.Actor.dataModels[type] = WitcherActorData;
@@ -249,8 +251,8 @@ Hooks.once("ready", async () => {
     console.error(`${SYSTEM_ID} | Could not update vision defaults`, error);
     ui.notifications.error(game.i18n.localize("WITCHER.Token.MigrationFailed"));
   });
-  migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).then(migrateBestiaryAutomation).then(migrateBestiaryJournalCreatures).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
-  migrateSpellContent().catch(error=>{
+  await migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).then(migrateBestiaryAutomation).then(migrateBestiaryJournalCreatures).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
+  await migrateSpellContent().catch(error=>{
     console.error(`${SYSTEM_ID} | Could not update magic content`,error);
     ui.notifications.error("Не удалось обновить каталог магии. Подробности в консоли.");
   });
@@ -261,6 +263,10 @@ Hooks.once("ready", async () => {
   await migratePregenContent().catch(error => {
     console.error(`${SYSTEM_ID} | Could not update pregens`, error);
     ui.notifications.error("Не удалось добавить прегены. Подробности в консоли.");
+  });
+  await migrateBookReferences().catch(error => {
+    console.error(`${SYSTEM_ID} | Book references`, error);
+    ui.notifications.error("Не удалось убрать номера страниц из описаний. Обновление повторится при следующем входе мастера.");
   });
   syncExistingDeathStates().catch(reportEffectError);
   syncExistingExhaustion().catch(reportEffectError);

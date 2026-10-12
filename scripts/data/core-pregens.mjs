@@ -120,7 +120,7 @@ export function additionalPregenSources({ take, gear }) {
         gear("armor-upgrade.steel"), gear("gear.belt-pouch"), gear("alchemy.chloroform", 2), gear("gear.rope"), gear("gear.grapple"),
         gear("gear.flint"), gear("gear.waterskin"), gear("gear.rations"), named("gear.gwent-deck", "Колода для гвинта (Королевства Севера)"),
         gear("gear.stakes"), gear("gear.bedroll")],
-      notes: "Стальное усиление брони лежит в инвентаре: на стр. 17 не указано, на какие части брони оно установлено. Колышки (×5) перенесены одним набором из пяти.",
+      notes: "Стальное усиление брони лежит в инвентаре: в книге не указано, на какие части брони оно установлено. Колышки (×5) перенесены одним набором из пяти.",
       appearance: "Темерский военный в кожаной куртке и головной повязке.",
       backstory: "Командир «Синих полосок», верный королю Фольтесту и Темерии. Опытный разведчик и боец, участвовал в расследовании убийств королей. После гибели своего отряда продолжает бороться за будущее страны."
     },
@@ -175,12 +175,12 @@ export function additionalPregenSources({ take, gear }) {
     return { _id: profile.documentId, name: profile.name, type: "character", img: "icons/svg/mystery-man.svg", sort: profile.page * 100000, ownership: { default: 2 },
       prototypeToken: { name: profile.name, actorLink: true, disposition: 1, texture: { src: "icons/svg/mystery-man.svg" },
         sight: { enabled: true, angle: VISION_ANGLE }, bar1: { attribute: "health" }, bar2: { attribute: "stamina" } },
-      flags: { [SYSTEM_ID]: { pregen: { id: profile.id, source: `Базовая книга, стр. ${profile.page}`, revision: profile.revision ?? 1, missing: structuredClone(missing) } } },
+      flags: { [SYSTEM_ID]: { pregen: { id: profile.id, source: "Базовая книга", revision: profile.revision ?? 1, missing: structuredClone(missing) } } },
       system: { details, attributes: baseValues(Object.fromEntries(ATTRIBUTE_KEYS.map((key, index) => [key, profile.attributes[index]])), modifiers, "attributes"),
         health: { value: profile.health, max: profile.health }, stamina: { value: profile.stamina, max: profile.stamina }, vigor: profile.vigor,
         skills: baseValues(profile.skills, modifiers, "skills"), languages: structuredClone(profile.languages ?? [common]),
         ...(profile.school ? { lifepath: { witcher: { school: profile.school } } } : {}),
-        biography: { appearance: profile.appearance, backstory: profile.backstory, sessionNotes: notes }, notes: `Базовая книга, стр. ${profile.page}.` },
+        biography: { appearance: profile.appearance, backstory: profile.backstory, sessionNotes: notes }, notes: "Базовая книга" },
       items: [...abilityRanks(profile.profession, profile.ranks), ...(profile.magic ?? []).map(id => take("spells", id)), ...profile.items], effects: [] };
   });
 }

@@ -80,14 +80,14 @@ export async function consumeMutagen(item) {
   const actor = item.actor;
   if (!actor?.isOwner) return;
   if (item.system.kind !== "mutagen" || !available(item)) throw new Error("Нужен мутаген при себе.");
-  if ((actor.system.mutations ?? []).length >= 2) throw new Error("Уже принято два мутагена: больше нельзя (стр. 251).");
+  if ((actor.system.mutations ?? []).length >= 2) throw new Error("Уже принято два мутагена: больше нельзя.");
   const witcher = actor.system.details.race === "witcher", prepared = item.system.mutagen.prepared, dc = item.system.mutagen.dc;
   const effect = String(item.system.properties ?? "").replace(/\.+$/u, "");
   const intro = `<p><b>${esc(item.name)}</b>: ${esc(effect)}.</p><p>Эффект постоянный, удалить мутаген нельзя. Принято: ${(actor.system.mutations ?? []).length} / 2.</p>`;
   const anyMage = mages().length > 0;
   const content = witcher
     ? `${intro}${prepared ? "<p>Порция уже подготовлена: проверка не нужна.</p>" : `<p>Подготовка — 1 час, затем Алхимия СЛ ${dc}. При неудаче порция пропадает.</p><label>Алхимию выполняет<select name="helper">${options(owned(), actor.id)}</select></label>`}<label><input type="checkbox" name="time"> Час подготовки прошёл, инструменты алхимика под рукой</label>`
-    : `${intro}<p>${esc(actor.name)} не ведьмак (стр. 251, «Мутирование»).</p>`
+    : `${intro}<p>${esc(actor.name)} не ведьмак («Мутирование»).</p>`
       + `<label><input type="radio" name="mode" value="mage" ${anyMage ? "checked" : "disabled"}> Мутирует маг (Мутация СЛ ${mutationDC(actor)}; полный день и вся Выносливость мага)</label>`
       + `<label>Маг<select name="mage" ${anyMage ? "" : "disabled"}>${options(mages(), mages()[0]?.id)}</select></label>`
       + `<label><input type="radio" name="mode" value="eat" ${anyMage ? "" : "checked"}> Съесть без мага: отравление, затем Стойкость СЛ 18 или Первая помощь СЛ 18</label>`
@@ -136,7 +136,7 @@ export async function consumeMutagen(item) {
 export const mutagenFor = npc => npc?.type === "npc" ? MUTAGENS.find(entry => (npc.name ?? "").toLocaleLowerCase("ru").includes(entry.system.mutagen.monster.toLocaleLowerCase("ru"))) ?? null : null;
 export async function harvestMutagen(npc) {
   const entry = mutagenFor(npc);
-  if (!npc?.isOwner || !entry) throw new Error("У этого существа нет мутагена из таблицы (стр. 251).");
+  if (!npc?.isOwner || !entry) throw new Error("У этого существа нет мутагена из таблицы.");
   if (!hasStatus(npc, DEAD) && npc.system.health.value > 0) throw new Error("Мутаген вырезают после убийства чудовища.");
   if (npc.flags?.[SYSTEM_ID]?.mutagenHarvested) throw new Error("Попытка извлечь мутаген уже была.");
   const witchers = game.actors.filter(actor => actor.isOwner && actor.system.details?.profession === "witcher");

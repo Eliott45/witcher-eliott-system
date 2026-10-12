@@ -127,7 +127,7 @@ function magicEntry(row,documentId) {
     system:{ruleId:row.id,...(row.kind?{kind:row.kind}:{}),...(row.ritual?{ritual:row.ritual}:{}),...(row.hex?{hex:row.hex}:{}),tradition:row.tradition??"mage",deity:row.deity??"",costStep:row.costStep??1,costMax:row.costMax??0,costHint:row.costHint??"",description:`<p>${row.description}</p>`,grade:row.grade,element:row.element,
       cost:row.cost,variableCost:row.variableCost??row.id==="spell.dispel",range:{kind:rangeKind,value:typeof row.range==="number"?row.range:Number(String(row.range).replace(/^[a-z]+/i,""))||0},
       duration:{kind:durationKind,formula:["rounds","hours","days"].includes(durationKind)?row.duration.slice(1):"",maintenance:durationKind==="sustained"?Number(row.duration.slice(1)):0,...(row.maintenanceMode?{maintenanceMode:row.maintenanceMode}:{}),text:durationKind==="special"?row.duration:""},
-      defense:row.defense.split(","),target:[...(SPELL_TARGET_BY_ID[row.id]??[])],damage:row.damage??"",source:`Базовая книга, стр. ${row.page}; официальная errata`,page:row.page}};
+      defense:row.defense.split(","),target:[...(SPELL_TARGET_BY_ID[row.id]??[])],damage:row.damage??"",source:"Базовая книга",page:row.page}};
 }
 export const CORE_SPELLS=rows.map((row,index)=>magicEntry(row,`spel${String(index+1).padStart(12,"0")}`));
 export const CORE_INVOCATIONS=INVOCATION_ROWS.map((row,index)=>magicEntry(row,`invo${String(index+1).padStart(12,"0")}`));

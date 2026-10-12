@@ -1112,6 +1112,35 @@ for (const [collection, pack] of game.packs) {
 const referenceSheet = new WitcherItemSheet();
 referenceSheet.isEditable = false;
 const itemTemplate = handlebars.compile(await readFile(new URL("../templates/item-sheet.hbs", import.meta.url), "utf8"), { strict: true });
+const spellChoicePreviews = {};
+{
+  referenceSheet.item = [...documents.values()].find(item => item.system?.ruleId === "sign.aard");
+  referenceSheet.tabGroups.item = "details";
+  for (const editable of [true, false]) {
+    referenceSheet.isEditable = editable;
+    const context = await referenceSheet._prepareContext({}), html = itemTemplate(context);
+    spellChoicePreviews[editable ? "editable" : "readonly"] = html;
+    for (const field of ["target", "defense"]) {
+      const select = html.match(new RegExp(`<select name="system.${field}"[^>]*>[\\s\\S]*?</select>`))?.[0];
+      assert.ok(select); assert.match(select, /multiple size="8"/);
+      assert.equal(select.includes("disabled"), !editable);
+      assert.ok((select.match(/<option/g) ?? []).length >= 7);
+      assert.ok(select.includes('selected'));
+    }
+    assert.match(html, /name="system.source"[^>]*value="Базовая книга"/);
+    assert.doesNotMatch(html, /стр\.\s*\d/);
+  }
+  const { bookReferenceUpdate } = await import('../scripts/migrations/book-references.mjs');
+  const oldSpell = new foundry.documents.BaseItem({ name:'Старый Аард', type:'spell', system:{
+    source:'Базовая книга, стр. 114; официальная errata', description:'<p>Урон [[/r 2d6+4]] (стр. 114).</p>', target:['area'], defense:['dodge'] } });
+  oldSpell.updateSource(bookReferenceUpdate(oldSpell));
+  assert.equal(oldSpell.validationFailures.fields, null);
+  assert.equal(oldSpell.system.source, 'Базовая книга');
+  assert.equal(oldSpell.system.description, '<p>Урон [[/r 2d6+4]].</p>');
+  assert.deepEqual(oldSpell.system.target, ['area']); assert.deepEqual(oldSpell.system.defense, ['dodge']);
+  referenceSheet.tabGroups.item = 'description';
+  console.log('Spell editor: full multiple selections, read-only permissions and native source cleanup OK');
+}
 for (const [ruleId, dc, sp, zones] of [["armor.raven", 14, 12, "torso-legs"], ["armor.mountain-folk", 16, 24, "all"], ["armor.draug", 18, 36, "all"]]) {
   const relic = [...documents.values()].find(item => item.system?.ruleId === ruleId);
   assert.ok(relic, `${ruleId}: missing catalog armor`);

@@ -128,7 +128,7 @@ async function openEnvironmentDialog(scene = globalThis.canvas?.scene) {
   const content = `<div class="witcher-environment-form"><label>Освещение<select name="light">${options(LIGHT_LEVELS, current.light)}</select></label>
     <label>Местность<select name="terrain">${options(TERRAINS, current.terrain)}</select></label>
     <label class="checkbox"><input type="checkbox" name="heat" ${current.heat ? "checked" : ""}> Экстремальная жара</label>
-    <details><summary>Что это даёт (стр. 165)</summary><ul>${hints(LIGHT_LEVELS)}${hints(TERRAINS)}<li>${HEAT_HINT}</li></ul>
+    <details><summary>Что это даёт</summary><ul>${hints(LIGHT_LEVELS)}${hints(TERRAINS)}<li>${HEAT_HINT}</li></ul>
     <p>Исключения для отдельных токенов — состояния «Против солнца», «Освещён», «На суше», «В воде», «Под водой» (HUD токена).</p></details></div>`;
   const result = await foundry.applications.api.DialogV2.prompt({ window: { title: `Среда: ${scene.name}` }, position: { width: 480 }, content, rejectClose: false,
     ok: { label: "Сохранить", callback: (_event, button) => { const data = new FormData(button.form); return { light: data.get("light"), terrain: data.get("terrain"), heat: data.get("heat") === "on" }; } } });
@@ -160,11 +160,11 @@ export function registerEnvironment() {
   CONFIG.RegionBehavior.dataModels.environment = environmentBehaviorClass();
   CONFIG.RegionBehavior.typeLabels.environment = "Среда Ведьмака";
   CONFIG.RegionBehavior.typeIcons.environment = "fa-solid fa-snowflake";
-  CONFIG.RegionBehavior.typeHints = { ...CONFIG.RegionBehavior.typeHints, environment: "Освещение, местность (лёд и снег, болото, вода) или жара внутри региона (стр. 165). Пустое поле — как в сцене." };
+  CONFIG.RegionBehavior.typeHints = { ...CONFIG.RegionBehavior.typeHints, environment: "Освещение, местность (лёд и снег, болото, вода) или жара внутри региона. Пустое поле — как в сцене." };
   Hooks.on("getSceneControlButtons", controls => {
     const tokens = controls.tokens ?? controls.token;
     if (!tokens?.tools || !game.user.isGM) return;
-    tokens.tools.witcherEnvironment = { name: "witcherEnvironment", title: "Среда сцены (стр. 165)", icon: "fa-solid fa-cloud-sun", order: 90, button: true,
+    tokens.tools.witcherEnvironment = { name: "witcherEnvironment", title: "Среда сцены", icon: "fa-solid fa-cloud-sun", order: 90, button: true,
       onChange: () => openEnvironmentDialog().catch(error => ui.notifications.error(error.message)) };
   });
   // Statistics read the scene: refresh open sheets when the environment changes.

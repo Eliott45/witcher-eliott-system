@@ -6,7 +6,7 @@ import { CORE_CONTAINERS } from "./core-containers.mjs";
 import { CORE_AMMUNITION } from "./core-ammunition.mjs";
 import { rarity, weaponRecord } from "./equipment-records.mjs";
 import { ELDER_EQUIPMENT } from "./elder-equipment.mjs";
-const weapon = (n, row) => weaponRecord(`weap${String(n).padStart(12, "0")}`, row, "Базовая книга, стр. 73–74 / 80");
+const weapon = (n, row) => weaponRecord(`weap${String(n).padStart(12, "0")}`, row, "Базовая книга");
 export const CORE_WEAPONS = [
   ["iron-longsword", "Железный полуторный меч", "swordsmanship", "Р/К", 0,"e","2d6+2",10,2,0,0,"large",0,1.5,160],
   ["arming-sword", "Рыцарский меч", "swordsmanship", "Р/К", 0,"c","2d6+4",15,1,0,0,"large",0,2.5,270],
@@ -50,7 +50,7 @@ const shieldRows = [
   ["kaedwen-shield", "Каэдвенский щит",14,"r",1,0,2.5,400], ["kite-shield", "Стальной каплевидный щит",16,"c",0,0,3,400],
   ["pavise", "Павеза",20,"r",0,1,4,500], ["nilfgaard-pavise", "Нильфгаардская павеза",25,"u",1,1,5,600]
 ];
-CORE_WEAPONS.push(...shieldRows.map(([id,name,reliability,rare,slots,ev,weight,price], i) => weapon(101+i,[id,name,"melee","",0,rare,"0",reliability,1,0,0,"none",slots,weight,price,reliability >= 20 ? "Полное укрытие (стр. 80)" : "","shield",ev])));
+CORE_WEAPONS.push(...shieldRows.map(([id,name,reliability,rare,slots,ev,weight,price], i) => weapon(101+i,[id,name,"melee","",0,rare,"0",reliability,1,0,0,"none",slots,weight,price,reliability >= 20 ? "Полное укрытие" : "","shield",ev])));
 const armorRows = [
   ["head", "Капюшон вердэнского лучника",3,"c",1,0,0.5,100], ["head","Двуслойный капюшон",5,"r",1,0,1,175], ["head","Каркасный шлем с полумаской",8,"c",0,0,1,200],
   ["head","Кольчужный капюшон",12,"e",0,0,1.5,250], ["head","Усиленный капюшон",14,"c",0,0,2,250], ["head","Темерский армет",16,"r",1,0,1.5,475],
@@ -64,7 +64,7 @@ const armorRows = [
 ];
 export const CORE_ARMOR = armorRows.map(([zone,name,sp,rare,slots,encumbrance,weight,price], i) => ({ id: `armor.${zone}.${i % 9 + 1}`, documentId: `armo${String(i+1).padStart(12,"0")}`, name, type: "armor", source: "armor", system: {
   zone, armorClass: sp <= 8 ? "light" : sp <= 16 ? "medium" : "heavy", stoppingPower: { value: sp, max: sp }, rarity: rarity(rare), enhancementSlots: slots, encumbrance, weight, price,
-  properties: zone === "head" && sp >= 16 ? "Ограничение зрения при опущенном забрале" : "", source: "Базовая книга, стр. 79–80" } }));
+  properties: zone === "head" && sp >= 16 ? "Ограничение зрения при опущенном забрале" : "", source: "Базовая книга" } }));
 const gearRows = [
   ["alchemy-tools","Инструменты алхимика",3,80,"r","tool"], ["gem-amulet","Амулет с самоцветом",0.1,500,"u","tool","Фокусирующее (3)"],
   ["simple-amulet","Простой амулет",0.1,250,"u","tool","Фокусирующее (1)"], ["cooking-tools","Принадлежности для готовки",3,15,"e","tool"],
@@ -83,14 +83,14 @@ const gearRows = [
   ["wine","Вино",1,8], ["bag","Мешок",0.1,3], ["belt-pouch","Поясная сумка",0.1,7], ["bandolier","Бандольера",1,19],
   ["clothing","Простая одежда",2,10], ["warm-clothing","Тёплая одежда",3,45]
 ];
-export const CORE_GEAR = gearRows.map(([id,name,weight,price,rare = "",kind = "gear",properties = ""], i) => ({ id: `gear.${id}`, documentId: `eqip${String(i+1).padStart(12,"0")}`, name, type: "equipment", source: kind === "tool" ? "tools" : "core", system: { weight, price, rarity: rarity(rare) ?? rare, kind, properties, source: "Базовая книга, стр. 92–93" } }));
+export const CORE_GEAR = gearRows.map(([id,name,weight,price,rare = "",kind = "gear",properties = ""], i) => ({ id: `gear.${id}`, documentId: `eqip${String(i+1).padStart(12,"0")}`, name, type: "equipment", source: kind === "tool" ? "tools" : "core", system: { weight, price, rarity: rarity(rare) ?? rare, kind, properties, source: "Базовая книга" } }));
 export const LEGACY_GEAR_STATS = {
   "musical-instrument": { weight: 1, price: 38 }, "sacred-symbol": { weight: 0.1, price: 14 }, "shoulder-bag": { weight: 1, price: 14 },
   "trained-bird": { kind: "companion" }, "trained-snake": { kind: "companion" }
 };
 for (const entry of CORE_GEAR) {
   const container = CORE_CONTAINERS[entry.id];
-  if (container) Object.assign(entry.system, container, { kind: "container", source: "Базовая книга, стр. 93, 95" });
+  if (container) Object.assign(entry.system, container, { kind: "container", source: "Базовая книга" });
   const content = toolContent(entry.id) ?? generalGearContent(entry.id);
   if (content) Object.assign(entry.system, content);
 }
