@@ -203,7 +203,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
   _toggleDisabled(disabled) {
     super._toggleDisabled(disabled);
     // Foundry disables every form button for observers, including read-only actions.
-    for (const button of this.element.querySelectorAll("[data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=viewFriend], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs], [data-action=viewSheetItem], [data-action=browseAbilities], [data-action=browseLanguages], [data-action=browseSpells]")) {
+    for (const button of this.element.querySelectorAll("[data-action=setCombatView], [data-action=viewRace], [data-action=viewOrigin], [data-action=viewFamilyStatus], [data-action=viewFriend], [data-action=showPortraitArtwork], [data-action=tab], [data-action=configureTabs], [data-action=viewSheetItem], [data-action=browseAbilities], [data-action=browseLanguages], [data-action=browseSpells]")) {
       button.disabled = false;
     }
     for (const search of this.element.querySelectorAll("[data-recipe-search], [data-recipe-kind], [data-magic-search], [data-magic-element], [data-magic-grade], [data-skill-search], [data-inventory-search], [data-action=toggleInventoryGroup], [data-action=browseEquipment]")) search.disabled = false;

@@ -1,4 +1,9 @@
 .witcher-combat-panel { color:#443e35; margin-bottom:30px; }
+.witcher-combat-view { display:flex; flex-wrap:wrap; gap:4px; width:fit-content; max-width:100%; padding:4px; margin:0 0 18px; border:1px solid #c7b69a; border-radius:8px; background:#e4ddcf; }
+.witcher-combat-view button { display:flex; align-items:center; justify-content:center; gap:7px; width:auto; height:auto; min-height:34px; padding:7px 14px; border:1px solid transparent; border-radius:5px; color:#68533d; background:transparent; box-shadow:none; }
+.witcher-combat-view button[aria-pressed=true] { background:#763b31; border-color:#763b31; color:#fff3de; }
+.witcher-combat-view button:hover { border-color:#967143; }
+.witcher-combat-view button:focus-visible { outline:2px solid #967143; outline-offset:2px; }
 .witcher-combat-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
 .witcher-combat-panel button,.witcher-combat-panel select,.witcher-combat-panel input { color:#453c30; background:#fbf7ee; border:1px solid #c7b69a; box-shadow:none; }
 .witcher-combat-panel button { transition:background .15s,border-color .15s; }
@@ -19,6 +24,9 @@
 .witcher-attack-card>header>div>button { border:0; padding:0; height:auto; background:none; font:700 18px Georgia,serif; text-align:left; }
 .witcher-attack-card small { display:block; font:11px/1.5 var(--font-primary,sans-serif); color:#806d53; }
 .witcher-attack-card .witcher-attack-equip { flex:0 0 30px; padding:0; height:30px; }
+.witcher-weapon-order { display:inline-flex; flex:0 0 auto; align-items:center; gap:3px; }
+.witcher-combat-panel .witcher-weapon-order button { width:26px; height:30px; padding:0; font-size:11px; }
+.witcher-combat-panel .witcher-weapon-order button:disabled { opacity:.35; }
 .witcher-attack-properties { font-size:11px; color:#7b6147; margin:0 14px 9px; }
 .witcher-attack-buttons { display:flex; gap:8px; padding:0 14px 12px; }
 .witcher-attack-buttons>button { flex:1; display:flex; flex-direction:column; align-items:stretch; padding:8px 12px; height:auto; text-align:left; border-radius:5px; background:#efe5d2; }
@@ -287,16 +295,22 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-healing-active { display:flex; align-items:center; gap:4px; font-size:12px; white-space:nowrap; }
 .witcher-healing-wound.is-dying { border-left-color:#7a1f1a; background:#fbeeea; margin-top:8px; }
 /* Special attacks and brawling, core pp.163–164 */
-.witcher-attack-techniques { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
-.witcher-attack-techniques button { width:auto; height:auto; min-height:24px; padding:2px 8px; font-size:11px; line-height:1.3; }
-.witcher-attack-techniques b { margin-left:3px; }
-.witcher-unarmed-card header { display:flex; align-items:center; gap:10px; }
-.witcher-unarmed-icon { font-size:22px; color:#7b5a3d; width:34px; text-align:center; }
+.witcher-attack-techniques { display:flex; flex-wrap:wrap; gap:6px; margin:0 14px 10px; }
+.witcher-attack-techniques button { display:inline-flex; align-items:center; justify-content:center; gap:5px; width:auto; height:auto; min-height:30px; padding:5px 8px; border-radius:4px; font-size:11px; line-height:1.3; white-space:normal; }
+.witcher-attack-techniques b { flex:none; font-variant-numeric:tabular-nums; }
+.witcher-unarmed-card { container:witcher-unarmed / inline-size; }
+.witcher-unarmed-card>header { display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid #e0d2b8; }
+.witcher-unarmed-icon { flex:0 0 34px; font-size:22px; color:#7b5a3d; width:34px; text-align:center; }
 .witcher-unarmed-card header small { display:block; }
-.witcher-unarmed-row { display:grid; grid-template-columns:92px minmax(0,1fr); gap:8px; align-items:center; margin-top:6px; }
-.witcher-unarmed-row > span { font-size:12px; font-weight:600; color:#5b3d31; }
+.witcher-unarmed-row { display:grid; grid-template-columns:92px minmax(0,1fr); gap:12px; align-items:center; padding:10px 14px; }
+.witcher-unarmed-row+.witcher-unarmed-row { border-top:1px solid #e0d2b8; }
+.witcher-unarmed-row>span { font-size:12px; line-height:1.4; font-weight:600; color:#5b3d31; }
+.witcher-unarmed-row>.witcher-attack-buttons { flex-wrap:wrap; min-width:0; padding:0; }
+.witcher-unarmed-row>.witcher-attack-buttons>button { flex:1 1 130px; min-width:0; margin:0; white-space:normal; }
+.witcher-unarmed-row .witcher-attack-buttons b { flex:none; font-variant-numeric:tabular-nums; }
+@container witcher-unarmed (max-width:520px) { .witcher-unarmed-row { grid-template-columns:minmax(0,1fr); gap:8px; } }
 .witcher-attack-note { font-size:12px; color:#6f5d47; margin:2px 0; }
-.witcher-technique-help { margin-top:6px; font-size:12px; color:#5e4f3d; }
+.witcher-technique-help { margin:0 14px 12px; padding-top:8px; border-top:1px solid #e0d2b8; font-size:12px; color:#5e4f3d; }
 .witcher-technique-help summary { cursor:pointer; color:#7b5a3d; }
 .witcher-technique-help ul { margin:4px 0 0; padding-left:16px; line-height:1.45; }
 .witcher-technique-help li { margin:2px 0; }
@@ -318,6 +332,7 @@ p.witcher-damage-type { margin:2px 0 6px; font-size:12px; }
 .witcher-verbal-panel .witcher-verbal-resolve { margin-left:auto; font-size:12px; color:#4a4170; }
 .witcher-verbal-panel .witcher-verbal-resolve b { font-size:15px; }
 .witcher-verbal-group header { display:flex; padding:10px 14px 6px; }
+.witcher-verbal-group+.witcher-verbal-group { margin-top:12px; }
 .witcher-verbal-actions { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:6px; padding:0 14px 12px; }
 .witcher-verbal-actions button { display:flex; flex-direction:column; align-items:stretch; height:auto; padding:6px 10px; text-align:left; background:#ece8f3; border-radius:5px; }
 .witcher-verbal-actions button span { display:flex; justify-content:space-between; font-size:13px; }

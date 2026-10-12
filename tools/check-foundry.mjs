@@ -540,7 +540,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["combat-actions", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "npc-loot", "crafting", "alchemy", "recipe-card"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["combat-actions", "verbal-duel", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "npc-loot", "crafting", "alchemy", "recipe-card"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -941,7 +941,8 @@ assert.ok(experienceEditingHTML.includes("data-sheet-experience"));
 assert.ok(!experienceEditingHTML.includes('name="system.experience"'), "XP editing goes through the shared guarded writer");
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleExperience.call(sheet);
 assert.equal((await sheet._prepareContext({})).editingExperience, false);
-assert.equal([...html.matchAll(/data-action="rollSkill"/g)].length, 49);
+assert.equal([...html.matchAll(/data-action="rollSkill" data-skill="(?!language")/g)].length, 49);
+assert.equal([...html.matchAll(/data-action="rollSkill" data-skill="language"/g)].length, 3);
 assert.equal([...html.matchAll(/name="system.skills\./g)].length, 0, "Skills are locked until editing is enabled");
 await WitcherActorSheet.DEFAULT_OPTIONS.actions.toggleSkills.call(sheet);
 assert.equal([...template(await sheet._prepareContext({})).matchAll(/name="system.skills\./g)].length, 49);
@@ -1852,6 +1853,7 @@ assert.ok(tacticsHTML.includes('Бонус действует до конца п
 assert.ok(!tacticsHTML.includes('Первая атака'));
 console.log('Combat tactics: native effects, core icons and active ambush controls OK');
 await (await import('./native-experimental.mjs')).checkNativeExperimental(tacticsTemplate,alchemyPartial,documents);
+const combatMenuPreviews=await (await import('./native-combat-menu.mjs')).checkNativeCombatMenu(tacticsTemplate);
 
 const {ambushWindowContext,groupCardContext}=await import('../scripts/sheets/ambush-context.mjs');
 const ambushTemplate=handlebars.compile(await readFile(new URL('../templates/ambush-window.hbs',import.meta.url),'utf8'),{strict:true});

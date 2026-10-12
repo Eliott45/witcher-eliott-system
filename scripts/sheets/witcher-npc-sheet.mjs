@@ -132,6 +132,6 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
       }).catch(error=>ui.notifications.error(error.message));
     });
   }
-  _toggleDisabled(disabled){super._toggleDisabled(disabled);for(const control of this.element.querySelectorAll('[data-action="tab"],[data-action="viewSheetItem"],[data-action="toggleItemDescription"],[data-inventory-search],[data-action="toggleInventoryGroup"],[data-action="toggleContainer"],[data-action="browseSpells"],[data-magic-search],[data-magic-tradition],[data-magic-element],[data-magic-grade]'))control.disabled=false;}
+  _toggleDisabled(disabled){super._toggleDisabled(disabled);for(const control of this.element.querySelectorAll('[data-action="setCombatView"],[data-action="tab"],[data-action="viewSheetItem"],[data-action="toggleItemDescription"],[data-inventory-search],[data-action="toggleInventoryGroup"],[data-action="toggleContainer"],[data-action="browseSpells"],[data-magic-search],[data-magic-tradition],[data-magic-element],[data-magic-grade]'))control.disabled=false;}
   async _onDropItem(event,item){if(!this.isEditable)return null;if(item.parent?.type==="loot")return void await takeLootByDrop(this.actor,item).catch(error=>ui.notifications.warn(error.message));if(item.type==="effect")return applyEffectItem(this.actor,item);if(isPhysical(item))return dropPhysicalItem(this,event,item);if(item.type==="spell"){await learnSpell(this.actor,item);return null;}return super._onDropItem(event,item);}
 }

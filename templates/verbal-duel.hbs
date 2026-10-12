@@ -1,7 +1,11 @@
 <section class="witcher-combat-panel witcher-verbal-panel">
   <header class="witcher-combat-heading"><h3><i class="fa-solid fa-comments"></i> Словесная дуэль</h3>
     <span class="witcher-verbal-resolve" data-tooltip="Решительность: (ВОЛЯ + ИНТ) / 2 × 5. На 0 — поражение.">Решительность <b>{{combat.duel.resolve.value}} / {{combat.duel.resolve.max}}</b></span></header>
-  <p class="witcher-combat-muted">Выберите противника (T). Он защищается в чате: у кого результат больше, тот наносит урон Решительности. Рычаг давления занимает полный ход.</p>
+  {{#if combat.duel.active}}<p class="witcher-combat-muted">Выберите противника (T). Он защищается в чате: у кого результат больше, тот наносит урон Решительности. Рычаг давления занимает полный ход.</p>
+  {{else}}<div class="witcher-combat-notice">Персонаж пока не участвует в словесной дуэли.
+    {{#if combat.duel.canStart}}<p>Выделите на сцене этого персонажа и остальных участников. При начале дуэли их Решительность восстановится.</p><button type="button" data-action="startSheetVerbalDuel" {{disabled (not editable)}}><i class="fa-solid fa-comments" aria-hidden="true"></i> Начать дуэль</button>
+    {{else}}<p>Мастер может начать дуэль с выделенными на сцене участниками.</p>{{/if}}
+  </div>{{/if}}
   <div class="witcher-attack-options">
     <label>Модификатор<input type="number" data-combat-option="modifier" value="{{combat.modifier}}" min="-100" max="100" step="1" data-tooltip="Малый 1, средний 3, большой 5 (стр. 177)"></label>
     <label>Пытки<select data-combat-option="torture">{{#each combat.duel.torture}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>

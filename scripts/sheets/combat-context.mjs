@@ -23,13 +23,14 @@ import { isBomb, bombProfile, throwBomb } from "../combat/bombs.mjs";
 import { activeOil, available } from "../data/workshop.mjs";
 import { MONSTER_CATEGORIES } from "../data/monster-categories.mjs";
 import { applyOil } from "../workshop/upgrades.mjs";
-import { duelOf, VERBAL_ATTACKS, VERBAL_LEVERS, VERBAL_DEFENSES, TORTURE, verbalAttack } from "../combat/verbal-duel.mjs";
+import { duelOf, startVerbalDuel, VERBAL_ATTACKS, VERBAL_LEVERS, VERBAL_DEFENSES, TORTURE, verbalAttack } from "../combat/verbal-duel.mjs";
 import { healingContext, healingPatient, stabilizePatientWound, treatPatientWound, startNaturalHealing, restDay, stabilizeDying } from "../combat/healing.mjs";
 import { creatureHasInfiniteStamina } from "../data/creature-modes.mjs";
 import { experimentalDeviceContext, experimentalDeviceActions } from "../combat/experimental-traps.mjs";
 import { experimentalEffectContext, mitigateMarker, rollMarkedTarget } from "../combat/experimental-effects.mjs";
 import { adrenalineContext, adrenalineDialog } from "../combat/adrenaline.mjs";
 import { trackingAmmunitionState, removeTrackingProjectile, trackByAmmunition } from "../combat/experimental-ammunition.mjs";
+import { orderedCombatWeapons, moveCombatWeapon } from "./combat-weapon-order.mjs";
 
 export function combatContext(actor,options={}) {
   const infiniteStamina=creatureHasInfiniteStamina(actor);
@@ -46,9 +47,10 @@ export function combatContext(actor,options={}) {
   const unarmed=actor.type==="npc"?[]:unarmedContext(actor,options,{extra,fastPending:fastPending&&actor.flags[SYSTEM_ID].fastStrike.extra===extra});
   const environmentState=actorEnvironment(actor);
   const duelCombat=duelOf(actor),skillName=key=>key?game.i18n.localize(`WITCHER.Skills.Entries.${key}.Label`):"своя атака";
+  const verbalView=options.view === "verbal" || options.view !== "combat" && Boolean(duelCombat);
   const verbalEntry=entry=>{const total=skillValue(actor.system,entry.skill)?.total;return {...entry,skillName:skillName(entry.skill),base:total==null?"—":signed(total),
-    damage:entry.damage?`${entry.label??entry.damage} + ${({empathy:"ЭМП",intelligence:"ИНТ",will:"ВОЛЯ"})[entry.stat]}`:"",disabled:!canAct};};
-  const duel=duelCombat?{resolve:actor.system.resolve,crowns:options.crowns??50,
+    damage:entry.damage?`${entry.label??entry.damage} + ${({empathy:"ЭМП",intelligence:"ИНТ",will:"ВОЛЯ"})[entry.stat]}`:"",disabled:!canAct || !duelCombat};};
+  const duel=verbalView?{active:Boolean(duelCombat),canStart:Boolean(game.user.isGM && actor.isOwner),resolve:actor.system.resolve,crowns:options.crowns??50,
     torture:TORTURE.map(entry=>({...entry,selected:Number(options.torture??0)===entry.id})),
     groups:[{name:"Эмпатические атаки",hint:"Расположить к себе: слабее, но не настраивают против вас",actions:VERBAL_ATTACKS.filter(entry=>entry.type==="empathic").map(verbalEntry)},
       {name:"Антагонистические атаки",hint:"Сильнее, но противник запомнит",actions:VERBAL_ATTACKS.filter(entry=>entry.type==="antagonistic").map(verbalEntry)},
@@ -65,7 +67,7 @@ export function combatContext(actor,options={}) {
     incoming:INCOMING_ATTACKS.map(entry=>({...entry,selected:entry.id===(options.incoming??"melee")})),
     locations:ATTACK_LOCATIONS.map(entry=>({...entry,selected:entry.id===(options.location??"random")})),
     ranges:RANGED_BANDS.map(entry=>({...entry,selected:entry.id===(options.range??"auto")})),
-    weapons:Array.from(actor.items ?? []).filter(item=>item.type==="weapon").map(item=>{
+    weapons:orderedCombatWeapons(actor).map((item,index,items)=>{
       const modes=attackModes(actor,item).map(mode=>{
         const quote=weaponAttack(actor,item,{...options,mode:mode.id,extraPenalty:extra?-3:0});
         const reason=quote.blocked||(!canAct?"Нельзя действовать":extra&&(used||!infiniteStamina&&actor.system.stamina.value<3)?"Дополнительное действие недоступно":"");
@@ -82,7 +84,7 @@ export function combatContext(actor,options={}) {
       const canOil=!item.system.natural&&item.system.category!=="shield"&&item.system.quantity===1&&hasOils;
       const bolts=isCrossbow(item)&&!loaded?boltChoices(actor).map(ammo=>({id:ammo.id,name:ammo.name,quantity:ammo.system.quantity})):[];
       const crossbow=isCrossbow(item)?{loaded,bolt:bolt?.name??"",bolts,choose:bolts.length>1}:null;
-      return {id:item.id,name:item.name,img:item.img,properties:item.system.properties??"",damageTypes:damageTypeLabel(item.system.damageType),rate:actor.type==="npc"?item.system.attackRate??1:null,natural:Boolean(item.system.natural),grip:gripOf(item),
+      return {id:item.id,name:item.name,img:item.img,canMoveUp:index>0,canMoveDown:index<items.length-1,properties:item.system.properties??"",damageTypes:damageTypeLabel(item.system.damageType),rate:actor.type==="npc"?item.system.attackRate??1:null,natural:Boolean(item.system.natural),grip:gripOf(item),
         equipped:equippedItems(actor.items).some(entry=>entry.id===item.id),modes,loaded,needsReload:!loaded,crossbow,oil,canOil,
         melee:item.system.category==="melee"&&!item.system.natural,techniques:actor.type!=="npc"&&!item.system.natural&&modes.some(mode=>mode.secondary)&&equippedItems(actor.items).some(entry=>entry.id===item.id),
         skill:game.i18n.localize(`WITCHER.Skills.Entries.${item.system.skill}.Label`)};
@@ -90,7 +92,22 @@ export function combatContext(actor,options={}) {
 }
 const guard=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){ui.notifications.warn(error.message);}};
 const healingPatientOf=sheet=>healingPatient(sheet.actor);
+const startingDuels=new WeakSet();
 export const combatActions={
+  setCombatView:guard(async function(_event,button){
+    const view=button.dataset.view;if(!["combat","verbal"].includes(view))return;
+    this.combatOptions={...this.combatOptions,view};await this.render();
+  }),
+  moveCombatWeapon:guard(async function(_event,button){
+    if(!this.isEditable||button.disabled)return;
+    await moveCombatWeapon(this.actor,button.dataset.itemId,button.dataset.direction);await this.render();
+  }),
+  startSheetVerbalDuel:guard(async function(_event,button){
+    if(!this.isEditable||button.disabled||!game.user.isGM||duelOf(this.actor)||startingDuels.has(this.actor))return;
+    if(!Array.from(globalThis.canvas?.tokens?.controlled??[]).some(token=>token.actor?.uuid===this.actor.uuid))throw new Error("Выделите на сцене этого персонажа и остальных участников дуэли (не меньше двух).");
+    button.disabled=true;startingDuels.add(this.actor);
+    try{await startVerbalDuel();}finally{startingDuels.delete(this.actor);await this.render();}
+  }),
   useAdrenaline:guard(async function(){if(!this.isEditable)return;await adrenalineDialog(this.actor);await this.render();}),
   trackingAmmunition:guard(async function(_event,button){if(!this.isEditable)return;if(button.dataset.kind==="remove")await removeTrackingProjectile(this.actor);else await trackByAmmunition(this.actor,{trailHours:Number(button.closest("[data-tracking-ammunition]").querySelector("[data-trail-hours]").value)});await this.render();}),
   ...experimentalDeviceActions,
