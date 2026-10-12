@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { CONDITION_BY_ID, conditionSource, effectRules } from "../data/condition-definitions.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
@@ -18,7 +19,7 @@ export async function nauseaTurn(combat, combatant, context) {
   await effect.update({ [`flags.${SYSTEM_ID}.nausea`]: { combat: combat.uuid, round: context.round + every } });
   if (next === null) return;
   const body = actor.system.statistics?.effective?.body ?? 0;
-  const roll = await new foundry.dice.Roll("1d10").evaluate();
+  const roll = await evaluateRoll("1d10");
   const vomits = roll.total >= body;
   await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), flags: { [SYSTEM_ID]: { skipLuck: true } },
     flavor: `<h3>Тошнота</h3><p>Нужно меньше ТЕЛ ${body}: <strong>${vomits ? `${esc(actor.name)} рвёт — этот ход потерян` : "удалось сдержаться"}</strong>.</p>` },

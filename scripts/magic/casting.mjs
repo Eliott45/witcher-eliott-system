@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { actionQuote, actionNote, actionUpdate } from "../combat/action-economy.mjs";
 import { consumeAiming } from "../combat/full-turn-rules.mjs";
@@ -113,11 +114,11 @@ function performCast(actor,itemId,options) {
     const display=trackRollDisplay(),messageMode=game.settings.get("core","messageMode");
     let posted;
     try {
-      const roll=options.maintenance||(ritual&&!quote.difficulty.target)?null:await new foundry.dice.Roll(`1d10wc + ${quote.skill.total}`).evaluate({allowInteractive:messageMode!=="blind"});
+      const roll=options.maintenance||(ritual&&!quote.difficulty.target)?null:await evaluateRoll(`1d10wc + ${quote.skill.total}`,{allowInteractive:messageMode!=="blind"});
       const fumble=roll?magicFumble(roll):{severity:0,failed:false,elemental:false,explosion:false};
       if(ritual||hex){fumble.failed=false;fumble.elemental=false;fumble.explosion=false;}
       const fumbleDamage=fumble.severity?(hex?0:ritual?quote.stamina:fumble.severity):0;
-      const backlash=hex&&fumble.severity?await new foundry.dice.Roll("1d100").evaluate({allowInteractive:messageMode!=="blind"}):null;
+      const backlash=hex&&fumble.severity?await evaluateRoll("1d100",{allowInteractive:messageMode!=="blind"}):null;
       const reflected=Boolean(backlash&&backlash.total<=50);
       const element=actor.system.details.profession==="priest"||["druid","priest"].includes(item.system.tradition)?"mixed":item.system.element;
       const elemental=fumble.elemental||quote.excess>0;
@@ -194,7 +195,7 @@ export async function rollRitualInterruption(actor,id) {
   const entry=RITUAL_INTERRUPTIONS.find(row=>row.id===id);
   if(!entry)throw new Error("Неизвестная помеха.");
   const skill=skillValue(actor.system,"ritualCrafting");
-  const roll=await new foundry.dice.Roll(`1d10wc + ${skill.total??0}`).evaluate();
+  const roll=await evaluateRoll(`1d10wc + ${skill.total??0}`);
   return roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),flags:{[SYSTEM_ID]:{skillCheck:{key:"ritualCrafting",base:skill.total??0,label:"Прерывание ритуала"}}},
     flavor:`<section class="witcher-magic-chat"><h3>Прерывание ритуала · СЛ ${entry.dc}</h3><p>${escape(entry.name)}. Проведение ритуалов против СЛ ${entry.dc}: при успехе концентрация сохранена и ритуал продолжается, при провале ритуал сорван.</p></section>`});
 }

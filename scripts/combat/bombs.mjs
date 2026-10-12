@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -96,11 +97,11 @@ export function throwBomb(actor, item) {
     return inventoryWrite(actor, async () => {
       const action = actionQuote(actor), quote = bombThrowQuote(actor, item, distance, action.penalty), profile = bombProfile(item);
       if (quote.blocked) throw new Error(quote.blocked);
-      const roll = await new foundry.dice.Roll(`1d10wc + ${quote.total}`).evaluate();
+      const roll = await evaluateRoll(`1d10wc + ${quote.total}`);
       const hit = roll.total > quote.dc;
       let point = aim, scatter = null;
       if (!hit) {
-        const direction = await new foundry.dice.Roll("1d10").evaluate(), far = await new foundry.dice.Roll("1d6").evaluate();
+        const direction = await evaluateRoll("1d10"), far = await evaluateRoll("1d6");
         // The scatter pattern faces along the throw (from the thrower to the aim point), north = 0°.
         const from = tokenCenter(thrower), bearing = Math.atan2(aim.x - from.x, from.y - aim.y) * 180 / Math.PI;
         const offset = scatterOffset(direction.total, (aim.x === from.x && aim.y === from.y) ? thrower.rotation : bearing, 1), length = Math.hypot(offset.x, offset.y) || 1;
@@ -110,8 +111,8 @@ export function throwBomb(actor, item) {
       }
       const victims = await Promise.all(tokensInBlast(scene, point, profile.radius).map(async token => ({
         uuid: token.uuid, name: token.name,
-        burning: profile.burning ? (await new foundry.dice.Roll("1d100").evaluate()).total <= profile.burning : false,
-        poisoned: profile.poison ? (await new foundry.dice.Roll("1d100").evaluate()).total <= profile.poison : false })));
+        burning: profile.burning ? (await evaluateRoll("1d100")).total <= profile.burning : false,
+        poisoned: profile.poison ? (await evaluateRoll("1d100")).total <= profile.poison : false })));
       canvas.ping?.(point);
       const effects = [profile.burning ? `горение ${profile.burning}%` : "", profile.poison ? `отравление ${profile.poison}%${profile.doublePoison ? " (двойной урон яда)" : ""}` : "",
         profile.blind ? `слепота ${profile.blind} раунд.` : "", profile.stunSave !== null ? `испытание УСТ ${signed(profile.stunSave)}, провал — дезориентация` : "",
@@ -142,9 +143,9 @@ export function throwBomb(actor, item) {
 /** Scene devices and ignited gas reuse the same per-part damage and condition application. */
 export async function postDeviceBlast(actor, scene, point, { name, profile, messageOptions = {} }) {
   const victims = await Promise.all(tokensInBlast(scene, point, profile.radius).map(async token => ({ uuid: token.uuid, name: token.name,
-    burning: profile.burning ? (await new foundry.dice.Roll("1d100").evaluate()).total <= profile.burning : false,
-    poisoned: profile.poison ? (await new foundry.dice.Roll("1d100").evaluate()).total <= profile.poison : false,
-    bleeding: profile.bleeding ? (await new foundry.dice.Roll("1d100").evaluate()).total <= profile.bleeding : false })));
+    burning: profile.burning ? (await evaluateRoll("1d100")).total <= profile.burning : false,
+    poisoned: profile.poison ? (await evaluateRoll("1d100")).total <= profile.poison : false,
+    bleeding: profile.bleeding ? (await evaluateRoll("1d100")).total <= profile.bleeding : false })));
   return foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), whisper:[...(messageOptions.whisper??[])], blind:Boolean(messageOptions.blind),
     content: `<section class="witcher-bomb-card"><h3>${esc(name)}</h3><p>Радиус ${profile.radius} м. ${victims.map(victim=>esc(victim.name)).join(", ") || "В радиусе никого нет."}</p><button type="button" data-bomb-apply>Применить взрыв</button></section>`,
     flags: { [SYSTEM_ID]: { skipLuck: true, bomb: { name, profile, victims, sceneUuid: scene.uuid, point, applied: false } } } });
@@ -177,7 +178,7 @@ export function blastDamage(actor, rolls, traits) {
 async function partRolls(actor, formula) {
   if (!formula) return {};
   const out = {};
-  for (const id of burningParts(actor)) out[id] = (await new foundry.dice.Roll(formula).evaluate()).total;
+  for (const id of burningParts(actor)) out[id] = (await evaluateRoll(formula)).total;
   return out;
 }
 
@@ -239,12 +240,12 @@ async function applyBlastNow(message) {
     if (data.profile.freeze) { effects.push(experimentalEffect(actor, "freeze")); notes.push(`заморожен на ${data.profile.freeze} раунд.; Сила СЛ 18`); }
     if (data.profile.marker) { effects.push(experimentalEffect(actor, "marker")); notes.push("метка на сутки: +5 к обнаружению и выслеживанию"); }
     if (data.profile.fury) {
-      const base = skillValue(actor.system, "endurance").total, roll = await new foundry.dice.Roll(`1d10wc + ${base}`).evaluate();
+      const base = skillValue(actor.system, "endurance").total, roll = await evaluateRoll(`1d10wc + ${base}`);
       notes.push(`Стойкость ${roll.total} против СЛ 18`);
       if (roll.total < 18) { effects.push(experimentalEffect(actor, "fury")); notes.push("атакует ближайшее существо"); }
     }
     if (data.profile.stunSave !== null) {
-      const stun = actor.system.statistics.stun ?? 0, save = await new foundry.dice.Roll("1d10").evaluate(), target = stun + data.profile.stunSave;
+      const stun = actor.system.statistics.stun ?? 0, save = await evaluateRoll("1d10"), target = stun + data.profile.stunSave;
       if (save.total < target) notes.push(`испытание УСТ ${save.total} (нужно меньше ${target}): устоял`);
       else { effects.push(timedCondition(actor, "stunned", 0)); notes.push(`испытание УСТ ${save.total} (нужно меньше ${target}): дезориентирован`); }
     }

@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { CONDITION_BY_ID, conditionSource } from "../data/condition-definitions.mjs";
@@ -79,8 +80,8 @@ export async function rollFeint(actor) {
   const deceit = skillValue(actor.system, "deceit"), awareness = skillValue(target.system, "awareness");
   if (deceit?.total == null) throw new Error("Заполните навык «Обман».");
   const action = actionQuote(actor);
-  const own = await new foundry.dice.Roll(`1d10wc + ${deceit.total + action.penalty}`).evaluate();
-  const their = await new foundry.dice.Roll(`1d10wc + ${awareness?.total ?? 0}`).evaluate();
+  const own = await evaluateRoll(`1d10wc + ${deceit.total + action.penalty}`);
+  const their = await evaluateRoll(`1d10wc + ${awareness?.total ?? 0}`);
   const success = own.total > their.total;
   await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), rolls: [own, their], flags: { [SYSTEM_ID]: { skipLuck: true } },
     content: `<section class="witcher-attack-chat"><h3><i class="fa-solid fa-mask"></i> Финт</h3><p>Обман <b>${own.total}</b> против Внимания ${esc(target.name)} <b>${their.total}</b>: <strong>${success ? "противник обманут — второй удар быстрой атаки получает +3" : "противник не поддался"}</strong>.</p>${actionNote(action)}</section>` });
@@ -114,7 +115,7 @@ export function canAnswerDual(actor, equipped) {
 export async function rollChargeContest(attacker, defender, sourceId) {
   const own = skillValue(attacker.system, "physique"), their = skillValue(defender.system, "physique");
   if (own?.total == null) throw new Error("Заполните навык «Сила».");
-  const a = await new foundry.dice.Roll(`1d10wc + ${own.total}`).evaluate(), d = await new foundry.dice.Roll(`1d10wc + ${their?.total ?? 0}`).evaluate();
+  const a = await evaluateRoll(`1d10wc + ${own.total}`), d = await evaluateRoll(`1d10wc + ${their?.total ?? 0}`);
   const success = a.total > d.total;
   return foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: attacker }), rolls: [a, d],
     content: `<p><b>С разбега:</b> Сила ${a.total} против Силы ${esc(defender.name)} ${d.total} — ${success ? "противник сбит с ног" : "устоял"}.</p>`,

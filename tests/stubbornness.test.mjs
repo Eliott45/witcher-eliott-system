@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { SYSTEM_ID } from "../scripts/config.mjs";
 import { adjustStubbornness } from "../scripts/data/abilities.mjs";
+import { minimumRollSource } from "../scripts/dice/minimum-roll.mjs";
 import { stubbornnessState, stubbornnessMessageMode, rerollStubbornness, renderStubbornness } from "../scripts/chat/stubbornness.mjs";
 
 function fixture({ race = "human", used = 0, original = 14, next = 9, luck = 0 } = {}) {
@@ -18,9 +19,17 @@ function fixture({ race = "human", used = 0, original = 14, next = 9, luck = 0 }
   const posted = [];
   let failure = false;
   globalThis.game = { i18n: { localize: key => key, format: (key, values) => key + JSON.stringify(values) } };
-  globalThis.foundry = { utils: { randomID: () => "claim" }, dice: { Roll: class {
+  globalThis.foundry = { utils: { randomID: () => "claim" }, dice: {
+    terms: { FunctionTerm: class { constructor(data) { Object.assign(this, data); } } },
+    Roll: class {
     constructor(formula) { this.formula = formula; this.total = next; }
     async evaluate(options) { this.options = options; return this; }
+    evaluateSync() { this.total = Number(this.formula); return this; }
+    static fromTerms(terms, options) {
+      const roll = new this(`max(0, ${terms[0].terms[1]})`);
+      Object.assign(roll, { terms, options, total: terms[0].result });
+      return roll;
+    }
     async toMessage(data, options) {
       if (failure) throw new Error("Chat write rejected");
       const message = { id: "reroll", rolls: [this], ...data, options };
@@ -64,9 +73,10 @@ test("rerolls keep the higher total, the original base/Luck and the original aud
     source.blind = true;
     await rerollStubbornness(source);
     const result = source.flags[SYSTEM_ID].stubbornness;
-    assert.equal(result.kept, Math.max(original, next));
+    assert.equal(result.kept, Math.max(0, original, next));
     assert.equal(actor.system.abilityState.stubbornnessUsed, 1);
-    assert.equal(posted[0].rolls[0].formula, "1d10wc + 10 + 4");
+    assert.equal(minimumRollSource(posted[0].rolls[0]).formula, "1d10wc + 10 + 4");
+    assert.equal(posted[0].rolls[0].total, Math.max(0, next));
     assert.equal(posted[0].flags[SYSTEM_ID].skipLuck, true);
     assert.equal(posted[0].flags[SYSTEM_ID].luck.bonus, 4);
     assert.deepEqual(posted[0].speaker, source.speaker, "Keep the unlinked token speaker");

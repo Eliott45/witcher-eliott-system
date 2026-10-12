@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { hasStatus, setStatus, DYING, DEAD } from "./status-effects.mjs";
@@ -14,7 +15,7 @@ export async function rollDeathSave(actor, cause = "manual", { onPosted = () => 
   const save = { base: statistics.stun, penalty: actor.system.death.penalty, episode, cause,
     body: statistics.adjusted.body, will: statistics.adjusted.will, physical: statistics.recovery };
   const messageMode = game.settings.get("core", "messageMode");
-  const roll = await new foundry.dice.Roll("1d10").evaluate({ allowInteractive: messageMode !== "blind" });
+  const roll = await evaluateRoll("1d10",{ allowInteractive: messageMode !== "blind" });
   const display = trackRollDisplay();
   try {
     const message = await roll.toMessage({

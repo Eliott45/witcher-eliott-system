@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID, ROUND_SECONDS } from "../config.mjs";
 import { activeEffect } from "../data/effect-counters.mjs";
 import { tokenCenter } from "./attack-target.mjs";
@@ -14,7 +15,7 @@ export async function createDragonCloud(scene, point, message) {
   if (!scene) throw new Error("Сцена облака недоступна.");
   const previous = Array.from(scene.regions ?? []).find(region => cloud(region)?.sourceMessage === message.uuid);
   if (previous) return previous;
-  const roll = await new foundry.dice.Roll("1d10").evaluate({allowInteractive:false}), combat = game.combat, radius = 8/scene.grid.distance*scene.grid.size;
+  const roll = await evaluateRoll("1d10",{allowInteractive:false}), combat = game.combat, radius = 8/scene.grid.distance*scene.grid.size;
   const [region] = await scene.createEmbeddedDocuments("Region", [{ name: "Сон дракона: горючий газ", color: "#d1b758", visibility: 2,
     shapes: [{ type: "ellipse", x: point.x, y: point.y, radiusX: radius, radiusY: radius, rotation: 0, hole: false, gridBased: false }],
     flags: { [SYSTEM_ID]: { dragonCloud: { sourceMessage: message.uuid, actor: message.speakerActor?.uuid ?? "", direction: roll.total, drift: 0,

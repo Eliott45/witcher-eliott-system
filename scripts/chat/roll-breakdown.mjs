@@ -2,6 +2,7 @@ import { creatureDetailsHidden } from "./concealment.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { SKILLS } from "../data/skills.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { minimumRollSource } from "../dice/minimum-roll.mjs";
 
 const signed = value => `${value < 0 ? "−" : "+"}${Math.abs(value)}`;
 const faces = die => `${die.number > 1 ? die.number : ""}к${die.faces}`;
@@ -38,10 +39,12 @@ export function rollBreakdown(message, roll, index = 0) {
   if (!roll?.dice?.length || !Number.isFinite(roll.total)) return null;
   const dice = roll.dice.map(dieRow), flags = message.flags?.[SYSTEM_ID] ?? {};
   const parts = knownParts(flags, index).filter(part => part.value);
-  const modifier = roll.total - dice.reduce((sum, row) => sum + row.value, 0);
+  const rawTotal = minimumRollSource(roll).total;
+  const modifier = rawTotal - dice.reduce((sum, row) => sum + row.value, 0);
   // Anything the flags do not explain (manual formula edits, older messages) stays visible as one line.
   const rest = modifier - parts.reduce((sum, part) => sum + part.value, 0);
   if (rest) parts.push({label:parts.length ? "Прочее" : "Модификатор", value:rest});
+  if (rawTotal < roll.total) parts.push({label:"Минимум итога — 0", value:roll.total - rawTotal, kind:"minimum"});
   return {dice, parts, total:roll.total};
 }
 

@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { CONDITION_BY_ID, conditionSource } from "../data/condition-definitions.mjs";
 import { fullTurnStart } from "../combat/full-turn-rules.mjs";
@@ -47,7 +48,7 @@ const timed = (actor, id, rounds, extra = {}) => {
   const source = conditionSource(CONDITION_BY_ID[id], text => globalThis.game?.i18n?.localize?.(text) ?? text); delete source._id;
   return foundry.utils.mergeObject(source, { ...(rounds ? { start: fullTurnStart(actor), duration: { value: rounds, units: "rounds", expiry: "turnEnd", expired: false } } : {}), ...extra });
 };
-const roll = async formula => (await new foundry.dice.Roll(formula).evaluate()).total;
+const roll = async formula => (await evaluateRoll(formula)).total;
 const statusIcon = { burning: "горит", frozen: "заморожен", staggered: "ошеломлён", stunned: "дезориентирован", prone: "сбит с ног", poisoned: "отравлен", blinded: "ослеплён" };
 
 /**

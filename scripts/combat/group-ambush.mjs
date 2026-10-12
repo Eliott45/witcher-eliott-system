@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID, COMBAT_ACTOR_TYPES } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { conditionRules } from "./condition-rules.mjs";
@@ -145,7 +146,7 @@ export async function rollGroupParticipant(combatant, sessionId) {
     const display = trackRollDisplay();
     try {
       const mode = combatant.hidden || combatant.token?.hidden ? "blind" : "public";
-      const roll = await new foundry.dice.Roll(`1d10wc + ${base}`).evaluate({allowInteractive:mode !== "blind"});
+      const roll = await evaluateRoll(`1d10wc + ${base}`,{allowInteractive:mode !== "blind"});
       const current = groupAmbush(combat);
       if (combat.started || current?.id !== sessionId || current.status !== "checks" || current.entries.find(entry => entry.id === combatant.id)?.claim?.id !== nonce) throw new Error("Проверка отменена мастером.");
       message = await roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor:combatant.actor,token:combatant.token}),

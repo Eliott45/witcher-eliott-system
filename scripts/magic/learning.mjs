@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import {SYSTEM_ID} from "../config.mjs";
 import {queueActorWrite} from "../data/actor-writes.mjs";
 import {skillValue} from "../data/skills.mjs";
@@ -48,7 +49,7 @@ export function studyDay(actor,id) {
       if(study.successes<study.required) {
         const skill=skillValue(actor.system,study.skill);if(skill?.total==null)throw new Error("Укажите Волю персонажа.");
         const mode=game.settings.get("core","messageMode");
-        const roll=await new foundry.dice.Roll(`1d10wc + ${skill.total}`).evaluate({allowInteractive:mode!=="blind"});
+        const roll=await evaluateRoll(`1d10wc + ${skill.total}`,{allowInteractive:mode!=="blind"});
         const message=await roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),
           flavor:`<h3>Обучение: ${esc(study.sourceName)}</h3><p>День ${study.days+1} · ${CASTING_SKILL_LABELS[study.skill]} · СЛ ${study.dc}. Провал добавляет один день обучения; новая попытка — в следующий день.</p>`,flags:{[SYSTEM_ID]:display.flags[SYSTEM_ID]}},{messageMode:mode});
         if(!message)throw new Error("Бросок обучения не создан.");

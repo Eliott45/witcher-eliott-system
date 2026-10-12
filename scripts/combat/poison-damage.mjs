@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID, COMBAT_ACTOR_TYPES } from "../config.mjs";
 import { regenerationAtStart, settleRegeneration, temporaryHealthAbsorptionPlan } from "../workshop/witcher-elixirs.mjs";
 import { inventoryTransaction } from "../workshop/transaction.mjs";
@@ -64,7 +65,7 @@ export function startTurnPoison(combat, combatant, context) {
       const suffocation = choking ? 3 : 0;
       const acid = acidAtStart;
       // Core p.167, dimeritium below 10: the adept's own magic burns them, 1d6 a turn, armor does not help.
-      const magicBurn = magicBurnAtStart ? (await new foundry.dice.Roll("1d6").evaluate()).total : 0;
+      const magicBurn = magicBurnAtStart ? (await evaluateRoll("1d6")).total : 0;
       const damage = poison + bleeding + burning + suffocation + acid + magicBurn, before = actor.system.health.value;
       const moon=temporaryHealthAbsorptionPlan(actor,damage),adrenaline=adrenalineAbsorptionPlan(actor,damage-moon.absorbed);
       const hpDamage=adrenaline.remaining,absorbed=moon.absorbed+adrenaline.absorbed;

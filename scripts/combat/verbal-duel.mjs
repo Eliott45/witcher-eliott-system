@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
@@ -92,7 +93,7 @@ export async function verbalAttack(actor, actionId, { skill = null, situational 
   if (action.once && pairState(combat, actor.uuid, target.uuid)[action.id]) throw new Error(`${action.name}: только один раз за дуэль.`);
   const key = skill && [action.skill, action.alt].includes(skill) ? skill : action.skill;
   const parts = duelModifiers(combat, actor, target, action, { torture, situational });
-  const roll = await new foundry.dice.Roll(`1d10wc + ${skillTotal(actor, key) + mods(parts)}`).evaluate();
+  const roll = await evaluateRoll(`1d10wc + ${skillTotal(actor, key) + mods(parts)}`);
   const lever = VERBAL_LEVERS.includes(action);
   // Study is checked against INT × 3 at once; every other action waits for the target's defense.
   const fixed = action.fixed ? statValue(target, action.fixed) * 3 : null;
@@ -120,7 +121,7 @@ export async function resolveVerbal(message, defenseId, { counterId = null, situ
     counter = defense.id === "counter" ? VERBAL_ATTACKS.find(entry => entry.id === counterId) : null;
     if (defense.id === "counter" && !counter) throw new Error("Выберите атаку для контраргумента.");
     const parts = duelModifiers(combat, target, attacker, counter ?? { ...defense, defense: true }, { situational });
-    const roll = await new foundry.dice.Roll(`1d10wc + ${skillTotal(target, counter?.skill ?? defense.skill) + mods(parts)}`).evaluate();
+    const roll = await evaluateRoll(`1d10wc + ${skillTotal(target, counter?.skill ?? defense.skill) + mods(parts)}`);
     rolls.push(roll); defenseTotal = roll.total;
     lines.push(`${esc(target.name)}: ${esc(counter ? `контраргумент «${counter.name}»` : defense.name)} <b>${roll.total}</b> против <b>${attackTotal}</b>.`);
     if (parts.length) lines.push(partsHTML(parts));
@@ -128,7 +129,7 @@ export async function resolveVerbal(message, defenseId, { counterId = null, situ
   // As in combat, the attack must be strictly higher than the defense.
   if (!(attackTotal > defenseTotal)) winner = "defender";
   const hitWith = async (who, whom, act) => {
-    const extra = stackDamage(combat, who, whom, act), roll = await new foundry.dice.Roll(`${act.damage} + ${statValue(who, act.stat) + mods(extra)}`).evaluate();
+    const extra = stackDamage(combat, who, whom, act), roll = await evaluateRoll(`${act.damage} + ${statValue(who, act.stat) + mods(extra)}`);
     rolls.push(roll); damage.push({ uuid: whom.uuid, amount: Math.max(0, roll.total), action: act.id, by: who.uuid });
     lines.push(`<b>${esc(who.name)}</b> → ${esc(whom.name)}: <b>${roll.total}</b> урона Решительности (${esc(act.label ?? act.damage)} + ${STAT[act.stat]} ${statValue(who, act.stat)}${extra.map(part => ` + ${esc(part.label)} ${part.value}`).join("")}).`);
     if (act.stack) state.push({ attacker: who.uuid, target: whom.uuid, key: act.stack.key, add: act.stack.value });

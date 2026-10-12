@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { stunSucceeded } from "../data/statistics.mjs";
 import { hasStunned, setStunned, setStatus, EXHAUSTED_STUN, reportEffectError } from "./status-effects.mjs";
 import { conditionRules } from "./condition-rules.mjs";
@@ -25,7 +26,7 @@ export async function rollStun(actor, { messageMode = game.settings.get("core", 
     ui.notifications.warn(game.i18n.localize("WITCHER.Statistics.UnfilledPhysical"));
     return;
   }
-  const roll = await new foundry.dice.Roll("1d10").evaluate({ allowInteractive: messageMode !== "blind" });
+  const roll = await evaluateRoll("1d10",{ allowInteractive: messageMode !== "blind" });
   const outcome = game.i18n.localize(stunSucceeded(roll.total, target)
     ? "WITCHER.Statistics.Success" : "WITCHER.Statistics.Failure");
   const tooltip = stunTooltip(actor.system, {

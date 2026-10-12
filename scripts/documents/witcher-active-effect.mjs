@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { immuneToCondition } from "../data/creatures.mjs";
 import { effectRules } from "../data/condition-definitions.mjs";
@@ -31,7 +32,7 @@ export class WitcherActiveEffect extends foundry.documents.ActiveEffect {
       const display=trackRollDisplay();
       try{
         const mode=game.settings.get("core","messageMode");
-        const roll=await new foundry.dice.Roll(formula).evaluate({allowInteractive:mode!=="blind"});
+        const roll=await evaluateRoll(formula,{allowInteractive:mode!=="blind"});
         value=Math.max(1,Math.floor(roll.total));
         const message=await roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),flavor:`Длительность: ${esc(this.name)}`,
           flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],skipLuck:true,effectDuration:{value,units:rules.roundsFormula?"rounds":"seconds"}}}},{messageMode:mode});

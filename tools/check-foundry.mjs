@@ -1434,7 +1434,49 @@ for (const formula of ["1d10 + 10", "2d6 + 1d4", "(1d6 + 2) * 3", "{2d6, 1d10}kh
 const { registerCriticalDice } = await import("../scripts/dice/critical-chain.mjs");
 const { prepareCriticalResult } = await import("../scripts/chat/critical-result.mjs");
 const { magicFumble } = await import("../scripts/magic/rules.mjs");
+const { evaluateRoll, minimumRollSource, prepareMinimumResults, withMinimumTotal } = await import("../scripts/dice/minimum-roll.mjs");
+const { rollBreakdown } = await import("../scripts/chat/roll-breakdown.mjs");
 registerCriticalDice();
+// Clamp only the complete result, preserving data, options and native serialization.
+for (const [formula, faces, face, expected] of [
+  ["1d10 - 20", 10, 4, -16], ["1d6 - 8", 6, 2, -6], ["1d10 - 4", 10, 4, 0],
+  ["1d10 + @bonus", 10, 4, 7], ["10 - (1d6 - 10)", 6, 4, 16]
+]) {
+  let draws = 0;
+  CONFIG.Dice.randomUniform = () => { draws++; return 1 - (face - 0.5) / faces; };
+  const roll = await evaluateRoll(formula, { allowInteractive: false }, { bonus: 3 }, { flavor: "Minimum check" });
+  assert.equal(draws, 1, "Applying the minimum must never roll dice again");
+  assert.equal(roll.total, Math.max(0, expected));
+  assert.equal(roll.options.flavor, "Minimum check");
+  assert.equal(withMinimumTotal(roll), roll, "Already bounded rolls stay unchanged");
+  const restored = CoreRoll.fromData(JSON.parse(JSON.stringify(roll)));
+  assert.equal(restored.total, Math.max(0, expected));
+  assert.equal(minimumRollSource(restored).total, expected);
+  assert.deepEqual(restored.dice[0].results.map(result => result.result), [face]);
+}
+// Native chat commands can contain multiple rolls or custom content, without an actor.
+for (const content of ["-16", "<p>Custom roll message</p>"]) {
+  CONFIG.Dice.randomUniform = () => 1 - (4 - 0.5) / 10;
+  const negative = await new CoreRoll("1d10 - 20").evaluate({ allowInteractive: false });
+  const positive = await new CoreRoll("1d10 + 3").evaluate({ allowInteractive: false });
+  const source = new foundry.documents.BaseChatMessage({ author: game.user.id, content,
+    rolls: [negative.toJSON(), positive.toJSON()] });
+  let writes = 0;
+  const message = { content, rolls: [negative, positive], updateSource(changes) {
+    writes++;
+    source.updateSource(changes);
+    Object.assign(this, { content: source.content, rolls: source.rolls.map(data => CoreRoll.fromData(data)) });
+  } };
+  prepareMinimumResults(message);
+  prepareMinimumResults(message);
+  assert.equal(writes, 1);
+  assert.deepEqual(message.rolls.map(roll => roll.total), [0, 7]);
+  assert.equal(message.content, content === "-16" ? "0" : content);
+  const breakdown = rollBreakdown(message, message.rolls[0]);
+  assert.equal(breakdown.parts.find(part => part.label === "Модификатор").value, -20);
+  assert.equal(breakdown.parts.find(part => part.kind === "minimum").value, 16);
+  assert.equal(breakdown.total, 0);
+}
 const sequences = [
   [[10, 4], 14], [[10, 10, 7], 27], [[10, 10, 10, 2], 32], [[10, 1], 11],
   [[1, 4], -4], [[1, 1], -1], [[1, 10, 3], -13], [[1, 10, 10, 6], -26], [[1, 10, 1], -11]
@@ -1447,9 +1489,10 @@ for (const [sequence, expected] of sequences) {
     return 1 - (queue.shift() - 0.5) / 10;
   };
   luckActor.system.updateSource({ luckSpent: [], luckPending: 4 });
-  const roll = await new CoreRoll("1d10wc + 10").evaluate({ allowInteractive: false });
+  const roll = await evaluateRoll("1d10wc + 10",{ allowInteractive: false });
   assert.equal(queue.length, 0);
-  assert.equal(roll.total, 10 + expected);
+  assert.equal(roll.total, Math.max(0, 10 + expected));
+  assert.equal(minimumRollSource(roll).total, 10 + expected);
   const serialized = CoreRoll.fromData(JSON.parse(JSON.stringify(roll)));
   assert.equal(serialized.total, roll.total);
   assert.deepEqual(serialized.dice[0].results.map(result => result.result), sequence);
@@ -1461,14 +1504,20 @@ for (const [sequence, expected] of sequences) {
     }
   };
   await prepareMessageLuck(message, "critical-check");
+  prepareMinimumResults(message);
   prepareCriticalResult(message);
-  assert.equal(message.rolls[0].total, 14 + expected, "Luck is added after the signed chain");
+  assert.equal(message.rolls[0].total, Math.max(0, 14 + expected), "Luck is added to the full check before its zero minimum");
   assert.equal(magicFumble(message.rolls[0]).severity,expected<0?-expected:0,"Magic reads the signed natural chain even after Luck and native serialization");
   assert.deepEqual(message.rolls[0].dice[0].results.map(result => result.result), sequence);
   assert.match(message.flavor, sequence[0] === 1 ? /Критический провал/ : /Критический успех/);
   assert.match(message.flavor, /\+4 от Удачи/);
   const sign = expected < 0 ? "−" : "+";
-  assert.ok(message.flavor.includes(`10 ${sign} ${Math.abs(expected)} + 4 = ${14 + expected}`));
+  assert.ok(message.flavor.includes(`10 ${sign} ${Math.abs(expected)} + 4 = ${Math.max(0, 14 + expected)}`));
+  const breakdown = rollBreakdown(message, message.rolls[0]);
+  assert.equal(breakdown.dice[0].value, expected);
+  assert.equal(breakdown.parts.filter(part => part.kind !== "minimum").reduce((sum, part) => sum + part.value, 0), 14);
+  assert.equal(breakdown.parts.find(part => part.kind === "minimum")?.value ?? 0, Math.max(0, -(14 + expected)));
+  assert.equal(message.flavor.includes("(минимум 0)"), 14 + expected < 0);
   criticalNativeRolls.push({ data: message.rolls[0].toJSON(), sequence });
   await settleMessageLuck([message], "critical-check");
   releaseMessageLuck("critical-check");
@@ -1482,6 +1531,7 @@ const stubbornActor = { uuid: "Actor.nativeStubborn", isOwner: true, items: [],
   async update(changes) { this.system.abilityState.stubbornnessUsed = changes["system.abilityState.stubbornnessUsed"]; }
 };
 const originalDiceRollClass = foundry.dice.Roll;
+let stubbornExpected = 25;
 foundry.dice.Roll = class extends CoreRoll {
   async toMessage(data, options) {
     const document = new foundry.documents.BaseChatMessage({ ...data, author: game.user.id, rolls: [this.toJSON()] });
@@ -1492,13 +1542,14 @@ foundry.dice.Roll = class extends CoreRoll {
     };
     await prepareMessageLuck(message, "stubborn-check");
     prepareCriticalResult(message);
-    assert.equal(message.rolls[0].total, 25);
-    assert.ok(message.flavor.includes("10 + 11 + 4 = 25"));
+    assert.equal(message.rolls[0].total, stubbornExpected);
+    assert.ok(message.flavor.includes(stubbornExpected ? "10 + 11 + 4 = 25" : "10 − 16 + 4 = 0 (минимум 0)"));
     return message;
   }
 };
-for (const { data } of criticalNativeRolls) {
-  const queue = [10, 1];
+for (const { data } of criticalNativeRolls) for (const sequence of [[10, 1], [1, 10, 6]]) {
+  const queue = [...sequence];
+  stubbornExpected = sequence[0] === 10 ? 25 : 0;
   CONFIG.Dice.randomUniform = () => 1 - (queue.shift() - 0.5) / 10;
   stubbornActor.system.abilityState.stubbornnessUsed = 0;
   const original = CoreRoll.fromData(JSON.parse(JSON.stringify(data)));
@@ -1508,12 +1559,13 @@ for (const { data } of criticalNativeRolls) {
     async update(changes) { this.flags[game.system.id].stubbornness = changes[`flags.${game.system.id}.stubbornness`]; }
   };
   await rerollStubbornness(message);
-  assert.equal(queue.length, 0, "Every previous positive/negative chain creates a new independent 10 → 1");
-  assert.equal(message.flags[game.system.id].stubbornness.kept, Math.max(original.total, 25));
+  assert.equal(queue.length, 0, "Every previous positive/negative chain creates a new independent chain");
+  assert.equal(message.flags[game.system.id].stubbornness.kept, Math.max(original.total, stubbornExpected));
   assert.equal(stubbornActor.system.abilityState.stubbornnessUsed, 1);
   assert.equal(stubbornActor.system.luckPending, 2);
 }
 foundry.dice.Roll = originalDiceRollClass;
+console.log("Roll minimum: native penalties, damage, Luck, critical chains, rerolls and chat totals stay at or above zero");
 // STUN, initiative and the ordinary dice tray retain their plain-d10 formulas.
 const {INITIATIVE_FORMULA,ROUND_SECONDS}=await import('../scripts/config.mjs');
 assert.equal(ROUND_SECONDS,3);

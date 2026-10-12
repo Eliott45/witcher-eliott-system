@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { RANDOM_LOOT_LABELS } from "../data/random-loot.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -41,7 +42,7 @@ export async function openPersonalBelongings() {
   const recipient = actors.find(entry => entry.id === answer.recipient)?.actor ?? null;
   const mode = game.settings.get("core", "messageMode"), rolls = [];
   const roll = async formula => {
-    const result = await new foundry.dice.Roll(formula).evaluate({ allowInteractive: mode !== "blind" });
+    const result = await evaluateRoll(formula,{ allowInteractive: mode !== "blind" });
     if (!Number.isFinite(result.total)) throw new Error("Некорректная формула количества.");
     rolls.push(result);
     return Math.floor(result.total);

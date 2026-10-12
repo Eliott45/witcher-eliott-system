@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 
 // Core p.165 «Влияние среды». The GM sets light, terrain and heat for a scene; a token can carry an
@@ -112,7 +113,7 @@ export async function rollFooting(actor) {
   const { skillValue } = await import("../data/skills.mjs");
   const { knockProne } = await import("./brawling.mjs");
   const athletics = skillValue(actor.system, "athletics");
-  const roll = await new foundry.dice.Roll(`1d10wc + ${athletics?.total ?? 0}`).evaluate();
+  const roll = await evaluateRoll(`1d10wc + ${athletics?.total ?? 0}`);
   const kept = roll.total >= 14;
   await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), flags: { [SYSTEM_ID]: { skipLuck: true } },
     flavor: `<section class="witcher-attack-chat"><h3>Лёд и снег · удержаться на ногах</h3><p>Атлетика против СЛ 14: <strong>${kept ? "устоял" : "поскользнулся и упал ничком"}</strong>.</p></section>` });

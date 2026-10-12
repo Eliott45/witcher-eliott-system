@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { getProfession } from "../data/professions.mjs";
 import { SKILLS } from "../data/skills.mjs";
@@ -101,7 +102,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
 
   /** One die roll, shown to everyone through Dice So Nice and kept in the creation log. */
   async roll(formula, label, { show = true } = {}) {
-    const roll = await new foundry.dice.Roll(formula).evaluate({ allowInteractive: false });
+    const roll = await evaluateRoll(formula,{ allowInteractive: false });
     if (show) await showDice(roll);
     const dice = roll.dice.flatMap(die => die.results.filter(result => result.active).map(result => result.result));
     this.draft.log.push({ label, formula, total: roll.total, dice: dice.length > 1 ? dice.join(", ") : "" });
@@ -249,7 +250,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
   /** One decade: an important event, or a witcher's decade at the risk chosen for it. */
   async generateEntry(age, risk = null) {
     const witcher = this.draft.race === "witcher", rolls = [];
-    const draw = async faces => { const roll = await new foundry.dice.Roll(`1d${faces}`).evaluate({ allowInteractive: false }); rolls.push(roll); return roll.total; };
+    const draw = async faces => { const roll = await evaluateRoll(`1d${faces}`,{ allowInteractive: false }); rolls.push(roll); return roll.total; };
     const entry = witcher ? await generateDecade(age, risk ?? this.draft.decadeRisks?.[age] ?? this.draft.decadeRisk ?? "normal", draw) : await generateLifeEvent(age, draw);
     if (rolls[0]) await showDice(rolls[0]);
     this.draft.log.push({ label: witcher ? `Десятилетие ${age}–${age + 9}` : `Событие в ${age} лет`, formula: `${rolls.length}×d10`, total: rolls[0]?.total ?? 0,
@@ -305,7 +306,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
     return this.commit(`style:${table.key}`);
   }
   static async #rollStyleAll() {
-    const roll = await new foundry.dice.Roll(`${STYLE_TABLES.length}d10`).evaluate({ allowInteractive: false });
+    const roll = await evaluateRoll(`${STYLE_TABLES.length}d10`,{ allowInteractive: false });
     await showDice(roll);
     const results = roll.dice[0].results.map(result => result.result);
     STYLE_TABLES.forEach((table, index) => { this.draft.style[table.key] = results[index]; });
@@ -340,7 +341,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
     return this.commit();
   }
   static async #rollAttributes() {
-    const roll = await new foundry.dice.Roll(ATTRIBUTE_ROLL).evaluate({ allowInteractive: false });
+    const roll = await evaluateRoll(ATTRIBUTE_ROLL,{ allowInteractive: false });
     await showDice(roll);
     const pool = roll.dice[0].results.filter(result => result.active).map(result => result.result);
     Object.assign(this.draft.attributes, { mode: "roll", pool, assigned: {}, selected: null });

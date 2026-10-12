@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { getProfessionAbility, professionAbilityState } from "../data/professions.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
@@ -21,7 +22,7 @@ export async function workshopCheck(actor, { name, skill, dc, bonus = 0, details
   const display = trackRollDisplay();
   try {
     const messageMode = game.settings.get("core", "messageMode");
-    const roll = await new foundry.dice.Roll(`1d10wc + ${base} + ${bonus}`).evaluate({ allowInteractive: messageMode !== "blind" });
+    const roll = await evaluateRoll(`1d10wc + ${base} + ${bonus}`,{ allowInteractive: messageMode !== "blind" });
     const message = await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }),
       flavor: `<b>${esc(name)}</b><p data-tooltip="${esc(`База ${base}; бонус ${bonus}. ${details}`)}">База ${base} + бонус ${bonus}; СЛ ${dc}</p>`,
       flags: { [SYSTEM_ID]: { ...flags, ...display.flags[SYSTEM_ID], workshop: { skill, dc, base, bonus } } }

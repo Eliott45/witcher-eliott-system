@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID, ROUND_SECONDS } from "../config.mjs";
 import { effectRules, EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions.mjs";
 import { skillValue } from "../data/skills.mjs";
@@ -97,7 +98,7 @@ export async function performEffectSave(actor,effect,{turn="",automatic=false,me
     const tooltip=save.kind==="stunModified"?`УСТ ${threshold} ${save.modifier??0}. Нужно выбросить строго меньше ${target}.`:`${game.i18n.localize(skill.label)}: параметр ${skill.attributeValue} + навык ${skill.level} + бонусы ${skill.bonus}. СЛ ${target}.`;
     const display=trackRollDisplay();
     try{
-      const roll=await new foundry.dice.Roll(formula).evaluate({allowInteractive:mode!=="blind"});
+      const roll=await evaluateRoll(formula,{allowInteractive:mode!=="blind"});
       const flavor=`<b>${esc(effect.name)}</b><p>${esc(save.action??"")} · ${save.kind==="stunModified"?"УСТ <":"СЛ"} <strong data-tooltip="${esc(tooltip)}">${target}</strong></p>`;
       const message=await roll.toMessage({...messageData,speaker:foundry.documents.ChatMessage.getSpeaker({actor}),flavor,
         flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],skipLuck:automatic||save.kind==="stunModified",conditionSave:{effect:effect.uuid,automatic,target}}}},{messageMode:mode});

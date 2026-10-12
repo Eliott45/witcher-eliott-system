@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { activeEffect } from "../data/effect-counters.mjs";
@@ -95,7 +96,7 @@ export async function rollGrappleAction(actor, kind) {
   const total = parts.reduce((sum, part) => sum + part.value, 0), combat = game.combat;
   const display = trackRollDisplay(), messageMode = game.settings.get("core", "messageMode");
   try {
-    const roll = await new foundry.dice.Roll(`1d10wc + ${total}`).evaluate({ allowInteractive: messageMode !== "blind" });
+    const roll = await evaluateRoll(`1d10wc + ${total}`,{ allowInteractive: messageMode !== "blind" });
     const math = parts.filter(part => part.value).map(part => `${part.label}: ${signed(part.value)}`).join("; ");
     const message = await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }),
       flavor: `<section class="witcher-attack-chat witcher-grapple-chat"><h3><i class="fa-solid ${data.icon}"></i> ${esc(data.name)}</h3><p data-tooltip="${esc(math)}">База проверки <b>${signed(total)}</b> · цель: <b>${esc(tokenName(targetUuid))}</b></p><p>${esc(data.hint)}</p>${actionNote(action)}</section>`,
@@ -171,7 +172,7 @@ export async function applyGrappleSuccess(message) {
       else await weapon.delete();
       notes.push(`${tokenName(grappler)} отбирает у ${tokenName(held)}: ${weapon.name}.`);
     } else {
-      const rolls = [await new foundry.dice.Roll("1d10").evaluate(), await new foundry.dice.Roll(attack.special === "disarm" ? "1d6" : "1d6").evaluate()];
+      const rolls = [await evaluateRoll("1d10"), await evaluateRoll(attack.special === "disarm" ? "1d6" : "1d6")];
       const meters = attack.special === "disarm" ? Math.max(1, Math.floor(rolls[1].total / 2)) : rolls[1].total;
       const dropped = await scatterItem(heldActor, weapon, meters, rolls[0].total);
       notes.push(`${weapon.name} выбито у ${tokenName(held)}: отлетает на ${meters} м (направление ${rolls[0].total} по таблице разброса)${dropped ? "" : " — поднимите его, чтобы снова взять в руки"}.`);
@@ -184,13 +185,13 @@ export async function applyGrappleSuccess(message) {
     const source = conditionSource(CONDITION_BY_ID.prone); delete source._id;
     if (heldActor && !heldActor.effects.some(effect => effect.statuses.has("prone"))) await heldActor.createEmbeddedDocuments("ActiveEffect", [source]);
     // Brawling deals non-lethal damage (core p.163): the throw lands as Stamina loss, then a Stun save at −1.
-    const roll = await new foundry.dice.Roll(attack.damage || "1d6").evaluate(), damage = Math.max(0, roll.total), rolls = [roll];
+    const roll = await evaluateRoll(attack.damage || "1d6"), damage = Math.max(0, roll.total), rolls = [roll];
     const infinite = heldActor && creatureHasInfiniteStamina(heldActor);
     if (heldActor && damage && !infinite) await heldActor.update({ "system.stamina.value": heldActor.system.stamina.value - damage });
     let stunned = "";
     const stun = heldActor?.system.statistics?.stun;
     if (heldActor && stun != null && conditionRules(heldActor).canStunSave) {
-      const save = await new foundry.dice.Roll("1d10").evaluate(); rolls.push(save);
+      const save = await evaluateRoll("1d10"); rolls.push(save);
       const failed = save.total >= stun - 1;
       if (failed) await setStunned(heldActor, true);
       stunned = ` Испытание Устойчивости −1: ${save.total} против ${stun - 1} — ${failed ? "дезориентирован" : "устоял"}.`;

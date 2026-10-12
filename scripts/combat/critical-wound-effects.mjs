@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { CRITICAL_WOUNDS } from "../data/critical-wounds.mjs";
@@ -158,7 +159,7 @@ async function heartDeathSave(actor, wound) {
   if (actor.type !== "character") return;
   const stun = actor.system.statistics?.stun;
   if (stun === null || stun === undefined) return;
-  const roll = await new foundry.dice.Roll("1d10").evaluate();
+  const roll = await evaluateRoll("1d10");
   const survived = stunSucceeded(roll.total, stun);
   await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), flags: { [SYSTEM_ID]: { skipLuck: true } },
     flavor: `<h3>Испытание против смерти · ${esc(wound.name)}</h3><p>Нужно меньше ${stun}: <strong>${survived ? "персонаж выжил" : "персонаж погиб"}</strong>.</p>` });
@@ -175,10 +176,10 @@ export async function onWoundCreated(effect, _options, userId) {
   const rules = WOUND_RULES[data.id] ?? {}, wound = findWound(data.id);
   let { arm: side = "", note = "" } = data;
   if ((rules.arm || rules.leg) && !side) {
-    const first = (await new foundry.dice.Roll("1d2").evaluate()).total === 1;
+    const first = (await evaluateRoll("1d2")).total === 1;
     side = rules.arm ? (first ? "rightArm" : "leftArm") : (first ? "rightLeg" : "leftLeg");
   }
-  if (rules.teeth && !note) note = `Выбито зубов: ${(await new foundry.dice.Roll("1d10").evaluate()).total}.`;
+  if (rules.teeth && !note) note = `Выбито зубов: ${(await evaluateRoll("1d10")).total}.`;
   const source = woundEffectData(data.id, data.level, { ...data, arm: side, note });
   const linked = data.state === "fresh" ? await linkConditions(actor, effect, "fresh") : [];
   await effect.update({ description: source.description, [`flags.${SYSTEM_ID}.criticalWound`]: { ...source.flags[SYSTEM_ID].criticalWound, applied: true, linked },
@@ -284,7 +285,7 @@ export async function criticalWoundTurn(combat, combatant, context) {
     if (!every) continue;
     const next = data.nextStun?.combat === combat.uuid ? data.nextStun.round : null;
     if (next !== null && context.round < next) continue;
-    const interval = (await new foundry.dice.Roll(every).evaluate()).total;
+    const interval = (await evaluateRoll(every)).total;
     await effect.update({ [`flags.${SYSTEM_ID}.criticalWound.nextStun`]: { combat: combat.uuid, round: context.round + interval } });
     if (next !== null) await rollStun(actor, { test: true });
   }

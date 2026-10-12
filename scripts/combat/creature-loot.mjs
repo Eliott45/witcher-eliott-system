@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
@@ -47,7 +48,7 @@ export function generateCreatureLoot(actor) {
       const rolls = [], creates = [], report = [];
       let crowns = 0;
       const quantityRoll = async formula => {
-        const roll = await new foundry.dice.Roll(formula || "1").evaluate({ allowInteractive: mode !== "blind" });
+        const roll = await evaluateRoll(formula || "1",{ allowInteractive: mode !== "blind" });
         if (!Number.isFinite(roll.total)) throw new Error("Некорректная формула количества добычи.");
         rolls.push(roll);
         return Math.max(0, Math.floor(roll.total));

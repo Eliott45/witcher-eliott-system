@@ -1,6 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { selectedLuck } from "../data/luck.mjs";
 import { escapeTooltip } from "../sheets/statistics-tooltips.mjs";
+import { minimumRollSource } from "../dice/minimum-roll.mjs";
 
 // Reservations last only for a chat creation operation. A rejected message must
 // neither spend Luck nor leave it reserved; simultaneous local rolls cannot reuse it.
@@ -22,13 +23,14 @@ export async function prepareMessageLuck(message, operationId) {
     return;
   }
   const roll = message.rolls[index];
+  const original = minimumRollSource(roll);
   const bonus = new foundry.dice.terms.NumericTerm({ number: points.length,
     options: { flavor: game.i18n.localize("WITCHER.Attributes.luck.Label") } });
   await bonus.evaluate();
   // Reuse evaluated dice instead of evaluating their formula a second time.
   const adjusted = foundry.dice.Roll.fromTerms([
-    ...roll.terms, new foundry.dice.terms.OperatorTerm({ operator: "+" }), bonus
-  ], { ...roll.options });
+    ...original.terms, new foundry.dice.terms.OperatorTerm({ operator: "+" }), bonus
+  ], { ...original.options });
   const rolls = [...message.rolls];
   rolls[index] = adjusted;
   message.updateSource({

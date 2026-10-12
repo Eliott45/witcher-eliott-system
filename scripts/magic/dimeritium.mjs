@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { tokenGap } from "../combat/attack-target.mjs";
 import { isPhysical } from "../data/physical-items.mjs";
@@ -82,7 +83,7 @@ export async function rollDimeritiumResistance(actor, state) {
   const ability = dimeritiumResistance(actor);
   if (!ability) throw new Error("Нужна способность мага «Устойчивость к двимериту».");
   if (!state) throw new Error("Сейчас двимерит на персонажа не действует.");
-  const roll = await new foundry.dice.Roll(`1d10wc + ${ability.base}`).evaluate();
+  const roll = await evaluateRoll(`1d10wc + ${ability.base}`);
   const success = roll.total >= DIMERITIUM_RESISTANCE_DC;
   const outcome = success
     ? "Успех: кружится голова и мучает дискомфорт, но маг сохраняет половину Энергии и может сотворять заклинания, пока длится это воздействие."
@@ -116,7 +117,7 @@ export async function clearEndedDimeritiumEffects(actors, tokenOf) {
 export async function rollDimeritium(actor) {
   const { skillValue } = await import("../data/skills.mjs");
   const endurance = skillValue(actor.system, "endurance");
-  const roll = await new foundry.dice.Roll(`1d10wc + ${endurance?.total ?? 0}`).evaluate();
+  const roll = await evaluateRoll(`1d10wc + ${endurance?.total ?? 0}`);
   const row = dimeritiumResult(roll.total);
   await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), flags: { [SYSTEM_ID]: { skipLuck: true } },
     flavor: `<section class="witcher-magic-chat"><h3>Двимерит · Стойкость СЛ 16</h3><p>Энергия снижена до 0, пока длится касание. Проверка повторяется каждые полчаса контакта.</p><p><strong>${roll.total}</strong>: ${row.text}</p></section>` });
@@ -144,12 +145,12 @@ export async function dimeritiumTurn(combat, combatant, context) {
   if (spasms) {
     const stored = spasms.flags?.[SYSTEM_ID]?.dimeritiumSpasms, next = stored?.combat === combat.uuid ? stored.round : null;
     if (next === null || context.round >= next) {
-      const interval = (await new foundry.dice.Roll("1d6").evaluate()).total;
+      const interval = (await evaluateRoll("1d6")).total;
       await spasms.update({ [`flags.${SYSTEM_ID}.dimeritiumSpasms`]: { combat: combat.uuid, round: context.round + interval } });
       // The first check comes after a full interval, like other periodic conditions.
       if (next !== null) {
         const { skillValue } = await import("../data/skills.mjs");
-        const roll = await new foundry.dice.Roll(`1d10wc + ${skillValue(actor.system, "endurance")?.total ?? 0}`).evaluate();
+        const roll = await evaluateRoll(`1d10wc + ${skillValue(actor.system, "endurance")?.total ?? 0}`);
         const failed = roll.total < 15;
         await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), flags: { [SYSTEM_ID]: { skipLuck: true } },
           flavor: `<section class="witcher-magic-chat"><h3>Двимерит: спазмы · Стойкость СЛ 15</h3><p><strong>${roll.total}</strong>: ${failed ? "спазм скручивает тело — персонаж ошеломлён." : "удалось перетерпеть."}</p></section>` }, { messageMode });

@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 
@@ -9,7 +10,7 @@ const initiativeBonus = combatant => combatant.actor?.system.statistics?.initiat
 const sideOf = combatant => combatant.token?.disposition ?? null;
 
 /** Pure: initiative per member from one shared die. */
-export const groupInitiative = (die, members) => members.map(member => ({ ...member, initiative: die + member.bonus }));
+export const groupInitiative = (die, members) => members.map(member => ({ ...member, initiative: Math.max(0, die + member.bonus) }));
 
 /** Who may join a group led by `leader` for `user`: GM — anyone; player — allies without initiative or their own combatants. */
 export function eligibleMembers(combat, leader, user = game.user) {
@@ -18,7 +19,7 @@ export function eligibleMembers(combat, leader, user = game.user) {
 }
 
 async function postGroupRoll(combat, leader, members) {
-  const roll = await new foundry.dice.Roll("1d10").evaluate();
+  const roll = await evaluateRoll("1d10");
   const rows = groupInitiative(roll.total, members.map(entry => ({ id: entry.id, name: entry.name, bonus: initiativeBonus(entry) })));
   const list = [...rows].sort((a, b) => b.initiative - a.initiative)
     .map(row => `<li><span>${esc(row.name)}</span><small>${roll.total} + ${row.bonus}</small><b>${row.initiative}</b></li>`).join("");

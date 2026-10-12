@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { CONDITION_BY_ID, conditionSource } from "../data/condition-definitions.mjs";
 import { activeEffect } from "../data/effect-counters.mjs";
@@ -12,7 +13,7 @@ export function requireCreatureGM(actor) {
   if(!activeCreatureGM())throw new Error("Особые действия существ выполняет активный ведущий.");
   if(!actor?.isOwner)throw new Error("Нет права управлять существом.");
 }
-export const creatureRoll = formula => new foundry.dice.Roll(formula).evaluate({allowInteractive:game.settings.get("core","messageMode")!=="blind"});
+export const creatureRoll = formula => evaluateRoll(formula,{allowInteractive:game.settings.get("core","messageMode")!=="blind"});
 export async function creaturePost(actor,{title,text="",rolls=[],flags={},content=""}) {
   const Message=foundry.documents.ChatMessage;
   return Message.create(Message.applyMode({speaker:Message.getSpeaker({actor}),rolls,

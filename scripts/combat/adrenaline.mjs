@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { installedRune } from "../data/rune-glyphs.mjs";
 import { hasDose } from "../data/consumables.mjs";
@@ -61,7 +62,7 @@ export function spendAdrenaline(actor, count, mode) {
     const quote = adrenalineSpendQuote(actor, count, mode), state = { ...quote.state, combatId: fight(), dice: quote.state.dice - count };
     let roll = null, recovered = 0;
     if (mode === "health") {
-      roll = await new foundry.dice.Roll(`${count}d6`).evaluate({ allowInteractive: game.settings.get("core", "messageMode") !== "blind" });
+      roll = await evaluateRoll(`${count}d6`,{ allowInteractive: game.settings.get("core", "messageMode") !== "blind" });
       // A separate pool handles ordinary temporary HP. At <=0 it must also lift the actor out of Death State.
       recovered = Math.min(roll.total, Math.max(0, 1 - actor.system.health.value));
       state.emergencyHP += recovered;

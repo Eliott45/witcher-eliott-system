@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
@@ -69,7 +70,7 @@ export function rollWeaponAttack(actor,itemId,options={}) {
     const display=trackRollDisplay(),messageMode=game.settings.get("core","messageMode");
     try {
       const rolls=[];
-      for(let i=0;i<quote.attack.count;i++)rolls.push(await new foundry.dice.Roll(`1d10wc + ${quote.total}`,{}, {flavor:`${quote.name} · ${i+1}/${quote.attack.count}`}).evaluate({allowInteractive:messageMode!=="blind"}));
+      for(let i=0;i<quote.attack.count;i++)rolls.push(await evaluateRoll(`1d10wc + ${quote.total}`,{allowInteractive:messageMode!=="blind"},{}, {flavor:`${quote.name} · ${i+1}/${quote.attack.count}`}));
       const math=quote.parts.filter(part=>part.value||part.label==="Основа навыка").map(part=>`${part.label}: ${signed(part.value)}`).join("; ");
       const types=damageTypeLabel(quote.weapon.damageType);
       const notes=[quote.ranged&&quote.band.distance!=null?`${quote.band.name} (дальность оружия ${quote.range} м).`:"",projectile?`${arrow?"Стрелы":"Болт"}: ${projectile.name}${projectile.properties?` (${projectile.properties})`:""}.`:"",quote.nonLethal?"Несмертельный урон: отнимает Выносливость.":"",quote.attack.charge?"С разбега: полный ход. Если удар заблокируют — Сила против Силы, чтобы сбить с ног.":"",
@@ -114,7 +115,7 @@ export async function rollWeaponDamage(message) {
   if(!actor?.isOwner||!message.isContentVisible||!attack)return;
   const mode=message.blind?"blind":message.whisper?.length?"gm":"public";
   const formula=attack.adrenalineDice?`${attack.damage} + ${attack.adrenalineDice}d6`:attack.damage;
-  const roll=await new foundry.dice.Roll(formula).evaluate({allowInteractive:!message.blind});
+  const roll=await evaluateRoll(formula,{allowInteractive:!message.blind});
   // Use the attack snapshot: changing grip/stats after the attack cannot change its damage.
   return roll.toMessage({speaker:{...message.speaker},whisper:[...message.whisper],blind:message.blind,
     flavor:`<h3>${esc(attack.name)} · урон</h3><p>До вычета брони. ${attack.location==="random"?"Определите место попадания (1d10).":`После брони примените множитель зоны ×${attack.multiplier}.`}</p><small>ПЗ цели и повреждение брони изменяются вручную.</small>`,
@@ -123,7 +124,7 @@ export async function rollWeaponDamage(message) {
 export async function rollHitLocation(message,bodyPlan) {
   if(!message.speakerActor?.isOwner||!message.isContentVisible||message.flags[SYSTEM_ID]?.weaponAttack?.location!=="random")return;
   hitLocation(1,bodyPlan);
-  const roll=await new foundry.dice.Roll("1d10").evaluate({allowInteractive:!message.blind});
+  const roll=await evaluateRoll("1d10",{allowInteractive:!message.blind});
   const location=hitLocation(roll.total,bodyPlan);
   return roll.toMessage({speaker:{...message.speaker},whisper:[...message.whisper],blind:message.blind,
     flavor:`<section class="witcher-attack-chat"><h3>${esc(message.flags[SYSTEM_ID].weaponAttack.name)} · ${location.name}</h3><p>${bodyPlan==="humanoid"?"Гуманоид":"Чудовище"}: ${roll.total} на 1d10 → урон ×${location.multiplier} после брони.</p>${location.id==="tail"?"<p>Если у чудовища нет хвоста и крыльев, попадание приходится в левую конечность (×½).</p>":""}</section>`,

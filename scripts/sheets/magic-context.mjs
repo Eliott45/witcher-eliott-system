@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { dimeritiumState, rollDimeritium, dimeritiumResistance, rollDimeritiumResistance, dimeritiumBanner, DIMERITIUM_CONTACT } from "../magic/dimeritium.mjs";
 import { RITUAL_INTERRUPTIONS } from "../magic/rules.mjs";
 import { actorToken } from "../combat/environment.mjs";
@@ -140,7 +141,7 @@ export const magicActions={
     const item=this.actor.items.get(target.dataset.itemId);if(item?.type!=="spell")return;
     const duration=target.dataset.spellRoll==="duration",formula=duration?item.system.duration.formula:item.system.damage;
     if(!formula||!foundry.dice.Roll.validate(formula))throw new Error("Укажите корректную формулу в параметрах заклинания.");
-    const roll=await new foundry.dice.Roll(formula).evaluate();
+    const roll=await evaluateRoll(formula);
     return roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor:this.actor}),
       flavor:`${duration?"Длительность":"Базовый урон / одно попадание"}: ${escape(item.name)}${duration?` (${item.system.duration.kind==="hours"?"часов":item.system.duration.kind==="days"?"дней":"раундов"})`:" — масштабирование и защиту учитывайте отдельно"}`,
       flags:{[SYSTEM_ID]:{skipLuck:true,...(duration?{effectDuration:{value:roll.total*(item.system.duration.kind==="hours"?3600:item.system.duration.kind==="days"?86400:1),units:["hours","days"].includes(item.system.duration.kind)?"seconds":"rounds"}}:{})}}},{messageMode:game.settings.get("core","messageMode")});

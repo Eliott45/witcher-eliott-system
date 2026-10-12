@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { fullTurnStart } from "../combat/full-turn-rules.mjs";
@@ -34,7 +35,7 @@ export async function heatItem(caster, spell, message) {
   const answer = await foundry.applications.api.DialogV2.prompt({ window: { title: spell.name }, content, rejectClose: false,
     ok: { label: "Раскалить", callback: (_event, button) => ({ pick: Number(button.form.elements.pick.value), mode: button.form.elements.mode.value }) } });
   if (!answer) return null;
-  const { token, item } = rows[answer.pick], rounds = (await new foundry.dice.Roll("1d6").evaluate()).total;
+  const { token, item } = rows[answer.pick], rounds = (await evaluateRoll("1d6")).total;
   if (answer.mode === "ally") {
     if (!token.actor.isOwner) throw new Error(`Нет прав на ${token.name}: пусть эффект наложит ведущий.`);
     await token.actor.createEmbeddedDocuments("ActiveEffect", [heatedWeaponSource(token.actor, item, spell, rounds)]);
@@ -66,7 +67,7 @@ async function resolveHeatNow(message, choice, heat, actor, item) {
     await foundry.documents.ChatMessage.implementation.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), content: `<p><i class="fa-solid fa-fire"></i> ${esc(result)}</p>` });
     return settle(message, "drop", result);
   }
-  const roll = await new foundry.dice.Roll("2d6").evaluate(), total = Math.floor(roll.total / 2);
+  const roll = await evaluateRoll("2d6"), total = Math.floor(roll.total / 2);
   const { sufferDamage } = await import("../combat/attack-exchange.mjs");
   await sufferDamage(actor, { total, ablate: [], steps: [] });
   await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }), flags: { [SYSTEM_ID]: { skipLuck: true } },

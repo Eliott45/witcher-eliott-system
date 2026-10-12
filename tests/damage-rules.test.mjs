@@ -103,6 +103,7 @@ test("ganging up counts distinct melee attackers on the target this round, up to
 test("group initiative: one shared d10 plus each member's own initiative", async () => {
   const { groupInitiative } = await import("../scripts/combat/group-initiative.mjs");
   assert.deepEqual(groupInitiative(7, [{ id: "a", bonus: 10 }, { id: "b", bonus: 8 }, { id: "c", bonus: 6 }]).map(row => row.initiative), [17, 15, 13]);
+  assert.deepEqual(groupInitiative(2, [{ id: "a", bonus: -5 }, { id: "b", bonus: -2 }, { id: "c", bonus: 6 }]).map(row => row.initiative), [0, 0, 8]);
 });
 
 test("layering helpers: zone SP and the limits follow the errata", async () => {

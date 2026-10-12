@@ -1,5 +1,6 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { escapeTooltip } from "../sheets/statistics-tooltips.mjs";
+import { minimumRollSource } from "../dice/minimum-roll.mjs";
 
 /** Persist a readable chain alongside native Roll data, so chat history stays useful. */
 export function prepareCriticalResult(message) {
@@ -11,7 +12,8 @@ export function prepareCriticalResult(message) {
     const spentLuck = message.flags[SYSTEM_ID]?.luck;
     const luck = index === (spentLuck?.rollIndex ?? 0) ? spentLuck?.bonus ?? 0 : 0;
     const contribution = chains.reduce((total, chain) => total + chain.total, 0);
-    const base = roll.total - contribution - luck;
+    const rawTotal = minimumRollSource(roll).total;
+    const base = rawTotal - contribution - luck;
     const signed = number => `${number < 0 ? "−" : "+"} ${Math.abs(number)}`;
     const rendered = chains.map(chain => {
       const fumble = chain.kind === "fumble";
@@ -21,7 +23,7 @@ export function prepareCriticalResult(message) {
         <strong>${escapeTooltip(label)}</strong><div class="witcher-chain-path">${path}<span class="witcher-chain-sum">= ${chain.total < 0 ? "−" : ""}${Math.abs(chain.total)}</span></div>
         ${fumble ? `<small>${escapeTooltip(game.i18n.localize("WITCHER.Critical.FirstOne"))}</small>` : ""}</div>`;
     }).join("");
-    const equation = `${base} ${chains.map(chain => signed(chain.total)).join(" ")}${luck ? ` + ${luck}` : ""} = ${roll.total}`;
+    const equation = `${base} ${chains.map(chain => signed(chain.total)).join(" ")}${luck ? ` + ${luck}` : ""} = ${roll.total}${rawTotal < roll.total ? " (минимум 0)" : ""}`;
     sections.push(`<section class="witcher-critical-result">${rendered}<div class="witcher-check-equation">${escapeTooltip(game.i18n.localize("WITCHER.Critical.Total"))}: ${escapeTooltip(equation)}</div></section>`);
   }
   if (sections.length) message.updateSource({

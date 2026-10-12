@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID,COMBAT_ACTOR_TYPES } from "../config.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { queueActorWrite } from "../data/actor-writes.mjs";
@@ -36,12 +37,12 @@ export function drawPower(actor,place,{prepared=false,reward="blessing"}={}) {
       let succeeded=true,damage=0;
       if(visit.dc){
         const skill=skillValue(actor.system,"endurance");if(skill.total===null)throw new Error("Укажите Телосложение персонажа.");
-        const roll=await new foundry.dice.Roll(`1d10wc + ${skill.total}`).evaluate({allowInteractive:mode!=="blind"});
+        const roll=await evaluateRoll(`1d10wc + ${skill.total}`,{allowInteractive:mode!=="blind"});
         const message=await roll.toMessage({speaker,flavor:`<h3>${esc(place.name)}: Стойкость</h3><p>СЛ ${visit.dc} = 20 + 4 × ${visit.saves} успешных повторных проверок. При провале — 5d6 урона и последствие стихии.</p>`,flags:{[SYSTEM_ID]:display.flags[SYSTEM_ID]}},{messageMode:mode});
         if(!message)throw new Error("Бросок не создан.");await display.wait(message);
         succeeded=message.rolls[0].total>=visit.dc;
         if(!succeeded){
-          const hurt=await new foundry.dice.Roll("5d6").evaluate({allowInteractive:mode!=="blind"});
+          const hurt=await evaluateRoll("5d6",{allowInteractive:mode!=="blind"});
           const damageDisplay=trackRollDisplay();
           try{const msg=await hurt.toMessage({speaker,flavor:`Место силы: урон от перегрузки. ${ELEMENTAL_MISHAPS[element]}`,flags:{[SYSTEM_ID]:{...damageDisplay.flags[SYSTEM_ID],skipLuck:true}}},{messageMode:mode});if(!msg)throw new Error("Бросок урона не создан.");await damageDisplay.wait(msg);damage=hurt.total;}finally{damageDisplay.close();}
         }

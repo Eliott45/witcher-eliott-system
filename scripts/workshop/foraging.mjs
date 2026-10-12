@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { validateForaging } from "../data/foraging.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -51,7 +52,7 @@ export async function resolveForaging(card, checkMessage) {
         if (!message) {
           const display = trackRollDisplay();
           try {
-            const roll = await new foundry.dice.Roll(formula).evaluate({allowInteractive:!visibility.blind});
+            const roll = await evaluateRoll(formula,{allowInteractive:!visibility.blind});
             message = await roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),...visibility,
               flavor:`<strong>Сбор: ${esc(state.name)}</strong><p>Количество найденных единиц</p>`,
               flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],skipLuck:true,foragingYield:card.id}}},{messageMode});

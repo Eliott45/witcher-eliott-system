@@ -1,3 +1,4 @@
+import { evaluateRoll, minimumRollSource } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { hasAbility, withStubbornnessLock } from "../data/abilities.mjs";
 import { escapeTooltip } from "../sheets/statistics-tooltips.mjs";
@@ -41,7 +42,7 @@ export async function rerollStubbornness(source) {
       const original = source.rolls[0];
       // Rebuild from formula, never clone evaluated dice/options: a cloned wc chain
       // would retain its old continuation metadata. The formula already includes Luck.
-      const roll = await new foundry.dice.Roll(original.formula).evaluate({ allowInteractive: !source.blind });
+      const roll = await evaluateRoll(minimumRollSource(original).formula,{ allowInteractive: !source.blind });
       const result = { state: "complete", claim, original: original.total, rerolled: roll.total,
         kept: Math.max(original.total, roll.total), sourceId: source.id };
       const flags = source.flags[SYSTEM_ID];

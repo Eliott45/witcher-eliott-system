@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { consumableContext, consumptionPlan, potionEffectSource, activeDoses, consumedDose, toxicityState } from "../data/consumables.mjs";
 import { conditionSource, CONDITION_BY_ID, EFFECT_TEMPLATES, ALCHEMY_EFFECT_KEYS } from "../data/condition-definitions.mjs";
@@ -30,7 +31,7 @@ async function initialEffectCheck(actor, item, key) {
   if (stun == null) throw new Error("Заполните параметры персонажа для испытания УСТ.");
   const target = Math.max(0, stun - 2), mode = game.settings.get("core", "messageMode"), display = trackRollDisplay();
   try {
-    const roll = await new foundry.dice.Roll("1d10").evaluate({ allowInteractive: mode !== "blind" });
+    const roll = await evaluateRoll("1d10",{ allowInteractive: mode !== "blind" });
     const success = roll.total < target;
     const message = await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }),
       flavor: `${esc(item.name)} · УСТ −2: нужно меньше ${target}. ${success ? "Успех" : "Неудача"}.`,

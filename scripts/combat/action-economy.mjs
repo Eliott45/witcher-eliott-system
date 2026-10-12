@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { conditionRules } from "./condition-rules.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -36,7 +37,7 @@ export function rollActionCheck(actor, { formula, flavor, flags = {} }, options 
   return inventoryWrite(actor, async () => {
     const quote = actionQuote(actor,options), display = trackRollDisplay(), messageMode = game.settings.get("core", "messageMode");
     try {
-      const roll = await new foundry.dice.Roll(`${formula}${quote.penalty ? ` - 3` : ""}`).evaluate({allowInteractive:messageMode!=="blind"});
+      const roll = await evaluateRoll(`${formula}${quote.penalty ? ` - 3` : ""}`,{allowInteractive:messageMode!=="blind"});
       const systemFlags = { ...flags[SYSTEM_ID], ...display.flags[SYSTEM_ID], action: quote };
       // Rerolls retain the original paid modifier without buying another action.
       for (const key of ["skillCheck", "professionCheck"]) if (systemFlags[key]) systemFlags[key] = {...systemFlags[key], base:systemFlags[key].base + quote.penalty};

@@ -41,15 +41,16 @@ export class WitcherCombat extends foundry.documents.Combat {
     }, { inplace: false });
     await super.rollInitiative(ids, { ...options, messageOptions });
     // Native initiative writes the tracker before creating its chat messages.
-    // Use the posted total if the chat creation applied selected Luck.
+    // Use the posted total after selected Luck and the zero minimum.
     const combatants = (typeof ids === "string" ? [ids] : ids).map(id => this.combatants.get(id)).filter(Boolean);
     const updates = [];
     for (const message of game.messages) {
       const flags = message.flags[SYSTEM_ID];
-      if (flags?.initiativeBatch !== batch || !flags.luck) continue;
+      if (flags?.initiativeBatch !== batch) continue;
       const combatant = combatants.find(entry => entry.actorId === message.speaker.actor
         && (entry.tokenId ?? null) === (message.speaker.token ?? null));
-      if (combatant?.isOwner) updates.push({ _id: combatant.id, initiative: message.rolls[0].total });
+      const total = message.rolls[0]?.total;
+      if (combatant?.isOwner && Number.isFinite(total) && combatant.initiative !== total) updates.push({ _id: combatant.id, initiative: total });
     }
     if (updates.length) await this.updateEmbeddedDocuments("Combatant", updates, {
       turnEvents: false, ...(options.updateTurn === false ? { combatTurn: this.turn } : {})

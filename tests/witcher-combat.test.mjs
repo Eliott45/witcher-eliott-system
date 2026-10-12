@@ -15,8 +15,8 @@ globalThis.foundry = {
     _sortCombatants(a,b){return ((b.initiative??-Infinity)-(a.initiative??-Infinity))||(a.id>b.id?1:-1);}
     turn = 2;
     combatants = new Map([
-      ["one", { id: "one", actorId: "actor", tokenId: "token-one", isOwner: true }],
-      ["two", { id: "two", actorId: "actor", tokenId: "token-two", isOwner: true }],
+      ["one", { id: "one", actorId: "actor", tokenId: "token-one", isOwner: true, initiative: 17 }],
+      ["two", { id: "two", actorId: "actor", tokenId: "token-two", isOwner: true, initiative: 17 }],
       ["three", { id: "three", actorId: "stranger", tokenId: "token-three", isOwner: false }]
     ]);
     async rollInitiative(_ids, options) {
@@ -24,7 +24,7 @@ globalThis.foundry = {
       const batch = options.messageOptions.flags[SYSTEM_ID].initiativeBatch;
       game.messages = [
         { flags: { [SYSTEM_ID]: { initiativeBatch: batch, luck: { bonus: 4 } } }, speaker: { actor: "actor", token: "token-one" }, rolls: [{ total: 21 }] },
-        { flags: { [SYSTEM_ID]: { initiativeBatch: batch } }, speaker: { actor: "actor", token: "token-two" }, rolls: [{ total: 17 }] },
+        { flags: { [SYSTEM_ID]: { initiativeBatch: batch } }, speaker: { actor: "actor", token: "token-two" }, rolls: [{ total: Math.max(0, this.combatants.get("two").initiative) }] },
         { flags: { [SYSTEM_ID]: { initiativeBatch: "old", luck: { bonus: 4 } } }, speaker: { actor: "actor", token: "token-two" }, rolls: [{ total: 99 }] }
       ];
     }
@@ -42,6 +42,14 @@ test("initiative adopts the posted Luck total only for the correct token in the 
   assert.deepEqual(inspectedOptions.messageOptions.flags.other, { keep: true });
   assert.equal(messageOptions.flags[SYSTEM_ID], undefined);
   assert.deepEqual(documentUpdate, { type: "Combatant", updates: [{ _id: "one", initiative: 21 }], options: { turnEvents: false, combatTurn: 2 } });
+});
+
+test("initiative adopts the zero minimum without Luck and preserves the current turn", async () => {
+  const combat = new WitcherCombat();
+  combat.combatants.get("two").initiative = -8;
+  await combat.rollInitiative("two", { updateTurn: false });
+  assert.deepEqual(documentUpdate, { type: "Combatant", updates: [{ _id: "two", initiative: 0 }],
+    options: { turnEvents: false, combatTurn: 2 } });
 });
 
 test("native unbound sort honors delayed order, survives tied initiatives, and handles newcomers",()=>{

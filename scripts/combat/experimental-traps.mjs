@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { isCarried } from "../data/containers.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -78,7 +79,7 @@ export async function checkTrap(actor,region,kind) {
   if(!actor?.isOwner||!game.user.isGM||!trap(region))return;
   const state=trap(region);if(state.triggered||state.disarmed)return;
   const key=kind==="disarm"?"trapCrafting":"awareness",dc=kind==="disarm"?state.disarmDC:state.noticeDC,action=actionQuote(actor);
-  const roll=await new foundry.dice.Roll(`1d10wc + ${skillValue(actor.system,key).total+action.penalty}`).evaluate(),success=roll.total>=dc;
+  const roll=await evaluateRoll(`1d10wc + ${skillValue(actor.system,key).total+action.penalty}`),success=roll.total>=dc;
   await actor.update(actionUpdate(actor,action));
   await creaturePost(actor,{title:kind==="disarm"?"Обезвредить ловушку":"Обнаружить ловушку",rolls:[roll],text:`${esc(region.name)}: ${roll.total} против СЛ${dc} — ${success?"успех":"провал"}.`});
   if(success&&kind==="disarm")await region.update({[`flags.${SYSTEM_ID}.experimentalTrap.disarmed`]:true});

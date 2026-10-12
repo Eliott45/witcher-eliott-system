@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { immuneToCondition } from "../data/creatures.mjs";
 import { setStatus } from "./status-effects.mjs";
 import { EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions.mjs";
@@ -35,7 +36,7 @@ export async function rollWeaponConditions(actor, traits, result, options = {}) 
   const rolls = [], effects = [];
   for (const entry of weaponConditionChances(traits, result, options)) {
     const immune = immuneToCondition(actor, [entry.id]);
-    const roll = !immune && entry.chance < 100 ? await new foundry.dice.Roll("1d100").evaluate({ allowInteractive: !options.blind }) : null;
+    const roll = !immune && entry.chance < 100 ? await evaluateRoll("1d100",{ allowInteractive: !options.blind }) : null;
     if (roll) rolls.push(roll);
     effects.push({ ...entry, immune, roll: roll?.total ?? null, applied: !immune && (!roll || roll.total <= entry.chance),
       ...(entry.id === "bleeding" && options.ammunition?.ruleId === "ammunition.elven-burrowing" ? {burrowing:true} : {}) });
@@ -44,7 +45,7 @@ export async function rollWeaponConditions(actor, traits, result, options = {}) 
   if (!result.immune && traits?.stunModifier != null && ["head", "torso"].includes(options.location)) {
     const target = actor.system?.statistics?.stun;
     if (Number.isFinite(target)) {
-      const roll = await new foundry.dice.Roll("1d10").evaluate({ allowInteractive: !options.blind });
+      const roll = await evaluateRoll("1d10",{ allowInteractive: !options.blind });
       rolls.push(roll);
       effects.push({ id: "stunned", save: true, target: target + traits.stunModifier, modifier: traits.stunModifier,
         roll: roll.total, applied: !stunSucceeded(roll.total, target + traits.stunModifier) });

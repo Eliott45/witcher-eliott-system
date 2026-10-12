@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { sizeClassOf } from "../data/creatures.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { activeEffect } from "../data/effect-counters.mjs";
@@ -212,7 +213,7 @@ export function rollExchangeLocation(message, index) {
   return rollAttackStep(message, index, "location", async (attack, outcome) => {
     if (attack.location !== "random" || criticalPicksLocation(attack, outcome)) return;
     const target = targetActor(attack), plan = bodyPlanOf(target);
-    const roll = await new foundry.dice.Roll("1d10").evaluate({ allowInteractive: !message.blind });
+    const roll = await evaluateRoll("1d10",{ allowInteractive: !message.blind });
     const { id, name, multiplier } = hitLocation(roll.total, plan, { hasTailOrWings: target?.system.creature?.hasTailOrWings ?? false });
     return { rolls: [roll], flavor: `<h3>${esc(attack.name)} · место попадания</h3><p>${esc(name)} · ×${multiplier} после брони</p>`,
       exchange: { location: { id, name, multiplier }, result: roll.total, bodyPlan: plan } };
@@ -233,16 +234,16 @@ export function rollExchangeDamage(message, index) {
     const target = targetActor(attack), item = attackItem(attack, actor), weapon = attack.weaponSnapshot?.system ?? (item ? effectiveItem(item) : {});
     const traits = attack.traits ?? weaponDamageTraits(weapon), monster = target ? monsterResistant(target) : false;
     const options = { allowInteractive: !message.blind };
-    const rolls = [await new foundry.dice.Roll(attack.damage).evaluate(options)];
+    const rolls = [await evaluateRoll(attack.damage,options)];
     let hitTraits = attack.hitTraits ?? weaponHitTraits(weapon,actor);
-    const ablation = hitTraits.ablating ? await new foundry.dice.Roll("floor(1d6 / 2)").evaluate(options) : null;
+    const ablation = hitTraits.ablating ? await evaluateRoll("floor(1d6 / 2)",options) : null;
     if (ablation) rolls.push(ablation);
-    const silver = traits.silverDice && monster ? await new foundry.dice.Roll(traits.silverDice).evaluate(options) : null;
+    const silver = traits.silverDice && monster ? await evaluateRoll(traits.silverDice,options) : null;
     if (silver) rolls.push(silver);
     let critical = null;
     if (outcome.critical) {
       const aimed = !woundPicksLocation;
-      const critRoll = await new foundry.dice.Roll(aimed && ["head", "torso"].includes(location.id) ? "1d6" : aimed ? "0" : "2d6").evaluate(options);
+      const critRoll = await evaluateRoll(aimed && ["head", "torso"].includes(location.id) ? "1d6" : aimed ? "0" : "2d6",options);
       if (critRoll.dice.length) rolls.push(critRoll);
       // Katakan decoction (core p.248): +3 to the critical location roll, within the table.
       const rolled = criticalTableRoll(critRoll.total, { weapon: attack.weaponProperties == null ? weapon : { properties: attack.weaponProperties },
@@ -250,7 +251,7 @@ export function rollExchangeDamage(message, index) {
       const tableRoll = aimed ? aimedCriticalRoll(location.id, rolled) : rolled;
       if (!aimed) {
         // The wound names the part struck; a limb's side is a coin toss.
-        const side = criticalWoundNeedsSide(tableRoll) ? await new foundry.dice.Roll("1d2").evaluate(options) : null;
+        const side = criticalWoundNeedsSide(tableRoll) ? await evaluateRoll("1d2",options) : null;
         if (side) rolls.push(side);
         const id = criticalWoundLocation(tableRoll, bodyPlanOf(target), side?.total);
         location = ATTACK_LOCATIONS.find(entry => entry.id === id);
@@ -268,16 +269,16 @@ export function rollExchangeDamage(message, index) {
     const held = location.id === "torso" ? grappleState(target).holding?.actor : null;
     const iceSources = [...frozenSources(target), ...frozenSources(held)];
     if (iceSources.length) {
-      const ice = await new foundry.dice.Roll("2d6").evaluate(options); rolls.push(ice);
+      const ice = await evaluateRoll("2d6",options); rolls.push(ice);
       extras.push({ label: "Алхимическое замораживание", value: ice.total, freeze: iceSources });
     }
     if (attack.adrenalineDice > 0 && index === 0) {
-      const adrenaline = await new foundry.dice.Roll(`${attack.adrenalineDice}d6`).evaluate(options); rolls.push(adrenaline);
+      const adrenaline = await evaluateRoll(`${attack.adrenalineDice}d6`,options); rolls.push(adrenaline);
       extras.push({ label: "Адреналин", value: adrenaline.total });
     }
     // Cadfan's Grasp (core p.103): a heated weapon deals +2d6 and burns with 50%.
     if (heatedWeapon(actor, attack.itemId)) {
-      const heat = await new foundry.dice.Roll("2d6").evaluate(options); rolls.push(heat);
+      const heat = await evaluateRoll("2d6",options); rolls.push(heat);
       extras.push({ label: "Раскалено (Хватка Кадфана)", value: heat.total });
       hitTraits = { ...hitTraits, burning: Math.max(hitTraits.burning ?? 0, 50) };
     }
@@ -545,7 +546,7 @@ export async function runFumbleStep({ message, index, role, actor, itemId, outco
   try {
     const attack = flagsOf(message).weaponAttack;
     const notes = [], rolls = [], extra = {}, item = role === "attack" ? attackItem(attack, actor) : itemId ? actor.items.get(itemId) : null;
-    const roll = async formula => { const result = await new foundry.dice.Roll(formula).evaluate(); rolls.push(result); return result; };
+    const roll = async formula => { const result = await evaluateRoll(formula); rolls.push(result); return result; };
     if (step.id === "status") { await applyStatus(actor, outcome.apply.status); notes.push(`${CONDITION_BY_ID[outcome.apply.status].name}`); }
     if (step.id === "reliability" || step.id === "break") {
       const result = step.id === "break" ? { total: item?.system.reliability?.value ?? 0 } : await roll(step.dice);

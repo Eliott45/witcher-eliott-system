@@ -1,3 +1,4 @@
+import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { WITCHER_CREATION_FIELDS, DECADE_FIELDS, DECADE_GROUPS, formFields } from "../data/lifepath-fields.mjs";
 import { WITCHER_RISKS, witcherTrialModifier } from "../data/witcher-lifepath.mjs";
@@ -118,7 +119,7 @@ export async function rollDecade() {
   if (!choice) return;
   const rolls = [];
   const entry = await generateDecade(choice.age, choice.risk, async faces => {
-    const roll = await new foundry.dice.Roll(`1d${faces}`).evaluate({ allowInteractive: false });
+    const roll = await evaluateRoll(`1d${faces}`,{ allowInteractive: false });
     rolls.push(roll); return roll.total;
   });
   await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: this.actor }),
@@ -157,7 +158,7 @@ export async function rollLifeEvent() {
   if (!this.isEditable || this.actor.system.details.race === "witcher") return;
   const rolls = [];
   const data = await generateLifeEvent(nextRecordAge(this.actor.system.lifepath.events), async faces => {
-    const roll = await new foundry.dice.Roll(`1d${faces}`).evaluate({ allowInteractive: false });
+    const roll = await evaluateRoll(`1d${faces}`,{ allowInteractive: false });
     rolls.push(roll); return roll.total;
   });
   await foundry.documents.ChatMessage.create({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor: this.actor }),
