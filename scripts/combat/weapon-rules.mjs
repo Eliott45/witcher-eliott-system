@@ -10,6 +10,8 @@ import { creatureHypnosisPenalty } from "./creature-actions-rules.mjs";
 import { creatureAttackParts, creatureCanSwim, creatureHumanForm } from "../data/creature-modes.mjs";
 import { furyTargetError } from "./experimental-effects.mjs";
 import { SYSTEM_ID } from "../config.mjs";
+import { attackLocation, bodyPlanOf } from "../data/hit-locations.mjs";
+export { ATTACK_LOCATIONS, attackLocation, bodyPlanOf, hitLocation } from "../data/hit-locations.mjs";
 
 export const gripOf = item => item.system.natural ? 0 : item.system.grip || item.system.hands || 1;
 /** Effect penalties such as Staggered or Prone, targeted at "combat.attack" / "combat.defense". */
@@ -38,16 +40,6 @@ export function shieldPunch(body,weightClass) {
   const steps={light:0,medium:2,heavy:4}[weightClass];
   return steps===undefined?null:Math.min(8,bodyDamage(body)+2*steps);
 }
-export const ATTACK_LOCATIONS = [
-  {id:"random",name:"Без прицеливания",penalty:0,multiplier:1},
-  {id:"head",name:"Голова",penalty:-6,multiplier:3},
-  {id:"torso",name:"Корпус",penalty:-1,multiplier:1},
-  {id:"rightArm",name:"Правая рука / конечность",penalty:-3,multiplier:0.5},
-  {id:"leftArm",name:"Левая рука / конечность",penalty:-3,multiplier:0.5},
-  {id:"rightLeg",name:"Правая нога",penalty:-2,multiplier:0.5},
-  {id:"leftLeg",name:"Левая нога",penalty:-2,multiplier:0.5},
-  {id:"tail",name:"Хвост / крыло",penalty:-2,multiplier:0.5}
-];
 // Core p.164: distance bands with the DC of a target that does not defend (p.165 adds the size modifier).
 export const RANGED_BANDS = [{id:"auto",name:"Дистанция: авто по токенам",penalty:0},{id:"normal",name:"Дистанция: без поправки",penalty:0,dc:15},
   {id:"point",name:"В упор (≤ 0,5 м) · +5",penalty:5,dc:10},{id:"short",name:"Ближняя (¼ дальности) · 0",penalty:0,dc:15},
@@ -61,12 +53,6 @@ export function bandFor(range,distance) {
   if(!id)return {id:"beyond",name:`Дистанция ${distance} м: дальше предельной (${range*2} м)`,penalty:0,dc:30,distance,beyond:true};
   const band=RANGED_BANDS.find(entry=>entry.id===id);
   return {...band,name:`Дистанция ${String(distance).replace(".",",")} м: ${BAND_NAMES[id]}`,distance,auto:true};
-}
-export function hitLocation(result,bodyPlan="humanoid",{hasTailOrWings=true}={}) {
-  if(!Number.isInteger(result)||result<1||result>10||!["humanoid","monster"].includes(bodyPlan))throw new Error("Неизвестная зона попадания.");
-  const table=bodyPlan==="humanoid"?["head","torso","torso","torso","rightArm","leftArm","rightLeg","rightLeg","leftLeg","leftLeg"]:
-    ["head","torso","torso","torso","torso","rightArm","rightArm","leftArm","leftArm",hasTailOrWings?"tail":"leftArm"];
-  return ATTACK_LOCATIONS.find(entry=>entry.id===table[result-1]);
 }
 /** Core p.163 «Парное оружие»: any weapon held in one hand, two hand crossbows included; a shield is held in one hand too. */
 export const canDualWield = item => item?.type==="weapon"&&!item.system.natural&&gripOf(item)===1&&(["melee","thrown","shield"].includes(item.system.category)||item.system.skill==="crossbow");
@@ -99,9 +85,6 @@ export function attackModes(actor,item) {
   const dual=dualMode(actor,item);if(dual)modes.push(dual);
   return [...modes,...thrown];
 }
-/** Humanoid or monster hit-location table for a target actor (core p.152). */
-export const bodyPlanOf = actor => actor?.type === "npc" && actor.system.creature?.category !== "humanoid" ? "monster" : "humanoid";
-
 export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="auto",modifier=0,targetContext=null,ambushBonus=0,ignoreNaturalRange=false}={}) {
   if(item?.type!=="weapon")throw new Error("Выберите оружие.");
   let weapon=effectiveItem(item);const attack=attackModes(actor,item).find(entry=>entry.id===mode);
@@ -109,7 +92,7 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   // The item remains a melee weapon in the inventory; only this attack is a thrown projectile.
   if(attack.thrown)weapon={...weapon,category:"thrown",skill:"athletics"};
   const skill=skillValue(actor.system,weapon.skill);
-  const aim=ATTACK_LOCATIONS.find(entry=>entry.id===location);
+  const aim=attackLocation(location,targetContext?.target?.actor?bodyPlanOf(targetContext.target.actor):undefined);
   if(!aim||!Number.isFinite(Number(modifier))||Math.abs(Number(modifier))>100)throw new Error("Неверный модификатор атаки.");
   const ranged=["ranged","thrown"].includes(weapon.category),underwater=Boolean(actorEnvironment(actor)?.underwater),bowUnderwater=underwater&&weapon.category==="ranged";
   // Core p.165: under water bows and crossbows reach a quarter as far and deal half damage.

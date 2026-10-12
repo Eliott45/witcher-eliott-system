@@ -28,7 +28,7 @@ import { GRAPPLE_ACTIONS, applyGrappleSuccess, grappleState } from "./grapple.mj
 import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
 import { attackConcealed, creatureDetailsHidden, enemyAttackHidden, creatureDetailsSecret } from "../chat/concealment.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
-import { hitLocation, bodyPlanOf, ATTACK_LOCATIONS, weaponAttack, attackModes } from "./weapon-rules.mjs";
+import { hitLocation, bodyPlanOf, attackLocation, weaponAttack, attackModes } from "./weapon-rules.mjs";
 import { weaponDamageTraits, armorAt, monsterResistant, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
 import { criticalWoundByRoll, aimedCriticalRoll, criticalWoundLocation, criticalWoundNeedsSide, ORGAN_WOUNDS, ANATOMY_FREE_BONUS } from "../data/critical-wounds.mjs";
 import { criticalTableRoll, specterDamageBonus } from "./relic-weapon-rules.mjs";
@@ -202,11 +202,12 @@ const criticalPicksLocation = (attack, outcome) => Boolean(outcome?.critical) &&
 
 function exchangeLocation(message, index) {
   const attack = flagsOf(message).weaponAttack, outcome = exchangeOutcome(message, index);
+  const plan = bodyPlanOf(targetActor(attack));
   // A body block takes the blow on the blocking arm (core p.164); no location roll.
-  if (outcome?.limbBlock) return ATTACK_LOCATIONS.find(entry => entry.id === "leftArm");
+  if (outcome?.limbBlock) return attackLocation("leftArm", plan);
   if (criticalPicksLocation(attack, outcome)) return null;
   return attack.location === "random" ? exchangeOf(linked(message.id, index, "location"))?.location
-    : ATTACK_LOCATIONS.find(entry => entry.id === attack.location);
+    : attackLocation(attack.location, plan);
 }
 
 export function rollExchangeLocation(message, index) {
@@ -254,7 +255,7 @@ export function rollExchangeDamage(message, index) {
         const side = criticalWoundNeedsSide(tableRoll) ? await evaluateRoll("1d2",options) : null;
         if (side) rolls.push(side);
         const id = criticalWoundLocation(tableRoll, bodyPlanOf(target), side?.total);
-        location = ATTACK_LOCATIONS.find(entry => entry.id === id);
+        location = attackLocation(id, bodyPlanOf(target));
       }
       let wound = criticalWoundByRoll(outcome.critical.id, tableRoll), bonus = outcome.critical.bonus;
       if (wound && anatomyFree(target) && ORGAN_WOUNDS.has(wound.id)) { bonus += ANATOMY_FREE_BONUS[outcome.critical.id]; wound = null; }
@@ -382,7 +383,7 @@ export async function sufferDamage(actor, result, { wound = null, level = "", lo
     await item.update({ "system.stoppingPower.value": to });
     worn.push(`${item.name} ${from} → ${to}`);
   }
-  if (wound && !result.immune) await actor.createEmbeddedDocuments("ActiveEffect", [woundEffectData(wound.id, level, { location: location.id, locationName: location.name })]);
+  if (wound && !result.immune) await actor.createEmbeddedDocuments("ActiveEffect", [woundEffectData(wound.id, level, { location: location.id, locationName: location.name, bodyPlan: bodyPlanOf(actor) })]);
   if (!nonLethal && !result.immune && result.total > 0) await onCreatureDamaged(actor, result.total, {electricity});
   return worn;
 }

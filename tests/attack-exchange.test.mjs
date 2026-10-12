@@ -207,7 +207,7 @@ test("a monster without tail or wings takes a ten in its left limb, persisted th
   const location = await rollExchangeLocation(f.message, 0);
   assert.equal(exchange(location).location.id, "leftArm");
   assert.equal(exchange(location).location.multiplier, 0.5);
-  assert.match(exchangeRowHTML(f.message, 0), /Левая рука \/ конечность/);
+  assert.match(exchangeRowHTML(f.message, 0), /Левая конечность/);
   f.target.system.creature.hasTailOrWings = true;
   const damage = await rollExchangeDamage(f.message, 0);
   assert.equal(exchange(damage).location.id, "leftArm", "anatomy edits cannot change an already rolled location");
@@ -250,6 +250,28 @@ test("an unaimed critical on the head or torso rolls no side, and a monster's le
   const damage = exchange(await rollExchangeDamage(monster.message, 0));
   assert.equal(damage.critical.wound.id, "sprained-leg");
   assert.equal(damage.location.id, "rightArm");
+  assert.equal(damage.location.name, "Правая конечность");
+});
+
+test("a wolf's unaimed leg critical keeps its side and limb label when damage creates the wound", async t => {
+  for (const [total, wound] of [[17,"sprained-leg"],[20,"fractured-leg"],[23,"compound-leg-fracture"],[25,"dismembered-leg"]]) {
+    for (const [side, id, name] of [[1,"rightArm","Правая конечность"],[2,"leftArm","Левая конечность"]]) {
+      const f = fixture(t, { totals: [total], category: "beast", results: [8, 2, side] });
+      mutableTarget(f);
+      f.target.createEmbeddedDocuments = async (_type, sources) => { f.target.effects.push(...sources); return sources; };
+      const damage = exchange(await rollExchangeDamage(f.message, 0));
+      assert.deepEqual(damage.location, { id, name, multiplier: 0.5 });
+      assert.equal(damage.critical.wound.id, wound);
+      await applyExchangeDamage(f.message, 0);
+      const stored = f.target.effects.find(effect => effect.flags?.[SYSTEM_ID]?.criticalWound).flags[SYSTEM_ID].criticalWound;
+      assert.equal(stored.id, wound);
+      assert.equal(stored.location, id);
+      assert.equal(stored.locationName, name);
+      assert.equal(stored.bodyPlan, "monster");
+      if (wound === "dismembered-leg") assert.equal(stored.arm, id);
+      assert.deepEqual(f.evaluated.map(row => row.formula), ["2d6+2", "2d6", "1d2"]);
+    }
+  }
 });
 
 test("misses, unresolved defenses, invisible attacks and non-owners cannot roll follow-up steps", async t => {

@@ -2,6 +2,7 @@ import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { CRITICAL_WOUNDS } from "../data/critical-wounds.mjs";
+import { attackLocation, bodyPlanOf } from "../data/hit-locations.mjs";
 import { EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions.mjs";
 import { stunSucceeded } from "../data/statistics.mjs";
 import { CRITICAL_LEVELS } from "./damage-rules.mjs";
@@ -111,16 +112,20 @@ function woundDescription(wound, level, locationName, state, note = "", prosthes
 }
 
 /** ActiveEffect source for a wound; its modifiers follow the wound state. */
-export function woundEffectData(woundId, level, { location = "", locationName = "", state = "fresh", arm = "", note = "", prosthesis = null } = {}) {
+export function woundEffectData(woundId, level, { location = "", locationName = "", bodyPlan = "humanoid", state = "fresh", arm = "", note = "", prosthesis = null } = {}) {
   const wound = findWound(woundId);
   if (!wound) throw new Error("Неизвестное критическое ранение.");
   const rules = WOUND_RULES[woundId] ?? {}, limbs = rules.arm ? ARMS : rules.leg ? LEGS : null;
-  // `arm` stores the struck limb's side: an arm, or a leg for a lost leg.
-  const side = limbs ? arm || (limbs[location] ? location : "") : "";
-  const place = side && !limbs[location] ? limbs[side] : locationName;
+  // A monster's shared limb zone may carry a leg wound. Keep that zone (and side)
+  // instead of rolling a second side or moving a prosthesis to another body part.
+  const monsterLimb = bodyPlan === "monster" && ["rightArm", "leftArm", "rightLeg", "leftLeg", "tail"].includes(location);
+  const side = limbs ? (monsterLimb || limbs[location] ? location : arm) : "";
+  const place = bodyPlan === "monster" ? attackLocation(side || location, bodyPlan)?.name ?? locationName
+    : side && !limbs[location] ? limbs[side] : locationName || attackLocation(location, bodyPlan)?.name || "";
   const fitted = rules.limb && prosthesis?.quality ? { itemId: prosthesis.itemId ?? "", quality: prosthesis.quality } : null;
   return { name: `Крит: ${wound.name}`, img: "icons/svg/blood.svg", description: woundDescription(wound, level, place, state, note, fitted),
-    flags: { [SYSTEM_ID]: { criticalWound: { id: woundId, level, location, locationName: place, state, arm: side, note, prosthesis: fitted },
+    flags: { [SYSTEM_ID]: { criticalWound: { id: woundId, level, location, locationName: place,
+      ...(location || side || bodyPlan === "monster" ? { bodyPlan } : {}), state, arm: side, note, prosthesis: fitted },
       condition: { key: "critical-wound", modifiers: woundModifiers(woundId, state, { arm: side, prosthesis: fitted }) } } } };
 }
 
@@ -174,13 +179,14 @@ export async function onWoundCreated(effect, _options, userId) {
   const data = effect.flags?.[SYSTEM_ID]?.criticalWound, actor = effect.parent;
   if (!data || data.applied || userId !== game.user.id || actor?.documentName !== "Actor" || !actor.isOwner) return;
   const rules = WOUND_RULES[data.id] ?? {}, wound = findWound(data.id);
-  let { arm: side = "", note = "" } = data;
+  const bodyPlan = bodyPlanOf(actor);
+  let { arm: side = "", note = "" } = woundEffectData(data.id, data.level, { ...data, bodyPlan }).flags[SYSTEM_ID].criticalWound;
   if ((rules.arm || rules.leg) && !side) {
     const first = (await evaluateRoll("1d2")).total === 1;
     side = rules.arm ? (first ? "rightArm" : "leftArm") : (first ? "rightLeg" : "leftLeg");
   }
   if (rules.teeth && !note) note = `Выбито зубов: ${(await evaluateRoll("1d10")).total}.`;
-  const source = woundEffectData(data.id, data.level, { ...data, arm: side, note });
+  const source = woundEffectData(data.id, data.level, { ...data, bodyPlan, arm: side, note });
   const linked = data.state === "fresh" ? await linkConditions(actor, effect, "fresh") : [];
   await effect.update({ description: source.description, [`flags.${SYSTEM_ID}.criticalWound`]: { ...source.flags[SYSTEM_ID].criticalWound, applied: true, linked },
     [`flags.${SYSTEM_ID}.condition.modifiers`]: source.flags[SYSTEM_ID].condition.modifiers });
@@ -217,12 +223,12 @@ export async function setWoundState(effect, state) {
     await setProsthesis(effect, null);
     data = effect.flags[SYSTEM_ID].criticalWound;
   }
-  const source = woundEffectData(data.id, data.level, { ...data, state });
+  const source = woundEffectData(data.id, data.level, { ...data, state,
+    bodyPlan: effect.parent?.documentName === "Actor" ? bodyPlanOf(effect.parent) : data.bodyPlan });
   // Stabilising stops the bleeding and other conditions this wound caused.
   if (effect.parent?.documentName === "Actor" && state !== "fresh") await unlinkConditions(effect.parent, effect);
-  await effect.update({ description: source.description, [`flags.${SYSTEM_ID}.criticalWound.state`]: state,
-    [`flags.${SYSTEM_ID}.criticalWound.nextStun`]: null,
-    [`flags.${SYSTEM_ID}.criticalWound.recoveryDays`]: null,
+  await effect.update({ description: source.description,
+    [`flags.${SYSTEM_ID}.criticalWound`]: { ...data, ...source.flags[SYSTEM_ID].criticalWound, nextStun: null, recoveryDays: null },
     [`flags.${SYSTEM_ID}.condition.modifiers`]: source.flags[SYSTEM_ID].condition.modifiers });
   const linked = state === "fresh" && effect.parent?.documentName === "Actor" ? await linkConditions(effect.parent, effect, state) : [];
   await effect.update({ [`flags.${SYSTEM_ID}.criticalWound.linked`]: linked });
@@ -243,8 +249,8 @@ export async function setProsthesis(effect, item = null) {
     if (used >= item.system.quantity) throw new Error("Этот протез уже надет на другую конечность.");
     prosthesis = { itemId: item.id, quality };
   }
-  const source = woundEffectData(data.id, data.level, { ...data, prosthesis });
-  await effect.update({ description: source.description, [`flags.${SYSTEM_ID}.criticalWound.prosthesis`]: prosthesis,
+  const source = woundEffectData(data.id, data.level, { ...data, prosthesis, bodyPlan: bodyPlanOf(actor) });
+  await effect.update({ description: source.description, [`flags.${SYSTEM_ID}.criticalWound`]: { ...data, ...source.flags[SYSTEM_ID].criticalWound },
     [`flags.${SYSTEM_ID}.condition.modifiers`]: source.flags[SYSTEM_ID].condition.modifiers });
   if (item && !item.system.equipped) await item.update({ "system.equipped": true });
   if (previous && previous.id !== item?.id && previous.system.equipped

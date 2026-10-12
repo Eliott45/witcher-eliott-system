@@ -120,6 +120,9 @@ test("hit location tables cover all d10 results including errata monster torso a
   assert.deepEqual(Array.from({length:10},(_,i)=>hitLocation(i+1).id),["head","torso","torso","torso","rightArm","leftArm","rightLeg","rightLeg","leftLeg","leftLeg"]);
   assert.deepEqual(Array.from({length:10},(_,i)=>hitLocation(i+1,"monster").id),["head","torso","torso","torso","torso","rightArm","rightArm","leftArm","leftArm","tail"]);
   assert.equal(hitLocation(1).multiplier,3);assert.equal(hitLocation(10).multiplier,.5);
+  assert.equal(hitLocation(5,"humanoid").name,"Правая рука");
+  assert.equal(hitLocation(6,"monster").name,"Правая конечность");
+  assert.equal(hitLocation(8,"monster").name,"Левая конечность");
   assert.equal(hitLocation(10,"monster",{hasTailOrWings:false}).id,"leftArm");
   assert.equal(hitLocation(10,"monster",{hasTailOrWings:false}).multiplier,.5);
   assert.equal(hitLocation(10,"monster",{hasTailOrWings:true}).id,"tail");

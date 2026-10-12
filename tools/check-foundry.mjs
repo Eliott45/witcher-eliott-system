@@ -1997,6 +1997,36 @@ assert.equal((await new CoreRoll(foragingFormula('1d10')).evaluate({maximize:tru
 globalThis.canvas=ambushGlobals.canvas;game.combat=ambushGlobals.combat;game.combats=ambushGlobals.combats;game.user=ambushGlobals.user;game.users=ambushGlobals.users;
 console.log('Group ambush: native Macro, role selection, shared roll matrix and manual combat start OK');
 
+// Real bestiary actors keep one critical limb and side through the native effect schema.
+{
+  const {woundEffectData,onWoundCreated}=await import('../scripts/combat/critical-wound-effects.mjs');
+  const {effectsContext}=await import('../scripts/sheets/effects-context.mjs');
+  const effectsTemplate=handlebars.compile(await readFile(new URL('../templates/effects-list.hbs',import.meta.url),'utf8'),{strict:true});
+  const random=CONFIG.Dice.randomUniform;
+  CONFIG.Dice.randomUniform=()=>assert.fail('The critical attack already chose a side; effect creation must not roll again');
+  try {
+    for(const [id,level] of [['sprained-leg','light'],['fractured-leg','medium'],['compound-leg-fracture','severe'],['dismembered-leg','deadly']]) {
+      for(const [location,name] of [['rightArm','Правая конечность'],['leftArm','Левая конечность']]) {
+        const actor=new foundry.documents.BaseActor({...bestiarySources().find(source=>source.name==='Волк'),
+          effects:[{...woundEffectData(id,level,{location,locationName:'Рука / конечность'}),_id:'wolfWound0000001'},
+            {_id:'wolfBleeding0001',name:'Кровотечение',statuses:['bleeding']}]});
+        Object.defineProperty(actor,'isOwner',{value:true});
+        const effect=actor.effects.get('wolfWound0000001');effect.update=async changes=>effect.updateSource(changes);
+        await onWoundCreated(effect,{},game.user.id);
+        const data=effect.flags[game.system.id].criticalWound;
+        assert.equal(data.location,location);assert.equal(data.locationName,name);assert.equal(data.bodyPlan,'monster');
+        if(id==='dismembered-leg')assert.equal(data.arm,location);
+        const html=effectsTemplate({editable:true,effects:await effectsContext({actor,isEditable:true})});
+        assert.ok(html.includes(name));assert.ok(!html.includes('Рука / конечность'));
+        const restored=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(actor.toObject())));
+        assert.equal(restored.effects.get(effect.id).flags[game.system.id].criticalWound.locationName,name);
+        assert.equal(effect.validationFailures.fields,null);
+      }
+    }
+  } finally {CONFIG.Dice.randomUniform=random;}
+  console.log('Critical limbs: native wolf effects preserve both sides, render creature labels and never reroll the struck limb');
+}
+
 const manualEditingPreviews={};
 {
   const {woundEffectData}=await import('../scripts/combat/critical-wound-effects.mjs');

@@ -75,9 +75,10 @@ function actorFixture() {
   return { actor, wound, effects };
 }
 const rolls = [];
+let evaluatedRolls = 0;
 globalThis.game = { user: { id: "u" }, users: {}, settings: { get: () => "public" } };
 globalThis.Hooks = { on() {}, once() {} };
-globalThis.foundry = { dice: { Roll: class { constructor(formula) { this.formula = formula; } async evaluate() { this.total = rolls.shift() ?? 1; return this; } async toMessage() {} } },
+globalThis.foundry = { dice: { Roll: class { constructor(formula) { this.formula = formula; } async evaluate() { evaluatedRolls++; this.total = rolls.shift() ?? 1; return this; } async toMessage() {} } },
   documents: { ChatMessage: { getSpeaker: () => ({}) } }, utils: {} };
 
 test("a new wound links its conditions once, resolves the arm and teeth, and stabilising removes the bleed", async () => {
@@ -113,6 +114,46 @@ test("only an untreated Torn Stomach burns 4 acid per turn", () => {
   assert.equal(woundAcidDamage(f.actor), 4);
   f.effects[0].flags[ID].criticalWound.state = "stabilized";
   assert.equal(woundAcidDamage(f.actor), 0);
+});
+
+test("monster leg wounds keep the struck side through creation, serialization and stabilization without a second die", async () => {
+  for (const [id, level, speed] of [["sprained-leg","light",4],["fractured-leg","medium",3],
+    ["compound-leg-fracture","severe",1],["dismembered-leg","deadly",1]]) {
+    for (const [location, name] of [["rightArm","Правая конечность"],["leftArm","Левая конечность"]]) {
+      const f = actorFixture(); f.actor.type = "npc"; f.actor.system.creature = { category: "beast" };
+      // Legacy source data used the generic arm zone with a human-looking label.
+      const effect = f.wound(id, level, { location, locationName: "Рука / конечность" });
+      const before = evaluatedRolls;
+      await onWoundCreated(effect, {}, "u");
+      assert.equal(evaluatedRolls, before, "The attack already chose the side");
+      assert.equal(effect.flags[ID].criticalWound.locationName, name);
+      assert.equal(stats(effect).effective.speed, speed, "Keep the book's leg-wound penalty");
+      if (id === "dismembered-leg") assert.equal(effect.flags[ID].criticalWound.arm, location);
+      effect.flags = JSON.parse(JSON.stringify(effect.flags));
+      await setWoundState(effect, "stabilized");
+      assert.equal(effect.flags[ID].criticalWound.location, location);
+      assert.equal(effect.flags[ID].criticalWound.locationName, name);
+      assert.equal(effect.flags[ID].criticalWound.bodyPlan, "monster");
+      assert.ok(effect.description.includes(name));
+      assert.equal(evaluatedRolls, before);
+    }
+  }
+});
+
+test("a known struck location wins over a stale opposite side, while unplaced wounds still choose a side", async () => {
+  const f = actorFixture(); f.actor.type = "npc"; f.actor.system.creature = { category: "beast" };
+  const effect = f.wound("dismembered-leg", "deadly", { location: "rightArm", arm: "leftLeg", locationName: "Левая нога" });
+  const before = evaluatedRolls;
+  await onWoundCreated(effect, {}, "u");
+  assert.equal(evaluatedRolls, before);
+  assert.equal(effect.flags[ID].criticalWound.arm, "rightArm");
+  assert.equal(effect.flags[ID].criticalWound.locationName, "Правая конечность");
+  const unplaced = f.wound("dismembered-leg", "deadly");
+  rolls.push(2);
+  await onWoundCreated(unplaced, {}, "u");
+  assert.equal(evaluatedRolls, before + 1);
+  assert.equal(unplaced.flags[ID].criticalWound.arm, "leftLeg");
+  assert.equal(unplaced.flags[ID].criticalWound.locationName, "Левая конечность");
 });
 
 test("manual wound editing updates penalties and restores linked conditions when a wound is reopened", async () => {
