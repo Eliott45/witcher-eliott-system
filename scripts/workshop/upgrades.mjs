@@ -3,15 +3,17 @@ import { AUGMENTATIONS } from "../data/workshop-upgrades.mjs";
 import { conditionKey, armorZones } from "../data/physical-items.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { chooseReference } from "../sheets/reference-picker.mjs";
+import { selectCatalogItem } from "../sheets/catalog-picker.mjs";
 import { workshopCheck, workshopBase, workshopNotice } from "./check.mjs";
 import { inventoryTransaction, copyPhysical } from "./transaction.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { applyWeaponWear } from "../combat/weapon-wear.mjs";
 
-export function canInstall(target, source) {
-  return available(source) && source.system.kind==="upgrade" && source.system.upgrade.target===target.type && freeSlots(target)>0
+function upgradeFits(target, source) {
+  return Boolean(conditionKey(target)) && source.system.kind==="upgrade" && source.system.upgrade.target===target.type && freeSlots(target)>0
     && (source.system.upgrade.category!=="armor" || armorZones(target).every(zone=>source.system.upgrade.zones.includes(zone)));
 }
+export const canInstall = (target, source) => available(source) && upgradeFits(target, source);
 async function chooseOwned(actor, title, predicate) {
   const entries=actor.items.filter(predicate);
   if(!entries.length) throw new Error("Нет подходящих предметов при себе или свободных слотов.");
@@ -24,11 +26,36 @@ async function toolsAvailable(actor) {
 }
 export async function installUpgrade(target, { withoutCheck = false, source: selectedSource = null } = {}) {
   const actor=target.actor;if(!actor?.isOwner)return;
+  if(withoutCheck) {
+    if(!freeSlots(target))throw new Error("Нет свободных слотов для улучшения.");
+    const source=selectedSource??await selectCatalogItem("Установить без проверки",item=>upgradeFits(target,item),
+      {hint:"Выберите улучшение из каталога или предметов мира. Наличие в инвентаре и инструменты не требуются; предметы не расходуются."});
+    if(source)return installCatalogUpgrade(target,source);
+    return;
+  }
   const source=selectedSource??await chooseOwned(actor,"Установить улучшение",item=>canInstall(target,item));if(!source)return;
   const category=source.system.upgrade.category;
   const confirmed=await foundry.applications.api.DialogV2.confirm({window:{title:"Установка улучшения"},content:`<p><b>${esc(source.name)}</b> → ${esc(target.name)}</p><p>${esc(source.system.properties)}</p><p>${category==="armor"?`${withoutCheck?"Установка без проверки и инструментов.":"Полный раунд, Изготовление СЛ 14."} Накладка занимает слот; остальные части комплекта остаются в инвентаре.`:"Руна / глиф расходуется и устанавливается НАВСЕГДА. Снять её нельзя."}</p>`,rejectClose:false});
   if(!confirmed)return;
   return installOwnedUpgrade(target, source, { withoutCheck });
+}
+function installationUpdate(target, source) {
+  const category=source.system.upgrade.category;
+  const installation={id:foundry.utils.randomID(),name:source.name,sourceUuid:source._stats.compendiumSource||source.uuid,ruleId:source.system.ruleId??"",category,zone:category==="armor"?target.system.zone:"",properties:source.system.properties,
+    bonuses:foundry.utils.deepClone(source.system.upgrade.bonuses),weight:category==="armor"?source.system.weight*armorZones(target).length/3:0};
+  if(category==="armor")installation.bonuses.push({target:"weight",value:installation.weight});
+  const key=conditionKey(target), conditionBonus=installation.bonuses.filter(b=>b.target===key).reduce((sum,b)=>sum+b.value,0);
+  return {_id:target.id,"system.installations":[...target.system.installations,installation],[`system.${key}.value`]:target.system[key].value+conditionBonus};
+}
+/** Sheet editing: use a catalogue definition without spending or creating inventory items. */
+export async function installCatalogUpgrade(target, source) {
+  const actor=target.actor;if(!actor?.isOwner)return;
+  return inventoryWrite(actor,async()=>{
+    if(!upgradeFits(target,source))throw new Error("Улучшение не подходит или нет свободных слотов.");
+    if(target.system.quantity!==1)throw new Error("Для улучшения оставьте один экземпляр предмета в этой записи инвентаря.");
+    await inventoryTransaction(actor,{updates:[installationUpdate(target,source)]});
+    await workshopNotice(actor,`<p>${esc(source.name)} установлено на ${esc(target.name)} без проверки и расхода предметов.</p>`);
+  });
 }
 /** Manual installation keeps ownership, slots and material accounting; only the crafting check/tools are bypassed. */
 export async function installOwnedUpgrade(target, source, { withoutCheck = false } = {}) {
@@ -41,14 +68,8 @@ export async function installOwnedUpgrade(target, source, { withoutCheck = false
     if(target.system.quantity!==1)throw new Error("Для улучшения оставьте один экземпляр предмета в этой записи инвентаря.");
     if(category==="armor" && !withoutCheck && !(await workshopCheck(actor,{name:"Установка накладки",skill:"crafting",dc:14})).success)return;
     if(!canInstall(target,source))throw new Error("Свободные слоты или предметы изменились.");
-    const zone=category==="armor"?target.system.zone:"";
-    const installation={id:foundry.utils.randomID(),name:source.name,sourceUuid:source._stats.compendiumSource||source.uuid,ruleId:source.system.ruleId??"",category,zone,properties:source.system.properties,
-      bonuses:foundry.utils.deepClone(source.system.upgrade.bonuses),weight:category==="armor"?source.system.weight*armorZones(target).length/3:0};
-    const updates=[{_id:target.id,"system.installations":[...target.system.installations,installation]}], creates=[];
-    const key=conditionKey(target), conditionBonus=installation.bonuses.filter(b=>b.target===key).reduce((sum,b)=>sum+b.value,0);
-    updates[0][`system.${key}.value`]=target.system[key].value+conditionBonus;
+    const updates=[installationUpdate(target,source)], creates=[];
     if(category==="armor"){
-      installation.bonuses.push({target:"weight",value:installation.weight});
       const zones=source.system.upgrade.zones.filter(z=>!armorZones(target).includes(z));
       if(zones.length){const remainder=copyPhysical(source,1);remainder.system.upgrade.zones=zones;creates.push(remainder);}
     }

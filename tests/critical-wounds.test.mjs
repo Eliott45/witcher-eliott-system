@@ -5,6 +5,7 @@ import { WOUND_RULES, woundModifiers, woundEffectData, onWoundCreated, setWoundS
 import { deriveStatistics } from "../scripts/data/statistics.mjs";
 import { skillValue } from "../scripts/data/skills.mjs";
 import { cleanupLootTemplate } from "../scripts/loot/loot.mjs";
+import { editWound, canEditWound } from "../scripts/sheets/wound-editor.mjs";
 
 const ID = "witcher-eliott-system";
 const ALL = Object.values(CRITICAL_WOUNDS).flat();
@@ -114,6 +115,44 @@ test("only an untreated Torn Stomach burns 4 acid per turn", () => {
   assert.equal(woundAcidDamage(f.actor), 0);
 });
 
+test("manual wound editing updates penalties and restores linked conditions when a wound is reopened", async () => {
+  const f=actorFixture(),wound=f.wound("ruptured-spleen","medium");
+  await onWoundCreated(wound,{},"u");
+  let answer="stabilized",prompts=0;
+  const oldApplications=foundry.applications;
+  foundry.applications={api:{DialogV2:{prompt:async options=>{prompts++;assert.match(options.content,/без броска/);return answer;}}}};
+  rolls.push(8);
+  try {
+    assert.equal(canEditWound(wound),true);
+    await editWound(wound);
+    assert.equal(wound.flags[ID].criticalWound.state,"stabilized");
+    assert.equal(f.effects.some(effect=>effect.statuses.has("bleeding")),false);
+    answer="treated";await editWound(wound);
+    assert.deepEqual(wound.flags[ID].condition.modifiers,woundModifiers("ruptured-spleen","treated"));
+    wound.flags[ID].criticalWound.recoveryDays=3;
+    answer="fresh";await editWound(wound);
+    assert.equal(wound.flags[ID].criticalWound.recoveryDays,null);
+    assert.equal(f.effects.filter(effect=>effect.statuses.has("bleeding")).length,1);
+    await editWound(wound);
+    assert.equal(f.effects.filter(effect=>effect.statuses.has("bleeding")).length,1);
+    answer=null;await editWound(wound);
+    assert.equal(wound.flags[ID].criticalWound.state,"fresh");
+    answer="invalid";await editWound(wound);
+    assert.equal(wound.flags[ID].criticalWound.state,"fresh");
+    const count=prompts;f.actor.isOwner=false;await editWound(wound);assert.equal(prompts,count);
+    assert.deepEqual(rolls,[8],"Manual editing never rolls a die");
+  } finally {foundry.applications=oldApplications;rolls.length=0;}
+});
+
+test("manual editing cannot stabilize decapitation or repeat a heart death save",async()=>{
+  const f=actorFixture(),fatal=f.wound("decapitation","deadly"),heart=f.wound("heart-damage","deadly");
+  assert.equal(canEditWound(fatal),false);
+  await setWoundState(fatal,"stabilized");assert.equal(fatal.flags[ID].criticalWound.state,"fresh");
+  rolls.push(1);
+  await setWoundState(heart,"stabilized");await setWoundState(heart,"fresh");
+  assert.deepEqual(rolls,[1]);rolls.length=0;
+});
+
 test("heart damage kills creatures without a save while characters still roll for survival", async () => {
   for (const [type, face, dead] of [["npc", 1, true], ["character", 1, false], ["character", 6, true]]) {
     const f = actorFixture();
@@ -177,6 +216,11 @@ test("prostheses replace the penalties of a healed lost limb, per core p.160", a
   await setProsthesis(wound, null);
   assert.equal(wound.flags[ID].criticalWound.prosthesis, null);
   assert.equal(items[0].system.equipped, false);
+  await setProsthesis(wound, items[0]);
+  await setWoundState(wound, "fresh");
+  assert.equal(wound.flags[ID].criticalWound.prosthesis, null, "Reopening the wound removes its fitted prosthesis");
+  assert.equal(items[0].system.equipped, false);
+  assert.ok(f.effects.some(effect => effect.statuses.has("bleeding")));
 });
 
 test("the inventory marks a prosthesis with the limb it replaces", async () => {

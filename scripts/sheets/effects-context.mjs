@@ -14,6 +14,7 @@ import { isToxicityPoison, poisonDescription } from "../data/poison-rules.mjs";
 import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
 import { woundContext, stabilizeWound, setWoundState, setProsthesis, PROSTHESES } from "../combat/critical-wound-effects.mjs";
 import { stripPageReferences } from "../data/item-lore.mjs";
+import { canEditWound, editWound } from "./wound-editor.mjs";
 
 export function toxicitySaveContext(sheet) {
   const effect = sheet.actor.effects.find(effect => activeEffect(effect) && isToxicityPoison(effect));
@@ -29,6 +30,7 @@ export async function effectsContext(sheet) {
     const text=stripPageReferences(poisonDescription(effect,effect.description||definition?.description||""));
     return {id:effect.id,name:legacy?game.i18n.localize(definition.name):effect.name,img:effect.img??definition?.img,inactive:effect.disabled||effect.isSuppressed,
       canRemove:sheet.isEditable&&(game.user.isGM||![DYING,DEAD,EXHAUSTED_STUN,UNCONSCIOUS].some(status=>effect.statuses.has(status))),
+      canEditWound:sheet.isEditable&&canEditWound(effect),
       toxicity:sheet.actor.system.details?.race==="witcher"?doseToxicity(effect):0,counter:effectCounter(effect),save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
       autoAllowed:Boolean(!rules.manualOnly&&rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
@@ -40,6 +42,10 @@ export async function effectsContext(sheet) {
 }
 const safe=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){console.error(error);ui.notifications.error(error.message);}};
 export const effectActions={
+  editWound:safe(async function(_event,target){
+    if(!this.isEditable||target.disabled)return;target.disabled=true;
+    try{await editWound(this.actor.effects.get(target.dataset.effectId));}finally{target.disabled=false;}
+  }),
   changeEffectCounter:safe(async function(_event,target){if(this.isEditable)await changeEffectCounter(this.actor,target.dataset.effectId,Number(target.dataset.delta));}),
   editEffectDuration:safe(async function(_event,target){if(this.isEditable)await editEffectDuration(this.actor.effects.get(target.dataset.effectId));}),
   browseEffects:safe(async function(){

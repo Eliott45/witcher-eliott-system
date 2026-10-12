@@ -8,6 +8,7 @@
         <header>
           <img src="{{effect.img}}" alt="">
           <h3>{{#if effect.save}}<button class="witcher-effect-save" type="button" data-action="rollEffectSave" data-effect-id="{{effect.id}}" data-tooltip="{{effect.saveHint}} · {{effect.save.action}}" {{disabled (not effect.canSave)}}><i class="fa-solid fa-dice-d10" aria-hidden="true"></i> {{effect.name}}</button>{{else}}{{effect.name}}{{/if}} {{#if effect.inactive}}<small>{{localize "WITCHER.Effects.Inactive"}}</small>{{/if}}</h3>
+          {{#if effect.critical}}<button type="button" data-action="editWound" data-effect-id="{{effect.id}}" data-tooltip="Редактировать состояние ранения без броска" aria-label="Редактировать ранение" {{disabled (not effect.canEditWound)}}><i class="fa-solid fa-pen" aria-hidden="true"></i></button>{{/if}}
           <button type="button" data-action="removeEffect" data-effect-id="{{effect.id}}" title="{{localize 'WITCHER.Effects.Remove'}}"
                   aria-label="{{localize 'WITCHER.Effects.Remove'}}" {{disabled (not effect.canRemove)}}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </header>

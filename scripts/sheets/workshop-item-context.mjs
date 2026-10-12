@@ -1,10 +1,11 @@
 import { SUBSTANCES, MONSTER_CATEGORIES, WORKSHOP_BONUS_LABELS, available, effectiveItem, freeSlots, activeOil } from "../data/workshop.mjs";
 import { conditionKey, isPhysical } from "../data/physical-items.mjs";
 import { durationLabel, craftDialog, findRepairDiagram } from "../workshop/crafting.mjs";
-import { chooseReference } from "./reference-picker.mjs";
 import { isRepairable } from "../workshop/repair.mjs";
 import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
 import { installUpgradeFromSource } from "../workshop/upgrades.mjs";
+import { selectCatalogItem } from "./catalog-picker.mjs";
+export { selectCatalogItem } from "./catalog-picker.mjs";
 export async function workshopItemContext(item, recipeDetails) {
   if(!isPhysical(item)) return null;
   const recipe=item.system.recipe;
@@ -24,11 +25,6 @@ export async function workshopItemContext(item, recipeDetails) {
     canApply:Boolean(item.actor&&available(item)&&(item.actor.system.mutations??[]).length<2),
     canInstallRuneGlyph:Boolean(item.actor&&available(item)&&item.system.kind==="upgrade"&&["rune","glyph"].includes(item.system.upgrade?.category)),
     isMutagen:item.system.kind==="mutagen", isOil:item.system.alchemy?.category==="oil", isUpgrade:item.system.kind==="upgrade" };
-}
-export async function selectCatalogItem(title, predicate = ()=>true) {
-  const documents=[...(await game.packs.get("witcher-eliott-system.equipment").getDocuments()),...game.items].filter(item=>isPhysical(item)&&predicate(item));
-  const id=await chooseReference("workshop","",{title,hint:"Можно выбрать предмет из каталога или созданный предмет мира.",entries:documents.map(item=>({id:item.uuid,label:item.name,group:item.type,groupLabel:game.i18n.localize(`TYPES.Item.${item.type}`),summary:item.system.properties??"",details:[]})),groups:Object.fromEntries([...new Set(documents.map(item=>item.type))].map(type=>[type,game.i18n.localize(`TYPES.Item.${type}`)]))});
-  return documents.find(item=>item.uuid===id);
 }
 const safe = fn => async function(...args) { try { return await fn.apply(this,args); } catch(error) { console.error(error); ui.notifications.error(error.message); } };
 const bonusPath = item => ["mutagen","upgrade"].includes(item.system.kind)?`${item.system.kind}.bonuses`:item.type!=="recipe"?"wearerBonuses":"";

@@ -1915,3 +1915,45 @@ assert.equal((await new CoreRoll(foragingFormula('1d6 / 2')).evaluate({minimize:
 assert.equal((await new CoreRoll(foragingFormula('1d10')).evaluate({maximize:true,allowInteractive:false})).total,10);
 globalThis.canvas=ambushGlobals.canvas;game.combat=ambushGlobals.combat;game.combats=ambushGlobals.combats;game.user=ambushGlobals.user;game.users=ambushGlobals.users;
 console.log('Group ambush: native Macro, role selection, shared roll matrix and manual combat start OK');
+
+const manualEditingPreviews={};
+{
+  const {woundEffectData}=await import('../scripts/combat/critical-wound-effects.mjs');
+  const {editWound}=await import('../scripts/sheets/wound-editor.mjs');
+  const {effectsContext}=await import('../scripts/sheets/effects-context.mjs');
+  const {installCatalogUpgrade}=await import('../scripts/workshop/upgrades.mjs');
+  const {workshopItemContext}=await import('../scripts/sheets/workshop-item-context.mjs');
+  const saved={dialog:foundry.applications.api.DialogV2,documents:foundry.documents};
+  const actor=new foundry.documents.BaseActor({name:'Ручное редактирование',type:'character',
+    effects:[{...woundEffectData('sprained-arm','light',{location:'rightArm',locationName:'Правая рука'}),_id:'manualWound00001'}],
+    items:[{_id:'manualWeapon0001',name:'Рыцарский меч',type:'weapon',system:{enhancementSlots:1,reliability:{value:10,max:10}}}]});
+  Object.defineProperty(actor,'isOwner',{value:true});
+  const effect=actor.effects.get('manualWound00001');effect.update=async changes=>effect.updateSource(changes);
+  const effectsTemplate=handlebars.compile(await readFile(new URL('../templates/effects-list.hbs',import.meta.url),'utf8'),{strict:true});
+  const itemTemplate=handlebars.compile(await readFile(new URL('../templates/workshop-item.hbs',import.meta.url),'utf8'),{strict:true});
+  const renderEffects=async editable=>effectsTemplate({editable,effects:await effectsContext({actor,isEditable:editable})});
+  manualEditingPreviews.wound=await renderEffects(true);
+  assert.match(manualEditingPreviews.wound,/data-action="editWound"[^>]*aria-label="Редактировать ранение"[^>]*>/);
+  assert.ok(!manualEditingPreviews.wound.match(/data-action="editWound"[^>]*disabled/));
+  assert.match(await renderEffects(false),/data-action="editWound"[^>]*disabled/);
+  try {
+    foundry.applications.api.DialogV2={prompt:async options=>{manualEditingPreviews.editor=options.content;return 'stabilized';}};
+    await editWound(effect);
+    assert.equal(effect.flags[game.system.id].criticalWound.state,'stabilized');
+    assert.equal(effect.flags[game.system.id].condition.modifiers[0].value,-1);
+    manualEditingPreviews.stabilized=await renderEffects(true);
+    assert.ok(manualEditingPreviews.stabilized.includes('Стабилизировано'));
+    const source=new foundry.documents.BaseItem(JSON.parse(await readFile(new URL('../pack-sources/equipment.json',import.meta.url),'utf8')).find(item=>item.system.ruleId==='rune.dazhbog'));
+    const target=actor.items.get('manualWeapon0001');Object.defineProperty(target,'actor',{value:actor});
+    actor.updateEmbeddedDocuments=async(_type,changes)=>changes.map(change=>actor.items.get(change._id).updateSource(change));
+    foundry.documents={...foundry.documents,ChatMessage:{getSpeaker:()=>({}),create:async()=>{}}};
+    await installCatalogUpgrade(target,source);
+    assert.equal(actor.items.size,1);
+    assert.equal(target.system.installations[0].ruleId,'rune.dazhbog');
+    assert.equal(target.validationFailures.fields,null);
+    manualEditingPreviews.item=itemTemplate({item:target,editable:true,workshop:await workshopItemContext(target,null)});
+    assert.ok(manualEditingPreviews.item.includes('Руна Даждьбог'));
+    assert.ok(manualEditingPreviews.item.includes('Горение (30%)'));
+  } finally {foundry.applications.api.DialogV2=saved.dialog;foundry.documents=saved.documents;}
+  console.log('Manual editing: native wound controls, direct stabilization and catalogue-only rune installation OK');
+}

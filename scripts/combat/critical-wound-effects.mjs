@@ -210,14 +210,21 @@ export function registerCriticalWoundHooks() {
 }
 
 export async function setWoundState(effect, state) {
-  const data = effect.flags?.[SYSTEM_ID]?.criticalWound;
-  if (!data || !WOUND_STATES[state]) return;
+  let data = effect.flags?.[SYSTEM_ID]?.criticalWound;
+  if (!data || !Object.hasOwn(WOUND_STATES, state) || (data.state ?? "fresh") === state || data.id === "decapitation") return;
+  if (state !== "treated" && data.prosthesis?.quality) {
+    await setProsthesis(effect, null);
+    data = effect.flags[SYSTEM_ID].criticalWound;
+  }
   const source = woundEffectData(data.id, data.level, { ...data, state });
   // Stabilising stops the bleeding and other conditions this wound caused.
   if (effect.parent?.documentName === "Actor" && state !== "fresh") await unlinkConditions(effect.parent, effect);
   await effect.update({ description: source.description, [`flags.${SYSTEM_ID}.criticalWound.state`]: state,
     [`flags.${SYSTEM_ID}.criticalWound.nextStun`]: null,
+    [`flags.${SYSTEM_ID}.criticalWound.recoveryDays`]: null,
     [`flags.${SYSTEM_ID}.condition.modifiers`]: source.flags[SYSTEM_ID].condition.modifiers });
+  const linked = state === "fresh" && effect.parent?.documentName === "Actor" ? await linkConditions(effect.parent, effect, state) : [];
+  await effect.update({ [`flags.${SYSTEM_ID}.criticalWound.linked`]: linked });
 }
 
 /** Fit or take off a prosthesis on a healed lost limb; the wound's penalties follow the prosthesis. */
