@@ -244,7 +244,8 @@ export function registerVerbalDuel() {
     if (!anchor) return;
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `${anchor.className} witcher-verbal-duel-button`.replace(/\bfa-\S+/g, "").trim() + " fa-solid fa-comments";
+    button.className = `${anchor.className} witcher-verbal-duel-button`.replace(/\bfa-\S+/g, "").trim();
+    button.innerHTML = '<i class="fa-solid fa-comments" aria-hidden="true"></i>';
     button.dataset.tooltip = "Словесная дуэль: с выделенными токенами";
     button.setAttribute("aria-label", button.dataset.tooltip);
     button.addEventListener("click", async event => { event.preventDefault(); event.stopPropagation(); try { await startVerbalDuel(); } catch (error) { ui.notifications.warn(error.message); } });
