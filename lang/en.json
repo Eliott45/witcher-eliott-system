@@ -120,7 +120,7 @@
       "Dying": "Dying",
       "DyingDescription": "At HP ≤ 0, the character is dying. Divide all primary attributes except Luck by 3, rounding down. Maximum HP and Stamina and base STUN are unchanged. Entering this state immediately triggers a death save with penalty 0. Further damage and each new round increase the penalty by 1 and trigger another save. Success does not stabilize the character; failure means death. First Aid against a DC equal to how far HP is below 0 (at least 1) stabilizes them: on a success HP becomes 1.",
       "Dead": "Dead",
-      "DeadDescription": "The character died after failing a death save. No further saves are made. Healing HP does not automatically remove death; the GM may remove this state.",
+      "DeadDescription": "The character or creature is dead. Creatures die at HP ≤ 0 without a death save. No further saves are made. Healing HP does not automatically remove death; the GM may remove this state.",
       "ExhaustedStun": "Stunned from exhaustion",
       "ExhaustedStunDescription": "Caused by Stamina reaching 0 or below. The character cannot move, attack, cast, or defend; only Recovery is allowed. To remove this state themselves, first restore at least 20 STA, or maximum STA if lower than 20, then spend an entire turn on a successful Stun save. Taking damage does not remove this stun.",
       "Unconscious": "Unconscious",

@@ -67,7 +67,7 @@ test("death appears only after the chat result and DSN finish, with both display
     globalThis.ui = { chat: { rendered: true } };
     globalThis.game = { settings: { get: () => "public" }, dice3d: {},
       i18n: { localize: key => key } };
-    const actor = { uuid: "Actor.death", isOwner: true,
+    const actor = { uuid: "Actor.death", type: "character", isOwner: true,
       effects: [{ id: "dying", statuses: new Set(["dying"]) }],
       system: { death: { penalty: 2, episode: "episode" }, statistics: {
         dying: true, stun: 10, recovery: 10, adjusted: { body: 10, will: 10 }

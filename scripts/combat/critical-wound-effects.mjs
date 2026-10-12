@@ -91,7 +91,7 @@ function automationNotes(id, state, prosthesis = null) {
   if (rules.stunEvery?.[state]) notes.push(`Испытание Устойчивости в начале хода каждые ${rules.stunEvery[state] === "1d6" ? "1d6" : rules.stunEvery[state]} раундов.`);
   if (rules.acid?.[state]) notes.push(`${rules.acid[state]} урона кислотой в начале каждого хода, броня не защищает.`);
   if (state === "fresh" && rules.dead) notes.push("Персонаж погибает.");
-  if (state === "fresh" && rules.deathSave) notes.push("Сразу — испытание против смерти; провал означает гибель.");
+  if (state === "fresh" && rules.deathSave) notes.push("Персонаж сразу проходит испытание против смерти; провал означает гибель. Существо погибает без испытания.");
   if (rules.arm && woundModifiers(id, state, { prosthesis }).some(modifier => modifier.target === "combat.arm"))
     notes.push("Штраф руки: к атакам и защите оружием, если оно в этой руке (правая — основная; левая — при хвате двумя руками или двух оружиях).");
   if (woundModifiers(id, state, { prosthesis }).some(modifier => modifier.target === "hands")) notes.push("Рукой нельзя пользоваться: доступна одна рука, двуручный хват невозможен.");
@@ -154,6 +154,8 @@ async function unlinkConditions(actor, effect) {
 
 /** Core p.160, Heart Damage: an immediate death save — 1d10 under the Stun value or the character dies. */
 async function heartDeathSave(actor, wound) {
+  if (actor.type === "npc") return setStatus(actor, DEAD, true);
+  if (actor.type !== "character") return;
   const stun = actor.system.statistics?.stun;
   if (stun === null || stun === undefined) return;
   const roll = await new foundry.dice.Roll("1d10").evaluate();

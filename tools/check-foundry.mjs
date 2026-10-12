@@ -1699,6 +1699,21 @@ mageView.sheet.isEditable=true;
 const emptyCreature=new foundry.documents.BaseActor({name:'New creature',type:'npc'});
 const emptySheet=new WitcherNPCSheet();emptySheet.actor=emptyCreature;emptySheet.isEditable=true;
 assert.match(npcTemplate(await emptySheet._prepareContext({})),/Бандит/);
+assert.equal(emptyCreature.system.statistics.dead,false,'A blank creature sheet is not dead');
+for(const hp of [0,-5]) {
+  const fallen=new foundry.documents.BaseActor({name:'Fallen creature',type:'npc',
+    system:{attributes:{body:6,will:6},health:{value:hp,max:30}},
+    effects:[{_id:'legacyDying00001',name:'При смерти',statuses:['dying']}]});
+  fallen.system.prepareDerivedData();
+  const sheet=new WitcherNPCSheet();sheet.actor=fallen;sheet.isEditable=true;
+  const view=await sheet._prepareContext({}),html=npcTemplate(view);
+  assert.equal(view.stats.dying,false);
+  assert.equal(view.stats.dead,true);
+  assert.ok(html.includes('Мёртв'));
+  assert.ok(!html.includes('data-action="creatureDeath"'));
+  assert.ok(!html.includes('name="system.death.penalty"'));
+  assert.ok(!html.includes('data-action="rollEffectSave"'),'Legacy dying effects do not offer creature saves');
+}
 for(const category of MONSTER_CATEGORIES) {
   emptyCreature.updateSource({'system.creature.category':category.id});
   emptySheet.actor=new foundry.documents.BaseActor(JSON.parse(JSON.stringify(emptyCreature.toObject())));

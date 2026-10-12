@@ -5,6 +5,7 @@ import { SYSTEM_ID } from "../scripts/config.mjs";
 import { ATTRIBUTE_KEYS, deriveStatistics } from "../scripts/data/statistics.mjs";
 import { hasStatus, DYING, DEAD } from "../scripts/combat/status-effects.mjs";
 import { prepareDeathTransition, applyDeathTransition, prepareDeathRound, applyDeathRound, rollDeath, syncExistingDeathStates } from "../scripts/combat/death-state.mjs";
+import { rollDeathSave } from "../scripts/combat/death-roll.mjs";
 
 let id = 0, faces = [], messages = [], cancel = false, fail = false, paused;
 const translations = JSON.parse(await readFile(new URL("../lang/ru.json", import.meta.url), "utf8"));
@@ -48,8 +49,8 @@ foundry.dice.Roll = class {
   }
 };
 
-function actor() {
-  const document = { uuid: `Actor.${++id}`, type: "character", isOwner: true, effects: [],
+function actor(type = "character") {
+  const document = { uuid: `Actor.${++id}`, type, isOwner: true, effects: [],
     async toggleStatusEffect(status) { this.effects.push({ id: `${status}-${++id}`, statuses: new Set([status]) }); },
     async deleteEmbeddedDocuments(_type, ids) { this.effects = this.effects.filter(effect => !ids.includes(effect.id)); },
     async update(changes) {
@@ -69,6 +70,7 @@ function actor() {
     }
   };
   document.system = {
+    parent: document,
     attributes: Object.fromEntries(ATTRIBUTE_KEYS.map(key => [key, 10])), health: { value: 50, max: 50 },
     luckSpent: [], luckPending: 0, death: { penalty: 0, episode: "", lastCombat: "", lastRound: 0 },
     get statistics() { return deriveStatistics(this, { dying: hasStatus(document, DYING), dead: hasStatus(document, DEAD) }); }
@@ -80,6 +82,70 @@ function reset() {
 }
 const latest = () => messages.at(-1).flags[SYSTEM_ID].deathSave;
 const tick = () => new Promise(resolve => setImmediate(resolve));
+
+test("creatures die at zero HP without death saves, penalties or automatic revival", async () => {
+  reset();
+  for (const hp of [0, -5]) {
+    const npc = actor("npc");
+    await npc.update({ "system.health.value": hp });
+    assert.equal(hasStatus(npc, DEAD), true);
+    assert.equal(hasStatus(npc, DYING), false);
+    assert.equal(npc.system.statistics.dead, true);
+    assert.equal(npc.system.statistics.dying, false);
+    await rollDeath(npc);
+    await rollDeathSave(npc);
+    const combat = { uuid: "Combat.npc", round: 1, combatants: [{ actor: npc }] }, options = {};
+    prepareDeathRound(combat, { round: 2 }, options);
+    await applyDeathRound(combat, {}, options, "local");
+    await npc.update({ "system.health.value": -10 });
+    await npc.update({ "system.health.value": 10 });
+    assert.equal(hasStatus(npc, DEAD), true, "Only the GM removes death");
+    assert.deepEqual(npc.system.death, { penalty: 0, episode: "", lastCombat: "", lastRound: 0 });
+  }
+  assert.equal(messages.length, 0);
+});
+
+test("legacy creature death-save requests and round events cannot roll or advance a penalty", async () => {
+  reset();
+  const npc = actor("npc");
+  npc.system.health.value = -2;
+  npc.system.death = { penalty: 4, episode: "legacy", lastCombat: "", lastRound: 0 };
+  await npc.toggleStatusEffect(DYING);
+  Object.defineProperty(npc.system, "statistics", { value: { dying: true, stun: 10 } });
+  await rollDeath(npc);
+  await rollDeathSave(npc);
+  const combat = { uuid: "Combat.npc", round: 1, combatants: [{ actor: npc }] }, options = {};
+  prepareDeathRound(combat, { round: 2 }, options);
+  await applyDeathRound(combat, {}, options, "local");
+  assert.equal(npc.system.death.penalty, 4);
+  await applyDeathTransition(npc, { kind: "damage", episode: "legacy", roll: true });
+  assert.equal(hasStatus(npc, DEAD), true);
+  assert.equal(hasStatus(npc, DYING), false);
+  assert.equal(messages.length, 0);
+});
+
+test("startup repairs legacy dying creatures and unlinked tokens but leaves blank sheets alive", async () => {
+  reset();
+  const npc = actor("npc"), synthetic = actor("npc"), healed = actor("npc"), blank = actor("npc");
+  npc.system.health.value = 0;
+  synthetic.system.health.value = -2;
+  synthetic.uuid = "Scene.test.Token.npc.Actor.test";
+  for (const entry of [npc, synthetic, healed]) await entry.toggleStatusEffect(DYING);
+  blank.system.attributes.body = blank.system.attributes.will = null;
+  blank.system.health = { value: 0, max: 0 };
+  game.actors = [npc, healed, blank];
+  game.scenes = [{ tokens: [{ actorLink: false, actor: synthetic }] }];
+  game.user.isActiveGM = true;
+  await syncExistingDeathStates();
+  await syncExistingDeathStates();
+  for (const entry of [npc, synthetic]) {
+    assert.deepEqual(entry.effects.map(effect => [...effect.statuses]), [[DEAD]]);
+  }
+  assert.equal(healed.effects.length, 0);
+  assert.equal(blank.effects.length, 0);
+  assert.equal(blank.system.statistics.dead, false);
+  assert.equal(messages.length, 0);
+});
 
 test("first HP crossing rolls with zero penalty; further hits increment; saves never self-stabilize", async () => {
   reset();

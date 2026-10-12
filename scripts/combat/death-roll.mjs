@@ -4,7 +4,7 @@ import { hasStatus, setStatus, DYING, DEAD } from "./status-effects.mjs";
 
 /** Called by the per-actor death event queue, including the manual sheet button. */
 export async function rollDeathSave(actor, cause = "manual", { onPosted = () => {} } = {}) {
-  if (!actor.isOwner || hasStatus(actor, DEAD) || !actor.system.statistics.dying) return;
+  if (actor.type !== "character" || !actor.isOwner || hasStatus(actor, DEAD) || !actor.system.statistics.dying) return;
   const statistics = actor.system.statistics;
   if (statistics.stun === null) {
     ui.notifications.warn(game.i18n.localize("WITCHER.Statistics.UnfilledPhysical"));

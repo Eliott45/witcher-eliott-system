@@ -54,7 +54,8 @@ test("arm wounds hit the weapon arm, a disabled arm leaves one hand", () => {
 
 function actorFixture() {
   const effects = [], statuses = new Set();
-  const actor = { documentName: "Actor", isOwner: true, uuid: "Actor.a", effects, system: { statistics: { stun: 6 } },
+  const actor = { documentName: "Actor", type: "character", isOwner: true, uuid: "Actor.a", effects, system: { statistics: { stun: 6 } },
+    async toggleStatusEffect(status) { effects.push({ id: status, statuses: new Set([status]), disabled: false }); },
     async createEmbeddedDocuments(_type, data) {
       const created = data.map((source, i) => ({ ...source, id: `c${effects.length + i}`, statuses: new Set(source.statuses ?? []), disabled: false }));
       effects.push(...created); for (const entry of created) for (const status of entry.statuses) statuses.add(status); return created;
@@ -111,6 +112,19 @@ test("only an untreated Torn Stomach burns 4 acid per turn", () => {
   assert.equal(woundAcidDamage(f.actor), 4);
   f.effects[0].flags[ID].criticalWound.state = "stabilized";
   assert.equal(woundAcidDamage(f.actor), 0);
+});
+
+test("heart damage kills creatures without a save while characters still roll for survival", async () => {
+  for (const [type, face, dead] of [["npc", 1, true], ["character", 1, false], ["character", 6, true]]) {
+    const f = actorFixture();
+    f.actor.type = type;
+    rolls.length = 0;
+    rolls.push(face);
+    await onWoundCreated(f.wound("heart-damage", "deadly"), {}, "u");
+    assert.equal(f.effects.some(effect => effect.statuses.has("dead")), dead);
+    assert.equal(rolls.length, type === "npc" ? 1 : 0);
+  }
+  rolls.length = 0;
 });
 
 test("the effects compendium holds every wound with a unique ID and state rules", () => {

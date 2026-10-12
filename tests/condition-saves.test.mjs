@@ -20,7 +20,7 @@ function fixture(key="black-venom",total=4){
     async evaluate(){this.total=total;return this;}
     async toMessage(data,options){const message={id:`m${messages.length}`,rolls:[{total:this.total}],...data,options,async update(changes){patch(this,changes);}};messages.push(message);return message;}
   }}};
-  const actor={uuid:"Actor.test",documentName:"Actor",isOwner:true,flags:{},effects:[],
+  const actor={uuid:"Actor.test",type:"character",documentName:"Actor",isOwner:true,flags:{},effects:[],
     system:{skills:{endurance:4,physique:4,firstAid:3,deduction:2},stamina:{value:20,max:50},statistics:{stun:10,effective:{body:6,craft:5,intelligence:5},modifiers:[]}},
     testUserPermission:()=>true,async update(changes){patch(this,changes);},async createEmbeddedDocuments(_type,entries){updates.push(...entries);return entries;},
     async deleteEmbeddedDocuments(_type,ids){this.effects=this.effects.filter(effect=>!ids.includes(effect.id));}};
@@ -54,6 +54,17 @@ test("end-turn checks ignore reordering/skipped turns, honor the toggle and neve
   await endTurnConditions(f.combat,f.combatant,{round:1,turn:0,skipped:false});assert.equal(f.messages.length,0);
   const dying=fixture("dying");dying.effect.flags[SYSTEM_ID].condition.autoSave=true;
   await endTurnConditions(dying.combat,dying.combatant,{round:1,turn:0,skipped:false});assert.equal(dying.messages.length,0);
+});
+
+test("a legacy dying effect cannot offer or request a creature death save",async()=>{
+  const f=fixture("dying");
+  assert.equal(canSaveEffect(f.actor,f.effect),true);
+  f.actor.type="npc";
+  assert.equal(canSaveEffect(f.actor,f.effect),false);
+  await requestEffectSave(f.actor,f.effect);
+  await performEffectSave(f.actor,f.effect);
+  assert.equal(f.messages.length,0);
+  assert.equal(f.effect.flags[SYSTEM_ID].conditionRequest,undefined);
 });
 test("chloroform is a plain strict-less-than d10 save without Luck; unrelated unconsciousness remains",async()=>{
   let f=fixture("chloroform",8);

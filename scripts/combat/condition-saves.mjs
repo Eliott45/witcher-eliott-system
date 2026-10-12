@@ -38,7 +38,7 @@ export function canSaveEffect(actor,effect) {
   }
   if(rules.delayTurns&&(state(effect).elapsedTurns??0)<rules.delayTurns
     && (game.time?.worldTime??0)-(effect.start?.time??0)<rules.delayTurns*ROUND_SECONDS)return false;
-  if(rules.save.kind==="death")return true;
+  if(rules.save.kind==="death")return actor.type==="character";
   if(rules.save.kind==="stun")return conditions.canStunSave;
   if(rules.save.kind==="stunModified")return true;
   if(effect.statuses.has("fisstech"))return !actor.effects.some(entry=>entry.statuses.has("fisstech-unconscious")&&!entry.disabled&&!entry.isSuppressed);

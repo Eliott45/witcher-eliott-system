@@ -25,7 +25,6 @@ import { sheetPreferences } from "./sheet-preferences.mjs";
 import { rollSkill } from "../combat/skill-roll.mjs";
 import { rollAttribute } from "../combat/attribute-roll.mjs";
 import { rollStun } from "../combat/stun-roll.mjs";
-import { rollDeath } from "../combat/death-state.mjs";
 import { recoverStamina } from "../combat/exhaustion.mjs";
 import { conditionRules } from "../combat/condition-rules.mjs";
 import { requestEffectSave } from "../combat/condition-saves.mjs";
@@ -54,7 +53,6 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     creatureDefense:guard(async function(_e,target){if(!this.isEditable||!conditionRules(this.actor).canDefend)return;const skill=skillValue(this.actor.system,target.dataset.skill);if(skill?.total!=null)await rollActionCheck(this.actor,{formula:`1d10wc + ${skill.total}`,flavor:`Сопротивление: ${game.i18n.localize(skill.label)}.`},{ignoreExtra:true});}),
     creatureAttribute:guard(async function(_e,target){if(this.isEditable)await rollAttribute(this.actor,target.dataset.attribute);}),
     creatureStun:guard(async function(){if(!this.isEditable)return;const effect=this.actor.effects.find(e=>!e.disabled&&(e.statuses.has("stunned")||e.statuses.has("exhausted-stun")));if(effect)await requestEffectSave(this.actor,effect);else await rollStun(this.actor);}),
-    creatureDeath:guard(async function(){if(this.isEditable)await rollDeath(this.actor);}),
     creatureRecover:guard(async function(){if(this.isEditable)await recoverStamina(this.actor);}),
     creatureLoot:guard(async function(){await generateCreatureLoot(this.actor);}),
     creatureSpecial:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await useCreatureAction(this.actor,target.dataset.creatureAction);}finally{await this.render();}}),

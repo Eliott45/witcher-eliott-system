@@ -22,6 +22,8 @@ function combatPosition(actor) {
 
 /** Persist a new episode with the HP change so healing invalidates in-flight rolls immediately. */
 export function prepareDeathTransition(actor, projected, changes, enteredHealth, damaged) {
+  if (actor.type === "npc") return dyingHealth(projected.health) || hasStatus(actor, DYING) ? { kind: "npc" } : null;
+  if (actor.type !== "character") return null;
   if (hasStatus(actor, DEAD)) return null;
   const wasDying = actor.system.statistics.dying;
   const nowDying = dyingHealth(projected.health);
@@ -45,6 +47,8 @@ export function prepareDeathTransition(actor, projected, changes, enteredHealth,
 export function applyDeathTransition(actor, event) {
   if (!event) return Promise.resolve();
   return enqueue(actor, async () => {
+    if (actor.type === "npc") return syncDeathStatus(actor);
+    if (actor.type !== "character") return;
     if (actor.system.death.episode !== event.episode || hasStatus(actor, DEAD)) return;
     if (event.kind === "recover") {
       await setStatus(actor, DYING, false);
@@ -69,6 +73,7 @@ async function ensureEpisode(actor) {
 // Coalesce repeated clicks while a manual save is being displayed; never lose automatic damage events.
 const manual = new Map();
 export function rollDeath(actor) {
+  if (actor.type !== "character") return Promise.resolve();
   if (manual.has(actor.uuid)) return manual.get(actor.uuid);
   const work = enqueue(actor, async () => {
     if (hasStatus(actor, DEAD) || !actor.system.statistics.dying) return;
@@ -95,8 +100,13 @@ export function rollDeath(actor) {
 }
 
 /** Existing/imported dying actors get the visible status without retrospective saves. */
-export function syncDeathStatus(actor) {
-  if (!actor.isOwner || !COMBAT_ACTOR_TYPES.includes(actor.type)) return Promise.resolve();
+export async function syncDeathStatus(actor) {
+  if (!actor.isOwner || !COMBAT_ACTOR_TYPES.includes(actor.type)) return;
+  if (actor.type === "npc") {
+    if (dyingHealth(actor.system.health)) await setStatus(actor, DEAD, true);
+    // Remove legacy dying states; creatures never enter the character death-save cycle.
+    return setStatus(actor, DYING, false);
+  }
   if (hasStatus(actor, DEAD)) return setStatus(actor, DYING, false);
   if (actor.system.statistics.dying) return setStatus(actor, DYING, true);
   return Promise.resolve();
@@ -125,7 +135,7 @@ export async function applyDeathRound(combat, _changes, options, userId) {
   const actors = new Map();
   for (const combatant of combat.combatants) {
     const actor = combatant.actor;
-    if (actor?.isOwner && actor.system.statistics?.dying && !hasStatus(actor, DEAD)) actors.set(actor.uuid, actor);
+    if (actor?.type === "character" && actor.isOwner && actor.system.statistics?.dying && !hasStatus(actor, DEAD)) actors.set(actor.uuid, actor);
   }
   await Promise.all([...actors.values()].map(actor => enqueue(actor, async () => {
     if (!actor.system.statistics.dying || hasStatus(actor, DEAD)) return;

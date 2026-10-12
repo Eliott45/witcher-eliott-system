@@ -58,7 +58,11 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const staminaMax = baseLimit("staminaMax") === null ? null : Math.max(0, scale(baseLimit("staminaMax") + modifierTotal(modifiers, "staminaMax"), "staminaMax"));
   const woundThreshold = Math.floor((healthMax ?? health.max) / 5);
   const wounded = woundThreshold > 0 && health.value < woundThreshold;
-  dying ||= dyingHealth({ value: health.value, max: healthMax ?? health.max });
+  const lethalHealth = dyingHealth({ value: health.value, max: healthMax ?? health.max });
+  if (parent?.type === "npc") {
+    dead ||= lethalHealth;
+    dying = false;
+  } else dying ||= lethalHealth;
   const effective = Object.fromEntries(ATTRIBUTE_KEYS.map(key => {
     const value = adjusted[key];
     // Death replaces (rather than stacks with) the serious-wound penalty. Luck is exempt.
