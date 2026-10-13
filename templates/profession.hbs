@@ -3,6 +3,7 @@
   {{#if profession}}<button type="button" data-action="toggleProfession" role="switch" aria-checked="{{editingProfession}}" title="{{localize 'WITCHER.Professions.Edit'}}" aria-label="{{localize 'WITCHER.Professions.Edit'}}" {{disabled (not editable)}}><i class="fa-solid {{#if editingProfession}}fa-toggle-on{{else}}fa-toggle-off{{/if}}" aria-hidden="true"></i> {{localize "WITCHER.Skills.Edit"}}</button>{{/if}}
 </div>
 {{#if profession}}
+{{#if profession.note}}<p class="witcher-profession-info">{{profession.source}} · {{profession.note}}</p>{{/if}}
 {{> "systems/witcher-eliott-system/templates/profession-tree.hbs" profession=profession editing=editingProfession editable=editable advancement=false}}
 <details class="witcher-profession-info">
   <summary><i class="fa-regular fa-circle-question" aria-hidden="true"></i> {{localize "WITCHER.Professions.Details"}}</summary>

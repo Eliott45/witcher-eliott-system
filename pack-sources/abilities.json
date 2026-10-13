@@ -1710,6 +1710,196 @@
     "flags": {}
   },
   {
+    "_id": "prab000000000091",
+    "name": "Нетерпимость",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.peasant.intolerance",
+      "description": "<p>При первой встрече с разумным существом со статусом «Ненависть и опасение»: проверка против ЭМП × 3 цели. Успех даёт бонус к Сопротивлению убеждению и Храбрости, равный уровню Нетерпимости. При сплочении других крестьян — половина уровня к Лидерству. В этом контексте крестьянин — NPC без иной профессии или определяющего навыка.</p><p>Фургончик Родольфа</p>",
+      "level": 0,
+      "attribute": "will"
+    },
+    "effects": [],
+    "folder": "prfd000000000010",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000092",
+    "name": "Время жатвы",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.peasant.harvest",
+      "description": "<p>При сборе растительных алхимических ингредиентов получает дополнительно половину уровня навыка единиц, минимум 1. Бонус применяется автоматически при успешном собирательстве.</p><p>Фургончик Родольфа</p>",
+      "level": 0,
+      "attribute": ""
+    },
+    "effects": [],
+    "folder": "prfd000000000010",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000093",
+    "name": "Шёпот животным",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.peasant.animal-whisper",
+      "description": "<p>Действием приказывает прирученному животному: СЛ ВОЛЯ × 3 цели. При успехе животное выполняет команду в меру возможностей. Пчёлы: СЛ 21; куры и свиньи: 15; коровы и кролики: 12; козы: 18; овцы: 9.</p><p>Фургончик Родольфа</p>",
+      "level": 0,
+      "attribute": "empathy"
+    },
+    "effects": [],
+    "folder": "prfd000000000010",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000094",
+    "name": "Фермерская мудрость",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.peasant.wisdom",
+      "description": "<p>Действием выполняет один из народных ритуалов. Каждый ритуал требует своих компонентов и проверки: кровоочиститель 8, предсказание погоды 10, венок из трав 12, круг от вредителей 14, убийца кошмаров 16, раскрытие чёрной магии 18, талисман 20.</p><h3>Народные ритуалы</h3><h4>Кровоочиститель · СЛ 8</h4><p>Эфир ×2; Купорос ×1.</p><p>Создаёт лосьон, полностью убирающий пятна крови с объёма до 5 м³.</p><h4>Предсказание погоды · СЛ 10</h4><p>Определяет погоду на следующие 24 часа по небу и поведению животных. Погоду сообщает ведущий.</p><h4>Венок из трав · СЛ 12</h4><p>Растительные ингредиенты ×3.</p><p>Венок из трёх растительных алхимических ингредиентов: пока он надет, владелец помнит всё происходящее в следующие 24 часа.</p><h4>Круг от вредителей · СЛ 14</h4><p>Любые алхимические ингредиенты ×5.</p><p>Пять единиц любых алхимических ингредиентов, радиус 20 м. Звери и инсектоиды должны пройти Стойкость против результата ритуала, чтобы войти.</p><h4>Убийца кошмаров · СЛ 16</h4><p>Выверните одежду наизнанку, наденьте шляпу задом наперёд и произнесите стишок: этой ночью обычные и магические кошмары не действуют.</p><h4>Раскрытие чёрной магии · СЛ 18</h4><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000012]{Древесина} ×1.</p><p>Вырезанный деревянный тотем один раз чернеет в пределах 5 м от проклятого существа или жертвы порчи.</p><h4>Талисман · СЛ 20</h4><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000018]{Перья} ×1; Разные алхимические ингредиенты ×3.</p><p>Перья и три разных алхимических ингредиента создают талисман с одноразовым запасом Удачи, равным уровню Фермерской мудрости. Талисманы не складываются.</p><p>Фургончик Родольфа</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000010",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000095",
+    "name": "Мясник",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.peasant.butcher",
+      "description": "<p>При свежевании животного или чудовища: СЛ 12 для обычного, 16 для незаурядного, 20 для трудного. Успех даёт максимальное количество одного типа органической добычи. На каждую часть тела разрешена одна попытка; разные типы можно извлекать отдельно.</p><p>Фургончик Родольфа</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000010",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000096",
+    "name": "Панацея от всех бед",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.peasant.panacea",
+      "description": "<p>За 10 минут смешивает по одной единице трёх разных алхимических субстанций. Шанс снять отравление, опьянение и тошноту равен уровню навыка × 5%. Вся порция расходуется при употреблении и портится через сутки. Проверка изготовления в описании не требуется.</p><p>Фургончик Родольфа</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000010",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000097",
+    "name": "Мамино рагу",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.peasant.stew",
+      "description": "<p>Раз в день, имея принадлежности для готовки и ингредиенты, за час готовит шесть порций одного семейного рецепта. Эффекты каждой съеденной порции длятся 24 часа. Проверка нужна для определения СЛ сопротивления рецепту «Мамино рагу»; для остальных рецептов отдельная СЛ изготовления не задана.</p><h3>Семейные рецепты</h3><h4>Симфония урожая</h4><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.ggen000000000022]{Сырое мясо} ×2; @UUID[Compendium.witcher-eliott-system.equipment.Item.eqip000000000040]{Пиво} ×3; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000162]{Собачья петрушка} ×3; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000141]{Плод берберки} ×4.</p><p>Невосприимчивость к страху. ПБ всех частей тела: треть уровня навыка; складывается с доспехами, заменяет расовые ПБ краснолюда только если выше.</p><h4>Мамино рагу</h4><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000103]{Вороний глаз} ×5; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000144]{Лепестки морозника} ×3; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000241]{Переступень} ×2; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000162]{Собачья петрушка} ×2.</p><p>Тошнота до успешной Стойкости против результата проверки Маминого рагу или окончания эффекта.</p><h4>Особый бульон</h4><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000014]{Кости животных} ×4; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000261]{Собачье сало} ×2; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000183]{Омела} ×3; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000122]{Волокна хана} ×3.</p><p>Сокращает заживление критического ранения на половину уровня навыка, минимум на 1 день. Повторные порции не ускоряют одно ранение повторно.</p><h4>Весеннее рагу</h4><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000100]{Плод балиссы} ×3; @UUID[Compendium.witcher-eliott-system.equipment.Item.ggen000000000022]{Сырое мясо} ×2; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000106]{Грибы-шибальцы} ×4; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000164]{Жимолость} ×3.</p><p>Половина уровня к Соблазнению и тройной уровень к Стойкости.</p><h4>Рагу из тролля</h4><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000101]{Ячмень} ×3; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000147]{Склеродерм} ×4; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000166]{Сера} ×2; @UUID[Compendium.witcher-eliott-system.equipment.Item.ggen000000000022]{Сырое мясо} ×3.</p><p>Половина уровня к проверкам против отравления и сопротивление урону яда.</p><h4>Зимнее рагу</h4><p>@UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000101]{Ячмень} ×5; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000014]{Кости животных} ×2; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000147]{Склеродерм} ×3; @UUID[Compendium.witcher-eliott-system.equipment.Item.matr000000000140]{Корень зарника} ×2.</p><p>Невосприимчивость к замораживанию; в ледяных условиях можно выживать дополнительно столько часов, каков уровень навыка.</p><p>Фургончик Родольфа</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000010",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000098",
+    "name": "Землекоп",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.peasant.digger",
+      "description": "<p>Грузоподъёмность увеличивается на удвоенный уровень. Во время физического труда добавляет половину уровня к проверкам ТЕЛ и Выносливости (Стойкости). Условный бонус включается отдельно и не действует на сопротивление яду.</p><p>Фургончик Родольфа</p>",
+      "level": 0,
+      "attribute": ""
+    },
+    "effects": [],
+    "folder": "prfd000000000010",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000099",
+    "name": "Грог",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.peasant.grog",
+      "description": "<p>Действием смешивает единицу алхимического ингредиента с порцией алкоголя и проходит проверку СЛ 14. Выпивший проходит Выносливость (Стойкость) против СЛ 12 + уровень Грога; провал вызывает опьянение. При уровне 5 и выше штрафы опьянения удваиваются.</p><p>Фургончик Родольфа</p>",
+      "level": 0,
+      "attribute": "craft"
+    },
+    "effects": [],
+    "folder": "prfd000000000010",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prab000000000100",
+    "name": "Укус за ухо",
+    "type": "ability",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "profession.peasant.ear-bite",
+      "description": "<p>Будучи схваченным или обездвиженным, действием проходит проверку против ЛВК × 3 захватчика. Успех освобождает от захвата и наносит 1d6 урона, не снижаемого бронёй. Цель навсегда получает −1 к Харизме и Соблазнению.</p><p>Фургончик Родольфа</p>",
+      "level": 0,
+      "attribute": "body"
+    },
+    "effects": [],
+    "folder": "prfd000000000010",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "abil000000000001",
     "name": "Доверие",
     "type": "ability",

@@ -151,5 +151,22 @@
       "default": 2
     },
     "flags": {}
+  },
+  {
+    "_id": "prof000000000010",
+    "name": "Крестьянин",
+    "type": "profession",
+    "img": "icons/svg/aura.svg",
+    "system": {
+      "ruleId": "peasant",
+      "description": "<p>Фургончик Родольфа</p><p>Первоапрельская профессия R. Talsorian Games; в дополнении отмечена как неканоничная.</p><p>Предел магии: 0. Магических способностей нет.</p><p>Атлетика, Борьба, Храбрость, Изготовление, Стойкость, Первая помощь, Азартные игры, Сила, Владение лёгкими клинками, Выживание в дикой природе</p><p>Языков на выбор: 0. Снаряжение — выберите 5: Пиво; ещё одно пиво; корзина; тёплая одежда; принадлежности для готовки; огниво; колода для гвинта; священный символ; трубка с табаком; мешок</p><p>@UUID[Compendium.witcher-eliott-system.abilities.Item.prab000000000091]{Нетерпимость}<br>@UUID[Compendium.witcher-eliott-system.abilities.Item.prab000000000092]{Время жатвы}<br>@UUID[Compendium.witcher-eliott-system.abilities.Item.prab000000000093]{Шёпот животным}<br>@UUID[Compendium.witcher-eliott-system.abilities.Item.prab000000000094]{Фермерская мудрость}<br>@UUID[Compendium.witcher-eliott-system.abilities.Item.prab000000000095]{Мясник}<br>@UUID[Compendium.witcher-eliott-system.abilities.Item.prab000000000096]{Панацея от всех бед}<br>@UUID[Compendium.witcher-eliott-system.abilities.Item.prab000000000097]{Мамино рагу}<br>@UUID[Compendium.witcher-eliott-system.abilities.Item.prab000000000098]{Землекоп}<br>@UUID[Compendium.witcher-eliott-system.abilities.Item.prab000000000099]{Грог}<br>@UUID[Compendium.witcher-eliott-system.abilities.Item.prab000000000100]{Укус за ухо}</p>"
+    },
+    "effects": [],
+    "folder": null,
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
   }
 ]

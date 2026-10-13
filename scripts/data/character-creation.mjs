@@ -284,13 +284,18 @@ export function skillState(state) {
 /*  Starting gear and money (pp.38–46, 71)      */
 /* -------------------------------------------- */
 
-export const STARTING_CROWNS = { bard: 120, witcher: 50, "man-at-arms": 150, priest: 75, mage: 200, doctor: 150, criminal: 100, craftsman: 120, merchant: 180 };
+export const STARTING_CROWNS = { bard: 120, witcher: 50, "man-at-arms": 150, priest: 75, mage: 200, doctor: 150, criminal: 100, craftsman: 120, merchant: 180, peasant: 20 };
 export const crownsFormula = profession => `${STARTING_CROWNS[profession] ?? 100} * 2d6`;
 
 const item = (ruleId, quantity = 1, extra = {}) => ({ ruleId, quantity, ...extra });
 const option = (name, items, crowns = 0) => ({ name, items, crowns });
 /** Each option names catalogue entries by rule id; «ингредиенты на N крон» are paid out as money for buying them. */
 export const PROFESSION_GEAR = {
+  peasant: [option("Пиво", [item("gear.beer")]), option("Ещё одно пиво", [item("gear.beer")]),
+    option("Корзина", [item("gear.basket")]), option("Тёплая одежда", [item("gear.warm-clothing")]),
+    option("Принадлежности для готовки", [item("gear.cooking-tools")]), option("Огниво", [item("gear.flint")]),
+    option("Колода для гвинта", [item("gear.gwent-deck")]), option("Священный символ", [item("sacred-symbol")]),
+    option("Трубка с табаком", [item("gear.pipe"), item("gear.tobacco")]), option("Мешок", [item("gear.bag")])],
   bard: [option("Доска для покера на костях", [item("gear.dice-poker-board")]), option("Колода для гвинта", [item("gear.gwent-deck")]),
     option("Ручное зеркальце", [item("gear.mirror")]), option("Музыкальный инструмент", [item("musical-instrument")]),
     option("Фляга с выпивкой", [item("gear.spirits")]), option("Кинжал", [item("weapon.dagger")]), option("Духи / одеколон", [item("gear.perfume")]),

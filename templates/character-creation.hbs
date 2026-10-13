@@ -222,7 +222,7 @@
       <section class="wcr-panel wcr-profession">
         <header><h3><i class="{{icon}}" aria-hidden="true"></i> {{name}}</h3><span class="wcr-pill is-gold">{{crowns}}</span></header>
         <div class="wcr-profession-grid">
-          <div><h4>Определяющий навык — {{defining}}</h4><p>{{definingText}}</p><h4>Магия</h4><p>{{magic}}</p></div>
+          <div><h4>Определяющий навык — {{defining}}</h4><p>{{definingText}}</p><h4>Магия</h4><p>{{magic}}</p>{{#if note}}<p>{{source}} · {{note}}</p>{{/if}}</div>
           <div><h4>Навыки</h4><ul class="wcr-chips">{{#each skills}}<li>{{this}}</li>{{/each}}</ul><h4>Снаряжение</h4><p>{{gear}}</p></div>
         </div>
       </section>

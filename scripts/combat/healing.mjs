@@ -90,7 +90,10 @@ async function performHealing(patient, change) {
   if (change.kind === "stabilize" && (effect.flags[SYSTEM_ID].criticalWound.state ?? "fresh") === "fresh") return setWoundState(effect, "stabilized");
   if (change.kind === "treat") {
     await setWoundState(effect, "treated");
-    await effect.update({ [`flags.${SYSTEM_ID}.criticalWound.recoveryDays`]: change.days ?? null });
+    const { stewRank } = await import("../data/peasant-rules.mjs");
+    const rank = stewRank(patient,"broth"), reduction = rank ? Math.max(1,Math.floor(rank/2)) : 0;
+    await effect.update({ [`flags.${SYSTEM_ID}.criticalWound.recoveryDays`]: change.days ? Math.max(1,change.days-reduction) : null,
+      [`flags.${SYSTEM_ID}.peasantBrothReduction`]: reduction });
   }
 }
 export function registerHealingRequests() {

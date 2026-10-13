@@ -104,7 +104,7 @@ function professionStep(state) {
       ...(profession.id === "man-at-arms" ? ["+ 5 боевых навыков на выбор"] : [])], gear: `Выберите ${profession.equipmentChoices}: ${profession.equipment}`,
     crowns: `${STARTING_CROWNS[profession.id]} × 2d6 крон`,
     icon: { bard: "fa-solid fa-guitar", witcher: "fa-solid fa-eye", "man-at-arms": "fa-solid fa-shield-halved", priest: "fa-solid fa-hands-praying", mage: "fa-solid fa-hat-wizard",
-      doctor: "fa-solid fa-staff-snake", criminal: "fa-solid fa-mask", craftsman: "fa-solid fa-hammer", merchant: "fa-solid fa-scale-balanced" }[profession.id] }));
+      doctor: "fa-solid fa-staff-snake", criminal: "fa-solid fa-mask", craftsman: "fa-solid fa-hammer", merchant: "fa-solid fa-scale-balanced", peasant: "fa-solid fa-wheat-awn" }[profession.id], source: profession.source, note: profession.note }));
 }
 
 function details(state) { return { race: state.race, origin: state.origin, familyStatus: state.race === "witcher" ? "" : state.family?.status }; }

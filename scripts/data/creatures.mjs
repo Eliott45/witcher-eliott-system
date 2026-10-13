@@ -3,6 +3,7 @@ import { MONSTER_CATEGORIES } from "./monster-categories.mjs";
 import { potionImmunity } from "./consumables.mjs";
 import { creatureIsMassive, creatureHasInfiniteStamina } from "./creature-modes.mjs";
 import { spiritConditionImmune } from "../combat/creature-spirits.mjs";
+import { peasantImmunity } from "./peasant-rules.mjs";
 
 /** NPC metadata only. Statistics, attacks, skills, abilities and equipment keep their existing models. */
 // Core p.164 «Модификаторы размера»: added to the DC of an unaware or inanimate target of a ranged attack (p.165).
@@ -45,7 +46,7 @@ export function creatureSkillAttribute(system,key) {
 }
 export function immuneToCondition(actor,statuses) {
   const ids=new Set(statuses),traits=new Set((actor.items??[]).filter(item=>item.type==="ability").map(item=>item.system.ruleId));
-  return potionImmunity(actor,ids)
+  return potionImmunity(actor,ids) || peasantImmunity(actor,ids)
     || ids.has("prone")&&creatureIsMassive(actor)
     || spiritConditionImmune(actor,ids)
     || ids.has("exhausted-stun")&&creatureHasInfiniteStamina(actor)

@@ -1,4 +1,5 @@
 import { cappedSkillModifiers } from "./background-modifiers.mjs";
+import { PEASANT_ROW, PEASANT_SOURCE, PEASANT_NOTE } from "./peasant-profession.mjs";
 // Core book (Russian edition), pp. 37–46, 61–70. Stable IDs are independent of display names.
 // Ordinary skill ranks remain in actor.system.skills; only profession abilities are embedded Items.
 const rows = [
@@ -130,11 +131,12 @@ const rows = [
     ]]
 ];
 
-export const PROFESSIONS = rows.map(([id, name, page, treePage, vigor, skills, languageChoices, equipmentChoices, equipment, magic, branches, abilities], index) => ({
+export const PROFESSIONS = [...rows, PEASANT_ROW].map(([id, name, page, treePage, vigor, skills, languageChoices, equipmentChoices, equipment, magic, branches, abilities], index) => ({
   id, name, page, treePage, vigor, skills: skills.split(" "), languageChoices, equipmentChoices, equipment, magic, branches,
+  source: id === "peasant" ? PEASANT_SOURCE : "Базовая книга", note: id === "peasant" ? PEASANT_NOTE : "",
   documentId: `prof${String(index + 1).padStart(12, "0")}`,
   abilities: abilities.map(([slug, name, attribute, description], rank) => ({
-    id: `profession.${id}.${slug}`, name, attribute, description, profession: id,
+    id: `profession.${id}.${slug}`, name, attribute, description, profession: id, source: id === "peasant" ? PEASANT_SOURCE : "Базовая книга",
     branch: rank === 0 ? "" : String(Math.floor((rank - 1) / 3)), tier: rank === 0 ? 0 : (rank - 1) % 3 + 1,
     documentId: `prab${String(index * 10 + rank + 1).padStart(12, "0")}`
   }))

@@ -14,8 +14,8 @@ test("exact profession names take priority over incidental mentions of magic", (
   }
   assert.deepEqual(filterEntries(entries, "мАг", "magic").map(entry => entry.id), ["mage"]);
   assert.deepEqual(filterEntries(entries, "маг", "mundane"), []);
-  assert.equal(filterEntries(entries, "").length, 9);
-  assert.equal(filterEntries(entries, "  ", "mundane").length, 6);
+  assert.equal(filterEntries(entries, "").length, 10);
+  assert.equal(filterEntries(entries, "  ", "mundane").length, 7);
   assert.deepEqual(filterEntries(entries, "познания").map(entry => entry.id), ["mage"]);
 });
 

@@ -13,6 +13,7 @@ import { environmentModifiers } from "../combat/environment.mjs";
 import { dimeritiumModifiers } from "../magic/dimeritium.mjs";
 import { creatureModeModifiers, creatureIsAmphibian, creatureProfile, creatureMovementMode } from "./creature-modes.mjs";
 import { hagModifiers } from "./hag-circle.mjs";
+import { peasantModifiers, stewRank } from "./peasant-rules.mjs";
 
 export const ATTRIBUTE_KEYS = ["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"];
 
@@ -31,6 +32,10 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   // Resisting dimeritium keeps half of the Vigor every other source produces.
   modifiers.push(...dimeritiumModifiers(dimeritium, Math.max(0, vigor + modifierTotal(modifiers, "vigor"))));
   const reputationBonus = modifierTotal(modifiers, "reputation");
+  const peasant = {system:{details},items,effects};
+  modifiers.push(...peasantModifiers(peasant));
+  const mealArmor = Math.floor(stewRank(peasant,"harvest") / 3), racialArmor = modifierTotal(modifiers,"naturalArmor");
+  if (mealArmor > racialArmor) modifiers.push({source:"peasant.stew.harvest",label:"Симфония урожая",category:"effect",target:"naturalArmor",value:mealArmor-racialArmor});
   const reputationTotal = reputationLevel(reputation.value, reputationBonus);
   modifiers.push(...reputationModifiers(reputation, reputationTotal));
   const ev = armorEncumbrance(items, modifierTotal(modifiers, "armorEncumbrance"));

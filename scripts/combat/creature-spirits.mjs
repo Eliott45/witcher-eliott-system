@@ -43,7 +43,7 @@ export function spiritConditionImmune(actor, statuses) {
 /** Immunity to mind magic is independent from courage or a saving-throw bonus. */
 export function creatureMentalImmunity(actor, { mental = false, fear = false } = {}) {
   if (mental && (has(actor, "creature.mindless") || has(actor, "creature.construct"))) return "Иммунитет к магии мыслей и эмоций";
-  if (fear && has(actor, "creature.fearless")) return "Бесстрашие: существо нельзя запугать";
+  if (fear && (has(actor, "creature.fearless") || Array.from(actor.effects??[]).some(effect=>active(effect)&&effect.flags?.[SYSTEM_ID]?.peasant?.kind==="stew.harvest"))) return "Невосприимчивость к страху";
   return "";
 }
 

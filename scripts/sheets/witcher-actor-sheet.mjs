@@ -1,4 +1,5 @@
 import { duelOf } from "../combat/verbal-duel.mjs";
+import { usePeasantAbility } from "./peasant-actions.mjs";
 import { temporaryHealth } from "../workshop/witcher-elixirs.mjs";
 import { takeLootByDrop } from "../loot/loot.mjs";
 import { magicContext, magicActions, bindMagic, learnSpell } from "./magic-context.mjs";
@@ -78,7 +79,7 @@ export class WitcherActorSheet extends HandlebarsApplicationMixin(foundry.applic
       changeInventoryQuantity, toggleCarried, toggleInventoryGroup,
       toggleItemDescription, postItem, searchItemTrait, chooseContainer, toggleContainer,
       editWitcherPath, editDecade, removeDecade, rollDecade, editLifeEvent, removeLifeEvent, rollLifeEvent,
-      rollProfessionAbility,
+      rollProfessionAbility, usePeasantAbility,
       toggleProfession: WitcherActorSheet.#onToggleProfession,
       viewRace: WitcherActorSheet.#onViewReference,
       viewOrigin: WitcherActorSheet.#onViewReference,

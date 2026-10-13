@@ -5,6 +5,7 @@ import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { inventoryTransaction, copyPhysical } from "./transaction.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { harvestBonus } from "../data/peasant-rules.mjs";
 
 export const foragingState = message => message?.author?.isGM ? message.flags[SYSTEM_ID]?.foraging : null;
 export function foragingContent(state) {
@@ -63,6 +64,7 @@ export async function resolveForaging(card, checkMessage) {
         quantity = Math.max(0,Math.floor(message.rolls[0].total));
       }
       if (!Number.isSafeInteger(quantity)) throw new Error("Некорректное количество материала.");
+      if (state.success) quantity += harvestBonus(actor,material);
       state = {...state,quantity};
       await saveForaging(card,state);
     }

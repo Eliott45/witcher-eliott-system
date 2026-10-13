@@ -8,6 +8,7 @@ import { rollDeath } from "./death-state.mjs";
 import { trackRollDisplay } from "../chat/roll-display.mjs";
 import { endToxicityPoison } from "../workshop/consumption.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { stewRank } from "../data/peasant-rules.mjs";
 
 const queues=new Map();
 const pendingRequests=new Set();
@@ -90,12 +91,13 @@ export async function performEffectSave(actor,effect,{turn="",automatic=false,me
       const message=await rollStun(actor,{messageMode:mode,messageData});completed=Boolean(message);return message;
     }
     const skill=save.kind==="skill"?skillValue(actor.system,save.skill):null;
-    const base=skill?.total;
+    const mealBonus=effect.statuses.has("poisoned")?Math.floor(stewRank(actor,"troll")/2):0;
+    const base=skill?.total==null?null:skill.total+mealBonus;
     const threshold=save.kind==="stunModified"?actor.system.statistics.stun:null;
     if((save.kind==="skill"&&base==null)||(save.kind==="stunModified"&&threshold==null))throw new Error("Заполните параметры персонажа для этой проверки.");
     const target=save.kind==="stunModified"?Math.max(0,threshold+(save.modifier??0)):save.dc;
     const formula=save.kind==="stunModified"?"1d10":`1d10wc + ${base}`;
-    const tooltip=save.kind==="stunModified"?`УСТ ${threshold} ${save.modifier??0}. Нужно выбросить строго меньше ${target}.`:`${game.i18n.localize(skill.label)}: параметр ${skill.attributeValue} + навык ${skill.level} + бонусы ${skill.bonus}. СЛ ${target}.`;
+    const tooltip=save.kind==="stunModified"?`УСТ ${threshold} ${save.modifier??0}. Нужно выбросить строго меньше ${target}.`:`${game.i18n.localize(skill.label)}: параметр ${skill.attributeValue} + навык ${skill.level} + бонусы ${skill.bonus}${mealBonus?` + Рагу из тролля ${mealBonus}`:""}. СЛ ${target}.`;
     const display=trackRollDisplay();
     try{
       const roll=await evaluateRoll(formula,{allowInteractive:mode!=="blind"});

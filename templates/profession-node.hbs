@@ -18,4 +18,5 @@
     {{#if ability.attribute}}<button type="button" class="witcher-profession-roll" data-action="rollProfessionAbility" data-ability-id="{{ability.id}}" data-tooltip="{{ability.rollHint}}" aria-label="{{ability.rollHint}}" {{#if ability.rollUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}><i class="fa-solid fa-dice-d10" aria-hidden="true"></i><strong>{{ability.total}}</strong></button>{{/if}}
   </div>
   {{/if}}
+  {{#if ability.peasantAction}}{{#unless advancement}}<button type="button" class="witcher-peasant-action" data-action="usePeasantAbility" data-peasant="{{ability.peasantAction}}" {{#if ability.actionUnavailable}}disabled{{else}}{{disabled (not editable)}}{{/if}}><i class="fa-solid fa-hand-sparkles" aria-hidden="true"></i> Применить</button>{{/unless}}{{/if}}
 </article>

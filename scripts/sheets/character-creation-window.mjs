@@ -487,7 +487,10 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
     const profession = getProfession(state.profession), defining = profession?.abilities[0];
     const ranks = Number(state.skills.ranks.defining) || 0;
     const abilities = defining ? await fromPack("abilities", [defining.id]) : new Map();
-    if (abilities.has(defining?.id)) items.push({ ...abilities.get(defining.id), _id: foundry.utils.randomID(), system: { ...abilities.get(defining.id).system, level: ranks }, flags });
+    if (defining) {
+      const source = abilities.get(defining.id) ?? { name: defining.name, type: "ability", img: "icons/svg/book.svg", system: { ruleId: defining.id, attribute: defining.attribute, description: `<p>${foundry.utils.escapeHTML(defining.description)}</p>` } };
+      items.push({ ...source, _id: foundry.utils.randomID(), system: { ...source.system, level: ranks }, flags });
+    }
     const catalog = (await this.catalogs()).magic;
     const magic = await fromPack("spells", magicRuleIds(state, catalog));
     for (const data of magic.values()) items.push({ ...data, _id: foundry.utils.randomID(), flags });

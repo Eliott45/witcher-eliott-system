@@ -4,11 +4,11 @@ import { PROFESSIONS, PROFESSION_ABILITIES, professionAbilityState } from "../sc
 import { SKILL_KEYS } from "../scripts/data/skills.mjs";
 import { professionSelectionUpdate } from "../scripts/sheets/profession-context.mjs";
 
-test("nine core professions use existing skills and stable, unique ten-node ability trees", () => {
-  assert.equal(PROFESSIONS.length, 9);
-  assert.equal(PROFESSION_ABILITIES.length, 90);
-  assert.equal(new Set(PROFESSION_ABILITIES.map(entry => entry.id)).size, 90);
-  assert.equal(new Set(PROFESSION_ABILITIES.map(entry => entry.documentId)).size, 90);
+test("nine core professions and the peasant use existing skills and stable ten-node trees", () => {
+  assert.equal(PROFESSIONS.length, 10);
+  assert.equal(PROFESSION_ABILITIES.length, 100);
+  assert.equal(new Set(PROFESSION_ABILITIES.map(entry => entry.id)).size, 100);
+  assert.equal(new Set(PROFESSION_ABILITIES.map(entry => entry.documentId)).size, 100);
   for (const profession of PROFESSIONS) {
     assert.equal(profession.abilities.filter(entry => entry.tier === 0).length, 1);
     for (const branch of ["0", "1", "2"]) assert.deepEqual(profession.abilities.filter(entry => entry.branch === branch).map(entry => entry.tier), [1, 2, 3]);

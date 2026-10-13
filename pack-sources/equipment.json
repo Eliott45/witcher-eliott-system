@@ -662,6 +662,191 @@
     "flags": {}
   },
   {
+    "_id": "pswp000000000001",
+    "name": "Вилы",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "peasant.weapon.pitchfork",
+      "skill": "staffSpear",
+      "damageType": "К",
+      "accuracy": -2,
+      "rarity": "everywhere",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 2,
+      "price": 115,
+      "properties": "Кровопускающее (15%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Фургончик Родольфа",
+      "description": "<p>Крестьянское оружие. Кровопускающее (15%).</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "pswp000000000002",
+    "name": "Короткий посох",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "peasant.weapon.quarterstaff",
+      "skill": "staffSpear",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "2d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 3,
+      "price": 96,
+      "properties": "Длинное; Несмертельное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Фургончик Родольфа",
+      "description": "<p>Крестьянское оружие. Длинное; Несмертельное.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "pswp000000000003",
+    "name": "Коса",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "peasant.weapon.scythe",
+      "skill": "staffSpear",
+      "damageType": "Р/К",
+      "accuracy": -3,
+      "rarity": "everywhere",
+      "damage": "3d6",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 3.5,
+      "price": 126,
+      "properties": "Длинное; Захватное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Фургончик Родольфа",
+      "description": "<p>Крестьянское оружие. Длинное; Захватное.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "pswp000000000004",
+    "name": "Пастуший посох",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "peasant.weapon.shepherd-staff",
+      "skill": "melee",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "1d6-2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 2,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 1,
+      "price": 14,
+      "properties": "Несмертельное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Фургончик Родольфа",
+      "description": "<p>Крестьянское оружие. Несмертельное.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "pswp000000000005",
+    "name": "Серп",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "peasant.weapon.sickle",
+      "skill": "smallBlades",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "everywhere",
+      "damage": "1d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "small",
+      "enhancementSlots": 0,
+      "weight": 1,
+      "price": 76,
+      "properties": "Захватное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Фургончик Родольфа",
+      "description": "<p>Крестьянское оружие. Захватное.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "rdlf000000000101",
     "name": "Нильфгаардский прицел",
     "type": "equipment",

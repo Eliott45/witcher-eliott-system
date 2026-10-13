@@ -97,5 +97,16 @@
     "sort": 0,
     "color": "#947641",
     "flags": {}
+  },
+  {
+    "_id": "prfd000000000010",
+    "name": "Крестьянин",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
   }
 ]

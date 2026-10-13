@@ -1,4 +1,8 @@
 import { registerCrossbowMovement } from "./combat/crossbow-modifications.mjs";
+import { registerPeasantMigration, migratePeasantContent } from "./migrations/peasant-content.mjs";
+import { registerPeasantCircle } from "./combat/peasant-circle.mjs";
+import { registerPeasantTargets } from "./combat/peasant-targets.mjs";
+import { registerPeasantTotems } from "./combat/peasant-totems.mjs";
 import { WitcherSpellData } from "./data/witcher-spell-data.mjs";
 import { WitcherEffectItemData } from "./data/witcher-effect-item-data.mjs";
 import { registerEffectExpiry } from "./combat/effect-expiry.mjs";
@@ -165,6 +169,9 @@ Hooks.once("init", async () => {
   registerQuickDraw();
   registerGroupInitiative();
   registerGrapple();
+  registerPeasantCircle();
+  registerPeasantTargets();
+  registerPeasantTotems();
   registerConcealedDice();
   registerDebugDice();
   registerLoot();
@@ -180,6 +187,7 @@ Hooks.once("init", async () => {
   registerSpellContentMigration();
   registerBestiaryMigration();
   registerPregenMigration();
+  registerPeasantMigration();
   registerBookReferencesMigration();
   registerSheetPreferences();
   for (const type of COMBAT_ACTOR_TYPES) {
@@ -257,6 +265,7 @@ Hooks.on("updateCombat", (_combat,changes) => {
 Hooks.once("ready", async () => {
   await ensureSystemLanguage();localizeStatusEffects();
   await migrateMacroContent().catch(error=>console.error(`${SYSTEM_ID} | Macro content`,error));
+  await migratePeasantContent().catch(error=>{console.error(`${SYSTEM_ID} | Peasant content`,error);ui.notifications.error("Не удалось добавить профессию «Крестьянин». Обновите страницу для повторной попытки.");});
   await migrateEffectContent().catch(error=>{console.error(`${SYSTEM_ID} | Effect compendium`,error);ui.notifications.error("Не удалось добавить критические ранения в компендиум эффектов. Подробности в консоли.");});
   await migratePoisonEffects().catch(error=>{console.error(`${SYSTEM_ID} | Poison effects`,error);ui.notifications.error("Не удалось обновить эффекты отравления. Подробности в консоли.");});
   // Vision and equipment migrations both repair the pregen pack; do not race its lock.

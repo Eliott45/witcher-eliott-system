@@ -5,6 +5,7 @@ import { layeredStoppingPower } from "../data/armor-layers.mjs";
 import { spiritState } from "./creature-spirits.mjs";
 import { creatureProfile, creatureHumanForm } from "../data/creature-modes.mjs";
 import { bookMonstersEnabled } from "../settings.mjs";
+import { stewRank } from "../data/peasant-rules.mjs";
 
 // Core pp.153–162 with errata v4: SP first, then resistance, then the location multiplier.
 // Critical bonus damage ignores armor and never ablates it (Sage's Answers 2 and 20).
@@ -45,6 +46,7 @@ export const creatureResistances = actor => actor?.type === "npc"
 
 /** Poison/bleeding resistance (core pp.78, 264): armor fields, properties with upgrades, or the creature field. */
 export function conditionResistant(actor, kind) {
+  if (kind === "poison" && stewRank(actor,"troll") > 0) return true;
   const words = kind === "poison" ? /^(яд|яды|poison)$/iu : /^(кровотечение|bleeding)$/iu;
   const phrase = kind === "poison" ? /сопротивлени[еяю] (яду|ядам)|poison resistance/iu : /сопротивлени[еяю] кровотечению|bleed(ing)? resistance/iu;
   const fields = [...equippedItems(actor.items ?? []).filter(item => item.type === "armor").map(item => effectiveItem(item)),

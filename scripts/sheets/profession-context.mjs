@@ -12,6 +12,7 @@ export function professionContext(actor) {
   const entries = definition.abilities.map(ability => {
     const state = professionAbilityState(actor, ability);
     return { ...ability, level: state.level, unlocked: state.unlocked, prerequisite: state.prerequisite, itemId: state.owned?.id ?? "", uuid: `Compendium.${SYSTEM_ID}.abilities.Item.${ability.documentId}`,
+      peasantAction: definition.id === "peasant" ? ability.id.split(".").at(-1) : "", actionUnavailable: state.level < 1,
       total: state.attribute === null ? "—" : state.attribute + state.level + state.bonus,
       rollHint: `${ability.name}: 1d10 + ${state.attribute ?? "—"} + ${state.level}${state.bonus ? ` + (${state.bonus})` : ""}`,
       rollUnavailable: !ability.attribute || state.attribute === null || !conditionRules(actor).canAct,
