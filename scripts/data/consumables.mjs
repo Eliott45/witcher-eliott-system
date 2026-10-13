@@ -4,7 +4,7 @@ import { available } from "./workshop.mjs";
 import { activeEffect } from "./effect-counters.mjs";
 import { conditionSource } from "./condition-definitions.mjs";
 
-const expendableGear = new Set(["simple-meal", "good-meal", "feast", "raw-meat", "sweets", "rations", "alcahest", "beer", "spirits", "wine", "tobacco", "torch", "candles", "soap", "perfume"].map(id => `gear.${id}`));
+const expendableGear = new Set(["simple-meal", "good-meal", "feast", "raw-meat", "sweets", "rations", "alcahest", "beer", "spirits", "wine", "tobacco", "candles", "soap", "perfume"].map(id => `gear.${id}`));
 const bottleUses = { "alchemy.smelling-salts": 25, "alchemy.chloroform": 25, "gear.candles": 5 };
 
 /** Classification reuses kind/ruleId. Only custom overrides and a partly used bottle need new Item state. */

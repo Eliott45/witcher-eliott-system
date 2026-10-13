@@ -15,6 +15,7 @@ globalThis.foundry = {
   abstract: await import(new URL("abstract/_module.mjs", core)),
   utils: { ...await import(new URL("utils/_module.mjs", core)) },
   data: {
+    operators: await import(new URL("data/operators.mjs", core)),
     fields: await import(new URL("data/fields.mjs", core)),
     ...await import(new URL("data/data.mjs", core))
   },

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { SYSTEM_ID as SYS } from "../scripts/config.mjs";
-import { RADOLF_EQUIPMENT, RADOLF_FOLDER, RADOLF_SOURCE } from "../scripts/data/radolf-equipment.mjs";
+import { RADOLF_EQUIPMENT, RADOLF_FIRST_PAGE, RADOLF_FOLDER, RADOLF_SOURCE } from "../scripts/data/radolf-equipment.mjs";
 import { torchHeldLit, radolfItemContext } from "../scripts/data/radolf-rules.mjs";
 import { effectiveItem } from "../scripts/data/workshop.mjs";
 import { weaponHitTraits } from "../scripts/combat/weapon-hit-effects.mjs";
@@ -53,7 +53,7 @@ function fixture() {
   actor.token = token; scene.tokens.push(token);
   globalThis.canvas = { scene, tokens: { controlled: [] } };
   const item = id => {
-    const row = RADOLF_EQUIPMENT.find(row => row.id === `radolf.${id}`);
+    const row = RADOLF_FIRST_PAGE.find(row => row.id === `radolf.${id}`);
     const result = { ...structuredClone(row), id: row.documentId, actor, flags: {},
       system: { ...structuredClone(row.system), ruleId: row.id, quantity: 1, carried: true, equipped: false } };
     actor.items.push(result); return result;
@@ -61,17 +61,18 @@ function fixture() {
   return { actor, token, scene, item, messages, rolls, totals };
 }
 
-test("first-page DLC contains ten distinct items, exact prices/weights and its own source/folder", async () => {
+test("first-page DLC shares identical core gear and keeps seven exclusive items", async () => {
   const sources = JSON.parse(await readFile(new URL("../pack-sources/equipment.json", import.meta.url)));
   const entries = sources.filter(item => item.system.ruleId.startsWith("radolf."));
-  assert.equal(entries.length, 10);
-  assert.equal(new Set(entries.map(item => item._id)).size, 10);
-  assert.deepEqual(entries.map(item => [item.system.weight, item.system.price]), [[.1,18],[.1,3],[.1,32],[1.5,15],[.1,30],[.1,36],[1,5],[.1,1],[1,8],[.1,6]]);
+  assert.equal(entries.length, 7);
+  assert.equal(new Set(entries.map(item => item._id)).size, 7);
+  assert.deepEqual(entries.map(item => [item.system.weight, item.system.price]), [[.1,18],[.1,3],[.1,32],[1.5,15],[.1,30],[.1,36],[.1,6]]);
   for (const item of entries) { assert.equal(item.folder, RADOLF_FOLDER.id); assert.equal(item.system.source, RADOLF_SOURCE); assert.doesNotMatch(item.system.description, /стр\./u); }
   const shovel = entries.find(item => item.system.ruleId === "radolf.shovel");
   assert.equal(shovel.type, "weapon"); assert.equal(shovel.system.hands, 2); assert.equal(shovel.system.accuracy, -2);
   assert.equal(shovel.system.damage, "2d6"); assert.equal(shovel.system.reliability.max, 15);
-  assert.ok(sources.some(item => item.system.ruleId === "gear.torch"), "core copy remains available");
+  assert.equal(sources.find(item => item.system.ruleId === "gear.torch").type, "weapon");
+  for (const id of ["rations", "waterskin", "torch"]) assert.equal(sources.filter(item => ["gear." + id, "radolf." + id].includes(item.system.ruleId)).length, 1);
   const f = fixture(); assert.equal(consumableContext(f.item("rations")).canUse, true);
   assert.equal(consumableContext(f.item("waterskin")).enabled, false);
 });

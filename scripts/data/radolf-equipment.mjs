@@ -13,7 +13,7 @@ const weapon = (n, row, text, rules) => {
 };
 
 // Furgonchik_Radolfa.pdf, first page. DLC identities do not replace similarly named core items.
-export const RADOLF_EQUIPMENT = [
+export const RADOLF_FIRST_PAGE = [
   gear(1, "marbles", "Мешочек с шариками", .1, 18,
     "Мелкие шарики, рассыпанные под ногами, превращают проход в скользкую преграду.", "Область 2 м; Атлетика СЛ 14; Четвероногие: СЛ 12",
     ["Пересекающий область проходит проверку Атлетики со СЛ 14. При провале падает ничком. Для четвероногих СЛ 12; существа без ног невосприимчивы.",
@@ -39,3 +39,7 @@ export const RADOLF_EQUIPMENT = [
   gear(10, "whistle", "Свисток", .1, 6, "Компактный металлический свисток для привлечения внимания и условных сигналов.", "Сигнал: до ½ мили",
     ["Работает как сигнальный рожок, но слышен не далее полумили. Сигнал могут услышать все в пределах этой дальности."])
 ];
+
+// Shared stock uses the original core identity, so existing links and owned items stay valid.
+export const RADOLF_EQUIPMENT = RADOLF_FIRST_PAGE.filter(entry => !["radolf.rations", "radolf.waterskin", "radolf.torch"].includes(entry.id));
+export const SHARED_TORCH = { ...RADOLF_FIRST_PAGE.find(entry => entry.id === "radolf.torch"), id: "gear.torch", documentId: "eqip000000000036" };

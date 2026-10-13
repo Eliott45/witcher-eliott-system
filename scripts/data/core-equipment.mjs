@@ -6,6 +6,7 @@ import { CORE_CONTAINERS } from "./core-containers.mjs";
 import { CORE_AMMUNITION } from "./core-ammunition.mjs";
 import { rarity, weaponRecord } from "./equipment-records.mjs";
 import { ELDER_EQUIPMENT } from "./elder-equipment.mjs";
+import { SHARED_TORCH } from "./radolf-equipment.mjs";
 const weapon = (n, row) => weaponRecord(`weap${String(n).padStart(12, "0")}`, row, "Базовая книга");
 export const CORE_WEAPONS = [
   ["iron-longsword", "Железный полуторный меч", "swordsmanship", "Р/К", 0,"e","2d6+2",10,2,0,0,"large",0,1.5,160],
@@ -95,4 +96,5 @@ for (const entry of CORE_GEAR) {
   if (content) Object.assign(entry.system, content);
 }
 Object.assign(LEGACY_GEAR_STATS["shoulder-bag"], CORE_CONTAINERS["shoulder-bag"], { kind: "container" });
+Object.assign(CORE_GEAR.find(entry => entry.id === "gear.torch"), SHARED_TORCH);
 export const CORE_EQUIPMENT = [...CORE_WEAPONS, ...CORE_ARMOR, ...CORE_GEAR, ...CORE_GENERAL_ADDITIONS, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK];

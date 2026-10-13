@@ -95,6 +95,7 @@ import { renderTokenVisionToggle, renderScatterToggle } from "./combat/token-hud
 import { migrateVisionDefaults, registerVisionMigration } from "./migrations/vision-defaults.mjs";
 import { migrateCompendiumFolders, registerCompendiumFolderMigration } from "./migrations/compendium-folders.mjs";
 import { migrateEquipmentContent, registerEquipmentContentMigration } from "./migrations/equipment-content.mjs";
+import { migrateSharedEquipment, registerSharedEquipmentMigration } from "./migrations/shared-equipment.mjs";
 import { renderDiceTray } from "./chat/dice-tray.mjs";
 import { registerStatusEffects, localizeStatusEffects, reportEffectError, registerUniqueStatuses, removeExistingDuplicateStatuses } from "./combat/status-effects.mjs";
 import { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources, applyInitialConditions } from "./combat/resource-updates.mjs";
@@ -172,6 +173,7 @@ Hooks.once("init", async () => {
   registerVisorVision();
   registerCompendiumFolderMigration();
   registerEquipmentContentMigration();
+  registerSharedEquipmentMigration();
   registerEffectContentMigration();
   registerSpellContentMigration();
   registerBestiaryMigration();
@@ -267,6 +269,10 @@ Hooks.once("ready", async () => {
   await migrateEquipmentContent().catch(error => {
     console.error(`${SYSTEM_ID} | Could not update equipment content`, error);
     ui.notifications.error("Не удалось обновить каталог предметов. Подробности в консоли.");
+  });
+  await migrateSharedEquipment().catch(error => {
+    console.error(`${SYSTEM_ID} | Could not merge shared equipment`, error);
+    ui.notifications.error("Не удалось объединить общие предметы. Обновление повторится при следующем входе мастера.");
   });
   await migratePregenContent().catch(error => {
     console.error(`${SYSTEM_ID} | Could not update pregens`, error);

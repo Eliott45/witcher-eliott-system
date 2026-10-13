@@ -1,7 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { isCarried, containerParent } from "./containers.mjs";
 
-export const isRadolfTorch = item => item?.system?.ruleId === "radolf.torch";
+export const isRadolfTorch = item => ["gear.torch", "radolf.torch"].includes(item?.system?.ruleId);
 export const torchIgnited = item => isRadolfTorch(item) && Boolean(item.flags?.[SYSTEM_ID]?.torchLit);
 export const torchHeldLit = item => torchIgnited(item) && item.system.equipped && isCarried(item) && !containerParent(item);
 export const holdsLitTorch = actor => Array.from(actor?.items ?? []).some(torchHeldLit);

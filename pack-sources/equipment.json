@@ -809,90 +809,6 @@
     "flags": {}
   },
   {
-    "_id": "rdlf000000000007",
-    "name": "Сухой паёк (на 1 день)",
-    "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
-    "system": {
-      "ruleId": "radolf.rations",
-      "kind": "gear",
-      "weight": 1,
-      "price": 5,
-      "source": "Фургончик Родольфа",
-      "properties": "Рацион на 1 день",
-      "description": "<p>Запас дорожной еды на один день.</p><h3>Применение</h3><ul><li>Кнопка «Использовать» расходует один дневной паёк.</li></ul><p><small>Фургончик Родольфа</small></p>",
-      "consumption": {
-        "mode": "consume"
-      }
-    },
-    "effects": [],
-    "folder": "gearRadolf000001",
-    "sort": 0,
-    "ownership": {
-      "default": 2
-    },
-    "flags": {}
-  },
-  {
-    "_id": "rdlf000000000008",
-    "name": "Факел",
-    "type": "weapon",
-    "img": "icons/svg/sword.svg",
-    "system": {
-      "ruleId": "radolf.torch",
-      "skill": "melee",
-      "damageType": "Д",
-      "accuracy": -1,
-      "rarity": "everywhere",
-      "damage": "1d6",
-      "reliability": {
-        "value": 5,
-        "max": 5
-      },
-      "hands": 1,
-      "range": 0,
-      "rangeBodyMultiplier": 0,
-      "concealment": "none",
-      "enhancementSlots": 0,
-      "weight": 0.1,
-      "price": 1,
-      "properties": "Освещение +1 · 5 м; Поджог 25% при зажжённом факеле",
-      "category": "melee",
-      "encumbrance": 0,
-      "source": "Фургончик Родольфа",
-      "description": "<p>Факел освещает дорогу и служит импровизированной дубинкой.</p><h3>Применение</h3><ul><li>Зажжённый факел повышает освещённость на один уровень в радиусе 5 м. Возьмите его в руку и нажмите «Зажечь»: свет следует за токеном.</li><li>Ближний бой; точность −1; урон 1d6; надёжность 5; хват одной рукой. При попадании зажжённым факелом автоматически проверяется поджог с вероятностью 25%.</li><li>Книга не задаёт время горения. Потушите факел кнопкой, когда он погаснет.</li></ul><p><small>Фургончик Родольфа</small></p>"
-    },
-    "effects": [],
-    "folder": "gearRadolf000001",
-    "sort": 0,
-    "ownership": {
-      "default": 2
-    },
-    "flags": {}
-  },
-  {
-    "_id": "rdlf000000000009",
-    "name": "Бурдюк",
-    "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
-    "system": {
-      "ruleId": "radolf.waterskin",
-      "kind": "gear",
-      "weight": 1,
-      "price": 8,
-      "source": "Фургончик Родольфа",
-      "properties": "",
-      "description": "<p>Дорожная ёмкость для питьевой воды или другого напитка.</p><p><small>Фургончик Родольфа</small></p>"
-    },
-    "effects": [],
-    "folder": "gearRadolf000001",
-    "sort": 0,
-    "ownership": {
-      "default": 2
-    },
-    "flags": {}
-  },
-  {
     "_id": "rdlf000000000010",
     "name": "Свисток",
     "type": "equipment",
@@ -4139,20 +4055,34 @@
   {
     "_id": "eqip000000000036",
     "name": "Факел",
-    "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
     "system": {
       "ruleId": "gear.torch",
+      "skill": "melee",
+      "damageType": "Д",
+      "accuracy": -1,
+      "rarity": "everywhere",
+      "damage": "1d6",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
       "weight": 0.1,
       "price": 1,
-      "rarity": "",
-      "kind": "gear",
-      "properties": "Освещение +1 · 5 м",
-      "source": "Базовая книга",
-      "description": "<p>Простой факел для освещения пути. При необходимости его можно использовать как импровизированную дубинку.</p><h3>Применение и правила</h3><ul><li>Повышает уровень освещения на 1 в радиусе 5 м.</li></ul>"
+      "properties": "Освещение +1 · 5 м; Поджог 25% при зажжённом факеле",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Фургончик Родольфа",
+      "description": "<p>Факел освещает дорогу и служит импровизированной дубинкой.</p><h3>Применение</h3><ul><li>Зажжённый факел повышает освещённость на один уровень в радиусе 5 м. Возьмите его в руку и нажмите «Зажечь»: свет следует за токеном.</li><li>Ближний бой; точность −1; урон 1d6; надёжность 5; хват одной рукой. При попадании зажжённым факелом автоматически проверяется поджог с вероятностью 25%.</li><li>Книга не задаёт время горения. Потушите факел кнопкой, когда он погаснет.</li></ul><p><small>Фургончик Родольфа</small></p>"
     },
     "effects": [],
-    "folder": "gearFolderCore01",
+    "folder": "gearRadolf000001",
     "sort": 0,
     "ownership": {
       "default": 2

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { RADOLF_EQUIPMENT } from "../scripts/data/radolf-equipment.mjs";
+import { RADOLF_EQUIPMENT, SHARED_TORCH } from "../scripts/data/radolf-equipment.mjs";
+import { sharedEquipmentUpdate } from "../scripts/migrations/shared-equipment.mjs";
 import { SYSTEM_ID as SYS } from "../scripts/config.mjs";
 import { useRadolfItem } from "../scripts/combat/radolf-actions.mjs";
 import { scatterMarbles } from "../scripts/combat/radolf-marbles.mjs";
@@ -12,8 +13,8 @@ export async function checkNativeRadolf(itemTemplate, documents) {
   const saved = { canvas: globalThis.canvas, user: game.user, users: game.users, combat: game.combat };
   try {
     const gm = { id: "radolfGM00000001", isGM: true, can: () => true }; game.user = gm; game.users = { activeGM: gm }; game.combat = null;
-    const items = [...documents.values()].filter(item => RADOLF_EQUIPMENT.some(entry => entry.id === item.system?.ruleId)).map(item => item.toObject());
-    assert.equal(items.length, 10);
+    const items = [...documents.values()].filter(item => [...RADOLF_EQUIPMENT, SHARED_TORCH].some(entry => entry.id === item.system?.ruleId)).map(item => item.toObject());
+    assert.equal(items.length, 8);
     const actor = new foundry.documents.BaseActor({ _id: "radolfActor00001", name: "Radolf native QA", type: "character", items,
       system: { attributes: { intelligence: 6, reflex: 6, dexterity: 6, body: 6, speed: 6, empathy: 6, craft: 6, will: 6, luck: 6 }, health: { value: 30, max: 30 }, stamina: { value: 30, max: 30 } } });
     Object.defineProperty(actor, "isOwner", { value: true });
@@ -47,7 +48,12 @@ export async function checkNativeRadolf(itemTemplate, documents) {
       sheet.isEditable = true;
     }
     for (const Sheet of [WitcherItemSheet, WitcherActorSheet, WitcherNPCSheet]) assert.equal(typeof Sheet.DEFAULT_OPTIONS.actions.useRadolfItem, "function");
-    const torch = actor.items.find(item => item.system.ruleId === "radolf.torch");
+    const torch = actor.items.find(item => item.system.ruleId === "gear.torch");
+    const legacy = new foundry.documents.BaseItem({ _id: "legacyTorch00001", name: "Факел", type: "equipment", system: { ruleId: "gear.torch", quantity: 3, description: "Мои заметки" } });
+    legacy.updateSource(sharedEquipmentUpdate(legacy));
+    assert.equal(legacy.type, "weapon"); assert.equal(legacy.system.damage, "1d6");
+    assert.equal(legacy.system.quantity, 3); assert.equal(legacy.system.description, "Мои заметки");
+    assert.equal(legacy.validate({ strict: true }), true);
     torch.updateSource({ "system.equipped": true });
     await useRadolfItem(torch); assert.equal(torch.flags[SYS].torchLit, true);
     const light = new foundry.documents.BaseAmbientLight(torchLightSource(token), { strict: true });
@@ -56,6 +62,6 @@ export async function checkNativeRadolf(itemTemplate, documents) {
     const region = await scatterMarbles(actor, bag, { point: { x: 250, y: 50 }, diameter: 2 });
     assert.equal(region.visibility, CONST.REGION_VISIBILITY.ALWAYS); assert.equal(region.shapes[0].radiusX, 50);
     assert.equal(bag.system.quantity, 0);
-    console.log("Radolf DLC: 10 native items, editable/read-only actions, torch light and marble Region validate in installed Foundry");
+    console.log("Radolf DLC: 8 native items, editable/read-only actions, torch light and marble Region validate in installed Foundry");
   } finally { globalThis.canvas = saved.canvas; game.user = saved.user; game.users = saved.users; game.combat = saved.combat; }
 }

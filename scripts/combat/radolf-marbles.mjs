@@ -43,7 +43,7 @@ export async function scatterMarbles(actor, item, { point = null, diameter = nul
     ok: { label: "Выбрать место", callback: (_event, button) => Number(new FormData(button.form).get("diameter")) }, rejectClose: false });
   if (diameter === null || diameter === false) return;
   if (!Number.isFinite(diameter) || diameter <= 0 || diameter > 100) throw new Error("Укажите поперечник от 0,1 до 100 м.");
-  point = await pickCreaturePoint(token, { destination: point, max: Infinity, title: "Выберите центр области с шариками" });
+  point = await pickCreaturePoint(token, { destination: point, max: Infinity, previewRadius: diameter / 2, title: "Выберите центр области с шариками" });
   if (!point) return;
   return inventoryWrite(actor, async () => {
     const action = actionQuote(actor);

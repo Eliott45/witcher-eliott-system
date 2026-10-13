@@ -153,7 +153,7 @@ test("Radolf DLC adds only missing items in its own folder and preserves an edit
   const custom = { _id: "customRadolf0001", type: "equipment", name: "Мой компас", system: { ruleId: "radolf.compass", price: 777, description: "Заметки игрока" } };
   state.index.set(custom._id, custom);
   await migrateEquipmentContent();
-  assert.equal(state.writes.find(([kind]) => kind === "items")[1], 9);
+  assert.equal(state.writes.find(([kind]) => kind === "items")[1], RADOLF_EQUIPMENT.length - 1);
   assert.equal(state.pack.folders.get(RADOLF_FOLDER.id).name, "Фургончик Родольфа");
   assert.equal(state.index.get(custom._id).system.price, 777);
   assert.equal(state.index.get(custom._id).system.description, "Заметки игрока");
@@ -458,3 +458,4 @@ test("version-seventeen worlds append the nine pure substances once with their s
   await migrateEquipmentContent();
   assert.equal(state.writes.length, 4);
 });
+

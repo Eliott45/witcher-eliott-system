@@ -5,6 +5,7 @@ import { activeEffect } from "../data/effect-counters.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
 import { attackerToken, tokenDocument, tokenCenter, tokenGap } from "./attack-target.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
+import { circlePreview } from "../canvas/circle-preview.mjs";
 
 export { esc };
 export const creatureFlags = document => document?.flags?.[SYSTEM_ID]??{};
@@ -52,16 +53,18 @@ export function creaturesInRadius(source,radius) {
   return Array.from(source.parent?.tokens??[]).filter(token=>token.actor&&token.uuid!==source.uuid&&tokenGap(source,token)<=radius);
 }
 export const centerDistance = (a,b,scene) => Math.hypot(a.x-b.x,a.y-b.y)/scene.grid.size*scene.grid.distance;
-export async function pickCreaturePoint(source,{destination=null,max=Infinity,min=0,title="Выберите точку на сцене",throughWalls=false}={}) {
+export async function pickCreaturePoint(source,{destination=null,max=Infinity,min=0,title="Выберите точку на сцене",throughWalls=false,previewRadius=0}={}) {
   const center=tokenCenter(source),scene=source.parent;
   let point=destination;
   if(!point) {
     ui.notifications.info(`${title}. Щёлкните по сцене; Esc — отмена.`);
     point=await new Promise(resolve=>{
-      const finish=value=>{canvas.stage.off("pointerdown",click);document.removeEventListener("keydown",key);resolve(value);};
-      const click=event=>{if(event.button===0)finish({x:event.global.x,y:event.global.y,...event.getLocalPosition(canvas.stage)});};
+      const stage=canvas.stage, clearPreview=previewRadius>0?circlePreview(scene,center,previewRadius):()=>{};
+      const finish=value=>{stage.off("pointerdown",click);document.removeEventListener("keydown",key);Hooks.off("canvasTearDown",teardown);clearPreview();resolve(value);};
+      const click=event=>{if(event.button===0)finish({x:event.global.x,y:event.global.y,...event.getLocalPosition(stage)});else if(event.button===2)finish(null);};
       const key=event=>{if(event.key==="Escape")finish(null);};
-      canvas.stage.on("pointerdown",click);document.addEventListener("keydown",key);
+      const teardown=Hooks.on("canvasTearDown",()=>finish(null));
+      stage.on("pointerdown",click);document.addEventListener("keydown",key);
     });
   }
   if(!point)return null;
