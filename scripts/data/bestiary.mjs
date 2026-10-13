@@ -9,6 +9,9 @@ import { CORE_AMMUNITION } from "./core-ammunition.mjs";
 import { ELDER_EQUIPMENT } from "./elder-equipment.mjs";
 import { CORE_MAGIC } from "./spells.mjs";
 import { bookSource } from "./book-references.mjs";
+import { radolfNPCSource, RADOLF_ACTOR_FOLDER } from "./radolf-npc.mjs";
+
+export const bestiaryFolders = () => [structuredClone(RADOLF_ACTOR_FOLDER)];
 
 const asset=name=>`systems/witcher-eliott-system/assets/creatures/${name}.svg`;
 const attributes=values=>Object.fromEntries(["intelligence","reflex","dexterity","body","speed","empathy","craft","will","luck"].map((key,i)=>[key,values[i]]));
@@ -44,7 +47,7 @@ export function bestiarySources() {
     return {id:`drownerHarvest${index}`,uuid:`Compendium.witcher-eliott-system.equipment.Item.${material.documentId}`,quantity:index===2?0:1,formula:index===2?"floor(1d6 / 2)":"",skill:"",dc:0,attempted:false};
   });
   drowner.items=[{_id:"drownerClaws0001",name:"Когти",type:"weapon",img:asset("claws"),system:{category:"melee",skill:"melee",damage:"3d6",damageType:"Р",natural:true,damageIncludesBody:true,equipped:true,attackRate:1,description:"<p>Естественное оружие утопца. СА 1; эффектов нет.</p>",source:"Базовая книга"}},...traits(["wild","poison-immunity","amphibian","mindless","fire-vulnerable","necrophage-oil","monster-resistance"])];
-  return [bandit,drowner,...coreBestiarySources()];
+  return [bandit,drowner,...coreBestiarySources(),radolfNPCSource()];
 }
 
 // ── Core pp.270–313: the rest of the bestiary, built from bestiary-core.mjs. ──

@@ -1,6 +1,6 @@
 import { MACRO_SOURCES } from "../scripts/data/macros.mjs";
 import { spellSources, spellFolders } from "../scripts/data/spells.mjs";
-import { bestiarySources } from "../scripts/data/bestiary.mjs";
+import { bestiarySources, bestiaryFolders } from "../scripts/data/bestiary.mjs";
 import { pregenSources } from "../scripts/data/pregens.mjs";
 import { MATERIALS } from "../scripts/data/workshop-materials.mjs";
 import { ALCHEMY, MUTAGENS } from "../scripts/data/workshop-alchemy.mjs";
@@ -100,7 +100,7 @@ export function compendiumData(translations) {
 /** Folders inside a compendium, distinct from the world sidebar's Witcher pack folder. */
 export function compendiumFolders(translations) {
   const localize = key => key.split(".").reduce((value, part) => value[part], translations);
-  return { spells: spellFolders(), abilities: PROFESSIONS.map(entry => ({ _id: getProfessionFolder(entry.id), name: entry.name, type: "Item", description: "", folder: null, sorting: "a", sort: 0, color: "#947641", flags: {} })), equipment: Object.values(EQUIPMENT_FOLDERS).map(folder => ({
+  return { bestiary: bestiaryFolders(), spells: spellFolders(), abilities: PROFESSIONS.map(entry => ({ _id: getProfessionFolder(entry.id), name: entry.name, type: "Item", description: "", folder: null, sorting: "a", sort: 0, color: "#947641", flags: {} })), equipment: Object.values(EQUIPMENT_FOLDERS).map(folder => ({
     _id: folder.id, name: localize(folder.label), type: "Item", description: "",
     folder: null, sorting: "a", sort: 0, color: "#947641", flags: {}
   })).concat(Object.values(coreFolders).map(folder => ({ _id: folder.id, name: folder.name, type: "Item", description: "", folder: null, sorting: "a", sort: 0, color: "#947641", flags: {} }))) };

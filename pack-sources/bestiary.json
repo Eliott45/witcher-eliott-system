@@ -8958,5 +8958,623 @@
         "flags": {}
       }
     ]
+  },
+  {
+    "_id": "radolfKazmer0001",
+    "name": "Родольф Казмер",
+    "type": "npc",
+    "img": "systems/witcher-eliott-system/assets/creatures/radolf-kazmer.jpg",
+    "folder": "npcRadolfFolder1",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Родольф Казмер",
+      "texture": {
+        "src": "systems/witcher-eliott-system/assets/creatures/radolf-kazmer.jpg"
+      },
+      "actorLink": true,
+      "disposition": 0,
+      "sight": {
+        "enabled": true,
+        "angle": 360
+      },
+      "bar1": {
+        "attribute": "health"
+      },
+      "bar2": {
+        "attribute": "stamina"
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 6,
+        "reflex": 7,
+        "dexterity": 9,
+        "body": 7,
+        "speed": 5,
+        "empathy": 9,
+        "craft": 7,
+        "will": 8,
+        "luck": 10
+      },
+      "details": {
+        "race": "dwarf",
+        "profession": "merchant",
+        "gender": "Мужской"
+      },
+      "skills": {
+        "gambling": 6,
+        "athletics": 3,
+        "brawling": 4,
+        "pickLock": 2,
+        "awareness": 7,
+        "wildernessSurvival": 6,
+        "deduction": 3,
+        "intimidation": 5,
+        "trapCrafting": 4,
+        "crafting": 1,
+        "sleightOfHand": 5,
+        "deceit": 7,
+        "education": 4,
+        "streetwise": 6,
+        "forgery": 7,
+        "humanPerception": 7,
+        "physique": 5,
+        "stealth": 6,
+        "resistMagic": 4,
+        "resistCoercion": 9,
+        "endurance": 6,
+        "business": 7,
+        "persuasion": 8,
+        "charisma": 8,
+        "courage": 6,
+        "dodgeEscape": 6,
+        "smallBlades": 4,
+        "crossbow": 7,
+        "melee": 5
+      },
+      "health": {
+        "value": 35,
+        "max": 35
+      },
+      "stamina": {
+        "value": 35,
+        "max": 35
+      },
+      "resolve": {
+        "value": 35,
+        "max": 35
+      },
+      "crowns": 1250,
+      "languages": [
+        {
+          "id": "language.dwarven",
+          "name": "Краснолюдский",
+          "level": 4
+        },
+        {
+          "id": "language.elder",
+          "name": "Старшая Речь",
+          "level": 4
+        }
+      ],
+      "creature": {
+        "category": "humanoid",
+        "difficulty": "Простой / незаурядный",
+        "reward": 0,
+        "rewardNote": "Неоплаченные счета из таверн и трактиров",
+        "intellect": "Разумный",
+        "habitat": "Северные королевства и нильфгаардские провинции",
+        "source": "Фургончик Родольфа",
+        "healthMax": 35,
+        "staminaMax": 35,
+        "description": "Краснолюд-торговец из Марибора, темерский патриот и контрабандист. Снабжает северных повстанцев и окружённые войска.",
+        "lore": [
+          {
+            "name": "Расхожие слухи",
+            "skill": "education",
+            "dc": 13,
+            "text": "Родольф торгует припасами в Северных королевствах и нильфгаардских провинциях, снабжая повстанцев и недовольных властью. В корчме он душевный собеседник, но за себя постоит. По слухам, он тесно связан со скоя’таэлями и может быстро вызвать эльфско-краснолюдский отряд. Сам Родольф охотно поддерживает эту версию."
+          },
+          {
+            "name": "Биографические факты",
+            "skill": "education",
+            "dc": 16,
+            "text": "Родольф Казмер — поставщик припасов северным повстанцам и опытный контрабандист. Родился в Мариборе в семье краснолюдов, недавно покинувшей Махакам, и с детства считает себя темерцем. На скоя’таэлей он никогда не работал: несмотря на пережитую нетерпимость, считает их движение ослеплённым ненавистью и надеется на мирное сосуществование людей и Старших народов при прекращении жестокости с обеих сторон. Воевал в Северных войнах и служил в армии разведчиком, партизаном, арбалетчиком и снайпером. Владеет арбалетом и краснолюдским топором, но больше полагается на красноречие и деловую хватку. После Второй войны с Нильфгаардом вернулся к торговле, путешествиям и азартным играм. С началом Третьей Северной войны тайно возит еду, доспехи и оружие северянам в осаждённые и оккупированные города. С солдат берёт небольшую плату, а остальным покупателям выставляет куда более высокие цены."
+          }
+        ],
+        "loot": [
+          {
+            "name": "Обычные предметы",
+            "formula": "1d6",
+            "currency": false
+          }
+        ],
+        "lootGenerated": false
+      },
+      "notes": "Ассортимент повозки определяет ведущий: товары общей стоимостью до 5000 крон. 1250 крон, снаряжение и боеприпасы уже при Родольфе; кнопка добычи добавляет только обычные предметы. Связи со скоя’таэлями — слух, а не факт. Восприимчив к яду повешенного как гуманоид."
+    },
+    "items": [
+      {
+        "_id": "weap000000000012",
+        "name": "Короткий кинжал",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "skill": "smallBlades",
+          "damageType": "Р/К",
+          "accuracy": 1,
+          "rarity": "rare",
+          "damage": "2d6+4",
+          "reliability": {
+            "value": 10,
+            "max": 10
+          },
+          "hands": 1,
+          "range": 0,
+          "rangeBodyMultiplier": 0,
+          "concealment": "small",
+          "enhancementSlots": 1,
+          "weight": 1,
+          "price": 350,
+          "properties": "Кровопускающее (25%)",
+          "category": "melee",
+          "encumbrance": 0,
+          "source": "Базовая книга",
+          "ruleId": "weapon.short-dagger",
+          "quantity": 1,
+          "carried": true,
+          "equipped": false,
+          "attackRate": 2,
+          "damageIncludesBody": true,
+          "grip": 0
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.weap000000000012"
+          }
+        }
+      },
+      {
+        "_id": "eldw000000000019",
+        "name": "Краснолюдский тяжёлый арбалет",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "skill": "crossbow",
+          "damageType": "К",
+          "accuracy": 3,
+          "rarity": "unique",
+          "damage": "5d6",
+          "reliability": {
+            "value": 15,
+            "max": 15
+          },
+          "hands": 2,
+          "range": 300,
+          "rangeBodyMultiplier": 0,
+          "concealment": "none",
+          "enhancementSlots": 2,
+          "weight": 3.5,
+          "price": 850,
+          "properties": "Медленно перезаряжающееся",
+          "category": "ranged",
+          "encumbrance": 0,
+          "source": "Базовая книга",
+          "ruleId": "weapon.dwarven-heavy-crossbow",
+          "quantity": 1,
+          "carried": true,
+          "equipped": false,
+          "attackRate": 1,
+          "damageIncludesBody": true,
+          "grip": 0,
+          "loaded": false
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000019"
+          }
+        }
+      },
+      {
+        "_id": "eldw000000000008",
+        "name": "Краснолюдский топор",
+        "type": "weapon",
+        "img": "icons/svg/sword.svg",
+        "system": {
+          "skill": "melee",
+          "damageType": "Р",
+          "accuracy": 3,
+          "rarity": "unique",
+          "damage": "5d6+7",
+          "reliability": {
+            "value": 15,
+            "max": 15
+          },
+          "hands": 1,
+          "range": 0,
+          "rangeBodyMultiplier": 0,
+          "concealment": "large",
+          "enhancementSlots": 1,
+          "weight": 4,
+          "price": 740,
+          "properties": "",
+          "category": "melee",
+          "encumbrance": 0,
+          "source": "Базовая книга",
+          "ruleId": "weapon.dwarven-axe",
+          "quantity": 1,
+          "carried": true,
+          "equipped": true,
+          "attackRate": 2,
+          "damageIncludesBody": true,
+          "grip": 1
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.eldw000000000008"
+          }
+        }
+      },
+      {
+        "_id": "armo000000000012",
+        "name": "Двуслойный гамбезон",
+        "type": "armor",
+        "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+        "system": {
+          "zone": "torso",
+          "armorClass": "light",
+          "stoppingPower": {
+            "value": 8,
+            "max": 8
+          },
+          "rarity": "rare",
+          "enhancementSlots": 1,
+          "encumbrance": 0,
+          "weight": 2.5,
+          "price": 250,
+          "properties": "",
+          "source": "Базовая книга",
+          "ruleId": "armor.torso.3",
+          "quantity": 1,
+          "carried": true,
+          "equipped": true
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.armo000000000012"
+          }
+        }
+      },
+      {
+        "_id": "eqip000000000014",
+        "name": "Воровские инструменты",
+        "type": "equipment",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "weight": 1,
+          "price": 80,
+          "rarity": "rare",
+          "kind": "tool",
+          "properties": "Вскрытие замков",
+          "source": "Базовая книга",
+          "description": "<p>Набор приспособлений для вскрытия замков.</p><h3>Применение и правила</h3><ul><li>Вскрытие замков.</li><li>Для соответствующей работы без инструментов книга указывает штраф -4. Если действие требует оборудования, само наличие штрафа не даёт возможности обойти это требование.</li></ul><p><small>Базовая книга</small></p>",
+          "concealment": "tiny",
+          "ruleId": "gear.thieves-tools",
+          "quantity": 1,
+          "carried": true,
+          "equipped": false
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.eqip000000000014"
+          }
+        }
+      },
+      {
+        "_id": "eqip000000000041",
+        "name": "Фляга с краснолюдским спиртом",
+        "type": "equipment",
+        "img": "icons/svg/item-bag.svg",
+        "system": {
+          "weight": 1,
+          "price": 10,
+          "rarity": "",
+          "kind": "gear",
+          "properties": "",
+          "source": "Базовая книга",
+          "description": "<p>Крепкий алкоголь для застолий и дорожных запасов.</p><p><small>Базовая книга</small></p>",
+          "ruleId": "gear.spirits",
+          "quantity": 1,
+          "carried": true,
+          "equipped": false
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.eqip000000000041"
+          }
+        }
+      },
+      {
+        "_id": "ammo000000000001",
+        "name": "Стандартные болты",
+        "type": "equipment",
+        "img": "icons/weapons/ammunition/arrow-simple.webp",
+        "system": {
+          "kind": "ammunition",
+          "quantity": 20,
+          "purchaseQuantity": 10,
+          "weight": 0.05,
+          "price": 1,
+          "rarity": "everywhere",
+          "damageType": "К",
+          "reliability": {
+            "value": 10,
+            "max": 10
+          },
+          "concealment": "large",
+          "properties": "",
+          "description": "<p>Стандартные боеприпасы продаются пачками по 10 штук за 10 крон (0,5 кг). В инвентаре учитываются отдельные боеприпасы: 1 штука весит 0,05 кг и стоит 1 крону.</p><p>Базовая книга.</p>",
+          "source": "Базовая книга",
+          "ruleId": "ammunition.standard",
+          "carried": true,
+          "equipped": false
+        },
+        "flags": {
+          "witcher-eliott-system": {
+            "ammunitionUnits": true
+          },
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.ammo000000000001"
+          }
+        }
+      },
+      {
+        "_id": "ammo000000000003",
+        "name": "Болты с широким наконечником",
+        "type": "equipment",
+        "img": "icons/weapons/ammunition/arrow-simple.webp",
+        "system": {
+          "kind": "ammunition",
+          "quantity": 5,
+          "purchaseQuantity": 1,
+          "weight": 0.1,
+          "price": 10,
+          "rarity": "common",
+          "damageType": "К",
+          "reliability": {
+            "value": 10,
+            "max": 10
+          },
+          "concealment": "large",
+          "properties": "Кровопускающее (100%)",
+          "description": "<p>Один боеприпас с широким наконечником. Если наносит урон цели, вызывает кровотечение.</p><p>Базовая книга.</p>",
+          "source": "Базовая книга",
+          "ruleId": "ammunition.broadhead",
+          "carried": true,
+          "equipped": false
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.ammo000000000003"
+          }
+        }
+      },
+      {
+        "_id": "ammo000000000004",
+        "name": "Бронебойные болты",
+        "type": "equipment",
+        "img": "icons/weapons/ammunition/arrow-simple.webp",
+        "system": {
+          "kind": "ammunition",
+          "quantity": 5,
+          "purchaseQuantity": 1,
+          "weight": 0.1,
+          "price": 15,
+          "rarity": "common",
+          "damageType": "К",
+          "reliability": {
+            "value": 10,
+            "max": 10
+          },
+          "concealment": "large",
+          "properties": "Пробивающее броню",
+          "description": "<p>Один бронебойный боеприпас. Игнорирует сопротивление брони соответствующему типу урона; не уменьшает её ПБ.</p><p>Базовая книга.</p>",
+          "source": "Базовая книга",
+          "ruleId": "ammunition.armor-piercing",
+          "carried": true,
+          "equipped": false
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.ammo000000000004"
+          }
+        }
+      },
+      {
+        "_id": "trns000000000005",
+        "name": "Мул",
+        "type": "equipment",
+        "img": "systems/witcher-eliott-system/assets/icons/horse.svg",
+        "system": {
+          "kind": "transport",
+          "quantity": 1,
+          "weight": 0,
+          "capacity": 150,
+          "price": 200,
+          "transport": {
+            "type": "mount",
+            "athletics": 7,
+            "handling": 0,
+            "speed": 9,
+            "speedModifier": 0,
+            "health": {
+              "value": 45,
+              "max": 45
+            },
+            "mountId": ""
+          },
+          "source": "Базовая книга",
+          "description": "<p>Верховое или вьючное животное. Грузоподъёмность — 150 кг.</p>",
+          "ruleId": "transport.mule",
+          "carried": true,
+          "equipped": false
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.trns000000000005"
+          }
+        }
+      },
+      {
+        "_id": "trns000000000002",
+        "name": "Повозка",
+        "type": "equipment",
+        "img": "systems/witcher-eliott-system/assets/icons/wagon.svg",
+        "system": {
+          "kind": "transport",
+          "quantity": 1,
+          "weight": 0,
+          "capacity": 300,
+          "price": 200,
+          "transport": {
+            "type": "wagon",
+            "athletics": 0,
+            "handling": 0,
+            "speed": 0,
+            "speedModifier": -1,
+            "health": {
+              "value": 30,
+              "max": 30
+            },
+            "mountId": "trns000000000005"
+          },
+          "source": "Базовая книга",
+          "description": "<p>Для движения необходимо запрячь животное. Грузоподъёмность — 300 кг.</p><p>Товары Родольфа на сумму до 5000 крон. Ассортимент определяет ведущий; конкретные товары помещаются внутрь повозки.</p>",
+          "ruleId": "transport.cart",
+          "carried": true,
+          "equipped": false
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.equipment.Item.trns000000000002"
+          }
+        }
+      },
+      {
+        "_id": "radolfVenom00001",
+        "name": "Яд повешенного",
+        "type": "ability",
+        "img": "icons/svg/blood.svg",
+        "system": {
+          "ruleId": "creature.hanged-man-venom",
+          "description": "<p>Гуманоид уязвим к яду повешенного. Используйте описание нанесённого на оружие состава.</p>"
+        }
+      },
+      {
+        "_id": "prab000000000081",
+        "name": "Бывалый путешественник",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.merchant.well-traveled",
+          "level": 9,
+          "attribute": "intelligence",
+          "description": "<p>Действием вспоминает один факт об определённом предмете, культуре или области. СЛ проверки определяет ведущий.</p><p><small>Фургончик Родольфа</small></p>"
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000081"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000082",
+        "name": "Рынок",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.merchant.market",
+          "level": 7,
+          "attribute": "intelligence",
+          "description": "<p>Во время покупки может потратить действие, чтобы найти другого продавца того же предмета за половину рыночной цены. СЛ определяет ведущий: чем выше редкость, тем труднее поиск. Не действует на экспериментальные и ведьмачьи предметы, а также реликвии.</p><p><small>Фургончик Родольфа</small></p>"
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000082"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000088",
+        "name": "Хорошие связи",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.merchant.connections",
+          "level": 6,
+          "attribute": "will",
+          "description": "<p>При первом посещении поселения тратит действие и проходит проверку: СЛ 14 для небольшого поселения, 18 для среднего и 22 для большого. При успехе местная репутация увеличивается на половину превышения СЛ на 1d6 недель.</p><p><small>Фургончик Родольфа</small></p>"
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000088"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000085",
+        "name": "Трущобы",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.merchant.rags",
+          "level": 7,
+          "attribute": "empathy",
+          "description": "<p>Действием нанимает местных осведомителей: СЛ 14 для небольшого поселения, 18 для среднего и 22 для большого. Каждый нанятый беспризорник или бездомный даёт +1 к Ориентированию в городе в этой местности и получает 1 крону. Количество помощников определяет ведущий по результату проверки.</p><p><small>Фургончик Родольфа</small></p>"
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000085"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000089",
+        "name": "Сбытчик",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.merchant.fence",
+          "level": 8,
+          "attribute": "intelligence",
+          "description": "<p>Действием ищет скупщика, готового приобрести любой предмет за полную рыночную цену без лишних вопросов и доноса властям. СЛ проверки определяет ведущий.</p><p><small>Фургончик Родольфа</small></p>"
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000089"
+          }
+        }
+      },
+      {
+        "_id": "prab000000000090",
+        "name": "Воинский долг",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "profession.merchant.warrior-debt",
+          "level": 4,
+          "attribute": "empathy",
+          "description": "<p>Действием просит помощи у воина, задолжавшего ему услугу. Результат распределяется между боевыми навыками, интеллектом и снаряжением помощника по таблице воинского долга. Воин выполняет разумные приказы и помогает Родольфу в течение 4 дней.</p><p><small>Фургончик Родольфа</small></p>"
+        },
+        "flags": {
+          "core": {
+            "sourceId": "Compendium.witcher-eliott-system.abilities.Item.prab000000000090"
+          }
+        }
+      }
+    ],
+    "effects": []
   }
 ]

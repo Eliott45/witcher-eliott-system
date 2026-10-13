@@ -6,7 +6,7 @@ import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from 
 import { registerSettingsLayout } from "./settings-layout.mjs";
 import { WitcherTokenLayer } from "./canvas/witcher-token-layer.mjs";
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
-import { migrateBestiaryContent,migrateBestiaryCreatures,migrateBestiaryJournalCreatures,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
+import { migrateBestiaryContent,migrateBestiaryCreatures,migrateBestiaryJournalCreatures,migrateBestiaryRadolf,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
 import { migrateBestiaryCorrections } from "./migrations/bestiary-corrections.mjs";
 import { migrateBestiaryAutomation } from "./migrations/bestiary-automation.mjs";
 import { migratePregenContent,registerPregenMigration } from "./migrations/pregen-content.mjs";
@@ -264,7 +264,7 @@ Hooks.once("ready", async () => {
     console.error(`${SYSTEM_ID} | Could not update vision defaults`, error);
     ui.notifications.error(game.i18n.localize("WITCHER.Token.MigrationFailed"));
   });
-  await migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).then(migrateBestiaryAutomation).then(migrateBestiaryJournalCreatures).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
+  await migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).then(migrateBestiaryAutomation).then(migrateBestiaryJournalCreatures).then(migrateBestiaryRadolf).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
   await migrateSpellContent().catch(error=>{
     console.error(`${SYSTEM_ID} | Could not update magic content`,error);
     ui.notifications.error("Не удалось обновить каталог магии. Подробности в консоли.");

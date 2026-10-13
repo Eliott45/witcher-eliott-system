@@ -1,0 +1,12 @@
+[
+  {
+    "_id": "npcRadolfFolder1",
+    "name": "Фургончик Родольфа",
+    "type": "Actor",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  }
+]

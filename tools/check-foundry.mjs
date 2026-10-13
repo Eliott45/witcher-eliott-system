@@ -1706,6 +1706,7 @@ for(const source of bestiarySources()) {
     assert.equal(actor.items.find(i=>i.system.ruleId==='weapon.hand-crossbow').system.accuracy,1);
   }
 }
+await (await import('./native-radolf-npc.mjs')).checkNativeRadolfNPC(creatureViews,npcTemplate);
 // Stateful creature modes must survive the installed schema and render with strict Handlebars.
 const nativeModes=[
   ['Сирена',{'system.creature.movementMode':'flying','system.creature.illusion':true}],

@@ -7,6 +7,21 @@ const armor = (sp, resistances = []) => ({ sp, resistances, layers: sp ? [{ name
 const traits = (properties = "", damageType = "Р/К") => weaponDamageTraits({ properties, damageType });
 const hit = options => resolveDamage({ location: "torso", multiplier: 1, traits: traits(), armor: armor(0), ...options });
 
+test("dwarven racial armor protects every location, adds to worn SP and is never ablated",async()=>{
+  const {armorAt}=await import("../scripts/combat/damage-rules.mjs");
+  for(const type of ["character","npc"]) {
+    const item={id:"gambeson",type:"armor",name:"Гамбезон",system:{zone:"torso",quantity:1,equipped:true,carried:true,stoppingPower:{value:8,max:8},installations:[]}};
+    const actor={type,items:[item],effects:[],system:{creature:{category:"humanoid",naturalArmor:0},statistics:{naturalArmor:2}}};
+    const torso=armorAt(actor,"torso");assert.equal(torso.sp,10);
+    const stopped=hit({base:10,armor:torso});assert.equal(stopped.total,0);assert.deepEqual(stopped.ablate,[]);
+    const penetrated=hit({base:12,armor:torso});assert.equal(penetrated.total,2);assert.deepEqual(penetrated.ablate,["gambeson"]);
+    for(const location of ["head","leftLeg","rightLeg"]) {
+      const bare=armorAt(actor,location);assert.equal(bare.sp,2);assert.deepEqual(hit({base:5,armor:bare}).ablate,[]);
+    }
+    item.system.stoppingPower.value=0;assert.equal(armorAt(actor,"torso").sp,2);
+  }
+});
+
 test("damage types and weapon traits are read from catalog fields", () => {
   assert.deepEqual(parseDamageTypes("Р/К"), ["slashing", "piercing"]);
   assert.deepEqual(parseDamageTypes("К/Д"), ["piercing", "bludgeoning"]);

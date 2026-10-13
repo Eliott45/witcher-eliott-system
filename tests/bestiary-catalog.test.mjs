@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { bestiarySources, bestiaryPreset } from "../scripts/data/bestiary.mjs";
+import { bestiarySources, bestiaryPreset, bestiaryFolders } from "../scripts/data/bestiary.mjs";
 import { CORE_BESTIARY } from "../scripts/data/bestiary-core.mjs";
 import { CORE_EQUIPMENT } from "../scripts/data/core-equipment.mjs";
 import { MATERIALS } from "../scripts/data/workshop-materials.mjs";
@@ -32,15 +32,15 @@ test("audited creature exceptions preserve book statistics and the tail or wing 
   assert.equal(hitLocation(10,"monster",get("Эндриага-рабочий").system.creature).id,"leftArm");
 });
 
-test("the complete bestiary is a stable flat set of 35 distinct NPCs with distinct embedded IDs", () => {
+test("bestiary keeps existing creatures flat and places the named DLC NPC in its own folder", () => {
   const sources = bestiarySources();
-  assert.equal(sources.length, 35);
-  assert.equal(new Set(sources.map(source => source._id)).size, 35);
-  assert.equal(new Set(sources.map(source => source.name)).size, 35);
+  assert.equal(sources.length, 36);
+  assert.equal(new Set(sources.map(source => source._id)).size, 36);
+  assert.equal(new Set(sources.map(source => source.name)).size, 36);
   assert.deepEqual(sources.slice(0, 2).map(source => source._id), ["bestiaryBandit01", "bestiaryDrowner1"]);
   for (const source of sources) {
     assert.equal(source.type, "npc");
-    assert.ok(!source.folder, source.name);
+    assert.ok(!source.folder || bestiaryFolders().some(folder=>folder._id===source.folder), source.name);
     assert.match(source._id, /^[a-zA-Z0-9]{16}$/u);
     assert.equal(new Set(source.items.map(item => item._id)).size, source.items.length, source.name);
     for (const item of source.items) assert.match(item._id, /^[a-zA-Z0-9]{16}$/u);
@@ -65,7 +65,7 @@ test("every specific harvested item resolves to the real catalog; only random lo
 });
 
 test("manufactured weapons retain catalog durability, damage types and crafting identities with statblock attacks", () => {
-  for (const source of bestiarySources().slice(2)) {
+  for (const source of bestiarySources().filter(source=>CORE_BESTIARY.some(entry=>entry.name===source.name))) {
     const entry = CORE_BESTIARY.find(entry => entry.name === source.name);
     for (const item of source.items.filter(item => item.type === "weapon" && !item.system.natural)) {
       const catalog = CORE_EQUIPMENT.find(entry => entry.id === item.system.ruleId);

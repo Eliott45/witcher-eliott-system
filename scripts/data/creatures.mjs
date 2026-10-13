@@ -12,7 +12,7 @@ export const SIZE_CLASSES = [
 export const sizeClassOf = actor => SIZE_CLASSES.find(entry=>entry.id===actor?.system?.creature?.sizeClass)??SIZE_CLASSES[1];
 export function creatureFields() {
   const {SchemaField,ArrayField,BooleanField}=foundry.data.fields;
-  return new SchemaField({category:itemText("humanoid",{choices:MONSTER_CATEGORIES.map(c=>c.id)}),difficulty:itemText("Простые / обычные"),reward:itemNumber(),
+  return new SchemaField({category:itemText("humanoid",{choices:MONSTER_CATEGORIES.map(c=>c.id)}),difficulty:itemText("Простые / обычные"),reward:itemNumber(),rewardNote:itemText(),
     habitat:itemText(),size:itemText(),sizeClass:itemText("medium",{choices:SIZE_CLASSES.map(entry=>entry.id)}),weight:itemText(),intellect:itemText(),group:itemText(),source:itemText(),
     naturalArmor:itemNumber(),resistances:itemText(),healthMax:itemNumber(),staminaMax:itemNumber(),runBase:itemNumber(),recoveryBase:itemNumber(),description:itemText(),tactics:itemText(),
     regenerationMode:itemText("normal",{choices:["normal","suppressed","sunlight"]}),

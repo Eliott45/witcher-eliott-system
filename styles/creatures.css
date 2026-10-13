@@ -109,6 +109,17 @@
 .witcher-npc-body .witcher-npc-abilities summary button { flex:none; width:22px; height:20px; padding:0; background:none; border:0; font-size:10px; color:#8d7050; }
 .witcher-npc-abilities details>div { padding:0 10px 10px; font-size:12px; }
 .witcher-npc-abilities p { margin:5px 0; }
+.witcher-npc-body .witcher-npc-abilities summary .witcher-npc-ability-roll { display:inline-flex; align-items:center; justify-content:center; gap:4px; width:auto; min-width:40px; height:26px; padding:0 5px; background:#e8dbc3; color:#70472c; font-size:12px; border:1px solid #bba37c; }
+.witcher-npc-luck { margin:8px 0; padding:7px; border:1px solid #bba37c; border-radius:4px; background:#f7eedb; font-size:12px; }
+.witcher-npc-luck > div { display:flex; align-items:center; flex-wrap:wrap; gap:4px; }
+.witcher-npc-luck strong { flex:1; }
+.witcher-npc-body .witcher-npc-luck button { width:23px; height:23px; min-height:0; padding:0; font-size:11px; border-radius:50%; }
+.witcher-npc-luck input { width:40px; }
+.witcher-npc-luck-points { margin-top:5px; }
+.witcher-npc-body .witcher-npc-luck-points button.selected { background:#806126; color:#fff6df; }
+.witcher-npc-luck-points button.spent { text-decoration:line-through; opacity:.35; }
+.witcher-npc-natural-armor { margin:5px 0 10px; color:#65543b; font-size:11px; line-height:1.4; }
+.witcher-npc-reward-note { display:block; max-width:190px; white-space:normal; font-size:12px; line-height:1.3; }
 .witcher-full-turn>summary { display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 10px; cursor:pointer; list-style:none; }
 .witcher-full-turn>summary::-webkit-details-marker { display:none; }
 .witcher-full-turn>summary h3::after { content:""; display:inline-block; width:6px; height:6px; border:solid #8d7050; border-width:0 2px 2px 0; transform:translateY(-3px) rotate(45deg); transition:transform .15s; margin-left:8px; color:#8d7050; }

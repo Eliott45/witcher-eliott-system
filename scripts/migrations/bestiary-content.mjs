@@ -1,5 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
-import { bestiarySources } from "../data/bestiary.mjs";
+import { bestiarySources, bestiaryFolders } from "../data/bestiary.mjs";
 export function registerBestiaryMigration(){game.settings.register(SYSTEM_ID,"bestiaryContentVersion",{scope:"world",config:false,type:Number,default:0});}
 
 /** Repair the initial pack's missing embedded records through the live Foundry API. */
@@ -26,6 +26,8 @@ export async function migrateBestiaryContent() {
 export const migrateBestiaryCreatures = () => appendMissingCreatures(2);
 /** Version 5 (Monster Hunter's Journal p.26): barghests, the barghest leader and Kai. */
 export const migrateBestiaryJournalCreatures = () => appendMissingCreatures(5);
+/** Version 6: Radolf Kazmer, a named GM character from Radolf's wagon. */
+export const migrateBestiaryRadolf = () => appendMissingCreatures(6);
 
 async function appendMissingCreatures(version) {
   if(game.user!==game.users.activeGM||game.settings.get(SYSTEM_ID,"bestiaryContentVersion")>=version)return;
@@ -35,6 +37,8 @@ async function appendMissingCreatures(version) {
   try {
     if(locked&&missing.length)await pack.configure({locked:false});
     if(missing.length) {
+      const folders=bestiaryFolders().filter(folder=>missing.some(source=>source.folder===folder._id)&&!pack.folders.has(folder._id));
+      if(folders.length)await foundry.documents.Folder.implementation.createDocuments(folders,{pack:pack.collection,keepId:true});
       const created=await Actor.implementation.createDocuments(missing.map(source=>foundry.utils.deepClone(source)),{pack:pack.collection,keepId:true});
       const createdIds=new Set(created.map(actor=>actor.id));
       if(missing.some(source=>!createdIds.has(source._id)))throw new Error("Не удалось добавить всех существ бестиария. Повторная загрузка продолжит миграцию.");
