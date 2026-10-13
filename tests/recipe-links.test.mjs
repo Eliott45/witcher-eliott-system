@@ -16,7 +16,7 @@ const get = id => [...materials, ...recipes].find(item => item.system.ruleId ===
 
 test("printed supplements are complete, independent of diagram prices, with leather/wax on p. 130", () => {
   const diagrams = recipes.filter(item => item.system.recipe.category === "diagram");
-  assert.equal(diagrams.length, Object.keys(DIAGRAM_INVESTMENTS).length + EXPERIMENTAL_RECIPES.filter(entry => entry.system.recipe.category === "diagram").length);
+  assert.equal(diagrams.length, Object.keys(DIAGRAM_INVESTMENTS).length + 5 + EXPERIMENTAL_RECIPES.filter(entry => entry.system.recipe.category === "diagram").length);
   assert.ok(diagrams.every(item => Number.isFinite(item.system.recipe.investment) && item.system.recipe.investment > 0));
   assert.equal(get("diagram.material.hardened-timber").system.recipe.investment, 11);
   assert.equal(get("diagram.weapon.dagger").system.recipe.investment, 33);

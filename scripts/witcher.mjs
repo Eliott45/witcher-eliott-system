@@ -1,3 +1,4 @@
+import { registerCrossbowMovement } from "./combat/crossbow-modifications.mjs";
 import { WitcherSpellData } from "./data/witcher-spell-data.mjs";
 import { WitcherEffectItemData } from "./data/witcher-effect-item-data.mjs";
 import { registerEffectExpiry } from "./combat/effect-expiry.mjs";
@@ -95,7 +96,7 @@ import { renderTokenVisionToggle, renderScatterToggle } from "./combat/token-hud
 import { migrateVisionDefaults, registerVisionMigration } from "./migrations/vision-defaults.mjs";
 import { migrateCompendiumFolders, registerCompendiumFolderMigration } from "./migrations/compendium-folders.mjs";
 import { migrateEquipmentContent, registerEquipmentContentMigration } from "./migrations/equipment-content.mjs";
-import { migrateSharedEquipment, registerSharedEquipmentMigration } from "./migrations/shared-equipment.mjs";
+import { migrateSharedEquipment, registerSharedEquipmentMigration, prepareSharedActorEquipment } from "./migrations/shared-equipment.mjs";
 import { renderDiceTray } from "./chat/dice-tray.mjs";
 import { registerStatusEffects, localizeStatusEffects, reportEffectError, registerUniqueStatuses, removeExistingDuplicateStatuses } from "./combat/status-effects.mjs";
 import { prepareResourceUpdate, applyResourceUpdate, prepareInitialResources, applyInitialConditions } from "./combat/resource-updates.mjs";
@@ -134,6 +135,7 @@ Hooks.once("init", async () => {
   registerEnvironment();
   registerRadolfLight();
   registerRadolfMarbles();
+  registerCrossbowMovement();
   registerBombs();
   registerSpellStrikes();
   registerSpellAreas();
@@ -232,6 +234,7 @@ Hooks.once("init", async () => {
 });
 
 Hooks.on("preCreateActor", applyActorTokenDefaults);
+Hooks.on("preCreateActor", prepareSharedActorEquipment);
 Hooks.on("preCreateActor", prepareInitialResources);
 Hooks.on("createActor", applyInitialConditions);
 Hooks.on("preUpdateActor", prepareResourceUpdate);

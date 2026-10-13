@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { RADOLF_EQUIPMENT, SHARED_TORCH } from "../scripts/data/radolf-equipment.mjs";
-import { sharedEquipmentUpdate } from "../scripts/migrations/shared-equipment.mjs";
+import { sharedEquipmentUpdate, prepareSharedActorEquipment } from "../scripts/migrations/shared-equipment.mjs";
 import { SYSTEM_ID as SYS } from "../scripts/config.mjs";
 import { useRadolfItem } from "../scripts/combat/radolf-actions.mjs";
 import { scatterMarbles } from "../scripts/combat/radolf-marbles.mjs";
@@ -54,6 +54,12 @@ export async function checkNativeRadolf(itemTemplate, documents) {
     assert.equal(legacy.type, "weapon"); assert.equal(legacy.system.damage, "1d6");
     assert.equal(legacy.system.quantity, 3); assert.equal(legacy.system.description, "Мои заметки");
     assert.equal(legacy.validate({ strict: true }), true);
+    const imported = new foundry.documents.BaseActor({name:"Старый преген",type:"character",items:[{_id:"legacyActorTorch",name:"Факел",type:"equipment",system:{ruleId:"gear.torch",quantity:4}}]});
+    prepareSharedActorEquipment(imported);
+    const persisted = new foundry.documents.BaseActor(JSON.parse(JSON.stringify(imported.toObject())));
+    assert.equal(persisted.items.get("legacyActorTorch").type,"weapon");
+    assert.equal(persisted.items.get("legacyActorTorch").system.quantity,4);
+    assert.equal(persisted.items.get("legacyActorTorch").system.reliability.max,5);
     torch.updateSource({ "system.equipped": true });
     await useRadolfItem(torch); assert.equal(torch.flags[SYS].torchLit, true);
     const light = new foundry.documents.BaseAmbientLight(torchLightSource(token), { strict: true });

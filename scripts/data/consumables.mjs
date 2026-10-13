@@ -43,7 +43,7 @@ export function toxicityState(actor) {
   const limit = 100 + (rank === 10 ? 50 : Math.ceil(rank / 2) * 5);
   const value = activeDoses(actor).reduce((sum, effect) => sum + doseToxicity(effect), 0);
   const poisoned = Array.from(actor.effects ?? []).some(effect => activeEffect(effect) && effect.flags?.[SYSTEM_ID]?.toxicity);
-  return { value, limit, witcher, poisoned, visible: witcher, overloaded: value > limit, percent: Math.min(100, value / limit * 100) };
+  return { value, limit, witcher, poisoned, visible: witcher || value > 0 || poisoned, overloaded: value > limit, percent: Math.min(100, value / limit * 100) };
 }
 const modifiers = {
   "potion.petri": ["spellCasting", "hexWeaving", "ritualCrafting"].map(skill => ({ target: `skills.${skill}`, value: 2 })),
@@ -56,7 +56,8 @@ const modifiers = {
 // never convert temporary HP into a permanent healthMax bonus.
 export function potionEffectSource(item) {
   const s = item.system, ruleId = s.ruleId || item.uuid;
-  const source = conditionSource({ id: ruleId, name: item.name, img: item.img, description: "", rules: { seconds: s.alchemy.duration, modifiers: modifiers[ruleId] ?? [] } });
+  const rounds = {"radolf.potion.vitality":"2d6","radolf.potion.raffard":"4d6"}[ruleId];
+  const source = conditionSource({ id: ruleId, name: item.name, img: item.img, description: "", rules: { ...(rounds?{roundsFormula:rounds,expiry:"turnEnd"}:{seconds:s.alchemy.duration}), modifiers: modifiers[ruleId] ?? [] } });
   delete source._id;
   // Each dose retains its own timer/toxicity. Benefit de-duplication is shared by statistics.
   source.statuses = [];

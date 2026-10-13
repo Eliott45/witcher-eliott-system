@@ -63,7 +63,7 @@ function fixture() {
 
 test("first-page DLC shares identical core gear and keeps seven exclusive items", async () => {
   const sources = JSON.parse(await readFile(new URL("../pack-sources/equipment.json", import.meta.url)));
-  const entries = sources.filter(item => item.system.ruleId.startsWith("radolf."));
+  const entries = sources.filter(item => RADOLF_EQUIPMENT.some(entry=>entry.id===item.system.ruleId));
   assert.equal(entries.length, 7);
   assert.equal(new Set(entries.map(item => item._id)).size, 7);
   assert.deepEqual(entries.map(item => [item.system.weight, item.system.price]), [[.1,18],[.1,3],[.1,32],[1.5,15],[.1,30],[.1,36],[.1,6]]);

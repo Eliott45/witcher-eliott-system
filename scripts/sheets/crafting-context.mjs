@@ -16,7 +16,7 @@ const RECIPE_SECTIONS = category => [
   { id: "unavailable", label: category === "formula" ? "Формулы не при себе" : "Чертежи не при себе", icon: "fa-box-archive", recipes: [] }
 ];
 const hasTool = (actor, id) => actor.items.some(item => available(item) && item.system.ruleId === id);
-const ALCHEMY_KINDS = { substance: "Алхимия", potion: "Эликсир", oil: "Масло", decoction: "Отвар", bomb: "Бомба" };
+const ALCHEMY_KINDS = { ordinaryPotion: "Обычный эликсир", substance: "Алхимия", potion: "Эликсир", oil: "Масло", decoction: "Отвар", bomb: "Бомба" };
 
 /** Substance units of a formula as signs; the first carried units are lit, the missing ones are hollow. */
 function substanceSigns(preview) {

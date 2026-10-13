@@ -73,6 +73,7 @@ export function disassemblyBlocker(item, recipe) {
   if (!available(item)) return "Предмет должен быть при себе.";
   if (item.system.equipped) return "Сначала снимите или уберите предмет.";
   if ((item.system.installations ?? []).some(entry => entry.category === "armor")) return "Сначала снимите накладки брони.";
+  if ((item.system.installations ?? []).some(entry => entry.category === "crossbow")) return "Сначала снимите модификации арбалета.";
   const batch = Math.max(1, recipe.quantity ?? 1);
   if (item.system.quantity < batch) return `Чертёж даёт ${batch} шт. за раз: для разборки нужна вся партия в одной записи.`;
   if (!disassemblyYield(recipe.components).length) return "В чертеже нет компонентов.";

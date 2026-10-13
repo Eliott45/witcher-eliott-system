@@ -63,7 +63,7 @@ export async function reconcileToxicity(actor, { newDose = false } = {}) {
   // the limit is safe. TODO: revisit this boundary if an official clarification appears.
   if (toxicity.value < toxicity.limit || immuneToCondition(actor, ["poisoned"])) {
     if (poison.length) await actor.deleteEmbeddedDocuments("ActiveEffect", poison.map(effect => effect.id));
-  } else if (newDose && toxicity.witcher && toxicity.overloaded && !poison.length) {
+  } else if (newDose && toxicity.overloaded && !poison.length) {
     const source = poisonSource(actor, true);
     if (source) await actor.createEmbeddedDocuments("ActiveEffect", [source]);
   }
@@ -86,22 +86,25 @@ export async function consumeOwnedItem(item, { apply = true, effectKey = "" } = 
     if (!actor.items.has(item.id) || !conditionRules(actor).canAct) throw new Error("Персонаж сейчас не может использовать этот предмет.");
     if(item.system.kind === "mutagen" || item.system.alchemy?.category === "oil") throw new Error("Выберите действие применения мутагена или нанесения масла.");
     consumptionPlan(item);
-    const s = item.system, witcherPotion = s.kind === "alchemy" && ["potion", "decoction"].includes(s.alchemy.category);
+    const s = item.system, ordinary = s.kind === "alchemy" && s.alchemy.category === "ordinaryPotion", witcherPotion = s.kind === "alchemy" && ["potion", "decoction", "ordinaryPotion"].includes(s.alchemy.category);
+    if (ordinary && apply && /halfling|низуш|полуросл/iu.test(actor.system.details.race)) throw new Error("Обычные эликсиры не действуют на низушков.");
+    let actorUpdate = {};
     let success = true;
-    if (witcherPotion && apply && actor.system.details.race !== "witcher")
+    if (witcherPotion && !ordinary && apply && actor.system.details.race !== "witcher")
       success = (await workshopCheck(actor, { name: `Выпить: ${item.name}`, skill: "endurance", dc: 18 })).success;
     const effects = [], remove = [], effectUpdates = [];
     if (witcherPotion && apply) {
       if (!success) { const poison = poisonSource(actor); if (poison) effects.push(poison); }
       else if (s.ruleId === "potion.white-honey") {
         for(const effect of activeDoses(actor)) {
-          if(["potion", "decoction"].includes(consumedDose(effect).category)) remove.push(effect.id);
+          if(["potion", "decoction", "ordinaryPotion"].includes(consumedDose(effect).category)) remove.push(effect.id);
           else effectUpdates.push({_id:effect.id,[`flags.${SYSTEM_ID}.consumable.toxicity`]:0});
         }
         remove.push(...actor.effects.filter(poisonFromToxicity).map(effect => effect.id));
       } else {
         const source = potionEffectSource(item);
         effects.push(source);
+        if (s.ruleId === "radolf.potion.stamina") actorUpdate = await restoreOrdinaryStamina(actor,item);
         if (s.ruleId === "potion.golden-oriole") remove.push(...activeStatus(actor, "poisoned").map(effect => effect.id));
       }
     } else if (apply) {
@@ -122,19 +125,33 @@ export async function consumeOwnedItem(item, { apply = true, effectKey = "" } = 
     // Stable ordering even when several drinks occur without advancing world time.
     const lastOrder = Math.max(0, ...activeDoses(actor).map(effect => effect.sort ?? 0));
     effects.filter(consumedDose).forEach((effect, index) => { effect.sort = lastOrder + index + 1; });
-    if(addedToxicity && toxicity.witcher && toxicity.value + addedToxicity > toxicity.limit && s.ruleId !== "potion.golden-oriole") {
+    if(addedToxicity && toxicity.value + addedToxicity > toxicity.limit && s.ruleId !== "potion.golden-oriole") {
       const poison = poisonSource(actor, true);
       if(poison) effects.push(poison);
     }
     // Re-read after the asynchronous roll; another client may have edited the stack.
     const plan = consumptionPlan(item);
-    await inventoryTransaction(actor, { ...plan, effectCreates: effects, effectDeletes: [...new Set(remove)], effectUpdates });
+    await inventoryTransaction(actor, { ...plan, actorUpdate, effectCreates: effects, effectDeletes: [...new Set(remove)], effectUpdates });
     await reconcileToxicity(actor);
     const presentation = await itemPresentation(item);
     const failure = immuneToCondition(actor, ["poisoned"]) ? " Стойкость не пройдена: эффект состава не получен. От отравления защищает иммунитет." : " Стойкость не пройдена: отравление, без эффекта состава.";
     await workshopNotice(actor, `<section class="witcher-item-card"><h3>${esc(item.name)}</h3><p>${esc(actor.name)}: использована одна порция.${witcherPotion && apply ? success ? " Эффект получен." : failure : ""}</p>${presentation.description}</section>`);
     return { success, quantity: item.system.quantity, toxicity: toxicityState(actor) };
   });
+}
+
+async function restoreOrdinaryStamina(actor,item) {
+  const display=trackRollDisplay(),mode=game.settings.get("core","messageMode");
+  try {
+    const roll=await evaluateRoll("3d6",{allowInteractive:mode!=="blind"});
+    const recovered=Math.max(0,Math.min(roll.total,actor.system.stamina.max-actor.system.stamina.value));
+    const message=await roll.toMessage({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),
+      flavor:`${esc(item.name)}: восстановлено ${recovered} ВЫН. Токсичность сохраняется 30 минут.`,
+      flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],skipLuck:true}}},{messageMode:mode});
+    if(!message)throw new Error("Приём эликсира отменён.");
+    await display.wait(message);
+    return {"system.stamina.value":Math.min(actor.system.stamina.max,actor.system.stamina.value+Math.max(0,roll.total))};
+  } finally { display.close(); }
 }
 
 const beneficial = new Set(["clotting", "numbing", "sterilizing", "succubus-breath", "pantagran", "smelling-salts", "wives-tears"]);
@@ -149,14 +166,14 @@ async function usageDialog(item) {
     if (id && actor.items.has(id)) await applyOil(actor.items.get(id), item);
     return;
   }
-  const s = item.system, potion = s.kind === "alchemy" && ["potion", "decoction"].includes(s.alchemy.category);
+  const s = item.system, potion = s.kind === "alchemy" && ["potion", "decoction", "ordinaryPotion"].includes(s.alchemy.category);
   const id = s.ruleId?.replace(/^alchemy\./, ""), keys = ALCHEMY_EFFECT_KEYS[id] ?? [];
   const self = potion || s.kind === "alchemy", defaultSelf = potion || beneficial.has(id);
   const options = self ? `<label>Применение<select name="application"><option value="self" ${defaultSelf ? "selected" : ""}>На себя</option><option value="other" ${defaultSelf ? "" : "selected"}>Израсходовать для другой цели</option></select></label>` : "<p>Порция будет израсходована, описание и эффекты появятся в чате.</p>";
   const effectOptions = keys.length ? `<label>Эффект<select name="effect">${keys.map(key => `<option value="${key}">${esc(EFFECT_TEMPLATES.find(entry => entry.key === key).name)}</option>`).join("")}</select></label>` : "";
   const presentation = await itemPresentation(item), toxicity = toxicityState(actor);
   const answer = await foundry.applications.api.DialogV2.prompt({ classes: ["witcher-eliott", "witcher-consume-dialog"], window: { title: `Использовать: ${item.name}` },
-    content: `<div class="witcher-consume-description">${presentation.description}</div>${options}${effectOptions}<p>Осталось применений: <strong>${context.remaining}</strong>.</p>${potion ? `<p>${toxicity.witcher ? `Токсичность: ${toxicity.value}% / ${toxicity.limit}%.` : "При употреблении: Стойкость СЛ 18. Неудача — отравление без эффекта состава."}</p>` : ""}`,
+    content: `<div class="witcher-consume-description">${presentation.description}</div>${options}${effectOptions}<p>Осталось применений: <strong>${context.remaining}</strong>.</p>${potion ? `<p>${(toxicity.witcher || s.alchemy.category === "ordinaryPotion") ? `Токсичность: ${toxicity.value}% / ${toxicity.limit}%.` : "При употреблении: Стойкость СЛ 18. Неудача — отравление без эффекта состава."}</p>` : ""}`,
     ok: { label: "Использовать", callback: (_event, button) => Object.fromEntries(new FormData(button.form)) }, rejectClose: false });
   if (answer) return consumeOwnedItem(item, { apply: self && answer.application === "self", effectKey: answer.effect ?? "" });
 }

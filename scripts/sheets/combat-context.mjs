@@ -1,3 +1,5 @@
+import { reloadCrossbow, movementReloadAvailable } from "../combat/crossbow-modifications.mjs";
+import { hasCrossbowMod } from "../data/crossbow-modifications.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -83,7 +85,7 @@ export function combatContext(actor,options={}) {
       const oil=coat?{name:coat.name,bonus:coat.bonus,target:MONSTER_CATEGORIES.find(entry=>entry.id===coat.target)?.name??coat.target,minutes:Math.max(1,Math.ceil((coat.expiresAt-now)/60))}:null;
       const canOil=!item.system.natural&&item.system.category!=="shield"&&item.system.quantity===1&&hasOils;
       const bolts=isCrossbow(item)&&!loaded?boltChoices(actor).map(ammo=>({id:ammo.id,name:ammo.name,quantity:ammo.system.quantity})):[];
-      const crossbow=isCrossbow(item)?{loaded,bolt:bolt?.name??"",bolts,choose:bolts.length>1}:null;
+      const crossbow=isCrossbow(item)?{loaded,bolt:bolt?.name??"",bolts,choose:bolts.length>1,windlass:hasCrossbowMod(item,"windlass"),movementAvailable:movementReloadAvailable(actor,item)}:null;
       return {id:item.id,name:item.name,img:item.img,canMoveUp:index>0,canMoveDown:index<items.length-1,properties:item.system.properties??"",damageTypes:damageTypeLabel(item.system.damageType),rate:actor.type==="npc"?item.system.attackRate??1:null,natural:Boolean(item.system.natural),grip:gripOf(item),
         equipped:equippedItems(actor.items).some(entry=>entry.id===item.id),modes,loaded,needsReload:!loaded,crossbow,oil,canOil,
         melee:item.system.category==="melee"&&!item.system.natural,techniques:actor.type!=="npc"&&!item.system.natural&&modes.some(mode=>mode.secondary)&&equippedItems(actor.items).some(entry=>entry.id===item.id),
@@ -157,14 +159,9 @@ export const combatActions={
   attackWeapon:guard(async function(_event,target){if(!this.isEditable||target.disabled)return;target.disabled=true;try{await rollWeaponAttack(this.actor,target.dataset.itemId,{...this.combatOptions,mode:target.dataset.mode});}finally{await this.render();}}),
   reloadWeapon:guard(async function(_event,target){
     if(!this.isEditable)return;
-    await inventoryWrite(this.actor,async()=>{
-      const item=this.actor.items.get(target.dataset.itemId);if(!isCrossbow(item)||item.system.loaded)return;
-      const ammoId=target.closest(".witcher-attack-card")?.querySelector("[data-bolt-choice]")?.value||"";
-      const {ammo,items}=loadUpdate(this.actor,item,ammoId),quote=actionQuote(this.actor);
-      const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor:this.actor}),
-        content:`<p>${esc(item.name)} заряжен: ${esc(ammo.name)} — действие${quote.extra?`; дополнительно, ${quote.stamina} ВЫН`:""}.</p>`,flags:{[SYSTEM_ID]:{skipLuck:true}}},game.settings.get("core","messageMode")));
-      if(message){await this.actor.update({...actionUpdate(this.actor,quote),items});await consumeAiming(this.actor);}
-    });
+    const item=this.actor.items.get(target.dataset.itemId);
+    const ammoId=target.closest(".witcher-attack-card")?.querySelector("[data-bolt-choice]")?.value||"";
+    await reloadCrossbow(this.actor,item,ammoId,{movement:target.dataset.movement==="true"});
   }),
   unloadWeapon:guard(async function(_event,target){
     if(!this.isEditable)return;

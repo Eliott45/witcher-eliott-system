@@ -1,3 +1,4 @@
+import { hasCrossbowMod } from "../data/crossbow-modifications.mjs";
 import { armPenaltyParts, usableHands } from "./critical-wound-effects.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
@@ -65,13 +66,14 @@ function dualMode(actor,item) {
     hint:`Одно действие атаки (errata): по удару каждым оружием в руках (в том числе щитом или двумя ручными арбалетами), ${penalty?"оба с −3":"без штрафа — школа Змеи"}, урон каждого считается отдельно. Блокировать или парировать её может только тот, у кого тоже два оружия или оружие и щит, остальные лишь уклоняются или меняют позицию.`};
 }
 export function attackModes(actor,item) {
+  const stirrup=hasCrossbowMod(item,"skellige")?[{id:"stirrup",name:"Удар арбалетом",count:1,penalty:-1,multiplier:1,stirrup:true,hint:"Дробящий удар. Бонусы других модификаций арбалета и боеприпасов не применяются."}]:[];
   const thrown = item.system.category === "melee" && !item.system.natural && item.system.rangeBodyMultiplier > 0
     ? [{id:"throw",name:"Метнуть",count:1,penalty:0,multiplier:1,thrown:true,hint:`Атлетика; дальность ТЕЛ × ${item.system.rangeBodyMultiplier}. После броска оружие остаётся у места попадания; его нужно подобрать.`}] : [];
   // Core p.165: under water a melee weapon strikes once per turn.
   const underwaterMelee=["melee","shield"].includes(item.system.category)&&!item.system.natural||item.system.natural&&item.system.category!=="ranged";
   const slowed=underwaterMelee&&Boolean(actorEnvironment(actor)?.underwater)&&!creatureCanSwim(actor);
-  if (actor.type === "npc") { const count=slowed?1:item.system.attackRate??1; return [{id:"npc",name:`Атака ×${count}`,count,penalty:0,multiplier:1},...thrown]; }
-  if (item.system.skill === "crossbow") { const dual=dualMode(actor,item); return [{id:"shot",name:"Выстрел",count:1,penalty:0,multiplier:1},...(dual?[dual]:[])]; }
+  if (actor.type === "npc") { const count=slowed?1:item.system.attackRate??1; return [{id:"npc",name:`Атака ×${count}`,count,penalty:0,multiplier:1},...stirrup,...thrown]; }
+  if (item.system.skill === "crossbow") { const dual=dualMode(actor,item); return [{id:"shot",name:"Выстрел",count:1,penalty:0,multiplier:1},...(dual?[dual]:[]),...stirrup]; }
   // Core p.153: a fast attack is two strikes for one action. Each click rolls one strike, so the two may hit different targets.
   const modes=[{id:"fast",name:item.system.skill==="archery"?"Быстрый выстрел":"Быстрая",count:1,penalty:0,multiplier:1,pair:item.system.skill!=="archery"&&!slowed,...(slowed?{hint:"Под водой оружием ближнего боя — один удар за ход."}:{})},
     {id:"strong",name:"Сильная",count:1,penalty:-3,multiplier:2}];
@@ -89,6 +91,10 @@ export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="ra
   if(item?.type!=="weapon")throw new Error("Выберите оружие.");
   let weapon=effectiveItem(item);const attack=attackModes(actor,item).find(entry=>entry.id===mode);
   if(!attack)throw new Error("Этот режим недоступен для данного оружия.");
+  if(attack.stirrup) {
+    const base=item.system.toObject?.()??item.system;
+    weapon={...effectiveItem({...item,system:{...base,installations:base.installations.filter(entry=>entry.category!=="crossbow"||entry.ruleId==="radolf.crossbow.skellige")}}),category:"melee",skill:"melee",damageType:"Д",range:1,rangeBodyMultiplier:0,damageIncludesBody:true};
+  }
   // The item remains a melee weapon in the inventory; only this attack is a thrown projectile.
   if(attack.thrown)weapon={...weapon,category:"thrown",skill:"athletics"};
   const skill=skillValue(actor.system,weapon.skill);

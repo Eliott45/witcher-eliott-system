@@ -662,6 +662,245 @@
     "flags": {}
   },
   {
+    "_id": "rdlf000000000101",
+    "name": "Нильфгаардский прицел",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.crossbow.sight",
+      "source": "Фургончик Родольфа",
+      "kind": "upgrade",
+      "rarity": "rare",
+      "concealment": "tiny",
+      "weight": 0.1,
+      "price": 275,
+      "properties": "Точность +1",
+      "upgrade": {
+        "category": "crossbow",
+        "target": "weapon",
+        "bonuses": [
+          {
+            "target": "accuracy",
+            "value": 1
+          }
+        ]
+      },
+      "description": "<p>Повышает точность выстрела на 1.</p><p>Ручной арбалет вмещает одну модификацию, остальные — две. Каждый вид можно установить только один раз. Установка и снятие занимают полный ход, без проверки. Снятая модификация возвращается в инвентарь.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000102",
+    "name": "Улучшенный ворот",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.crossbow.windlass",
+      "source": "Фургончик Родольфа",
+      "kind": "upgrade",
+      "rarity": "unique",
+      "concealment": "none",
+      "weight": 0.5,
+      "price": 440,
+      "properties": "Перезарядка действием или передвижением",
+      "upgrade": {
+        "category": "crossbow",
+        "target": "weapon",
+        "bonuses": []
+      },
+      "description": "<p>Арбалет можно перезарядить обычным действием или потратить на перезарядку передвижение за раунд.</p><p>Ручной арбалет вмещает одну модификацию, остальные — две. Каждый вид можно установить только один раз. Установка и снятие занимают полный ход, без проверки. Снятая модификация возвращается в инвентарь.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000103",
+    "name": "Скеллигское стремя",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.crossbow.skellige",
+      "source": "Фургончик Родольфа",
+      "kind": "upgrade",
+      "rarity": "common",
+      "concealment": "none",
+      "weight": 0.5,
+      "price": 375,
+      "properties": "Надёжность +5; Удар арбалетом",
+      "upgrade": {
+        "category": "crossbow",
+        "target": "weapon",
+        "bonuses": [
+          {
+            "target": "reliability",
+            "value": 5
+          }
+        ]
+      },
+      "description": "<p>Повышает надёжность на 5. Позволяет ударить арбалетом в ближнем бою: дробящий урон равен урону выстрела, точность −1. Бонусы других модификаций арбалета к этому удару не применяются.</p><p>Ручной арбалет вмещает одну модификацию, остальные — две. Каждый вид можно установить только один раз. Установка и снятие занимают полный ход, без проверки. Снятая модификация возвращается в инвентарь.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000104",
+    "name": "Усиленная тетива",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.crossbow.string",
+      "source": "Фургончик Родольфа",
+      "kind": "upgrade",
+      "rarity": "rare",
+      "concealment": "tiny",
+      "weight": 0.1,
+      "price": 425,
+      "properties": "Урон выстрела +1d6",
+      "upgrade": {
+        "category": "crossbow",
+        "target": "weapon",
+        "bonuses": []
+      },
+      "description": "<p>Добавляет 1d6 к урону выстрела.</p><p>Ручной арбалет вмещает одну модификацию, остальные — две. Каждый вид можно установить только один раз. Установка и снятие занимают полный ход, без проверки. Снятая модификация возвращается в инвентарь.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000105",
+    "name": "Балансировочное стремя",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.crossbow.balanced",
+      "source": "Фургончик Родольфа",
+      "kind": "upgrade",
+      "rarity": "common",
+      "concealment": "none",
+      "weight": 0.5,
+      "price": 395,
+      "properties": "Сбалансированное",
+      "upgrade": {
+        "category": "crossbow",
+        "target": "weapon",
+        "bonuses": []
+      },
+      "description": "<p>Добавляет свойство «Сбалансированное»: бонус к броску определения критического ранения.</p><p>Ручной арбалет вмещает одну модификацию, остальные — две. Каждый вид можно установить только один раз. Установка и снятие занимают полный ход, без проверки. Снятая модификация возвращается в инвентарь.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000201",
+    "name": "Зелье живучести",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.potion.vitality",
+      "source": "Фургончик Родольфа",
+      "kind": "alchemy",
+      "rarity": "rare",
+      "price": 85,
+      "weight": 0,
+      "properties": "Обычный эликсир; 2d6 раундов; Токсичность 50%",
+      "alchemy": {
+        "category": "ordinaryPotion",
+        "toxicity": 50,
+        "duration": 0
+      },
+      "description": "<p>Игнорирует штрафы от нахождения ниже порога ранения. Не отменяет критические ранения и состояние при смерти.</p><p>Обычный эликсир: доступен всем расам, кроме низушков, без проверки Стойкости. Токсичность 50%; при превышении допустимого предела вызывает отравление. Длительность: 2d6 раундов. Масса в дополнении не указана.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000202",
+    "name": "Зелье выносливости",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.potion.stamina",
+      "source": "Фургончик Родольфа",
+      "kind": "alchemy",
+      "rarity": "rare",
+      "price": 75,
+      "weight": 0,
+      "properties": "Обычный эликсир; 30 минут; Токсичность 50%",
+      "alchemy": {
+        "category": "ordinaryPotion",
+        "toxicity": 50,
+        "duration": 1800
+      },
+      "description": "<p>Немедленно восстанавливает 3d6 Выносливости, не выше максимума. Токсичность сохраняется полчаса, даже если восстановленная Выносливость уже потрачена.</p><p>Обычный эликсир: доступен всем расам, кроме низушков, без проверки Стойкости. Токсичность 50%; при превышении допустимого предела вызывает отравление. Длительность: 30 минут. Масса в дополнении не указана.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000203",
+    "name": "Зелье Раффара Белого",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.potion.raffard",
+      "source": "Фургончик Родольфа",
+      "kind": "alchemy",
+      "rarity": "unique",
+      "price": 95,
+      "weight": 0,
+      "properties": "Обычный эликсир; 4d6 раундов; Токсичность 50%",
+      "alchemy": {
+        "category": "ordinaryPotion",
+        "toxicity": 50,
+        "duration": 0
+      },
+      "description": "<p>Восстанавливает 1 ПЗ в начале каждого своего хода на протяжении действия эликсира.</p><p>Обычный эликсир: доступен всем расам, кроме низушков, без проверки Стойкости. Токсичность 50%; при превышении допустимого предела вызывает отравление. Длительность: 4d6 раундов. Масса в дополнении не указана.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "rdlf000000000001",
     "name": "Мешочек с шариками",
     "type": "equipment",
@@ -25826,6 +26065,429 @@
       "witcher-eliott-system": {
         "priceUnavailable": true,
         "exactComponents": true
+      }
+    }
+  },
+  {
+    "_id": "rdlf000000000301",
+    "name": "Чертёж: Нильфгаардский прицел",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.radolf.crossbow.sight",
+      "source": "Фургончик Родольфа",
+      "price": 550,
+      "recipe": {
+        "category": "diagram",
+        "grade": "journeyman",
+        "dc": 15,
+        "time": 14400,
+        "investment": 176,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.rdlf000000000101",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 4
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Нильфгаардский прицел».</p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000302",
+    "name": "Чертёж: Улучшенный ворот",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.radolf.crossbow.windlass",
+      "source": "Фургончик Родольфа",
+      "price": 880,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 20,
+        "time": 36000,
+        "investment": 284,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.rdlf000000000102",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 7
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Улучшенный ворот».</p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000303",
+    "name": "Чертёж: Скеллигское стремя",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.radolf.crossbow.skellige",
+      "source": "Фургончик Родольфа",
+      "price": 750,
+      "recipe": {
+        "category": "diagram",
+        "grade": "novice",
+        "dc": 10,
+        "time": 3600,
+        "investment": 242,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.rdlf000000000103",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+            "substance": "",
+            "quantity": 6
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Скеллигское стремя».</p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000304",
+    "name": "Чертёж: Усиленная тетива",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.radolf.crossbow.string",
+      "source": "Фургончик Родольфа",
+      "price": 850,
+      "recipe": {
+        "category": "diagram",
+        "grade": "journeyman",
+        "dc": 17,
+        "time": 14400,
+        "investment": 280,
+        "quantity": 1,
+        "forge": false,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.rdlf000000000104",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000010",
+            "substance": "",
+            "quantity": 3
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Усиленная тетива».</p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000305",
+    "name": "Чертёж: Балансировочное стремя",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.radolf.crossbow.balanced",
+      "source": "Фургончик Родольфа",
+      "price": 790,
+      "recipe": {
+        "category": "diagram",
+        "grade": "novice",
+        "dc": 12,
+        "time": 7200,
+        "investment": 260,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.rdlf000000000105",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Балансировочное стремя».</p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000401",
+    "name": "Формула: Зелье живучести",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.radolf.potion.vitality",
+      "source": "Фургончик Родольфа",
+      "price": 0,
+      "recipe": {
+        "category": "formula",
+        "grade": "master",
+        "dc": 18,
+        "time": 1800,
+        "quantity": 1,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.rdlf000000000201",
+        "components": [
+          {
+            "substance": "vitriol",
+            "quantity": 1,
+            "uuid": ""
+          },
+          {
+            "substance": "fulgur",
+            "quantity": 2,
+            "uuid": ""
+          },
+          {
+            "substance": "hydragenum",
+            "quantity": 1,
+            "uuid": ""
+          },
+          {
+            "substance": "rebis",
+            "quantity": 2,
+            "uuid": ""
+          }
+        ]
+      },
+      "description": "<p>Алхимическая формула с пропорциями, порядком смешивания и временем выдержки. По ней готовят «Зелье живучести».</p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "rdlf000000000402",
+    "name": "Формула: Зелье выносливости",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.radolf.potion.stamina",
+      "source": "Фургончик Родольфа",
+      "price": 0,
+      "recipe": {
+        "category": "formula",
+        "grade": "master",
+        "dc": 17,
+        "time": 1800,
+        "quantity": 1,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.rdlf000000000202",
+        "components": [
+          {
+            "substance": "aether",
+            "quantity": 2,
+            "uuid": ""
+          },
+          {
+            "substance": "caelum",
+            "quantity": 1,
+            "uuid": ""
+          },
+          {
+            "substance": "vermilion",
+            "quantity": 2,
+            "uuid": ""
+          }
+        ]
+      },
+      "description": "<p>Алхимическая формула с пропорциями, порядком смешивания и временем выдержки. По ней готовят «Зелье выносливости».</p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "rdlf000000000403",
+    "name": "Формула: Зелье Раффара Белого",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.radolf.potion.raffard",
+      "source": "Фургончик Родольфа",
+      "price": 0,
+      "recipe": {
+        "category": "formula",
+        "grade": "master",
+        "dc": 19,
+        "time": 1800,
+        "quantity": 1,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.rdlf000000000203",
+        "components": [
+          {
+            "substance": "aether",
+            "quantity": 1,
+            "uuid": ""
+          },
+          {
+            "substance": "caelum",
+            "quantity": 1,
+            "uuid": ""
+          },
+          {
+            "substance": "quebrith",
+            "quantity": 1,
+            "uuid": ""
+          },
+          {
+            "substance": "rebis",
+            "quantity": 1,
+            "uuid": ""
+          },
+          {
+            "substance": "vermilion",
+            "quantity": 1,
+            "uuid": ""
+          },
+          {
+            "substance": "vitriol",
+            "quantity": 1,
+            "uuid": ""
+          }
+        ]
+      },
+      "description": "<p>Алхимическая формула с пропорциями, порядком смешивания и временем выдержки. По ней готовят «Зелье Раффара Белого».</p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
       }
     }
   }

@@ -1,3 +1,4 @@
+import { hasCrossbowMod } from "./crossbow-modifications.mjs";
 import { isCarried } from "./containers.mjs";
 import { torchHeldLit } from "./radolf-rules.mjs";
 /** Shared, document-independent workshop rules. Catalog entries use the same Items as inventory. */
@@ -41,7 +42,7 @@ export function materialPlan(items, requirements, references = new Map(), choice
   return { rows, expenses: [...expenses].map(([itemId, quantity]) => ({ itemId, quantity })), complete: rows.every(row => row.missing === 0) };
 }
 export function repairRecipe(recipe, item) {
-  const enhancements = (item.system.installations ?? []).filter(entry => entry.category !== "craftsman").length;
+  const enhancements = (item.system.installations ?? []).filter(entry => !["craftsman", "crossbow"].includes(entry.category)).length;
   // Core p. 140 specifies no repair time: do not silently reuse manufacturing time.
   const components = [...new Map(recipe.components.map(entry => [entry.uuid || entry.substance, { ...entry, quantity: 1 }])).values()];
   return { ...recipe, time: 0, dc: Math.max(0, recipe.dc - 5 + 2 * enhancements), components, physicalBonus: 0 };
@@ -68,11 +69,12 @@ export function effectiveItem(item) {
     data[key].value = Math.max(0, Math.min(data[key].max, data[key].value));
   }
   data.properties = [data.properties, ...(data.installations ?? []).map(entry => entry.properties)].filter(Boolean).join("; ");
+  if (hasCrossbowMod(item,"string") && data.skill === "crossbow") data.damage = `(${data.damage}) + 1d6`;
   if (torchHeldLit(item)) data.properties += "; Горение (25%)";
   return data;
 }
 export function freeSlots(item) {
-  return Math.max(0, (item.system.enhancementSlots ?? 0) - (item.system.installations ?? []).filter(entry => entry.category !== "craftsman").length);
+  return Math.max(0, (item.system.enhancementSlots ?? 0) - (item.system.installations ?? []).filter(entry => !["craftsman", "crossbow"].includes(entry.category)).length);
 }
 export function activeOil(item, now) { const oil = item.system.oil; return oil?.sourceUuid && oil.expiresAt > now ? oil : null; }
 export function oilDamage(item, category, now) { const oil = activeOil(item, now); return oil?.target === category ? oil.bonus : 0; }

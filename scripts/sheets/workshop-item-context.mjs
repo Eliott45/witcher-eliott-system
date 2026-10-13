@@ -1,3 +1,5 @@
+import { crossbowCapacity, crossbowSlots } from "../data/crossbow-modifications.mjs";
+import { removeCrossbowModification } from "../combat/crossbow-modifications.mjs";
 import { SUBSTANCES, MONSTER_CATEGORIES, WORKSHOP_BONUS_LABELS, available, effectiveItem, freeSlots, activeOil } from "../data/workshop.mjs";
 import { conditionKey, isPhysical } from "../data/physical-items.mjs";
 import { durationLabel, craftDialog, findRepairDiagram } from "../workshop/crafting.mjs";
@@ -15,20 +17,22 @@ export async function workshopItemContext(item, recipeDetails) {
   return { recipe:Boolean(recipe), owned:Boolean(item.actor), repairable:Boolean(item.actor&&isRepairable(item)),
     condition:condition?{...effective[condition],label:condition==="stoppingPower"?"ПБ":"Надёжность"}:null,
     components, resultName:recipeDetails?.result.name ?? "", time:recipe?durationLabel(recipe.time):"",
-    tools:recipe?recipe.tools.join(", "):"", upgradeable:Boolean(item.actor&&conditionKey(item)), slots:freeSlots(item),
-    installations:item.system.installations.map(entry=>({...entry,zoneLabel:({head:"Голова",torso:"Корпус / руки",legs:"Ноги"})[entry.zone],removable:entry.category==="armor"})), oil:oil?{...oil,targetLabel:MONSTER_CATEGORIES.find(c=>c.id===oil.target)?.name??oil.target}:null, effective,
+    tools:recipe?recipe.tools.join(", "):"", upgradeable:Boolean(item.actor&&conditionKey(item)), slots:freeSlots(item), crossbow:crossbowCapacity(item)?{max:crossbowCapacity(item),free:crossbowSlots(item)}:null,
+    installations:item.system.installations.map(entry=>({...entry,zoneLabel:({head:"Голова",torso:"Корпус / руки",legs:"Ноги"})[entry.zone],removable:entry.category==="armor",crossbow:entry.category==="crossbow"})), oil:oil?{...oil,targetLabel:MONSTER_CATEGORIES.find(c=>c.id===oil.target)?.name??oil.target}:null, effective,
     bonusPath:bonusPath(item),
     bonusHeading:["mutagen","upgrade"].includes(item.system.kind)?"Бонусы":"Бонусы владельцу, пока предмет экипирован",
     bonuses:(foundry.utils.getProperty(item.system,bonusPath(item))??[]).map((b,index)=>({...b,index,label:WORKSHOP_BONUS_LABELS[b.target]??b.target})),
     canOil:Boolean(item.actor&&item.type==="weapon"&&item.system.category!=="shield"),
     canPrepare:Boolean(item.actor&&available(item)&&!item.system.mutagen.prepared),
     canApply:Boolean(item.actor&&available(item)&&(item.actor.system.mutations??[]).length<2),
-    canInstallRuneGlyph:Boolean(item.actor&&available(item)&&item.system.kind==="upgrade"&&["rune","glyph"].includes(item.system.upgrade?.category)),
+    canInstallRuneGlyph:Boolean(item.actor&&available(item)&&item.system.kind==="upgrade"&&["rune","glyph","crossbow"].includes(item.system.upgrade?.category)),
+    crossbowUpgrade:item.system.upgrade?.category==="crossbow",
     isMutagen:item.system.kind==="mutagen", isOil:item.system.alchemy?.category==="oil", isUpgrade:item.system.kind==="upgrade" };
 }
 const safe = fn => async function(...args) { try { return await fn.apply(this,args); } catch(error) { console.error(error); ui.notifications.error(error.message); } };
 const bonusPath = item => ["mutagen","upgrade"].includes(item.system.kind)?`${item.system.kind}.bonuses`:item.type!=="recipe"?"wearerBonuses":"";
 export const workshopItemActions = {
+ removeCrossbowModification:safe(async function(_event,button){if(this.isEditable)await removeCrossbowModification(this.item,button.dataset.installationId);}),
  installRuneGlyph:safe(async function(){if(this.isEditable)return installUpgradeFromSource(this.item);}),
  addWorkshopBonus:safe(async function(){
    if(!this.isEditable||!isPhysical(this.item)||!bonusPath(this.item))return;

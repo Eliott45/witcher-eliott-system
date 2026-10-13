@@ -74,6 +74,6 @@ export function statisticsContext(system, { localize, format }) {
     vigorTooltip: [description("Vigor"), format("WITCHER.Statistics.BaseValue", { value: system.vigor }),
       ...modifierLines(statistics, "vigor", localize), format("WITCHER.Statistics.TotalValue", { value: statistics.vigor })].join("<br>"),
     wounded: statistics.wounded && !statistics.dying && !statistics.dead,
-    woundNotice: "WITCHER.Statistics.Wounded"
+    woundNotice: statistics.ignoresWoundPenalty ? "Зелье живучести: штрафы порога ранения не действуют" : "WITCHER.Statistics.Wounded"
   };
 }

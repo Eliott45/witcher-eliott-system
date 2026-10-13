@@ -1,3 +1,5 @@
+import { RADOLF_POTIONS } from "../scripts/data/radolf-additions.mjs";
+import { regenerationAtStart } from "../scripts/workshop/witcher-elixirs.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { SYSTEM_ID } from "../scripts/config.mjs";
@@ -20,6 +22,7 @@ const set = (object, path, value) => {
 const get = (object, path) => path.split(".").reduce((value, key) => value?.[key], object);
 let serial = 0, rolls, notices, total, rolled, createFail, dialogCount, response;
 function environment() {
+  delete globalThis.Hooks;
   rolls = []; notices = []; total = 18; rolled = 0; createFail = false; dialogCount = 0; response = { application: "self" };
   globalThis.game = { user: { id: "gm" }, i18n: { localize: text => text }, time: { worldTime: 100 }, settings: { get: () => "blind" } };
   globalThis.foundry = { utils: { deepClone: structuredClone, getProperty: get, randomID: () => String(++serial) },
@@ -53,7 +56,7 @@ function actor(race = "witcher") {
   return value;
 }
 function item(owner, ruleId, quantity = 1) {
-  const entry = [...ALCHEMY, ...MUTAGENS, ...WITCHER_SPECIAL_EQUIPMENT].find(item => item.id === ruleId);
+  const entry = [...RADOLF_POTIONS, ...ALCHEMY, ...MUTAGENS, ...WITCHER_SPECIAL_EQUIPMENT].find(item => item.id === ruleId);
   const value = { type: "equipment", name: ruleId, img: "icons/svg/item-bag.svg", flags: {}, ...structuredClone(entry), id: String(++serial),
     system: { ruleId, kind: "gear", carried: true, ...structuredClone(entry?.system), quantity, consumption: { mode: "auto", usesPerItem: 0, spentUses: 0 } }, actor: owner };
   value.uuid = `Actor.a.Item.${value.id}`;
@@ -278,4 +281,49 @@ test("changing Iron Stomach updates poison as well as the displayed limit; other
   game.user = game.users.activeGM;
   await hooks.get("updateItem")(ability, {name:"Мой желудок"}); assert.equal(toxicityState(owner).poisoned, false);
   await hooks.get("deleteItem")(ability); assert.equal(toxicityState(owner).poisoned, true);
+});
+
+test("ordinary potions work without resistance checks, retain per-dose toxicity and poison any race above 100", async () => {
+  environment(); const owner=actor("human"), potion=item(owner,"radolf.potion.vitality",3);
+  await consumeOwnedItem(potion); assert.equal(rolled,0); assert.equal(toxicityState(owner).visible,true);
+  assert.equal(owner.effects[0].flags[SYSTEM_ID].condition.roundsFormula,"2d6");
+  await consumeOwnedItem(potion); assert.equal(toxicityState(owner).value,100); assert.equal(toxicityState(owner).poisoned,false);
+  await consumeOwnedItem(potion); assert.equal(toxicityState(owner).value,150); assert.equal(toxicityState(owner).poisoned,true);
+  const poison=owner.effects.find(effect=>effect.flags[SYSTEM_ID].toxicity);
+  await endToxicityPoison(owner,poison); assert.equal(toxicityState(owner).value,100);
+  environment(); const halfling=actor("halfling"), forbidden=item(halfling,"radolf.potion.vitality");
+  await assert.rejects(consumeOwnedItem(forbidden),/низушков/); assert.equal(forbidden.system.quantity,1);
+  await consumeOwnedItem(forbidden,{apply:false}); assert.equal(forbidden.system.quantity,0);
+});
+
+test("vitality suppresses only wound threshold, leaves critical modifiers/death intact, and expires normally", async()=>{
+  environment();const owner=actor("elf"); owner.system.health.value=5;
+  assert.equal(deriveStatistics(owner.system).effective.reflex,4);
+  await consumeOwnedItem(item(owner,"radolf.potion.vitality"));
+  owner.effects.push({statuses:new Set(),flags:{[SYSTEM_ID]:{condition:{modifiers:[{target:"attributes.reflex",value:-2}]}}}});
+  assert.equal(deriveStatistics(owner.system,{effects:owner.effects}).effective.reflex,6);
+  owner.system.health.value=0;
+  assert.equal(deriveStatistics(owner.system,{effects:owner.effects}).effective.reflex,2);
+  owner.system.health.value=5;owner.effects[0].duration.expired=true;
+  assert.equal(deriveStatistics(owner.system,{effects:owner.effects}).effective.reflex,3);
+});
+
+test("stamina heals 3d6 capped at maximum, keeps thirty-minute toxicity, and cancels without spending",async()=>{
+  environment();const owner=actor("dwarf"),potion=item(owner,"radolf.potion.stamina",2);owner.system.stamina.value=35;
+  await consumeOwnedItem(potion);assert.equal(owner.system.stamina.value,40);assert.equal(rolled,1);
+  assert.equal(rolls[0].message.rolls[0].formula,"3d6");assert.equal(rolls[0].message.flags[SYSTEM_ID].skipLuck,true);
+  assert.equal(owner.effects[0].flags[SYSTEM_ID].condition.seconds,1800);
+  owner.system.stamina.value=0;assert.equal(toxicityState(owner).value,50);
+  foundry.dice.Roll.prototype.toMessage=async()=>null;
+  await assert.rejects(consumeOwnedItem(potion),/отменён/);assert.equal(potion.system.quantity,1);assert.equal(owner.system.stamina.value,0);
+});
+
+test("Raffard regenerates once per round despite duplicate doses, stops on expiry and never revives dead actors",async()=>{
+  environment();const owner=actor("human"),potion=item(owner,"radolf.potion.raffard",2);
+  await consumeOwnedItem(potion);await consumeOwnedItem(potion);
+  assert.equal(owner.effects[0].flags[SYSTEM_ID].condition.roundsFormula,"4d6");
+  assert.equal(regenerationAtStart(owner).total,1);
+  owner.effects.push({statuses:new Set(["dead"])});assert.equal(regenerationAtStart(owner).total,0);owner.effects.pop();
+  for(const effect of owner.effects)effect.duration.expired=true;
+  assert.equal(regenerationAtStart(owner).total,0);
 });

@@ -58,7 +58,7 @@ export function rollWeaponAttack(actor,itemId,options={}) {
     if(quote.blocked)throw new Error(quote.blocked);
     const arrow = await chooseArrow(actor,item,quote.attack.count,options.ammoId);
     if (arrow === false) return;
-    const bolt=loadedBolt(item), projectile=arrow || bolt;
+    const bolt=quote.ranged?loadedBolt(item):null, projectile=arrow || bolt;
     quote.weapon=ammunitionWeapon(quote.weapon,projectile);
     const thrown = thrownWeaponPlan(actor, item, quote, { targetContext, point: options.point });
     if (projectile && /несмертельн/iu.test(projectile.properties ?? "")) quote.nonLethal=true;

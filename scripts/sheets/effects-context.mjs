@@ -31,7 +31,7 @@ export async function effectsContext(sheet) {
     return {id:effect.id,name:legacy?game.i18n.localize(definition.name):effect.name,img:effect.img??definition?.img,inactive:effect.disabled||effect.isSuppressed,
       canRemove:sheet.isEditable&&(game.user.isGM||![DYING,DEAD,EXHAUSTED_STUN,UNCONSCIOUS].some(status=>effect.statuses.has(status))),
       canEditWound:sheet.isEditable&&canEditWound(effect),
-      toxicity:sheet.actor.system.details?.race==="witcher"?doseToxicity(effect):0,counter:effectCounter(effect),save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
+      toxicity:doseToxicity(effect),counter:effectCounter(effect),save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
       autoAllowed:Boolean(!rules.manualOnly&&rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
       durationLabel:effectDurationLabel(effect,globalThis.CONFIG?.time?.roundTime??3),pending,canEditDuration:sheet.isEditable&&canEditEffectDuration(effect),

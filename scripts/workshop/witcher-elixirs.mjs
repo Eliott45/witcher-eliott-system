@@ -53,6 +53,7 @@ export const criticalLocationBonus = actor => dose(actor, "decoction.katakan") ?
 export function regenerationAtStart(actor) {
   const parts = [];
   if (actor.effects.some(effect => activeEffect(effect) && effect.statuses.has("dead"))) return {total:0,parts,swallow:null};
+  if (dose(actor, "radolf.potion.raffard")) parts.push({label:"Зелье Раффара Белого",value:1});
   const swallow = dose(actor, "potion.swallow");
   // Swallow: no healing in a round in which the drinker was hit.
   if (swallow) parts.push(state(swallow).hitSince ? { label: "Ласточка: по вам попали — без восстановления", value: 0 } : { label: "Ласточка", value: 3 });

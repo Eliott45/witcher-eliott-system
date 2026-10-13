@@ -1,3 +1,4 @@
+import { RADOLF_RECIPES } from "./radolf-additions.mjs";
 import { CORE_EQUIPMENT } from "./core-equipment.mjs";
 import { MATERIALS, materialUuid } from "./workshop-materials.mjs";
 import { ALCHEMY, SUBSTANCE_CODES } from "./workshop-alchemy.mjs";
@@ -141,4 +142,4 @@ RECIPES.push(...ALCHEMY.map((result,i)=>{
  if(recipe.mutagenUuid) components.push({uuid:recipe.mutagenUuid,quantity:1,substance:""},{uuid:equipmentUuid(CORE_EQUIPMENT.find(item=>item.id==="gear.spirits").documentId),quantity:1,substance:""});
  return {id:`formula.${result.id}`,documentId:`recp${String(i+501).padStart(12,"0")}`,type:"recipe",source:"recipes",name:`Формула: ${result.name}`,flags:recipe.price === undefined ? structuredClone(result.flags) : {},system:{price:recipe.price??0,source:result.system.source,recipe:{category:"formula",resultUuid:equipmentUuid(result.documentId),dc:recipe.dc,time:recipe.time,quantity:1,grade:recipe.grade??"novice",tools:["gear.alchemy-tools"],components}}};
 }));
-RECIPES.push(...EXPERIMENTAL_RECIPES);
+RECIPES.push(...EXPERIMENTAL_RECIPES, ...RADOLF_RECIPES);

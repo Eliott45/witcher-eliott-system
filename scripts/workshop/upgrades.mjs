@@ -9,7 +9,12 @@ import { inventoryTransaction, copyPhysical } from "./transaction.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { applyWeaponWear } from "../combat/weapon-wear.mjs";
 
+import { crossbowSlots, crossbowModFits } from "../data/crossbow-modifications.mjs";
+import { actionQuote } from "../combat/action-economy.mjs";
+import { crossbowFullTurn } from "../combat/crossbow-modifications.mjs";
+
 function upgradeFits(target, source) {
+  if (source.system.kind==="upgrade" && source.system.upgrade.category==="crossbow") return crossbowModFits(target,source);
   return Boolean(conditionKey(target)) && source.system.kind==="upgrade" && source.system.upgrade.target===target.type && freeSlots(target)>0
     && (source.system.upgrade.category!=="armor" || armorZones(target).every(zone=>source.system.upgrade.zones.includes(zone)));
 }
@@ -27,7 +32,7 @@ async function toolsAvailable(actor) {
 export async function installUpgrade(target, { withoutCheck = false, source: selectedSource = null } = {}) {
   const actor=target.actor;if(!actor?.isOwner)return;
   if(withoutCheck) {
-    if(!freeSlots(target))throw new Error("Нет свободных слотов для улучшения.");
+    if(!freeSlots(target)&&!crossbowSlots(target))throw new Error("Нет свободных слотов для улучшения.");
     const source=selectedSource??await selectCatalogItem("Установить без проверки",item=>upgradeFits(target,item),
       {hint:"Выберите улучшение из каталога или предметов мира. Наличие в инвентаре и инструменты не требуются; предметы не расходуются."});
     if(source)return installCatalogUpgrade(target,source);
@@ -35,15 +40,15 @@ export async function installUpgrade(target, { withoutCheck = false, source: sel
   }
   const source=selectedSource??await chooseOwned(actor,"Установить улучшение",item=>canInstall(target,item));if(!source)return;
   const category=source.system.upgrade.category;
-  const confirmed=await foundry.applications.api.DialogV2.confirm({window:{title:"Установка улучшения"},content:`<p><b>${esc(source.name)}</b> → ${esc(target.name)}</p><p>${esc(source.system.properties)}</p><p>${category==="armor"?`${withoutCheck?"Установка без проверки и инструментов.":"Полный раунд, Изготовление СЛ 14."} Накладка занимает слот; остальные части комплекта остаются в инвентаре.`:"Руна / глиф расходуется и устанавливается НАВСЕГДА. Снять её нельзя."}</p>`,rejectClose:false});
+  const confirmed=await foundry.applications.api.DialogV2.confirm({window:{title:"Установка улучшения"},content:`<p><b>${esc(source.name)}</b> → ${esc(target.name)}</p><p>${esc(source.system.properties)}</p><p>${category==="crossbow"?"Установка занимает полный ход без проверки. Модификацию можно снять за полный ход.":category==="armor"?`${withoutCheck?"Установка без проверки и инструментов.":"Полный раунд, Изготовление СЛ 14."} Накладка занимает слот; остальные части комплекта остаются в инвентаре.`:"Руна / глиф расходуется и устанавливается НАВСЕГДА. Снять её нельзя."}</p>`,rejectClose:false});
   if(!confirmed)return;
   return installOwnedUpgrade(target, source, { withoutCheck });
 }
 function installationUpdate(target, source) {
   const category=source.system.upgrade.category;
   const installation={id:foundry.utils.randomID(),name:source.name,sourceUuid:source._stats.compendiumSource||source.uuid,ruleId:source.system.ruleId??"",category,zone:category==="armor"?target.system.zone:"",properties:source.system.properties,
-    bonuses:foundry.utils.deepClone(source.system.upgrade.bonuses),weight:category==="armor"?source.system.weight*armorZones(target).length/3:0};
-  if(category==="armor")installation.bonuses.push({target:"weight",value:installation.weight});
+    bonuses:foundry.utils.deepClone(source.system.upgrade.bonuses),weight:category==="crossbow"?source.system.weight:category==="armor"?source.system.weight*armorZones(target).length/3:0};
+  if(["armor","crossbow"].includes(category))installation.bonuses.push({target:"weight",value:installation.weight});
   const key=conditionKey(target), conditionBonus=installation.bonuses.filter(b=>b.target===key).reduce((sum,b)=>sum+b.value,0);
   return {_id:target.id,"system.installations":[...target.system.installations,installation],[`system.${key}.value`]:target.system[key].value+conditionBonus};
 }
@@ -65,6 +70,7 @@ export async function installOwnedUpgrade(target, source, { withoutCheck = false
   if(category==="armor"&&!withoutCheck&&!await toolsAvailable(actor))return;
   return inventoryWrite(actor,async()=>{
     if(!canInstall(target,source))throw new Error("Установка больше недоступна.");
+    if(category==="crossbow")actionQuote(actor,{ignoreExtra:true});
     if(target.system.quantity!==1)throw new Error("Для улучшения оставьте один экземпляр предмета в этой записи инвентаря.");
     if(category==="armor" && !withoutCheck && !(await workshopCheck(actor,{name:"Установка накладки",skill:"crafting",dc:14})).success)return;
     if(!canInstall(target,source))throw new Error("Свободные слоты или предметы изменились.");
@@ -73,14 +79,14 @@ export async function installOwnedUpgrade(target, source, { withoutCheck = false
       const zones=source.system.upgrade.zones.filter(z=>!armorZones(target).includes(z));
       if(zones.length){const remainder=copyPhysical(source,1);remainder.system.upgrade.zones=zones;creates.push(remainder);}
     }
-    await inventoryTransaction(actor,{expenses:[{itemId:source.id,quantity:1}],updates,creates});
+    await inventoryTransaction(actor,{expenses:[{itemId:source.id,quantity:1}],updates,creates,effectCreates:category==="crossbow"?crossbowFullTurn(actor,"Установка модификации"):[]});
     await workshopNotice(actor,`<p>${esc(source.name)} установлено на ${esc(target.name)}.</p>`);
   });
 }
 /** Applying an owned rune/glyph directly from its card uses the same permanent installation transaction. */
 export async function installUpgradeFromSource(source) {
   const actor=source.actor;if(!actor?.isOwner)return;
-  const target=await chooseOwned(actor,"Предмет для руны / глифа",item=>canInstall(item,source)&&available(item)&&item.system.quantity===1);
+  const target=await chooseOwned(actor,"Предмет для улучшения",item=>canInstall(item,source)&&available(item)&&item.system.quantity===1);
   if(target)return installUpgrade(target,{source});
 }
 export async function removeArmorUpgrade(target,id) {

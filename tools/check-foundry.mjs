@@ -1914,8 +1914,8 @@ const npcToxicityHTML=inventoryPartial({rootId:'npc-consumption',system:npcDoseA
 assert.ok(npcToxicityHTML.includes('witcher-toxicity '),'NPC inventory retains its toxicity meter');
 doseActor.updateSource({'system.details.race':'human'});
 const humanDoseHTML = template(await doseSheet._prepareContext({}));
-assert.ok(!humanDoseHTML.includes('witcher-sidebar-toxicity'),'Race, not profession or active doses, controls visibility');
-assert.ok(!humanDoseHTML.includes('witcher-effect-toxicity'));
+assert.ok(humanDoseHTML.includes('witcher-sidebar-toxicity'),'Active doses also show toxicity for non-witchers');
+assert.ok(humanDoseHTML.includes('witcher-effect-toxicity'));
 const legacyToxicPoison=conditionSource(EFFECT_TEMPLATES.find(effect=>effect.key==='poisoned'));
 legacyToxicPoison._id='toxicityPoison01';legacyToxicPoison.flags[game.system.id].toxicity=true;
 legacyToxicPoison.flags[game.system.id].condition.autoSave=true;
@@ -1951,6 +1951,7 @@ assert.ok(!tacticsHTML.includes('Первая атака'));
 console.log('Combat tactics: native effects, core icons and active ambush controls OK');
 await (await import('./native-experimental.mjs')).checkNativeExperimental(tacticsTemplate,alchemyPartial,documents);
 await (await import('./native-radolf.mjs')).checkNativeRadolf(itemTemplate,documents);
+await (await import('./native-radolf-additions.mjs')).checkNativeRadolfAdditions(itemTemplate,tacticsTemplate,alchemyPartial,documents);
 const combatMenuPreviews=await (await import('./native-combat-menu.mjs')).checkNativeCombatMenu(tacticsTemplate);
 
 const {ambushWindowContext,groupCardContext}=await import('../scripts/sheets/ambush-context.mjs');

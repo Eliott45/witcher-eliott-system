@@ -1,3 +1,4 @@
+import { hasDose } from "./consumables.mjs";
 import { mutationModifiers, wearerBonuses } from "./workshop.mjs";
 import { equippedItems } from "./physical-items.mjs";
 import { backgroundModifiers, modifierTotal, modifierFactor } from "./background-modifiers.mjs";
@@ -58,6 +59,7 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   const staminaMax = baseLimit("staminaMax") === null ? null : Math.max(0, scale(baseLimit("staminaMax") + modifierTotal(modifiers, "staminaMax"), "staminaMax"));
   const woundThreshold = Math.floor((healthMax ?? health.max) / 5);
   const wounded = woundThreshold > 0 && health.value < woundThreshold;
+  const ignoresWoundPenalty = hasDose({effects},"radolf.potion.vitality");
   const lethalHealth = dyingHealth({ value: health.value, max: healthMax ?? health.max });
   if (parent?.type === "npc") {
     dead ||= lethalHealth;
@@ -67,7 +69,7 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
     const value = adjusted[key];
     // Death replaces (rather than stacks with) the serious-wound penalty. Luck is exempt.
     if (value !== null && (dying || dead) && key !== "luck") return [key, Math.floor(value / 3)];
-    return [key, value !== null && wounded && WOUNDED_ATTRIBUTES.has(key) ? Math.floor(value / 2) : value];
+    return [key, value !== null && wounded && !ignoresWoundPenalty && WOUNDED_ATTRIBUTES.has(key) ? Math.floor(value / 2) : value];
   }));
   const { speed } = effective;
   // Printed creature exceptions (bird RUN 10, fiend REC 11) override the ordinary formulas.
@@ -78,7 +80,7 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   return {
     healthMax, staminaMax, resolveMax, meleeDamageBonus: modifierTotal(modifiers, "meleeDamage"), physicalDamageBonus: modifierTotal(modifiers, "physicalDamage"), encumbrance: ev, vigor: Math.max(0, vigor + modifierTotal(modifiers, "vigor")),
     stun: physical === null ? null : Math.max(0, Math.min(10, physical) + modifierTotal(modifiers, "stun")),
-    physical, recovery: recoveryBase === null ? null : Math.max(0, scale(recoveryBase + modifierTotal(modifiers, "recovery"), "recovery")), woundThreshold, wounded, dying: dying && !dead, dead, effective, adjusted, modifiers,
+    physical, recovery: recoveryBase === null ? null : Math.max(0, scale(recoveryBase + modifierTotal(modifiers, "recovery"), "recovery")), woundThreshold, wounded, ignoresWoundPenalty, dying: dying && !dead, dead, effective, adjusted, modifiers,
     reputationBonus, reputation: reputationTotal, naturalArmor: modifierTotal(modifiers, "naturalArmor"),
     skillBonuses: Object.fromEntries([...new Set(modifiers.filter(modifier => modifier.target.startsWith("skills.")).map(modifier => modifier.target))]
       .map(target => [target.slice(7), modifierTotal(modifiers, target, abilityState.trustEnabled ? ["humanTarget"] : [])])),

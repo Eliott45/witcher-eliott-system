@@ -19,6 +19,8 @@ function references(value) {
 /** Normalize identity without deleting paid inventory units, changing IDs, or overwriting custom notes. */
 export function sharedEquipmentUpdate(item) {
   const s = item.system ?? {}, id = aliases[s.ruleId] ?? s.ruleId, result = {};
+  const origin = item._stats?.compendiumSource;
+  if (origin && references(origin) !== origin) result["_stats.compendiumSource"] = references(origin);
   for (const [key, value] of Object.entries(s.toObject?.() ?? s)) {
     const normalized = references(value);
     if (JSON.stringify(value) !== JSON.stringify(normalized)) result[`system.${key}`] = normalized;
@@ -56,6 +58,17 @@ function uneditedDuplicate(item) {
 
 export function registerSharedEquipmentMigration() {
   game.settings.register(SYSTEM_ID, key, { scope: "world", config: false, type: Number, default: 0 });
+}
+
+/** Actor imports may contain embedded Items without running their individual creation hooks. */
+export function prepareSharedActorEquipment(actor) {
+  let changed = false;
+  for (const item of actor.items) {
+    const update = sharedEquipmentUpdate(item);
+    if (!Object.keys(update).length) continue;
+    item.updateSource(update); changed = true;
+  }
+  if (changed) actor.updateSource({ items: Array.from(actor.items, item => item.toObject()) });
 }
 
 export async function migrateSharedEquipment() {

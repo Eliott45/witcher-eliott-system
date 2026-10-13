@@ -41,7 +41,7 @@ export function creatureSkillAttribute(system,key) {
   if(!wild)return null;
   // The statblock prints the instinct INT (6–8); older creatures keep 7.
   const instinct=Number(wild.flags?.["witcher-eliott-system"]?.wildIntelligence)||7,stats=system.statistics;
-  return {value:stats.dying||stats.dead?Math.floor(instinct/3):stats.wounded?Math.floor(instinct/2):instinct,label:`Дикий: ИНТ ${instinct} для Внимания и Выживания`};
+  return {value:stats.dying||stats.dead?Math.floor(instinct/3):stats.wounded&&!stats.ignoresWoundPenalty?Math.floor(instinct/2):instinct,label:`Дикий: ИНТ ${instinct} для Внимания и Выживания`};
 }
 export function immuneToCondition(actor,statuses) {
   const ids=new Set(statuses),traits=new Set((actor.items??[]).filter(item=>item.type==="ability").map(item=>item.system.ruleId));

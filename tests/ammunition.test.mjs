@@ -1,3 +1,4 @@
+import { RADOLF_UPGRADES, RADOLF_POTIONS, RADOLF_RECIPES } from "../scripts/data/radolf-additions.mjs";
 import { CORE_GENERAL_ADDITIONS } from "../scripts/data/general-gear.mjs";
 import { RADOLF_EQUIPMENT, RADOLF_FOLDER } from "../scripts/data/radolf-equipment.mjs";
 import { CORE_TRANSPORT, CORE_TACK } from "../scripts/data/core-transport.mjs";
@@ -24,6 +25,7 @@ const sources = compendiumData(translations).equipment;
 const folders = compendiumFolders(translations).equipment;
 const diagrams = sources.filter(item => item.type === "recipe" && item.system.recipe.category === "diagram");
 const pureSubstances = sources.filter(item => item.system.ruleId?.startsWith("substance."));
+const radolfAdditions = sources.filter(item => item.system.ruleId.startsWith("radolf.crossbow.") || item.system.ruleId.startsWith("radolf.potion.") || item.system.ruleId.startsWith("formula.radolf."));
 const experiments = sources.filter(item => [...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES.filter(entry => entry.system.recipe.category === "formula")].some(entry => entry.id === item.system.ruleId));
 
 test("four ammunition records reproduce the supplied table and remain separate from weapons", () => {
@@ -61,6 +63,7 @@ function migrationFixture({ fail = false, locked = true, startVersion = 0, elder
   const gm = {}, writes = [], index = new Map(), packFolders = new Map();
   let version = startVersion;
   for (const item of diagrams) index.set(item._id, structuredClone(item));
+  for (const item of radolfAdditions) index.set(item._id, structuredClone(item));
   for (const item of experiments) index.set(item._id, structuredClone(item));
   for (const item of sources.filter(item => item.system.ruleId.startsWith("radolf."))) index.set(item._id, structuredClone(item));
   if (substances) for (const item of pureSubstances) index.set(item._id, structuredClone(item));
@@ -103,7 +106,7 @@ test("content update appends only missing ammunition, keeps edited entries and r
   game.user = state.gm;
   await migrateEquipmentContent();
   assert.deepEqual(state.writes, [["lock", false], ["folders", 1], ["items", 3], ["lock", true]]);
-  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 52 + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length);
+  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 52 + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length);
   assert.equal(state.index.get("custom-canonical").system.price, 999);
   await migrateEquipmentContent(); assert.equal(state.writes.length, 4);
 });
@@ -364,7 +367,7 @@ test("version-one worlds repair pack, world, actor and unlinked token copies wit
     assert.equal(item.system.quantity, 10); assert.equal(item.system.weight, .05); assert.equal(item.system.price, 1);
     assert.equal(item.img, CORE_AMMUNITION[0].img); assert.equal(item.name, "Стандартные боеприпасы");
   }
-  assert.equal(state.index.size, 52 + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
+  assert.equal(state.index.size, 52 + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
   assert.ok(Array.from(state.index.values()).filter(item=>item.system.kind==="ammunition").every(item => item.img === CORE_AMMUNITION[0].img));
   await migrateEquipmentContent(); assert.equal(worldActor.items[0].system.quantity, 10);
 });
@@ -396,7 +399,7 @@ test("version-three worlds append all thirty Elder Folk items without recreating
   const state=migrationFixture({startVersion:3,elder:false});
   for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
   await migrateEquipmentContent();
-  assert.equal(state.index.size,52 + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length);
+  assert.equal(state.index.size,52 + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length);
   assert.equal(state.writes.find(([key])=>key==="items")[1],30);
   assert.equal(state.version,EQUIPMENT_CONTENT_VERSION);
 });
@@ -420,7 +423,7 @@ test("creating or dropping an old pack normalizes once while new individual stac
 test("version-five worlds append transport and tack once with their own folders",async()=>{
  const state=migrationFixture({startVersion:5,transport:false});
  for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
- await migrateEquipmentContent();assert.equal(state.index.size,52 + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length);
+ await migrateEquipmentContent();assert.equal(state.index.size,52 + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length);
  assert.equal(state.writes.find(([key])=>key==="items")[1],18);
  assert.equal(state.writes.find(([key])=>key==="folders")[1],2);
  const count=state.writes.length;await migrateEquipmentContent();assert.equal(state.writes.length,count);
@@ -459,3 +462,17 @@ test("version-seventeen worlds append the nine pure substances once with their s
   assert.equal(state.writes.length, 4);
 });
 
+
+test("page two and three migration adds all missing DLC items/recipes once and preserves custom entries",async()=>{
+  const state=migrationFixture({startVersion:30});
+  for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
+  const entries=[...RADOLF_UPGRADES,...RADOLF_POTIONS,...RADOLF_RECIPES];
+  for(const entry of entries)state.index.delete(entry.documentId);
+  const custom={_id:"customRadolf0002",name:"Мой прицел",type:"equipment",system:{ruleId:RADOLF_UPGRADES[0].id,price:777,description:"Мои заметки"}};
+  state.index.set(custom._id,custom);
+  await migrateEquipmentContent();
+  assert.equal(state.writes.find(([kind])=>kind==="items")[1],15);
+  for(const entry of entries)assert.ok([...state.index.values()].some(item=>item.system.ruleId===entry.id));
+  assert.equal(state.index.get(custom._id).system.price,777);assert.equal(state.pack.locked,true);
+  const count=state.writes.length;await migrateEquipmentContent();assert.equal(state.writes.length,count);
+});
