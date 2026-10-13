@@ -31,6 +31,8 @@ import { registerCriticalWoundHooks } from "./combat/critical-wound-effects.mjs"
 import { registerHealingRequests } from "./combat/healing.mjs";
 import { registerBrawling } from "./combat/brawling.mjs";
 import { registerEnvironment } from "./combat/environment.mjs";
+import { registerRadolfLight } from "./combat/radolf-light.mjs";
+import { registerRadolfMarbles } from "./combat/radolf-marbles.mjs";
 import { registerBombs } from "./combat/bombs.mjs";
 import { registerSpellStrikes } from "./magic/spell-strikes.mjs";
 import { registerSpellAreas } from "./magic/spell-areas.mjs";
@@ -129,6 +131,8 @@ Hooks.once("init", async () => {
   registerHealingRequests();
   registerBrawling();
   registerEnvironment();
+  registerRadolfLight();
+  registerRadolfMarbles();
   registerBombs();
   registerSpellStrikes();
   registerSpellAreas();

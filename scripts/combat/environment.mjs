@@ -1,5 +1,6 @@
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
+import { torchLightLevel } from "./radolf-light.mjs";
 
 // Core p.165 «Влияние среды». The GM sets light, terrain and heat for a scene; a token can carry an
 // exception as a condition (against the sun, lit by a torch, in or under water, on dry ground).
@@ -69,7 +70,8 @@ export function actorEnvironment(actor, scene = undefined, token = actorToken(ac
   scene ??= token?.parent ?? null;
   if (!scene) return null;
   const environment = regionEnvironment(sceneEnvironment(scene), token), statuses = actor?.statuses ?? new Set();
-  const light = LIGHT_LEVELS.find(entry => entry.id === lightLevel(environment, scene, statuses));
+  const level = torchLightLevel(lightLevel(environment, scene, statuses), scene, token);
+  const light = LIGHT_LEVELS.find(entry => entry.id === level);
   const terrain = TERRAINS.find(entry => entry.id === terrainOf(environment, statuses)) ?? TERRAINS[0];
   return { light, terrain, heat: Boolean(environment.heat), underwater: terrain.id === "underwater" };
 }

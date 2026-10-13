@@ -9,6 +9,7 @@
       </div>
       <span class="witcher-inventory-weight" data-tooltip="Общий вес: {{item.totalWeight}} кг">{{item.totalWeight}}</span>
       <div class="witcher-inventory-row-actions">
+        {{#if item.radolf}}<button type="button" data-action="useRadolfItem" data-item-id="{{item.id}}" data-tooltip="{{item.radolf.label}}" aria-label="{{item.radolf.label}}: {{item.name}}" {{disabled (or (not editable) item.radolf.disabled)}}><i class="fa-solid {{item.radolf.icon}}" aria-hidden="true"></i></button>{{/if}}
         {{#if item.consumption.enabled}}<button type="button" data-action="useConsumable" data-item-id="{{item.id}}" data-tooltip="{{item.consumption.hint}}" aria-label="Использовать: {{item.name}}" {{disabled (or (not editable) (not item.consumption.canUse))}}><i class="fa-solid fa-hand-sparkles" aria-hidden="true"></i></button>{{/if}}
         <button type="button" data-action="chooseContainer" data-item-id="{{item.id}}" data-tooltip="Переместить в контейнер или достать" aria-label="Переместить: {{item.name}}" {{disabled (not editable)}}><i class="fa-solid fa-box-open" aria-hidden="true"></i></button>
         {{#if item.isRecipe}}<button type="button" data-action="craftInventory" data-item-id="{{item.id}}" data-tooltip="Изготовить по рецепту" aria-label="Изготовить: {{item.name}}" {{disabled (not editable)}}><i class="fa-solid fa-hammer" aria-hidden="true"></i></button>{{/if}}

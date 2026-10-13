@@ -22,7 +22,8 @@ import { relicWeaponContentUpdate } from "./relic-weapon-content.mjs";
 import { experimentalDescriptionUpdate } from "./experimental-descriptions.mjs";
 import { dimeritiumDescriptionUpdate } from "./dimeritium-descriptions.mjs";
 import { personalBelongingsDescriptionUpdate } from "./personal-belongings-descriptions.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 29;
+import { RADOLF_EQUIPMENT } from "../data/radolf-equipment.mjs";
+export const EQUIPMENT_CONTENT_VERSION = 30;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {
@@ -47,7 +48,7 @@ export async function migrateEquipmentContent() {
   const index = await pack.getIndex({ fields: ["system.ruleId"] });
   const existing = new Set(Array.from(index.values(), entry => entry.system?.ruleId));
   const diagrams = RECIPES.filter(entry => entry.system.recipe.category === "diagram");
-  const additions = [...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS, ...WITCHER_SPECIAL_EQUIPMENT, ...diagrams, ...PURE_SUBSTANCES, ...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES];
+  const additions = [...RADOLF_EQUIPMENT, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS, ...WITCHER_SPECIAL_EQUIPMENT, ...diagrams, ...PURE_SUBSTANCES, ...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES];
   const missing = [...new Map(additions.map(entry => [entry.id, entry])).values()].filter(entry => !existing.has(entry.id));
   const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry =>
     specialRuleIds.has(entry.system?.ruleId) || TOOL_RULES[entry.system?.ruleId] || GENERAL_GEAR_RULES[entry.system?.ruleId] || entry.system?.ruleId === "dimeritium-ring" || /^(material|substance|ammunition|alchemy|potion|oil|decoction|mutagen|formula|diagram|bomb|trap|rune|glyph)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));

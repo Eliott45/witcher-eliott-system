@@ -662,6 +662,259 @@
     "flags": {}
   },
   {
+    "_id": "rdlf000000000001",
+    "name": "Мешочек с шариками",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.marbles",
+      "kind": "gear",
+      "weight": 0.1,
+      "price": 18,
+      "source": "Фургончик Родольфа",
+      "properties": "Область 2 м; Атлетика СЛ 14; Четвероногие: СЛ 12",
+      "description": "<p>Мелкие шарики, рассыпанные под ногами, превращают проход в скользкую преграду.</p><h3>Применение</h3><ul><li>Пересекающий область проходит проверку Атлетики со СЛ 14. При провале падает ничком. Для четвероногих СЛ 12; существа без ног невосприимчивы.</li><li>«Рассыпать» расходует один мешочек и позволяет ведущему разместить область на сцене. Размер можно уточнить: книга не указывает, являются ли 2 м радиусом или поперечником. При перемещении через область проверка выполняется автоматически. Удалите регион, когда шарики убраны.</li></ul><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000002",
+    "name": "Пустая склянка",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.empty-vial",
+      "kind": "gear",
+      "weight": 0.1,
+      "price": 3,
+      "source": "Фургончик Родольфа",
+      "properties": "",
+      "description": "<p>Пустая стеклянная ёмкость с пробкой для хранения жидкостей.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000003",
+    "name": "Компас",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.compass",
+      "kind": "gear",
+      "weight": 0.1,
+      "price": 32,
+      "source": "Фургончик Родольфа",
+      "properties": "+3 к Выживанию при ориентировании",
+      "description": "<p>Помогает определять направление в дороге, в том числе ночью.</p><h3>Применение</h3><ul><li>Кнопка «Ориентироваться» бросает Выживание в дикой природе с бонусом +3. Бонус действует только при навигации и ориентировании.</li></ul><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000004",
+    "name": "Лопата",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "radolf.shovel",
+      "skill": "melee",
+      "damageType": "Д",
+      "accuracy": -2,
+      "rarity": "everywhere",
+      "damage": "2d6",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 2,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 0,
+      "weight": 1.5,
+      "price": 15,
+      "properties": "",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Фургончик Родольфа",
+      "description": "<p>Крепкая лопата для земляных работ. В бою используется как импровизированное дробящее оружие.</p><h3>Применение</h3><ul><li>Ближний бой; точность −2; урон 2d6; надёжность 15; хват двумя руками.</li></ul><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000005",
+    "name": "Сигнальный рожок",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.signal-horn",
+      "kind": "gear",
+      "weight": 0.1,
+      "price": 30,
+      "source": "Фургончик Родольфа",
+      "properties": "Сигнал: около 1 мили",
+      "description": "<p>Рожок для предупреждений и условных сигналов на большом расстоянии.</p><h3>Применение</h3><ul><li>Сигнал слышен примерно за милю. Его могут услышать и союзники, и противники. Значение условного сигнала оговаривается заранее.</li></ul><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000006",
+    "name": "Солнечный камень",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.sunstone",
+      "kind": "gear",
+      "weight": 0.1,
+      "price": 36,
+      "source": "Фургончик Родольфа",
+      "properties": "+2 к Выживанию при ориентировании",
+      "description": "<p>Помогает определить положение солнца даже в шторм и выбрать направление пути.</p><h3>Применение</h3><ul><li>Кнопка «Ориентироваться» бросает Выживание в дикой природе с бонусом +2. Бонус действует только при навигации и ориентировании.</li></ul><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000007",
+    "name": "Сухой паёк (на 1 день)",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.rations",
+      "kind": "gear",
+      "weight": 1,
+      "price": 5,
+      "source": "Фургончик Родольфа",
+      "properties": "Рацион на 1 день",
+      "description": "<p>Запас дорожной еды на один день.</p><h3>Применение</h3><ul><li>Кнопка «Использовать» расходует один дневной паёк.</li></ul><p><small>Фургончик Родольфа</small></p>",
+      "consumption": {
+        "mode": "consume"
+      }
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000008",
+    "name": "Факел",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "radolf.torch",
+      "skill": "melee",
+      "damageType": "Д",
+      "accuracy": -1,
+      "rarity": "everywhere",
+      "damage": "1d6",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 0,
+      "weight": 0.1,
+      "price": 1,
+      "properties": "Освещение +1 · 5 м; Поджог 25% при зажжённом факеле",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Фургончик Родольфа",
+      "description": "<p>Факел освещает дорогу и служит импровизированной дубинкой.</p><h3>Применение</h3><ul><li>Зажжённый факел повышает освещённость на один уровень в радиусе 5 м. Возьмите его в руку и нажмите «Зажечь»: свет следует за токеном.</li><li>Ближний бой; точность −1; урон 1d6; надёжность 5; хват одной рукой. При попадании зажжённым факелом автоматически проверяется поджог с вероятностью 25%.</li><li>Книга не задаёт время горения. Потушите факел кнопкой, когда он погаснет.</li></ul><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000009",
+    "name": "Бурдюк",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.waterskin",
+      "kind": "gear",
+      "weight": 1,
+      "price": 8,
+      "source": "Фургончик Родольфа",
+      "properties": "",
+      "description": "<p>Дорожная ёмкость для питьевой воды или другого напитка.</p><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "rdlf000000000010",
+    "name": "Свисток",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "radolf.whistle",
+      "kind": "gear",
+      "weight": 0.1,
+      "price": 6,
+      "source": "Фургончик Родольфа",
+      "properties": "Сигнал: до ½ мили",
+      "description": "<p>Компактный металлический свисток для привлечения внимания и условных сигналов.</p><h3>Применение</h3><ul><li>Работает как сигнальный рожок, но слышен не далее полумили. Сигнал могут услышать все в пределах этой дальности.</li></ul><p><small>Фургончик Родольфа</small></p>"
+    },
+    "effects": [],
+    "folder": "gearRadolf000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "weap000000000001",
     "name": "Железный полуторный меч",
     "type": "weapon",

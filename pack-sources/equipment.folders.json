@@ -22,6 +22,17 @@
     "flags": {}
   },
   {
+    "_id": "gearRadolf000001",
+    "name": "Фургончик Родольфа",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
     "_id": "gearTransport001",
     "name": "Транспорт",
     "type": "Item",

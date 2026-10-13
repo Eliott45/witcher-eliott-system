@@ -19,6 +19,8 @@ import { consumableContext } from "../data/consumables.mjs";
 import { recipeDetailsContext } from "./recipe-details-context.mjs";
 import { relicLore } from "../data/relic-lore.mjs";
 import { rollRelicLore } from "./relic-lore.mjs";
+import { radolfActions } from "../combat/radolf-actions.mjs";
+import { radolfItemContext } from "../data/radolf-rules.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const effectItemActions={
@@ -33,7 +35,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     classes: ["witcher-eliott", "reference-sheet"],
     position: { width: 620, height: 660 },
     window: { resizable: true },
-    actions: { ...consumptionActions, ...effectItemActions, ...ritualComponentActions, installUpgradeDirect: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item,{withoutCheck:true});}), searchItemTrait, ...workshopItemActions, installUpgrade: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item);}), removeArmorUpgrade:workshopAction(async function(_e,target){if(this.isEditable)await removeArmorUpgrade(this.item,target.dataset.installationId);}), augmentItem:workshopAction(async function(){if(this.isEditable)await augmentItem(this.item);}), applyOil:workshopAction(async function(){if(this.isEditable)await applyOil(this.item);}), prepareMutagen:workshopAction(async function(){if(this.isEditable)await prepareMutagen(this.item);}), applyMutagen:workshopAction(async function(){if(this.isEditable)await consumeMutagen(this.item);}) },
+    actions: { ...radolfActions, ...consumptionActions, ...effectItemActions, ...ritualComponentActions, installUpgradeDirect: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item,{withoutCheck:true});}), searchItemTrait, ...workshopItemActions, installUpgrade: workshopAction(async function(){if(this.isEditable)await installUpgrade(this.item);}), removeArmorUpgrade:workshopAction(async function(_e,target){if(this.isEditable)await removeArmorUpgrade(this.item,target.dataset.installationId);}), augmentItem:workshopAction(async function(){if(this.isEditable)await augmentItem(this.item);}), applyOil:workshopAction(async function(){if(this.isEditable)await applyOil(this.item);}), prepareMutagen:workshopAction(async function(){if(this.isEditable)await prepareMutagen(this.item);}), applyMutagen:workshopAction(async function(){if(this.isEditable)await consumeMutagen(this.item);}) },
     form: { submitOnChange: true, closeOnSubmit: false }
   };
 
@@ -93,6 +95,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     return Object.assign(context, {
       workshop, recipeDetails, spell, hasDetails, hasActions, isEffectItem,
       relicLore: relicLore(this.item),
+      radolf: radolfItemContext(this.item),
       consumption: this.item.actor ? consumableContext(this.item) : { enabled: false },
       effectTemplates:isEffectItem?await Promise.all(this.item.effects.map(async effect=>({id:effect.id,uuid:effect.uuid,name:effect.name,description:effect.description,enriched:await enrich(effect.description),duration:effectDurationLabel(effect)}))):[],
       itemTabs:visible.map(id=>context.tabs[id]),

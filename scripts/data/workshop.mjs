@@ -1,4 +1,5 @@
 import { isCarried } from "./containers.mjs";
+import { torchHeldLit } from "./radolf-rules.mjs";
 /** Shared, document-independent workshop rules. Catalog entries use the same Items as inventory. */
 // Core p. 142: the nine substances, their printed colors and cut signs (assets/substances).
 export const SUBSTANCES = [
@@ -67,6 +68,7 @@ export function effectiveItem(item) {
     data[key].value = Math.max(0, Math.min(data[key].max, data[key].value));
   }
   data.properties = [data.properties, ...(data.installations ?? []).map(entry => entry.properties)].filter(Boolean).join("; ");
+  if (torchHeldLit(item)) data.properties += "; Горение (25%)";
   return data;
 }
 export function freeSlots(item) {

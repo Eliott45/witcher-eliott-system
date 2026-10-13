@@ -1949,6 +1949,7 @@ assert.ok(tacticsHTML.includes('Бонус действует до конца п
 assert.ok(!tacticsHTML.includes('Первая атака'));
 console.log('Combat tactics: native effects, core icons and active ambush controls OK');
 await (await import('./native-experimental.mjs')).checkNativeExperimental(tacticsTemplate,alchemyPartial,documents);
+await (await import('./native-radolf.mjs')).checkNativeRadolf(itemTemplate,documents);
 const combatMenuPreviews=await (await import('./native-combat-menu.mjs')).checkNativeCombatMenu(tacticsTemplate);
 
 const {ambushWindowContext,groupCardContext}=await import('../scripts/sheets/ambush-context.mjs');

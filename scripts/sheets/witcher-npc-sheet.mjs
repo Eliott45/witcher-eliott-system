@@ -2,6 +2,8 @@ import { duelOf } from "../combat/verbal-duel.mjs";
 import { takeLootByDrop } from "../loot/loot.mjs";
 import { creatureResistances, conditionResistant, DAMAGE_TYPE_NAMES } from "../combat/damage-rules.mjs";
 import { SYSTEM_ID } from "../config.mjs";
+import { radolfActions } from "../combat/radolf-actions.mjs";
+import { FOOTING_CHOICES } from "../combat/radolf-marbles.mjs";
 import { consumptionActions } from "./consumption-actions.mjs";
 import { applyEffectItem } from "../data/effect-items.mjs";
 import { ATTRIBUTE_KEYS } from "../data/statistics.mjs";
@@ -43,7 +45,7 @@ const meter=({value,max}={})=>({percent:max>0?Math.max(0,Math.min(100,Math.round
 export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
   editing=false;
   static DEFAULT_OPTIONS={classes:["witcher-eliott","npc-sheet"],position:{width:820,height:820},window:{resizable:true},form:{submitOnChange:true,closeOnSubmit:false},actions:{
-    ...combatActions,...magicActions,...effectActions,...workshopActorActions,...consumptionActions,
+    ...combatActions,...magicActions,...effectActions,...workshopActorActions,...radolfActions,...consumptionActions,
     equipItem,dropToGround,toggleVisor,changeGrip,createInventoryItem,browseEquipment,addCatalogItem,changeInventoryQuantity,toggleCarried,toggleInventoryGroup,
     toggleItemDescription,postItem,searchItemTrait,chooseContainer,toggleContainer,viewSheetItem,removeSheetItem,createAbility,browseAbilities,
     editCreature:guard(async function(){if(this.isEditable){this.editing=!this.editing;await this.render();}}),
@@ -96,6 +98,7 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
       canRestoreItems:!actor.items.size&&Boolean(bestiaryPreset(actor)),
       categories:MONSTER_CATEGORIES.map(entry=>({...entry,selected:entry.id===system.creature.category})),category:MONSTER_CATEGORIES.find(c=>c.id===system.creature.category)?.name,
       creatureClass:MONSTER_CATEGORIES.find(entry=>entry.id===system.creature.category),verbalDuel:Boolean(duelOf(this.actor)),
+      footingChoices:FOOTING_CHOICES.map(entry=>({...entry,selected:entry.id===actor.system.creature.footing})),
       sizeClasses:SIZE_CLASSES.map(entry=>({...entry,selected:entry.id===sizeClassOf(this.actor).id,label:`${entry.name} (${entry.examples}) ${entry.modifier>0?"+":entry.modifier<0?"−":""}${Math.abs(entry.modifier)}`})),sizeClass:sizeClassOf(this.actor),
       meters:{health:meter(system.health),stamina:meter(system.stamina)},
       attributes:ATTRIBUTE_KEYS.filter(key=>key!=="luck").map(key=>({key,icon:`fa-solid ${ATTRIBUTE_ICONS[key]}`,name:i18n.localize(`WITCHER.Attributes.${key}.Short`),label:i18n.localize(`WITCHER.Attributes.${key}.Label`),base:system.attributes[key],value:stats.effective[key]??"—"})),

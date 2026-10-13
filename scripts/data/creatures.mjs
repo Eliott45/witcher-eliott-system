@@ -17,6 +17,7 @@ export function creatureFields() {
     naturalArmor:itemNumber(),resistances:itemText(),healthMax:itemNumber(),staminaMax:itemNumber(),runBase:itemNumber(),recoveryBase:itemNumber(),description:itemText(),tactics:itemText(),
     regenerationMode:itemText("normal",{choices:["normal","suppressed","sunlight"]}),
     movementMode:itemText("auto",{choices:["auto","ground","flying","swimming"]}),flightHeight:itemNumber(),
+    footing:itemText("auto",{choices:["auto","ordinary","quadruped","legless"]}),
     fallRemaining:itemNumber(),fallDistance:itemNumber(),fallRound:itemText(),illusion:new BooleanField({initial:false}),camouflage:new BooleanField({initial:false}),weakSpot:new BooleanField({initial:false}),
     invisible:new BooleanField({initial:false}),invisibilityEpoch:itemText(),transformed:new BooleanField({initial:true}),packId:itemText(),
     spiritMode:itemText("normal",{choices:["normal","suppressed"]}),moonlight:new BooleanField({initial:false}),
