@@ -3,6 +3,7 @@ import { WitcherEffectItemData } from "./data/witcher-effect-item-data.mjs";
 import { registerEffectExpiry } from "./combat/effect-expiry.mjs";
 import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from "./settings.mjs";
 import { registerSettingsLayout } from "./settings-layout.mjs";
+import { WitcherTokenLayer } from "./canvas/witcher-token-layer.mjs";
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
 import { migrateBestiaryContent,migrateBestiaryCreatures,migrateBestiaryJournalCreatures,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
 import { migrateBestiaryCorrections } from "./migrations/bestiary-corrections.mjs";
@@ -106,6 +107,7 @@ Hooks.once("init", async () => {
   registerManualCriticalChat();
   const templatesReady = foundry.applications.handlebars.loadTemplates(["ambush-card", "combat-actions", "verbal-duel", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "npc-loot", "crafting", "alchemy", "recipe-card"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
+  CONFIG.Canvas.layers.tokens.layerClass = WitcherTokenLayer;
   CONFIG.Actor.documentClass = WitcherActor;
   CONFIG.ActiveEffect.documentClass = WitcherActiveEffect;
   CONFIG.Item.documentClass = WitcherItem;

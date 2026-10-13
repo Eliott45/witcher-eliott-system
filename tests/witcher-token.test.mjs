@@ -36,15 +36,65 @@ class GraphicsHarness {
   drawPolygon(points) { this.polygons.push(points); }
 }
 
-globalThis.foundry = { canvas: { placeables: { Token: TokenHarness } } };
+class TokenLayerHarness {
+  _prepareKeyboardRotationUpdates(objects, dx, dy, dz) {
+    this.offsets = [dx, dy, dz];
+    return [objects.map(token => ({ _id: token.id, rotation: this.coreAngle })), this.options];
+  }
+}
+
+globalThis.foundry = { canvas: { placeables: { Token: TokenHarness }, layers: { TokenLayer: TokenLayerHarness } } };
 globalThis.PIXI = { Graphics: GraphicsHarness };
 globalThis.canvas = { visibility: { tokenVision: true } };
 const { WitcherToken } = await import("../scripts/canvas/witcher-token.mjs");
+const { WitcherTokenLayer } = await import("../scripts/canvas/witcher-token-layer.mjs");
+const { withinFacing } = await import("../scripts/combat/attack-target.mjs");
 const { renderTokenVisionToggle } = await import("../scripts/combat/token-hud.mjs");
 const { refreshActorVision } = await import("../scripts/canvas/visor-vision.mjs");
 const { hasAbility } = await import("../scripts/data/abilities.mjs");
 
 const helmet = () => ({id: "helm", type: "armor", system: {ruleId: "armor.head.7", zone: "head", equipped: true, quantity: 1, visorDown: true}});
+
+test("keyboard facing agrees with the arrow, vision and front/rear checks in all eight directions", async () => {
+  const layer = new WitcherTokenLayer();
+  const token = new WitcherToken(); token.id = "hero";
+  Object.assign(token.document, { x: 0, y: 0 });
+  await token._draw({}); token.toggleVisionPreview();
+  for (const [dx, dy, coreAngle, expected] of [
+    [0, -1, 180, 0], [1, -1, 225, 45], [1, 0, 270, 90], [1, 1, 315, 135],
+    [0, 1, 0, 180], [-1, 1, 45, 225], [-1, 0, 90, 270], [-1, -1, 135, 315]
+  ]) {
+    layer.coreAngle = coreAngle;
+    const [updates] = layer._prepareKeyboardRotationUpdates([token], dx, dy, 0);
+    assert.deepEqual(updates, [{ _id: "hero", rotation: expected }]);
+    Object.assign(token.document, { rotation: updates[0].rotation }); token._refreshRotation();
+    assert.equal(token.children[0].angle, expected);
+    assert.equal(token._getVisionSourceData().rotation, coreAngle);
+    const subject = sign => ({ x: sign * dx * 100, y: sign * dy * 100, getSize: token.document.getSize });
+    assert.equal(withinFacing(token, subject(1)), true);
+    assert.equal(withinFacing(token, subject(-1)), false);
+  }
+});
+
+test("keyboard rotation preserves native grid angles, options and tokens without facing", () => {
+  const layer = new WitcherTokenLayer(); layer.options = { animate: false };
+  const hero = new WitcherToken(); hero.id = "hero";
+  const npc = new WitcherToken({ type: "npc" }); npc.id = "npc";
+  const loot = new WitcherToken({ type: "loot" }); loot.id = "loot";
+  for (const coreAngle of [30, 60, 120, 150, 210, 240, 300, 330]) {
+    layer.coreAngle = coreAngle;
+    const [updates, options] = layer._prepareKeyboardRotationUpdates([hero, npc, loot], 1, -1, 0);
+    assert.deepEqual(updates, [
+      { _id: "hero", rotation: (coreAngle + 180) % 360 },
+      { _id: "npc", rotation: (coreAngle + 180) % 360 },
+      { _id: "loot", rotation: coreAngle }
+    ]);
+    assert.equal(options, layer.options); assert.deepEqual(layer.offsets, [1, -1, 0]);
+    assert.equal(hero.document.rotation, 0, "Preparing updates must not mutate a live token");
+  }
+  layer.coreAngle = 0;
+  assert.deepEqual(layer._prepareKeyboardRotationUpdates([hero], 0, 0, 1)[0], [{ _id: "hero", rotation: 0 }]);
+});
 
 test("preview is local, reversible, preserves lighting and resets on deselection", () => {
   const token = new WitcherToken();
