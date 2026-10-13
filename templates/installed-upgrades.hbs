@@ -1,0 +1,6 @@
+{{#if installations}}
+<div class="witcher-installed-upgrades" aria-label="Установленные улучшения">
+  <span class="witcher-installed-label"><i class="fa-solid fa-wrench" aria-hidden="true"></i> Установлено</span>
+  <ul>{{#each installations}}<li><strong>{{name}}</strong>{{#if properties}}<span>{{properties}}</span>{{/if}}</li>{{/each}}</ul>
+</div>
+{{/if}}

@@ -754,6 +754,13 @@
 .witcher-item-expand:hover, .witcher-item-expand:focus-visible { background:#a3834820; }
 .witcher-inventory-description { grid-column:1/-1; padding:8px 5px; line-height:1.45; font-size:12px; color:#44392e; border-top:1px solid #cbbfaa; overflow-wrap:anywhere; }
 .witcher-inventory-description p { margin:5px 0; }
+.witcher-installed-upgrades { display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; margin:0 0 12px; padding:6px 9px; border-left:2px solid #627563; border-radius:3px; background:#62756312; color:#3d5343; font:11px/1.4 var(--font-primary,sans-serif); overflow-wrap:anywhere; text-shadow:none; }
+.witcher-installed-label { display:inline-flex; align-items:center; gap:5px; font-size:10px; color:#536452; }
+.witcher-installed-upgrades ul { display:flex; flex:1 1 220px; flex-wrap:wrap; gap:5px 16px; min-width:0; list-style:none; margin:0; padding:0; }
+.witcher-installed-upgrades li { display:flex; flex-wrap:wrap; align-items:baseline; gap:0 7px; min-width:0; }
+.witcher-installed-upgrades li span { color:#626757; }
+.witcher-inventory-row > .witcher-installed-upgrades { grid-column:1/-1; margin:0 0 4px; }
+.witcher-attack-card > .witcher-installed-upgrades { margin:0 14px 10px; }
 .witcher-inventory-description :is(h1,h2,h3,h4,h5,h6),
 .witcher-item-chat :is(h1,h2,h3,h4,h5,h6),
 .witcher-eliott.reference-sheet :is(.witcher-description,prose-mirror) :is(h1,h2,h3,h4,h5,h6) { color:inherit; font-family:inherit; font-size:14px; font-weight:600; line-height:1.3; margin:10px 0 5px; border:0; text-shadow:none; }

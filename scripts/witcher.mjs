@@ -109,7 +109,7 @@ Hooks.once("init", async () => {
   registerSystemSettings();
   registerSettingsLayout();
   registerManualCriticalChat();
-  const templatesReady = foundry.applications.handlebars.loadTemplates(["ambush-card", "combat-actions", "verbal-duel", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "npc-loot", "crafting", "alchemy", "recipe-card"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
+  const templatesReady = foundry.applications.handlebars.loadTemplates(["ambush-card", "combat-actions", "verbal-duel", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "installed-upgrades", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "npc-loot", "crafting", "alchemy", "recipe-card"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));
   CONFIG.Token.objectClass = WitcherToken;
   CONFIG.Canvas.layers.tokens.layerClass = WitcherTokenLayer;
   CONFIG.Actor.documentClass = WitcherActor;

@@ -7,8 +7,10 @@ import { potionEffectSource, toxicityState } from "../scripts/data/consumables.m
 import { combatContext } from "../scripts/sheets/combat-context.mjs";
 import { alchemyContext } from "../scripts/sheets/crafting-context.mjs";
 import { crossbowFullTurn } from "../scripts/combat/crossbow-modifications.mjs";
+import { inventoryContext } from "../scripts/sheets/inventory-context.mjs";
+import { workshopActorContext } from "../scripts/sheets/workshop-actor-context.mjs";
 
-export async function checkNativeRadolfAdditions(itemTemplate,combatTemplate,alchemyTemplate,documents) {
+export async function checkNativeRadolfAdditions(itemTemplate,combatTemplate,alchemyTemplate,inventoryTemplate,documents) {
   const saved={combat:game.combat,Roll:foundry.dice.Roll,documents:foundry.documents};
   try {
     game.combat=null;
@@ -54,11 +56,25 @@ export async function checkNativeRadolfAdditions(itemTemplate,combatTemplate,alc
     assert.ok(html.includes("Удар арбалетом"));assert.ok(html.includes("Зарядить · передвижение"));
     sheet.item=bow;sheet.tabGroups.item="workshop";const bowHTML=itemTemplate(await sheet._prepareContext({}));
     assert.ok(bowHTML.includes("Модификации арбалета"));assert.ok(bowHTML.includes('data-action="removeCrossbowModification"'));
+    const sight=RADOLF_UPGRADES.find(entry=>entry.id==="radolf.crossbow.sight");
+    bow.updateSource({"system.installations":[{id:sight.documentId,name:sight.name,ruleId:sight.id,category:"crossbow",properties:sight.system.properties,bonuses:sight.system.upgrade.bonuses,weight:sight.system.weight}]});
+    const renderInventory=async editable=>inventoryTemplate({rootId:"radolf-native",system:actor.system,editable,inventory:inventoryContext(actor),workshop:await workshopActorContext(actor)});
+    for(const editable of [true,false]) {
+      sheet.isEditable=editable;sheet.tabGroups.item="description";
+      for(const html of [await renderInventory(editable),combatTemplate({combat:combatContext(actor),editable}),itemTemplate(await sheet._prepareContext({}))]) {
+        const installed=html.match(/<div class="witcher-installed-upgrades"[\s\S]*?<\/div>/u)?.[0]??"";
+        assert.ok(installed.includes(sight.name),"Installed sight is named without expanding inventory or opening Actions");
+        assert.ok(installed.includes(sight.system.properties),"The sight bonus is shown alongside its name");
+      }
+    }
+    bow.updateSource({"system.installations":[]});
+    assert.ok(!(await renderInventory(true)).includes('class="witcher-installed-upgrades"'),"Removing the upgrade removes its label");
+    sheet.isEditable=true;
     const alchemy=await alchemyContext(actor),alchemyHTML=alchemyTemplate({alchemy,editable:true,rootId:"radolf-native"});
     for(const potion of RADOLF_POTIONS)assert.ok(alchemyHTML.includes(potion.name));assert.ok(alchemyHTML.includes('value="ordinaryPotion"'));
     game.combat={started:true,combatants:[],turns:[]};
     const turn=new WitcherActiveEffect(crossbowFullTurn(actor,"Установка")[0],{parent:actor,strict:true});await turn._preCreate(turn.toObject(),{},game.user);
     assert.equal(turn.duration.expiry,"turnStart");assert.equal(turn.flags[SYS].condition.immobilized,true);
-    console.log("Radolf pages 2–3: 16 native documents, crossbow controls, alchemy formulas and rolled potion durations validate and render");
+    console.log("Radolf pages 2–3: 16 native documents, installed upgrade labels, crossbow controls, alchemy formulas and rolled potion durations validate and render");
   } finally {game.combat=saved.combat;foundry.dice.Roll=saved.Roll;foundry.documents=saved.documents;}
 }

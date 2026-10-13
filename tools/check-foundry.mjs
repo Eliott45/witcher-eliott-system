@@ -541,7 +541,7 @@ handlebars.registerHelper("eq", (a,b) => a === b);
 handlebars.registerHelper("or", (...values) => values.slice(0, -1).some(Boolean));
 handlebars.registerHelper("checked", value => value ? "checked" : "");
 handlebars.registerHelper("disabled", value => value ? "disabled" : "");
-for (const name of ["combat-actions", "verbal-duel", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "npc-loot", "crafting", "alchemy", "recipe-card"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
+for (const name of ["combat-actions", "verbal-duel", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "installed-upgrades", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "npc-loot", "crafting", "alchemy", "recipe-card"]) handlebars.registerPartial(`systems/witcher-eliott-system/templates/${name}.hbs`, await readFile(new URL(`../templates/${name}.hbs`, import.meta.url), "utf8"));
 const template = handlebars.compile(await readFile(new URL("../templates/actor-sheet.hbs", import.meta.url), "utf8"), { strict: true });
 // Use the real sheet context preparation; only the browser application host is stubbed.
 foundry.applications = {
@@ -1951,7 +1951,7 @@ assert.ok(!tacticsHTML.includes('Первая атака'));
 console.log('Combat tactics: native effects, core icons and active ambush controls OK');
 await (await import('./native-experimental.mjs')).checkNativeExperimental(tacticsTemplate,alchemyPartial,documents);
 await (await import('./native-radolf.mjs')).checkNativeRadolf(itemTemplate,documents);
-await (await import('./native-radolf-additions.mjs')).checkNativeRadolfAdditions(itemTemplate,tacticsTemplate,alchemyPartial,documents);
+await (await import('./native-radolf-additions.mjs')).checkNativeRadolfAdditions(itemTemplate,tacticsTemplate,alchemyPartial,inventoryPartial,documents);
 const combatMenuPreviews=await (await import('./native-combat-menu.mjs')).checkNativeCombatMenu(tacticsTemplate);
 
 const {ambushWindowContext,groupCardContext}=await import('../scripts/sheets/ambush-context.mjs');

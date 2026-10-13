@@ -87,7 +87,7 @@ export function combatContext(actor,options={}) {
       const bolts=isCrossbow(item)&&!loaded?boltChoices(actor).map(ammo=>({id:ammo.id,name:ammo.name,quantity:ammo.system.quantity})):[];
       const crossbow=isCrossbow(item)?{loaded,bolt:bolt?.name??"",bolts,choose:bolts.length>1,windlass:hasCrossbowMod(item,"windlass"),movementAvailable:movementReloadAvailable(actor,item)}:null;
       return {id:item.id,name:item.name,img:item.img,canMoveUp:index>0,canMoveDown:index<items.length-1,properties:item.system.properties??"",damageTypes:damageTypeLabel(item.system.damageType),rate:actor.type==="npc"?item.system.attackRate??1:null,natural:Boolean(item.system.natural),grip:gripOf(item),
-        equipped:equippedItems(actor.items).some(entry=>entry.id===item.id),modes,loaded,needsReload:!loaded,crossbow,oil,canOil,
+        equipped:equippedItems(actor.items).some(entry=>entry.id===item.id),modes,loaded,needsReload:!loaded,crossbow,oil,canOil,installations:item.system.installations??[],
         melee:item.system.category==="melee"&&!item.system.natural,techniques:actor.type!=="npc"&&!item.system.natural&&modes.some(mode=>mode.secondary)&&equippedItems(actor.items).some(entry=>entry.id===item.id),
         skill:game.i18n.localize(`WITCHER.Skills.Entries.${item.system.skill}.Label`)};
     }) };

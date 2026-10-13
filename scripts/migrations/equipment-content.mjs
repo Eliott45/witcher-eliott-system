@@ -24,11 +24,13 @@ import { dimeritiumDescriptionUpdate } from "./dimeritium-descriptions.mjs";
 import { personalBelongingsDescriptionUpdate } from "./personal-belongings-descriptions.mjs";
 import { RADOLF_EQUIPMENT } from "../data/radolf-equipment.mjs";
 import { RADOLF_UPGRADES, RADOLF_POTIONS, RADOLF_RECIPES } from "../data/radolf-additions.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 31;
+import { radolfPotionContentUpdate } from "./radolf-potion-content.mjs";
+export const EQUIPMENT_CONTENT_VERSION = 32;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {
   const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item), ...toolDescriptionUpdate(item), ...generalGearDescriptionUpdate(item), ...specialEquipmentDescriptionUpdate(item), ...materialDescriptionUpdate(item), ...recipeDetailsUpdate(item), ...experimentalDescriptionUpdate(item), ...dimeritiumDescriptionUpdate(item), ...personalBelongingsDescriptionUpdate(item) };
+  Object.assign(update, radolfPotionContentUpdate(item));
   // Description migrations compose in order so a legacy cleanup is not lost to the new legend.
   Object.assign(update, relicArmorContentUpdate({ ...item, system: { ...item.system,
     description: update["system.description"] ?? item.system?.description } }));
@@ -52,7 +54,7 @@ export async function migrateEquipmentContent() {
   const additions = [...RADOLF_UPGRADES, ...RADOLF_POTIONS, ...RADOLF_RECIPES, ...RADOLF_EQUIPMENT, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS, ...WITCHER_SPECIAL_EQUIPMENT, ...diagrams, ...PURE_SUBSTANCES, ...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES];
   const missing = [...new Map(additions.map(entry => [entry.id, entry])).values()].filter(entry => !existing.has(entry.id));
   const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry =>
-    specialRuleIds.has(entry.system?.ruleId) || TOOL_RULES[entry.system?.ruleId] || GENERAL_GEAR_RULES[entry.system?.ruleId] || entry.system?.ruleId === "dimeritium-ring" || /^(material|substance|ammunition|alchemy|potion|oil|decoction|mutagen|formula|diagram|bomb|trap|rune|glyph)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
+    specialRuleIds.has(entry.system?.ruleId) || RADOLF_POTIONS.some(potion => potion.id === entry.system?.ruleId) || TOOL_RULES[entry.system?.ruleId] || GENERAL_GEAR_RULES[entry.system?.ruleId] || entry.system?.ruleId === "dimeritium-ring" || /^(material|substance|ammunition|alchemy|potion|oil|decoction|mutagen|formula|diagram|bomb|trap|rune|glyph)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));
   const updates = updatesFor(oldDocuments);
   let documents = [], requiredFolders = [];
   if (missing.length) {

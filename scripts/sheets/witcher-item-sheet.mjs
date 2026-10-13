@@ -93,7 +93,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
       };
     }));
     return Object.assign(context, {
-      workshop, recipeDetails, spell, hasDetails, hasActions, isEffectItem,
+      workshop, recipeDetails, spell, hasDetails, hasActions, isEffectItem, installations: this.item.system.installations ?? [],
       relicLore: relicLore(this.item),
       radolf: radolfItemContext(this.item),
       consumption: this.item.actor ? consumableContext(this.item) : { enabled: false },

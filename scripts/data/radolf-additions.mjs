@@ -33,8 +33,8 @@ const potions = [
 ];
 export const RADOLF_POTIONS = potions.map(([id,name,rarity,price,duration,, ,description],i) => ({
   id:`radolf.potion.${id}`,documentId:documentId(201+i),name,type:"equipment",source:"radolf",
-  system:{...source,kind:"alchemy",rarity,price,weight:0,properties:`Обычный эликсир; ${duration}; Токсичность 50%`,alchemy:{category:"ordinaryPotion",toxicity:50,duration:id==="stamina"?1800:0},
-    description:`<p>${description}</p><p>Обычный эликсир: доступен всем расам, кроме низушков, без проверки Стойкости. Токсичность 50%; при превышении допустимого предела вызывает отравление. Длительность: ${duration}. Масса в дополнении не указана.</p><p><small>${RADOLF_SOURCE}</small></p>`}
+  system:{...source,kind:"alchemy",rarity,price,weight:.5,properties:`Обычный эликсир; ${duration}; Токсичность 50%`,alchemy:{category:"ordinaryPotion",toxicity:50,duration:id==="stamina"?1800:0},
+    description:`<p>${description}</p><p>Обычный эликсир: доступен всем расам, кроме низушков, без проверки Стойкости. Токсичность 50%; при превышении допустимого предела вызывает отравление. Длительность: ${duration}.</p><p><small>${RADOLF_SOURCE}</small></p>`}
 }));
 export const RADOLF_RECIPES = [
   ...modifications.map(([id,, , , , , , ,dc,minutes,price,investment,grade,materials],i) => ({

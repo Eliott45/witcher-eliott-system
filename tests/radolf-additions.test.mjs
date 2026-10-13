@@ -12,6 +12,7 @@ import { reloadCrossbow, removeCrossbowModification, movementReloadAvailable, re
 import { weaponAttack, attackModes } from "../scripts/combat/weapon-rules.mjs";
 import { rollWeaponAttack } from "../scripts/combat/weapon-rolls.mjs";
 import { conditionRules } from "../scripts/combat/condition-rules.mjs";
+import { radolfPotionContentUpdate } from "../scripts/migrations/radolf-potion-content.mjs";
 class Collection extends Array { get(id){return this.find(item=>item.id===id);} has(id){return Boolean(this.get(id));} }
 const get=(o,path)=>path.split('.').reduce((v,k)=>v?.[k],o);
 function patch(o,changes){for(const [path,value] of Object.entries(changes)){const keys=path.split('.'),last=keys.pop();keys.reduce((v,k)=>v[k]??={},o)[last]=structuredClone(value);}}
@@ -48,6 +49,20 @@ test("DLC recipes preserve prices, supplements, exact component links and visual
   }
   const signs=RADOLF_RECIPES.slice(5).map(row=>Object.fromEntries(row.system.recipe.components.map(c=>[c.substance,c.quantity])));
   assert.deepEqual(signs,[{vitriol:1,fulgur:2,hydragenum:1,rebis:2},{aether:2,caelum:1,vermilion:2},{aether:1,caelum:1,quebrith:1,rebis:1,vermilion:1,vitriol:1}]);
+});
+
+test("Radolf potion migration gives existing doses weight without replacing custom descriptions or weights",()=>{
+  for(const entry of RADOLF_POTIONS) {
+    assert.equal(entry.system.weight,.5);
+    const item={type:entry.type,system:{...entry.system,ruleId:entry.id,weight:0,
+      description:entry.system.description.replace("</p>"," Масса в дополнении не указана.</p>")+"<p>Пометка игрока.</p>"}};
+    patch(item,radolfPotionContentUpdate(item));
+    assert.equal(item.system.weight,.5);
+    assert.equal(item.system.description,entry.system.description+"<p>Пометка игрока.</p>");
+    assert.deepEqual(radolfPotionContentUpdate(item),{});
+    item.system.weight=.25;assert.deepEqual(radolfPotionContentUpdate(item),{});
+  }
+  assert.deepEqual(radolfPotionContentUpdate({type:"equipment",system:{ruleId:"gear.rations",weight:0}}),{});
 });
 
 test("modifications have separate capacity, reject duplicates, consume inventory and return when removed",async()=>{
