@@ -1,3 +1,4 @@
+import { MANTICORE_TRAINING } from "./manticore-school.mjs";
 // Russian core pp. 238–245. IDs, rather than translated prose, are persisted.
 const table = rows => rows.map(([id, name, description = "", modifiers = []]) => ({ id, name, description, modifiers }));
 export const WITCHER_TABLES = {
@@ -11,7 +12,8 @@ export const WITCHER_TABLES = {
     ["griffin", "Школа Грифона", "Каэр И Серен. +2 к пределу магии.", [["vigor", 2]]],
     ["cat", "Школа Кота", "Караван Дин Марв. Невосприимчивость к немагическим попыткам обольщения."],
     ["viper", "Школа Змеи", "Гортур Гвед. Нет штрафа за парное оружие."],
-    ["bear", "Школа Медведя", "Хаэрн Кадух. Штраф от доспеха (EV) уменьшается на 2.", [["armorEncumbrance", -2]]]
+    ["bear", "Школа Медведя", "Хаэрн Кадух. Штраф от доспеха (EV) уменьшается на 2.", [["armorEncumbrance", -2]]],
+    ["manticore", "Школа Мантикоры", `Бехельт Нар и Бельсуф Ассирия, Зеррикания. ${MANTICORE_TRAINING}`]
   ]),
   training: table([
     ["gauntlet", "Травма на Мучильне", "−1 к СКОРОСТИ.", [["attributes.speed", -1]]],

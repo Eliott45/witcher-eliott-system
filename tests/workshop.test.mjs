@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { RADOLF_UPGRADES, RADOLF_POTIONS } from "../scripts/data/radolf-additions.mjs";
+import { MANTICORE_EQUIPMENT } from "../scripts/data/manticore-school.mjs";
 import { MATERIALS } from "../scripts/data/workshop-materials.mjs";
 import { ALCHEMY, MUTAGENS } from "../scripts/data/workshop-alchemy.mjs";
 import { UPGRADES } from "../scripts/data/workshop-upgrades.mjs";
@@ -15,7 +16,7 @@ import { deriveStatistics } from "../scripts/data/statistics.mjs";
 const physical=(id,ruleId,quantity,extra={})=>({id,uuid:`Actor.a.Item.${id}`,type:"equipment",system:{ruleId,quantity,carried:true,weight:.1,price:1,...extra}});
 
 test("workshop catalog has unique canonical identities and every recipe resolves real ingredients and result",()=>{
- const catalog=[...RADOLF_UPGRADES,...RADOLF_POTIONS,...CORE_EQUIPMENT,...MATERIALS,...ALCHEMY,...MUTAGENS,...UPGRADES,...RECIPES,...WITCHER_SPECIAL_EQUIPMENT,...EXPERIMENTAL_DEVICES];
+ const catalog=[...MANTICORE_EQUIPMENT,...RADOLF_UPGRADES,...RADOLF_POTIONS,...CORE_EQUIPMENT,...MATERIALS,...ALCHEMY,...MUTAGENS,...UPGRADES,...RECIPES,...WITCHER_SPECIAL_EQUIPMENT,...EXPERIMENTAL_DEVICES];
  assert.equal(new Set(catalog.map(x=>x.id)).size,catalog.length);
  assert.equal(new Set(catalog.map(x=>x.documentId)).size,catalog.length);
  const uuids=new Map(catalog.map(x=>[equipmentUuid(x.documentId),x]));

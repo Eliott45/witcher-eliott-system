@@ -13,7 +13,7 @@ test("witcher schools and histories derive once, vanish on race change and prese
   assert.equal(a.healthMax, 50); assert.deepEqual(a, b); assert.equal(system.attributes.speed, 10);
   system.details.race = "human";
   assert.equal(witcherModifiers(system).length, 0); assert.equal(deriveStatistics(system).staminaMax, 50);
-  assert.equal(WITCHER_TABLES.school.length, 5);
+  assert.equal(WITCHER_TABLES.school.length, 6);
   assert.equal(witcherTrialModifier({ recruitment: "infancy", training: "reaction" }), -4);
 });
 test("risk and benefit tables retain both independent events in a decade", async () => {

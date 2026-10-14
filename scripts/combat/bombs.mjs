@@ -1,4 +1,5 @@
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
+import { handActionError } from "./shield-master.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -78,7 +79,7 @@ export function bombThrowQuote(actor, item, distance, extraPenalty = 0) {
     { label: "Дополнительное действие", value: extraPenalty }, ...combatModifierParts(actor, "combat.attack")];
   const total = parts.reduce((sum, part) => sum + (part.value ?? 0), 0);
   const blocked = !conditionRules(actor).canAct ? "Персонаж сейчас не может действовать." : !(range > 0) ? "Заполните ТЕЛ: дальность броска — ТЕЛ × 4 м."
-    : !band || band.beyond ? `Слишком далеко: дальность броска ${range} м, предел — ${range * 2} м.` : (item.system.quantity ?? 0) < 1 ? "Бомбы закончились." : "";
+    : !band || band.beyond ? `Слишком далеко: дальность броска ${range} м, предел — ${range * 2} м.` : (item.system.quantity ?? 0) < 1 ? "Бомбы закончились." : handActionError(actor, "bomb");
   return { range, band, parts, total, dc: band?.dc ?? null, blocked };
 }
 

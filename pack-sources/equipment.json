@@ -662,6 +662,48 @@
     "flags": {}
   },
   {
+    "_id": "mantShield000001",
+    "name": "Щит школы Мантикоры",
+    "type": "weapon",
+    "img": "icons/svg/shield.svg",
+    "system": {
+      "ruleId": "weapon.manticore-shield",
+      "skill": "melee",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "unique",
+      "damage": "0",
+      "reliability": {
+        "value": 20,
+        "max": 20
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 1,
+      "weight": 2,
+      "price": 0,
+      "properties": "Метеоритное; Серебряное (3d6)",
+      "category": "shield",
+      "encumbrance": 0,
+      "source": "Школа Мантикоры",
+      "shieldClass": "medium",
+      "description": "<p>Щит ведьмаков школы Мантикоры, покрытый метеоритной сталью и инкрустированный серебром. Предназначен для защиты и ударов по чудовищам.</p><p>Надёжность 20, один слот усиления, скованность 0, вес 2 кг. Дополнительный серебряный урон 3d6 применяется против восприимчивых к серебру существ.</p><p>Мастер щита: выхватывание и убирание щита не требуют действия. Парирование щитом без штрафа. Руку со щитом можно использовать для знаков, бросков бомб и питья эликсиров.</p>"
+    },
+    "effects": [],
+    "folder": "gearManticore001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
     "_id": "pswp000000000001",
     "name": "Вилы",
     "type": "weapon",
@@ -26675,5 +26717,74 @@
         "priceUnavailable": true
       }
     }
+  },
+  {
+    "_id": "mantDiagram00001",
+    "name": "Чертёж: Щит школы Мантикоры",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.manticore-shield",
+      "source": "Школа Мантикоры",
+      "price": 1304,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 20,
+        "time": 28800,
+        "investment": 652,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.mantShield000001",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000041",
+            "substance": "",
+            "quantity": 6
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Щит школы Мантикоры».</p>"
+    },
+    "effects": [],
+    "folder": "gearManticore001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
   }
 ]

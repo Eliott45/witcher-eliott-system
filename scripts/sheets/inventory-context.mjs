@@ -1,6 +1,7 @@
 import { isCrossbow, loadedBolt } from "../combat/crossbow-ammo.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { usableHands } from "../combat/critical-wound-effects.mjs";
+import { freeShieldDraw } from "../combat/shield-master.mjs";
 import { dropItemToGround } from "../loot/loot.mjs";
 import { layeringPlan, zoneStoppingPower, layeringDetails } from "../data/armor-layers.mjs";
 import { isTransport, cargoSections, cargoSection } from "../data/transport.mjs";
@@ -150,8 +151,9 @@ export async function changeGrip(_event,target) {
   if(!this.isEditable)return;
   const item=this.actor.items.get(target.dataset.itemId);
   if(item?.type!=="weapon"||item.system.natural)return;
-  const grip=await foundry.applications.api.DialogV2.wait({window:{title:`Хват: ${item.name}`},content:`<p>Нужно рук для атаки: ${item.system.hands}. Выберите текущий хват. При смене оружия лишнее оружие будет убрано.</p>`,
-    buttons:[{action:"stow",label:"Убрать",callback:()=>0},{action:"one",label:"1 рукой",callback:()=>1},{action:"two",label:"2 руками",callback:()=>2}],rejectClose:false});
+  const freeShield=freeShieldDraw(this.actor,item);
+  const grip=await foundry.applications.api.DialogV2.wait({window:{title:`Хват: ${item.name}`},content:`<p>Нужно рук для атаки: ${item.system.hands}. Выберите текущий хват. При смене оружия лишнее оружие будет убрано.</p>${freeShield?"<p><strong>Мастер щита:</strong> взять и убрать щит можно без действия. Рука со щитом доступна для знаков, бомб и эликсиров.</p>":""}`,
+    buttons:[{action:"stow",label:freeShield?"Убрать без действия":"Убрать",callback:()=>0},{action:"one",label:freeShield?"Взять без действия":"1 рукой",callback:()=>1},{action:"two",label:"2 руками",callback:()=>2}],rejectClose:false});
   if(![0,1,2].includes(grip))return;
   // A disabled arm (critical wound) leaves fewer hands to hold weapons.
   const hands=usableHands(this.actor);

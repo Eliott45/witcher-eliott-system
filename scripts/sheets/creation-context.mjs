@@ -52,7 +52,7 @@ function originStep(state) {
       chosenStatus: statuses.find(entry => entry.chosen) ?? null, chosenFriend: friends.find(entry => entry.chosen) ?? null },
     witcherTables: WITCHER_ROLL_TABLES.map(table => ({ ...table, rows: WITCHER_TABLES[table.key].map(row => ({ id: row.id, name: row.name, text: row.description, chosen: state.witcher?.[table.key] === row.id })),
       chosen: WITCHER_TABLES[table.key].find(row => row.id === state.witcher?.[table.key])?.name ?? "",
-      hint: table.key === "trial" ? `Модификатор Испытания: ${witcherTrialModifier(state.witcher)}${state.witcher?.trialRoll ? ` · бросок ${state.witcher.trialRoll}` : ""}` : "" }))
+      hint: table.key === "trial" ? `Модификатор Испытания: ${witcherTrialModifier(state.witcher)}${state.witcher?.trialRoll ? ` · бросок ${state.witcher.trialRoll}` : ""}` : table.key === "school" ? "Школу Мантикоры можно выбрать вручную. Бросок d10 использует пять школ Базовой книги." : "" }))
   };
 }
 

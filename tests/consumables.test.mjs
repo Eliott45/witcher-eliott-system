@@ -63,6 +63,18 @@ function item(owner, ruleId, quantity = 1) {
   owner.items.push(value);
   return value;
 }
+test("Manticore drinks with sword and shield without stowing either; an unavailable hand consumes nothing", async () => {
+  environment(); const owner = actor(), potion = item(owner, "potion.swallow", 2);
+  owner.system.lifepath = { witcher: { school: "wolf" } };
+  for (const category of ["melee", "shield"]) owner.items.push({ id: category, type: "weapon", system: { category, hands: 1, quantity: 1, carried: true, equipped: true } });
+  await assert.rejects(consumeOwnedItem(potion), /свободная рука/);
+  assert.equal(potion.system.quantity, 2); assert.equal(owner.effects.length, 0);
+  owner.system.lifepath.witcher.school = "manticore";
+  await consumeOwnedItem(potion);
+  assert.equal(potion.system.quantity, 1); assert.equal(activeDoses(owner).length, 1);
+  assert.equal(owner.items.get("shield").system.equipped, true); assert.equal(owner.items.get("melee").system.equipped, true);
+});
+
 test("canonical consumables reuse kinds; custom overrides, quantity and 25-use bottles survive serialization", () => {
   environment(); const owner = actor();
   for (const entry of [...ALCHEMY, ...MUTAGENS]) assert(consumableContext(item(owner, entry.id)).enabled, entry.id);

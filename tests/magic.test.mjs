@@ -31,6 +31,18 @@ function fixture() {
   return {actor,spell,source,state,events,messages};
 }
 
+test("Manticore casts a sign with sword and shield; other schools must free a hand before spending stamina", async () => {
+  const { actor, spell, events } = fixture(), sign = spell("sign.aard");
+  actor.system.details.race = "witcher"; actor.system.lifepath = { witcher: { school: "manticore" } };
+  for (const category of ["melee", "shield"]) actor.items.push({ id: category, type: "weapon", system: { category, hands: 1, quantity: 1, carried: true, equipped: true } });
+  assert.equal(castingQuote(actor, sign, { cost: 2 }).stamina, 2);
+  actor.system.lifepath.witcher.school = "wolf";
+  await assert.rejects(castSpell(actor, sign.id, { cost: 2 }), /свободная рука/);
+  assert.equal(actor.system.stamina.value, 40); assert.deepEqual(events, []);
+  actor.items.get("shield").system.equipped = false;
+  assert.equal(castingQuote(actor, sign, { cost: 2 }).stamina, 2);
+});
+
 test("Fury forbids a farther direct spell target before rolling and when assigning targets later, but keeps area casts",async()=>{
   const {actor,spell,events}=fixture(),item=spell("aenye");
   actor.effects.push({statuses:new Set(),flags:{[SYS]:{experimental:{kind:"fury"}}}});

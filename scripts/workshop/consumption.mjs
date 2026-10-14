@@ -1,4 +1,5 @@
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
+import { handActionError } from "../combat/shield-master.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { consumableContext, consumptionPlan, potionEffectSource, activeDoses, consumedDose, toxicityState } from "../data/consumables.mjs";
 import { conditionSource, CONDITION_BY_ID, EFFECT_TEMPLATES, ALCHEMY_EFFECT_KEYS } from "../data/condition-definitions.mjs";
@@ -87,6 +88,8 @@ export async function consumeOwnedItem(item, { apply = true, effectKey = "" } = 
     if(item.system.kind === "mutagen" || item.system.alchemy?.category === "oil") throw new Error("Выберите действие применения мутагена или нанесения масла.");
     consumptionPlan(item);
     const s = item.system, ordinary = s.kind === "alchemy" && s.alchemy.category === "ordinaryPotion", witcherPotion = s.kind === "alchemy" && ["potion", "decoction", "ordinaryPotion"].includes(s.alchemy.category);
+    const handError = witcherPotion && apply ? handActionError(actor, "potion") : "";
+    if (handError) throw new Error(handError);
     if (ordinary && apply && /halfling|низуш|полуросл/iu.test(actor.system.details.race)) throw new Error("Обычные эликсиры не действуют на низушков.");
     let actorUpdate = {};
     let success = true;
