@@ -1644,6 +1644,7 @@ const {bestiarySources}=await import('../scripts/data/bestiary.mjs');
 const {WitcherNPCSheet}=await import('../scripts/sheets/witcher-npc-sheet.mjs');
 const {MONSTER_CATEGORIES}=await import('../scripts/data/monster-categories.mjs');
 const {weaponAttack}=await import('../scripts/combat/weapon-rules.mjs');
+const {creatureWeaponBlocked}=await import('../scripts/data/creature-modes.mjs');
 const {castingQuote}=await import('../scripts/magic/casting.mjs');
 const {focusOptions}=await import('../scripts/magic/rules.mjs');
 const npcTemplate=handlebars.compile(await readFile(new URL('../templates/npc-sheet.hbs',import.meta.url),'utf8'),{strict:true});
@@ -1657,7 +1658,8 @@ for(const source of bestiarySources()) {
   assert.equal(actor.system.health.value,source.system.health.value);assert.equal(actor.system.stamina.max,source.system.stamina.max);
   for(const item of actor.items.filter(item=>item.type==='weapon'&&item.system.equipped)) {
     const attack=weaponAttack(actor,item,{mode:'npc'});
-    assert.equal(attack.blocked,'',`${actor.name}: ${item.name} must be ready to attack`);
+    // Only a printed form restriction may hold a weapon back (the botchling's claws need its battle form).
+    assert.equal(attack.blocked,creatureWeaponBlocked(actor,item),`${actor.name}: ${item.name} must be ready to attack`);
     assert.ok(Number.isFinite(attack.total),`${actor.name}: ${item.name} needs a numeric attack base`);
     assert.ok(CoreRoll.validate(attack.damage),`${actor.name}: ${item.name} needs a valid damage formula`);
   }

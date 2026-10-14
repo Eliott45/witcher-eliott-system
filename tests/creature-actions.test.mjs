@@ -13,12 +13,17 @@ import { rotfiendDecay, rotfiendDue, rotfiendTurn, startRotfiendDecay, explodeRo
 import { onCreatureDamaged } from "../scripts/combat/creature-modes.mjs";
 import { burningParts } from "../scripts/combat/burning.mjs";
 import { fogRegions, fogSightLimit, revealFogletIfExposed, dispelFog, dismissFoglet } from "../scripts/combat/creature-fog.mjs";
+import { creatureFlags } from "../scripts/combat/creature-actions-common.mjs";
 import { afterCreatureAttack } from "../scripts/combat/creature-modes.mjs";
 import { actionQuote } from "../scripts/combat/action-economy.mjs";
 import { constrainHypnotizedVision } from "../scripts/combat/creature-actions-vision.mjs";
 import { igniteHym } from "../scripts/combat/hym.mjs";
 import { hymShadow } from "../scripts/combat/creature-spirits.mjs";
 import { pestaFliesTurn, onPestaStruck } from "../scripts/combat/pesta.mjs";
+import { burstDuePods, calmBotchling, provokeBotchling } from "../scripts/combat/journal-beasts.mjs";
+import { afterCreatureBite } from "../scripts/combat/creature-modes.mjs";
+import { advanceWendigoCurse, cureWendigoCurse, wendigoCurse } from "../scripts/combat/wendigo.mjs";
+import { creatureMentalImmunity } from "../scripts/combat/creature-spirits.mjs";
 
 const put=(object,path,value)=>{const keys=path.split(".");for(const key of keys.slice(0,-1))object=object[key]??= {};object[keys.at(-1)]=value;};
 const collection=values=>Object.assign(values,{get(id){return this.find(row=>row.id===id);},has(id){return this.some(row=>row.id===id);}});
@@ -449,4 +454,74 @@ test("the pesta calls two rat swarms beside her; a swarm bite hits every body pa
   const parts=(await import("../scripts/combat/burning.mjs")).burningParts(wolf).length;
   env.totals.push(...Array(parts).fill(5),40);await applyCreatureSpecial(card,0,{hit:true});await applyCreatureSpecial(card,0,{hit:true});
   assert.ok(wolf.system.health.value<before);assert.equal(wolf.effects.filter(effect=>effect.statuses.has("diseased")).length,1);
+});
+
+test("the bear's overhead strike hits at base 12 for 6d6 into the torso, pins its victim, and a block needs the stronger Physique",async()=>{
+  const env=setup(),bear=env.actor("Медведь"),wolf=env.actor("Волк"),from=env.token(bear),to=env.token(wolf,100);env.combat();
+  env.totals.push(20);const attack=(await useCreatureAction(bear,"maul",{sourceToken:from,targets:[to]})).flags[SYSTEM_ID].weaponAttack;
+  assert.deepEqual([attack.base,attack.special,attack.defenses],[12,"creature:maul",["dodge","reposition","block"]]);
+  assert.ok(bear.effects.some(effect=>effect.flags[SYSTEM_ID].creatureFullTurn));
+  const card=await env.card(bear,{weaponAttack:{name:"Удар сверху",special:"creature:maul",attacker:from.uuid,target:to.uuid,creatureAction:{id:"maul"}}}),before=wolf.system.health.value;
+  env.totals.push(20);await applyCreatureSpecial(card,0,{hit:true});
+  assert.equal(wolf.system.health.value,before-20+wolf.system.creature.naturalArmor);
+  assert.ok(wolf.effects.some(effect=>effect.statuses.has("prone")));assert.ok(wolf.effects.some(effect=>effect.statuses.has("pinned")));
+  wolf.effects.length=0;const blocked=await env.card(bear,{weaponAttack:{name:"Удар сверху",special:"creature:maul",attacker:from.uuid,target:to.uuid,creatureAction:{id:"maul"}}});
+  env.totals.push(9,14);await onCreatureChargeMissed(blocked,0,{hit:false,mode:"block"});
+  assert.ok(wolf.effects.some(effect=>effect.statuses.has("pinned")),"weaker defender is pinned without damage");
+  wolf.effects.length=0;const held=await env.card(bear,{weaponAttack:{name:"Удар сверху",special:"creature:maul",attacker:from.uuid,target:to.uuid,creatureAction:{id:"maul"}}});
+  env.totals.push(15,14);await onCreatureChargeMissed(held,0,{hit:false,mode:"block"});assert.equal(wolf.effects.length,0);
+});
+
+test("the boar charges 6–15 m at base 9 for 5d6 without a push and may run on in any direction",async()=>{
+  const env=setup(),boar=env.actor("Вепрь"),wolf=env.actor("Волк"),from=env.token(boar),to=env.token(wolf,300);env.combat();
+  await assert.rejects(useCreatureAction(boar,"charge",{sourceToken:from,targets:[to]}),/дальше 6 м/);
+  to.x=500;env.totals.push(15);const message=await useCreatureAction(boar,"charge",{sourceToken:from,targets:[to]}),attack=message.flags[SYSTEM_ID].weaponAttack;
+  assert.deepEqual([attack.base,attack.damage,attack.creatureAction.pushMeters],[9,"5d6",0]);assert.match(message.content,/Оставшиеся 7 м/u);
+  await onCreatureExchangeApplied(message,0,{total:5});assert.equal(to.x,500,"no knockback");
+});
+
+test("archespores burrow 6 m (18 m as a full turn) and leave a pod that bursts at the end of the round",async()=>{
+  const env=setup(),plant=env.actor("Археспора"),wolf=env.actor("Волк"),from=env.token(plant);withRegions(env);const combat=env.combat();
+  await assert.rejects(useCreatureAction(plant,"burrow",{sourceToken:from,destination:{x:450,y:50}}),/от 0 до 6/);
+  await useCreatureAction(plant,"burrow",{sourceToken:from,destination:{x:350,y:50}});assert.equal(from.x,300);
+  combat.round=2;from.x=0;const near=env.token(wolf,100);
+  await useCreatureAction(plant,"pod",{sourceToken:from,destination:{x:950,y:50}});
+  assert.equal(from.x,900);assert.ok(plant.effects.some(effect=>effect.flags[SYSTEM_ID].creatureFullTurn));
+  const pod=env.scene.regions.find(region=>region.flags[SYSTEM_ID]?.archesporePod);assert.ok(pod);
+  await burstDuePods(combat);assert.ok(env.scene.regions.includes(pod),"not before the round ends");
+  combat.round=3;await burstDuePods(combat);assert.equal(env.scene.regions.includes(pod),false);
+  const card=env.messages.find(message=>message.flags[SYSTEM_ID]?.creatureArea?.id==="pod");
+  assert.deepEqual(card.flags[SYSTEM_ID].creatureArea.targets.map(row=>row.name),["Волк"]);
+  const before=wolf.system.health.value,parts=(await import("../scripts/combat/burning.mjs")).burningParts(wolf).length;
+  env.totals.push(10,...Array(parts).fill(4));await resolveCreatureArea(card,0,{mode:"athletics"});
+  assert.ok(wolf.system.health.value<before);assert.ok(wolf.effects.some(effect=>effect.statuses.has("poisoned")));
+});
+
+test("the botchling transforms, grows spikes, drinks blood and is calmed at DC 18 until attacked again (then 25)",async()=>{
+  const env=setup(),botchling=env.actor("Игоша"),mage=env.actor("Маг"),wolf=env.actor("Волк"),from=env.token(botchling),caster=env.token(mage,100);env.combat();
+  await assert.rejects(useCreatureAction(botchling,"botchling-spikes",{sourceToken:from}),/боевой форме/);
+  await useCreatureAction(botchling,"botchling-form",{sourceToken:from});assert.equal(botchling.system.creature.battleForm,true);
+  botchling.system.health.value=50;const before=wolf.system.health.value;
+  await afterCreatureBite(botchling,wolf,"bite-1");await afterCreatureBite(botchling,wolf,"bite-1");
+  assert.equal(wolf.system.health.value,before-4,"4 more damage, once per bite");assert.equal(botchling.system.health.value,58);
+  env.totals.push(17);await calmBotchling(botchling,{sourceToken:from,targets:[caster]});assert.equal(botchling.system.creature.battleForm,true);
+  env.totals.push(18);await calmBotchling(botchling,{sourceToken:from,targets:[caster]});assert.equal(botchling.system.creature.battleForm,false);
+  await provokeBotchling(await env.card(mage,{weaponAttack:{target:from.uuid}}));assert.equal(botchling.system.creature.battleForm,true);
+  env.totals.push(24);await calmBotchling(botchling,{sourceToken:from,targets:[caster]});assert.equal(botchling.system.creature.battleForm,true,"DC 25 now");
+});
+
+test("the wendigo's storm blinds others to 4 m; its curse runs three days and ends in servitude or a mage's cure",async()=>{
+  const env=setup(),wendigo=env.actor("Вендиго"),wolf=env.actor("Волк"),mage=env.actor("Маг"),from=env.token(wendigo),victim=env.token(wolf,500);withRegions(env);const combat=env.combat();
+  await useCreatureAction(wendigo,"storm",{sourceToken:from});
+  const storm=fogRegions(env.scene,"storm")[0];assert.equal(storm.shapes[0].radiusX,2500);assert.equal(storm.behaviors[0].system.terrain,"snow");
+  assert.deepEqual([fogSightLimit(victim),fogSightLimit(from)],[4,null]);
+  combat.round=2;env.totals.push(20,10);await useCreatureAction(wendigo,"wendigo-curse",{sourceToken:from,targets:[victim]});
+  assert.equal(creatureFlags(wendigoCurse(wolf)).wendigoCurse.stage,1);
+  await advanceWendigoCurse(wolf,"morning");
+  assert.ok(wendigoCurse(wolf).flags[SYSTEM_ID].condition.modifiers.some(modifier=>modifier.target==="staminaMax"&&modifier.factor===0.5));
+  await advanceWendigoCurse(wolf,"morning");await assert.rejects(advanceWendigoCurse(wolf,"morning"),/пройдены/);
+  env.totals.push(10);await advanceWendigoCurse(wolf,"sunset");
+  assert.equal(creatureFlags(wendigoCurse(wolf)).wendigoCurse.stage,"companion");assert.ok(creatureMentalImmunity(wolf,{mental:true}));
+  env.totals.push(20);await cureWendigoCurse(wolf,mage);assert.ok(wendigoCurse(wolf),"20 does not beat the hex of 20");
+  env.totals.push(21);await cureWendigoCurse(wolf,mage);assert.equal(wendigoCurse(wolf),null);
 });

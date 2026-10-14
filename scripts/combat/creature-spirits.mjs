@@ -45,7 +45,8 @@ export function hymShadow(actor) {
 export const hymInShadow = actor => (actor?.system?.creature?.shadowMode ?? "auto") === "active" || ["dim", "dark"].includes(actorEnvironment(actor)?.light?.id);
 
 export function spiritState(actor) {
-  const permanent = has(actor, "creature.incorporeal") || legacy(actor, "noonwraith");
+  // A botchling reborn as a chur (Monster Hunter's Journal p.49) is an incorporeal house spirit.
+  const permanent = has(actor, "creature.incorporeal") || legacy(actor, "noonwraith") || legacy(actor, "botchling") && Boolean(actor?.system?.creature?.chur);
   const slip = has(actor, "creature.slip") || legacy(actor, "wraith");
   const teleport = has(actor, "creature.teleport") || legacy(actor, "wraith");
   const suppression = creatureSuppression(actor);
@@ -64,7 +65,8 @@ export function spiritConditionImmune(actor, statuses) {
 
 /** Immunity to mind magic is independent from courage or a saving-throw bonus. */
 export function creatureMentalImmunity(actor, { mental = false, fear = false } = {}) {
-  if (mental && (has(actor, "creature.mindless") || has(actor, "creature.construct"))) return "Иммунитет к магии мыслей и эмоций";
+  if (mental && (has(actor, "creature.mindless") || has(actor, "creature.construct") || has(actor, "creature.magic-mind-immunity")
+    || Array.from(actor?.effects ?? []).some(effect => active(effect) && effect.flags?.[SYSTEM_ID]?.wendigoCurse?.stage === "companion"))) return "Иммунитет к магии мыслей и эмоций";
   if (fear && (has(actor, "creature.fearless") || Array.from(actor.effects??[]).some(effect=>active(effect)&&effect.flags?.[SYSTEM_ID]?.peasant?.kind==="stew.harvest"))) return "Невосприимчивость к страху";
   return "";
 }

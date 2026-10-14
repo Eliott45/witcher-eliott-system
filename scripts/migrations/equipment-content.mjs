@@ -41,7 +41,8 @@ export function journalMaterialUpdate(item) {
 }
 // 37: tavern games — Devil's Musk with its formula, the Hidden Weight with its diagram.
 // 38: Monster Hunter's Journal components (pp.142–143) for bestiary loot; priced school placeholders.
-export const EQUIPMENT_CONTENT_VERSION = 38;
+// 39: components of the journal beasts and cursed ones.
+export const EQUIPMENT_CONTENT_VERSION = 39;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {

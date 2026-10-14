@@ -42,6 +42,8 @@ import { heatedWeapon } from "../magic/cadfan.mjs";
 import { igniteDragonClouds } from "./dragon-clouds.mjs";
 import { tokenCenter } from "./attack-target.mjs";
 import { onPestaStruck } from "./pesta.mjs";
+import { onBotchlingStruck, onBotchlingGrappled } from "./journal-beasts.mjs";
+import { applyCreatureDamage } from "./creature-actions-damage.mjs";
 import { experimentalAmmoReplacesDamage, experimentalAttackRolls, experimentalExchangeOutcome, resolveExperimentalAmmunition, experimentalAmmoHTML } from "./experimental-ammunition.mjs";
 
 // One weapon attack card hosts the whole exchange: each attack roll gets its own defense, location, damage and
@@ -107,14 +109,16 @@ export function gangingUp(message) {
 export function defenseChoices(actor, incoming, defenseModifier = 0, allowed = null) {
   // One button per weapon or shield so the defender chooses what takes the blow, plus bare-handed options.
   const items = equippedItems(actor.items).filter(item => item.type === "weapon" && ["melee", "shield"].includes(item.system.category));
-  const options = [{ mode: "dodge" }, { mode: "reposition" },
+  // An archespore is rooted (Monster Hunter's Journal p.47): it cannot reposition.
+  const rooted = Array.from(actor.items ?? []).some(item => item.type === "ability" && item.system?.ruleId === "creature.rooted");
+  const options = [{ mode: "dodge" }, ...(rooted ? [] : [{ mode: "reposition" }]),
     ...(spiritState(actor).canSlip ? [{mode:"slip"}] : []),
     ...items.map(item => ({ mode: "block", itemId: item.id })), { mode: "block", itemId: "" },
     ...items.map(item => ({ mode: "parry", itemId: item.id })), { mode: "parry", itemId: "" }];
   // A restricted list (grapple, joint attack, a spell) keeps the per-item buttons of the modes it allows.
   const modes = allowed?.length && spiritState(actor).canSlip ? [...new Set([...allowed, "slip"])] : allowed;
   const chosen = modes ? modes.flatMap(mode => { const own = options.filter(option => option.mode === mode); return own.length ? own : [{ mode }]; }) : options;
-  return chosen.map(option => ({ ...defenseQuote(actor, { ...option, incoming, defenseModifier }), mode: option.mode, itemId: option.itemId ?? "" }));
+  return chosen.filter(option => !(rooted && option.mode === "reposition")).map(option => ({ ...defenseQuote(actor, { ...option, incoming, defenseModifier }), mode: option.mode, itemId: option.itemId ?? "" }));
 }
 
 const incomingOf = attack => attack.ranged ? (attack.thrown ? "thrown" : "ranged") : "melee";
@@ -922,7 +926,7 @@ async function afterSettled(message) {
     if (attack?.spell && attack.traits?.types?.includes("elemental") && token?.parent)
       await igniteDragonClouds(token.parent, tokenCenter(token));
   }
-  if (outcome?.hit && game.users.activeGM?.isSelf) await onPestaStruck(flagsOf(attackMessage).weaponAttack);
+  if (outcome?.hit && game.users.activeGM?.isSelf) { await onPestaStruck(flagsOf(attackMessage).weaponAttack); await onBotchlingStruck(attackMessage); }
   if (outcome?.hit && game.users.activeGM?.isSelf && !linkedAny(attackMessage.id,link.index,"applied")) {
     const token = targetToken(flagsOf(attackMessage).weaponAttack);
     if (token?.actor?.flags?.[SYSTEM_ID]?.noonCopy && await destroyNoonCopy(token)) {
@@ -933,7 +937,7 @@ async function afterSettled(message) {
   if (outcome?.hit && flagsOf(attackMessage).weaponAttack?.special) {
     if (game.users.activeGM?.isSelf) {
       if (isCreatureSpecial(flagsOf(attackMessage).weaponAttack)) await applyCreatureSpecial(attackMessage,link.index,outcome);
-      else await applyGrappleSuccess(attackMessage);
+      else { await applyGrappleSuccess(attackMessage); await onBotchlingGrappled(attackMessage, applyCreatureDamage); }
     }
     return;
   }
@@ -978,7 +982,7 @@ export async function applyCreatureBite(message) {
   if (!victim || !attacker.isOwner) return;
   pendingBites.add(message.id);
   try {
-    await afterCreatureBite(attacker, victim);
+    await afterCreatureBite(attacker, victim, message.id);
     await message.update({ [`flags.${SYSTEM_ID}.exchange.biteApplied`]: true });
   } finally { pendingBites.delete(message.id); }
 }

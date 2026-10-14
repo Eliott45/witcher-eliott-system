@@ -22,6 +22,7 @@ import { createNoonDance, tickNoonDance, destroyNoonCopy, noonCopyState } from "
 import { applyCreatureDamage } from "./creature-actions-damage.mjs";
 import { registerCreatureVision } from "./creature-actions-vision.mjs";
 import { rotfiendBlastHit, rotfiendBlastEffects } from "./rotfiend.mjs";
+import { bearMaulHit, bearPinEffects, bearMaulBlocked } from "./journal-beasts.mjs";
 export { isCreatureSpecial, creatureSpecialDefenses, creatureHypnosisPenalty, creatureHypnosisSource } from "./creature-actions-rules.mjs";
 export { tickNoonDance, destroyNoonCopy } from "./creature-actions-dance.mjs";
 
@@ -39,6 +40,7 @@ function blocked(actor,id) {
   if(actor.effects.some(effect=>activeEffect(effect)&&creatureFlags(effect).creatureFullTurn))return "Полный ход уже потрачен";
   if(id==="teleport"&&!spiritState(actor).canTeleport)return `Телепортация подавлена: ${spiritState(actor).reason}`;
   if(id==="shadow-step"&&!hymInShadow(actor))return "Шаг сквозь тень возможен только в полумраке или темноте";
+  if(["wendigo-spoil","wendigo-curse"].includes(id)&&creatureSuppression(actor).dimeritium)return "Двимеритовая бомба подавляет способность";
   if(["charge","hypnosis"].includes(id)&&creatureSuppression(actor).dimeritium&&["golem","fiend"].includes(creatureProfile(actor)?.id))return "Способность подавлена двимеритовой бомбой";
   return "";
 }
@@ -89,7 +91,7 @@ async function postCreatureAttack(actor,id,rule,profile,options,quote) {
   } else {
     const skill=skillValue(actor.system,rule.skill);
     if(skill.total===null)throw new Error("Заполните навык особой атаки.");
-    parts=[{label:"Навык",value:skill.total},{label:"Дополнительное действие",value:quote.penalty},...combatModifierParts(actor,"combat.attack"),...facingModifiers(source,target).parts];
+    parts=[{label:"Навык",value:skill.total},...(rule.modifier?[{label:rule.name,value:rule.modifier}]:[]),{label:"Дополнительное действие",value:quote.penalty},...combatModifierParts(actor,"combat.attack"),...facingModifiers(source,target).parts];
     total=parts.reduce((sum,part)=>sum+part.value,0);damage=null;traits={types:[],piercing:"none",silver:false,silverDice:""};
   }
   const roll=await creatureRoll(`1d10wc + ${total}`);
@@ -98,7 +100,8 @@ async function postCreatureAttack(actor,id,rule,profile,options,quote) {
     special:rule.special?`creature:${id}`:null,noCritical:Boolean(rule.special),defenses:rule.defenses,
     combat:game.combat?.started?{id:game.combat.id,round:game.combat.round}:null,
     creatureAction:{id,...(charge?{pushMeters:charge.pushMeters,...(charge.collision?{collision:charge.collision}:{}),...(charge.blockSave?{blockSave:charge.blockSave}:{}),...(overrun?{overrun}:{})}:{}),sourceDistance:distance}};
-  const message=await creaturePost(actor,{title:rule.name,text:`Цель: <b>${esc(target.name)}</b>. ${rule.fullTurn?"Полный ход. ":""}${damage?`Урон ${esc(damage)}.`:"Результат применяется после защиты."}`,rolls:[roll],flags:{weaponAttack:attack,action:quote}});
+  const redirect=charge?.redirect?` Оставшиеся ${Math.round(Math.max(0,charge.max-distance)*10)/10} м вепрь проходит в любом направлении после удара или промаха, но другую цель не атакует.`:"";
+  const message=await creaturePost(actor,{title:rule.name,text:`Цель: <b>${esc(target.name)}</b>.${redirect} ${rule.fullTurn?"Полный ход. ":""}${damage?`Урон ${esc(damage)}.`:"Результат применяется после защиты."}`,rolls:[roll],flags:{weaponAttack:attack,action:quote}});
   if(message){await payAction(actor,quote,rule,message.id);if(chargeEnd)await moveCreatureTo(source,chargeEnd);}
   return message;
 }
@@ -133,18 +136,25 @@ export function useCreatureAction(actor,id,options={}) {
       return creaturePost(actor,{title:"Чувствительный слух",text:"Бес ошеломлён громким резким звуком до начала следующего хода."});
     }
     if(rule.movement) {
-      const {source}=creatureTargets(actor,{...options,targets:[]}),max=["teleport","shadow-step"].includes(id)?10:pounceDistance(profile.id,actor.system.statistics);
+      const {source}=creatureTargets(actor,{...options,targets:[]}),max=rule.max??pounceDistance(profile.id,actor.system.statistics);
       const round=actionRoundKey(actor);
       if(round&&creatureFlags(actor).creatureMovementRound===round)throw new Error("Особое передвижение в этом раунде уже использовано.");
-      const point=await pickCreaturePoint(source,{destination:options.destination,max,title:rule.name,throughWalls:id==="teleport"});
+      const point=await pickCreaturePoint(source,{destination:options.destination,max,title:rule.name,throughWalls:id==="teleport"||Boolean(rule.throughWalls)});
       if(!point)return null;
       await moveCreatureTo(source,point);
       if(round)await actor.update({[`flags.${SYSTEM_ID}.creatureMovementRound`]:round});
-      return creaturePost(actor,{title:rule.name,text:`Перемещение выполнено: до ${max} м${id==="pounce"?" без разбега":""}. Обычное действие остаётся.`});
+      const moved=await creaturePost(actor,{title:rule.name,text:`Перемещение выполнено: до ${max} м${id==="pounce"?" без разбега":""}.${rule.fullTurn?" Полный ход.":" Обычное действие остаётся."}`});
+      if(moved&&rule.fullTurn)await markCreatureFullTurn(actor,rule.name,moved.id);
+      return moved;
     }
     const quote=actionQuote(actor);
     if(rule.fullTurn&&quote.extra)throw new Error("Действие полного хода нельзя выполнить дополнительным действием.");
     if(["needles","scream","hypnosis"].includes(id))return areaAction(actor,id,rule,options,quote);
+    if(rule.beast||rule.wendigo) {
+      const message=rule.wendigo?await (await import("./wendigo.mjs")).useWendigoAction(actor,id,options,quote)
+        :id==="pod"?await (await import("./journal-beasts.mjs")).plantPod(actor,options):await (await import("./journal-beasts.mjs")).useBotchlingAction(actor,id,options);
+      if(message)await payAction(actor,quote,rule,message.id);return message;
+    }
     if(rule.hym||rule.pesta) {
       const message=rule.hym?await (await import("./hym.mjs")).useHymAction(actor,id,options,quote):await (await import("./pesta.mjs")).usePestaAction(actor,id,options);
       if(message)await payAction(actor,quote,rule,message.id);return message;
@@ -167,10 +177,19 @@ export function applyCreatureSpecial(message,index,outcome) {
   return once(`special:${message.id}:${index}`,async()=>{
     if(!activeCreatureGM()||!outcome?.hit)return false;
     const attack=creatureFlags(message).weaponAttack,id=attack?.special?.replace("creature:","");
-    if(!["web","whirlwind","swarm"].includes(id))return false;
+    if(!["web","whirlwind","swarm","maul"].includes(id))return false;
     const target=resolveToken(attack.target)?.actor;if(!target?.isOwner)return false;
     const key=`${message.id}:${index}`,done=creatureFlags(message).creatureSpecialDone??{};
     if(done[index])return false;
+    if(id==="maul") {
+      // Monster Hunter's Journal p.37: 6d6 into the torso, prone and pinned.
+      const hit=await bearMaulHit(target);
+      await applyCreatureDamage(target,hit.damage,key,{effects:bearPinEffects(target)});
+      await message.update({[`flags.${SYSTEM_ID}.creatureSpecialDone`]:{...creatureFlags(message).creatureSpecialDone,[index]:true}});
+      const notes=[`${target.name}: ${hit.damage.total} урона в туловище после брони; сбит с ног и прижат.`];
+      await creaturePost(target,{title:attack.name,text:esc(notes.join(" ")),rolls:[hit.roll],flags:{exchange:{attack:message.id,index,kind:"special",notes}}});
+      return true;
+    }
     if(id==="swarm") {
       // Monster Hunter's Journal p.31: 2d6 to every body part and a 50% chance of disease.
       const {bodyWideHit,PESTA}=await import("./pesta.mjs");
@@ -220,6 +239,12 @@ export function resolveCreatureArea(message,index,{mode="dodge",itemId=""}={}) {
         const roll=immune?null:await creatureRoll(`1d10wc + ${skillValue(target.system,"resistMagic").total}`);
         result={success:Boolean(immune)||roll.total>=data.total,roll:roll?.total??null,immune};
         await creaturePost(target,{title:"Сопротивление гипнозу",text:immune?esc(immune):`${roll.total} против ${data.total}: ${result.success?"не поддался":"под гипнозом"}.`,rolls:roll?[roll]:[]});
+      } else if(data.id==="pod") {
+        // Monster Hunter's Journal p.47: Athletics DC 14 to spring clear of the bursting pod.
+        const roll=await creatureRoll(`1d10wc + ${skillValue(target.system,"athletics").total??0}`),success=roll.total>=data.dc,copy=Boolean(noonCopyState(token));
+        const hit=success||copy?null:await (await import("./pesta.mjs")).bodyWideHit(target,"1d6");
+        result={success,roll:roll.total,damage:hit?.damage??null};
+        await creaturePost(target,{title:`Стручок: Атлетика СЛ ${data.dc}`,rolls:[roll,...(hit?.dice??[])],text:success?`${roll.total}: отскочил.`:copy?"Взрыв развеивает копию.":`${roll.total}: урон после брони ${hit.damage.total}, отравление.`});
       } else if(data.id==="rotfiend-blast") {
         // Monster Hunter's Journal p.21: a shield block or Reposition against DC 15; no defense means the blast lands.
         let total=null;
@@ -249,7 +274,10 @@ export function resolveCreatureArea(message,index,{mode="dodge",itemId=""}={}) {
       const rows=[...creatureFlags(message).creatureArea.targets];rows[index]={...rows[index],result};await message.update({[`flags.${SYSTEM_ID}.creatureArea.targets`]:rows});
     }
     if(!result.success) {
-      if(data.id==="rotfiend-blast") {
+      if(data.id==="pod") {
+        if(noonCopyState(token))await destroyNoonCopy(token);
+        else await applyCreatureDamage(target,result.damage,key,{effects:[creatureEffect(target,"poisoned")]});
+      } else if(data.id==="rotfiend-blast") {
         if(noonCopyState(token))await destroyNoonCopy(token);
         else await applyCreatureDamage(target,result.damage,key,{effects:rotfiendBlastEffects(target,result)});
       } else if(data.id==="needles") {
@@ -348,6 +376,7 @@ export function onCreatureExchangeApplied(message,index,result) {
 async function pushChargeTarget(message,index) {
   {
     const attack=creatureFlags(message).weaponAttack;
+    if(!attack.creatureAction?.pushMeters)return;
     const key=`${message.id}:${index}`,target=resolveToken(attack.target),source=resolveToken(attack.attacker);
     if(!target||!source||creatureFlags(target).creaturePushes?.includes(key))return;
     const a=tokenCenter(source),b=tokenCenter(target),length=Math.hypot(b.x-a.x,b.y-a.y)||1,meters=attack.creatureAction.pushMeters,pixels=meters/target.parent.grid.distance*target.parent.grid.size;
@@ -369,6 +398,10 @@ export function onCreatureChargeMissed(message,index,outcome) {
   return once(`chargeMiss:${message.id}:${index}`,async()=>{
     if(!activeCreatureGM()||!outcome||outcome.hit||outcome.limbBlock)return false;
     const attack=creatureFlags(message).weaponAttack,action=attack?.creatureAction;
+    if(action?.id==="maul"&&outcome.mode==="block"&&!creatureFlags(message).creatureChargeMiss?.[index]) {
+      await message.update({[`flags.${SYSTEM_ID}.creatureChargeMiss`]:{...creatureFlags(message).creatureChargeMiss,[index]:true}});
+      return bearMaulBlocked(message,index,(target,effects,key)=>applyCreatureDamage(target,{total:0,ablate:[],steps:[]},key,{effects}));
+    }
     if(action?.id!=="charge"||!(action.blockSave||action.overrun)||creatureFlags(message).creatureChargeMiss?.[index])return false;
     await message.update({[`flags.${SYSTEM_ID}.creatureChargeMiss`]:{...creatureFlags(message).creatureChargeMiss,[index]:true}});
     if(outcome.mode==="block") {
@@ -422,6 +455,7 @@ export function registerCreatureActions() {
         if(row.done)return `<p>${esc(row.name)}: результат применён.</p>`;
         const target=resolveToken(row.uuid)?.actor;
         const choices=data.id==="needles"&&target?defenseChoices(target,"ranged",0,["dodge","block"]).filter(choice=>!choice.blocked)
+          :data.id==="pod"?[{mode:"athletics",itemId:"",name:"Атлетика СЛ 14"}]
           :data.id==="rotfiend-blast"&&target?[...defenseChoices(target,"melee",0,["reposition","block"]).filter(choice=>!choice.blocked&&(choice.mode!=="block"||target.items.get(choice.itemId)?.system.category==="shield")),{mode:"none",itemId:"",name:"Не защищается"}]
           :[{mode:"dodge",itemId:"",name:"Бросить и применить"}];
         return `<div><b>${esc(row.name)}</b>${choices.map(choice=>`<button type="button" data-creature-area="${index}" data-mode="${choice.mode}" data-item="${esc(choice.itemId??"")}" ${activeCreatureGM()?"":"disabled"}>${esc(choice.name)}${choice.weaponName?` · ${esc(choice.weaponName)}`:""}</button>`).join("")}</div>`;

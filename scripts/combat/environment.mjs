@@ -72,7 +72,9 @@ export function actorEnvironment(actor, scene = undefined, token = actorToken(ac
   const environment = regionEnvironment(sceneEnvironment(scene), token), statuses = actor?.statuses ?? new Set();
   const level = torchLightLevel(lightLevel(environment, scene, statuses), scene, token);
   const light = LIGHT_LEVELS.find(entry => entry.id === level);
-  const terrain = TERRAINS.find(entry => entry.id === terrainOf(environment, statuses)) ?? TERRAINS[0];
+  // Monster Hunter's Journal: the wendigo is immune to snow and ice.
+  const snowProof = Array.from(actor?.items ?? []).some(item => item.type === "ability" && item.system?.ruleId === "creature.snow-immunity");
+  const terrain = (snowProof && terrainOf(environment, statuses) === "snow" ? TERRAINS[0] : TERRAINS.find(entry => entry.id === terrainOf(environment, statuses))) ?? TERRAINS[0];
   return { light, terrain, heat: Boolean(environment.heat), underwater: terrain.id === "underwater" };
 }
 

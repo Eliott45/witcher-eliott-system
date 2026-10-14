@@ -33,6 +33,8 @@ export const migrateBestiaryRadolf = () => appendMissingCreatures(6);
 export const migrateBestiaryJournalNecrophages = () => appendMissingCreatures(7);
 /** Version 9 (Monster Hunter's Journal pp.28–31): the hym, the pesta and her plague rat swarm. */
 export const migrateBestiaryJournalSpirits = () => appendMissingCreatures(9);
+/** Version 10 (Monster Hunter's Journal pp.36–51): beasts and cursed ones, with their sidebar variants. */
+export const migrateBestiaryJournalBeasts = () => appendMissingCreatures(10);
 
 async function appendMissingCreatures(version) {
   if(game.user!==game.users.activeGM||game.settings.get(SYSTEM_ID,"bestiaryContentVersion")>=version)return;

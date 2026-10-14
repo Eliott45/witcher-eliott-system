@@ -22,7 +22,7 @@ export function creatureFields() {
     footing:itemText("auto",{choices:["auto","ordinary","quadruped","legless"]}),
     fallRemaining:itemNumber(),fallDistance:itemNumber(),fallRound:itemText(),illusion:new BooleanField({initial:false}),camouflage:new BooleanField({initial:false}),weakSpot:new BooleanField({initial:false}),
     invisible:new BooleanField({initial:false}),invisibilityEpoch:itemText(),transformed:new BooleanField({initial:true}),packId:itemText(),
-    spiritMode:itemText("normal",{choices:["normal","suppressed"]}),shadowMode:itemText("auto",{choices:["auto","active","off"]}),moonlight:new BooleanField({initial:false}),
+    spiritMode:itemText("normal",{choices:["normal","suppressed"]}),shadowMode:itemText("auto",{choices:["auto","active","off"]}),battleForm:new BooleanField({initial:false}),spikes:new BooleanField({initial:false}),chur:new BooleanField({initial:false}),moonlight:new BooleanField({initial:false}),
     hasTailOrWings:new BooleanField({initial:false}),
     lore:new ArrayField(new SchemaField({name:itemText(),skill:itemText("education"),dc:itemNumber(),text:itemText()})),
     loot:new ArrayField(new SchemaField({name:itemText(),formula:itemText("1"),currency:new BooleanField({initial:false})})),

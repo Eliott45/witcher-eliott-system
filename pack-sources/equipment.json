@@ -12254,6 +12254,314 @@
     "flags": {}
   },
   {
+    "_id": "journalMatr00006",
+    "name": "Медвежий жир",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
+    "system": {
+      "ruleId": "material.bear-fat",
+      "kind": "material",
+      "weight": 0.5,
+      "price": 90,
+      "rarity": "",
+      "material": {
+        "substance": "rebis",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Медведи"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Медвежий жир: алхимический компонент. Добывается: Медведи.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00007",
+    "name": "Клыки вепря",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
+    "system": {
+      "ruleId": "material.boar-tusks",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 82,
+      "rarity": "",
+      "material": {
+        "substance": "vitriol",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Вепри"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Клыки вепря: алхимический компонент. Добывается: Вепри.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00008",
+    "name": "Шкура вепря",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.boar-hide",
+      "kind": "material",
+      "weight": 2,
+      "price": 10,
+      "rarity": "",
+      "material": {
+        "substance": "",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Вепри"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Шкура вепря: идёт на кожу и украшение оружия или брони. Добывается: Вепри.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00009",
+    "name": "Шкура пантеры",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.panther-hide",
+      "kind": "material",
+      "weight": 3,
+      "price": 38,
+      "rarity": "",
+      "material": {
+        "substance": "",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Пантеры"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Шкура пантеры: идёт на кожу и украшение оружия или брони. Добывается: Пантеры.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00010",
+    "name": "Сок археспоры",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
+    "system": {
+      "ruleId": "material.archespore-juice",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 38,
+      "rarity": "",
+      "material": {
+        "substance": "vitriol",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Археспоры"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Сок археспоры: алхимический компонент. Добывается: Археспоры.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00011",
+    "name": "Кости игоши",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
+    "system": {
+      "ruleId": "material.botchling-bones",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 55,
+      "rarity": "",
+      "material": {
+        "substance": "hydragenum",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Игоши"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Кости игоши: алхимический компонент. Добывается: Игоши.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00012",
+    "name": "Кровь игоши",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
+    "system": {
+      "ruleId": "material.botchling-blood",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 66,
+      "rarity": "",
+      "material": {
+        "substance": "vitriol",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Игоши"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Кровь игоши: алхимический компонент. Добывается: Игоши.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00013",
+    "name": "Мозг игоши",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
+    "system": {
+      "ruleId": "material.botchling-brain",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 164,
+      "rarity": "",
+      "material": {
+        "substance": "caelum",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Игоши"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Мозг игоши: алхимический компонент. Добывается: Игоши.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00014",
+    "name": "Ухо игоши",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
+    "system": {
+      "ruleId": "material.botchling-ear",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 100,
+      "rarity": "",
+      "material": {
+        "substance": "fulgur",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Игоши"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Ухо игоши: алхимический компонент. Добывается: Игоши.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00015",
+    "name": "Мех вендиго",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
+    "system": {
+      "ruleId": "material.wendigo-fur",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 76,
+      "rarity": "",
+      "material": {
+        "substance": "fulgur",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Вендиго"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Мех вендиго: алхимический компонент. Добывается: Вендиго.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00016",
+    "name": "Сердце вендиго",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
+    "system": {
+      "ruleId": "material.wendigo-heart",
+      "kind": "material",
+      "weight": 1,
+      "price": 167,
+      "rarity": "",
+      "material": {
+        "substance": "aether",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Вендиго"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Сердце вендиго: алхимический компонент. Добывается: Вендиго.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "alch000000000001",
     "name": "Могила Адды",
     "type": "equipment",
@@ -30407,9 +30715,15 @@
       "ruleId": "material.bear-hide",
       "source": "Снаряжение ведьмака",
       "kind": "material",
-      "weight": 0,
-      "price": 0,
-      "description": "<p>Медвежья шкура: компонент чертежей ведьмачьего снаряжения.</p>"
+      "weight": 6,
+      "price": 30,
+      "material": {
+        "substance": "",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Медведи"
+      },
+      "description": "<p>Медвежья шкура: компонент чертежей ведьмачьего снаряжения; материал для кожи, добывается: Медведи.</p>"
     },
     "effects": [],
     "folder": "gearWitcherDLC01",
@@ -30417,11 +30731,7 @@
     "ownership": {
       "default": 2
     },
-    "flags": {
-      "witcher-eliott-system": {
-        "priceUnavailable": true
-      }
-    }
+    "flags": {}
   },
   {
     "_id": "schoolMatr000003",
@@ -30504,14 +30814,20 @@
     "_id": "schoolMatr000006",
     "name": "Усики археспоры",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/quebrith.svg",
     "system": {
       "ruleId": "material.archespores-tendrils",
       "source": "Снаряжение ведьмака",
       "kind": "material",
-      "weight": 0,
-      "price": 0,
-      "description": "<p>Усики археспоры: компонент чертежей ведьмачьего снаряжения.</p>"
+      "weight": 0.5,
+      "price": 44,
+      "material": {
+        "substance": "quebrith",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Археспоры"
+      },
+      "description": "<p>Усики археспоры: компонент чертежей ведьмачьего снаряжения; алхимический компонент, добывается: Археспоры.</p>"
     },
     "effects": [],
     "folder": "gearWitcherDLC01",
@@ -30519,11 +30835,7 @@
     "ownership": {
       "default": 2
     },
-    "flags": {
-      "witcher-eliott-system": {
-        "priceUnavailable": true
-      }
-    }
+    "flags": {}
   },
   {
     "_id": "schoolMatr000007",

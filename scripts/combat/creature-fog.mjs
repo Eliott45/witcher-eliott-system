@@ -9,25 +9,36 @@ import { creatureSuppression, tokenInsideRegion } from "./creature-spirits.mjs";
 import { activeCreatureGM, requireCreatureGM, creatureFlags, creatureTargets, creatureRoll, creaturePost, pickCreaturePoint, centerDistance, esc } from "./creature-actions-common.mjs";
 import { createFogCopies, dismissCopies } from "./creature-actions-dance.mjs";
 
-// Monster Hunter's Journal pp.18–19, foglet: a 30 m fog that limits everyone else's sight to 4 m, lasts a day,
-// drifts 10 m per action and dies with its maker; invisibility, illusory copies and illusions work only inside it.
+// Monster Hunter's Journal: a creature's own weather. The foglet's fog (pp.18–19) and the wendigo's snowstorm (p.51)
+// both limit sight inside to 4 m, last a day, drift per action, die with their maker and resist dimeritium only at birth.
 export const FOG = { radius: 30, sight: 4, move: 10, seconds: 86400, dispelDc: 18, dispelStamina: 5, copyDc: 16, illusionDc: 18 };
+export const WEATHER = {
+  fog: { ...FOG, name: "Туман", color: "#b8c4c8", owner: "туманник" },
+  storm: { radius: 50, sight: 4, move: 20, seconds: 86400, dispelDc: 20, dispelStamina: 10, name: "Снежная буря", color: "#dfeaf2", owner: "вендиго",
+    behaviors: [{ type: "environment", name: "Лёд и снег", system: { light: "", terrain: "snow", heat: "" } }] }
+};
+const KIND_OF = { fog: "fog", "fog-move": "fog", "fog-clear": "fog", storm: "storm", "storm-move": "storm", "storm-clear": "storm" };
 
 export const isFoglet = actor => creatureProfile(actor)?.id === "foglet";
+export const weatherKind = actor => ({ foglet: "fog", wendigo: "storm" })[creatureProfile(actor)?.id] ?? null;
 export const fogState = region => region?.flags?.[SYSTEM_ID]?.creatureFog ?? null;
+export const regionKind = region => fogState(region)?.kind ?? "fog";
 const expired = state => (globalThis.game?.time?.worldTime ?? 0) >= state.endTime;
-export const fogRegions = scene => Array.from(scene?.regions ?? []).filter(region => fogState(region) && !expired(fogState(region)));
-export const pointInFog = (scene, point) => fogRegions(scene).some(region => Array.from(region.shapes ?? []).some(shape => shape.radiusX > 0 && shape.radiusY > 0
+/** Living weather regions on a scene; `kind` keeps the foglet's tricks to its own fog. */
+export const fogRegions = (scene, kind = null) => Array.from(scene?.regions ?? []).filter(region => fogState(region) && !expired(fogState(region)) && (!kind || regionKind(region) === kind));
+export const pointInFog = (scene, point, kind = "fog") => fogRegions(scene, kind).some(region => Array.from(region.shapes ?? []).some(shape => shape.radiusX > 0 && shape.radiusY > 0
   && ((point.x - shape.x) / shape.radiusX) ** 2 + ((point.y - shape.y) / shape.radiusY) ** 2 <= 1 + 1e-7));
-export const fogsAt = token => token?.parent ? fogRegions(token.parent).filter(region => tokenInsideRegion(token, region)) : [];
-export const ownFog = (actor, scene) => fogRegions(scene).find(region => fogState(region).owner === actor?.uuid) ?? null;
+export const fogsAt = (token, kind = "fog") => token?.parent ? fogRegions(token.parent, kind).filter(region => tokenInsideRegion(token, region)) : [];
+export const ownFog = (actor, scene, kind = weatherKind(actor) ?? "fog") => fogRegions(scene, kind).find(region => fogState(region).owner === actor?.uuid) ?? null;
 const actorToken = actor => actor?.isToken ? actor.token : actor?.getActiveTokens?.(false, true)?.[0]?.document
   ?? Array.from(globalThis.canvas?.scene?.tokens ?? []).find(token => token.actor === actor) ?? null;
+const snowProof = actor => Array.from(actor?.items ?? []).some(item => item.type === "ability" && item.system?.ruleId === "creature.snow-immunity");
 
-/** Everyone in the fog but a foglet sees no further than 4 m (metres from the observer's edge). */
+/** Inside fog (except foglets) or a snowstorm (except the snow-proof wendigo) nobody sees further than 4 m from their edge. */
 export function fogSightLimit(token) {
-  if (!token?.actor || isFoglet(token.actor) || !fogsAt(token).length) return null;
-  return FOG.sight;
+  if (!token?.actor) return null;
+  const blinding = fogsAt(token, null).filter(region => regionKind(region) === "storm" ? !snowProof(token.actor) : !isFoglet(token.actor));
+  return blinding.length ? Math.min(...blinding.map(region => WEATHER[regionKind(region)].sight)) : null;
 }
 
 /** The attack reveals the foglet until its next turn; outside combat nothing keeps it visible. */
@@ -54,34 +65,39 @@ export async function revealFogletIfExposed(actor) {
   return true;
 }
 
-async function summonFog(actor, source) {
-  if (creatureSuppression(actor).dimeritium) throw new Error("Двимеритовая бомба не даёт туманнику вызвать туман.");
-  const scene = source.parent, previous = ownFog(actor, scene);
+async function summonFog(actor, source, kind) {
+  const rule = WEATHER[kind];
+  if (creatureSuppression(actor).dimeritium) throw new Error(`Двимеритовая бомба не даёт вызвать: ${rule.name.toLocaleLowerCase("ru")}.`);
+  const scene = source.parent, previous = ownFog(actor, scene, kind);
   if (previous) await previous.delete();
-  const center = tokenCenter(source), pixels = FOG.radius / scene.grid.distance * scene.grid.size;
-  await scene.createEmbeddedDocuments("Region", [{ name: `Туман: ${source.name ?? actor.name}`, color: "#b8c4c8", visibility: 2,
+  const center = tokenCenter(source), pixels = rule.radius / scene.grid.distance * scene.grid.size;
+  await scene.createEmbeddedDocuments("Region", [{ name: `${rule.name}: ${source.name ?? actor.name}`, color: rule.color, visibility: 2,
     shapes: [{ type: "ellipse", x: center.x, y: center.y, radiusX: pixels, radiusY: pixels, rotation: 0, gridBased: false, hole: false }],
-    flags: { [SYSTEM_ID]: { creatureFog: { owner: actor.uuid, token: source.uuid, endTime: (game.time?.worldTime ?? 0) + FOG.seconds } } } }]);
-  return creaturePost(actor, { title: "Призыв тумана", text: `Туман радиусом ${FOG.radius} м на сутки. Все в нём, кроме туманника, видят не дальше ${FOG.sight} м.` });
+    ...(rule.behaviors ? { behaviors: structuredClone(rule.behaviors) } : {}),
+    flags: { [SYSTEM_ID]: { creatureFog: { kind, owner: actor.uuid, token: source.uuid, endTime: (game.time?.worldTime ?? 0) + rule.seconds } } } }]);
+  return creaturePost(actor, { title: kind === "storm" ? "Призыв снежной бури" : "Призыв тумана", text: kind === "storm"
+    ? `Буря радиусом ${rule.radius} м на сутки: лёд и снег под ногами, все в ней видят не дальше ${rule.sight} м.`
+    : `Туман радиусом ${rule.radius} м на сутки. Все в нём, кроме туманника, видят не дальше ${rule.sight} м.` });
 }
 
-async function moveFog(actor, source, options) {
-  if (creatureSuppression(actor).dimeritium) throw new Error("Двимеритовая бомба не даёт туманнику управлять туманом.");
-  const fog = ownFog(actor, source.parent);
-  if (!fog) throw new Error("У туманника нет своего тумана на этой сцене.");
-  const point = options.destination ?? await pickCreaturePoint(source, { throughWalls: true, title: "Куда сдвинуть центр тумана" });
+async function moveFog(actor, source, options, kind) {
+  const rule = WEATHER[kind];
+  if (creatureSuppression(actor).dimeritium) throw new Error(`Двимеритовая бомба не даёт управлять: ${rule.name.toLocaleLowerCase("ru")}.`);
+  const fog = ownFog(actor, source.parent, kind);
+  if (!fog) throw new Error(`Нет своей области «${rule.name}» на этой сцене.`);
+  const point = options.destination ?? await pickCreaturePoint(source, { throughWalls: true, title: `Куда сдвинуть центр: ${rule.name}` });
   if (!point) return null;
   const shape = fog.shapes[0], center = { x: shape.x, y: shape.y };
-  if (centerDistance(center, point, source.parent) > FOG.move + 0.001) throw new Error(`Туман сдвигается не дальше чем на ${FOG.move} м.`);
+  if (centerDistance(center, point, source.parent) > rule.move + 0.001) throw new Error(`${rule.name} сдвигается не дальше чем на ${rule.move} м.`);
   await fog.update({ shapes: Array.from(fog.shapes).map(entry => ({ ...(entry.toObject?.() ?? entry), x: point.x, y: point.y })) });
-  return creaturePost(actor, { title: "Туман сдвинут", text: `Центр тумана перемещён на ${Math.round(centerDistance(center, point, source.parent) * 10) / 10} м.` });
+  return creaturePost(actor, { title: `${rule.name}: сдвиг`, text: `Центр перемещён на ${Math.round(centerDistance(center, point, source.parent) * 10) / 10} м.` });
 }
 
-async function clearFog(actor, source) {
-  const fog = ownFog(actor, source.parent);
-  if (!fog) throw new Error("У туманника нет своего тумана на этой сцене.");
+async function clearFog(actor, source, kind) {
+  const rule = WEATHER[kind], fog = ownFog(actor, source.parent, kind);
+  if (!fog) throw new Error(`Нет своей области «${rule.name}» на этой сцене.`);
   await fog.delete();
-  return creaturePost(actor, { title: "Туман рассеян", text: "Туманник рассеивает свой туман." });
+  return creaturePost(actor, { title: `${rule.name} рассеяна`, text: `${esc(actor.name)} развеивает: ${rule.name.toLocaleLowerCase("ru")}.` });
 }
 
 async function vanish(actor, source) {
@@ -96,46 +112,47 @@ async function illusion(actor, source) {
   return creaturePost(actor, { title: "Сотворение иллюзий", text: `Туманник создаёт беззвучную неосязаемую иллюзию в пределах тумана. Кто её видит, проходит Внимание СЛ ${FOG.illusionDc}, чтобы распознать обман; внезапное появление перед глазами или касание выдаёт иллюзию сразу.` });
 }
 
-/** Special actions of the foglet; the caller pays the action (and marks the full turn for an illusion). */
+/** Special actions of the foglet and the wendigo's storm; the caller pays the action. */
 export async function useFogAction(actor, id, options = {}) {
-  const { source } = creatureTargets(actor, { ...options, targets: [] });
-  if (id === "fog") return summonFog(actor, source);
-  if (id === "fog-move") return moveFog(actor, source, options);
-  if (id === "fog-clear") return clearFog(actor, source);
+  const { source } = creatureTargets(actor, { ...options, targets: [] }), kind = KIND_OF[id];
+  if (id === "fog" || id === "storm") return summonFog(actor, source, kind);
+  if (id === "fog-move" || id === "storm-move") return moveFog(actor, source, options, kind);
+  if (id === "fog-clear" || id === "storm-clear") return clearFog(actor, source, kind);
   if (id === "fog-invisible") return vanish(actor, source);
   if (id === "fog-illusion") return illusion(actor, source);
   if (id === "fog-copies") {
     if (!fogsAt(source).length) throw new Error("Иллюзорные копии туманник создаёт только в тумане.");
     return createFogCopies(actor, { ...options, sourceToken: source, inFog: point => pointInFog(source.parent, point), dc: FOG.copyDc });
   }
-  throw new Error("Неизвестное действие туманника.");
+  throw new Error("Неизвестное действие.");
 }
 
-/** A mage or priest pays 5 STA and an action: Spell Casting DC 18 disperses the foglet's fog. */
-export function dispelFog(foglet, options = {}) {
-  requireCreatureGM(foglet);
-  const { source, targets } = creatureTargets(foglet, options);
-  const fog = ownFog(foglet, source.parent);
-  if (!fog) throw new Error("У туманника нет тумана на этой сцене.");
-  if (targets.length !== 1) throw new Error("Выберите токен мага или жреца, который разгоняет туман.");
+/** A mage or priest pays STA and an action: Spell Casting disperses the fog (5 STA, DC 18) or the storm (10 STA, DC 20). */
+export function dispelFog(maker, options = {}) {
+  requireCreatureGM(maker);
+  const kind = weatherKind(maker) ?? "fog", rule = WEATHER[kind];
+  const { source, targets } = creatureTargets(maker, options);
+  const fog = ownFog(maker, source.parent, kind);
+  if (!fog) throw new Error(`Нет области «${rule.name}» на этой сцене.`);
+  if (targets.length !== 1) throw new Error("Выберите токен мага или жреца, который разгоняет её.");
   const caster = targets[0].actor;
-  if (!((caster.system.statistics?.vigor ?? 0) > 0)) throw new Error("Разогнать туман может только маг или жрец (Энергия больше 0).");
+  if (!((caster.system.statistics?.vigor ?? 0) > 0)) throw new Error("Разогнать может только маг или жрец (Энергия больше 0).");
   return inventoryWrite(caster, async () => {
-    const quote = actionQuote(caster, { cost: FOG.dispelStamina }), skill = skillValue(caster.system, "spellCasting").total ?? 0;
-    const roll = await creatureRoll(`1d10wc + ${skill + quote.penalty}`), success = roll.total >= FOG.dispelDc;
-    const message = await creaturePost(caster, { title: "Разогнать туман", rolls: [roll], text: `${FOG.dispelStamina} ВЫН и действие. Сотворение заклинаний ${roll.total} против СЛ ${FOG.dispelDc}: ${success ? "туман рассеян" : "туман держится"}.` });
+    const quote = actionQuote(caster, { cost: rule.dispelStamina }), skill = skillValue(caster.system, "spellCasting").total ?? 0;
+    const roll = await creatureRoll(`1d10wc + ${skill + quote.penalty}`), success = roll.total >= rule.dispelDc;
+    const message = await creaturePost(caster, { title: `Разогнать: ${rule.name.toLocaleLowerCase("ru")}`, rolls: [roll], text: `${rule.dispelStamina} ВЫН и действие. Сотворение заклинаний ${roll.total} против СЛ ${rule.dispelDc}: ${success ? "рассеяна" : "держится"}.` });
     if (!message) return null;
-    await caster.update(actionUpdate(caster, quote, FOG.dispelStamina));
+    await caster.update(actionUpdate(caster, quote, rule.dispelStamina));
     if (success) await fog.delete();
     return message;
   });
 }
 
-/** The fog dies with the foglet; its illusory copies go with it. */
+/** The weather dies with its maker; a foglet's illusory copies go with it. */
 export async function dismissFoglet(actor) {
-  if (!activeCreatureGM() || !isFoglet(actor)) return;
+  if (!activeCreatureGM() || !weatherKind(actor)) return;
   for (const scene of globalThis.game?.scenes ?? []) for (const region of fogRegions(scene).filter(region => fogState(region).owner === actor.uuid)) await region.delete();
-  await dismissCopies(actor, "fog");
+  if (isFoglet(actor)) await dismissCopies(actor, "fog");
 }
 
 export async function removeExpiredFogs() {
@@ -154,7 +171,7 @@ export function registerCreatureFog() {
   for (const hook of ["updateRegion", "deleteRegion"]) Hooks.on(hook, region => { if (fogState(region)) recheck(region.parent); });
   Hooks.on("createActiveEffect", effect => {
     const actor = effect.parent;
-    if (!activeCreatureGM() || !isFoglet(actor) || !activeEffect(effect)) return;
+    if (!activeCreatureGM() || !weatherKind(actor) || !activeEffect(effect)) return;
     if (effect.statuses?.has("dead")) return dismissFoglet(actor).catch(fail);
     if (creatureFlags(effect).creatureSuppression) revealFogletIfExposed(actor).catch(fail);
   });

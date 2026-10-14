@@ -8,7 +8,7 @@ import { aimingBonus } from "./full-turn-rules.mjs";
 import { statusEffect } from "../data/effect-counters.mjs";
 import { actorEnvironment, worksUnderwater } from "./environment.mjs";
 import { creatureHypnosisPenalty } from "./creature-actions-rules.mjs";
-import { creatureAttackParts, creatureCanSwim, creatureHumanForm } from "../data/creature-modes.mjs";
+import { creatureAttackParts, creatureCanSwim, creatureHumanForm, creatureWeaponBlocked } from "../data/creature-modes.mjs";
 import { furyTargetError } from "./experimental-effects.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { attackLocation, bodyPlanOf } from "../data/hit-locations.mjs";
@@ -25,6 +25,7 @@ export function weaponReadiness(actor,item,weapon=effectiveItem(item),{allowOneH
   const transfer = actor.flags?.[SYSTEM_ID]?.lootRequest;
   if (transfer?.action === "drop" && transfer.itemId === item.id) return "Оружие уже брошено: дождитесь перемещения предмета мастером";
   if (weapon.natural && creatureHumanForm(actor)) return "В человеческом облике когти и укус волколака недоступны";
+  if (weapon.natural && creatureWeaponBlocked(actor, item)) return creatureWeaponBlocked(actor, item);
   if (actor.flags?.["witcher-eliott-system"]?.severedTongue && item.name === "Язык") return "Язык отрублен";
   if(!equippedItems(actor.items).some(entry=>entry.id===item.id))return "Возьмите оружие в руки";
   if(!allowOneHand&&!weapon.natural&&gripOf(item)<(weapon.hands??1))return `Нужно рук: ${weapon.hands}`;

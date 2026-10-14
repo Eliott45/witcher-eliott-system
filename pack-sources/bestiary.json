@@ -10455,6 +10455,2629 @@
     ]
   },
   {
+    "_id": "bstr000000000040",
+    "name": "Медведь",
+    "type": "npc",
+    "img": "icons/svg/pawprint.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Медведь",
+      "texture": {
+        "src": "icons/svg/pawprint.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 7,
+        "dexterity": 6,
+        "body": 12,
+        "speed": 7,
+        "empathy": 1,
+        "craft": 1,
+        "will": 5,
+        "luck": 0
+      },
+      "health": {
+        "value": 80,
+        "max": 80
+      },
+      "stamina": {
+        "value": 40,
+        "max": 40
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 4,
+        "brawling": 6,
+        "melee": 8,
+        "awareness": 9,
+        "wildernessSurvival": 11,
+        "intimidation": 9,
+        "physique": 8,
+        "stealth": 2,
+        "resistMagic": 8,
+        "endurance": 4,
+        "courage": 9,
+        "dodgeEscape": 6
+      },
+      "creature": {
+        "category": "beast",
+        "difficulty": "Средние / обычные",
+        "reward": 450,
+        "size": "1,75 м",
+        "weight": "600 кг",
+        "habitat": "Леса",
+        "intellect": "Дикий",
+        "group": "Одиночка или пара",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Крупный хищник лесов, чьи удары ломают щиты и доспехи.",
+        "tactics": "Кусает и рвёт когтями дважды за ход; встав на дыбы, обрушивает удар сверху, сбивая жертву с ног и прижимая к земле.",
+        "naturalArmor": 10,
+        "resistances": "Д",
+        "healthMax": 80,
+        "staminaMax": 40,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "large",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 8,
+            "text": "О чудищах говорят много, а про медведя забывают — пока он не перевернёт повозку. Если медведь встал на задние лапы, беги что есть мочи."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "education",
+            "dc": 12,
+            "text": "Медведи убивают больше людей, чем многие чудовища: когти нельзя парировать, а щит под их ударом ломается. Держитесь подальше и запаситесь маслом против зверей; оказаться под вставшим на дыбы медведем — смертельная ошибка."
+          }
+        ],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "bear-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+          "quantity": 0,
+          "formula": "2d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "bear-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00006",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "bear-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000002",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "bear-3",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.ggen000000000022",
+          "quantity": 0,
+          "formula": "3d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst040i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "8d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Нельзя парировать; двойной урон оружию, щиту или броне; Кровопускающее (75%)",
+          "description": "<p>Нельзя парировать; двойной урон оружию, щиту или броне; Кровопускающее (75%) СА 1.</p>",
+          "ruleId": "creature.weapon.bear.0"
+        }
+      },
+      {
+        "_id": "bst040i000000002",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "4d6+5",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Нельзя парировать; двойной урон оружию, щиту или броне",
+          "description": "<p>Нельзя парировать; двойной урон оружию, щиту или броне СА 2.</p>",
+          "ruleId": "creature.weapon.bear.1"
+        }
+      },
+      {
+        "_id": "bst040i000000003",
+        "name": "Ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.night-vision",
+          "description": "<p>Действует в зонах со слабым освещением без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst040i000000004",
+        "name": "Выслеживание по запаху",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.bear.3",
+          "description": "<p>Выслеживает существо по запаху, не видя и не слыша его, без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst040i000000005",
+        "name": "Сокрушающая сила",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.bear.4",
+          "description": "<p>Укус и когти невозможно парировать; они наносят двойной разрушающий урон оружию, щиту или броне.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst040i000000006",
+        "name": "Удар сверху",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.bear.5",
+          "description": "<p>Действие полного хода: встаёт на задние лапы и бьёт всеми когтями цель на дистанции ближнего боя с основой 12. При попадании 6d6 урона в туловище, цель сбита с ног и обездвижена. Заблокировавшая цель не получает урона, но тоже сбита с ног и обездвижена, если не победит медведя во встречной проверке Силы; тогда она отбрасывает медведя без последствий.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst040i000000007",
+        "name": "Масло против зверей",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.beast-oil",
+          "description": "<p>Уязвимость: масло против зверей добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000041",
+    "name": "Гигантский медведь",
+    "type": "npc",
+    "img": "icons/svg/pawprint.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Гигантский медведь",
+      "texture": {
+        "src": "icons/svg/pawprint.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 7,
+        "dexterity": 6,
+        "body": 12,
+        "speed": 7,
+        "empathy": 1,
+        "craft": 1,
+        "will": 5,
+        "luck": 0
+      },
+      "health": {
+        "value": 80,
+        "max": 80
+      },
+      "stamina": {
+        "value": 40,
+        "max": 40
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 4,
+        "brawling": 6,
+        "melee": 10,
+        "awareness": 9,
+        "wildernessSurvival": 11,
+        "intimidation": 9,
+        "physique": 8,
+        "stealth": 2,
+        "resistMagic": 8,
+        "endurance": 4,
+        "courage": 9,
+        "dodgeEscape": 6
+      },
+      "creature": {
+        "category": "beast",
+        "difficulty": "Средние / обычные",
+        "reward": 450,
+        "size": "1,75 м",
+        "weight": "600 кг",
+        "habitat": "Леса",
+        "intellect": "Дикий",
+        "group": "Одиночка или пара",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Огромный медведь, яростно защищающий свою территорию даже от чудовищ.",
+        "tactics": "Кусает и рвёт когтями дважды за ход; встав на дыбы, обрушивает удар сверху, сбивая жертву с ног и прижимая к земле.",
+        "naturalArmor": 14,
+        "resistances": "К, Р, Д",
+        "healthMax": 80,
+        "staminaMax": 40,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "large",
+        "lore": [],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "giant-bear-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+          "quantity": 0,
+          "formula": "2d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "giant-bear-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00006",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "giant-bear-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000002",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "giant-bear-3",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.ggen000000000022",
+          "quantity": 0,
+          "formula": "3d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst041i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "8d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Нельзя парировать; двойной урон оружию, щиту или броне; Кровопускающее (75%)",
+          "description": "<p>Нельзя парировать; двойной урон оружию, щиту или броне; Кровопускающее (75%) СА 1.</p>",
+          "ruleId": "creature.weapon.giant-bear.0"
+        }
+      },
+      {
+        "_id": "bst041i000000002",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "4d6+5",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Нельзя парировать; двойной урон оружию, щиту или броне",
+          "description": "<p>Нельзя парировать; двойной урон оружию, щиту или броне СА 2.</p>",
+          "ruleId": "creature.weapon.giant-bear.1"
+        }
+      },
+      {
+        "_id": "bst041i000000003",
+        "name": "Ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.night-vision",
+          "description": "<p>Действует в зонах со слабым освещением без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst041i000000004",
+        "name": "Выслеживание по запаху",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.giant-bear.3",
+          "description": "<p>Выслеживает существо по запаху, не видя и не слыша его, без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst041i000000005",
+        "name": "Сокрушающая сила",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.giant-bear.4",
+          "description": "<p>Укус и когти невозможно парировать; они наносят двойной разрушающий урон оружию, щиту или броне.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst041i000000006",
+        "name": "Удар сверху",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.giant-bear.5",
+          "description": "<p>Действие полного хода: встаёт на задние лапы и бьёт всеми когтями цель на дистанции ближнего боя с основой 14. При попадании 6d6 урона в туловище, цель сбита с ног и обездвижена. Заблокировавшая цель не получает урона, но тоже сбита с ног и обездвижена, если не победит медведя во встречной проверке Силы; тогда она отбрасывает медведя без последствий.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst041i000000007",
+        "name": "Гигантский медведь",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.giant-bear.6",
+          "description": "<p>Вариация медведя из глубоких лесов и Скеллиге: броня 14, сопротивление колющему, режущему и дробящему урону, основа атак 17 (Удар сверху — 14).</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst041i000000008",
+        "name": "Масло против зверей",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.beast-oil",
+          "description": "<p>Уязвимость: масло против зверей добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000042",
+    "name": "Вепрь",
+    "type": "npc",
+    "img": "icons/svg/pawprint.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Вепрь",
+      "texture": {
+        "src": "icons/svg/pawprint.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 5,
+        "dexterity": 4,
+        "body": 8,
+        "speed": 5,
+        "empathy": 1,
+        "craft": 1,
+        "will": 6,
+        "luck": 0
+      },
+      "health": {
+        "value": 35,
+        "max": 35
+      },
+      "stamina": {
+        "value": 35,
+        "max": 35
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 4,
+        "brawling": 1,
+        "melee": 6,
+        "awareness": 6,
+        "wildernessSurvival": 8,
+        "intimidation": 4,
+        "physique": 4,
+        "stealth": 6,
+        "resistMagic": 2,
+        "endurance": 5,
+        "courage": 10,
+        "dodgeEscape": 5
+      },
+      "creature": {
+        "category": "beast",
+        "difficulty": "Простые / трудные",
+        "reward": 10,
+        "size": "1 м",
+        "weight": "90 кг",
+        "habitat": "Леса и равнины",
+        "intellect": "Дикий",
+        "group": "Группы из 2–6 особей",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Злобный лесной кабан, опасный своими клыками и упрямым разбегом.",
+        "tactics": "Бросается с разбега издалека, бьёт клыками и сразу разворачивается для нового удара.",
+        "naturalArmor": 5,
+        "resistances": "",
+        "healthMax": 35,
+        "staminaMax": 35,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "medium",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 8,
+            "text": "Крепкий и злобный зверь: клыками распорет бригантину. Кто-то считает вепря счастливым знаком — повалишь его, и потомство будет крепким."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "education",
+            "dc": 12,
+            "text": "Упрямый зверь, ради мяса которого стоит рискнуть. Охотьтесь с копьём: вепрь может оборвать неудачный разбег и броситься снова. Живут семьями по четыре–шесть, яростно преследуют чужаков и редко отступают даже раненными."
+          }
+        ],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "boar-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00007",
+          "quantity": 0,
+          "formula": "floor(1d6 / 3)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "boar-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.ggen000000000022",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "boar-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00008",
+          "quantity": 0,
+          "formula": "floor(1d6 / 3)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst042i000000001",
+        "name": "Удар клыками",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "3d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Кровопускающее (30%)",
+          "description": "<p>Кровопускающее (30%) СА 1.</p>",
+          "ruleId": "creature.weapon.boar.0"
+        }
+      },
+      {
+        "_id": "bst042i000000002",
+        "name": "Выслеживание по запаху",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.boar.1",
+          "description": "<p>Выслеживает существо по запаху, не видя и не слыша его, без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst042i000000003",
+        "name": "Перенаправляемая атака с разбега",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.boar.2",
+          "description": "<p>Действие полного хода против цели дальше 6 м: разбег до 15 м и один Удар клыками с основой 9, 5d6 урона вместо обычного. После удара (или промаха) вепрь проходит оставшееся расстояние в любом направлении, в том числе назад или сквозь место цели, но другую цель атаковать уже не может.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst042i000000004",
+        "name": "Масло против зверей",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.beast-oil",
+          "description": "<p>Уязвимость: масло против зверей добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000043",
+    "name": "Боевой вепрь",
+    "type": "npc",
+    "img": "icons/svg/pawprint.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Боевой вепрь",
+      "texture": {
+        "src": "icons/svg/pawprint.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 5,
+        "dexterity": 4,
+        "body": 8,
+        "speed": 5,
+        "empathy": 1,
+        "craft": 1,
+        "will": 6,
+        "luck": 0
+      },
+      "health": {
+        "value": 35,
+        "max": 35
+      },
+      "stamina": {
+        "value": 35,
+        "max": 35
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 4,
+        "brawling": 1,
+        "melee": 10,
+        "awareness": 6,
+        "wildernessSurvival": 8,
+        "intimidation": 4,
+        "physique": 4,
+        "stealth": 6,
+        "resistMagic": 2,
+        "endurance": 5,
+        "courage": 10,
+        "dodgeEscape": 5
+      },
+      "creature": {
+        "category": "beast",
+        "difficulty": "Простые / трудные",
+        "reward": 10,
+        "size": "1 м",
+        "weight": "90 кг",
+        "habitat": "Леса и равнины",
+        "intellect": "Дикий",
+        "group": "Группы из 2–6 особей",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Крупный вепрь, приученный убивать и ломать строй.",
+        "tactics": "Бросается с разбега издалека, бьёт клыками и сразу разворачивается для нового удара.",
+        "naturalArmor": 10,
+        "resistances": "",
+        "healthMax": 35,
+        "staminaMax": 35,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "medium",
+        "lore": [],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "war-boar-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00007",
+          "quantity": 0,
+          "formula": "floor(1d6 / 3)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "war-boar-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.ggen000000000022",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "war-boar-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00008",
+          "quantity": 0,
+          "formula": "floor(1d6 / 3)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst043i000000001",
+        "name": "Удар клыками",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "4d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Кровопускающее (30%)",
+          "description": "<p>Кровопускающее (30%) СА 1.</p>",
+          "ruleId": "creature.weapon.war-boar.0"
+        }
+      },
+      {
+        "_id": "bst043i000000002",
+        "name": "Выслеживание по запаху",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.war-boar.1",
+          "description": "<p>Выслеживает существо по запаху, не видя и не слыша его, без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst043i000000003",
+        "name": "Перенаправляемая атака с разбега",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.war-boar.2",
+          "description": "<p>Действие полного хода против цели дальше 6 м: разбег до 15 м и один Удар клыками с основой 15, 5d6 урона вместо обычного. После удара (или промаха) вепрь проходит оставшееся расстояние в любом направлении, в том числе назад или сквозь место цели, но другую цель атаковать уже не может.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst043i000000004",
+        "name": "Боевой вепрь",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.war-boar.3",
+          "description": "<p>Скеллигская вариация: броня 10, Удар клыками 4d6, основа атак 15.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst043i000000005",
+        "name": "Масло против зверей",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.beast-oil",
+          "description": "<p>Уязвимость: масло против зверей добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000044",
+    "name": "Пантера",
+    "type": "npc",
+    "img": "icons/svg/pawprint.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Пантера",
+      "texture": {
+        "src": "icons/svg/pawprint.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 7,
+        "dexterity": 7,
+        "body": 5,
+        "speed": 8,
+        "empathy": 1,
+        "craft": 1,
+        "will": 6,
+        "luck": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25
+      },
+      "stamina": {
+        "value": 25,
+        "max": 25
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 9,
+        "brawling": 5,
+        "melee": 8,
+        "awareness": 14,
+        "wildernessSurvival": 13,
+        "intimidation": 6,
+        "physique": 8,
+        "stealth": 10,
+        "resistMagic": 4,
+        "endurance": 7,
+        "courage": 8,
+        "dodgeEscape": 5
+      },
+      "creature": {
+        "category": "beast",
+        "difficulty": "Средние / обычные",
+        "reward": 20,
+        "size": "0,75 м",
+        "weight": "78 кг",
+        "habitat": "Леса",
+        "intellect": "Дикий",
+        "group": "Одиночка или пара",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Скрытная крупная кошка, нападающая из засады.",
+        "tactics": "Подкрадывается, прыгает с места на жертву, кусает и рвёт когтями; почуяв угрозу, взбирается на дерево и ждёт.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 25,
+        "staminaMax": 25,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "medium",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 12,
+            "text": "Экзотических кошек будто бы приручают южные дикарки и ведьмы; блеснувшие в лунном свете глаза пантеры означают, что за тобой следит маг."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "education",
+            "dc": 14,
+            "text": "Крупные кошки крадутся за путниками и бросаются из засады на наименее защищённого. Быстрые и ловкие лазальщицы, при угрозе они удирают на дерево и ждут нового шанса. Шкура ценится, особенно пятнистая."
+          }
+        ],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "panther-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "panther-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.ggen000000000022",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "panther-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00009",
+          "quantity": 0,
+          "formula": "floor(1d6 / 3)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst044i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "4d6+4",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "",
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.panther.0"
+        }
+      },
+      {
+        "_id": "bst044i000000002",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "2d6+2",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Кровопускающее (30%)",
+          "description": "<p>Кровопускающее (30%) СА 2.</p>",
+          "ruleId": "creature.weapon.panther.1"
+        }
+      },
+      {
+        "_id": "bst044i000000003",
+        "name": "Ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.night-vision",
+          "description": "<p>Действует в зонах со слабым освещением без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst044i000000004",
+        "name": "Наскок",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.panther.3",
+          "description": "<p>Перемещением прыгает с места до 4 м — по горизонтали или по вертикали.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst044i000000005",
+        "name": "Опытный верхолаз",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.panther.4",
+          "description": "<p>После успешной проверки Атлетики для лазания поднимается на 8 м за раунд вместо 4.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst044i000000006",
+        "name": "Масло против зверей",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.beast-oil",
+          "description": "<p>Уязвимость: масло против зверей добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000045",
+    "name": "Большая кошка",
+    "type": "npc",
+    "img": "icons/svg/pawprint.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Большая кошка",
+      "texture": {
+        "src": "icons/svg/pawprint.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 7,
+        "dexterity": 7,
+        "body": 5,
+        "speed": 8,
+        "empathy": 1,
+        "craft": 1,
+        "will": 6,
+        "luck": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25
+      },
+      "stamina": {
+        "value": 25,
+        "max": 25
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 9,
+        "brawling": 5,
+        "melee": 10,
+        "awareness": 14,
+        "wildernessSurvival": 13,
+        "intimidation": 6,
+        "physique": 8,
+        "stealth": 10,
+        "resistMagic": 4,
+        "endurance": 7,
+        "courage": 8,
+        "dodgeEscape": 5
+      },
+      "creature": {
+        "category": "beast",
+        "difficulty": "Средние / обычные",
+        "reward": 20,
+        "size": "0,75 м",
+        "weight": "78 кг",
+        "habitat": "Леса",
+        "intellect": "Дикий",
+        "group": "Одиночка или пара",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Крупная южная хищница, способная сбить всадника наскоком.",
+        "tactics": "Подкрадывается, прыгает с места на жертву, кусает и рвёт когтями; почуяв угрозу, взбирается на дерево и ждёт.",
+        "naturalArmor": 5,
+        "resistances": "",
+        "healthMax": 25,
+        "staminaMax": 25,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "medium",
+        "lore": [],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "big-cat-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "big-cat-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.ggen000000000022",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "big-cat-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00009",
+          "quantity": 0,
+          "formula": "floor(1d6 / 3)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst045i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "5d6+4",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Кровопускающее (50%)",
+          "description": "<p>Кровопускающее (50%) СА 1.</p>",
+          "ruleId": "creature.weapon.big-cat.0"
+        }
+      },
+      {
+        "_id": "bst045i000000002",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "3d6+2",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Кровопускающее (30%); Сбалансированное",
+          "description": "<p>Кровопускающее (30%); Сбалансированное СА 2.</p>",
+          "ruleId": "creature.weapon.big-cat.1"
+        }
+      },
+      {
+        "_id": "bst045i000000003",
+        "name": "Ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.night-vision",
+          "description": "<p>Действует в зонах со слабым освещением без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst045i000000004",
+        "name": "Наскок",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.big-cat.3",
+          "description": "<p>Перемещением прыгает с места до 4 м — по горизонтали или по вертикали.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst045i000000005",
+        "name": "Опытный верхолаз",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.big-cat.4",
+          "description": "<p>После успешной проверки Атлетики для лазания поднимается на 8 м за раунд вместо 4.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst045i000000006",
+        "name": "Большая кошка",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.big-cat.5",
+          "description": "<p>Хищница южных лесов Нильфгаарда: броня 5, сбалансированные когти 3d6+2, укус 5d6+4 с кровотечением 50%, основа атак 17.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst045i000000007",
+        "name": "Масло против зверей",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.beast-oil",
+          "description": "<p>Уязвимость: масло против зверей добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000046",
+    "name": "Археспора",
+    "type": "npc",
+    "img": "icons/svg/blood.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Археспора",
+      "texture": {
+        "src": "icons/svg/blood.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 6,
+        "dexterity": 5,
+        "body": 5,
+        "speed": 6,
+        "empathy": 1,
+        "craft": 1,
+        "will": 5,
+        "luck": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25
+      },
+      "stamina": {
+        "value": 25,
+        "max": 25
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 3,
+        "brawling": 3,
+        "melee": 6,
+        "awareness": 8,
+        "wildernessSurvival": 7,
+        "intimidation": 4,
+        "physique": 3,
+        "stealth": 5,
+        "resistMagic": 5,
+        "endurance": 5,
+        "courage": 5,
+        "dodgeEscape": 6
+      },
+      "creature": {
+        "category": "cursed",
+        "difficulty": "Простые / трудные",
+        "reward": 30,
+        "size": "2,5 м",
+        "weight": "68 кг",
+        "habitat": "Возле трупов",
+        "intellect": "Дикий",
+        "group": "Рощи из 3–5 особей",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Хищное проклятое растение, плюющееся кислотой и роющее землю.",
+        "tactics": "Прячется среди цветов, плюётся кислотой и кусает подошедших; зарываясь, оставляет взрывающиеся ядовитые стручки.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 25,
+        "staminaMax": 25,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "large",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 14,
+            "text": "Говорят, цветок, на лепестки которого попала кровь злодея, может стать археспорой — злобным растением, что плюётся кислотой и жрёт людей. Коричневые опаснее всех; спасает только огонь."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "monsterLore",
+            "dc": 14,
+            "text": "Археспоры растут там, где пролилась кровь и случились злодеяния, и прячутся среди растений. Издалека плюются кислотой, вблизи кусают, а зарывшись, оставляют взрывающиеся стручки. Двигайтесь, держитесь подальше от стручков, берите «Иволгу», масло против проклятых и огонь."
+          }
+        ],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "archespore-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00010",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "archespore-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000006",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst046i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "2d6+2",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Длинное",
+          "description": "<p>Длинное СА 1.</p>",
+          "ruleId": "creature.weapon.archespore.0"
+        }
+      },
+      {
+        "_id": "bst046i000000002",
+        "name": "Плевок кислотой",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "ranged",
+          "skill": "athletics",
+          "damage": "2d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 2,
+          "range": 8,
+          "rangeBodyMultiplier": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Разрушающее; Разрушает блок (1d6/2)",
+          "description": "<p>Разрушающее; Разрушает блок (1d6/2) СА 1.</p>",
+          "ruleId": "creature.weapon.archespore.1"
+        }
+      },
+      {
+        "_id": "bst046i000000003",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst046i000000004",
+        "name": "Уязвимость к огню",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fire-vulnerable",
+          "description": "<p>Существо получает двойной урон от огня, включая состояние «Горение». Множитель применяется автоматически.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst046i000000005",
+        "name": "Корни",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.rooted",
+          "description": "<p>Не прыгает и перемещается только зарываясь: Скорость и Бег относятся к зарыванию. Не защищается Сменой позиции.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst046i000000006",
+        "name": "Плевок кислотой",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.archespore.5",
+          "description": "<p>Действие: атака с основой 10 по цели в пределах 8 м. При попадании 2d6 урона в случайную часть тела и 1d6/2 разрушающего урона броне на ней; успешный блок наносит 1d6/2 разрушающего урона блокирующему предмету.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst046i000000007",
+        "name": "Камуфляж",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.archespore.6",
+          "description": "<p>Среди цветов и другой растительности сливается с окружением: +10 к Скрытности.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst046i000000008",
+        "name": "Зарывание",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.archespore.7",
+          "description": "<p>Перемещением зарывается и ползёт под землёй до 6 м; полным ходом — до 18 м. Роет песок, землю и твёрдый грунт, но не сплошной камень.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst046i000000009",
+        "name": "Взрыв стручка",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.archespore.8",
+          "description": "<p>Действие полного хода: зарывается, уходя от цели на дистанции ближнего боя, и оставляет стручок. В конце раунда он взрывается: все в пределах 2 м проходят Атлетику СЛ 14, чтобы отскочить; при провале 1d6 урона по каждой части тела и отравление.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst046i000000010",
+        "name": "Масло против проклятых",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.cursed-oil",
+          "description": "<p>Уязвимость: масло против проклятых добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000047",
+    "name": "Зелёная археспора",
+    "type": "npc",
+    "img": "icons/svg/blood.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Зелёная археспора",
+      "texture": {
+        "src": "icons/svg/blood.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 6,
+        "dexterity": 5,
+        "body": 5,
+        "speed": 6,
+        "empathy": 1,
+        "craft": 1,
+        "will": 5,
+        "luck": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25
+      },
+      "stamina": {
+        "value": 25,
+        "max": 25
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 3,
+        "brawling": 3,
+        "melee": 6,
+        "awareness": 8,
+        "wildernessSurvival": 7,
+        "intimidation": 4,
+        "physique": 3,
+        "stealth": 5,
+        "resistMagic": 5,
+        "endurance": 5,
+        "courage": 5,
+        "dodgeEscape": 6
+      },
+      "creature": {
+        "category": "cursed",
+        "difficulty": "Простые / трудные",
+        "reward": 30,
+        "size": "2,5 м",
+        "weight": "68 кг",
+        "habitat": "Возле трупов",
+        "intellect": "Дикий",
+        "group": "Рощи из 3–5 особей",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Хищное проклятое растение, плюющееся кислотой и роющее землю.",
+        "tactics": "Прячется среди цветов, плюётся кислотой и кусает подошедших; зарываясь, оставляет взрывающиеся ядовитые стручки.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 25,
+        "staminaMax": 25,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "large",
+        "lore": [],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "green-archespore-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00010",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "green-archespore-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000006",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst047i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "2d6+2",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Длинное; Отравление (50%)",
+          "description": "<p>Длинное; Отравление (50%) СА 1.</p>",
+          "ruleId": "creature.weapon.green-archespore.0"
+        }
+      },
+      {
+        "_id": "bst047i000000002",
+        "name": "Плевок кислотой",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "ranged",
+          "skill": "athletics",
+          "damage": "2d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 2,
+          "range": 8,
+          "rangeBodyMultiplier": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Разрушающее; Разрушает блок (1d6/2)",
+          "description": "<p>Разрушающее; Разрушает блок (1d6/2) СА 1.</p>",
+          "ruleId": "creature.weapon.green-archespore.1"
+        }
+      },
+      {
+        "_id": "bst047i000000003",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst047i000000004",
+        "name": "Уязвимость к огню",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fire-vulnerable",
+          "description": "<p>Существо получает двойной урон от огня, включая состояние «Горение». Множитель применяется автоматически.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst047i000000005",
+        "name": "Корни",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.rooted",
+          "description": "<p>Не прыгает и перемещается только зарываясь: Скорость и Бег относятся к зарыванию. Не защищается Сменой позиции.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst047i000000006",
+        "name": "Плевок кислотой",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.green-archespore.5",
+          "description": "<p>Действие: атака с основой 10 по цели в пределах 8 м. При попадании 2d6 урона в случайную часть тела и 1d6/2 разрушающего урона броне на ней; успешный блок наносит 1d6/2 разрушающего урона блокирующему предмету.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst047i000000007",
+        "name": "Камуфляж",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.green-archespore.6",
+          "description": "<p>Среди цветов и другой растительности сливается с окружением: +10 к Скрытности.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst047i000000008",
+        "name": "Зарывание",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.green-archespore.7",
+          "description": "<p>Перемещением зарывается и ползёт под землёй до 6 м; полным ходом — до 18 м. Роет песок, землю и твёрдый грунт, но не сплошной камень.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst047i000000009",
+        "name": "Взрыв стручка",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.green-archespore.8",
+          "description": "<p>Действие полного хода: зарывается, уходя от цели на дистанции ближнего боя, и оставляет стручок. В конце раунда он взрывается: все в пределах 2 м проходят Атлетику СЛ 14, чтобы отскочить; при провале 1d6 урона по каждой части тела и отравление.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst047i000000010",
+        "name": "Зелёная археспора",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.green-archespore.9",
+          "description": "<p>Укус отравляет с вероятностью 50%.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst047i000000011",
+        "name": "Масло против проклятых",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.cursed-oil",
+          "description": "<p>Уязвимость: масло против проклятых добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000048",
+    "name": "Пурпурная археспора",
+    "type": "npc",
+    "img": "icons/svg/blood.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Пурпурная археспора",
+      "texture": {
+        "src": "icons/svg/blood.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 6,
+        "dexterity": 5,
+        "body": 5,
+        "speed": 6,
+        "empathy": 1,
+        "craft": 1,
+        "will": 5,
+        "luck": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25
+      },
+      "stamina": {
+        "value": 25,
+        "max": 25
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 3,
+        "brawling": 3,
+        "melee": 6,
+        "awareness": 8,
+        "wildernessSurvival": 7,
+        "intimidation": 4,
+        "physique": 3,
+        "stealth": 5,
+        "resistMagic": 5,
+        "endurance": 5,
+        "courage": 5,
+        "dodgeEscape": 6
+      },
+      "creature": {
+        "category": "cursed",
+        "difficulty": "Простые / трудные",
+        "reward": 30,
+        "size": "2,5 м",
+        "weight": "68 кг",
+        "habitat": "Возле трупов",
+        "intellect": "Дикий",
+        "group": "Рощи из 3–5 особей",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Хищное проклятое растение, плюющееся кислотой и роющее землю.",
+        "tactics": "Прячется среди цветов, плюётся кислотой и кусает подошедших; зарываясь, оставляет взрывающиеся ядовитые стручки.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 25,
+        "staminaMax": 25,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "large",
+        "lore": [],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "purple-archespore-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00010",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "purple-archespore-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000006",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst048i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "2d6+2",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Длинное",
+          "description": "<p>Длинное СА 1.</p>",
+          "ruleId": "creature.weapon.purple-archespore.0"
+        }
+      },
+      {
+        "_id": "bst048i000000002",
+        "name": "Плевок кислотой",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "ranged",
+          "skill": "athletics",
+          "damage": "2d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 2,
+          "range": 8,
+          "rangeBodyMultiplier": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Разрушающее; Разрушает блок (1d6/2)",
+          "description": "<p>Разрушающее; Разрушает блок (1d6/2) СА 1.</p>",
+          "ruleId": "creature.weapon.purple-archespore.1"
+        }
+      },
+      {
+        "_id": "bst048i000000003",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst048i000000004",
+        "name": "Уязвимость к огню",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fire-vulnerable",
+          "description": "<p>Существо получает двойной урон от огня, включая состояние «Горение». Множитель применяется автоматически.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst048i000000005",
+        "name": "Корни",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.rooted",
+          "description": "<p>Не прыгает и перемещается только зарываясь: Скорость и Бег относятся к зарыванию. Не защищается Сменой позиции.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst048i000000006",
+        "name": "Плевок кислотой",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.purple-archespore.5",
+          "description": "<p>Действие: атака с основой 10 по цели в пределах 8 м. При попадании 2d6 урона в случайную часть тела и 1d6/2 разрушающего урона броне на ней; успешный блок наносит 1d6/2 разрушающего урона блокирующему предмету.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst048i000000007",
+        "name": "Камуфляж",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.purple-archespore.6",
+          "description": "<p>Среди цветов и другой растительности сливается с окружением: +10 к Скрытности.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst048i000000008",
+        "name": "Зарывание",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.purple-archespore.7",
+          "description": "<p>Перемещением зарывается и ползёт под землёй до 6 м; полным ходом — до 18 м. Роет песок, землю и твёрдый грунт, но не сплошной камень.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst048i000000009",
+        "name": "Взрыв стручка",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.purple-archespore.8",
+          "description": "<p>Действие полного хода: зарывается, уходя от цели на дистанции ближнего боя, и оставляет стручок. В конце раунда он взрывается: все в пределах 2 м проходят Атлетику СЛ 14, чтобы отскочить; при провале 1d6 урона по каждой части тела и отравление.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst048i000000010",
+        "name": "Пурпурная археспора",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.purple-archespore.9",
+          "description": "<p>+2 к проверкам атаки и защиты.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst048i000000011",
+        "name": "Масло против проклятых",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.cursed-oil",
+          "description": "<p>Уязвимость: масло против проклятых добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000049",
+    "name": "Игоша",
+    "type": "npc",
+    "img": "icons/svg/blood.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Игоша",
+      "texture": {
+        "src": "icons/svg/blood.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 8,
+        "dexterity": 9,
+        "body": 5,
+        "speed": 7,
+        "empathy": 1,
+        "craft": 1,
+        "will": 8,
+        "luck": 0
+      },
+      "health": {
+        "value": 60,
+        "max": 60
+      },
+      "stamina": {
+        "value": 30,
+        "max": 30
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 8,
+        "brawling": 7,
+        "melee": 8,
+        "awareness": 13,
+        "wildernessSurvival": 9,
+        "intimidation": 6,
+        "physique": 10,
+        "stealth": 7,
+        "resistMagic": 7,
+        "endurance": 9,
+        "courage": 8,
+        "dodgeEscape": 8
+      },
+      "creature": {
+        "category": "cursed",
+        "difficulty": "Средние / незаурядные",
+        "reward": 600,
+        "size": "0,3 м",
+        "weight": "3,5 кг",
+        "habitat": "Поселения",
+        "intellect": "Дикий",
+        "group": "Одиночка или пара",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Проклятый младенец-кровопийца, принимающий в бою шипастую боевую форму.",
+        "tactics": "Кусает, высасывая кровь; почуяв угрозу, превращается, отращивает шипы и рвёт когтями.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 60,
+        "staminaMax": 30,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "small",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 15,
+            "text": "Брошенный без материнской любви младенец становится игошей: ненавидит всё живое и пьёт кровь беременных и младенцев. Избавить от мучений его может лишь мать, если продержит его на руках всю ночь до рассвета."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "monsterLore",
+            "dc": 15,
+            "text": "Игошей становится брошенный или неправильно погребённый младенец. Он редко нападает без причины, но, почуяв угрозу, принимает боевую форму, похожую на альгуля, с шипами и когтями. Лучше снять проклятие: если родитель похоронит его на своей земле и проведёт эльфский ритуал имянаречения, игоша станет чуром — духом-хранителем дома."
+          }
+        ],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "botchling-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00011",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "botchling-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00012",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "botchling-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00013",
+          "quantity": 1,
+          "formula": "",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "botchling-3",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00014",
+          "quantity": 0,
+          "formula": "floor(1d6 / 3)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst049i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "3d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Улучшенное пробивающее броню; Высасывание крови",
+          "description": "<p>Улучшенное пробивающее броню; Высасывание крови СА 1.</p>",
+          "ruleId": "creature.weapon.botchling.0"
+        }
+      },
+      {
+        "_id": "bst049i000000002",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "5d6+4",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Только в боевой форме",
+          "description": "<p>Только в боевой форме СА 2.</p>",
+          "ruleId": "creature.weapon.botchling.1"
+        }
+      },
+      {
+        "_id": "bst049i000000003",
+        "name": "Ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.night-vision",
+          "description": "<p>Действует в зонах со слабым освещением без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst049i000000004",
+        "name": "Высасывание крови",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.botchling.3",
+          "description": "<p>Нанеся урон укусом, игоша наносит ещё 4 урона и восстанавливает 4 ПЗ.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst049i000000005",
+        "name": "Вытягивание жизненной силы",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.botchling.4",
+          "description": "<p>В пределах 2 м от спящей цели: за ночь цель не восстанавливает ВЫН, а её максимум ВЫН снижается на 5 (не ниже 5); снижение суммируется и проходит после ночи, проведённой вдали от игоши.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst049i000000006",
+        "name": "Боевая форма",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.botchling.5",
+          "description": "<p>Заметив угрозу или высосав кровь, полным ходом превращается: +2 к РЕА, ЛВК и СКОР, +3 к ТЕЛ, доступен удар когтями. Действием выращивает шипы: кто успешно берёт игошу в захват, получает 2d6 урона в туловище, а оружие, попавшее по игоше, получает 1 разрушающий урон; дезориентированный игоша шипы втягивает. Знак Аксий или «Управление чувствами» со Сотворением заклинаний СЛ 18 возвращают обычную форму; атакованный после этого игоша снова превращается, и СЛ становится 25.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst049i000000007",
+        "name": "Чур",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.botchling.6",
+          "description": "<p>Если родитель проведёт над могилой эльфский ритуал имянаречения Айм Ройн, через день и ночь игоша переродится в чура — бесплотного духа-хранителя дома. Чур перемещается до 8 м в любом направлении, в воздухе защищается Сменой позиции и не пользуется боевой формой, вытягиванием сил и высасыванием крови.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst049i000000008",
+        "name": "Масло против проклятых",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.cursed-oil",
+          "description": "<p>Уязвимость: масло против проклятых добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst049i000000009",
+        "name": "Уязвимость: Эликсир «Чёрная кровь»",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.botchling.8",
+          "description": "<p>высосав кровь цели под действием эликсира, игоша отравляется.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000050",
+    "name": "Вендиго",
+    "type": "npc",
+    "img": "icons/svg/blood.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Вендиго",
+      "texture": {
+        "src": "icons/svg/blood.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 5,
+        "reflex": 9,
+        "dexterity": 11,
+        "body": 10,
+        "speed": 9,
+        "empathy": 1,
+        "craft": 2,
+        "will": 10,
+        "luck": 0
+      },
+      "health": {
+        "value": 100,
+        "max": 100
+      },
+      "stamina": {
+        "value": 50,
+        "max": 50
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 8,
+        "brawling": 7,
+        "melee": 11,
+        "awareness": 11,
+        "wildernessSurvival": 13,
+        "intimidation": 7,
+        "hexWeaving": 7,
+        "physique": 8,
+        "stealth": 8,
+        "resistMagic": 8,
+        "endurance": 9,
+        "courage": 8,
+        "dodgeEscape": 7
+      },
+      "creature": {
+        "category": "cursed",
+        "difficulty": "Сложные / трудные",
+        "reward": 1500,
+        "size": "3,5 м",
+        "weight": "110 кг",
+        "habitat": "Высоко в горах",
+        "intellect": "Разумный",
+        "group": "Одиночка",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Проклятый горный великан с оленьими рогами, насылающий голод, бурю и тягу к людоедству.",
+        "tactics": "Скрывается в метели, кусает и рвёт заразными когтями, проклинает и подчиняет поддавшихся голоду. Держится подальше от огня.",
+        "naturalArmor": 10,
+        "resistances": "",
+        "healthMax": 100,
+        "staminaMax": 50,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "large",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 18,
+            "text": "О вендиго говорят мало: в горах будто бы бродит дух, что насылает на путников зверский голод. Горцы берут лишний припас и носят ритуальные маски."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "monsterLore",
+            "dc": 16,
+            "text": "Вендиго живёт высоко в горах: исхудавший рогатый великан с заразными когтями и сильной порчей. Проклятые им три дня тянутся к сырому мясу, и поддавшиеся попадают в его власть. Он боится огня — держите костёр и факелы; заметив тягу к сырому мясу, ведите несчастного вниз к жрецу. В бою старайтесь его сжечь."
+          }
+        ],
+        "loot": [
+          {
+            "name": "Эссенция смерти",
+            "formula": "2d6",
+            "currency": false
+          }
+        ],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "wendigo-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00005",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "wendigo-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00015",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "wendigo-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00016",
+          "quantity": 1,
+          "formula": "",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst050i000000001",
+        "name": "Укус",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "7d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Болезнь (60%)",
+          "description": "<p>Болезнь (60%) СА 1.</p>",
+          "ruleId": "creature.weapon.wendigo.0"
+        }
+      },
+      {
+        "_id": "bst050i000000002",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "5d6+4",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Кровопускающее (50%); Болезнь (25%)",
+          "description": "<p>Кровопускающее (50%); Болезнь (25%) СА 2.</p>",
+          "ruleId": "creature.weapon.wendigo.1"
+        }
+      },
+      {
+        "_id": "bst050i000000003",
+        "name": "Ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.night-vision",
+          "description": "<p>Действует в зонах со слабым освещением без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000004",
+        "name": "Невосприимчивость к магическому воздействию",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.magic-mind-immunity",
+          "description": "<p>Магия, действующая на разум, на него не действует.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000005",
+        "name": "Невосприимчивость к заморозке",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.freeze-immunity",
+          "description": "<p>Состояние «Замораживание» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000006",
+        "name": "Невосприимчивость к болезням",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.disease-immunity",
+          "description": "<p>Не заражается болезнями.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000007",
+        "name": "Невосприимчивость к убеждению",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.coercion-immunity",
+          "description": "<p>Убеждение, обман и другие словесные уловки на него не действуют.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000008",
+        "name": "Невосприимчивость к снегу и льду",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.snow-immunity",
+          "description": "<p>Лёд и снег не мешают ему: местность «Лёд и снег» на него не действует.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000009",
+        "name": "Выслеживание по запаху",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.wendigo.8",
+          "description": "<p>Выслеживает существо по запаху, не видя и не слыша его, без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000010",
+        "name": "Призыв снежной бури",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.wendigo.9",
+          "description": "<p>Действие: снежная буря радиусом 50 м с центром на вендиго — лёд и снег под ногами, все внутри видят не дальше 4 м. Действием вендиго сдвигает бурю на 20 м или развеивает её; иначе она держится 24 часа и исчезает со смертью вендиго. Маг или жрец разгоняет её за 10 ВЫН, действие и Сотворение заклинаний СЛ 20. Двимеритовая бомба не даёт вызвать бурю, но не развеивает её.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000011",
+        "name": "Порча еды",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.wendigo.10",
+          "description": "<p>Действие: портит не больше 1 м² еды и питья в пределах 10 м. Съевший проходит Стойкость СЛ 18, иначе его тошнит. Двимеритовая бомба не даёт этого сделать.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000012",
+        "name": "Проклятие вендиго",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.wendigo.11",
+          "description": "<p>Действие: глядя в глаза, Наведение порчи против Сопротивления магии цели. Проклятый три дня жаждет сырого мяса: не съев его к утру первого дня — −1 ко всем действиям и вдвое меньше ВЫН; ко второму — −3 и вчетверо меньше ВЫН; на закате третьего дня 1d10 ниже Воли, иначе он становится спутником вендиго (Инт 2, невосприимчив к убеждению и магии, подчиняется вендиго), а при успехе его Воля каждый день уменьшается вдвое. Снимают проклятие смерть вендиго или маг либо жрец за пределами гор: 10 ВЫН, действие и Сотворение заклинаний выше результата Наведения порчи. Двимерит не даёт проклясть.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000013",
+        "name": "Масло против проклятых",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.cursed-oil",
+          "description": "<p>Уязвимость: масло против проклятых добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000014",
+        "name": "Уязвимость: Боязнь огня",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.wendigo.13",
+          "description": "<p>подойти на 6 м к костру — Храбрость СЛ 20, на 10 м к большому костру — СЛ 26; к факелу или горящему оружию подходит без проверки, но первым на его владельца не нападает.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000015",
+        "name": "Уязвимость: Двимеритовые бомбы",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.wendigo.14",
+          "description": "<p>не дают вызвать бурю, испортить еду и проклясть.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst050i000000016",
+        "name": "Уязвимость: Бомба «Лунная пыль».",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.wendigo.15",
+          "description": "<p>Бомба «Лунная пыль».</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
     "_id": "radolfKazmer0001",
     "name": "Родольф Казмер",
     "type": "npc",

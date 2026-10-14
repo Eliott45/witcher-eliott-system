@@ -24,7 +24,8 @@ export function weaponHitTraits(weapon = {}, actor = null) {
     ablating: /разрушающ/iu.test(text),
     // Monster Hunter's Journal, graveir acid: its own ablation dice, dice against a blocking item, effects on any hit.
     ablationDice: text.match(/разрушающ\S*\s*\((\d+d\d+)\)/iu)?.[1] ?? null,
-    blockWear: text.match(/разрушает блок\S*\s*\((\d+d\d+)\)/iu)?.[1] ?? null,
+    // «1d6/2» (archespore) halves the dice like ordinary ablation.
+    blockWear: text.match(/разрушает блок\S*\s*\((\d+d\d+)(?:\s*\/\s*(\d+))?\)/iu)?.slice(1, 3).reduce((dice, divisor) => divisor ? `floor(${dice} / ${divisor})` : dice) ?? null,
     contact: /без пробития/iu.test(text),
     wearMultiplier: !creatureGolemSlowed(actor) && /двойной урон (?:оружию|снаряжению)/iu.test(text) ? 2 : 1,
     noParry: !creatureGolemSlowed(actor) && /нельзя парировать/iu.test(text)

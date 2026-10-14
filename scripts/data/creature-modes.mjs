@@ -35,6 +35,9 @@ export const creatureHumanForm = actor => creatureProfile(actor)?.id === "werewo
 export const creatureSuppressionFlags = creatureSuppression;
 export const creatureInvisible = actor => Boolean(actor?.system?.creature?.invisible) && !creatureSuppression(actor).suppressed || hymShadow(actor);
 /** A mage who found the hym by Magic Training halves its attack bonus until it moves (a move renews the epoch). */
+/** Monster Hunter's Journal p.49: the botchling's claws exist only in its battle form. */
+export const creatureWeaponBlocked = (actor, item) => creatureProfile(actor)?.id === "botchling" && item?.name === "Удар когтями" && !actor.system?.creature?.battleForm
+  ? "Когти игоши доступны только в боевой форме" : "";
 export const hymLocated = actor => { const located = actor?.flags?.[SYSTEM_ID]?.hymLocated; return located !== undefined && located === (actor.system?.creature?.invisibilityEpoch ?? ""); };
 export const creatureSeesInvisible = actor => creatureProfile(actor)?.id === "cat";
 export const creatureGolemSlowed = actor => creatureProfile(actor)?.id === "golem" && creatureSuppression(actor).dimeritium;
@@ -76,6 +79,9 @@ export function creatureModeModifiers(actor, environment = null) {
   if (hymShadow(actor)) add("combat.attack", hymLocated(actor) ? 5 : 10, hymLocated(actor) ? "Тело из теней: найден магом" : "Тело из теней");
   else if (creatureInvisible(actor)) { add("skills.stealth", 10, "Невидимость"); add("combat.attack", 5, "Атака из невидимости"); }
   if (profile?.id === "arachas" && state.camouflage) add("skills.stealth", 10, "Неподвижный камуфляж");
+  if (/archespore$/.test(profile?.id ?? "") && state.camouflage) add("skills.stealth", 10, "Камуфляж среди растений");
+  if (profile?.id === "purple-archespore") { add("combat.attack", 2, "Пурпурная археспора"); add("combat.defense", 2, "Пурпурная археспора"); }
+  if (profile?.id === "botchling" && state.battleForm && !state.chur) for (const [key, value] of Object.entries({ reflex: 2, dexterity: 2, speed: 2, body: 3 })) add(`attributes.${key}`, value, "Боевая форма игоши");
   add("skills.courage", creaturePackBonus(actor), "Живой вожак стаи");
   const presence = creatureLeaderPresence(actor);
   add("combat.attack", presence, "Присутствие вожака");
@@ -100,6 +106,8 @@ export function creatureModeContext(actor) {
   if (profile?.id === "siren") check("illusion", "Иллюзия прекрасной женщины");
   if (profile?.id === "arachas") { check("camouflage", "Неподвижен в привычной среде"); check("weakSpot", "Атакуют сзади: ПБ 10"); }
   if (profile?.id === "rock-troll") check("weakSpot", "Открытый живот: ПБ 5 для торса");
+  if (/archespore$/.test(profile?.id ?? "")) check("camouflage", "Среди растений");
+  if (profile?.id === "botchling") { check("battleForm", "Боевая форма"); check("spikes", "Шипы"); check("chur", "Чур: дух-хранитель"); }
   if (profile?.id === "werewolf") check("transformed", "Облик волколака", true);
   if (profile?.id === "hym") select("shadowMode", "Тело из теней", [["auto", "По освещению: в темноте"], ["active", "Хим в тени"], ["off", "Хим на свету"]], "auto");
   if (["wraith", "noonwraith", "katakan", "werewolf", "pesta"].includes(profile?.id)) select("spiritMode", "Подавление способностей", [["normal", "По эффектам Ирдена и Лунной пыли"], ["suppressed", "Подавлено ведущим"]], "normal");
@@ -111,5 +119,5 @@ export function creatureModeContext(actor) {
   const notes = [hymShadow(actor) ? `Тело из теней: бесплотен и невидим, +${hymLocated(actor) ? 5 : 10} к атаке.` : "",
     profile?.id === "pesta" ? (actor.flags?.[SYSTEM_ID]?.pestaFliesGone ? "Облако мух рассеяно." : "Облако мух: −2 ко всем действиям рядом с ней, болезнь 25% в начале хода.") : "",
     rotfiend?.decaying ? "Разлагается: взорвётся в начале своего следующего хода." : "", creatureRaging(actor) ? "Ярость: +3 ПЗ в начале хода; необходимо двигаться и атаковать." : "", creatureHasInfiniteStamina(actor) ? "Конструкция: Выносливость не расходуется." : "", creaturePackBonus(actor) ? "Живой вожак в этой стае: +4 к Храбрости." : "", creatureLeaderPresence(actor) ? "Присутствие вожака: +3 к атаке и защите." : "", creatureInvisible(actor) ? "Невидим: +10 Скрытности, +5 к атаке; после атаки станет видим." : ""].filter(Boolean);
-  return { fields, notes, rotfiend, available: fields.length > 0 || notes.length > 0 || ["cat", "foglet"].includes(profile?.id) || Boolean(rotfiend), infiniteStamina: creatureHasInfiniteStamina(actor), lycanthropy: profile?.id === "werewolf", detectMagic: ["katakan", "hym"].includes(profile?.id), detectSight: ["katakan", "foglet"].includes(profile?.id), foglet: profile?.id === "foglet", senseMagic: profile?.id === "cat", sirenIllusion: profile?.id === "siren" && state.illusion, falling: (state.fallRemaining ?? 0) > 0, fallRemaining: state.fallRemaining ?? 0 };
+  return { fields, notes, rotfiend, available: fields.length > 0 || notes.length > 0 || ["cat", "foglet"].includes(profile?.id) || Boolean(rotfiend), infiniteStamina: creatureHasInfiniteStamina(actor), lycanthropy: profile?.id === "werewolf", detectMagic: ["katakan", "hym"].includes(profile?.id), detectSight: ["katakan", "foglet"].includes(profile?.id), weather: ["foglet", "wendigo"].includes(profile?.id), botchling: profile?.id === "botchling" && state.battleForm, senseMagic: profile?.id === "cat", sirenIllusion: profile?.id === "siren" && state.illusion, falling: (state.fallRemaining ?? 0) > 0, fallRemaining: state.fallRemaining ?? 0 };
 }

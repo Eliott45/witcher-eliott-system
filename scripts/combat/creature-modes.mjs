@@ -33,7 +33,12 @@ export async function setCreatureMode(actor, key, raw) {
   const suppression = creatureSuppressionFlags(actor);
   if (key === "invisible" && value && creatureProfile(actor)?.id === "foglet") { const reason = fogVanishBlocked(actor); if (reason) throw new Error(reason); }
   if (key === "invisible" && value && suppression.suppressed || key === "transformed" && value && (suppression.moonDust || suppression.manual)) throw new Error("Способность подавлена Ирденом или Лунной пылью.");
+  // Monster Hunter's Journal p.49: spikes grow only in the battle form; a chur never takes it.
+  if (key === "spikes" && value && !actor.system.creature.battleForm) throw new Error("Шипы — только в боевой форме.");
+  if (key === "battleForm" && value && actor.system.creature.chur) throw new Error("Чур не принимает боевую форму.");
   const patch = { [`system.creature.${key}`]: value };
+  if (key === "battleForm" && !value) patch["system.creature.spikes"] = false;
+  if (key === "chur" && value) Object.assign(patch, { "system.creature.battleForm": false, "system.creature.spikes": false });
   if (key === "invisible" && value) patch["system.creature.invisibilityEpoch"] = globalThis.foundry?.utils?.randomID?.() ?? globalThis.crypto.randomUUID();
   if (key === "movementMode" && value !== "flying") patch["system.creature.flightHeight"] = 0;
   await actor.update(patch);
@@ -170,7 +175,11 @@ export async function senseCreatureMagic(actor) {
 }
 
 /** Katakan's blood transfer: the victim's active substances also affect the drinking vampire. */
-export async function afterCreatureBite(attacker, victim) {
+export async function afterCreatureBite(attacker, victim, key = "") {
+  if (creatureProfile(attacker)?.id === "botchling") {
+    const [{ botchlingBite }, { applyCreatureDamage }] = await Promise.all([import("./journal-beasts.mjs"), import("./creature-actions-damage.mjs")]);
+    return botchlingBite(attacker, victim, applyCreatureDamage, key);
+  }
   if (creatureProfile(attacker)?.id !== "katakan" || !victim) return false;
   const doses = activeDoses(victim), black = doses.some(effect => effect.flags[SYSTEM_ID].consumable.ruleId === "potion.black-blood");
   const substances = Array.from(victim.effects ?? []).filter(effect => activeEffect(effect)
@@ -203,7 +212,8 @@ export async function afterCreatureBite(attacker, victim) {
 
 export function registerCreatureModes() {
   Hooks.on("updateToken", (token, changes) => {
-    if (game.user !== game.users.activeGM || !token.actor?.system.creature?.camouflage || !("x" in changes || "y" in changes)) return;
+    // The arachas must stay still to blend in; an archespore among plants stays hidden wherever it burrows.
+    if (game.user !== game.users.activeGM || !token.actor?.system.creature?.camouflage || !("x" in changes || "y" in changes) || /archespore$/.test(creatureProfile(token.actor)?.id ?? "")) return;
     return token.actor.update({ "system.creature.camouflage": false });
   });
   const onStun = effect => {

@@ -12,7 +12,7 @@ import { registerSystemSettings,applyLoadedLanguage,ensureSystemLanguage } from 
 import { registerSettingsLayout } from "./settings-layout.mjs";
 import { WitcherTokenLayer } from "./canvas/witcher-token-layer.mjs";
 import { registerManualCriticalChat } from "./chat/manual-critical.mjs";
-import { migrateBestiaryContent,migrateBestiaryCreatures,migrateBestiaryJournalCreatures,migrateBestiaryRadolf,migrateBestiaryJournalNecrophages,migrateBestiaryJournalRefresh,migrateBestiaryJournalSpirits,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
+import { migrateBestiaryContent,migrateBestiaryCreatures,migrateBestiaryJournalCreatures,migrateBestiaryRadolf,migrateBestiaryJournalNecrophages,migrateBestiaryJournalRefresh,migrateBestiaryJournalSpirits,migrateBestiaryJournalBeasts,registerBestiaryMigration } from "./migrations/bestiary-content.mjs";
 import { migrateBestiaryCorrections } from "./migrations/bestiary-corrections.mjs";
 import { migrateBestiaryAutomation } from "./migrations/bestiary-automation.mjs";
 import { migratePregenContent,registerPregenMigration } from "./migrations/pregen-content.mjs";
@@ -62,6 +62,8 @@ import { registerHagActions } from "./combat/hag-actions.mjs";
 import { registerCreatureActions } from "./combat/creature-actions.mjs";
 import { registerCreatureFog } from "./combat/creature-fog.mjs";
 import { registerHym } from "./combat/hym.mjs";
+import { registerJournalBeasts } from "./combat/journal-beasts.mjs";
+import { registerWendigo } from "./combat/wendigo.mjs";
 import { registerCreatureModes } from "./combat/creature-modes.mjs";
 import { registerTokenEffectsPanel } from "./canvas/token-effects-panel.mjs";
 import { registerCombatEffects } from "./canvas/fx/combat-effects.mjs";
@@ -170,6 +172,8 @@ Hooks.once("init", async () => {
   registerCreatureActions();
   registerCreatureFog();
   registerHym();
+  registerJournalBeasts();
+  registerWendigo();
   registerCreatureModes();
   registerTokenEffectsPanel();
   registerCombatEffects();
@@ -281,7 +285,7 @@ Hooks.once("ready", async () => {
     console.error(`${SYSTEM_ID} | Could not update vision defaults`, error);
     ui.notifications.error(game.i18n.localize("WITCHER.Token.MigrationFailed"));
   });
-  await migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).then(migrateBestiaryAutomation).then(migrateBestiaryJournalCreatures).then(migrateBestiaryRadolf).then(migrateBestiaryJournalNecrophages).then(migrateBestiaryJournalRefresh).then(migrateBestiaryJournalSpirits).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
+  await migrateBestiaryContent().then(migrateBestiaryCreatures).then(migrateBestiaryCorrections).then(migrateBestiaryAutomation).then(migrateBestiaryJournalCreatures).then(migrateBestiaryRadolf).then(migrateBestiaryJournalNecrophages).then(migrateBestiaryJournalRefresh).then(migrateBestiaryJournalSpirits).then(migrateBestiaryJournalBeasts).catch(error=>{console.error(`${SYSTEM_ID} | Bestiary content`,error);ui.notifications.error("Не удалось обновить содержимое бестиария. Подробности в консоли.");});
   await migrateSpellContent().catch(error=>{
     console.error(`${SYSTEM_ID} | Could not update magic content`,error);
     ui.notifications.error("Не удалось обновить каталог магии. Подробности в консоли.");
