@@ -1,7 +1,9 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
-import { pokerClosed, requirePokerAction, rerollIndices, revealPoker, wagerAmount, pokerHand } from "./poker-rules.mjs";
+import { isCarried } from "../data/containers.mjs";
+import { skillValue } from "../data/skills.mjs";
+import { pokerClosed, requirePokerAction, rerollIndices, revealPoker, wagerAmount, pokerHand, LOADED_DICE_DC } from "./poker-rules.mjs";
 
 export const pokerState = message => message?.flags?.[SYSTEM_ID]?.pokerTable;
 export const pokerReceipt = message => message?.flags?.[SYSTEM_ID]?.pokerReceipt;
@@ -14,11 +16,11 @@ const copy = value => foundry.utils.deepClone(value);
 const documentClass = () => foundry.documents.ChatMessage.implementation;
 const messageSource = flags => ({ author: game.user.id, style: CONST.CHAT_MESSAGE_STYLES.OTHER, flags: { [SYSTEM_ID]: { skipLuck: true, ...flags } } });
 export const ownedPokerActors = user => game.actors.filter(actor => ["character", "npc"].includes(actor.type) && actor.testUserPermission(user, "OWNER"));
-export const hasLoadedDice = actor => Boolean(actor?.items.some(item => item.system.ruleId === "gear.loaded-dice" && item.system.quantity > 0 && item.system.carried !== false));
+export const hasLoadedDice = actor => Boolean(actor?.items.some(item => item.system.ruleId === "gear.loaded-dice" && item.system.quantity > 0 && isCarried(item)));
 const receiptFor = requestId => game.messages.find(message => gmDocument(message) && pokerReceipt(message)?.requestId === requestId);
 export function seatReceipt(id, tableId, userId, kind) {
   const message = game.messages.get(id), data = pokerReceipt(message);
-  if (!gmDocument(message) || data?.tableId !== tableId || data.userId !== userId || data.kind !== kind) throw new Error("Результат броска недоступен. Попросите мастера восстановить стол.");
+  if (!gmDocument(message) || data?.tableId !== tableId || data.userId !== userId || ![kind].flat().includes(data.kind)) throw new Error("Результат броска недоступен. Попросите мастера восстановить стол.");
   return data;
 }
 function actorFor(uuid, user, required = false) {
@@ -28,12 +30,13 @@ function actorFor(uuid, user, required = false) {
   return actor;
 }
 function participant(user, actor) {
-  return { userId: user.id, name: actor?.name ?? user.name, actorUuid: actor?.uuid ?? "", revision: 0, opening: "", draw: "", final: "" };
+  return { userId: user.id, name: actor?.name ?? user.name, actorUuid: actor?.uuid ?? "", revision: 0, opening: "", draw: "", rerolled: [], palm: "", final: "" };
 }
 export function pokerCard(state) {
-  const phase = { invited: "Приглашение за стол", funding: "Сбор ставок", opening: "Первый бросок", drawing: "Переброс костей", settling: "Расчёт банка", finished: "Партия завершена", declined: "Приглашение отклонено", cancelled: "Партия отменена" }[state.phase];
+  const phase = { invited: "Приглашение за стол", funding: "Сбор ставок", opening: "Первый бросок", drawing: "Переброс костей", palming: "Вскрытие", settling: "Расчёт банка", finished: "Партия завершена", declined: "Приглашение отклонено", cancelled: "Партия отменена" }[state.phase];
   const result = state.phase === "finished" ? state.winner === null ? "Ничья" : `Победитель: ${state.seats[state.winner].name}` : phase;
-  return `<section class="witcher-poker-card"><h3><i class="fa-solid fa-dice"></i> Покер на костях</h3><p>${state.seats.map(seat => esc(seat.name)).join(" · ")}</p><strong>${esc(result)}</strong><p>${state.stake ? `Ставка: ${state.stake} кр. с каждого · Банк: ${state.stake * 2} кр.` : "Игра без ставок"}</p><button type="button" data-poker-open><i class="fa-solid fa-dice-five"></i> Открыть стол</button></section>`;
+  const caught = state.phase === "finished" && state.reason === "caught" ? `<p class="witcher-poker-caught"><i class="fa-solid fa-mask"></i> ${state.caught.map(index => esc(state.seats[index].name)).join(" и ")}: пойман на шулерских костях</p>` : "";
+  return `<section class="witcher-poker-card"><h3><i class="fa-solid fa-dice"></i> Покер на костях</h3><p>${state.seats.map(seat => esc(seat.name)).join(" · ")}</p><strong>${esc(result)}</strong>${caught}<p>${state.stake ? `Ставка: ${state.stake} кр. с каждого · Банк: ${state.stake * 2} кр.` : "Игра без ставок"}</p><button type="button" data-poker-open><i class="fa-solid fa-dice-five"></i> Открыть стол</button></section>`;
 }
 async function saveTable(message, state) {
   if (!activeGM()) throw new Error("Мастер сменился. Повторите действие после подключения ведущего.");
@@ -47,6 +50,39 @@ async function saveReceipt(message, data) {
 async function createReceipt(request, user, fields) {
   return documentClass().create({ ...messageSource({ pokerReceipt: { requestId: request.id, userId: user.id, done: false, ...fields } }),
     whisper: [...new Set([user.id, ...gmIds()])], content: "<p>Ход за столом покера.</p>" });
+}
+const actorOf = seat => seat.actorUuid ? game.actors.find(actor => actor.uuid === seat.actorUuid) ?? null : null;
+/** The opponent's character gets a hidden Awareness check; only the GM sees the swap and the roll. */
+async function spotSwap(state, index, cheat) {
+  const cheater = state.seats[index], watcher = actorOf(state.seats[1 - index]);
+  let skill = null;
+  try { skill = watcher ? skillValue(watcher.system, "awareness") : null; } catch { skill = null; }
+  const roll = skill?.total == null ? null : await new Roll(`1d10wc + ${skill.total}`).evaluate();
+  const spotted = Boolean(roll && roll.total >= LOADED_DICE_DC);
+  const check = roll ? `<p>Внимание: ${esc(watcher.name)} — ${roll.total} против СЛ ${LOADED_DICE_DC}. <strong>${spotted ? "Подмена замечена: шулер проигрывает." : "Подмену не заметили."}</strong></p>`
+    : `<p>У соперника нет персонажа — при желании проведите проверку Внимания СЛ ${LOADED_DICE_DC} вручную.</p>`;
+  await documentClass().create({ ...messageSource({ pokerNote: true }), whisper: gmIds(), blind: true, rolls: roll ? [roll] : [],
+    content: `<section class="witcher-poker-card is-note"><h3><i class="fa-solid fa-mask"></i> Шулерские кости</h3><p>${esc(cheater.name)} подменяет кость ${cheat.index + 1}: ${cheat.from} → ${cheat.value}.</p>${check}</section>` });
+  return { spotted, check: roll?.total ?? null };
+}
+function revealTable(state, table) {
+  const finals = state.seats.map(row => seatReceipt(row.final, table.id, row.userId, ["reroll", "finish"]));
+  const caught = finals.flatMap((receipt, index) => receipt.cheat?.spotted ? [index] : []);
+  return { ...revealPoker(state, finals.map(receipt => receipt.dice), caught), swaps: finals.map(receipt => receipt.cheat?.spotted ? receipt.cheat.index : -1) };
+}
+/** Once both have rerolled: reveal at once, unless someone carries loaded dice and may still palm one die. */
+async function afterDraws(state, table) {
+  if (state.phase !== "drawing" || !state.seats.every(row => row.draw)) return state;
+  const finals = state.seats.map(row => seatReceipt(row.draw, table.id, row.userId, "reroll").dice);
+  const palming = state.seats.map(row => !row.final && hasLoadedDice(actorOf(row)));
+  for (const [index, row] of state.seats.entries()) {
+    if (!palming[index]) { row.final ||= row.draw; continue; }
+    if (row.palm) continue;
+    // The rule lets the cheater see every die first; the opponent's dice reach only them and the GM.
+    const peek = await createReceipt({ id: "" }, game.users.get(row.userId), { tableId: table.id, kind: "peek", done: true, ok: true, hands: [finals[index], finals[1 - index]] });
+    row.palm = peek.id;
+  }
+  return palming.some(Boolean) ? { ...state, phase: "palming" } : revealTable(state, table);
 }
 async function rollDice(count) {
   if (!count) return [];
@@ -153,7 +189,7 @@ export async function processPokerRequest(request, creatorId) {
           else if (command.action === "concede") { state.phase = "settling"; state.winner = 1 - index; state.reason = "conceded"; }
           else {
             const kind = command.action;
-            let dice = pokerReceipt(receipt)?.dice;
+            let dice = pokerReceipt(receipt)?.dice, cheat = null;
             if (!dice) {
               if (kind === "roll") dice = await rollDice(5);
               else if (kind === "reroll") {
@@ -162,25 +198,30 @@ export async function processPokerRequest(request, creatorId) {
               } else {
                 dice = [...seatReceipt(seat.draw, table.id, user.id, "reroll").dice];
                 if (data.cheat) {
-                  const actor = actorFor(seat.actorUuid, user);
-                  if (!hasLoadedDice(actor)) throw new Error("Шулерские кости должны быть при себе.");
                   const { index: position, value } = data.cheat;
                   rerollIndices([position]); if (!Number.isInteger(value) || value < 1 || value > 6) throw new Error("На кости может быть от 1 до 6.");
-                  dice[position] = value;
+                  if (dice[position] !== value) {
+                    if (!hasLoadedDice(actorFor(seat.actorUuid, user))) throw new Error("Шулерские кости должны быть при себе.");
+                    cheat = { index: position, from: dice[position], value };
+                    dice[position] = value;
+                    Object.assign(cheat, await spotSwap(state, index, cheat));
+                  }
                 }
               }
               pokerHand(dice);
-              receipt = await createReceipt(request, user, { tableId: table.id, kind, dice });
+              receipt = await createReceipt(request, user, { tableId: table.id, kind, dice, ...(cheat ? { cheat } : {}), ...(kind === "reroll" ? { indices: rerollIndices(data.indices) } : {}) });
             }
             if (kind === "roll") {
               seat.opening = receipt.id;
               if (state.seats.every(row => row.opening)) {
                 state.hands = state.seats.map(row => seatReceipt(row.opening, table.id, row.userId, "roll").dice); state.phase = "drawing";
               }
-            } else if (kind === "reroll") seat.draw = receipt.id;
-            else {
+            } else if (kind === "reroll") {
+              seat.draw = receipt.id; seat.rerolled = pokerReceipt(receipt).indices ?? [];
+              state = await afterDraws(state, table);
+            } else {
               seat.final = receipt.id;
-              if (state.seats.every(row => row.final)) state = revealPoker(state, state.seats.map(row => seatReceipt(row.final, table.id, row.userId, "finish").dice));
+              if (state.seats.every(row => row.final)) state = revealTable(state, table);
             }
           }
           state.seats[index].revision++;

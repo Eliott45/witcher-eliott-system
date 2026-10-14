@@ -16,6 +16,7 @@
   <nav class="witcher-item-tabs tabs" aria-label="{{localize 'WITCHER.ItemTabs.Navigation'}}">{{#each itemTabs}}<button type="button" data-action="tab" data-group="{{group}}" data-tab="{{id}}" class="{{cssClass}}" aria-pressed="{{active}}"><i class="{{icon}}"></i> {{localize label}}</button>{{/each}}</nav>
   <section class="witcher-item-tab tab {{tabs.description.cssClass}}" data-group="item" data-tab="description">
   {{#if radolf}}<div class="witcher-consume-controls"><button type="button" data-action="useRadolfItem" {{disabled (or (not editable) radolf.disabled)}}><i class="fa-solid {{radolf.icon}}"></i> {{radolf.label}}</button></div>{{/if}}
+  {{#if poker}}<div class="witcher-consume-controls"><button type="button" data-action="playPoker"><i class="fa-solid {{poker.icon}}"></i> {{poker.label}}</button></div>{{/if}}
   {{#if consumption.enabled}}<div class="witcher-consume-controls"><button type="button" data-action="useConsumable" {{disabled (or (not editable) (not consumption.canUse))}}><i class="fa-solid fa-hand-sparkles"></i> Использовать</button><span>Осталось применений: {{consumption.remaining}}</span></div>{{/if}}
   {{{alchemyDetails}}}
   {{{materialDetails}}}

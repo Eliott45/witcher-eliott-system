@@ -2,12 +2,21 @@ import { SYSTEM_ID } from "../config.mjs";
 import { pokerClosed } from "./poker-rules.mjs";
 import { pokerState, pokerReceipt, pokerTables, pokerWrite, processPokerRequest, resumePoker } from "./poker-service.mjs";
 
-export async function openPoker(tableId = "") {
+export async function openPoker(tableId = "", options = {}) {
   const { openPokerWindow } = await import("./poker-window.mjs");
-  return openPokerWindow(tableId);
+  return openPokerWindow(tableId, options);
 }
+/** Macro entry: `game.system.api.poker()` or `game.system.api.poker({ actor })` to sit down as that character. */
+const pokerApi = ({ actor = null, tableId = "" } = {}) => openPoker(tableId, { actorUuid: actor?.uuid ?? "" });
+export const pokerActions = {
+  async playPoker(_event, target) {
+    const item = this.item ?? this.actor?.items.get(target.dataset.itemId);
+    if (!item?.actor?.isOwner) return;
+    try { await openPoker("", { actorUuid: item.actor.uuid }); } catch (error) { ui.notifications.warn(error.message); }
+  }
+};
 export function registerPoker() {
-  game.system.api = { ...game.system.api, poker: openPoker };
+  game.system.api = { ...game.system.api, poker: pokerApi };
   const report = error => { console.error("Dice poker", error); ui.notifications.warn(error.message); };
   Hooks.on("getSceneControlButtons", controls => {
     const tokens = controls.tokens ?? controls.token;

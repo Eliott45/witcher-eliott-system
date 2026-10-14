@@ -20,6 +20,7 @@ import { sheetPreferences, updateSheetPreferences, reportPreferencesError } from
 import { relicArmorLore } from "../data/relic-armor.mjs";
 import { isFocusItem } from "../magic/rules.mjs";
 import { radolfItemContext } from "../data/radolf-rules.mjs";
+import { pokerItemContext } from "../minigames/poker-rules.mjs";
 
 // Display groups reuse Item types/kinds. They are not a second item classification.
 const GROUPS = [
@@ -58,7 +59,7 @@ function fittedLimbs(actor, itemId) {
 export function inventoryContext(actor, preferences = {}) {
   const items = Array.from(actor.items ?? []).filter(isPhysical);
   const rows = items.map(item => ({ id: item.id, name: item.name, img: item.img, ...item.system, ...visorContext(item), sort: item.sort ?? 0,
-    quantity: item.system.quantity ?? 1, consumption: consumableContext(item), radolf: radolfItemContext(item), carried: isCarried(item, items), expanded: false, presentation: null, cargoSections: [], onTransport: false,
+    quantity: item.system.quantity ?? 1, consumption: consumableContext(item), radolf: radolfItemContext(item), poker: pokerItemContext(item), carried: isCarried(item, items), expanded: false, presentation: null, cargoSections: [], onTransport: false,
     isContainer: isContainer(item), parentId: containerParent(item, items)?.id ?? "", children: [], containerOpen: true,
     isRecipe: item.type === "recipe", oil: activeOil(item, globalThis.game?.time?.worldTime ?? 0), installations: item.system.installations ?? [],
     isWeapon: item.type === "weapon" && !item.system.natural, grip: gripOf(item),

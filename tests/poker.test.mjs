@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { SYSTEM_ID as SYS } from "../scripts/config.mjs";
-import { pokerHand, comparePoker, rerollIndices, wagerAmount, requirePokerAction } from "../scripts/minigames/poker-rules.mjs";
+import { pokerHand, pokerScoring, comparePoker, rerollIndices, wagerAmount, requirePokerAction, pokerItemContext } from "../scripts/minigames/poker-rules.mjs";
 import { pokerState, pokerReceipt, processPokerRequest, pokerWrite, recoverPokerBank, resumePoker, pokerTables } from "../scripts/minigames/poker-service.mjs";
 
 test("dice poker ranks all 7776 outcomes with the printed full-house/straight hierarchy", () => {
@@ -15,6 +15,21 @@ test("dice poker ranks all 7776 outcomes with the printed full-house/straight hi
   assert.equal(comparePoker([2, 2, 2, 1, 1], [2, 3, 4, 5, 6]), 1);
   assert.equal(comparePoker([1, 1, 1, 1, 1], [6, 6, 6, 6, 5]), 1);
   assert.equal(comparePoker([1, 2, 3, 4, 6], [1, 2, 3, 5, 6]), -1);
+});
+test("scoring dice highlight exactly the dice that make the combination", () => {
+  assert.deepEqual(pokerScoring([1, 2, 3, 4, 6]), []);
+  assert.deepEqual(pokerScoring([5, 2, 5, 4, 6]), [0, 2]);
+  assert.deepEqual(pokerScoring([5, 2, 5, 2, 6]), [0, 1, 2, 3]);
+  assert.deepEqual(pokerScoring([3, 1, 3, 3, 6]), [0, 2, 3]);
+  assert.deepEqual(pokerScoring([3, 5, 3, 3, 5]), [0, 1, 2, 3, 4]);
+  assert.deepEqual(pokerScoring([6, 2, 4, 3, 5]), [0, 1, 2, 3, 4]);
+  assert.deepEqual(pokerScoring([4, 4, 1, 4, 4]), [0, 1, 3, 4]);
+});
+test("only owned gaming gear offers a dice poker challenge", () => {
+  assert.ok(pokerItemContext({ actor: {}, system: { ruleId: "gear.dice-poker-board" } }));
+  assert.ok(pokerItemContext({ actor: {}, system: { ruleId: "gear.loaded-dice" } }));
+  assert.equal(pokerItemContext({ actor: null, system: { ruleId: "gear.dice-poker-board" } }), null);
+  assert.equal(pokerItemContext({ actor: {}, system: { ruleId: "gear.gwent-deck" } }), null);
 });
 test("matching hands compare their groups before kickers and exact ties stay ties", () => {
   assert.equal(comparePoker([3, 3, 1, 2, 4], [2, 2, 4, 5, 6]), 1);
@@ -53,7 +68,8 @@ function fixture() {
   globalThis.ui = { notifications: { warn() {} } };
   globalThis.CONST = { CHAT_MESSAGE_STYLES: { OTHER: 0 } };
   globalThis.foundry = { utils: { deepClone: structuredClone }, documents: { ChatMessage: { implementation: { async create(data) { return make(data); } } } } };
-  globalThis.Roll = class { constructor(formula) { this.count = Number(formula.split("d")[0]); } async evaluate() { rolled++; const dice = rolls.shift() ?? Array(this.count).fill(1); assert.equal(dice.length, this.count); this.dice = [{ results: dice.map(result => ({ result, active: true })) }]; return this; } };
+  globalThis.Roll = class { constructor(formula) { this.formula = formula; this.count = Number(formula.split("d")[0]); this.bonus = Number(formula.split("+")[1] ?? 0); }
+    async evaluate() { rolled++; const dice = rolls.shift() ?? Array(this.count).fill(1); assert.equal(dice.length, this.count); this.dice = [{ results: dice.map(result => ({ result, active: true })) }]; this.total = dice.reduce((a, b) => a + b, this.bonus); return this; } };
   const request = async (user, action, table = null, data = {}, changes = {}) => {
     const revision = pokerState(table)?.seats.find(seat => seat.userId === user.id)?.revision ?? 0;
     const message = make({ author: user.id, flags: { [SYS]: { pokerRequest: { action, tableId: table?.id ?? "", revision, data, ...changes } } } });
@@ -78,9 +94,10 @@ test("accepted challenges escrow both wagers and a full game pays the winner onc
   assert.equal(draw.reply.done, true); assert.deepEqual(draw.reply.dice, [1, 1, 6, 6, 6]);
   assert.ok(!draw.response.whisper.includes(f.b.id)); assert.ok(draw.response.whisper.includes(f.gm.id));
   assert.deepEqual(pokerState(table).hands[0], [1, 1, 2, 3, 4], "The opponent sees the opening hand until both finish");
-  await f.request(f.b, "reroll", table, { indices: [] });
-  await f.request(f.a, "finish", table); const finish = await f.request(f.b, "finish", table);
-  assert.equal(pokerState(table).phase, "finished"); assert.equal(pokerState(table).winner, 0);
+  assert.deepEqual(pokerState(table).seats[0].rerolled, [2, 3, 4], "Which dice were rerolled is public, their values are not");
+  const finish = await f.request(f.b, "reroll", table, { indices: [] });
+  assert.equal(pokerState(table).phase, "finished", "The reroll is final: no extra confirmation"); assert.equal(pokerState(table).winner, 0);
+  assert.deepEqual(pokerState(table).hands, [[1, 1, 6, 6, 6], [2, 2, 3, 4, 5]]);
   assert.equal(f.first.system.crowns, 110); assert.equal(f.second.system.crowns, 90);
   await processPokerRequest(finish.request, f.b.id); await recoverPokerBank(table); await resumePoker();
   assert.equal(f.first.system.crowns, 110); assert.equal(f.second.system.crowns, 90); assert.equal(f.rolled(), 3);
@@ -89,7 +106,7 @@ test("draws return both stakes and playing a GM without an actor works with no s
   const f = fixture(), table = await f.start(20);
   f.rolls.push([4, 4, 4, 4, 4], [4, 4, 4, 4, 4]);
   for (const user of [f.a, f.b]) await f.request(user, "roll", table);
-  for (const user of [f.a, f.b]) { await f.request(user, "reroll", table, { indices: [] }); await f.request(user, "finish", table); }
+  for (const user of [f.a, f.b]) await f.request(user, "reroll", table, { indices: [] });
   assert.equal(pokerState(table).winner, null); assert.equal(f.first.system.crowns, 100); assert.equal(f.second.system.crowns, 100);
   const next = await f.start(0, f.gm, null); assert.equal(pokerState(next).phase, "opening");
   await f.request(f.gm, "concede", next); assert.equal(pokerState(next).winner, 0); assert.equal(f.first.system.crowns, 100);
@@ -110,6 +127,7 @@ test("permissions, spoofed authors, stale moves and premature rerolls are reject
   await processPokerRequest(forged, f.intruder.id); assert.equal(f.rolled(), 0);
   await f.request(f.a, "roll", table); const repeat = await f.request(f.a, "roll", table, {}, { revision: 0 }); assert.equal(repeat.reply.ok, false); assert.equal(f.rolled(), 1);
   assert.throws(() => requirePokerAction(pokerState(table), f.a.id, "finish", 1));
+  assert.throws(() => requirePokerAction(pokerState(table), f.a.id, "reroll", 1));
   const abort = await f.request(f.a, "abort", table); assert.equal(abort.reply.ok, false);
 });
 test("both players can move concurrently but duplicated moves cannot generate more dice", async () => {
@@ -118,8 +136,7 @@ test("both players can move concurrently but duplicated moves cannot generate mo
   assert.equal(f.rolled(), 2); assert.equal(pokerState(table).phase, "drawing");
   f.rolls.push([2, 3], [4]);
   await Promise.all([f.request(f.a, "reroll", table, { indices: [0, 2] }), f.request(f.b, "reroll", table, { indices: [3] })]);
-  assert.equal(f.rolled(), 4);
-  await Promise.all([f.request(f.a, "finish", table), f.request(f.b, "finish", table)]); assert.equal(pokerState(table).phase, "finished");
+  assert.equal(f.rolled(), 4); assert.equal(pokerState(table).phase, "finished");
 });
 test("GM cancellation refunds deposits; conceding awards the bank", async () => {
   const f = fixture(), table = await f.start(40);
@@ -156,15 +173,43 @@ test("retrying with a new request after a write failure recovers the saved die, 
   table.failUpdate = null; const again = await f.request(f.a, "roll", table);
   assert.equal(f.rolled(), 1); assert.equal(again.reply.ok, false); assert.ok(pokerState(table).seats[0].opening);
 });
-test("loaded dice change one result privately, require the actual item, and cannot be used twice", async () => {
+test("without loaded dice nobody gets an extra step; finish is refused", async () => {
   const f = fixture(), table = await f.start(0); await f.open(table);
   await f.request(f.a, "reroll", table, { indices: [] });
-  const denied = await f.request(f.a, "finish", table, { cheat: { index: 0, value: 6 } }); assert.equal(denied.reply.ok, false);
+  const early = await f.request(f.a, "finish", table, { cheat: { index: 0, value: 6 } }); assert.equal(early.reply.ok, false);
+  await f.request(f.b, "reroll", table, { indices: [] });
+  assert.equal(pokerState(table).phase, "finished"); assert.deepEqual(pokerState(table).hands[0], [1, 1, 2, 3, 4]);
+});
+test("loaded dice: the cheater sees every die, swaps one privately and an unnoticed swap stands", async () => {
+  const f = fixture(), table = await f.start(10); await f.open(table);
   f.first.items.push({ system: { ruleId: "gear.loaded-dice", quantity: 1, carried: true } });
-  const accepted = await f.request(f.a, "finish", table, { cheat: { index: 0, value: 6 } }); assert.equal(accepted.reply.ok, true);
-  assert.deepEqual(accepted.reply.dice, [6, 1, 2, 3, 4]); assert.ok(!accepted.response.whisper.includes(f.b.id));
+  await f.request(f.a, "reroll", table, { indices: [] });
+  f.rolls.push([6]); await f.request(f.b, "reroll", table, { indices: [4] });
+  const state = pokerState(table); assert.equal(state.phase, "palming");
+  assert.equal(state.seats[1].final, state.seats[1].draw, "The honest player is done after the reroll");
+  const peek = f.messages.get(state.seats[0].palm);
+  assert.deepEqual(pokerReceipt(peek).hands, [[1, 1, 2, 3, 4], [2, 2, 3, 4, 6]]); assert.ok(!peek.whisper.includes(f.b.id));
+  const honest = await f.request(f.b, "finish", table); assert.equal(honest.reply.ok, false);
+  const swap = await f.request(f.a, "finish", table, { cheat: { index: 4, value: 1 } }); assert.equal(swap.reply.ok, true);
+  assert.deepEqual(swap.reply.dice, [1, 1, 2, 3, 1]); assert.ok(!swap.response.whisper.includes(f.b.id));
+  const note = f.messages.find(message => message.flags?.[SYS]?.pokerNote); assert.deepEqual(note.whisper, [f.gm.id]);
+  assert.equal(pokerState(table).phase, "finished"); assert.equal(pokerState(table).winner, 0, "Unnoticed: the swapped set beats a pair");
+  assert.equal(f.first.system.crowns, 110);
   const again = await f.request(f.a, "finish", table, { cheat: { index: 1, value: 6 } }); assert.equal(again.reply.ok, false);
-  assert.deepEqual(pokerState(table).hands[0], [1, 1, 2, 3, 4]);
   const fake = f.make({ author: f.a.id, flags: { [SYS]: { pokerTable: { version: 1 }, pokerReceipt: { requestId: "fake", done: true, dice: [6, 6, 6, 6, 6] } } } });
   assert.ok(!pokerTables().includes(fake));
+});
+test("a spotted swap loses the game and the bank; picking the same value is no swap", async () => {
+  const f = fixture(); f.second.system = { crowns: 100, skills: { awareness: 6 }, statistics: { effective: { intelligence: 6 }, modifiers: [], mobilityAttributes: {} } };
+  const table = await f.start(10); await f.open(table);
+  f.first.items.push({ system: { ruleId: "gear.loaded-dice", quantity: 1, carried: true } });
+  for (const user of [f.a, f.b]) await f.request(user, "reroll", table, { indices: [] });
+  f.rolls.push([5]); await f.request(f.a, "finish", table, { cheat: { index: 4, value: 1 } });
+  const state = pokerState(table); assert.equal(state.reason, "caught"); assert.deepEqual(state.caught, [0]); assert.equal(state.winner, 1); assert.deepEqual(state.swaps, [4, -1]);
+  assert.equal(f.first.system.crowns, 90); assert.equal(f.second.system.crowns, 110);
+  const fair = await f.start(0); await f.open(fair);
+  for (const user of [f.a, f.b]) await f.request(user, "reroll", fair, { indices: [] });
+  const rolled = f.rolled(); await f.request(f.a, "finish", fair, { cheat: { index: 0, value: 1 } });
+  assert.equal(f.rolled(), rolled, "Choosing the value already on the die is not a swap");
+  assert.equal(pokerState(fair).reason, "showdown"); assert.equal(pokerState(fair).winner, 1);
 });

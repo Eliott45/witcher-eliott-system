@@ -3,6 +3,7 @@ import { takeLootByDrop } from "../loot/loot.mjs";
 import { creatureResistances, conditionResistant, DAMAGE_TYPE_NAMES } from "../combat/damage-rules.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { radolfActions } from "../combat/radolf-actions.mjs";
+import { pokerActions } from "../minigames/poker.mjs";
 import { FOOTING_CHOICES } from "../combat/radolf-marbles.mjs";
 import { consumptionActions } from "./consumption-actions.mjs";
 import { applyEffectItem } from "../data/effect-items.mjs";
@@ -50,7 +51,7 @@ const meter=({value,max}={})=>({percent:max>0?Math.max(0,Math.min(100,Math.round
 export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
   editing=false;
   static DEFAULT_OPTIONS={classes:["witcher-eliott","npc-sheet"],position:{width:820,height:820},window:{resizable:true},form:{submitOnChange:true,closeOnSubmit:false},actions:{
-    ...combatActions,...magicActions,...effectActions,...workshopActorActions,...radolfActions,...consumptionActions,rollProfessionAbility,
+    ...combatActions,...magicActions,...effectActions,...workshopActorActions,...radolfActions,...pokerActions,...consumptionActions,rollProfessionAbility,
     equipItem,dropToGround,toggleVisor,changeGrip,createInventoryItem,browseEquipment,addCatalogItem,changeInventoryQuantity,toggleCarried,toggleInventoryGroup,
     toggleItemDescription,postItem,searchItemTrait,chooseContainer,toggleContainer,viewSheetItem,removeSheetItem,createAbility,browseAbilities,
     editCreature:guard(async function(){if(this.isEditable){this.editing=!this.editing;await this.render();}}),
