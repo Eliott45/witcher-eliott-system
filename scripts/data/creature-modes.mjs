@@ -84,8 +84,8 @@ export function creatureModeModifiers(actor, environment = null) {
   return out;
 }
 /** A detected invisible katakan still imposes -3; an undetected one is handled by normal visibility/ambush. */
-export const creatureAttackParts = (actor, target) => creatureInvisible(target) && !creatureSeesInvisible(actor) ? [{ label: "Невидимый катакан", value: -3 }] : [];
-export const creatureDefenseParts = (actor, attacker) => creatureInvisible(attacker) && !creatureSeesInvisible(actor) ? [{ label: "Невидимый катакан", value: -3 }] : [];
+export const creatureAttackParts = (actor, target) => creatureInvisible(target) && !creatureSeesInvisible(actor) ? [{ label: `Невидимый: ${target.name}`, value: -3 }] : [];
+export const creatureDefenseParts = (actor, attacker) => creatureInvisible(attacker) && !creatureSeesInvisible(actor) ? [{ label: `Невидимый: ${attacker.name}`, value: -3 }] : [];
 
 export function creatureModeContext(actor) {
   const profile = creatureProfile(actor), state = actor.system.creature ?? {}, fields = [];
@@ -93,7 +93,7 @@ export function creatureModeContext(actor) {
   const check = (key, label, fallback = false) => fields.push({ key, label, checkbox: true, checked: state[key] ?? fallback });
   if (creatureCanFly(actor) || creatureCanSwim(actor)) select("movementMode", "Передвижение", [["auto", "По среде сцены"], ["ground", "На суше"], ...(creatureCanFly(actor) ? [["flying", "В полёте"]] : []), ...(creatureCanSwim(actor) ? [["swimming", "В воде"]] : [])], "auto");
   if (creatureCanFly(actor)) fields.push({ key: "flightHeight", label: "Высота полёта, м", number: true, value: state.flightHeight ?? 0 });
-  if (profile?.id === "katakan") check("invisible", "Невидимость");
+  if (["katakan", "foglet"].includes(profile?.id)) check("invisible", "Невидимость");
   if (profile?.id === "siren") check("illusion", "Иллюзия прекрасной женщины");
   if (profile?.id === "arachas") { check("camouflage", "Неподвижен в привычной среде"); check("weakSpot", "Атакуют сзади: ПБ 10"); }
   if (profile?.id === "rock-troll") check("weakSpot", "Открытый живот: ПБ 5 для торса");
@@ -101,6 +101,9 @@ export function creatureModeContext(actor) {
   if (["wraith", "noonwraith", "katakan", "werewolf"].includes(profile?.id)) select("spiritMode", "Подавление способностей", [["normal", "По эффектам Ирдена и Лунной пыли"], ["suppressed", "Подавлено ведущим"]], "normal");
   if (profile?.id === "noonwraith") check("moonlight", "Под лунным светом");
   if (["wolf", "warg", "nekker", "nekker-chief", "barghest", ...BARGHEST_LEADERS].includes(profile?.id)) fields.push({ key: "packId", label: "Название стаи", text: true, value: state.packId ?? "" });
-  const notes = [creatureRaging(actor) ? "Ярость: +3 ПЗ в начале хода; необходимо двигаться и атаковать." : "", creatureHasInfiniteStamina(actor) ? "Конструкция: Выносливость не расходуется." : "", creaturePackBonus(actor) ? "Живой вожак в этой стае: +4 к Храбрости." : "", creatureLeaderPresence(actor) ? "Присутствие вожака: +3 к атаке и защите." : "", creatureInvisible(actor) ? "Невидим: +10 Скрытности, +5 к атаке; после атаки станет видим." : ""].filter(Boolean);
-  return { fields, notes, available: fields.length > 0 || notes.length > 0 || profile?.id === "cat", infiniteStamina: creatureHasInfiniteStamina(actor), lycanthropy: profile?.id === "werewolf", detectMagic: profile?.id === "katakan", senseMagic: profile?.id === "cat", sirenIllusion: profile?.id === "siren" && state.illusion, falling: (state.fallRemaining ?? 0) > 0, fallRemaining: state.fallRemaining ?? 0 };
+  // Monster Hunter's Journal p.21: read the decay effect directly; combat/rotfiend.mjs depends on this module.
+  const rotfiend = profile?.id === "rotfiend" && !actor.flags?.[SYSTEM_ID]?.rotfiendExploded
+    ? { decaying: Array.from(actor.effects ?? []).some(effect => active(effect) && effect.flags?.[SYSTEM_ID]?.rotfiendDecay) } : null;
+  const notes = [rotfiend?.decaying ? "Разлагается: взорвётся в начале своего следующего хода." : "", creatureRaging(actor) ? "Ярость: +3 ПЗ в начале хода; необходимо двигаться и атаковать." : "", creatureHasInfiniteStamina(actor) ? "Конструкция: Выносливость не расходуется." : "", creaturePackBonus(actor) ? "Живой вожак в этой стае: +4 к Храбрости." : "", creatureLeaderPresence(actor) ? "Присутствие вожака: +3 к атаке и защите." : "", creatureInvisible(actor) ? "Невидим: +10 Скрытности, +5 к атаке; после атаки станет видим." : ""].filter(Boolean);
+  return { fields, notes, rotfiend, available: fields.length > 0 || notes.length > 0 || ["cat", "foglet"].includes(profile?.id) || Boolean(rotfiend), infiniteStamina: creatureHasInfiniteStamina(actor), lycanthropy: profile?.id === "werewolf", detectMagic: profile?.id === "katakan", detectSight: ["katakan", "foglet"].includes(profile?.id), foglet: profile?.id === "foglet", senseMagic: profile?.id === "cat", sirenIllusion: profile?.id === "siren" && state.illusion, falling: (state.fallRemaining ?? 0) > 0, fallRemaining: state.fallRemaining ?? 0 };
 }

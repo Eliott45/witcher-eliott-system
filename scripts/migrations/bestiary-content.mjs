@@ -28,6 +28,8 @@ export const migrateBestiaryCreatures = () => appendMissingCreatures(2);
 export const migrateBestiaryJournalCreatures = () => appendMissingCreatures(5);
 /** Version 6: Radolf Kazmer, a named GM character from Radolf's wagon. */
 export const migrateBestiaryRadolf = () => appendMissingCreatures(6);
+/** Version 7 (Monster Hunter's Journal pp.16–21): graveir, foglet and rotfiend. */
+export const migrateBestiaryJournalNecrophages = () => appendMissingCreatures(7);
 
 async function appendMissingCreatures(version) {
   if(game.user!==game.users.activeGM||game.settings.get(SYSTEM_ID,"bestiaryContentVersion")>=version)return;

@@ -17,7 +17,7 @@ export function actionRoundKey(actor, combat = globalThis.game?.combat) {
 /** Errata p.151: one extra ACTION, not one extra attack; all its checks take −3. */
 export function actionQuote(actor, { ignoreExtra = false, cost = 0 } = {}) {
   if (!actor.isOwner || !conditionRules(actor).canAct) throw new Error("Персонаж сейчас не может действовать.");
-  if (actor.flags?.[SYSTEM_ID]?.noonCopy) throw new Error("Копия полуденницы только защищается; высасывание жизни происходит в ход создателя.");
+  if (actor.flags?.[SYSTEM_ID]?.noonCopy && actor.flags[SYSTEM_ID].noonCopy.kind !== "fog") throw new Error("Копия полуденницы только защищается; высасывание жизни происходит в ход создателя.");
   if (Array.from(actor.effects ?? []).some(effect => !effect.disabled && !effect.isSuppressed && !effect.duration?.expired && effect.flags?.[SYSTEM_ID]?.creatureFullTurn))
     throw new Error("Существо уже потратило полный ход. Дождитесь начала следующего хода.");
   const extra = !ignoreExtra && Boolean(actor.system.combatAction?.extra), roundKey = actionRoundKey(actor);

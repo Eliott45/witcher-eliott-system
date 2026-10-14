@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { bestiarySources, bestiaryFolders } from "../scripts/data/bestiary.mjs";
-import { migrateBestiaryCreatures, migrateBestiaryJournalCreatures, migrateBestiaryRadolf } from "../scripts/migrations/bestiary-content.mjs";
+import { migrateBestiaryCreatures, migrateBestiaryJournalCreatures, migrateBestiaryRadolf, migrateBestiaryJournalNecrophages } from "../scripts/migrations/bestiary-content.mjs";
 
 const SYSTEM_ID = "witcher-eliott-system";
 function fixture({ locked = true, allPresent = false } = {}) {
@@ -32,7 +32,7 @@ test("bestiary v2 appends every missing creature, preserving existing edits and 
   const { state, pack, sources } = fixture(), saved = structuredClone(state.original);
   await migrateBestiaryCreatures();
   assert.equal(state.version, 2);
-  assert.equal(state.index.size, 36);
+  assert.equal(state.index.size, 39);
   assert.deepEqual(state.original, saved);
   assert.deepEqual(state.calls[0].options, { pack: pack.collection, keepId: true });
   assert.deepEqual(state.calls[0].documents.map(source => source._id), sources.slice(2).map(source => source._id));
@@ -53,10 +53,10 @@ test("partial bestiary creation stays retryable and only missing actors are retr
   const firstId = state.calls[0].documents[0]._id;
   state.limit = Infinity;
   await migrateBestiaryCreatures();
-  assert.equal(state.calls[1].documents.length, 33);
+  assert.equal(state.calls[1].documents.length, 36);
   assert.ok(state.calls[1].documents.every(source => source._id !== firstId));
   assert.equal(state.version, 2);
-  assert.equal(state.index.size, 36);
+  assert.equal(state.index.size, 39);
 });
 
 test("bestiary v5 adds the barghests to a world already at v4, leaving older creatures alone", async () => {
@@ -68,7 +68,7 @@ test("bestiary v5 adds the barghests to a world already at v4, leaving older cre
   await migrateBestiaryJournalCreatures();
   assert.deepEqual(state.calls[0].documents.map(source => source.name), ["Баргест", "Баргест-вожак", "Кай"]);
   assert.equal(state.version, 5);
-  assert.equal(state.index.size, 36);
+  assert.equal(state.index.size, 39);
 });
 
 test("failed writes relock the bestiary and never mark v2 complete", async () => {
@@ -126,4 +126,18 @@ test("bestiary migration waits for the active GM and for the pack", async () => 
   game.packs.clear();
   await migrateBestiaryCreatures();
   assert.equal(state.version, 1);
+});
+
+test("bestiary v7 adds the journal necrophages to a world already at v6, leaving older creatures alone", async () => {
+  const { state, sources } = fixture({ allPresent: true }), names = ["Утковол", "Туманник", "Гнилец"];
+  for (const source of sources.filter(source => names.includes(source.name))) state.index.delete(source._id);
+  state.version = 6;
+  await migrateBestiaryRadolf();
+  assert.equal(state.calls.length, 0);
+  await migrateBestiaryJournalNecrophages();
+  assert.deepEqual(state.calls[0].documents.map(source => source.name), names);
+  assert.equal(state.version, 7);
+  assert.equal(state.index.size, 39);
+  await migrateBestiaryJournalNecrophages();
+  assert.equal(state.calls.length, 1);
 });

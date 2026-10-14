@@ -101,7 +101,7 @@ export function spiritZoneExpired(zone, now = clock()) {
 const actorTokens = actor => actor?.isToken ? [actor.token] : Array.from(actor?.getActiveTokens?.(false, true) ?? []).map(token => token.document ?? token);
 // Core v14 animates a moving token's prepared x/y: right after a move they still hold the old cell. Region tests
 // must read the source position, which is what TokenDocument#testInsideRegion does.
-function insideZone(token, region) {
+export function tokenInsideRegion(token, region) {
   // While a synthetic token actor is still being prepared, the core test cannot run yet: use the same source math.
   if (typeof token.testInsideRegion === "function" && region.parent && token.parent === region.parent) {
     try { return token.testInsideRegion(region); } catch { /* fall through */ }
@@ -122,7 +122,7 @@ export function spiritZonesAt(actor) {
       if (!zone || spiritZoneExpired(zone)) continue;
       // The witcher's own Yrden does not slow the witcher.
       if (zone.kind === "yrden" && yrdenCaster(zone) === owner) continue;
-      if (insideZone(token, region)) out.push({ ...zone, uuid: region.uuid });
+      if (tokenInsideRegion(token, region)) out.push({ ...zone, uuid: region.uuid });
     }
   }
   return out;

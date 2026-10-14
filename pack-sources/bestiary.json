@@ -8960,6 +8960,771 @@
     ]
   },
   {
+    "_id": "bstr000000000034",
+    "name": "Утковол",
+    "type": "npc",
+    "img": "icons/svg/skull.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Утковол",
+      "texture": {
+        "src": "icons/svg/skull.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 2,
+        "reflex": 5,
+        "dexterity": 4,
+        "body": 12,
+        "speed": 3,
+        "empathy": 1,
+        "craft": 2,
+        "will": 6,
+        "luck": 0
+      },
+      "health": {
+        "value": 90,
+        "max": 90
+      },
+      "stamina": {
+        "value": 45,
+        "max": 45
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 6,
+        "brawling": 9,
+        "awareness": 8,
+        "wildernessSurvival": 5,
+        "intimidation": 8,
+        "physique": 8,
+        "stealth": 1,
+        "resistMagic": 8,
+        "resistCoercion": 8,
+        "endurance": 8,
+        "courage": 9,
+        "dodgeEscape": 8
+      },
+      "creature": {
+        "category": "necrophage",
+        "difficulty": "Средние / незаурядные",
+        "reward": 500,
+        "size": "3,5 м",
+        "weight": "500 кг",
+        "habitat": "Пещеры",
+        "intellect": "Разумный",
+        "group": "Одиночка",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Огромный рогатый трупоед, словно слепленный из множества тел: плюётся едкой рвотой и сносит врагов разбегом.",
+        "tactics": "Держится за спинами гнильцов и накеров, обстреливая врагов кислотой; подошедших рвёт когтями дважды за ход, а стоящих дальше 5 м сносит атакой с разбега. Регенерирует 4 ПЗ за ход.",
+        "naturalArmor": 8,
+        "resistances": "",
+        "healthMax": 90,
+        "staminaMax": 45,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "large",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 16,
+            "text": "Говорят, раз в сто лет молния бьёт в братскую могилу и сплавляет мертвецов в одну громадную тварь. Живёт глубоко в пещерах с гнильцами, плюётся кислотой и, начав убивать, уже не остановится."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "monsterLore",
+            "dc": 14,
+            "text": "Трупоед, пришедший после Сопряжения. Живёт один, но силой подчиняет гнильцов и накеров и из-за их спин обстреливает врагов ядовитой кислотой, портящей щиты. Бросается с разбега, не щадя своих: стоя спиной к скале, можно заставить его врезаться в камень. Раны затягиваются, как у тролля; помогает масло против трупоедов."
+          }
+        ],
+        "loot": [
+          {
+            "name": "Глаза утковола",
+            "formula": "floor(1d6/3)",
+            "currency": false
+          },
+          {
+            "name": "Кровь утковола",
+            "formula": "2d6",
+            "currency": false
+          },
+          {
+            "name": "Мозг утковола",
+            "formula": "1",
+            "currency": false
+          },
+          {
+            "name": "Жилы",
+            "formula": "2d6",
+            "currency": false
+          }
+        ],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "graveir-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst034i000000001",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "brawling",
+          "damage": "3d6+3",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "",
+          "description": "<p>Эффектов нет. СА 2.</p>",
+          "ruleId": "creature.weapon.graveir.0"
+        }
+      },
+      {
+        "_id": "bst034i000000002",
+        "name": "Удар рогами",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "brawling",
+          "damage": "5d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Кровопускающее (50%)",
+          "description": "<p>Кровопускающее (50%) СА 1.</p>",
+          "ruleId": "creature.weapon.graveir.1"
+        }
+      },
+      {
+        "_id": "bst034i000000003",
+        "name": "Едкая рвота",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "ranged",
+          "skill": "athletics",
+          "damage": "3d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "К",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 3,
+          "range": 8,
+          "rangeBodyMultiplier": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Нельзя парировать; Отравление (100%) без пробития брони; Разрушающее (1d10); Разрушает блок (1d10)",
+          "description": "<p>Нельзя парировать; Отравление (100%) без пробития брони; Разрушающее (1d10); Разрушает блок (1d10) СА 1.</p>",
+          "ruleId": "creature.weapon.graveir.2"
+        }
+      },
+      {
+        "_id": "bst034i000000004",
+        "name": "Улучшенное ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.enhanced-night-vision",
+          "description": "<p>Действует в слабом освещении и в темноте без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst034i000000005",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst034i000000006",
+        "name": "Невосприимчивость к кровотечению",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.bleeding-immunity",
+          "description": "<p>Состояние «Кровотечение» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst034i000000007",
+        "name": "Чудовище: сталь и серебро",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.monster-resistance",
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst034i000000008",
+        "name": "Регенерация",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.graveir.7",
+          "description": "<p>Восстанавливает 4 ПЗ в начале каждого своего хода. Бомба «Лунная пыль» подавляет регенерацию.</p>"
+        },
+        "flags": {
+          "witcher-eliott-system": {
+            "regeneration": 4
+          }
+        }
+      },
+      {
+        "_id": "bst034i000000009",
+        "name": "Едкая рвота",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.graveir.8",
+          "description": "<p>Действие: атака с основой 13 по цели в пределах 8 м. При попадании 3d6 урона в случайную часть тела и отравление; броня на этой части получает 1d10 разрушающего урона. Успешный блок наносит 1d10 разрушающего урона блокирующему предмету. Атаку нельзя парировать, даже Отбиванием стрел.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst034i000000010",
+        "name": "Атака с разбега",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.graveir.9",
+          "description": "<p>Действие полного хода против цели дальше 5 м: разбег до 10 м и Удар рогами с основой 12. При попадании 7d6 урона в туловище и отбрасывание на 5 м; врезавшись, цель получает Xd6, где X — половина пролетевших метров. Успешно заблокировавшая цель проходит Силу СЛ 25 или отлетает так же. При промахе утковол пробегает оставшуюся дистанцию по прямой; врезавшись в стену, он дезориентирован до успешного испытания Устойчивости.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst034i000000011",
+        "name": "Масло против трупоедов",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.necrophage-oil",
+          "description": "<p>На существо действует масло против трупоедов. Его бонус учитывается при нанесении урона подходящим оружием.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst034i000000012",
+        "name": "Уязвимость: Бомба «Лунная пыль»",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.graveir.11",
+          "description": "<p>подавляет регенерацию утковола.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000035",
+    "name": "Туманник",
+    "type": "npc",
+    "img": "icons/svg/skull.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Туманник",
+      "texture": {
+        "src": "icons/svg/skull.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 5,
+        "reflex": 8,
+        "dexterity": 8,
+        "body": 7,
+        "speed": 6,
+        "empathy": 3,
+        "craft": 3,
+        "will": 6,
+        "luck": 0
+      },
+      "health": {
+        "value": 60,
+        "max": 60
+      },
+      "stamina": {
+        "value": 30,
+        "max": 30
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 8,
+        "brawling": 4,
+        "melee": 7,
+        "awareness": 9,
+        "wildernessSurvival": 7,
+        "intimidation": 7,
+        "physique": 2,
+        "stealth": 7,
+        "resistMagic": 8,
+        "endurance": 3,
+        "courage": 6,
+        "dodgeEscape": 7
+      },
+      "creature": {
+        "category": "necrophage",
+        "difficulty": "Средние / трудные",
+        "reward": 800,
+        "size": "2 м",
+        "weight": "75 кг",
+        "habitat": "Пещеры и болота",
+        "intellect": "Дикий",
+        "group": "Одиночка",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Тощий светящийся трупоед, охотящийся в собственном тумане с помощью невидимости и иллюзий.",
+        "tactics": "Окутывает местность туманом, становится невидимым и посылает иллюзорные копии; бьёт когтями дважды за ход и снова растворяется.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 60,
+        "staminaMax": 30,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "medium",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 16,
+            "text": "Говорят, туманники живут на болотах у Понтара и Яруги, напускают туман, прячутся в нём и насылают видения; от наваждения будто бы помогает промыть глаза болотной водой."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "monsterLore",
+            "dc": 16,
+            "text": "Слабо светящийся трупоед, заманивающий путников огоньком в тумане. В своём тумане исчезает, создаёт иллюзии и призрачные копии, развеивающиеся от удара; нанося удар, ненадолго становится видимым. Двимеритовая бомба не даст ему нагнать туман, Ирден и Лунная пыль делают его видимым, маг или жрец может разогнать туман."
+          }
+        ],
+        "loot": [
+          {
+            "name": "Зубы туманника",
+            "formula": "floor(1d6/2)",
+            "currency": false
+          },
+          {
+            "name": "Эссенция туманника",
+            "formula": "1d6",
+            "currency": false
+          }
+        ],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "foglet-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000182",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "foglet-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000205",
+          "quantity": 0,
+          "formula": "2d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst035i000000001",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "3d6+2",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "",
+          "description": "<p>Эффектов нет. СА 2.</p>",
+          "ruleId": "creature.weapon.foglet.0"
+        }
+      },
+      {
+        "_id": "bst035i000000002",
+        "name": "Ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.night-vision",
+          "description": "<p>Действует в зонах со слабым освещением без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst035i000000003",
+        "name": "Чудовище: сталь и серебро",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.monster-resistance",
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst035i000000004",
+        "name": "Призыв тумана",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.foglet.3",
+          "description": "<p>Действие: туман радиусом 30 м с центром на туманнике. Все в тумане, кроме туманника, видят не дальше 4 м. Действием туманник сдвигает туман на 10 м или рассеивает его; иначе туман держится 24 часа и исчезает со смертью туманника. Маг или жрец может разогнать туман: 5 ВЫН, действие и Сотворение заклинаний СЛ 18. Двимеритовая бомба не даёт вызвать туман, но не рассеивает его.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst035i000000005",
+        "name": "Невидимость",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.foglet.4",
+          "description": "<p>В тумане действием становится невидимым: +10 к Скрытности и +5 к атаке; даже заметивший его получает −3 к атакам и защите против него. После атаки видим до своего следующего хода. Ирден и Лунная пыль делают его видимым и не дают снова исчезнуть, пока действует эффект; выйдя из тумана, тоже становится видимым.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst035i000000006",
+        "name": "Иллюзорные копии",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.foglet.5",
+          "description": "<p>В тумане действием создаёт четыре неотличимые копии. В начале его хода каждая копия перемещается и действует по его воле. Защита от копий считается обычной защитой, но их попадания не наносят урона. У копий нет ПЗ: любое попадание развеивает копию. Внимание СЛ 16 распознаёт иллюзию.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst035i000000007",
+        "name": "Сотворение иллюзий",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.foglet.6",
+          "description": "<p>Действие полного хода: правдоподобная беззвучная и неосязаемая иллюзия в пределах тумана. Заметивший её проходит Внимание СЛ 18, чтобы распознать обман; внезапное появление перед глазами или касание выдаёт иллюзию сразу.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst035i000000008",
+        "name": "Масло против трупоедов",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.necrophage-oil",
+          "description": "<p>На существо действует масло против трупоедов. Его бонус учитывается при нанесении урона подходящим оружием.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst035i000000009",
+        "name": "Уязвимость: Ирден и Лунная пыль",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.foglet.8",
+          "description": "<p>делают туманника видимым и не дают снова стать невидимым, пока действует эффект.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst035i000000010",
+        "name": "Уязвимость: Двимеритовая бомба",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.foglet.9",
+          "description": "<p>не даёт вызвать туман, но не рассеивает уже созданный.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000036",
+    "name": "Гнилец",
+    "type": "npc",
+    "img": "icons/svg/skull.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Гнилец",
+      "texture": {
+        "src": "icons/svg/skull.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 6,
+        "dexterity": 6,
+        "body": 5,
+        "speed": 11,
+        "empathy": 1,
+        "craft": 1,
+        "will": 5,
+        "luck": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25
+      },
+      "stamina": {
+        "value": 25,
+        "max": 25
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 6,
+        "brawling": 4,
+        "melee": 6,
+        "awareness": 7,
+        "wildernessSurvival": 9,
+        "intimidation": 5,
+        "physique": 3,
+        "stealth": 4,
+        "resistMagic": 4,
+        "endurance": 3,
+        "courage": 8,
+        "dodgeEscape": 6
+      },
+      "creature": {
+        "category": "necrophage",
+        "difficulty": "Простые / обычные",
+        "reward": 10,
+        "size": "2 м",
+        "weight": "80 кг",
+        "habitat": "Пещеры и поля боя",
+        "intellect": "Дикий",
+        "group": "Группы из 4–6 особей",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Быстрый трупоед, разящий гнилью и взрывающийся, когда умирает.",
+        "tactics": "Нападает группой и рвёт когтями. Израненный или убитый не огнём гнилец в начале своего следующего хода взрывается, задевая всех рядом.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 25,
+        "staminaMax": 25,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "medium",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 12,
+            "text": "В народе гнильцов считают трупами, поднятыми чёрной магией за грехи покойника. Советуют сжечь все трупы вокруг деревни, иначе гнильцы будут появляться снова, и бить их большой компанией."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "monsterLore",
+            "dc": 10,
+            "text": "Не мертвецы, а трупоеды, похожие на трупы. Охотятся группами и бегают быстро, как скачущая лошадь. Серебро и масло против трупоедов убивают их легко, но умирающий гнилец взрывается и может вызвать цепную реакцию; последний удар лучше наносить огнём."
+          }
+        ],
+        "loot": [
+          {
+            "name": "Кровь гнильца",
+            "formula": "floor(1d6/2)",
+            "currency": false
+          },
+          {
+            "name": "Печень гнильца",
+            "formula": "1",
+            "currency": false
+          }
+        ],
+        "lootGenerated": false
+      },
+      "harvest": []
+    },
+    "items": [
+      {
+        "_id": "bst036i000000001",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "3d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 1,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "",
+          "description": "<p>Эффектов нет. СА 1.</p>",
+          "ruleId": "creature.weapon.rotfiend.0"
+        }
+      },
+      {
+        "_id": "bst036i000000002",
+        "name": "Улучшенное ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.enhanced-night-vision",
+          "description": "<p>Действует в слабом освещении и в темноте без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst036i000000003",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst036i000000004",
+        "name": "Невосприимчивость к кровотечению",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.bleeding-immunity",
+          "description": "<p>Состояние «Кровотечение» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst036i000000005",
+        "name": "Чудовище: сталь и серебро",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.monster-resistance",
+          "description": "<p>Обычное стальное оружие наносит половину урона; серебряное действует полностью. Серебро добавляет указанный у оружия серебряный урон. Сопротивление автоматически учитывается после брони; огонь его игнорирует.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst036i000000006",
+        "name": "Взрывная смерть",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.rotfiend.5",
+          "description": "<p>Если гнилец умирает или после любой атаки, кроме огня, у него остаётся не больше 5 ПЗ, он начинает разлагаться и в начале своего следующего хода взрывается: 2d6 урона по каждой части тела всем на дистанции ближнего боя. Блок щитом или Смена позиции СЛ 15 защищают от взрыва. Задетые получают уязвимость «Жуткий запах» и проходят Стойкость СЛ 14, иначе их тошнит, пока не смоют ошмётки. Задетый гнилец с 5 ПЗ и меньше тоже взорвётся в следующем ходу.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst036i000000007",
+        "name": "Масло против трупоедов",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.necrophage-oil",
+          "description": "<p>На существо действует масло против трупоедов. Его бонус учитывается при нанесении урона подходящим оружием.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst036i000000008",
+        "name": "Уязвимость: Жуткий запах",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.rotfiend.7",
+          "description": "<p>существо с обонянием чует гнильца за 20 м, с выслеживанием по запаху — за 40 м.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
     "_id": "radolfKazmer0001",
     "name": "Родольф Казмер",
     "type": "npc",

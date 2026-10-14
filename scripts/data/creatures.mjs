@@ -52,5 +52,6 @@ export function immuneToCondition(actor,statuses) {
     || ids.has("exhausted-stun")&&creatureHasInfiniteStamina(actor)
     || ids.has("poisoned")&&traits.has("creature.poison-immunity")
     || ids.has("burning")&&traits.has("creature.fire-immunity")
+    || ids.has("bleeding")&&traits.has("creature.bleeding-immunity")
     || traits.has("creature.construct")&&["bleeding","burning","poisoned"].some(id=>ids.has(id));
 }

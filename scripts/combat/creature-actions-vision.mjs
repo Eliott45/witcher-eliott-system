@@ -1,6 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { creatureInvisible, creatureSeesInvisible } from "../data/creature-modes.mjs";
 import { creatureHypnosisSource } from "./creature-actions-rules.mjs";
+import { fogSightLimit } from "./creature-fog.mjs";
 
 const registered = Symbol("witcherCreatureVision");
 const documentOf = object => object?.document ?? object;
@@ -24,6 +25,9 @@ export function creatureVisibilityAllowed(visionSource, object, { isGM = globalT
 export function constrainHypnotizedVision(source, polygon, { isGM = globalThis.game?.user?.isGM } = {}) {
   if (isGM) return polygon;
   const observer = tokenOf(source), hypnosis = creatureHypnosisSource(observer?.actor);
+  // Monster Hunter's Journal p.19: inside a foglet's fog nobody else sees further than 4 m from their edge.
+  const fog = fogSightLimit(observer), grid = observer?.parent?.grid;
+  if (fog && grid) polygon = polygon.applyConstraint(new PIXI.Circle(source.data.x, source.data.y, (fog + Math.max(observer.width ?? 1, observer.height ?? 1) * grid.distance / 2) / grid.distance * grid.size));
   if (!hypnosis) return polygon;
   const target = globalThis.fromUuidSync?.(hypnosis.sourceToken);
   if (!target || target.parent?.uuid !== observer.parent?.uuid) {

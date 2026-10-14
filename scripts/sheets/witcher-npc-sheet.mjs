@@ -36,6 +36,8 @@ import { skillCalculationTooltip } from "./skills-context.mjs";
 import { creatureModeContext } from "../data/creature-modes.mjs";
 import { setCreatureMode, rollLycanthropy, detectCreature, senseCreatureMagic, continueCreatureFall } from "../combat/creature-modes.mjs";
 import { creatureActions, useCreatureAction, attackCreatureWeb, dispelSirenIllusion } from "../combat/creature-actions.mjs";
+import { startRotfiendDecay, explodeRotfiend } from "../combat/rotfiend.mjs";
+import { dispelFog } from "../combat/creature-fog.mjs";
 import { liveCreatureWeb } from "../combat/creature-actions-common.mjs";
 import { hagActions, useHagAction } from "../combat/hag-actions.mjs";
 import { getProfessionAbility, professionAbilityState } from "../data/professions.mjs";
@@ -80,6 +82,9 @@ export class WitcherNPCSheet extends foundry.applications.api.HandlebarsApplicat
     creatureFall:guard(async function(){if(this.isEditable)await continueCreatureFall(this.actor);}),
     creatureWeb:guard(async function(){if(this.isEditable)await attackCreatureWeb(this.actor);}),
     creatureDispelIllusion:guard(async function(){if(this.isEditable)await dispelSirenIllusion(this.actor);}),
+    creatureDispelFog:guard(async function(){if(this.isEditable)await dispelFog(this.actor);}),
+    creatureRotfiendDecay:guard(async function(){if(this.isEditable)await startRotfiendDecay(this.actor,{force:true});}),
+    creatureRotfiendExplode:guard(async function(){if(this.isEditable)await explodeRotfiend(this.actor);}),
     restoreCreatureItems:guard(async function(){
       if(!this.isEditable)return;
       await inventoryWrite(this.actor,async()=>{

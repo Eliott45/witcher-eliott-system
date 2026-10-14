@@ -9,7 +9,7 @@ import { spiritState, setSlipIncorporeal } from "./creature-spirits.mjs";
 import { severHagTongue } from "./hag-actions.mjs";
 import { onCreatureDamaged, afterCreatureBite } from "./creature-modes.mjs";
 import { creatureHasInfiniteStamina, creatureSeesInvisible } from "../data/creature-modes.mjs";
-import { isCreatureSpecial, creatureSpecialDefenses, applyCreatureSpecial, onCreatureExchangeApplied, destroyNoonCopy, creatureHypnosisPenalty } from "./creature-actions.mjs";
+import { isCreatureSpecial, creatureSpecialDefenses, applyCreatureSpecial, onCreatureExchangeApplied, onCreatureChargeMissed, destroyNoonCopy, creatureHypnosisPenalty } from "./creature-actions.mjs";
 import { canAnswerDual, rollChargeContest } from "./brawling.mjs";
 import { loadedBolt, firedUpdate } from "./crossbow-ammo.mjs";
 import { hasStatus, setStatus, STUNNED } from "./status-effects.mjs";
@@ -154,9 +154,11 @@ export async function defendAttack(message, index, mode, itemId = "", repeat = n
   if (won && mode === "block" && itemId) {
     const item = actor.items.get(itemId), reliability = effectiveItem(item)?.reliability;
     if (item && !item.system.natural && reliability?.max) {
-      const wear = await applyWeaponWear(item, attack.hitTraits?.wearMultiplier ?? 1,
+      // Graveir acid (Monster Hunter's Journal p.17): a successful block takes its own ablation dice instead of 1.
+      const dice = attack.hitTraits?.blockWear ? await evaluateRoll(attack.hitTraits.blockWear, { allowInteractive: !message.blind }) : null;
+      const wear = await applyWeaponWear(item, (dice?.total ?? 1) * (attack.hitTraits?.wearMultiplier ?? 1),
         { messageMode: message.blind ? "blind" : message.whisper?.length ? "gm" : "public" });
-      await defense.update({ [`flags.${SYSTEM_ID}.exchange.wear`]: { name: item.name, from: wear.from, to: wear.to, protectedByRune: wear.protectedByRune } });
+      await defense.update({ [`flags.${SYSTEM_ID}.exchange.wear`]: { name: item.name, from: wear.from, to: wear.to, protectedByRune: wear.protectedByRune, ...(dice ? { roll: dice.total } : {}) } });
     }
   }
   return defense;
@@ -182,7 +184,7 @@ const pendingRolls = new Set();
 async function rollAttackStep(message, index, kind, prepare) {
   const attack = flagsOf(message).weaponAttack, outcome = exchangeOutcome(message, index), actor = message.speakerActor;
   const key = `${message.id}:${index}:${kind}`;
-  if (!attack || experimentalAmmoReplacesDamage(attack) || !actor?.isOwner || !message.isContentVisible || !(outcome?.hit || outcome?.limbBlock) || pendingRolls.has(key)
+  if (!attack || attack.illusory || experimentalAmmoReplacesDamage(attack) || !actor?.isOwner || !message.isContentVisible || !(outcome?.hit || outcome?.limbBlock) || pendingRolls.has(key)
     || linkedAny(message.id, index, kind) || linkedAny(message.id, index, "damage")) return;
   pendingRolls.add(key);
   const display = trackRollDisplay();
@@ -239,7 +241,7 @@ export function rollExchangeDamage(message, index) {
     const options = { allowInteractive: !message.blind };
     const rolls = [await evaluateRoll(attack.damage,options)];
     let hitTraits = attack.hitTraits ?? weaponHitTraits(weapon,actor);
-    const ablation = hitTraits.ablating ? await evaluateRoll("floor(1d6 / 2)",options) : null;
+    const ablation = hitTraits.ablating ? await evaluateRoll(hitTraits.ablationDice ?? "floor(1d6 / 2)",options) : null;
     if (ablation) rolls.push(ablation);
     const silver = traits.silverDice && material === "silver" ? await evaluateRoll(traits.silverDice,options) : null;
     if (silver) rolls.push(silver);
@@ -367,7 +369,7 @@ async function pushTarget(attack) {
 const chargeContest = (message, index) => game.messages.contents.map(entry => flagsOf(entry).chargeContest).find(contest => contest?.source === `${message.id}:${index}`) ?? null;
 
 /** HP loss, armor wear and a critical wound on one actor; returns what wore down. */
-export async function sufferDamage(actor, result, { wound = null, level = "", location = {}, nonLethal = false, electricity = false } = {}) {
+export async function sufferDamage(actor, result, { wound = null, level = "", location = {}, nonLethal = false, electricity = false, fire = false } = {}) {
   if (nonLethal) { if (!creatureHasInfiniteStamina(actor)) await actor.update({ "system.stamina.value": actor.system.stamina.value - result.total }); }
   else {
     // Full Moon's temporary HP take the blow first; Griffin, Wyvern and Swallow react to it (core pp.247–248).
@@ -391,7 +393,7 @@ export async function sufferDamage(actor, result, { wound = null, level = "", lo
     worn.push(`${item.name} ${from} → ${to}`);
   }
   if (wound && !result.immune) await actor.createEmbeddedDocuments("ActiveEffect", [woundEffectData(wound.id, level, { location: location.id, locationName: location.name, bodyPlan: bodyPlanOf(actor) })]);
-  if (!nonLethal && !result.immune && result.total > 0) await onCreatureDamaged(actor, result.total, {electricity});
+  if (!nonLethal && !result.immune && result.total > 0) await onCreatureDamaged(actor, result.total, {electricity, fire});
   return worn;
 }
 
@@ -427,7 +429,7 @@ async function applyExchangeDamageNow(message, index, { useShield = false, shiel
   // Remove only the disorientation that preceded this blow; electricity may cause a new one.
   if (!shield && !own.immune && hasStatus(target, STUNNED)) await setStatus(target, STUNNED, false);
   if (preview.magicShield && !shield) await absorbWithMagicShield(target, preview.magicShield);
-  const worn = await sufferDamage(target, own, {electricity:Boolean(data.traits?.electricity), ...(shield || preview.prosthesis ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location, nonLethal })});
+  const worn = await sufferDamage(target, own, {electricity:Boolean(data.traits?.electricity), fire:Boolean(data.traits?.types?.includes("elemental")), ...(shield || preview.prosthesis ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location, nonLethal })});
   if (!own.immune && (!shield || shield.overflow > 0) && !preview.prosthesis) await clearExperimentalFreeze(target);
   if ((attack.push || attack.schoolShieldStrike) && !own.immune && own.total >= 0 && !shield) await pushTarget(attack);
   if (attack.schoolShieldStrike && !own.immune && !shield) await setStatus(target, "prone", true);
@@ -711,7 +713,7 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
   if (outcome.critical) body += `<p class="witcher-exchange-crit"><i class="fa-solid fa-burst"></i> Критическое ранение: ${esc(outcome.critical.name.toLocaleLowerCase("ru"))} (+${outcome.critical.bonus} урона)</p>`;
   if (!outcome.hit && outcome.mode === "parry") body += `<p class="witcher-exchange-note"><i class="fa-solid fa-person-falling"></i> ${esc(message.speakerActor?.name ?? "Атакующий")} ошеломлён: −2 к атаке и защите до начала своего хода.</p>`;
   const wear = exchangeOf(outcome.defense).wear;
-  if (wear) body += `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> Удар принял ${esc(wear.name)}: надёжность ${wear.from} → ${wear.to}${wear.to === 0 ? " · сломано" : ""}</p>`;
+  if (wear) body += `<p class="witcher-exchange-wear"><i class="fa-solid fa-shield-halved"></i> Удар принял ${esc(wear.name)}${wear.roll ? ` (разрушающий урон ${wear.roll})` : ""}: надёжность ${wear.from} → ${wear.to}${wear.to === 0 ? " · сломано" : ""}</p>`;
   if (attack.special) {
     const done = linkedAny(message.id, index, "special"), name = GRAPPLE_ACTIONS[attack.special]?.name ?? "";
     if (outcome.hit) body += done ? `<p class="witcher-exchange-applied is-special"><i class="fa-solid fa-hand-back-fist"></i> ${esc(exchangeOf(done).notes?.join(" ") ?? "")}</p>`
@@ -726,6 +728,8 @@ export function exchangeRowHTML(message, index, attack = flagsOf(message).weapon
       : `<p class="witcher-exchange-note">Атакующий может попытаться сбить с ног: Сила против Силы.</p>`;
   }
   if (outcome.limbBlock) body += `<p class="witcher-exchange-note"><i class="fa-solid fa-hand"></i> Блок телом: урон атаки приходится в подставленную руку, ПБ учитывается. Критического ранения нет.</p>`;
+  // Monster Hunter's Journal p.19: a foglet's illusory copy forces a defense, but its hit deals no damage.
+  if (attack.illusory && (outcome.hit || outcome.limbBlock)) return `<li class="is-hit">${head}<span>${defenseLine}</span>${verdict}</header>${body}<p class="witcher-exchange-note"><i class="fa-solid fa-ghost"></i> Иллюзия: попадание не наносит урона.</p></li>`;
   if (experimentalAmmoReplacesDamage(attack)) return `<li class="${outcome.hit ? "is-hit" : "is-miss"}">${head}<span>${defenseLine}</span></header>${body}${experimentalAmmoHTML(message, index, outcome)}</li>`;
   // Magic without damage (Aard, Axii, Blinding Dust…): a hit applies the spell's own effect, no location or damage.
   if (outcome.hit && attack.spell && !attack.damage) {
@@ -915,7 +919,7 @@ async function afterSettled(message) {
   if (outcome?.hit && game.users.activeGM?.isSelf && !linkedAny(attackMessage.id,link.index,"applied")) {
     const token = targetToken(flagsOf(attackMessage).weaponAttack);
     if (token?.actor?.flags?.[SYSTEM_ID]?.noonCopy && await destroyNoonCopy(token)) {
-      await post({content:"<p>Копия полуденницы уничтожена попаданием.</p>",flags:{[SYSTEM_ID]:{skipLuck:true,exchange:{attack:attackMessage.id,index:link.index,kind:"applied",copyDestroyed:true,total:0}}}},attackMessage.blind?"blind":attackMessage.whisper?.length?"gm":"public");
+      await post({content:"<p>Копия уничтожена попаданием.</p>",flags:{[SYSTEM_ID]:{skipLuck:true,exchange:{attack:attackMessage.id,index:link.index,kind:"applied",copyDestroyed:true,total:0}}}},attackMessage.blind?"blind":attackMessage.whisper?.length?"gm":"public");
       return;
     }
   }
@@ -926,6 +930,8 @@ async function afterSettled(message) {
     }
     return;
   }
+  // A creature charge that was blocked or dodged has its own consequences (graveir).
+  if (outcome && !outcome.hit && game.users.activeGM?.isSelf) await onCreatureChargeMissed(attackMessage, link.index, outcome);
   if (!outcome || outcome.hit || outcome.mode !== "parry") return;
   const attack = flagsOf(attackMessage).weaponAttack;
   const attacker = (attack.attacker && fromUuidSync(attack.attacker)?.actor) ?? attackMessage.speakerActor;

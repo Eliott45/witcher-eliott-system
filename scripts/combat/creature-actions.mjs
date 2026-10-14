@@ -21,6 +21,7 @@ import { creatureFlags, activeCreatureGM, requireCreatureGM, creatureRoll, creat
 import { createNoonDance, tickNoonDance, destroyNoonCopy, noonCopyState } from "./creature-actions-dance.mjs";
 import { applyCreatureDamage } from "./creature-actions-damage.mjs";
 import { registerCreatureVision } from "./creature-actions-vision.mjs";
+import { rotfiendBlastHit, rotfiendBlastEffects } from "./rotfiend.mjs";
 export { isCreatureSpecial, creatureSpecialDefenses, creatureHypnosisPenalty, creatureHypnosisSource } from "./creature-actions-rules.mjs";
 export { tickNoonDance, destroyNoonCopy } from "./creature-actions-dance.mjs";
 
@@ -45,7 +46,7 @@ export function creatureActions(actor) {
   if(actor?.type!=="npc"||!profile||creatureFlags(actor).noonCopy)return [];
   return Object.entries(CREATURE_ACTIONS).filter(([,rule])=>rule.profiles.includes(profile.id)).map(([id,rule])=>{
     const reason=blocked(actor,id);
-    return {id,name:rule.name,disabled:Boolean(reason),reason,hint:reason||(rule.fullTurn?"Действие полного хода":rule.movement?"Перемещение":"Выберите цели на сцене")};
+    return {id,name:rule.name,disabled:Boolean(reason),reason,hint:reason||rule.hint||(rule.fullTurn?"Действие полного хода":rule.movement?"Перемещение":"Выберите цели на сцене")};
   });
 }
 
@@ -62,22 +63,25 @@ function oneTarget(actor,options,rule) {
 }
 
 async function postCreatureAttack(actor,id,rule,profile,options,quote) {
-  const {source,target,distance}=oneTarget(actor,options,rule);
   const charge=id==="charge"?chargeProfile(profile.id):null;
-  let chargeEnd=null;
+  // A charge with its own printed distances (graveir: 5–10 m) replaces the Run limit.
+  const {source,target,distance}=oneTarget(actor,options,charge?.min!==undefined?{...rule,min:charge.min,max:charge.max}:rule);
+  let chargeEnd=null,overrun=null;
   if(charge) {
-    if(distance>actor.system.statistics.run)throw new Error("Для разбега цель должна находиться в пределах Бега существа.");
-    const a=tokenCenter(source),b=tokenCenter(target),length=Math.hypot(b.x-a.x,b.y-a.y)||1;
-    const separation=(Math.max(source.width,source.height)+Math.max(target.width,target.height))*source.parent.grid.size/2;
+    if(charge.max===undefined&&distance>actor.system.statistics.run)throw new Error("Для разбега цель должна находиться в пределах Бега существа.");
+    const a=tokenCenter(source),b=tokenCenter(target),length=Math.hypot(b.x-a.x,b.y-a.y)||1,grid=source.parent.grid;
+    const separation=(Math.max(source.width,source.height)+Math.max(target.width,target.height))*grid.size/2;
     chargeEnd={x:b.x-(b.x-a.x)/length*separation,y:b.y-(b.y-a.y)/length*separation};
     if(source.object?.checkCollision(chargeEnd,{origin:a,type:"move",mode:"any"}))throw new Error("Разбег перекрыт преградой.");
+    // On a miss the graveir runs on in a straight line for whatever is left of its charge.
+    if(charge.overrun){const pixels=Math.max(0,charge.max-distance)/grid.distance*grid.size;overrun={from:chargeEnd,to:{x:chargeEnd.x+(b.x-a.x)/length*pixels,y:chargeEnd.y+(b.y-a.y)/length*pixels}};}
   }
   const weaponName=charge?.weapon??(id==="rock"?"Метательные камни":id==="web"?"Паутина":null);
   const item=weaponName?Array.from(actor.items).find(item=>item.type==="weapon"&&item.name===weaponName):null;
   if(weaponName&&!item)throw new Error(`Не найдено естественное оружие «${weaponName}». Восстановите предметы существа.`);
   let parts,total,damage,traits,hitTraits={},ranged=id!=="charge",band={id:"normal",dc:15};
   if(item) {
-    const result=weaponAttack(actor,item,{mode:"npc",modifier:charge?-4:0,extraPenalty:quote.penalty,ignoreNaturalRange:Boolean(charge),
+    const result=weaponAttack(actor,item,{mode:"npc",modifier:charge?charge.modifier??-4:0,extraPenalty:quote.penalty,ignoreNaturalRange:Boolean(charge),
       targetContext:{attacker:source,target,distance,...facingModifiers(source,target)}});
     if(result.blocked)throw new Error(result.blocked);
     parts=result.parts;total=result.total;damage=charge?.damage??(id==="web"?null:result.damage);traits=weaponDamageTraits(result.weapon);hitTraits=weaponHitTraits(result.weapon,actor);band=result.band;
@@ -88,11 +92,11 @@ async function postCreatureAttack(actor,id,rule,profile,options,quote) {
     total=parts.reduce((sum,part)=>sum+part.value,0);damage=null;traits={types:[],piercing:"none",silver:false,silverDice:""};
   }
   const roll=await creatureRoll(`1d10wc + ${total}`);
-  const attack={itemId:item?.id??null,name:rule.name,mode:"creature",base:total,count:1,damage,location:"random",multiplier:1,body:0,bonus:0,
+  const attack={itemId:item?.id??null,name:rule.name,mode:"creature",base:total,count:1,damage,location:charge?.location??"random",multiplier:1,body:0,bonus:0,
     target:target.uuid,attacker:source.uuid,parts,ranged,band:band.id,dc:band.dc??15,thrown:id==="rock",traits,hitTraits,attackingInvisible:creatureInvisible(actor),
     special:rule.special?`creature:${id}`:null,noCritical:Boolean(rule.special),defenses:rule.defenses,
     combat:game.combat?.started?{id:game.combat.id,round:game.combat.round}:null,
-    creatureAction:{id,...(charge?{pushMeters:charge.pushMeters}:{}),sourceDistance:distance}};
+    creatureAction:{id,...(charge?{pushMeters:charge.pushMeters,...(charge.collision?{collision:charge.collision}:{}),...(charge.blockSave?{blockSave:charge.blockSave}:{}),...(overrun?{overrun}:{})}:{}),sourceDistance:distance}};
   const message=await creaturePost(actor,{title:rule.name,text:`Цель: <b>${esc(target.name)}</b>. ${rule.fullTurn?"Полный ход. ":""}${damage?`Урон ${esc(damage)}.`:"Результат применяется после защиты."}`,rolls:[roll],flags:{weaponAttack:attack,action:quote}});
   if(message){await payAction(actor,quote,rule,message.id);if(chargeEnd)await moveCreatureTo(source,chargeEnd);}
   return message;
@@ -140,6 +144,10 @@ export function useCreatureAction(actor,id,options={}) {
     const quote=actionQuote(actor);
     if(rule.fullTurn&&quote.extra)throw new Error("Действие полного хода нельзя выполнить дополнительным действием.");
     if(["needles","scream","hypnosis"].includes(id))return areaAction(actor,id,rule,options,quote);
+    if(rule.fog) {
+      const {useFogAction}=await import("./creature-fog.mjs");
+      const message=await useFogAction(actor,id,options);if(message)await payAction(actor,quote,rule,message.id);return message;
+    }
     if(id==="dance") {
       const message=await createNoonDance(actor,options);if(message)await payAction(actor,quote,rule,message.id);return message;
     }
@@ -196,6 +204,21 @@ export function resolveCreatureArea(message,index,{mode="dodge",itemId=""}={}) {
         const roll=immune?null:await creatureRoll(`1d10wc + ${skillValue(target.system,"resistMagic").total}`);
         result={success:Boolean(immune)||roll.total>=data.total,roll:roll?.total??null,immune};
         await creaturePost(target,{title:"Сопротивление гипнозу",text:immune?esc(immune):`${roll.total} против ${data.total}: ${result.success?"не поддался":"под гипнозом"}.`,rolls:roll?[roll]:[]});
+      } else if(data.id==="rotfiend-blast") {
+        // Monster Hunter's Journal p.21: a shield block or Reposition against DC 15; no defense means the blast lands.
+        let total=null;
+        if(mode!=="none") {
+          if(!["reposition","block"].includes(mode))throw new Error("От взрыва гнильца защищают только блок щитом или Смена позиции.");
+          if(mode==="block"&&target.items.get(itemId)?.system.category!=="shield")throw new Error("Взрыв можно заблокировать только щитом.");
+          const mark=creatureFlags(target).defenses,combat=game.combat,repeat=Boolean(combat?.started&&mark?.combat===combat.id&&mark.round===combat.round&&mark.count>0);
+          const defense=await rollDefense(target,{mode,itemId,incoming:"melee",repeat});if(!defense)return false;
+          if(combat?.started)await target.update({[`flags.${SYSTEM_ID}.defenses`]:{combat:combat.id,round:combat.round,count:repeat?mark.count+1:1}});
+          total=defense.rolls[0].total;
+        }
+        const success=total!==null&&total>=data.dc,copy=Boolean(noonCopyState(token)),hit=success||copy?null:await rotfiendBlastHit(target);
+        result={success,roll:total,damage:hit?.damage??null,endurance:hit?.endurance??null,nauseated:Boolean(hit?.nauseated)};
+        await creaturePost(target,{title:`Взрыв гнильца: защита СЛ ${data.dc}`,rolls:hit?.rolls??[],text:success?`Защита ${total}: успех, взрыв не задел.`
+          :copy?"Взрыв развеивает копию.":`${total===null?"Без защиты":`Защита ${total}`}: урон после брони ${hit.damage.total}; «Жуткий запах»; Стойкость ${hit.endurance} против СЛ 14 — ${hit.nauseated?"тошнота, пока не смоет ошмётки":"сдержался"}.`});
       } else {
         if(!["dodge","block"].includes(mode))throw new Error("От игл можно уклониться или заблокировать их.");
         const mark=creatureFlags(target).defenses,combat=game.combat,repeat=Boolean(combat?.started&&mark?.combat===combat.id&&mark.round===combat.round&&mark.count>0);
@@ -210,7 +233,10 @@ export function resolveCreatureArea(message,index,{mode="dodge",itemId=""}={}) {
       const rows=[...creatureFlags(message).creatureArea.targets];rows[index]={...rows[index],result};await message.update({[`flags.${SYSTEM_ID}.creatureArea.targets`]:rows});
     }
     if(!result.success) {
-      if(data.id==="needles") {
+      if(data.id==="rotfiend-blast") {
+        if(noonCopyState(token))await destroyNoonCopy(token);
+        else await applyCreatureDamage(target,result.damage,key,{effects:rotfiendBlastEffects(target,result)});
+      } else if(data.id==="needles") {
         if(noonCopyState(token))await destroyNoonCopy(token);
         else if(!result.immune)await applyCreatureDamage(target,result.damage,key,{effects:[creatureEffect(target,"poisoned")]});
       } else if(data.id==="scream")await addCreatureEffect(target,creatureEffect(target,"stunned"),key);
@@ -282,10 +308,12 @@ export function applyCreatureCollision(message,{meters,weight="light",obstacleUu
     if(!Number.isFinite(distance)||distance<0||distance>state.max||!factor)throw new Error("Проверьте расстояние полёта и категорию массы.");
     let result=state.result;
     if(!result) {
-      const extra=Math.min(5,Math.floor(distance/2)),formula=`3d6${extra?` + floor(${extra}d6 * ${factor})`:""}`,roll=await creatureRoll(formula);
+      // Graveir throws (Monster Hunter's Journal p.17): Xd6, X = half the metres flown, no mass factor.
+      const half=state.formula==="half",extra=Math.min(5,Math.floor(distance/2));
+      const formula=half?(Math.floor(distance/2)?`${Math.floor(distance/2)}d6`:"0"):`3d6${extra?` + floor(${extra}d6 * ${factor})`:""}`,roll=formula==="0"?{total:0}:await creatureRoll(formula);
       const damage=resolveDamage({base:roll.total,location:"torso",multiplier:1,traits:{types:["bludgeoning"],piercing:"none",silver:false},armor:armorAt(target,"torso"),monster:false});
       result={damage,formula};await message.update({[`flags.${SYSTEM_ID}.creatureCollision.result`]:result});
-      await creaturePost(target,{title:"Столкновение после отбрасывания",text:`${distance} м; ${esc(formula)}, ${damage.total} урона после брони.`,rolls:[roll]});
+      await creaturePost(target,{title:"Столкновение после отбрасывания",text:`${distance} м; ${esc(formula)}, ${damage.total} урона после брони.`,rolls:formula==="0"?[]:[roll]});
     }
     const key=`collision:${message.id}`;
     await applyCreatureDamage(target,result.damage,key);
@@ -297,7 +325,13 @@ export function applyCreatureCollision(message,{meters,weight="light",obstacleUu
 export function onCreatureExchangeApplied(message,index,result) {
   return once(`push:${message.id}:${index}`,async()=>{
     if(!activeCreatureGM()||result?.immune)return;
-    const attack=creatureFlags(message).weaponAttack;if(attack?.creatureAction?.id!=="charge")return;
+    if(creatureFlags(message).weaponAttack?.creatureAction?.id==="charge")await pushChargeTarget(message,index);
+  });
+}
+/** Knock the charge target back once; a failed Physique save after a block throws it the same way. */
+async function pushChargeTarget(message,index) {
+  {
+    const attack=creatureFlags(message).weaponAttack;
     const key=`${message.id}:${index}`,target=resolveToken(attack.target),source=resolveToken(attack.attacker);
     if(!target||!source||creatureFlags(target).creaturePushes?.includes(key))return;
     const a=tokenCenter(source),b=tokenCenter(target),length=Math.hypot(b.x-a.x,b.y-a.y)||1,meters=attack.creatureAction.pushMeters,pixels=meters/target.parent.grid.distance*target.parent.grid.size;
@@ -310,7 +344,34 @@ export function onCreatureExchangeApplied(message,index,result) {
     const size=target.getSize();await target.update({x:Math.round(point.x-size.width/2),y:Math.round(point.y-size.height/2),
       [`flags.${SYSTEM_ID}.creaturePushes`]:[...(creatureFlags(target).creaturePushes??[]).slice(-29),key]});
     await creaturePost(target.actor,{title:"Отбрасывание",text:`${esc(target.name)} отброшен до ${meters} м.${collision?" Путь остановила преграда: примените столкновение.":""}`,
-      flags:{creatureCollision:{target:target.uuid,max:meters,applied:false}}});
+      flags:{creatureCollision:{target:target.uuid,max:meters,applied:false,...(attack.creatureAction.collision?{formula:attack.creatureAction.collision}:{})}}});
+  }
+}
+
+/** Monster Hunter's Journal p.17, graveir: a blocked charge forces Physique DC 25; a dodged one runs on to the full distance. */
+export function onCreatureChargeMissed(message,index,outcome) {
+  return once(`chargeMiss:${message.id}:${index}`,async()=>{
+    if(!activeCreatureGM()||!outcome||outcome.hit||outcome.limbBlock)return false;
+    const attack=creatureFlags(message).weaponAttack,action=attack?.creatureAction;
+    if(action?.id!=="charge"||!(action.blockSave||action.overrun)||creatureFlags(message).creatureChargeMiss?.[index])return false;
+    await message.update({[`flags.${SYSTEM_ID}.creatureChargeMiss`]:{...creatureFlags(message).creatureChargeMiss,[index]:true}});
+    if(outcome.mode==="block") {
+      const target=resolveToken(attack.target)?.actor;if(!action.blockSave||!target)return false;
+      const {skill,dc}=action.blockSave,roll=await creatureRoll(`1d10wc + ${skillValue(target.system,skill).total??0}`),held=roll.total>=dc;
+      await creaturePost(target,{title:`Удар с разбега заблокирован: Сила СЛ ${dc}`,rolls:[roll],text:`${roll.total} против СЛ ${dc}: ${held?"устоял на ногах":"отброшен"}.`});
+      if(!held)await pushChargeTarget(message,index);
+      return true;
+    }
+    if(outcome.mode==="parry"||!action.overrun)return false;
+    const source=resolveToken(attack.attacker);if(!source?.actor)return false;
+    const {from,to}=action.overrun,hits=point=>Boolean(source.object?.checkCollision(point,{origin:from,type:"move",mode:"any"}));
+    let point=to;const wall=hits(to);
+    if(wall){let low=0,high=1;for(let i=0;i<12;i++){const mid=(low+high)/2;if(hits({x:from.x+(to.x-from.x)*mid,y:from.y+(to.y-from.y)*mid}))high=mid;else low=mid;}point={x:from.x+(to.x-from.x)*low,y:from.y+(to.y-from.y)*low};}
+    await moveCreatureTo(source,point);
+    const stunned=wall&&!immuneToCondition(source.actor,["stunned"]);
+    if(stunned)await addCreatureEffect(source.actor,creatureEffect(source.actor,"stunned"),`chargeWall:${message.id}:${index}`);
+    await creaturePost(source.actor,{title:"Промах с разбега",text:wall?`${esc(source.name)} врезается в преграду${stunned?" и дезориентирован до успешного испытания Устойчивости":""}.`:`${esc(source.name)} пробегает оставшуюся дистанцию по прямой.`});
+    return true;
   });
 }
 
@@ -333,7 +394,7 @@ export function registerCreatureActions() {
       const button=document.createElement("button");button.type="button";button.textContent="Столкновение с преградой";button.disabled=!activeCreatureGM();
       button.addEventListener("click",async()=>{
         const choices=await foundry.applications.api.DialogV2.prompt({window:{title:"Столкновение"},rejectClose:false,
-          content:`<p>Таранный урон как от лошади: 3d6 + до 5d6 за расстояние, с множителем массы.</p><label>Пролетел метров<input name="meters" type="number" min="0" max="${collision.max}" step="0.1" value="${collision.max}"></label><label>Масса препятствия<select name="weight"><option value="veryLight">Очень лёгкая ×½</option><option value="light" selected>Лёгкая ×1</option><option value="medium">Средняя ×2</option><option value="heavy">Тяжёлая ×3</option></select></label>`,
+          content:collision.formula==="half"?`<p>Урон Xd6, где X — половина пролетевших метров.</p><label>Пролетел метров<input name="meters" type="number" min="0" max="${collision.max}" step="0.1" value="${collision.max}"></label>`:`<p>Таранный урон как от лошади: 3d6 + до 5d6 за расстояние, с множителем массы.</p><label>Пролетел метров<input name="meters" type="number" min="0" max="${collision.max}" step="0.1" value="${collision.max}"></label><label>Масса препятствия<select name="weight"><option value="veryLight">Очень лёгкая ×½</option><option value="light" selected>Лёгкая ×1</option><option value="medium">Средняя ×2</option><option value="heavy">Тяжёлая ×3</option></select></label>`,
           ok:{label:"Бросить и применить",callback:(_event,control)=>Object.fromEntries(new FormData(control.form))}});
         if(choices)try{await applyCreatureCollision(message,choices);}catch(error){ui.notifications.error(error.message);}
       });(html.querySelector(".message-content")??html).append(button);
@@ -344,7 +405,9 @@ export function registerCreatureActions() {
       box.innerHTML=data.targets.map((row,index)=>{
         if(row.done)return `<p>${esc(row.name)}: результат применён.</p>`;
         const target=resolveToken(row.uuid)?.actor;
-        const choices=data.id==="needles"&&target?defenseChoices(target,"ranged",0,["dodge","block"]).filter(choice=>!choice.blocked):[{mode:"dodge",itemId:"",name:"Бросить и применить"}];
+        const choices=data.id==="needles"&&target?defenseChoices(target,"ranged",0,["dodge","block"]).filter(choice=>!choice.blocked)
+          :data.id==="rotfiend-blast"&&target?[...defenseChoices(target,"melee",0,["reposition","block"]).filter(choice=>!choice.blocked&&(choice.mode!=="block"||target.items.get(choice.itemId)?.system.category==="shield")),{mode:"none",itemId:"",name:"Не защищается"}]
+          :[{mode:"dodge",itemId:"",name:"Бросить и применить"}];
         return `<div><b>${esc(row.name)}</b>${choices.map(choice=>`<button type="button" data-creature-area="${index}" data-mode="${choice.mode}" data-item="${esc(choice.itemId??"")}" ${activeCreatureGM()?"":"disabled"}>${esc(choice.name)}${choice.weaponName?` · ${esc(choice.weaponName)}`:""}</button>`).join("")}</div>`;
       }).join("");
       for(const button of box.querySelectorAll("[data-creature-area]"))button.addEventListener("click",async()=>{button.disabled=true;try{await resolveCreatureArea(message,Number(button.dataset.creatureArea),{mode:button.dataset.mode,itemId:button.dataset.item});}catch(error){ui.notifications.error(error.message);button.disabled=false;}});

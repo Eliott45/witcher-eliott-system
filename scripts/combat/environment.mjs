@@ -87,7 +87,9 @@ export function environmentModifiers(state, { items = [], effects = [], senses =
   if (!state) return [];
   const label = text => ({ source: "environment", category: "environment", label: text });
   const out = [];
-  const ignoresLight = state.light.id === "dark" ? catPotion(effects) : state.light.id === "dim" ? senses || catPotion(effects) : false;
+  // Monster Hunter's Journal: enhanced night vision also cancels darkness penalties.
+  const darkSight = Array.from(items ?? []).some(item => item.type === "ability" && item.system?.ruleId === "creature.enhanced-night-vision");
+  const ignoresLight = state.light.id === "dark" ? darkSight || catPotion(effects) : state.light.id === "dim" ? senses || darkSight || catPotion(effects) : false;
   if (!ignoresLight) for (const modifier of state.light.modifiers ?? []) out.push({ ...modifier, ...label(state.light.name) });
   const water = ["water", "underwater"].includes(state.terrain.id);
   // Amphibious creatures (core p.277) ignore water penalties, not other terrain or light.

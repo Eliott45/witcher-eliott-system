@@ -34,9 +34,9 @@ test("audited creature exceptions preserve book statistics and the tail or wing 
 
 test("bestiary keeps existing creatures flat and places the named DLC NPC in its own folder", () => {
   const sources = bestiarySources();
-  assert.equal(sources.length, 36);
-  assert.equal(new Set(sources.map(source => source._id)).size, 36);
-  assert.equal(new Set(sources.map(source => source.name)).size, 36);
+  assert.equal(sources.length, 39);
+  assert.equal(new Set(sources.map(source => source._id)).size, 39);
+  assert.equal(new Set(sources.map(source => source.name)).size, 39);
   assert.deepEqual(sources.slice(0, 2).map(source => source._id), ["bestiaryBandit01", "bestiaryDrowner1"]);
   for (const source of sources) {
     assert.equal(source.type, "npc");
@@ -51,8 +51,8 @@ test("bestiary keeps existing creatures flat and places the named DLC NPC in its
 test("every specific harvested item resolves to the real catalog; only random loot and currency stay generic", () => {
   const catalog = new Set(equipment.map(equipmentUuid));
   const generic = new Set(["Кроны", "Обычные предметы", "Странные предметы", "Странные вещи", "Случайные предметы", "Случайная руна",
-    // Monster Hunter's Journal p.26 names this essence without a price or substance, so it has no catalog item.
-    "Эссенция баргеста"]);
+    // Monster Hunter's Journal components (pp.142–143) are not in the catalog yet.
+    "Эссенция баргеста", "Глаза утковола", "Кровь утковола", "Мозг утковола", "Жилы", "Зубы туманника", "Эссенция туманника", "Кровь гнильца", "Печень гнильца"]);
   for (const source of bestiarySources()) {
     for (const row of source.system.harvest ?? []) {
       assert.ok(catalog.has(row.uuid), `${source.name}: ${row.uuid}`);

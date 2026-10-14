@@ -222,7 +222,7 @@ async function applyBlastNow(message) {
       if (await destroyNoonCopy(token)) {
         victim.applied = true;victim.copyDestroyed = true;
         await message.update({ [`flags.${SYSTEM_ID}.bomb.victims`]: data.victims });
-        lines.push(`<li><b>${esc(actor.name)}</b>: копия полуденницы уничтожена попаданием.</li>`);
+        lines.push(`<li><b>${esc(actor.name)}</b>: копия уничтожена попаданием.</li>`);
         continue;
       }
     }
@@ -255,7 +255,7 @@ async function applyBlastNow(message) {
     }
     // Persist the damage phase separately: retrying a failed condition write must not deal the blast again.
     if (!victim.damageApplied) {
-      victim.worn = result.total || result.ablate.length ? await sufferDamage(actor, result) : [];
+      victim.worn = result.total || result.ablate.length ? await sufferDamage(actor, result, { fire: Boolean(data.profile.traits?.types?.includes("elemental")) }) : [];
       victim.damageApplied = true;
       await message.update({ [`flags.${SYSTEM_ID}.bomb.victims`]: data.victims });
     }

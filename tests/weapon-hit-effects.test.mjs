@@ -26,7 +26,7 @@ test("bleed and poison need penetrating injury; burning can ignite armor; incorp
   assert.equal(weaponConditionChances(traits,{total:5,penetrated:true}).length,3);
   assert.equal(weaponConditionChances(traits,{total:5,penetrated:true},{nonLethal:true}).length,1);
   assert.deepEqual(weaponConditionChances(traits,{total:0,penetrated:false,immune:true}),[]);
-  assert.deepEqual(weaponHitTraits({properties:"Разрушающее; нельзя парировать; двойной урон оружию, щиту или броне"}),{bleeding:0,poisoned:0,burning:0,frozen:0,staggered:0,stunModifier:null,specterDamage:0,ablating:true,noParry:true,wearMultiplier:2});
+  assert.deepEqual(weaponHitTraits({properties:"Разрушающее; нельзя парировать; двойной урон оружию, щиту или броне"}),{bleeding:0,poisoned:0,burning:0,frozen:0,staggered:0,stunModifier:null,specterDamage:0,ablating:true,ablationDice:null,blockWear:null,contact:false,noParry:true,wearMultiplier:2});
 });
 
 test("percentile effects respect chance boundaries, immunity, blind dice and guaranteed elf bleeding",async t=>{

@@ -2,6 +2,7 @@ import { SYSTEM_ID } from "../config.mjs";
 import { endTurnConditions } from "../combat/condition-saves.mjs";
 import { startTurnPoison } from "../combat/poison-damage.mjs";
 import { tickNoonDance } from "../combat/creature-actions-dance.mjs";
+import { rotfiendTurn } from "../combat/rotfiend.mjs";
 import { criticalWoundTurn } from "../combat/critical-wound-effects.mjs";
 import { nauseaTurn } from "../combat/nausea.mjs";
 import { dimeritiumTurn } from "../magic/dimeritium.mjs";
@@ -20,6 +21,8 @@ export class WitcherCombat extends foundry.documents.Combat {
     await super._onStartTurn(combatant,context);
     try { await tickNoonDance(this,combatant,context); }
     catch(error) { console.error("witcher-eliott-system | Noonwraith dance",error); ui.notifications.error(error.message); }
+    try { await rotfiendTurn(this,combatant,context); }
+    catch(error) { console.error(`${SYSTEM_ID} | Rotfiend blast`,error); ui.notifications.error("Не удалось взорвать гнильца. Используйте кнопку на его листе."); }
     try { await startTurnPoison(this,combatant,context); }
     catch(error) { console.error(`${SYSTEM_ID} | Start-turn poison`,error); ui.notifications.error("Не удалось завершить обработку отравления. Проверьте ПЗ и сообщение в чате; подробности в консоли."); }
     try { await nauseaTurn(this,combatant,context); }

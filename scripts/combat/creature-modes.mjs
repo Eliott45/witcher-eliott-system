@@ -10,6 +10,8 @@ import { armorAt, weaponDamageTraits, resolveDamage } from "./damage-rules.mjs";
 import { tokenGap } from "./attack-target.mjs";
 import { isCarried } from "../data/containers.mjs";
 import { focusRating } from "../magic/rules.mjs";
+import { isRotfiend, startRotfiendDecay } from "./rotfiend.mjs";
+import { fogVanishBlocked } from "./creature-fog.mjs";
 
 const actorToken = actor => actor?.isToken ? actor.token : actor?.getActiveTokens?.(false, true)?.[0]?.document;
 const pending = new WeakMap();
@@ -29,6 +31,7 @@ export async function setCreatureMode(actor, key, raw) {
   if (key === "movementMode" && value === "flying" && !creatureCanFly(actor) || key === "movementMode" && value === "swimming" && !creatureCanSwim(actor)) throw new Error("Этот способ передвижения недоступен.");
   if (key === "movementMode" && value === "flying" && actor.system.creature.fallRemaining > 0) throw new Error("Сначала завершите падение.");
   const suppression = creatureSuppressionFlags(actor);
+  if (key === "invisible" && value && creatureProfile(actor)?.id === "foglet") { const reason = fogVanishBlocked(actor); if (reason) throw new Error(reason); }
   if (key === "invisible" && value && suppression.suppressed || key === "transformed" && value && (suppression.moonDust || suppression.manual)) throw new Error("Способность подавлена Ирденом или Лунной пылью.");
   const patch = { [`system.creature.${key}`]: value };
   if (key === "invisible" && value) patch["system.creature.invisibilityEpoch"] = globalThis.foundry?.utils?.randomID?.() ?? globalThis.crypto.randomUUID();
@@ -39,7 +42,10 @@ export async function setCreatureMode(actor, key, raw) {
 
 /** A successful declaration reveals the katakan after its attack bonus has already been captured. */
 export async function afterCreatureAttack(actor) {
-  if (actor?.system?.creature?.invisible) await actor.update({ "system.creature.invisible": false });
+  // Monster Hunter's Journal p.19: an attacking foglet stays visible until its next turn.
+  const combat = globalThis.game?.combat, reveal = creatureProfile(actor)?.id === "foglet" && combat?.started
+    ? { [`flags.${SYSTEM_ID}.fogReveal`]: { combatId: combat.id, round: combat.round, turn: combat.turn ?? 0 } } : {};
+  if (actor?.system?.creature?.invisible || Object.keys(reveal).length) await actor.update({ ...(actor.system.creature.invisible ? { "system.creature.invisible": false } : {}), ...reveal });
 }
 export const creatureFlightThreshold = actor => ({ siren: 5, griffin: 10, wyvern: 10, bird: 0 })[creatureProfile(actor)?.id] ?? 0;
 export const fallingDice = height => Math.floor(Math.max(0, Number(height) || 0) / 2);
@@ -79,7 +85,8 @@ export async function groundCreature(actor, { disoriented = false } = {}) {
 }
 
 /** Invoked once for applied damage, after armor. Other damage pipelines can call the same hook. */
-export function onCreatureDamaged(actor, total, { electricity = false } = {}) {
+export function onCreatureDamaged(actor, total, { electricity = false, fire = false } = {}) {
+  if (isRotfiend(actor)) return startRotfiendDecay(actor, { fire });
   if (actor?.system?.creature?.movementMode !== "flying" && !(electricity && total > 10 && creatureProfile(actor)?.id === "golem")) return Promise.resolve();
   return once(actor, async () => {
     if (actor?.system?.creature?.movementMode === "flying" && total > creatureFlightThreshold(actor)) await groundCreature(actor);
@@ -121,7 +128,7 @@ export async function detectCreature(actor, { magic = false, observer = null } =
     await observer.setFlag(SYSTEM_ID, "detectedCreatures", records);
     globalThis.canvas?.perception?.update?.({ refreshVision: true });
   }
-  await creaturePost(actor, { title: magic ? "Обнаружить магией" : "Заметить невидимого", rolls: [check, resist], text: `${esc(observer.name)}: ${success ? "обнаруживает катакана; штраф −3 к атаке и защите против него остаётся" : "не обнаруживает катакана"}.` });
+  await creaturePost(actor, { title: magic ? "Обнаружить магией" : "Заметить невидимого", rolls: [check, resist], text: `${esc(observer.name)}: ${success ? `обнаруживает: ${esc(actor.name)}; штраф −3 к атаке и защите против него остаётся` : `не обнаруживает: ${esc(actor.name)}`}.` });
   return success;
 }
 

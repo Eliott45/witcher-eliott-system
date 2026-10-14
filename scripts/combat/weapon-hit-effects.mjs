@@ -19,6 +19,10 @@ export function weaponHitTraits(weapon = {}, actor = null) {
     stunModifier: /дезориентирующ/iu.test(text) ? Number(text.match(/дезориентирующ\S*\s*\(([−-]?\d+)\)/iu)?.[1]?.replace("−", "-") ?? 0) : null,
     specterDamage: Number(text.match(/\+(\d+)\s+урона\s+призракам/iu)?.[1] ?? 0),
     ablating: /разрушающ/iu.test(text),
+    // Monster Hunter's Journal, graveir acid: its own ablation dice, dice against a blocking item, effects on any hit.
+    ablationDice: text.match(/разрушающ\S*\s*\((\d+d\d+)\)/iu)?.[1] ?? null,
+    blockWear: text.match(/разрушает блок\S*\s*\((\d+d\d+)\)/iu)?.[1] ?? null,
+    contact: /без пробития/iu.test(text),
     wearMultiplier: !creatureGolemSlowed(actor) && /двойной урон (?:оружию|снаряжению)/iu.test(text) ? 2 : 1,
     noParry: !creatureGolemSlowed(actor) && /нельзя парировать/iu.test(text)
   };
@@ -27,7 +31,7 @@ export function weaponHitTraits(weapon = {}, actor = null) {
 export function weaponConditionChances(traits, result, { nonLethal = false } = {}) {
   if (result.immune) return [];
   return ["bleeding", "poisoned", "burning", "frozen", "staggered"].filter(id => traits?.[id] > 0
-    && (["burning", "frozen", "staggered"].includes(id) || !nonLethal && result.total > 0 && result.penetrated))
+    && (["burning", "frozen", "staggered"].includes(id) || !nonLethal && (traits.contact || result.total > 0 && result.penetrated)))
     .map(id => ({ id, chance: traits[id] }));
 }
 

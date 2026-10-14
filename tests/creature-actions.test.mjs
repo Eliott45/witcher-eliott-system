@@ -6,9 +6,16 @@ import { deriveStatistics } from "../scripts/data/statistics.mjs";
 import { SKILL_KEYS } from "../scripts/data/skills.mjs";
 import { needleDice, chargeProfile, validateCreatureRange, creatureHypnosisPenalty } from "../scripts/combat/creature-actions-rules.mjs";
 import { creatureActions, useCreatureAction, applyCreatureSpecial, resolveCreatureArea, damageCreatureWeb, attackCreatureWeb,
-  onCreatureExchangeApplied, applyCreatureCollision, dispelSirenIllusion, registerCreatureActions } from "../scripts/combat/creature-actions.mjs";
+  onCreatureExchangeApplied, onCreatureChargeMissed, applyCreatureCollision, dispelSirenIllusion, registerCreatureActions } from "../scripts/combat/creature-actions.mjs";
 import { createNoonDance, tickNoonDance, destroyNoonCopy } from "../scripts/combat/creature-actions-dance.mjs";
 import { applyCreatureDamage } from "../scripts/combat/creature-actions-damage.mjs";
+import { rotfiendDecay, rotfiendDue, rotfiendTurn, startRotfiendDecay, explodeRotfiend } from "../scripts/combat/rotfiend.mjs";
+import { onCreatureDamaged } from "../scripts/combat/creature-modes.mjs";
+import { burningParts } from "../scripts/combat/burning.mjs";
+import { fogRegions, fogSightLimit, revealFogletIfExposed, dispelFog, dismissFoglet } from "../scripts/combat/creature-fog.mjs";
+import { afterCreatureAttack } from "../scripts/combat/creature-modes.mjs";
+import { actionQuote } from "../scripts/combat/action-economy.mjs";
+import { constrainHypnotizedVision } from "../scripts/combat/creature-actions-vision.mjs";
 
 const put=(object,path,value)=>{const keys=path.split(".");for(const key of keys.slice(0,-1))object=object[key]??= {};object[keys.at(-1)]=value;};
 const collection=values=>Object.assign(values,{get(id){return this.find(row=>row.id===id);},has(id){return this.some(row=>row.id===id);}});
@@ -230,4 +237,157 @@ test("player-applied charge damage is pushed once by the active GM chat hook, wi
   assert.equal(to.x,500);assert.deepEqual(to.flags[SYSTEM_ID].creaturePushes,[`${card.id}:0`]);
   await created(applied);assert.equal(to.x,500);
   assert.equal(env.messages.filter(message=>message.flags[SYSTEM_ID]?.creatureCollision).length,1);
+});
+
+test("graveir charges only at 5–10 m, at base 12 into the torso, and spends the full turn",async()=>{
+  const env=setup(),graveir=env.actor("Утковол"),victim=env.actor("Волк"),from=env.token(graveir);env.combat();
+  assert.ok(creatureActions(graveir).some(action=>action.id==="charge"));
+  const near=env.token(victim,300);
+  await assert.rejects(useCreatureAction(graveir,"charge",{sourceToken:from,targets:[near]}),/дальше 5 м/);
+  near.x=700;await assert.rejects(useCreatureAction(graveir,"charge",{sourceToken:from,targets:[near]}),/не дальше 10 м/);
+  near.x=500;env.totals.push(20);
+  const message=await useCreatureAction(graveir,"charge",{sourceToken:from,targets:[near]}),attack=message.flags[SYSTEM_ID].weaponAttack;
+  assert.deepEqual([attack.base,attack.damage,attack.location],[12,"7d6","torso"]);
+  assert.deepEqual([attack.creatureAction.pushMeters,attack.creatureAction.collision,attack.creatureAction.blockSave],[5,"half",{skill:"physique",dc:25}]);
+  assert.equal(from.x,400,"the graveir stops in contact");
+  assert.deepEqual(attack.creatureAction.overrun,{from:{x:450,y:50},to:{x:550,y:50}},"8 m run, 2 m left");
+  assert.ok(graveir.effects.some(effect=>effect.flags[SYSTEM_ID].creatureFullTurn));
+});
+
+test("a blocked graveir charge throws a target that fails Physique DC 25; a dodged one carries the graveir on",async()=>{
+  const env=setup(),graveir=env.actor("Утковол"),victim=env.actor("Волк"),from=env.token(graveir,400),to=env.token(victim,500);
+  const action={id:"charge",pushMeters:5,collision:"half",blockSave:{skill:"physique",dc:25},overrun:{from:{x:450,y:50},to:{x:550,y:50}}};
+  const blocked=await env.card(graveir,{weaponAttack:{target:to.uuid,attacker:from.uuid,count:1,creatureAction:action}});
+  env.totals.push(24);
+  await Promise.all([onCreatureChargeMissed(blocked,0,{hit:false,mode:"block"}),onCreatureChargeMissed(blocked,0,{hit:false,mode:"block"})]);
+  assert.equal(env.rolls.length,1);assert.equal(to.x,750,"thrown 5 m away from the graveir");
+  const collision=env.messages.at(-1).flags[SYSTEM_ID].creatureCollision;assert.equal(collision.formula,"half");
+  const held=await env.card(graveir,{weaponAttack:{target:to.uuid,attacker:from.uuid,count:1,creatureAction:action}});
+  env.totals.push(25);await onCreatureChargeMissed(held,0,{hit:false,mode:"block"});assert.equal(to.x,750);
+  const dodged=await env.card(graveir,{weaponAttack:{target:to.uuid,attacker:from.uuid,count:1,creatureAction:action}});
+  assert.equal(await onCreatureChargeMissed(dodged,0,{hit:false,mode:"parry"}),false);assert.equal(from.x,400);
+  const missed=await env.card(graveir,{weaponAttack:{target:to.uuid,attacker:from.uuid,count:1,creatureAction:action}});
+  await onCreatureChargeMissed(missed,0,{hit:false,mode:"dodge"});assert.equal(from.x,500);
+  assert.equal(graveir.effects.some(effect=>effect.statuses.has("stunned")),false,"no wall, no disorientation");
+  from.x=400;from.object={checkCollision:point=>point.x>500};
+  const wall=await env.card(graveir,{weaponAttack:{target:to.uuid,attacker:from.uuid,count:1,creatureAction:action}});
+  await onCreatureChargeMissed(wall,0,{hit:false,mode:"reposition"});
+  assert.ok(from.x<=450&&from.x>=440,"stops at the wall");assert.ok(graveir.effects.some(effect=>effect.statuses.has("stunned")));
+  const ox=await env.card(graveir,{weaponAttack:{target:to.uuid,attacker:from.uuid,count:1,creatureAction:{id:"charge",pushMeters:3}}});
+  assert.equal(await onCreatureChargeMissed(ox,0,{hit:false,mode:"block"}),false,"other chargers keep the core rules");
+});
+
+test("graveir throw collisions deal Xd6 for half the metres flown, without a mass factor",async()=>{
+  const env=setup(),victim=env.actor("Волк"),to=env.token(victim,100),before=victim.system.health.value;
+  const card=await env.card(victim,{creatureCollision:{target:to.uuid,max:5,applied:false,formula:"half"}});
+  env.totals.push(7);await applyCreatureCollision(card,{meters:5});
+  assert.deepEqual(env.rolls,["2d6"]);assert.equal(victim.system.health.value,before-7);
+  const short=await env.card(victim,{creatureCollision:{target:to.uuid,max:5,applied:false,formula:"half"}});
+  await applyCreatureCollision(short,{meters:1});assert.equal(env.rolls.length,1);assert.equal(victim.system.health.value,before-7);
+});
+
+test("a rotfiend starts to decay at 5 HP or less after non-fire damage, never from fire or above 5 HP",async()=>{
+  const env=setup(),rotfiend=env.actor("Гнилец");env.token(rotfiend);
+  await applyCreatureDamage(rotfiend,{total:10,ablate:[]},"hit-1");assert.equal(rotfiendDecay(rotfiend),null,"15 HP left");
+  rotfiend.system.health.value=4;await onCreatureDamaged(rotfiend,3,{fire:true});assert.equal(rotfiendDecay(rotfiend),null,"fire kills it cleanly");
+  await applyCreatureDamage(rotfiend,{total:11,ablate:[]},"hit-2");await onCreatureDamaged(rotfiend,1);
+  assert.equal(rotfiend.effects.filter(effect=>effect.flags[SYSTEM_ID]?.rotfiendDecay).length,1);
+  const wolf=env.actor("Волк");wolf.system.health.value=3;await onCreatureDamaged(wolf,5);assert.equal(rotfiendDecay(wolf),null);
+  const manual=env.actor("Гнилец");assert.equal(await startRotfiendDecay(manual),false);assert.equal(await startRotfiendDecay(manual,{force:true}),true);
+});
+
+test("the blast comes at the rotfiend's next turn start, or once the order has passed a skipped dead rotfiend",()=>{
+  const a={id:"a"},b={id:"b"},c={id:"c"},combat={id:"combat",round:1,turn:1,turns:[a,b,c]},state={combatId:"combat",round:1,turn:1};
+  assert.equal(rotfiendDue(combat,a,state,c),false,"its slot comes next round");
+  assert.equal(rotfiendDue(combat,a,state,a),true,"its own turn start");
+  Object.assign(combat,{round:2,turn:1});assert.equal(rotfiendDue(combat,a,state,b),true,"slot 0 of round 2 was skipped");
+  Object.assign(combat,{round:1,turn:2});assert.equal(rotfiendDue(combat,c,{...state,turn:0},b),false);
+  assert.equal(rotfiendDue(combat,c,{...state,combatId:"other"},b),false);
+});
+
+test("the burst destroys the rotfiend, hits everyone in melee range per body part, stinks and may nauseate",async()=>{
+  const env=setup(),rotfiend=env.actor("Гнилец"),wolf=env.actor("Волк"),other=env.actor("Гнилец"),far=env.actor("Грифон");
+  const from=env.token(rotfiend),to=env.token(wolf,100),next=env.token(other,0,100);env.token(far,2000);
+  rotfiend.system.health.value=3;await startRotfiendDecay(rotfiend);other.system.health.value=6;
+  const combat=env.combat();combat.turns=combat.combatants;
+  await Promise.all([rotfiendTurn(combat,combat.combatants[0],{round:1}),explodeRotfiend(rotfiend)]);
+  const card=env.messages.find(message=>message.flags[SYSTEM_ID]?.creatureArea?.id==="rotfiend-blast");
+  assert.deepEqual(card.flags[SYSTEM_ID].creatureArea.targets.map(row=>row.name),["Волк","Гнилец"]);
+  assert.equal(rotfiend.system.health.value,0);assert.ok(rotfiend.effects.some(effect=>effect.statuses.has("dead")));
+  assert.equal(rotfiendDecay(rotfiend),null);assert.equal(await explodeRotfiend(rotfiend),null,"bursts once");
+  const before=wolf.system.health.value,parts=burningParts(wolf).length;
+  env.totals.push(...Array(parts).fill(4),13);await resolveCreatureArea(card,0,{mode:"none"});
+  assert.equal(env.rolls.filter(formula=>formula==="2d6").length,parts);
+  const hit=card.flags[SYSTEM_ID].creatureArea.targets[0].result;
+  assert.equal(wolf.system.health.value,before-hit.damage.total);assert.ok(hit.damage.total>0);
+  assert.ok(wolf.effects.some(effect=>effect.flags[SYSTEM_ID]?.rotfiendSmell));assert.ok(wolf.effects.some(effect=>effect.statuses.has("nauseated")));
+  await resolveCreatureArea(card,0,{mode:"none"});assert.equal(wolf.system.health.value,before-hit.damage.total);
+  await assert.rejects(resolveCreatureArea(card,1,{mode:"dodge"}),/Смена позиции/);
+  env.totals.push(...Array(burningParts(other).length).fill(6),14);await resolveCreatureArea(card,1,{mode:"none"});
+  assert.equal(other.effects.some(effect=>effect.statuses.has("nauseated")),false,"Endurance 14 holds it down");
+  assert.ok(rotfiendDecay(other),"a rotfiend left at 5 HP or less bursts in turn");
+});
+
+/** Regions for the fog tests: the shared mock scene only creates tokens. */
+function withRegions(env) {
+  const scene=env.scene,tokens=scene.createEmbeddedDocuments.bind(scene);let serial=0;
+  scene.regions=Object.assign([],{get(id){return this.find(row=>row.id===id);}});
+  const region=source=>{const row={...structuredClone(source),id:`region${++serial}`,uuid:`Scene.scene.Region.${serial}`,parent:scene,
+    async update(data){if(data.shapes)this.shapes=data.shapes;return this;},async delete(){scene.regions.splice(scene.regions.indexOf(this),1);}};scene.regions.push(row);return row;};
+  scene.createEmbeddedDocuments=async(type,data)=>type==="Region"?data.map(region):tokens(type,data);
+  scene.deleteEmbeddedDocuments=(original=>async(type,ids)=>{if(type!=="Region")return original.call(scene,type,ids);for(const id of ids)await scene.regions.get(id)?.delete();})(scene.deleteEmbeddedDocuments);
+  return region;
+}
+
+test("the foglet's fog limits everyone else's sight to 4 m, moves 10 m and cannot be raised in dimeritium",async()=>{
+  const env=setup(),region=withRegions(env),foglet=env.actor("Туманник"),wolf=env.actor("Волк"),from=env.token(foglet),inside=env.token(wolf,600),outside=env.token(env.actor("Волк"),5000);env.combat();
+  await useCreatureAction(foglet,"fog",{sourceToken:from});
+  const [fog]=fogRegions(env.scene);assert.equal(fog.shapes[0].radiusX,1500);assert.deepEqual([fog.shapes[0].x,fog.shapes[0].y],[50,50]);
+  assert.deepEqual([fogSightLimit(inside),fogSightLimit(from),fogSightLimit(outside)],[4,null,null]);
+  globalThis.PIXI={Circle:class{constructor(x,y,radius){Object.assign(this,{x,y,radius});}}};
+  const circle=constrainHypnotizedVision({data:{x:650,y:50},object:inside},{applyConstraint:shape=>shape},{isGM:false});
+  assert.equal(circle.radius,250,"4 m from the edge of a 2 m token");
+  delete globalThis.PIXI;
+  foglet.system.combatAction.extra=false;game.combat.round=2;
+  await assert.rejects(useCreatureAction(foglet,"fog-move",{sourceToken:from,destination:{x:650,y:50}}),/не дальше чем на 10 м/);
+  await useCreatureAction(foglet,"fog-move",{sourceToken:from,destination:{x:550,y:50}});assert.equal(fogRegions(env.scene)[0].shapes[0].x,550);
+  region({shapes:[{type:"ellipse",x:50,y:50,radiusX:300,radiusY:300}],flags:{[SYSTEM_ID]:{creatureZone:{kind:"dimeritium",endTime:1e9}}}});
+  foglet.getActiveTokens=()=>[from];game.combat.round=3;await assert.rejects(useCreatureAction(foglet,"fog",{sourceToken:from}),/Двимеритовая бомба/);
+  assert.equal(fogRegions(env.scene).length,1,"dimeritium does not disperse the fog");
+});
+
+test("the foglet vanishes only in fog, is revealed by its attack until its next turn and by leaving the fog",async()=>{
+  const env=setup(),foglet=env.actor("Туманник"),from=env.token(foglet);withRegions(env);
+  const combat=env.combat();
+  await assert.rejects(useCreatureAction(foglet,"fog-invisible",{sourceToken:from}),/только в тумане/);
+  await useCreatureAction(foglet,"fog",{sourceToken:from});combat.round=2;
+  await useCreatureAction(foglet,"fog-invisible",{sourceToken:from});assert.equal(foglet.system.creature.invisible,true);
+  await afterCreatureAttack(foglet);assert.equal(foglet.system.creature.invisible,false);
+  combat.round=3;combat.combatant=null;await assert.rejects(useCreatureAction(foglet,"fog-invisible",{sourceToken:from}),/до своего следующего хода/);
+  combat.combatant=combat.combatants[0];await useCreatureAction(foglet,"fog-invisible",{sourceToken:from});assert.equal(foglet.system.creature.invisible,true);
+  from.x=5000;await revealFogletIfExposed(foglet);assert.equal(foglet.system.creature.invisible,false);
+});
+
+test("four illusory copies appear only in the fog, look like the foglet, may act and vanish with it",async()=>{
+  const env=setup(),foglet=env.actor("Туманник"),from=env.token(foglet);withRegions(env);const combat=env.combat();
+  await useCreatureAction(foglet,"fog",{sourceToken:from});combat.round=2;
+  await assert.rejects(useCreatureAction(foglet,"fog-copies",{sourceToken:from,positions:[{x:150,y:50},{x:250,y:50},{x:350,y:50},{x:9000,y:50}]}),/в тумане/);
+  combat.round=3;await useCreatureAction(foglet,"fog-copies",{sourceToken:from,positions:[{x:150,y:50},{x:250,y:50},{x:350,y:50},{x:450,y:50}]});
+  const copies=env.scene.tokens.filter(token=>token.flags[SYSTEM_ID]?.noonCopy);
+  assert.equal(copies.length,4);assert.ok(copies.every(token=>token.name===from.name&&token.actor.name===foglet.name));
+  assert.equal(copies[0].actor.flags[SYSTEM_ID].noonCopy.kind,"fog");
+  copies[0].actor.system.combatAction={extra:false,lastExtraRound:""};assert.doesNotThrow(()=>actionQuote(copies[0].actor),"copies act at the foglet's turn");
+  const before=foglet.system.health.value;await tickNoonDance(combat,combat.combatants[0],{round:3});assert.equal(foglet.system.health.value,before,"fog copies drain nothing");
+  await destroyNoonCopy(copies[0]);assert.equal(env.scene.tokens.filter(token=>token.flags[SYSTEM_ID]?.noonCopy).length,3);
+  await dismissFoglet(foglet);
+  assert.equal(env.scene.tokens.filter(token=>token.flags[SYSTEM_ID]?.noonCopy).length,0);assert.equal(fogRegions(env.scene).length,0);
+});
+
+test("a mage disperses the fog with 5 STA, an action and Spell Casting DC 18",async()=>{
+  const env=setup(),foglet=env.actor("Туманник"),mage=env.actor("Маг"),wolf=env.actor("Волк"),from=env.token(foglet),caster=env.token(mage,100),beast=env.token(wolf,200);withRegions(env);
+  await useCreatureAction(foglet,"fog",{sourceToken:from});
+  assert.throws(()=>dispelFog(foglet,{sourceToken:from,targets:[beast]}),/маг или жрец/);
+  const stamina=mage.system.stamina.value;env.totals.push(17);
+  await dispelFog(foglet,{sourceToken:from,targets:[caster]});assert.equal(fogRegions(env.scene).length,1);assert.equal(mage.system.stamina.value,stamina-5);
+  env.totals.push(18);await dispelFog(foglet,{sourceToken:from,targets:[caster]});assert.equal(fogRegions(env.scene).length,0);
 });

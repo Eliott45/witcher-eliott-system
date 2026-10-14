@@ -11,7 +11,7 @@ export function creatureRegeneration(actor) {
   const mode = actor.system.creature?.regenerationMode ?? "normal";
   const options = [{id:"normal",name:`Обычная: ${base} ПЗ`}, {id:"suppressed",name:"Подавлена: 0 ПЗ"}];
   if (sunlight !== base) options.push({id:"sunlight",name:`На солнце: ${sunlight} ПЗ`});
-  const suppression = creatureSuppressionFlags(actor), magical = ["werewolf", "katakan", "fiend"].includes(creatureProfile(actor)?.id);
+  const suppression = creatureSuppressionFlags(actor), magical = ["werewolf", "katakan", "fiend", "graveir"].includes(creatureProfile(actor)?.id);
   const suppressed = mode === "suppressed" || creatureHumanForm(actor) || magical && (suppression.moonDust || suppression.manual);
   const total = suppressed ? 0 : mode === "sunlight" ? sunlight : base;
   return { available: base > 0 || creatureProfile(actor)?.id === "ghoul", total, label: suppressed ? "Регенерация подавлена" : rage ? "Ярость гуля" : mode === "sunlight" ? "Регенерация на солнце" : "Регенерация существа",
