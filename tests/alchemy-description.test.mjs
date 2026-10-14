@@ -77,7 +77,7 @@ test("legacy alchemy cleanup removes shipped notes, retains custom content and i
 test("unpriced witcher products, mutagens and formulas are not free purchases; assigned prices still work", () => {
   globalThis.game = { user: {} };
   const unpriced = [...ALCHEMY, ...MUTAGENS, ...RECIPES].filter(entry => entry.flags?.[SYSTEM_ID]?.priceUnavailable);
-  assert.equal(unpriced.length, 103, "80 witcher alchemy entries + 3 witcher diagrams + 17 experimental recipes + 3 Radolf formulas");
+  assert.equal(unpriced.length, 125, "80 witcher alchemy entries + 25 witcher diagrams + 17 experimental recipes + 3 Radolf formulas");
   for (const entry of unpriced) {
     const source = { ...item(entry), testUserPermission: () => true };
     const actor = { isOwner: true, system: { crowns: 1000 } };

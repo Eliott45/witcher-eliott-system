@@ -31,6 +31,23 @@ function fixture() {
   return {actor,spell,source,state,events,messages};
 }
 
+test("Griffin armor casts one sign at its normal cost while preserving an already spent extra action", async () => {
+  const {actor,spell,messages}=fixture(),sign=spell("sign.axii");
+  actor.items.push({id:"armor",type:"armor",system:{ruleId:"armor.school-griffin",equipped:true,carried:true,quantity:1,encumbrance:0}});
+  actor.system.combatAction={extra:true,lastExtraRound:"fight:1"};
+  const source={id:"griffin-hit",speakerActor:actor,flags:{[SYS]:{weaponAttack:{schoolGear:{armors:["griffin"],witcherWeapon:true,combat:null}}}}};
+  const trigger={id:"griffin-trigger",isContentVisible:true,flags:{[SYS]:{exchange:{kind:"applied",attack:source.id,index:0,schoolCritical:true}}}};
+  messages.push(source,trigger);game.messages={contents:messages,get:id=>messages.find(message=>message.id === id)};
+  const schoolReaction={triggerId:trigger.id,school:"griffin"};
+  const quote=castingQuote(actor,sign,{cost:4,schoolReaction});
+  assert.equal(quote.action.penalty,0);assert.equal(quote.action.stamina,0);assert.equal(quote.stamina,4);
+  assert.throws(()=>castingQuote(actor,spell("aenye"),{schoolReaction}),/только знак/);
+  const posted=await castSpell(actor,sign.id,{cost:4,schoolReaction});
+  assert.equal(posted.flags[SYS].schoolReaction.triggerId,trigger.id);
+  assert.equal(actor.system.stamina.value,36);assert.equal(actor.system.combatAction.extra,true);assert.equal(actor.system.combatAction.lastExtraRound,"fight:1");
+  assert.throws(()=>castingQuote(actor,sign,{cost:4,schoolReaction}),/недоступна/);
+});
+
 test("Manticore casts a sign with sword and shield; other schools must free a hand before spending stamina", async () => {
   const { actor, spell, events } = fixture(), sign = spell("sign.aard");
   actor.system.details.race = "witcher"; actor.system.lifepath = { witcher: { school: "manticore" } };

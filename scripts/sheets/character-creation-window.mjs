@@ -12,7 +12,7 @@ import { creationContext } from "./creation-context.mjs";
 import {
   CREATION_STEPS, STYLE_TABLES, SIBLING_COLUMNS, WITCHER_ROLL_TABLES, ATTRIBUTE_ORDER, ATTRIBUTE_ROLL, ATTRIBUTE_MAX, CREATION_SKILL_MAX, PROFESSION_MAGIC,
   blankCreation, regionForRoll, homelandForRoll, regionOfOrigin, familyGroup, evenAlive, whichParent, familyStatusForRoll, friendForRoll, siblingCount,
-  witcherRow, professionAllowed, gearChoiceCount, crownsFormula, pendingAges, withMinimumRanks, creationErrors, creationUpdate, creationItems, magicRuleIds, nameSamples
+  witcherRow, usesSchoolGear, professionAllowed, gearChoiceCount, crownsFormula, pendingAges, withMinimumRanks, creationErrors, creationUpdate, creationItems, magicRuleIds, nameSamples
 } from "../data/character-creation.mjs";
 
 const windows = new Map();
@@ -82,6 +82,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
       const raw = input.type === "checkbox" ? input.checked : input.value;
       const value = input.dataset.type === "number" ? Math.max(0, Math.trunc(Number(raw) || 0)) : raw;
       setPath(this.draft, input.dataset.field, value);
+      if (input.dataset.field === "gear.schoolKit") this.draft.crowns = null;
       if (input.dataset.field === "attributes.level" || input.dataset.rerender !== undefined) this.commit(); else this.save();
     });
     // A rolled result flares once, then settles.
@@ -410,7 +411,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
     return this.commit();
   }
   static async #rollCrowns() {
-    this.draft.crowns = await this.roll(crownsFormula(this.draft.profession), "Стартовый капитал");
+    this.draft.crowns = await this.roll(crownsFormula(this.draft.profession, usesSchoolGear(this.draft)), "Стартовый капитал");
     return this.commit("crowns");
   }
 
@@ -501,7 +502,7 @@ export class CharacterCreationWindow extends foundry.applications.api.Handlebars
       if (spec.custom) { items.push({ _id: foundry.utils.randomID(), name: spec.name, type: "equipment", system: { kind: "gear", quantity: spec.quantity }, flags }); continue; }
       const source = gear.get(spec.ruleId);
       if (!source) continue;
-      const data = { ...foundry.utils.deepClone(source), _id: foundry.utils.randomID(), flags: { ...source.flags, ...flags } };
+      const data = { ...foundry.utils.deepClone(source), _id: foundry.utils.randomID(), flags: { ...source.flags, ...flags, [SYSTEM_ID]: {...source.flags?.[SYSTEM_ID], ...flags[SYSTEM_ID]} } };
       data.system.quantity = spec.quantity;
       if (spec.name) data.name = spec.name;
       if (spec.equipped) data.system.equipped = true;

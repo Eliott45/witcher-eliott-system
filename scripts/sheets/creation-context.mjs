@@ -14,7 +14,7 @@ import {
   ATTRIBUTE_ORDER, POINT_LEVELS, ATTRIBUTE_MAX, CREATION_SKILL_MAX, NATIVE_LANGUAGE_LEVEL, PROFESSION_GEAR, PROFESSION_FIXED_GEAR,
   PROFESSION_FIXED_NOTES, WITCHER_FORMULAS, PROFESSION_MAGIC, STARTING_CROWNS, familyGroup, nativeLanguage, regionOfOrigin, professionAllowed,
   attributeState, chosenAttributes, derivedPreview, skillState, stepErrors, lifeEventCount, pendingAges, gearChoiceCount, gearCrowns, lifepathCrowns,
-  nameSamples, magicMatches, biographyText, PICKUP_LANGUAGE
+  nameSamples, magicMatches, biographyText, PICKUP_LANGUAGE, usesSchoolGear, creationItems, crownsFormula
 } from "../data/character-creation.mjs";
 
 const loc = key => globalThis.game?.i18n?.localize(key) ?? key;
@@ -180,10 +180,13 @@ function gearStep(state, catalogs) {
   const keepsake = id => loc(getEquipment(id)?.label ?? id);
   const keepsakes = [...(family ? [{ name: `Семья: ${loc(family.label)}`, text: family.equipment.length ? family.equipment.map(keepsake).join(", ") : loc(family.reward) }] : []),
     ...(friend ? [{ name: `Друг: ${loc(friend.label)}`, text: (friend.equipment ?? []).map(keepsake).join(", ") }] : [])];
-  return { need, picked: picks.size, full: picks.size >= need, options: options.map((entry, index) => ({ index, name: entry.name, chosen: picks.has(index), locked: !picks.has(index) && picks.size >= need,
+  const schoolKit = usesSchoolGear(state);
+  const fixedGear = schoolKit ? [...creationItems(state).filter(entry => !entry.ruleId.startsWith("formula.")).reduce((map,entry)=>{ const previous=map.get(entry.ruleId); if(previous)previous.quantity+=entry.quantity;else map.set(entry.ruleId,{...entry});return map;},new Map()).values()] : PROFESSION_FIXED_GEAR[state.profession] ?? [];
+  return { canChooseSchoolKit: state.race === "witcher" && state.profession === "witcher", schoolKit,
+    need: schoolKit ? 0 : need, picked: schoolKit ? 0 : picks.size, full: schoolKit || picks.size >= need, options: (schoolKit ? [] : options).map((entry, index) => ({ index, name: entry.name, chosen: picks.has(index), locked: !picks.has(index) && picks.size >= need,
       money: entry.crowns ? `+${entry.crowns} крон` : "" })),
-    fixed: (PROFESSION_FIXED_GEAR[state.profession] ?? []).map(entry => catalogs.names?.[entry.ruleId] ?? entry.ruleId), fixedNote: PROFESSION_FIXED_NOTES[state.profession] ?? "",
-    formulas, magic, keepsakes, crowns: state.crowns, crownsRolled: Number.isInteger(state.crowns), crownsFormula: `${STARTING_CROWNS[state.profession] ?? 0} × 2d6`,
+    fixed: fixedGear.map(entry => `${entry.name ?? catalogs.names?.[entry.ruleId] ?? entry.ruleId}${entry.quantity > 1 ? ` ×${entry.quantity}` : ""}`), fixedNote: PROFESSION_FIXED_NOTES[state.profession] ?? "",
+    formulas, magic, keepsakes, crowns: state.crowns, crownsRolled: Number.isInteger(state.crowns), crownsFormula: crownsFormula(state.profession, schoolKit).replace(" * ", " × "), crownsDice: schoolKit ? "1d6" : "2d6",
     bonusCrowns: gearCrowns(state) + lifepathCrowns(state), totalCrowns: (Number(state.crowns) || 0) + gearCrowns(state) + lifepathCrowns(state) };
 }
 

@@ -1,3 +1,4 @@
+import { registerSchoolGearChat } from "./combat/school-gear-chat.mjs";
 import { registerCrossbowMovement } from "./combat/crossbow-modifications.mjs";
 import { registerPeasantMigration, migratePeasantContent } from "./migrations/peasant-content.mjs";
 import { registerPeasantCircle } from "./combat/peasant-circle.mjs";
@@ -155,6 +156,7 @@ Hooks.once("init", async () => {
   registerStubbornnessChat();
   registerRollBreakdown();
   registerAttackExchange();
+  registerSchoolGearChat();
   registerExperimentalAmmunition();
   registerRelicLore();
   registerExperimentalDevices();

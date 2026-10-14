@@ -1,3 +1,4 @@
+import { schoolGearSnapshot, validateSchoolReaction, schoolReactionTarget } from "./school-gear-rules.mjs";
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -40,6 +41,8 @@ export function rollWeaponAttack(actor,itemId,options={}) {
   if(creatureWeapon==="creature.weapon.arachas.1")return useCreatureAction(actor,"web",options);
   if(pending.has(actor))return pending.get(actor);
   const work=inventoryWrite(actor,async()=>{
+    const reaction = validateSchoolReaction(actor, options.schoolReaction, actor.items.get(itemId), options);
+    if (reaction) options = { ...options, attackerUuid: reaction.attackerUuid, targetUuid: schoolReactionTarget(reaction, options.targetUuid) };
     const targetContext=selectedAttackTarget(actor,options),combat=options.combatId?game.combats.get(options.combatId):globalThis.game?.combat;
     if (experimentalEffectContext(actor).fury && !targetContext?.target) throw new Error("Бешенство: выберите ближайшую цель (T).");
     const furyError = furyTargetError(actor, targetContext?.target);
@@ -52,10 +55,12 @@ export function rollWeaponAttack(actor,itemId,options={}) {
     if(actorCombatants.some(entry=>tacticsFlags(entry).tacticRequest))throw new Error("Дождитесь завершения запроса в трекере боя.");
     if(!targetContext&&actorCombatants.some(entry=>ambushState(combat,entry)))throw new Error("Выберите цель атаки, чтобы учесть засаду.");
     const ambush=targetContext?ambushAttack(combat,targetContext.attacker,targetContext.target):{bonus:0};
-    const item=itemId?actor.items.get(itemId):null,action=actionQuote(actor),attackOptions={...options,extraPenalty:action.penalty,targetContext,ambushBonus:ambush.bonus};
+    const item=itemId?actor.items.get(itemId):null,action=actionQuote(actor,{ignoreExtra:Boolean(reaction)}),attackOptions={...options,schoolReaction:Boolean(reaction),extraPenalty:action.penalty,targetContext,ambushBonus:ambush.bonus};
     // Unarmed strikes (core p.163) share the attack card; the second blow of a joint attack is part of the same action.
     const quote=options.unarmed?unarmedAttack(actor,options.unarmed,attackOptions):weaponAttack(actor,item,attackOptions);
     if(quote.blocked)throw new Error(quote.blocked);
+    if (reaction && !targetContext) throw new Error("Токены участников этого обмена больше недоступны.");
+    if (reaction && !quote.ranged && targetContext.distance > Math.max(item.system.range || 1, /длинное/iu.test(item.system.properties ?? "") ? 2 : 1)) throw new Error("Противник вне досягаемости оружия для ответного удара.");
     const arrow = await chooseArrow(actor,item,quote.attack.count,options.ammoId);
     if (arrow === false) return;
     const bolt=quote.ranged?loadedBolt(item):null, projectile=arrow || bolt;
@@ -64,7 +69,7 @@ export function rollWeaponAttack(actor,itemId,options={}) {
     if (projectile && /несмертельн/iu.test(projectile.properties ?? "")) quote.nonLethal=true;
     if(options.free){action.stamina=0;}
     // The second strike of a fast attack belongs to the same action: no new STA for an extra action.
-    const pair=fastPair(actor,quote.attack,action),strike=pair?(pair.second?2:1):0;
+    const pair=reaction?null:fastPair(actor,quote.attack,action),strike=pair?(pair.second?2:1):0;
     if(pair?.second)action.stamina=0;
     const adrenalineDice = adrenalineDamage(actor);
     const display=trackRollDisplay(),messageMode=game.settings.get("core","messageMode");
@@ -80,12 +85,12 @@ export function rollWeaponAttack(actor,itemId,options={}) {
         +attackModifierMarkup(quote.parts)
         +(targetContext?.blind?"<small>Вне конуса зрения: бонус прицеливания не применяется.</small>":"")
         +`<p>${esc(quote.aim.name)}${quote.aim.id!=="random"?` · урон ×${quote.aim.multiplier} после брони`:" · место попадания после успешной атаки"}</p>`
-        +actionNote(action)+(quote.damage?`<button type="button" data-weapon-damage><i class="fa-solid fa-dice-d6"></i> Урон: ${esc(quote.damage)}</button>`:"")
+        +(reaction?`<p>${esc(reaction.title)}: одно немедленное действие без дополнительной платы ВЫН.</p>`:actionNote(action))+(quote.damage?`<button type="button" data-weapon-damage><i class="fa-solid fa-dice-d6"></i> Урон: ${esc(quote.damage)}</button>`:"")
         +(quote.aim.id==="random"?'<div class="witcher-location-buttons"><button type="button" data-hit-location="humanoid">Место: гуманоид</button><button type="button" data-hit-location="monster">Место: чудовище</button></div>':"")
         +(actorEnvironment(actor)?.terrain.id==="snow"?'<button type="button" data-snow-footing><i class="fa-solid fa-person-falling"></i> Лёд и снег: Атлетика СЛ 14</button>':"")
         +`<small>Каждое попадание — отдельный урон и зона. Сравните атаку с защитой цели.</small></section>`;
       const message=await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls,flavor,
-        flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,weaponAttack:{...thrown,itemId:itemId??null,name:quote.name,mode:quote.attack.id,unarmed:options.unarmed??null,nonLethal:Boolean(quote.nonLethal),
+        flags:{[SYSTEM_ID]:{...display.flags[SYSTEM_ID],action,...(reaction?{schoolReaction:{...options.schoolReaction}}:{}),weaponAttack:{...thrown,schoolGear:schoolGearSnapshot(actor,item),schoolShieldStrike:reaction?.school==="manticore",itemId:itemId??null,name:quote.name,mode:quote.attack.id,unarmed:options.unarmed??null,nonLethal:Boolean(quote.nonLethal),
           special:quote.attack.special??null,attackingInvisible:creatureInvisible(actor),charge:Boolean(quote.attack.charge),push:Boolean(quote.attack.push),dual:Boolean(quote.attack.dual),base:quote.total,count:quote.attack.count,
           damage:quote.damage,adrenalineDice,weaponProperties:quote.weapon.properties,traits:weaponDamageTraits(quote.weapon),hitTraits:weaponHitTraits(quote.weapon,actor),ammunition:projectile?{name:projectile.name,ruleId:projectile.ruleId}:null,location:quote.aim.id,multiplier:quote.aim.multiplier,body:quote.body,bonus:quote.bonus,
           target:targetContext?.target.uuid??null,attacker:targetContext?.attacker.uuid??null,parts:quote.parts,ranged:quote.ranged,band:quote.band.id,dc:quote.band.dc??null,thrown:quote.weapon.category==="thrown",combat:combat?.started?{id:combat.id,round:combat.round}:null,strike,damageTypes:damageTypeLabel(quote.weapon.damageType)}}}},messageMode));
@@ -93,9 +98,9 @@ export function rollWeaponAttack(actor,itemId,options={}) {
       if(thrown)try{await settleThrownWeapon(actor,item,message);}catch(error){ui.notifications.error(error.message);}
       if(adrenalineDice)await consumeAdrenalineDamage(actor);
       await display.wait(message);
-      const update=options.free?{}:actionUpdate(actor,action);
+      const update=options.free||reaction?{}:actionUpdate(actor,action);
       if(pair&&!pair.second){delete update["system.combatAction.extra"];delete update["system.combatAction.lastExtraRound"];}
-      if(!options.free)update[`flags.${SYSTEM_ID}.fastStrike`]=pair&&!pair.second?{round:pair.key,extra:action.extra,itemId:itemId??""}:null;
+      if(!options.free&&!reaction)update[`flags.${SYSTEM_ID}.fastStrike`]=pair&&!pair.second?{round:pair.key,extra:action.extra,itemId:itemId??""}:null;
       if(bolt)update.items=[firedUpdate(item)];
       if(arrow)update.items=[...(update.items??[]),{_id:arrow.item.id,"system.quantity":arrow.item.system.quantity-arrow.count}];
       if(Object.keys(update).length)await actor.update(update);

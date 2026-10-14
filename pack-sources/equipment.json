@@ -26725,7 +26725,8 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "diagram.weapon.manticore-shield",
-      "source": "Школа Мантикоры",
+      "source": "Снаряжение ведьмака; Школа Мантикоры",
+      "rarity": "rare",
       "price": 1304,
       "recipe": {
         "category": "diagram",
@@ -26763,7 +26764,7 @@
           {
             "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
             "substance": "",
-            "quantity": 4
+            "quantity": 2
           },
           {
             "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
@@ -26786,5 +26787,2991 @@
       "default": 2
     },
     "flags": {}
+  },
+  {
+    "_id": "schoolDiag000001",
+    "name": "Чертёж: Стальной меч школы Медведя",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-bear-steel",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 18,
+        "time": 32400,
+        "investment": 656,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000001",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000244",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000186",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000261",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Стальной меч школы Медведя».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000002",
+    "name": "Чертёж: Серебряный меч школы Медведя",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-bear-silver",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 19,
+        "time": 36000,
+        "investment": 597,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000002",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000001",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000183",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Серебряный меч школы Медведя».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000003",
+    "name": "Чертёж: Арбалет школы Медведя",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-bear-crossbow",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 17,
+        "time": 28800,
+        "investment": 347,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000003",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000009",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000031",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000222",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Арбалет школы Медведя».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000004",
+    "name": "Чертёж: Броня школы Медведя",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.school-bear",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 22,
+        "time": 90000,
+        "investment": 1813,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolArmr000001",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 7
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000004",
+            "substance": "",
+            "quantity": 6
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 8
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000002",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000003",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 6
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000223",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000010",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000185",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 6
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Броня школы Медведя».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000005",
+    "name": "Чертёж: Стальной меч школы Кота",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-cat-steel",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 18,
+        "time": 32400,
+        "investment": 656,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000004",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000226",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Стальной меч школы Кота».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000006",
+    "name": "Чертёж: Серебряный меч школы Кота",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-cat-silver",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 19,
+        "time": 36000,
+        "investment": 597,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000005",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000004",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Серебряный меч школы Кота».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000007",
+    "name": "Чертёж: Арбалет школы Кота",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-cat-crossbow",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 17,
+        "time": 28800,
+        "investment": 346,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000006",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000009",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000031",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000005",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Арбалет школы Кота».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000008",
+    "name": "Чертёж: Броня школы Кота",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.school-cat",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 18,
+        "time": 64800,
+        "investment": 713,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolArmr000002",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000031",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000260",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000163",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000010",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000121",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Броня школы Кота».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000009",
+    "name": "Чертёж: Стальной меч школы Грифона",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-griffin-steel",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 18,
+        "time": 32400,
+        "investment": 656,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000007",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000202",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Стальной меч школы Грифона».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000010",
+    "name": "Чертёж: Серебряный меч школы Грифона",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-griffin-silver",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 19,
+        "time": 36000,
+        "investment": 597,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000008",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000018",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000027",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Серебряный меч школы Грифона».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000011",
+    "name": "Чертёж: Арбалет школы Грифона",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-griffin-crossbow",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 17,
+        "time": 28800,
+        "investment": 342,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000009",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000009",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000028",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000031",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000006",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Арбалет школы Грифона».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000012",
+    "name": "Чертёж: Броня школы Грифона",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.school-griffin",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 20,
+        "time": 86400,
+        "investment": 1571,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolArmr000003",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000226",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000221",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000163",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000010",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000003",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Броня школы Грифона».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000013",
+    "name": "Чертёж: Стальной меч школы Мантикоры",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-manticore-steel",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 18,
+        "time": 32400,
+        "investment": 656,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000010",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000033",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000014",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Стальной меч школы Мантикоры».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000014",
+    "name": "Чертёж: Серебряный меч школы Мантикоры",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-manticore-silver",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 19,
+        "time": 36000,
+        "investment": 597,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000011",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000033",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000102",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Серебряный меч школы Мантикоры».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000015",
+    "name": "Чертёж: Броня школы Мантикоры",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.school-manticore",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 20,
+        "time": 79200,
+        "investment": 1052,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolArmr000004",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000016",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000184",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000265",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000260",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000007",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000033",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000005",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Броня школы Мантикоры».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000016",
+    "name": "Чертёж: Стальной меч школы Змеи",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-viper-steel",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 18,
+        "time": 32400,
+        "investment": 656,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000012",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000247",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000180",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Стальной меч школы Змеи».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000017",
+    "name": "Чертёж: Серебряный меч школы Змеи",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-viper-silver",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 19,
+        "time": 36000,
+        "investment": 597,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000013",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000010",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Серебряный меч школы Змеи».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000018",
+    "name": "Чертёж: Змеиный клык",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-viper-fang",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 16,
+        "time": 14400,
+        "investment": 218,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000014",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000016",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000105",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Змеиный клык».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000019",
+    "name": "Чертёж: Броня школы Змеи",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.school-viper",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 18,
+        "time": 72000,
+        "investment": 842,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolArmr000005",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 6
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000016",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000032",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000023",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Броня школы Змеи».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000020",
+    "name": "Чертёж: Стальной меч школы Волка",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-wolf-steel",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 18,
+        "time": 32400,
+        "investment": 656,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000015",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 3
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000008",
+            "substance": "",
+            "quantity": 1
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Стальной меч школы Волка».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000021",
+    "name": "Чертёж: Серебряный меч школы Волка",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.school-wolf-silver",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 19,
+        "time": 36000,
+        "investment": 597,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolWeap000016",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "substance": "",
+            "quantity": 4
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000027",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000206",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Серебряный меч школы Волка».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolDiag000022",
+    "name": "Чертёж: Броня школы Волка",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.armor.school-wolf",
+      "source": "Снаряжение ведьмака",
+      "rarity": "rare",
+      "price": 0,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 20,
+        "time": 82800,
+        "investment": 1302,
+        "quantity": 1,
+        "forge": true,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.schoolArmr000006",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000040",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "substance": "",
+            "quantity": 10
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000009",
+            "substance": "",
+            "quantity": 2
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "substance": "",
+            "quantity": 5
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000007",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000142",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000163",
+            "substance": "",
+            "quantity": 1
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000010",
+            "substance": "",
+            "quantity": 2
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Броня школы Волка».</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000001",
+    "name": "Стальной меч школы Медведя",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-bear-steel",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "",
+      "damage": "6d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 0,
+      "properties": "Пробивающее броню; Метеоритное; Разрушающее",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Стальной меч школы Медведя. Пробивающее броню; Метеоритное; Разрушающее.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Медведя: её представителя обычно считают за жестокого и вспыльчивого варвара. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000002",
+    "name": "Серебряный меч школы Медведя",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-bear-silver",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 0,
+      "rarity": "",
+      "damage": "3d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 1.5,
+      "price": 0,
+      "properties": "Серебряное (3d6); Разрушающее",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Серебряный меч школы Медведя. Серебряное (3d6); Разрушающее.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Медведя: её представителя обычно считают за жестокого и вспыльчивого варвара. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000003",
+    "name": "Арбалет школы Медведя",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-bear-crossbow",
+      "skill": "crossbow",
+      "damageType": "К",
+      "accuracy": 1,
+      "rarity": "",
+      "damage": "4d6+2",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 1,
+      "range": 50,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 1,
+      "weight": 0.5,
+      "price": 0,
+      "properties": "Медленно перезаряжающееся",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Арбалет школы Медведя. Медленно перезаряжающееся.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Медведя: её представителя обычно считают за жестокого и вспыльчивого варвара. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000004",
+    "name": "Стальной меч школы Кота",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-cat-steel",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 2,
+      "rarity": "",
+      "damage": "4d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 0,
+      "properties": "Пробивающее броню; Метеоритное; Кровотечение (30%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Стальной меч школы Кота. Пробивающее броню; Метеоритное; Кровотечение (30%).</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Кота: её представителя обычно считают за жестокого психопата. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000005",
+    "name": "Серебряный меч школы Кота",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-cat-silver",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 2,
+      "rarity": "",
+      "damage": "1d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 1.5,
+      "price": 0,
+      "properties": "Серебряное (3d6); Кровотечение (30%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Серебряный меч школы Кота. Серебряное (3d6); Кровотечение (30%).</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Кота: её представителя обычно считают за жестокого психопата. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000006",
+    "name": "Арбалет школы Кота",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-cat-crossbow",
+      "skill": "crossbow",
+      "damageType": "К",
+      "accuracy": 1,
+      "rarity": "",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 1,
+      "range": 50,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 1,
+      "weight": 0.5,
+      "price": 0,
+      "properties": "Медленно перезаряжающееся; Сбалансированное",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Арбалет школы Кота. Медленно перезаряжающееся; Сбалансированное.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Кота: её представителя обычно считают за жестокого психопата. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000007",
+    "name": "Стальной меч школы Грифона",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-griffin-steel",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 1,
+      "rarity": "",
+      "damage": "5d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 0,
+      "properties": "Пробивающее броню; Метеоритное; Фокусирующее (1)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Стальной меч школы Грифона. Пробивающее броню; Метеоритное; Фокусирующее (1).</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Грифона: её представителя обычно считают за чудовище, скрывающееся под обликом рыцаря. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000008",
+    "name": "Серебряный меч школы Грифона",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-griffin-silver",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 1,
+      "rarity": "",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 1.5,
+      "price": 0,
+      "properties": "Серебряное (3d6); Фокусирующее (1)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Серебряный меч школы Грифона. Серебряное (3d6); Фокусирующее (1).</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Грифона: её представителя обычно считают за чудовище, скрывающееся под обликом рыцаря. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000009",
+    "name": "Арбалет школы Грифона",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-griffin-crossbow",
+      "skill": "crossbow",
+      "damageType": "К",
+      "accuracy": 1,
+      "rarity": "",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 1,
+      "range": 50,
+      "rangeBodyMultiplier": 0,
+      "concealment": "large",
+      "enhancementSlots": 1,
+      "weight": 0.5,
+      "price": 0,
+      "properties": "Медленно перезаряжающееся; Улучшенное пробивающее броню",
+      "category": "ranged",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Арбалет школы Грифона. Медленно перезаряжающееся; Улучшенное пробивающее броню.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Грифона: её представителя обычно считают за чудовище, скрывающееся под обликом рыцаря. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000010",
+    "name": "Стальной меч школы Мантикоры",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-manticore-steel",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 1,
+      "rarity": "",
+      "damage": "5d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 0,
+      "properties": "Пробивающее броню; Метеоритное; Сбалансированное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Стальной меч школы Мантикоры. Пробивающее броню; Метеоритное; Сбалансированное.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Мантикоры: её представителя обычно считают за опасного скитальца с востока. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000011",
+    "name": "Серебряный меч школы Мантикоры",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-manticore-silver",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 1,
+      "rarity": "",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 1.5,
+      "price": 0,
+      "properties": "Серебряное (3d6); Сбалансированное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Серебряный меч школы Мантикоры. Серебряное (3d6); Сбалансированное.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Мантикоры: её представителя обычно считают за опасного скитальца с востока. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000012",
+    "name": "Стальной меч школы Змеи",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-viper-steel",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 2,
+      "rarity": "",
+      "damage": "4d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 2.5,
+      "price": 0,
+      "properties": "Пробивающее броню; Метеоритное; Отравление (30%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Стальной меч школы Змеи. Пробивающее броню; Метеоритное; Отравление (30%).</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Змеи: её представителя обычно считают за коварного убийцу. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000013",
+    "name": "Серебряный меч школы Змеи",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-viper-silver",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 2,
+      "rarity": "",
+      "damage": "1d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 2,
+      "weight": 1.5,
+      "price": 0,
+      "properties": "Серебряное (3d6); Отравление (30%)",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Серебряный меч школы Змеи. Серебряное (3d6); Отравление (30%).</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Змеи: её представителя обычно считают за коварного убийцу. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000014",
+    "name": "Змеиный клык",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-viper-fang",
+      "skill": "smallBlades",
+      "damageType": "Р/К",
+      "accuracy": 1,
+      "rarity": "",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "small",
+      "enhancementSlots": 1,
+      "weight": 0.5,
+      "price": 0,
+      "properties": "Парирующее",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Змеиный клык. Парирующее.</p><p>Парирующее: штраф парирования меньше на 2 (−1 в ближнем бою, −3 против метательного оружия).</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Змеи: её представителя обычно считают за коварного убийцу. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000015",
+    "name": "Стальной меч школы Волка",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-wolf-steel",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 1,
+      "rarity": "",
+      "damage": "5d6+2",
+      "reliability": {
+        "value": 15,
+        "max": 15
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 2.5,
+      "price": 0,
+      "properties": "Улучшенное пробивающее броню; Метеоритное",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Стальной меч школы Волка. Улучшенное пробивающее броню; Метеоритное.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Волка: её представителя обычно считают за нелюдимого и вспыльчивого охотника. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolWeap000016",
+    "name": "Серебряный меч школы Волка",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.school-wolf-silver",
+      "skill": "swordsmanship",
+      "damageType": "Р/К",
+      "accuracy": 1,
+      "rarity": "",
+      "damage": "2d6+2",
+      "reliability": {
+        "value": 10,
+        "max": 10
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "none",
+      "enhancementSlots": 3,
+      "weight": 1.5,
+      "price": 0,
+      "properties": "Серебряное (3d6); Пробивающее броню",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Снаряжение ведьмака",
+      "description": "<p>Серебряный меч школы Волка. Серебряное (3d6); Пробивающее броню.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Волка: её представителя обычно считают за нелюдимого и вспыльчивого охотника. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolArmr000001",
+    "name": "Броня школы Медведя",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.school-bear",
+      "source": "Снаряжение ведьмака",
+      "zone": "torso-legs",
+      "armorClass": "heavy",
+      "stoppingPower": {
+        "value": 20,
+        "max": 20
+      },
+      "enhancementSlots": 2,
+      "encumbrance": 3,
+      "weight": 24,
+      "price": 0,
+      "description": "<h3>Критическая казнь</h3><p>Критическое ранение, нанесённое ведьмачьим оружием, становится на одну степень тяжелее, максимум до смертельного.</p><p>Защищает туловище, руки и ноги. Способность действует, пока броня надета.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Медведя: её представителя обычно считают за жестокого и вспыльчивого варвара. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolArmr000002",
+    "name": "Броня школы Кота",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.school-cat",
+      "source": "Снаряжение ведьмака",
+      "zone": "torso-legs",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 6,
+        "max": 6
+      },
+      "enhancementSlots": 2,
+      "encumbrance": 0,
+      "weight": 3,
+      "price": 0,
+      "description": "<h3>Критический натиск</h3><p>Нанеся критическое ранение ведьмачьим оружием, можно немедленно провести разоружение или подсечку без штрафа и расхода Выносливости за дополнительное действие.</p><p>Защищает туловище, руки и ноги. Способность действует, пока броня надета.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Кота: её представителя обычно считают за жестокого психопата. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolArmr000003",
+    "name": "Броня школы Грифона",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.school-griffin",
+      "source": "Снаряжение ведьмака",
+      "zone": "torso-legs",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 16,
+        "max": 16
+      },
+      "enhancementSlots": 2,
+      "encumbrance": 1,
+      "weight": 18,
+      "price": 0,
+      "description": "<h3>Критическая магия</h3><p>Нанеся критическое ранение ведьмачьим оружием, можно немедленно сотворить знак без штрафа и расхода Выносливости за дополнительное действие. Обычная стоимость знака и перегрузка сохраняются.</p><p>Защищает туловище, руки и ноги. Способность действует, пока броня надета.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Грифона: её представителя обычно считают за чудовище, скрывающееся под обликом рыцаря. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolArmr000004",
+    "name": "Броня школы Мантикоры",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.school-manticore",
+      "source": "Снаряжение ведьмака",
+      "zone": "torso-legs",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 12,
+        "max": 12
+      },
+      "enhancementSlots": 2,
+      "encumbrance": 1,
+      "weight": 10,
+      "price": 0,
+      "description": "<h3>Критическое блокирование</h3><p>Если блок или парирование щитом Мантикоры превосходит атаку на 5 или более, можно немедленно ударить этим щитом без штрафа и расхода Выносливости за дополнительное действие. Попадание отбрасывает нападающего на 4 м и сбивает ничком.</p><p>Защищает туловище, руки и ноги. Способность действует, пока броня надета.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Мантикоры: её представителя обычно считают за опасного скитальца с востока. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolArmr000005",
+    "name": "Броня школы Змеи",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.school-viper",
+      "source": "Снаряжение ведьмака",
+      "zone": "torso-legs",
+      "armorClass": "light",
+      "stoppingPower": {
+        "value": 8,
+        "max": 8
+      },
+      "enhancementSlots": 2,
+      "encumbrance": 0,
+      "weight": 5,
+      "price": 0,
+      "description": "<h3>Критическое парирование</h3><p>Если парирование ведьмачьим оружием превосходит атаку на 5 или более, можно немедленно нанести один удар взятым оружием без штрафа и расхода Выносливости за дополнительное действие.</p><p>Защищает туловище, руки и ноги. Способность действует, пока броня надета.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Змеи: её представителя обычно считают за коварного убийцу. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolArmr000006",
+    "name": "Броня школы Волка",
+    "type": "armor",
+    "img": "systems/witcher-eliott-system/assets/icons/armor.svg",
+    "system": {
+      "ruleId": "armor.school-wolf",
+      "source": "Снаряжение ведьмака",
+      "zone": "torso-legs",
+      "armorClass": "medium",
+      "stoppingPower": {
+        "value": 14,
+        "max": 14
+      },
+      "enhancementSlots": 2,
+      "encumbrance": 1,
+      "weight": 14,
+      "price": 0,
+      "description": "<h3>Критическое ускорение</h3><p>Нанеся критическое ранение ведьмачьим оружием, можно немедленно нанести один удар взятым оружием без штрафа и расхода Выносливости за дополнительное действие.</p><p>Защищает туловище, руки и ноги. Способность действует, пока броня надета.</p><p>Любой может пользоваться этим снаряжением и его свойствами. Если носить его на виду, окружающие принимают владельца за ведьмака и относятся к нему соответственно. Образование СЛ 16 позволяет узнать школу Волка: её представителя обычно считают за нелюдимого и вспыльчивого охотника. Ценные ведьмачьи вещи привлекают воров и коллекционеров.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolMatr000001",
+    "name": "Желудок куролиска",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.cockatrice-stomach",
+      "source": "Снаряжение ведьмака",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "description": "<p>Желудок куролиска: компонент чертежей ведьмачьего снаряжения.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolMatr000002",
+    "name": "Медвежья шкура",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.bear-hide",
+      "source": "Снаряжение ведьмака",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "description": "<p>Медвежья шкура: компонент чертежей ведьмачьего снаряжения.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolMatr000003",
+    "name": "Кровь гнильца",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.rotfiend-blood",
+      "source": "Снаряжение ведьмака",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "description": "<p>Кровь гнильца: компонент чертежей ведьмачьего снаряжения.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolMatr000004",
+    "name": "Рубиновая пыль",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.ruby-dust",
+      "source": "Снаряжение ведьмака",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "description": "<p>Рубиновая пыль: компонент чертежей ведьмачьего снаряжения.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolMatr000005",
+    "name": "Волосы стучака",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.knocker-hair",
+      "source": "Снаряжение ведьмака",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "description": "<p>Волосы стучака: компонент чертежей ведьмачьего снаряжения.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolMatr000006",
+    "name": "Усики археспоры",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.archespores-tendrils",
+      "source": "Снаряжение ведьмака",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "description": "<p>Усики археспоры: компонент чертежей ведьмачьего снаряжения.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolMatr000007",
+    "name": "Кровь утковола",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.bullvore-blood",
+      "source": "Снаряжение ведьмака",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "description": "<p>Кровь утковола: компонент чертежей ведьмачьего снаряжения.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolMatr000008",
+    "name": "Мозг утковола",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.bullvore-brain",
+      "source": "Снаряжение ведьмака",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "description": "<p>Мозг утковола: компонент чертежей ведьмачьего снаряжения.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolMatr000009",
+    "name": "Глаза утковола",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.bullvore-eyes",
+      "source": "Снаряжение ведьмака",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "description": "<p>Глаза утковола: компонент чертежей ведьмачьего снаряжения.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "schoolMatr000010",
+    "name": "Изумрудная пыль",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "material.emerald-dust",
+      "source": "Снаряжение ведьмака",
+      "kind": "material",
+      "weight": 0,
+      "price": 0,
+      "description": "<p>Изумрудная пыль: компонент чертежей ведьмачьего снаряжения.</p>"
+    },
+    "effects": [],
+    "folder": "gearWitcherDLC01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
   }
 ]

@@ -88,7 +88,7 @@ export function bindMagic(sheet) {
   }
 }
 
-async function castDialog(actor,item,maintenance=false) {
+export async function castDialog(actor,item,maintenance=false,extraOptions={}) {
   if(!actor.isOwner)return;
   // TODO(Dispel): no specific odd-cost rounding was found in core/errata/Sage. Let
   // the table supply an integer cost rather than silently truncate Actor resources.
@@ -105,7 +105,7 @@ async function castDialog(actor,item,maintenance=false) {
   return foundry.applications.api.DialogV2.wait({window:{title:maintenance?"Поддержание магии":ritual?"Проведение ритуала":"Сотворение магии"},classes:["witcher-picker"],position:{width:520},content,
     buttons:[{action:"cast",label:maintenance?"Оплатить поддержание":"Сотворить",default:true,callback:async(_e,button)=>{
       const form=button.form;
-      await castSpell(actor,item.id,{maintenance,cost:item.system.variableCost&&!maintenance?Number(form.elements.variableCost.value):cost,focusId:form.elements.focus?.value??"",glyphChoice:form.elements.glyphChoice?.value??"dc",aim:form.elements.aim?.value??"random",allowOverexertion:form.elements.overload.checked,prepared:form.elements.prepared?.checked??false,dc:form.elements.ritualDC?Number(form.elements.ritualDC.value):undefined,helpers:Number(form.elements.helpers?.value??0)});
+      return await castSpell(actor,item.id,{...extraOptions,maintenance,cost:item.system.variableCost&&!maintenance?Number(form.elements.variableCost.value):cost,focusId:form.elements.focus?.value??"",glyphChoice:form.elements.glyphChoice?.value??"dc",aim:form.elements.aim?.value??"random",allowOverexertion:form.elements.overload.checked,prepared:form.elements.prepared?.checked??false,dc:form.elements.ritualDC?Number(form.elements.ritualDC.value):undefined,helpers:Number(form.elements.helpers?.value??0)});
     }},{action:"cancel",label:"Отмена"}],render:(_event,dialog)=>{
       const root=dialog.element,form=root.querySelector("form")??root;
       const refresh=()=>{
@@ -114,7 +114,7 @@ async function castDialog(actor,item,maintenance=false) {
         const base=item.system.variableCost&&!maintenance?Number(root.querySelector('[name="variableCost"]').value):cost;
         try {
           const dcInput=root.querySelector('[name="ritualDC"]'),helpers=Number(root.querySelector('[name="helpers"]')?.value??0);
-          const preview=castingQuote(actor,item,{cost:base,focusId,maintenance,glyphChoice:form.elements.glyphChoice?.value??"dc",dc:dcInput?Number(dcInput.value):undefined,helpers,aim:form.elements.aim?.value??"random"});
+          const preview=castingQuote(actor,item,{...extraOptions,cost:base,focusId,maintenance,glyphChoice:form.elements.glyphChoice?.value??"dc",dc:dcInput?Number(dcInput.value):undefined,helpers,aim:form.elements.aim?.value??"random"});
           root.querySelector("[data-cast-quote]").textContent=`${preview.aim?`Прицел: ${preview.aim.name} ${preview.aim.penalty} → проверка ${preview.skill.total}\n`:""}${base} − ${preview.focus?.rating??0} = ${preview.stamina} ВЫН (минимум 1)\nЗа раунд: ${preview.after} / ${preview.vigor}${preview.damage?`\nПерегрузка: ${preview.excess} × 5 = ${preview.damage} урона ПЗ + стихийный эффект`:""}${preview.difficulty?.target?`\nСЛ: ${preview.difficulty.base} − ${helpers} = ${preview.difficulty.target}`:""}\n${signPotency(item.system,base)}`;
           root.querySelector("[data-overload-row]").hidden=!preview.damage;
           if(preview.power.label)root.querySelector("[data-cast-quote]").textContent+=`\n${preview.power.label}: +${preview.power.vigor} к пределу, +${preview.power.casting} к Сотворению этой стихии`;

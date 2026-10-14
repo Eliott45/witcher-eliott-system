@@ -3,6 +3,7 @@ import { materialUuid } from "../data/workshop-materials.mjs";
 
 const diagrams = new Map(RECIPES.filter(item => item.system.recipe.category === "diagram").map(item => [item.id, item.system.recipe]));
 const legacyComponents = {
+  "diagram.weapon.manticore-shield": "hardened-leather:2 hardened-timber:4 meteorite:3 silver:2 etching-acid:4 ester-grease:2 river-clay:6",
   "diagram.material.hardened-leather": "timber:2 resin:4",
   "diagram.armor.head.9": "dark-steel:4 hardened-leather:1 darkening-oil:2 drake-oil:2 linen:1 ashes:10 oil:1"
 };
@@ -19,6 +20,7 @@ export function recipeDetailsUpdate(item) {
   if (previous && legacy?.length === previous.length && previous.every(([id, quantity]) =>
     legacy.some(row => row.uuid === materialUuid(id) && row.quantity === Number(quantity) && !row.substance))) {
     update["system.recipe.components"] = structuredClone(expected.components);
+    if (item.system.ruleId === "diagram.weapon.manticore-shield") { update["system.source"] = "Снаряжение ведьмака; Школа Мантикоры"; update["system.rarity"] = "rare"; }
     if (item.system.ruleId === "diagram.armor.head.9" && item.system.source === "Базовая книга, стр. 130–135 / 139; errata v4")
       update["system.source"] = "Базовая книга";
   }

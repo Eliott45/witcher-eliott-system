@@ -1,3 +1,4 @@
+import { schoolCriticalLevel } from "./school-gear-rules.mjs";
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { sizeClassOf } from "../data/creatures.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
@@ -29,7 +30,7 @@ import { fumbleMagnitude, fumbleOutcome } from "../data/fumbles.mjs";
 import { attackConcealed, creatureDetailsHidden, enemyAttackHidden, creatureDetailsSecret } from "../chat/concealment.mjs";
 import { defenseQuote, rollDefense } from "./defense-rolls.mjs";
 import { hitLocation, bodyPlanOf, attackLocation, weaponAttack, attackModes } from "./weapon-rules.mjs";
-import { weaponDamageTraits, armorAt, monsterMaterial, fireVulnerable, criticalLevel, resolveDamage } from "./damage-rules.mjs";
+import { weaponDamageTraits, armorAt, monsterMaterial, fireVulnerable, resolveDamage } from "./damage-rules.mjs";
 import { criticalWoundByRoll, aimedCriticalRoll, criticalWoundLocation, criticalWoundNeedsSide, ORGAN_WOUNDS, ANATOMY_FREE_BONUS } from "../data/critical-wounds.mjs";
 import { criticalTableRoll, specterDamageBonus } from "./relic-weapon-rules.mjs";
 import { applyWeaponWear } from "./weapon-wear.mjs";
@@ -170,7 +171,7 @@ export function exchangeOutcome(message, index) {
   const hit = attackTotal > defenseTotal, margin = attackTotal - defenseTotal;
   // Core p.164: a successful block with the body sends the attack's damage into the blocking arm.
   const limbBlock = !hit && !none && Boolean(flagsOf(defense).defense?.limb);
-  return { defense, none, attackTotal, defenseTotal, hit, limbBlock, margin, critical: hit && !flagsOf(message).weaponAttack?.special && !flagsOf(message).weaponAttack?.noCritical ? criticalLevel(margin) : null,
+  return { defense, none, attackTotal, defenseTotal, hit, limbBlock, margin, critical: hit && !flagsOf(message).weaponAttack?.special && !flagsOf(message).weaponAttack?.noCritical ? schoolCriticalLevel(margin, flagsOf(message).weaponAttack?.schoolGear) : null,
     mode: flagsOf(defense).defense?.mode ?? "", name: none ? "Без защиты" : flagsOf(defense).defense?.name ?? "Защита" };
 }
 
@@ -348,14 +349,19 @@ async function knockOffProsthesis(actor, { effectId, itemId }) {
 
 /** Push kick (core p.163): the target flies BODY/3 m straight away from the attacker. */
 const attackerActor = (attack, message) => (attack.attacker && fromUuidSync(attack.attacker)?.actor) ?? message.speakerActor;
-export const pushMeters = attack => Math.max(1, Math.floor((fromUuidSync(attack.attacker)?.actor?.system.statistics?.effective?.body ?? 3) / 3));
+export const pushMeters = attack => attack.schoolShieldStrike ? 4 : Math.max(1, Math.floor((fromUuidSync(attack.attacker)?.actor?.system.statistics?.effective?.body ?? 3) / 3));
 async function pushTarget(attack) {
   const from = attack.attacker && fromUuidSync(attack.attacker), to = attack.target && fromUuidSync(attack.target);
   if (!from?.parent || !to?.parent || from.parent !== to.parent || !to.isOwner) return;
   const scene = to.parent, centre = token => ({ x: token.x + token.width * scene.grid.size / 2, y: token.y + token.height * scene.grid.size / 2 });
   const a = centre(from), b = centre(to), length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
   const pixels = pushMeters(attack) / scene.grid.distance * scene.grid.size;
-  await to.update({ x: Math.round(to.x + (b.x - a.x) / length * pixels), y: Math.round(to.y + (b.y - a.y) / length * pixels) });
+  let fraction = 1;
+  const point = f => ({x:b.x+(b.x-a.x)/length*pixels*f,y:b.y+(b.y-a.y)/length*pixels*f});
+  if (attack.schoolShieldStrike && to.object?.checkCollision(point(1), {origin:b,type:"move",mode:"any"})) {
+    let low=0,high=1; for(let i=0;i<12;i++){const mid=(low+high)/2;if(to.object.checkCollision(point(mid),{origin:b,type:"move",mode:"any"}))high=mid;else low=mid;} fraction=low;
+  }
+  await to.update({ x: Math.round(to.x + (b.x - a.x) / length * pixels * fraction), y: Math.round(to.y + (b.y - a.y) / length * pixels * fraction) });
 }
 const chargeContest = (message, index) => game.messages.contents.map(entry => flagsOf(entry).chargeContest).find(contest => contest?.source === `${message.id}:${index}`) ?? null;
 
@@ -422,13 +428,14 @@ async function applyExchangeDamageNow(message, index, { useShield = false, shiel
   if (preview.magicShield && !shield) await absorbWithMagicShield(target, preview.magicShield);
   const worn = await sufferDamage(target, own, {electricity:Boolean(data.traits?.electricity), ...(shield || preview.prosthesis ? {} : { wound: data.critical?.wound, level: data.critical?.level, location: data.location, nonLethal })});
   if (!own.immune && (!shield || shield.overflow > 0) && !preview.prosthesis) await clearExperimentalFreeze(target);
-  if (attack.push && !own.immune && own.total >= 0) await pushTarget(attack);
+  if ((attack.push || attack.schoolShieldStrike) && !own.immune && own.total >= 0 && !shield) await pushTarget(attack);
+  if (attack.schoolShieldStrike && !own.immune && !shield) await setStatus(target, "prone", true);
   if (preview.prosthesis) await knockOffProsthesis(target, preview.prosthesis);
   await applyWeaponConditions(target, conditions.effects);
   const magic = attack.spell && !own.immune ? await applySpellHit(target, attack) : { notes: [] };
   await onCreatureExchangeApplied(message,index,own);
   const exchange = { attack: message.id, index, kind: "applied", total: own.total, steps: own.steps, from: health, nonLethal, immune: Boolean(own.immune), penetrated: Boolean(own.penetrated),
-    effects: conditions.effects, magicNotes: magic.notes, critical: Boolean(data.critical && !own.immune && !nonLethal), ablated: worn.join(", "), armorHeld: !own.penetrated && preview.armor.sp > 0 && !shield };
+    effects: conditions.effects, magicNotes: magic.notes, schoolCritical: Boolean(data.critical?.wound && !own.immune && !nonLethal && !shield && !preview.prosthesis), critical: Boolean(data.critical && !own.immune && !nonLethal), ablated: worn.join(", "), armorHeld: !own.penetrated && preview.armor.sp > 0 && !shield };
   if (shield) {
     const shieldData = { token: shield.token, name: shield.name, ...shield.result, electricity:Boolean(data.traits?.electricity), hitTraits:data.hitTraits??attack.hitTraits, ammunition:attack.ammunition,
       wound: data.critical?.wound ?? null, level: data.critical?.level ?? "", location: data.location, overflow: shield.overflow,
@@ -442,6 +449,7 @@ async function applyExchangeDamageNow(message, index, { useShield = false, shiel
       conditions.rolls.push(...shieldConditions.rolls); shieldData.effects=shieldConditions.effects; shieldData.applied = true;
     }
     exchange.shield = shieldData;
+    exchange.schoolCritical = Boolean(shieldData.wound && !shield.result.immune && shieldData.applied);
   }
   return foundry.documents.ChatMessage.implementation.create({ blind: Boolean(message.blind), whisper: [...(message.whisper ?? [])], speaker: foundry.documents.ChatMessage.getSpeaker({ actor: target }), content: `<p>${esc(target.name)}: −${own.total - (own.absorbed ?? 0)} ${nonLethal ? "ВЫН" : "ПЗ"}${own.absorbed ? ` (временные ПЗ поглотили ${own.absorbed})` : ""}${shield ? ` · живой щит ${esc(shield.name)}: −${shield.result.total} ПЗ` : ""}${preview.prosthesis ? ` · ${esc(preview.prosthesis.name)} отвалился` : ""}</p>`,
     rolls: conditions.rolls, flavor: weaponConditionReport(conditions.effects),
@@ -470,7 +478,8 @@ export async function applyShieldShare(message) {
     const ablated = await sufferDamage(actor, { ...result, ablate: result.ablate ?? [] }, share);
     if (!result.immune) await clearExperimentalFreeze(actor);
     await applyWeaponConditions(actor,conditions.effects);
-    await message.update({ [`flags.${SYSTEM_ID}.exchange.shield`]: { ...share, ...result, applied: true, effects: conditions.effects, ablated: ablated.join(", ") } });
+    await message.update({ [`flags.${SYSTEM_ID}.exchange.shield`]: { ...share, ...result, applied: true, effects: conditions.effects, ablated: ablated.join(", ") },
+      [`flags.${SYSTEM_ID}.exchange.schoolCritical`]: Boolean(share.wound && !result.immune) });
     if(conditions.rolls.length || conditions.effects.length) await post({speaker:foundry.documents.ChatMessage.getSpeaker({actor}),rolls:conditions.rolls,content:weaponConditionReport(conditions.effects),flags:{[SYSTEM_ID]:{skipLuck:true}}},message.blind?"blind":message.whisper?.length?"gm":"public");
   });
 }

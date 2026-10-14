@@ -1,3 +1,4 @@
+import { schoolStartingGear, SCHOOL_GEAR_NAMES } from "./witcher-school-gear.mjs";
 import { FAMILY_STATUSES } from "./family-statuses.mjs";
 import { INFLUENTIAL_FRIENDS } from "./influential-friends.mjs";
 import { getOrigin } from "./origins.mjs";
@@ -285,7 +286,8 @@ export function skillState(state) {
 /* -------------------------------------------- */
 
 export const STARTING_CROWNS = { bard: 120, witcher: 50, "man-at-arms": 150, priest: 75, mage: 200, doctor: 150, criminal: 100, craftsman: 120, merchant: 180, peasant: 20 };
-export const crownsFormula = profession => `${STARTING_CROWNS[profession] ?? 100} * 2d6`;
+export const usesSchoolGear = state => state.race === "witcher" && state.profession === "witcher" && state.gear?.schoolKit === true;
+export const crownsFormula = (profession, schoolKit = false) => profession === "witcher" && schoolKit ? "10 * 1d6" : `${STARTING_CROWNS[profession] ?? 100} * 2d6`;
 
 const item = (ruleId, quantity = 1, extra = {}) => ({ ruleId, quantity, ...extra });
 const option = (name, items, crowns = 0) => ({ name, items, crowns });
@@ -429,7 +431,8 @@ export function stepErrors(state, step) {
   if (step === "skills") errors.push(...(state.profession ? skillState(state).errors : ["Сначала выберите профессию."]));
   if (step === "gear") {
     const need = gearChoiceCount(state.profession), picks = state.gear?.picks ?? [];
-    if (picks.length !== need) errors.push(`Выберите ${need} предметов снаряжения (выбрано ${picks.length}).`);
+    if (usesSchoolGear(state) && !SCHOOL_GEAR_NAMES[state.witcher?.school]) errors.push("Выберите ведьмачью школу на шаге жизненного пути.");
+    if (!usesSchoolGear(state) && picks.length !== need) errors.push(`Выберите ${need} предметов снаряжения (выбрано ${picks.length}).`);
     if (state.profession === "witcher") for (const group of WITCHER_FORMULAS)
       if (formulaIds(state, group.key).length !== group.count) { errors.push(`${group.name}: выберите ${group.count}.`); break; }
     for (const group of PROFESSION_MAGIC[state.profession] ?? []) if (!group.all && (state.gear?.magic?.[group.key] ?? []).length !== group.count) { errors.push(`${group.name}: выберите ${group.count}.`); break; }
@@ -489,8 +492,9 @@ export const lifepathCrowns = state => [...(state.events ?? []).map(event => eve
 /** Every catalogue item the draft grants, by rule id: profession picks and fixed kit, formulas and family/friend keepsakes. */
 export function creationItems(state) {
   const list = [], gear = PROFESSION_GEAR[state.profession] ?? [];
-  for (const index of state.gear?.picks ?? []) for (const entry of gear[index]?.items ?? []) list.push({ ...entry, source: gear[index].name });
-  for (const entry of PROFESSION_FIXED_GEAR[state.profession] ?? []) list.push({ ...entry, source: "Профессия" });
+  if (usesSchoolGear(state)) list.push(...schoolStartingGear(state.witcher?.school).flatMap(entry => entry.ruleId === "weapon.school-viper-fang" ? [{...entry,quantity:1},{...entry,quantity:1}] : [entry]));
+  for (const index of usesSchoolGear(state) ? [] : state.gear?.picks ?? []) for (const entry of gear[index]?.items ?? []) list.push({ ...entry, source: gear[index].name });
+  for (const entry of PROFESSION_FIXED_GEAR[state.profession] ?? []) if (!usesSchoolGear(state) || !entry.ruleId.startsWith("weapon.")) list.push({ ...entry, source: "Профессия" });
   if (state.profession === "witcher") for (const group of WITCHER_FORMULAS) for (const id of formulaIds(state, group.key)) list.push(item(id, 1, { source: group.name }));
   if (state.race !== "witcher") {
     for (const id of FAMILY_STATUSES.find(entry => entry.id === state.family?.status)?.equipment ?? []) list.push(item(id, 1, { source: "Положение семьи", keepsake: true }));
@@ -498,7 +502,7 @@ export function creationItems(state) {
   }
   return list;
 }
-export const gearCrowns = state => (state.gear?.picks ?? []).reduce((sum, index) => sum + (PROFESSION_GEAR[state.profession]?.[index]?.crowns ?? 0), 0);
+export const gearCrowns = state => (usesSchoolGear(state) ? [] : state.gear?.picks ?? []).reduce((sum, index) => sum + (PROFESSION_GEAR[state.profession]?.[index]?.crowns ?? 0), 0);
 export const magicRuleIds = (state, catalog = []) => (PROFESSION_MAGIC[state.profession] ?? []).flatMap(group => group.all
   ? catalog.filter(entry => magicMatches(entry, group.filter)).slice(0, group.count).map(entry => entry.system?.ruleId ?? entry.id)
   : state.gear?.magic?.[group.key] ?? []);

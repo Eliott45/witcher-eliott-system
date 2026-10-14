@@ -297,6 +297,34 @@ test("a wolf's unaimed leg critical keeps its side and limb label when damage cr
   }
 });
 
+test("Bear armor raises the actual wound and damage bonus; applied critical receipts are emitted only after a wound", async t => {
+  const f=fixture(t,{totals:[17],results:[8,2,1]});mutableTarget(f);
+  f.attack.schoolGear={armors:["bear","wolf"],witcherWeapon:true};
+  f.target.createEmbeddedDocuments=async(_type,sources)=>{f.target.effects.push(...sources);return sources;};
+  const damage=exchange(await rollExchangeDamage(f.message,0));
+  assert.equal(damage.critical.level,"medium");assert.equal(damage.critical.bonus,5);assert.equal(damage.critical.wound.id,"fractured-leg");
+  const applied=exchange(await applyExchangeDamage(f.message,0));assert.equal(applied.schoolCritical,true);
+  assert.equal(f.target.effects[0].flags[SYSTEM_ID].criticalWound.level,"medium");
+  assert.equal(await applyExchangeDamage(f.message,0),undefined);
+});
+
+test("Manticore counterstrike pushes 4m, stops at a wall and applies prone once even when armor absorbs damage", async t => {
+  for (const wall of [false,true]) {
+    const f=fixture(t,{location:"torso",results:[8]});mutableTarget(f);
+    f.target.system.creature.naturalArmor=10;f.attack.schoolShieldStrike=true;f.attack.attacker="Scene.scene.Token.attacker";
+    const statuses=[];f.target.toggleStatusEffect=async(id,{active})=>{statuses.push([id,active]);};
+    const scene={grid:{size:100,distance:2}},a={x:0,y:0,width:1,height:1,parent:scene},b={x:100,y:0,width:1,height:1,parent:scene,isOwner:true,actor:f.target,
+      object:{checkCollision:point=>wall&&point.x>250},async update(data){Object.assign(this,data);}};
+    const previous=globalThis.fromUuidSync;globalThis.fromUuidSync=id=>id === f.attack.attacker ? a : id === f.attack.target ? b : previous?.(id);
+    try {
+      await rollExchangeDamage(f.message,0);const applied=exchange(await applyExchangeDamage(f.message,0));
+      assert.equal(applied.total,0);assert.equal(applied.schoolCritical,false);
+      assert.ok(Math.abs(b.x-(wall?200:300))<=1);assert.deepEqual(statuses,[["prone",true]]);
+      await applyExchangeDamage(f.message,0);assert.equal(statuses.length,1);
+    } finally {globalThis.fromUuidSync=previous;}
+  }
+});
+
 test("misses, unresolved defenses, invisible attacks and non-owners cannot roll follow-up steps", async t => {
   const f = fixture(t, { totals: [10] });
   const cannotRoll = async () => {

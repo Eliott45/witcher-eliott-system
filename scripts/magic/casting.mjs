@@ -1,3 +1,4 @@
+import { validateSchoolReaction } from "../combat/school-gear-rules.mjs";
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { handActionError } from "../combat/shield-master.mjs";
 import { SYSTEM_ID } from "../config.mjs";
@@ -42,7 +43,7 @@ export async function learnSpell(actor,source) {
 export function spellAimable(system) {
   return Boolean(spellStrikeDamage(system,1))&&!["ritual","hex"].includes(system.kind)&&!["self","radius","cone"].includes(system.range?.kind)&&!spellArea(system)&&!isCadfan(system);
 }
-export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,helpers=0,glyphChoice="dc",aim="random"}={}) {
+export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,helpers=0,glyphChoice="dc",aim="random",schoolReaction=null}={}) {
   if(item?.type!=="spell"||item.parent!==actor)throw new Error("Сначала добавьте заклинание в книгу персонажа.");
   if(!maintenance){const frenzy=furySpellTargetError(actor,item);if(frenzy)throw new Error(frenzy);}
   // A mage who passed «Устойчивость к двимериту» keeps the ability to cast (core p.66).
@@ -72,7 +73,9 @@ export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,he
   if(maintenance&&base<1)throw new Error("Не сохранена стоимость поддерживаемого знака. Прекратите поддержание и сотворите его заново.");
   const quote=castingCost({cost:base,focus:focus?.rating??0,spent:roundSpent(actor.system.magic,roundKey),vigor:actor.system.statistics.vigor+power.vigor});
   if(quote.stamina>actor.system.stamina.value)throw new Error(`Недостаточно Выносливости: нужно ${quote.stamina}, доступно ${actor.system.stamina.value}.`);
-  const action = maintenance ? {extra:false,penalty:0,stamina:0,roundKey:""} : actionQuote(actor,{cost:quote.stamina});
+  const reaction = schoolReaction ? validateSchoolReaction(actor, schoolReaction, item, {casting:true}) : null;
+  if (reaction && maintenance) throw new Error("Критическая магия даёт новое сотворение знака, не поддержание.");
+  const action = maintenance ? {extra:false,penalty:0,stamina:0,roundKey:""} : actionQuote(actor,{cost:quote.stamina,ignoreExtra:Boolean(reaction)});
   const aimAt=!maintenance&&aim!=="random"?ATTACK_LOCATIONS.find(entry=>entry.id===aim):null;
   if(aimAt&&!spellAimable(item.system))throw new Error("Прицелиться можно только прямой магией с уроном, не областью.");
   if(!maintenance&&aim!=="random"&&!aimAt)throw new Error("Неизвестная часть тела.");
@@ -150,7 +153,7 @@ function performCast(actor,itemId,options) {
         +`<p>Защита: ${escape(item.system.defense.map(key=>SPELL_DEFENSES[key]).join(" / "))}</p>`+actionNote(quote.action)
         +`<ul>${summary.map(line=>`<li>${escape(line)}</li>`).join("")}</ul>`
         +`<details><summary>Действие магии</summary>${await foundry.applications.ux.TextEditor.implementation.enrichHTML(spellDescriptionWithDC(item.system.description,quote.effectDC),{secrets:false,relativeTo:item})}${hex?`<p>Снятие: ${escape(item.system.hex.lifting)}</p>`:""}</details></section>`;
-      const flags={[SYSTEM_ID]:{...display.flags[SYSTEM_ID],...(!roll?{skipLuck:true}:{}),
+      const flags={[SYSTEM_ID]:{...display.flags[SYSTEM_ID],...(options.schoolReaction?{schoolReaction:{...options.schoolReaction}}:{}),...(!roll?{skipLuck:true}:{}),
         magicCast:{aim:quote.aim?.id??"random",kind,element,elemental,spellId:item.id,spellName:item.name,roundKey:quote.roundKey,stamina:quote.stamina,powerCost:quote.base,overload:quote.damage,fumble,fumbleDamage,reflected,difficulty:quote.difficulty,glyph:quote.glyph,effectDC:quote.effectDC,adrenalineDice:adrenaline,maintenance:Boolean(options.maintenance)}}};
       const data={speaker:foundry.documents.ChatMessage.getSpeaker({actor}),flavor,flags};
       posted=backlash?await foundry.documents.ChatMessage.create(foundry.documents.ChatMessage.applyMode({...data,rolls:[roll,backlash]},messageMode))

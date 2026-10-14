@@ -87,9 +87,13 @@ export function attackModes(actor,item) {
   const dual=dualMode(actor,item);if(dual)modes.push(dual);
   return [...modes,...thrown];
 }
-export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="auto",modifier=0,targetContext=null,ambushBonus=0,ignoreNaturalRange=false}={}) {
+export function weaponAttack(actor,item,{mode="fast",extraPenalty=0,location="random",range="auto",modifier=0,targetContext=null,ambushBonus=0,ignoreNaturalRange=false,schoolReaction=false}={}) {
   if(item?.type!=="weapon")throw new Error("Выберите оружие.");
-  let weapon=effectiveItem(item);const attack=attackModes(actor,item).find(entry=>entry.id===mode);
+  let weapon=effectiveItem(item);let attack=attackModes(actor,item).find(entry=>entry.id===mode);
+  if (schoolReaction) {
+    if (["disarm", "trip"].includes(mode) && item.system.category === "melee") attack = {id:mode,name:mode === "trip" ? "Подсечка" : "Разоружение",count:1,penalty:0,multiplier:1,special:`weapon-${mode}`};
+    else if (mode === "fast") { attack ??= attackModes(actor,item).find(entry => ["shot", "npc"].includes(entry.id)); if (attack) attack = {...attack,count:1,pair:false}; }
+  }
   if(!attack)throw new Error("Этот режим недоступен для данного оружия.");
   if(attack.stirrup) {
     const base=item.system.toObject?.()??item.system;

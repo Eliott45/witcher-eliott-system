@@ -78,7 +78,7 @@ test("Manticore shield strikes use the chosen medium class and the existing silv
 test("the DLC folder and diagram link to real items, spend exact ingredients and support repair/disassembly", async () => {
   const documents = JSON.parse(await readFile(new URL("../pack-sources/equipment.json", import.meta.url), "utf8")).map(item => ({ ...item, id: item._id, uuid: equipmentUuid(item._id) }));
   const shield = documents.find(item => item.system.ruleId === MANTICORE_EQUIPMENT[0].id), diagram = documents.find(item => item.system.ruleId === MANTICORE_RECIPES[0].id);
-  for (const item of [shield, diagram]) { assert.equal(item.folder, MANTICORE_FOLDER.id); assert.equal(item.system.source, "Школа Мантикоры"); }
+  for (const item of [shield, diagram]) { assert.equal(item.folder, MANTICORE_FOLDER.id); assert.match(item.system.source, /Школа Мантикоры/); }
   assert.equal(shield.system.reliability.max, 20); assert.equal(shield.system.weight, 2); assert.equal(shield.system.enhancementSlots, 1); assert.equal(shield.system.encumbrance, 0);
   assert.equal(diagram.system.price, 1304);
   const recipe = diagram.system.recipe;
@@ -86,9 +86,9 @@ test("the DLC folder and diagram link to real items, spend exact ingredients and
   assert.equal(recipeRelations(shield, documents).recipes[0].id, diagram.id);
   const references = new Map(documents.map(item => [item.uuid, item]));
   const ingredients = recipe.components.map(row => { const item = references.get(row.uuid); assert.ok(item); assert.ok(recipeRelations(item, documents).uses.some(use => use.document.id === diagram.id)); return { ...item, system: { ...item.system, quantity: row.quantity, carried: true } }; });
-  assert.deepEqual(ingredients.map(item => [item.system.ruleId, item.system.quantity]), [["material.hardened-leather", 2], ["material.hardened-timber", 4], ["material.meteorite", 3], ["material.silver", 2], ["material.etching-acid", 4], ["material.ester-grease", 2], ["material.river-clay", 6]]);
+  assert.deepEqual(ingredients.map(item => [item.system.ruleId, item.system.quantity]), [["material.hardened-leather", 2], ["material.hardened-timber", 4], ["material.meteorite", 3], ["material.silver", 2], ["material.etching-acid", 2], ["material.ester-grease", 2], ["material.river-clay", 6]]);
   const plan = materialPlan(ingredients, recipe.components, references);
   assert.equal(plan.complete, true); assert.equal(plan.expenses.length, 7);
   assert.equal(repairDC(recipe, shield), 15);
-  assert.deepEqual(disassemblyYield(recipe.components).map(row => row.quantity), [1, 2, 1, 1, 2, 1, 3]);
+  assert.deepEqual(disassemblyYield(recipe.components).map(row => row.quantity), [1, 2, 1, 1, 1, 1, 3]);
 });

@@ -1,3 +1,5 @@
+import { validateSchoolReaction, schoolReactionTarget } from "./school-gear-rules.mjs";
+import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
@@ -82,15 +84,19 @@ export function grappleOptions(actor) {
 }
 
 /** Rolls the special attack as an exchange card: the opponent defends in chat like against a strike. */
-export async function rollGrappleAction(actor, kind) {
+export async function rollGrappleAction(actor, kind, options = {}) {
+  if (options.schoolReaction && !options.schoolQueued) return inventoryWrite(actor, () => rollGrappleAction(actor, kind, {...options, schoolQueued:true}));
+  const reaction = validateSchoolReaction(actor, options.schoolReaction, null, {mode:kind,unarmed:true});
   const data = GRAPPLE_ACTIONS[kind], option = grappleOptions(actor).find(entry => entry.kind === kind);
   if (!data || !actor.isOwner) return;
   if (option.disabled) throw new Error(option.reason);
-  const { holding, heldBy } = grappleState(actor), attacker = attackerToken(actor);
-  const targetUuid = kind === "grapple" || data.free ? selectedAttackTarget(actor, { attackerUuid: attacker.uuid })?.target.uuid : kind === "escape" ? heldBy.token : holding.token;
+  const { holding, heldBy } = grappleState(actor), attacker = reaction ? fromUuidSync(reaction.attackerUuid) : attackerToken(actor);
+  const reactionTarget = reaction ? selectedAttackTarget(actor, {attackerUuid:reaction.attackerUuid,targetUuid:schoolReactionTarget(reaction,options.targetUuid)}) : null;
+  if (reaction && (!reactionTarget || reactionTarget.distance > 1)) throw new Error("Противник вне досягаемости для приёма.");
+  const targetUuid = reactionTarget?.target.uuid ?? (kind === "grapple" || data.free ? selectedAttackTarget(actor, { attackerUuid: attacker.uuid })?.target.uuid : kind === "escape" ? heldBy.token : holding.token);
   if (!targetUuid) throw new Error("Выберите цель (T).");
   if (kind !== "escape" && spiritState(tokenActor(targetUuid)).incorporeal) throw new Error("Бесплотная цель невосприимчива к физической борьбе.");
-  const action = kind === "escape" && !conditionRules(actor).canAct ? { extra: false, penalty: 0, stamina: 0, roundKey: "" } : actionQuote(actor);
+  const action = kind === "escape" && !conditionRules(actor).canAct ? { extra: false, penalty: 0, stamina: 0, roundKey: "" } : actionQuote(actor, {ignoreExtra:Boolean(reaction)});
   const skill = skillValue(actor.system, data.skill);
   const parts = [{ label: game.i18n.localize(skill.label), value: skill.total }, ...(data.penalty ? [{ label: data.name, value: data.penalty }] : []), { label: "Дополнительное действие", value: action.penalty }, ...combatModifierParts(actor, "combat.attack")];
   const total = parts.reduce((sum, part) => sum + part.value, 0), combat = game.combat;
@@ -100,7 +106,7 @@ export async function rollGrappleAction(actor, kind) {
     const math = parts.filter(part => part.value).map(part => `${part.label}: ${signed(part.value)}`).join("; ");
     const message = await roll.toMessage({ speaker: foundry.documents.ChatMessage.getSpeaker({ actor }),
       flavor: `<section class="witcher-attack-chat witcher-grapple-chat"><h3><i class="fa-solid ${data.icon}"></i> ${esc(data.name)}</h3><p data-tooltip="${esc(math)}">База проверки <b>${signed(total)}</b> · цель: <b>${esc(tokenName(targetUuid))}</b></p><p>${esc(data.hint)}</p>${actionNote(action)}</section>`,
-      flags: { [SYSTEM_ID]: { ...display.flags[SYSTEM_ID], action, weaponAttack: { name: data.name, special: kind, target: targetUuid, attacker: attacker.uuid, count: 1, ranged: false, thrown: false,
+      flags: { [SYSTEM_ID]: { ...display.flags[SYSTEM_ID], action, ...(reaction?{schoolReaction:{...options.schoolReaction}}:{}), weaponAttack: { name: data.name, special: kind, target: targetUuid, attacker: attacker.uuid, count: 1, ranged: false, thrown: false,
         location: "random", itemId: null, damage: kind === "throw" ? punchFormula(actor) : null, base: total, parts,
         combat: combat?.started ? { id: combat.id, round: combat.round } : null } } } }, { messageMode });
     if (!message) return;

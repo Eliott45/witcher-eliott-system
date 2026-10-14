@@ -1,3 +1,4 @@
+import { schoolGearSnapshot, parryingWeaponBonus } from "./school-gear-rules.mjs";
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { isShieldMaster } from "./shield-master.mjs";
 import { armPenaltyParts } from "./critical-wound-effects.mjs";
@@ -28,7 +29,7 @@ export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repe
   const underwater=Boolean(actorEnvironment(actor)?.underwater)&&!creatureCanSwim(actor);
   const skillKey=mode==="dodge"?(underwater?"athletics":"dodgeEscape"):mode==="reposition"?"athletics":mode==="brawl"?"brawling":mode==="resist"?"resistMagic":["counter","slip"].includes(mode)?"spellCasting":weapon?.category==="shield"?"melee":weapon?.skill??"brawling";
   const shieldMaster=mode==="parry"&&weapon?.category==="shield"&&isShieldMaster(actor);
-  const skill=skillValue(actor.system,skillKey),penalty=mode==="parry"&&!shieldMaster?(incoming==="thrown"?-5:-3):0;
+  const skill=skillValue(actor.system,skillKey),penalty=mode==="parry"&&!shieldMaster?Math.min(0,(incoming==="thrown"?-5:-3)+parryingWeaponBonus(weapon)):0;
   const activeDodge=Boolean(statusEffect(actor,ACTIVE_DODGE));
   const effects=[...combatModifierParts(actor,"combat.defense"),...(armed?combatModifierParts(actor,"combat.blockParry"):[]),...(item?armPenaltyParts(actor,item):[])],effectTotal=effects.reduce((sum,part)=>sum+part.value,0);
   const total=skill.total===null?null:skill.total+penalty+modifier+effectTotal,cost=repeat&&!activeDodge&&!creatureHasInfiniteStamina(actor)?1:0;
@@ -43,7 +44,7 @@ export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repe
     mode==="block"?(unarmed||weapon?.natural?"Блок телом в безвыходном положении: при успехе урон атаки сразу приходится в подставленную руку (ПБ учитывается, ×½).":"При успешном блоке предмет теряет 1 надёжности."):
     mode==="parry"?"При успехе атака отражена, противник ошеломлён. Оружие не теряет надёжность.":mode==="slip"?"При успехе атака отменяется: призрак бесплотен до начала следующего хода. Физические атаки и воздействия не действуют.":"Сравните результат с атакой противника.";
   const limb=mode==="block"&&(unarmed||Boolean(weapon?.natural));
-  return {mode,itemId,skillKey,total,cost,penalty,modifier,incoming,blocked,activeDodge,limb,unarmed,name:unarmed?(mode==="block"?"Блок рукой":"Парирование рукой"):NAMES[mode],weaponName:item?.name??"",note:note+(activeDodge?" Активное уклонение: защиты без расхода ВЫН; атакующему в ближнем бою −2.":""),
+  return {schoolGear:schoolGearSnapshot(actor,item),mode,itemId,skillKey,total,cost,penalty,modifier,incoming,blocked,activeDodge,limb,unarmed,name:unarmed?(mode==="block"?"Блок рукой":"Парирование рукой"):NAMES[mode],weaponName:item?.name??"",note:note+(activeDodge?" Активное уклонение: защиты без расхода ВЫН; атакующему в ближнем бою −2.":""),
     math:`Основа навыка: ${signed(skill.total??0)}; ${shieldMaster?"Мастер щита":NAMES[mode]}: ${signed(penalty)}; ситуация: ${signed(modifier)}${effects.map(part=>`; ${part.label}: ${signed(part.value)}`).join("")}. Точность оружия не добавляется.`};
 }
 const pending=new WeakMap();

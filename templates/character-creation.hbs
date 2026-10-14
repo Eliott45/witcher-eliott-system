@@ -314,6 +314,7 @@
       {{!-- 8. Gear --}}
       {{#if is.gear}}
       {{#with gear}}
+      {{#if canChooseSchoolKit}}<section class="wcr-panel"><label><input type="checkbox" data-field="gear.schoolKit" data-rerender {{#if schoolKit}}checked{{/if}}> Снаряжение своей школы</label><p class="wcr-hint">Снаряжение ведьмака: школьные мечи, броня и дополнительное оружие, все их чертежи. Медальон и формулы сохраняются; стартовый капитал — 1d6 × 10 крон.</p></section>{{/if}}
       <div class="wcr-split is-gear">
         <section class="wcr-panel">
           <header><h3><i class="fa-solid fa-toolbox" aria-hidden="true"></i> Снаряжение профессии</h3><span class="wcr-pill {{#if full}}is-gold{{/if}}">{{picked}} / {{need}}</span></header>
@@ -332,7 +333,7 @@
           <header><h3><i class="fa-solid fa-coins" aria-hidden="true"></i> Стартовый капитал</h3></header>
           <div class="wcr-coin {{#if crownsRolled}}is-rolled{{/if}}"><strong>{{#if crownsRolled}}{{totalCrowns}}{{else}}?{{/if}}</strong><span>крон</span></div>
           <p class="wcr-hint">{{crownsFormula}}{{#if bonusCrowns}} + {{bonusCrowns}} (жизненный путь и снаряжение){{/if}}</p>
-          <button type="button" class="wcr-roll is-big" data-action="rollCrowns"><i class="fa-solid fa-dice" aria-hidden="true"></i> {{#if crownsRolled}}Перебросить{{else}}Бросить{{/if}} 2d6</button>
+          <button type="button" class="wcr-roll is-big" data-action="rollCrowns"><i class="fa-solid fa-dice" aria-hidden="true"></i> {{#if crownsRolled}}Перебросить{{else}}Бросить{{/if}} {{crownsDice}}</button>
           <p class="wcr-hint">Остальное покупается за кроны на листе персонажа.</p>
         </section>
       </div>
