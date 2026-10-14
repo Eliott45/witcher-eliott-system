@@ -1,5 +1,6 @@
 import { GWENT_CARDS, GWENT_SKILLS, gwentCard } from "./gwent-rules.mjs";
 import { skillValue } from "../data/skills.mjs";
+import { critText } from "./tavern-dice.mjs";
 
 const signed = value => value > 0 ? `+${value}` : `${value}`;
 export const gwentRules = GWENT_CARDS.map(card => ({ faces: card.faces.join("–"), name: card.name, mod: card.mod ? signed(card.mod) : "", text: card.text, icon: card.icon }));
@@ -20,6 +21,7 @@ function playView(play, faded = false) {
   if (play.carry) parts.push({ label: "Жертва", value: signed(play.carry) });
   return { faded, name: play.card.name, icon: card.icon ?? "fa-layer-group", text: card.text ?? "", mod: play.card.mod ? signed(play.card.mod) : "0",
     tone: play.card.mod > 0 ? "good" : play.card.mod < 0 ? "bad" : "even", path: play.card.path ? `Путь к победе: ${play.card.faces.join(" → ")}` : "",
+    crit: critText(play.faces), fumble: play.faces?.[0] === 1 && play.faces.length > 1,
     parts, total: play.total, key: `${play.card.faces.join(".")}:${play.total}` };
 }
 /** Everything at a gwent table is public: drawn cards, rolls and the round score. */

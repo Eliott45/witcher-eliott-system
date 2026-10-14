@@ -25,6 +25,7 @@
         {{#if seat.play.faded}}<small class="gwent-previous">прошлый раунд</small>{{/if}}
         <div class="gwent-parts">{{#each seat.play.parts}}<span><small>{{label}}</small><b>{{value}}</b></span>{{/each}}</div>
         {{#if seat.play.path}}<small class="gwent-path"><i class="fa-solid fa-route"></i> {{seat.play.path}}</small>{{/if}}
+        {{#if seat.play.crit}}<small class="tavern-crit {{#if seat.play.fumble}}is-fumble{{/if}}"><i class="fa-solid {{#if seat.play.fumble}}fa-skull{{else}}fa-burst{{/if}}"></i> {{seat.play.crit}}</small>{{/if}}
       </div>
       <output class="gwent-total {{#if seat.play.faded}}is-faded{{/if}}">{{seat.play.total}}</output>
     {{else}}
@@ -62,6 +63,7 @@
       </div>
       <label class="poker-toggle"><input type="checkbox" name="open" {{checked openGame}}><span><i class="fa-solid fa-eye"></i> Пустить зрителей — партия видна всем за столом таверны</span></label>
       <button type="button" class="poker-primary poker-wide" data-action="challenge" {{disabled busy}}>{{#if isHoard}}<i class="fa-solid fa-staff-snake"></i> Поставить корзину со змеёй{{else}}<i class="fa-solid fa-hand-fist"></i> Бросить вызов{{/if}}</button>
+      {{#if openTables}}<button type="button" class="poker-end-all" data-action="endAll" {{disabled busy}}><i class="fa-solid fa-hand"></i> Мастер: завершить все игры · {{openTables}}</button>{{/if}}
       {{#if recent}}<div class="poker-recent"><h3>Столы</h3>{{#each recent}}<button type="button" class="{{#if open}}is-open{{/if}}" data-action="openTable" data-table="{{id}}"><span><i class="fa-solid {{icon}}" aria-hidden="true"></i> {{names}}</span><small>{{status}}{{#if stake}} · {{stake}} кр.{{/if}} {{#if watch}}<b><i class="fa-solid fa-eye"></i> смотреть</b>{{else}}<i class="fa-solid fa-chevron-right"></i>{{/if}}</small></button>{{/each}}</div>{{/if}}
     </div>
   {{else}}
@@ -82,7 +84,7 @@
           <div class="hoard-wicker"></div>
           <svg class="hoard-snake-svg" viewBox="0 0 120 110" aria-hidden="true"><path class="hoard-snake-body" d="M24 100 C 18 70, 92 78, 84 54 C 78 36, 40 46, 46 26 C 50 14, 64 12, 70 16"/><path class="hoard-snake-scales" d="M24 100 C 18 70, 92 78, 84 54 C 78 36, 40 46, 46 26 C 50 14, 64 12, 70 16"/><ellipse class="hoard-snake-head" cx="74" cy="17" rx="11" ry="7.5" transform="rotate(18 74 17)"/><circle class="hoard-snake-eye" cx="78" cy="14" r="1.8"/><path class="hoard-snake-tongue" d="M84 22 l7 4 m-7 -4 l4 7"/></svg>
           <div class="hoard-pot"><strong>{{hoard.potLabel}}</strong><small>в корзине · рывок {{hoard.grab}}</small></div>
-          {{#if hoard.snake}}<div class="hoard-snake-roll" data-tooltip="Внимание змеи: 1d10 + {{hoard.awareness}}"><small>Змея</small><b>{{hoard.snake}}</b></div>{{/if}}
+          {{#if hoard.snake}}<div class="hoard-snake-roll {{#if hoard.snakeCrit}}is-crit{{/if}}" data-tooltip="Внимание змеи: 1d10 + {{hoard.awareness}}{{#if hoard.snakeCrit}} · {{hoard.snakeCrit}}{{/if}}"><small>Змея</small><b>{{hoard.snake}}</b></div>{{/if}}
         </div>
       </div>
       <div class="poker-center" aria-live="polite">
@@ -132,7 +134,7 @@
       {{#unless canRematch}}<button type="button" data-action="lobby" {{disabled busy}}><i class="fa-solid fa-arrow-left"></i> Столы</button>{{/unless}}
       {{#if canConcede}}<button type="button" data-action="concede" {{disabled busy}}><i class="fa-solid fa-flag"></i> Сдаться</button>{{/if}}
       {{#if canRecover}}<button type="button" data-action="recover" {{disabled busy}}>Повторить расчёт банка</button>{{/if}}
-      {{#if canAbort}}<button type="button" data-action="abort" {{disabled busy}}>Мастер: отменить с возвратом</button>{{/if}}
+      {{#if canAbort}}<button type="button" data-action="abort" {{disabled busy}}><i class="fa-solid fa-hand"></i> Мастер: завершить досрочно</button>{{/if}}
     </footer>
   {{/if}}
   {{#if isHoard}}

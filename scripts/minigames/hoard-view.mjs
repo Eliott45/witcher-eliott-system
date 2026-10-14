@@ -1,5 +1,8 @@
 import { HOARD_MAX, HOARD_MIN, SNAKE_AWARENESS, SNAKE_BITE, DOPING_BONUS, hoardPayouts, hoardLeader } from "./hoard-rules.mjs";
 import { controlsSeat } from "./poker-rules.mjs";
+import { critText } from "./tavern-dice.mjs";
+
+const mark = faces => faces?.length > 1 ? ` [${critText(faces)}]` : "";
 
 const coinWord = (state, count) => state.stake ? `${count} кр.` : `${count} ${count % 10 === 1 && count % 100 !== 11 ? "монета" : [2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100) ? "монеты" : "монет"}`;
 function logLine(state, entry, user) {
@@ -7,9 +10,10 @@ function logLine(state, entry, user) {
   if (entry.left) return { tone: "left", icon: "fa-person-walking-arrow-right", text: `${name} забирает добычу и отходит от корзины.` };
   if (entry.caught) return { tone: "caught", icon: "fa-mask", text: `${name} пойман на «Дыхании суккуба» — выбывает, монеты возвращаются в корзину.` };
   const doping = entry.doping && mine ? ` (+${DOPING_BONUS} суккуб)` : "";
-  if (entry.success) return { tone: "grab", icon: "fa-hand-holding-dollar", text: `${name} выхватывает ${coinWord(state, entry.taken ?? 0)}: Ловкость рук ${entry.grab}${doping} против змеи ${entry.snake}.` };
-  if (entry.bitten) return { tone: "bite", icon: "fa-skull-crossbones", text: `${name} не успевает (${entry.grab}${doping} против ${entry.snake}) — укус! Уклонение ${entry.dodge} против ${entry.bite}. Отравление.` };
-  return { tone: "dodge", icon: "fa-hand", text: `${name} не успевает (${entry.grab}${doping} против ${entry.snake}), но отдёргивает руку: ${entry.dodge} против ${entry.bite}.` };
+  const grab = `${entry.grab}${mark(entry.grabFaces)}${doping}`, dodge = `${entry.dodge}${mark(entry.dodgeFaces)} против ${entry.bite}${mark(entry.biteFaces)}`;
+  if (entry.success) return { tone: "grab", icon: "fa-hand-holding-dollar", text: `${name} выхватывает ${coinWord(state, entry.taken ?? 0)}: Ловкость рук ${grab} против змеи ${entry.snake}.` };
+  if (entry.bitten) return { tone: "bite", icon: "fa-skull-crossbones", text: `${name} не успевает (${grab} против ${entry.snake}) — укус! Уклонение ${dodge}. Отравление.` };
+  return { tone: "dodge", icon: "fa-hand", text: `${name} не успевает (${grab} против ${entry.snake}), но отдёргивает руку: ${dodge}.` };
 }
 /** Everything a hoard table shows: seats around the basket, the snake's roll, the pot and the latest events. */
 export function hoardView(state, user, me, { portrait, online }) {
@@ -26,7 +30,7 @@ export function hoardView(state, user, me, { portrait, online }) {
   const leader = closed && state.reason !== "cancelled" ? hoardLeader(state) : null;
   return {
     hoard: { seats, empty, pot: state.pot ?? 0, potLabel: coinWord(state, state.pot ?? 0), grab: coinWord(state, state.grab ?? 5), per: coinWord(state, state.per ?? 10),
-      snake: state.snake?.total ?? null, round: state.round ?? 0, coins: Array.from({ length: Math.min(12, Math.ceil((state.pot ?? 0) / Math.max(1, state.grab ?? 5))) }, (_, i) => ({ i })),
+      snake: state.snake?.total ?? null, snakeCrit: critText(state.snake?.faces), round: state.round ?? 0, coins: Array.from({ length: Math.min(12, Math.ceil((state.pot ?? 0) / Math.max(1, state.grab ?? 5))) }, (_, i) => ({ i })),
       log: (state.log ?? []).slice(-6).reverse().map(entry => logLine(state, entry, user)), awareness: SNAKE_AWARENESS, bite: SNAKE_BITE, min: HOARD_MIN, max: HOARD_MAX,
       leader: leader === null ? "" : state.seats[leader].name },
     canStart: gathering && host && state.seats.length >= HOARD_MIN, canJoin: gathering && state.seats.length < HOARD_MAX && !state.seats.some(seat => seat.userId === user.id && !seat.npc),

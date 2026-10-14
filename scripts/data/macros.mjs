@@ -14,12 +14,14 @@ export const MACRO_SOURCES = [{
   _id:"createCharactr01",name:"Создание персонажа",type:"script",scope:"global",img:"icons/svg/mystery-man.svg",
   command:"await game.system.api.createCharacter();",ownership:{default:2},flags:{}
 },{
-  _id:"dicePokerTable01",name:"Покер на костях",type:"script",scope:"global",img:"icons/svg/d6-grey.svg",
+  _id:"dicePokerTable01",name:"Покер на костях",type:"script",scope:"global",img:"systems/witcher-eliott-system/assets/icons/tavern-dice.svg",
   command:"await game.system.api.poker({ actor: canvas.tokens?.controlled[0]?.actor ?? game.user.character });",ownership:{default:2},flags:{}
 },{
-  _id:"gwentTable000001",name:"Гвинт",type:"script",scope:"global",img:"icons/svg/card-hand.svg",
+  _id:"gwentTable000001",name:"Гвинт",type:"script",scope:"global",img:"systems/witcher-eliott-system/assets/icons/tavern-gwent.svg",
   command:"await game.system.api.gwent({ actor: canvas.tokens?.controlled[0]?.actor ?? game.user.character });",ownership:{default:2},flags:{}
 },{
-  _id:"dragonHoard00001",name:"Драконий клад",type:"script",scope:"global",img:"icons/svg/poison.svg",
+  _id:"dragonHoard00001",name:"Драконий клад",type:"script",scope:"global",img:"systems/witcher-eliott-system/assets/icons/tavern-hoard.svg",
   command:"await game.system.api.hoard({ actor: canvas.tokens?.controlled[0]?.actor ?? game.user.character });",ownership:{default:2},flags:{}
 }];
+/** Earlier images of the tavern macros; copies on the hotbar that still show them get the new icon. */
+export const LEGACY_MACRO_IMAGES = { dicePokerTable01: "icons/svg/d6-grey.svg", gwentTable000001: "icons/svg/card-hand.svg", dragonHoard00001: "icons/svg/poison.svg" };

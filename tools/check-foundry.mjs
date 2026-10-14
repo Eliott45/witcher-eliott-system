@@ -2167,7 +2167,7 @@ const manualEditingPreviews={};
       assert.equal(new foundry.documents.BaseChatMessage({content:pokerCard(hoardState),flags:hoardTable.flags,author:gm.id}).validationFailures.fields,null);}
     hoardState.phase='finished';hoardState.pot=0;game.user=first;const loot=await PokerWindow.prototype._prepareContext.call(hoardApp);
     assert.equal(loot.result.title,'Клад разобран!');assert.equal(loot.hoard.seats[0].payout,'5 монет');assert.equal(loot.hoard.leader,'Игрок <1>');
-    game.user=gm;const npcLobby=await PokerWindow.prototype._prepareContext.call({...app,tableId:'',table:null,game:'poker',seatIndex:-1});assert.ok(npcLobby.npcs.length>0);assert.ok(pokerTemplate(npcLobby).includes('НПС — играете вы'));
+    game.user=gm;const npcLobby=await PokerWindow.prototype._prepareContext.call({...app,tableId:'',table:null,game:'poker',seatIndex:-1});assert.ok(npcLobby.npcs.length>0);assert.ok(npcLobby.openTables>0);const npcLobbyHtml=pokerTemplate(npcLobby);assert.ok(npcLobbyHtml.includes('НПС — играете вы'));assert.ok(npcLobbyHtml.includes('завершить все игры'));
   } finally {Object.assign(game,saved);}
   console.log('Dice poker: native wallets and private chat cards, all window phases, open rerolls, loaded-dice swaps, spectators, gwent and dragon hoard tables, NPC seats render correctly');
 }

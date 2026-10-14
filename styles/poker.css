@@ -282,3 +282,8 @@
 .witcher-poker-card.is-hoard { background:radial-gradient(ellipse at top,#7a2f1f,#260c08); border-color:#c58a3e; }
 @media (max-width:560px) { .hoard-ring { grid-template-columns:1fr 1fr; grid-template-areas:"basket basket" "s0 s1" "s2 s3"; } }
 @media (prefers-reduced-motion:reduce) { .hoard-basket.is-alert :is(.hoard-snake-svg,.hoard-snake-tongue) { animation:none; } }
+.tavern-crit { font-size:11.5px; color:#ffd772; }
+.tavern-crit.is-fumble { color:#ff9c86; }
+.hoard-snake-roll.is-crit { box-shadow:0 0 0 3px #ffd77288,0 0 22px #ffd772; }
+.witcher-poker-window .poker-end-all { align-self:center; font-size:12px; min-height:30px; color:#ffd2c8; background:#4f1f17; border-color:#b8483a; }
+.witcher-poker-window .poker-end-all:not(:disabled):hover { background:#6e2820; border-color:#ff9c86; }

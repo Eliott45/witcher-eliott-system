@@ -64,7 +64,7 @@
     "name": "Покер на костях",
     "type": "script",
     "scope": "global",
-    "img": "icons/svg/d6-grey.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/tavern-dice.svg",
     "command": "await game.system.api.poker({ actor: canvas.tokens?.controlled[0]?.actor ?? game.user.character });",
     "ownership": {
       "default": 2
@@ -76,7 +76,7 @@
     "name": "Гвинт",
     "type": "script",
     "scope": "global",
-    "img": "icons/svg/card-hand.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/tavern-gwent.svg",
     "command": "await game.system.api.gwent({ actor: canvas.tokens?.controlled[0]?.actor ?? game.user.character });",
     "ownership": {
       "default": 2
@@ -88,7 +88,7 @@
     "name": "Драконий клад",
     "type": "script",
     "scope": "global",
-    "img": "icons/svg/poison.svg",
+    "img": "systems/witcher-eliott-system/assets/icons/tavern-hoard.svg",
     "command": "await game.system.api.hoard({ actor: canvas.tokens?.controlled[0]?.actor ?? game.user.character });",
     "ownership": {
       "default": 2

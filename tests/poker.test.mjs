@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { SYSTEM_ID as SYS } from "../scripts/config.mjs";
 import { pokerHand, pokerScoring, comparePoker, rerollIndices, wagerAmount, requirePokerAction, pokerItemContext } from "../scripts/minigames/poker-rules.mjs";
 import { pokerState, pokerReceipt, processPokerRequest, pokerWrite, recoverPokerBank, resumePoker, pokerTables, pokerCard } from "../scripts/minigames/poker-service.mjs";
+import { tavernD10, tavernCheck } from "../scripts/minigames/tavern-dice.mjs";
 import { drawGwentCard, settleGwentRound, gwentStart, gwentForgeries, gwentDeckBonus, gwentCard } from "../scripts/minigames/gwent-rules.mjs";
 
 test("dice poker ranks all 7776 outcomes with the printed full-house/straight hierarchy", () => {
@@ -270,12 +271,12 @@ test("a full gwent match is public to spectators, pays the bank and only the cho
 });
 test("forged gwent cards add their bonus and a spotted forgery loses the match", async () => {
   const f = fixture(); skilled(f.first, { gambling: 2, tactics: 0 }); skilled(f.second, { gambling: 2, tactics: 0, awareness: 6 });
-  gwentDeck(f.first, "deckA0000000001", { forgeries: [15, 13] });
+  gwentDeck(f.first, "deckA0000000001", { forgeries: [15, 14] });
   const invite = await f.request(f.a, "challenge", null, { game: "gwent", opponentId: f.b.id, actorUuid: f.first.uuid, stake: 10, deckId: "deckA0000000001", fakes: true });
-  const table = invite.table; assert.deepEqual(pokerState(table).seats[0].deck, { name: "Колода Севера", quality: 0, fakes: 2, fakeDc: 13 });
+  const table = invite.table; assert.deepEqual(pokerState(table).seats[0].deck, { name: "Колода Севера", quality: 0, fakes: 2, fakeDc: 14 });
   await f.request(f.b, "accept", table, { actorUuid: f.second.uuid });
-  f.rolls.push([5], [4], [1]); await f.request(f.a, "play", table, { skill: "gambling" });
-  const play = pokerState(table).rounds[0].plays[0]; assert.equal(play.total, 4 + 7 + 1 + 2); assert.equal(play.spotted, false, "Awareness 1 + 11 misses the weakest forgery (DC 13)");
+  f.rolls.push([5], [4], [2]); await f.request(f.a, "play", table, { skill: "gambling" });
+  const play = pokerState(table).rounds[0].plays[0]; assert.equal(play.total, 4 + 7 + 1 + 2); assert.equal(play.spotted, false, "Awareness 2 + 11 misses the weakest forgery (DC 14)");
   const note = f.messages.find(message => message.flags?.[SYS]?.pokerNote); assert.deepEqual(note.whisper, [f.gm.id]);
   f.rolls.push([5], [1]); await f.request(f.b, "play", table, { skill: "gambling" });
   assert.equal(pokerState(table).phase, "playing"); assert.deepEqual(pokerState(table).score, [1, 0]);
@@ -283,8 +284,8 @@ test("forged gwent cards add their bonus and a spotted forgery loses the match",
   gwentDeck(caught.first, "deckA0000000001", { forgeries: [12] });
   const other = (await caught.request(caught.a, "challenge", null, { game: "gwent", opponentId: caught.b.id, actorUuid: caught.first.uuid, stake: 10, deckId: "deckA0000000001", fakes: true })).table;
   await caught.request(caught.b, "accept", other, { actorUuid: caught.second.uuid });
-  caught.rolls.push([1], [10], [1]); await caught.request(caught.a, "play", other, { skill: "gambling" });
-  caught.rolls.push([2], [1]); await caught.request(caught.b, "play", other, { skill: "gambling" });
+  caught.rolls.push([1], [9], [3]); await caught.request(caught.a, "play", other, { skill: "gambling" });
+  caught.rolls.push([2], [3]); await caught.request(caught.b, "play", other, { skill: "gambling" });
   const state = pokerState(other); assert.equal(state.reason, "caught"); assert.deepEqual(state.caught, [0]); assert.equal(state.winner, 1);
   assert.equal(caught.first.system.crowns, 90); assert.equal(caught.second.system.crowns, 110);
 });
@@ -327,10 +328,10 @@ test("dragon's hoard: players and NPCs gather, grab coins past the snake, get bi
   f.rolls.push([9]); await seatMove(f, f.a, "reach", table, 0);
   f.rolls.push([3], [2], [8]); await seatMove(f, f.b, "reach", table, 1);
   const twice = await seatMove(f, f.b, "reach", table, 1); assert.equal(twice.reply.ok, false, "One reach per round");
-  f.rolls.push([10], [3], [1], [1]); await seatMove(f, f.gm, "reach", table, 2);
+  f.rolls.push([9], [3], [2], [3]); await seatMove(f, f.gm, "reach", table, 2);
   state = pokerState(table);
   assert.deepEqual(state.seats.map(seat => [seat.collected, seat.bites]), [[5, 0], [0, 1], [0, 0]]);
-  assert.equal(state.pot, 25); assert.equal(state.round, 2); assert.equal(state.snake.total, 13, "A new round wakes the snake again");
+  assert.equal(state.pot, 25); assert.equal(state.round, 2); assert.equal(state.snake.total, 15, "A new round wakes the snake again");
   assert.ok(state.log.at(-2).bitten); assert.equal(state.log.at(-1).bitten, false);
   for (const [user, seat] of [[f.a, 0], [f.b, 1], [f.gm, 2]]) await seatMove(f, user, "leave", table, seat);
   state = pokerState(table); assert.equal(state.phase, "finished");
@@ -339,20 +340,48 @@ test("dragon's hoard: players and NPCs gather, grab coins past the snake, get bi
 });
 test("dragon's hoard: Succubus Breath gives +5 until someone smells it; the caught cheater's coins return", async () => {
   const f = fixture(); skilled(f.second, { awareness: 6 });
+  skilled(f.first, { sleightOfHand: 2 }); f.first.system.statistics.effective.dexterity = 5;
   const statuses = []; f.first.effects = [{ statuses: new Set(["succubus-drink"]), disabled: false }]; f.first.toggleStatusEffect = async id => statuses.push(id);
   const table = (await f.request(f.a, "challenge", null, { game: "hoard", actorUuid: f.first.uuid, stake: 0 })).table;
   await f.request(f.b, "join", table, { actorUuid: f.second.uuid });
-  f.rolls.push([1]); await f.request(f.a, "start", table); assert.equal(pokerState(table).snake.total, 13);
-  f.rolls.push([1], [9]); await seatMove(f, f.a, "reach", table, 0);
-  let state = pokerState(table); assert.equal(state.seats[0].collected, 5, "9 + 5 doping beats 13"); assert.equal(state.seats[0].doped, true);
-  f.rolls.push([10]); await seatMove(f, f.b, "reach", table, 1);
+  f.rolls.push([2]); await f.request(f.a, "start", table); assert.equal(pokerState(table).snake.total, 14);
+  f.rolls.push([3], [5]); await seatMove(f, f.a, "reach", table, 0);
+  let state = pokerState(table); assert.equal(state.seats[0].collected, 5, "5 + 7 + 5 doping beats 14; without it 12 would miss"); assert.equal(state.seats[0].doped, true);
+  f.rolls.push([4]); await seatMove(f, f.b, "reach", table, 1);
   f.rolls.push([1]); state = pokerState(table); assert.equal(state.round, 2);
   const caught = fixture(); skilled(caught.second, { awareness: 6 });
   caught.first.effects = [{ statuses: new Set(["succubus-skin"]), disabled: false }];
   const other = (await caught.request(caught.a, "challenge", null, { game: "hoard", actorUuid: caught.first.uuid, stake: 0 })).table;
   await caught.request(caught.b, "join", other, { actorUuid: caught.second.uuid });
-  caught.rolls.push([1]); await caught.request(caught.a, "start", other);
+  caught.rolls.push([2]); await caught.request(caught.a, "start", other);
   caught.rolls.push([5]); await seatMove(caught, caught.a, "reach", other, 0);
   const result = pokerState(other); assert.equal(result.seats[0].caught, true); assert.equal(result.seats[0].active, false); assert.equal(result.pot, 20);
   assert.ok(caught.messages.some(message => message.flags?.[SYS]?.pokerNote && message.whisper.length === 1));
+});
+test("tavern checks resolve Witcher critical chains on their own, never through the manual prompt", async () => {
+  const queue = values => async () => values.shift();
+  assert.deepEqual(await tavernD10(queue([7])), { value: 7, faces: [7], crit: "" });
+  assert.deepEqual(await tavernD10(queue([10, 10, 4])), { value: 24, faces: [10, 10, 4], crit: "critical" });
+  assert.deepEqual(await tavernD10(queue([1, 6])), { value: -6, faces: [1, 6], crit: "fumble" });
+  assert.deepEqual(await tavernD10(queue([1, 10, 3])), { value: -13, faces: [1, 10, 3], crit: "fumble" });
+  assert.equal((await tavernCheck(12, queue([10, 2]))).total, 24);
+  const f = fixture(), table = (await f.request(f.a, "challenge", null, { game: "hoard", actorUuid: "", stake: 0 })).table;
+  await f.request(f.b, "join", table, { actorUuid: "" });
+  f.rolls.push([10], [5]); await f.request(f.a, "start", table);
+  assert.deepEqual(pokerState(table).snake, { total: 27, faces: [10, 5], round: 1 }, "The snake's crit is kept for the table to show");
+});
+test("a GM ends games early: hoard players keep their loot, an unfinished duel returns the stakes, players cannot", async () => {
+  const f = fixture(); skilled(f.first, { sleightOfHand: 6 }); f.first.system.statistics.effective.dexterity = 5;
+  const table = (await f.request(f.a, "challenge", null, { game: "hoard", actorUuid: f.first.uuid, stake: 10 })).table;
+  await f.request(f.b, "join", table, { actorUuid: f.second.uuid });
+  f.rolls.push([2]); await f.request(f.a, "start", table);
+  f.rolls.push([9]); await seatMove(f, f.a, "reach", table, 0);
+  assert.equal((await f.request(f.a, "end", table)).reply.ok, false, "Only the GM may stop a table");
+  await f.request(f.gm, "end", table);
+  assert.equal(pokerState(table).phase, "finished"); assert.equal(pokerState(table).reason, "ended");
+  assert.equal(f.first.system.crowns, 100 - 10 + 5 + 7 + 1, "Own grab plus half of the 15 left, the odd coin to the first seat");
+  assert.equal(f.second.system.crowns, 100 - 10 + 7);
+  const duel = await f.start(20); await f.open(duel);
+  await f.request(f.gm, "end", duel);
+  assert.equal(pokerState(duel).phase, "cancelled"); assert.equal(f.first.system.crowns, 103); assert.equal(f.second.system.crowns, 97);
 });

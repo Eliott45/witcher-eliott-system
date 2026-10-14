@@ -29,7 +29,7 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
       roll: PokerWindow.#roll, die: PokerWindow.#die, reroll: PokerWindow.#reroll, palmValue: PokerWindow.#palmValue, palm: PokerWindow.#palm, fair: PokerWindow.#fair,
       skill: PokerWindow.#skill, play: PokerWindow.#play, seat: PokerWindow.#seat, join: PokerWindow.#join, addNpc: PokerWindow.#addNpc, kick: PokerWindow.#kick,
       start: PokerWindow.#start, reach: PokerWindow.#reach, leave: PokerWindow.#leave,
-      concede: PokerWindow.#concede, abort: PokerWindow.#abort, recover: PokerWindow.#recover, lobby: PokerWindow.#lobby, openTable: PokerWindow.#open, rematch: PokerWindow.#rematch
+      concede: PokerWindow.#concede, abort: PokerWindow.#abort, endAll: PokerWindow.#endAll, recover: PokerWindow.#recover, lobby: PokerWindow.#lobby, openTable: PokerWindow.#open, rematch: PokerWindow.#rematch
     } };
   static PARTS = { content: { template: `systems/${SYSTEM_ID}/templates/poker-table.hbs` } };
   constructor(tableId = "", { actorUuid = "", game: kind = "poker" } = {}) {
@@ -70,6 +70,7 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
       // GMs may seat any character or NPC of the world and play it themselves.
       npcs: user.isGM ? game.actors.filter(actor => ["character", "npc"].includes(actor.type) && !state?.seats.some(seat => seat.actorUuid === actor.uuid))
         .map(actor => ({ id: `actor:${actor.uuid}`, uuid: actor.uuid, name: actor.name, selected: `actor:${actor.uuid}` === this.opponentId || actor.uuid === this.npcUuid })) : [],
+      openTables: user.isGM ? pokerTables().filter(message => !pokerClosed(pokerState(message)) && pokerState(message).phase !== "settling").length : 0,
       seatPicker: [], hoard: null, canStart: false, canJoin: false, canAddNpc: false, canReach: false, canLeave: false,
       openGame: this.open !== false, deck: { decks: [], forgeries: 0, forgeryDc: 0, fakes: false },
       // Own tables plus every unfinished game this user may watch (public cards reach every client).
@@ -177,7 +178,7 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
           : phase === "settling" ? "Подсчёт добычи…" : "";
     if (closed) {
       const empty = (state.pot ?? 0) <= 0;
-      view.result = { title: phase === "cancelled" ? "Игра отменена" : empty ? "Клад разобран!" : "Игра окончена",
+      view.result = { title: phase === "cancelled" ? "Игра отменена" : state.reason === "ended" ? "Мастер остановил игру" : empty ? "Клад разобран!" : "Игра окончена",
         detail: phase === "cancelled" ? "" : view.hoard.leader ? `Больше всех унёс ${view.hoard.leader}.` : "Никто не ушёл вперёд.",
         bank: phase === "cancelled" ? stake ? "Ставки возвращены владельцам." : "" : `${empty ? "" : "Оставшиеся монеты делятся поровну. "}${stake ? "Каждый забирает свою добычу в кошелёк." : ""}`, win: false, lose: false };
     }
@@ -270,8 +271,28 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
     if (yes) return this.run("concede");
   }
   static async #abort() {
-    const yes = await foundry.applications.api.DialogV2.confirm({ window: { title: "Отменить партию?" }, content: "<p>Партия закончится без победителя. Списанные ставки вернутся владельцам.</p>", yes: { label: "Отменить и вернуть ставки" }, no: { label: "Продолжить" }, rejectClose: false });
-    if (yes) return this.run("abort");
+    const hoard = gameOf(pokerState(this.table)) === "hoard" && pokerState(this.table).phase === "playing";
+    const yes = await foundry.applications.api.DialogV2.confirm({ window: { title: "Завершить досрочно?" },
+      content: hoard ? "<p>Игроки заберут то, что уже вытащили из корзины; оставшиеся монеты поделятся поровну.</p>" : "<p>Партия закончится без победителя. Списанные ставки вернутся владельцам.</p>",
+      yes: { label: "Завершить" }, no: { label: "Продолжить" }, rejectClose: false });
+    if (yes) return this.run("end");
+  }
+  /** GM: stop every unfinished table at once, each by its own early-end rule. */
+  static async #endAll() {
+    const open = pokerTables().filter(message => !pokerClosed(pokerState(message)) && pokerState(message).phase !== "settling");
+    if (!open.length || this.busy) return;
+    const yes = await foundry.applications.api.DialogV2.confirm({ window: { title: "Завершить все игры?" },
+      content: `<p>Незавершённых столов: ${open.length}. Дуэли без результата вернут ставки, в «Драконьем кладе» каждый заберёт уже добытое.</p>`,
+      yes: { label: "Завершить все" }, no: { label: "Отмена" }, rejectClose: false });
+    if (!yes) return;
+    this.busy = true; this.notice = ""; await this.render();
+    const failed = [];
+    for (const message of open) {
+      try { await sendPoker("end", message); } catch (error) { failed.push(`${pokerState(message).seats.map(seat => seat.name).join(", ")}: ${error.message}`); }
+    }
+    this.busy = false; this.notice = failed.join(" · ");
+    if (!failed.length) ui.notifications.info(`Завершено столов: ${open.length}.`);
+    if (!this.dismissed) await this.render();
   }
   static #recover() { return this.run("recover"); }
   static #lobby() { this.game = gameOf(pokerState(this.table) ?? { game: this.game }); this.tableId = ""; this.reset(); return this.render(); }

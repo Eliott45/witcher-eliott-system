@@ -6,6 +6,7 @@ import { skillValue } from "../data/skills.mjs";
 import { setStatus, hasStatus } from "../combat/status-effects.mjs";
 import { pokerClosed, requirePokerAction, rerollIndices, revealPoker, wagerAmount, pokerHand, gameOf, controlsSeat, LOADED_DICE_DC } from "./poker-rules.mjs";
 import { HOARD_MAX, HOARD_MIN, SNAKE_AWARENESS, SNAKE_BITE, DOPING_BONUS, DOPING_DC, DOPING_STATUSES, hoardCoins, hoardSeat, applyReach, leaveHoard, hoardPayouts, hoardLeader } from "./hoard-rules.mjs";
+import { tavernCheck, critText } from "./tavern-dice.mjs";
 import { GWENT_SKILLS, drawGwentCard, gwentDeckBonus, gwentForgeries, gwentStart, settleGwentRound, clamp } from "./gwent-rules.mjs";
 
 export const pokerState = message => message?.flags?.[SYSTEM_ID]?.pokerTable;
@@ -98,24 +99,23 @@ async function createReceipt(request, user, fields) {
 }
 const actorOf = seat => seat.actorUuid ? game.actors.find(actor => actor.uuid === seat.actorUuid) ?? null : null;
 const skillTotal = (actor, key) => { try { const total = actor ? skillValue(actor.system, key)?.total : null; return Number.isFinite(total) ? total : null; } catch { return null; } };
-const signed = value => value < 0 ? `- ${-value}` : `+ ${value}`;
+const crit = check => check.faces.length > 1 ? ` (${critText(check.faces)})` : "";
 /** The opponent's character gets a hidden Awareness check; only the GM sees the trick and the roll. */
 async function spotCheat(state, index, dc, title, text) {
   const watcher = actorOf(state.seats[1 - index]), awareness = skillTotal(watcher, "awareness");
-  const roll = awareness == null ? null : await new Roll(`1d10wc ${signed(awareness)}`).evaluate();
+  const roll = awareness == null ? null : await tavernCheck(awareness);
   const spotted = Boolean(roll && roll.total >= dc);
-  const check = roll ? `<p>Внимание: ${esc(watcher.name)} — ${roll.total} против СЛ ${dc}. <strong>${spotted ? "Обман замечен: шулер проигрывает." : "Обман не заметили."}</strong></p>`
+  const check = roll ? `<p>Внимание: ${esc(watcher.name)} — ${roll.total}${crit(roll)} против СЛ ${dc}. <strong>${spotted ? "Обман замечен: шулер проигрывает." : "Обман не заметили."}</strong></p>`
     : `<p>У соперника нет персонажа — при желании проведите проверку Внимания СЛ ${dc} вручную.</p>`;
-  await documentClass().create({ ...messageSource({ pokerNote: true }), whisper: gmIds(), blind: true, rolls: roll ? [roll] : [],
+  await documentClass().create({ ...messageSource({ pokerNote: true }), whisper: gmIds(), blind: true,
     content: `<section class="witcher-poker-card is-note"><h3><i class="fa-solid fa-mask"></i> ${title}</h3><p>${esc(state.seats[index].name)} ${text}</p>${check}</section>` });
   return { spotted, check: roll?.total ?? null };
 }
-const rollTotal = async formula => (await new Roll(formula).evaluate()).total;
 /** At the start of each round the snake checks Awareness (base 12); everyone sees the number before reaching. */
 async function snakeTick(state) {
   if (gameOf(state) !== "hoard" || state.phase !== "playing" || state.snake) return state;
-  const total = await rollTotal(`1d10wc + ${SNAKE_AWARENESS}`);
-  return { ...state, snake: { total, round: state.round } };
+  const roll = await tavernCheck(SNAKE_AWARENESS);
+  return { ...state, snake: { total: roll.total, faces: roll.faces, round: state.round } };
 }
 /** «Дыхание суккуба» is easy to smell: every other player with a character gets one hidden Awareness check. */
 async function spotDoping(state, index) {
@@ -125,8 +125,8 @@ async function spotDoping(state, index) {
     if (other === index || !seat.active) continue;
     const watcher = actorOf(seat), awareness = skillTotal(watcher, "awareness");
     if (awareness == null) continue;
-    const roll = await new Roll(`1d10wc ${signed(awareness)}`).evaluate(), spotted = roll.total >= DOPING_DC;
-    caught ||= spotted; lines.push(`${esc(watcher.name)}: ${roll.total}${spotted ? " — заметил!" : ""}`);
+    const roll = await tavernCheck(awareness), spotted = roll.total >= DOPING_DC;
+    caught ||= spotted; lines.push(`${esc(watcher.name)}: ${roll.total}${crit(roll)}${spotted ? " — заметил!" : ""}`);
   }
   await documentClass().create({ ...messageSource({ pokerNote: true }), whisper: gmIds(), blind: true,
     content: `<section class="witcher-poker-card is-note"><h3><i class="fa-solid fa-mask"></i> Дыхание суккуба</h3><p>${esc(state.seats[index].name)} тянется к корзине под действием состава (+${DOPING_BONUS} к Ловкости рук).</p><p>Внимание против СЛ ${DOPING_DC}: ${lines.join(", ") || "некому проверить"}.</p><p><strong>${caught ? "Обман замечен: игрок выбывает, его монеты возвращаются в корзину." : "Никто не заметил."}</strong></p></section>` });
@@ -139,12 +139,11 @@ async function reachHoard(state, index) {
   const play = { snake: state.snake.total, sleight, doping };
   if (doping && !seat.checked) Object.assign(play, await spotDoping(state, index));
   if (play.caught) return play;
-  play.grab = await rollTotal(`1d10wc ${signed(sleight + (doping ? DOPING_BONUS : 0))}`);
-  play.success = play.grab > play.snake;
+  const grab = await tavernCheck(sleight + (doping ? DOPING_BONUS : 0));
+  Object.assign(play, { grab: grab.total, grabFaces: grab.faces, success: grab.total > play.snake });
   if (!play.success) {
-    play.dodge = await rollTotal(`1d10wc ${signed(skillTotal(actor, "dodgeEscape") ?? 0)}`);
-    play.bite = await rollTotal(`1d10wc + ${SNAKE_BITE}`);
-    play.bitten = play.bite > play.dodge;
+    const dodge = await tavernCheck(skillTotal(actor, "dodgeEscape") ?? 0), bite = await tavernCheck(SNAKE_BITE);
+    Object.assign(play, { dodge: dodge.total, dodgeFaces: dodge.faces, bite: bite.total, biteFaces: bite.faces, bitten: bite.total > dodge.total });
     // The supplement's snake is venomous: a bite poisons the character (the GM rules on anything harsher).
     if (play.bitten && actor?.effects) await setStatus(actor, "poisoned", true);
   }
@@ -156,8 +155,8 @@ async function playGwent(state, index, data) {
   const seat = state.seats[index], skill = GWENT_SKILLS[data.skill] ? data.skill : "gambling", value = skillTotal(actorOf(seat), skill) ?? 0;
   const card = await drawGwentCard(async () => (await new Roll("1d10").evaluate()).total, state.round);
   const deck = gwentDeckBonus(seat.deck), carry = state.carry?.[index] ?? 0, base = value + card.mod + deck + carry;
-  const roll = await new Roll(`1d10wc ${signed(base)}`).evaluate();
-  const play = { skill, skillValue: value, card, deck, carry, die: roll.total - base, total: roll.total };
+  const roll = await tavernCheck(base);
+  const play = { skill, skillValue: value, card, deck, carry, die: roll.die, faces: roll.faces, total: roll.total };
   // Forged cards are in the deck from the first hand; the opponent gets one chance to notice them.
   if (state.round === 1 && seat.deck?.fakes) Object.assign(play, await spotCheat(state, index, seat.deck.fakeDc, "Поддельные карты гвинта", `играет колодой с поддельными картами (+${seat.deck.fakes}).`));
   return play;
@@ -319,10 +318,12 @@ export async function processPokerRequest(request, creatorId) {
           if (!pokerReceipt(staged).done) throw new Error("Предыдущий бросок уже сохранён. Попросите мастера восстановить соединение.");
           state = copy(pokerState(table));
         }
-        if (command.action === "abort" || command.action === "recover") {
+        if (["abort", "end", "recover"].includes(command.action)) {
           if (!user.isGM || pokerClosed(state)) throw new Error("Это действие доступно ведущему для незавершённой партии.");
-          if (command.action === "abort" && state.phase === "settling") throw new Error("Результат уже зафиксирован. Завершите расчёт банка; изменить победителя нельзя.");
-          if (command.action === "abort") state = { ...state, phase: ["invited", "gathering"].includes(state.phase) ? "cancelled" : "settling", winner: null, reason: "cancelled" };
+          if (command.action !== "recover" && state.phase === "settling") throw new Error("Результат уже зафиксирован. Завершите расчёт банка; изменить победителя нельзя.");
+          // Ending early: hoard players keep what they already grabbed; a duel without a result returns the stakes.
+          if (command.action === "end" && gameOf(state) === "hoard" && state.phase === "playing") state = { ...state, phase: "settling", winner: null, reason: "ended" };
+          else if (command.action !== "recover") state = { ...state, phase: ["invited", "gathering"].includes(state.phase) ? "cancelled" : "settling", winner: null, reason: "cancelled" };
           else if (!["funding", "settling"].includes(state.phase)) throw new Error("Расчёт банка не требуется.");
         } else if (["join", "addNpc", "kick", "start"].includes(command.action)) state = hoardTable(state, user, command);
         else {
