@@ -2107,7 +2107,7 @@ const manualEditingPreviews={};
     assert.equal(opposite.top.combination,'Покер','Rerolled dice are open to the opponent');assert.equal(opposite.canPalm,false);pokerTemplate(opposite);
     // Loaded dice: only the cheater gets the swap controls once every die is on the table.
     game.user=first;state.phase='palming';state.hands=[[6,6,6,6,6],[2,2,3,4,1]];state.seats[1].rerolled=[4];state.seats[0].palm=true;
-    const palming=await PokerWindow.prototype._prepareContext.call({...app,palm:{index:4,value:1}});
+    const palming=await PokerWindow.prototype._prepareContext.call({...app,seatIndex:0,palm:{index:4,value:1}});
     assert.equal(palming.canPalm,true);assert.equal(palming.palmReady,true);assert.equal(palming.top.combination,'Пара');
     assert.ok(pokerTemplate(palming).includes('Подменить и вскрыть'));
     game.user=second;const watcher=await PokerWindow.prototype._prepareContext.call(app);
@@ -2148,6 +2148,26 @@ const manualEditingPreviews={};
     }
     Object.assign(gwentState,{phase:'finished',winner:0,score:[2,0],reason:'showdown'});game.user=first;
     const won=await PokerWindow.prototype._prepareContext.call(gwentApp);assert.equal(won.result.detail,'Счёт раундов 2 : 0');assert.equal(won.result.win,true);assert.ok(pokerCard(gwentState).includes('Гвинт'));
+    // Dragon's hoard: up to four seats around the basket, NPC seats played by the GM, a seat picker for several of them.
+    const hoardSeat=(user,name,extra={})=>({userId:user.id,name,actorUuid:'',npc:false,revision:0,opening:'',draw:'',rerolled:[],palm:'',final:'',collected:0,active:true,bites:0,acted:false,doped:false,caught:false,checked:false,...extra});
+    const hoardState={version:1,game:'hoard',phase:'gathering',stake:0,tieMode:'faces',issue:'',hands:[[],[]],winner:null,reason:'',processed:[],open:true,per:10,grab:5,pot:0,round:0,snake:null,log:[],
+      seats:[hoardSeat(first,'Игрок <1>'),hoardSeat(gm,'Трактирщик',{npc:true}),hoardSeat(gm,'Вышибала',{npc:true})]};
+    const hoardTable={id:'hoardTable000001',author:gm,flags:{[game.system.id]:{pokerTable:hoardState}}};game.messages.push(hoardTable);
+    const hoardApp={...app,tableId:hoardTable.id,table:hoardTable,game:'hoard',seatIndex:-1,npcUuid:'',hoardContext:PokerWindow.prototype.hoardContext};
+    game.user=first;const host=await PokerWindow.prototype._prepareContext.call(hoardApp);
+    assert.equal(host.isHoard,true);assert.equal(host.canStart,true);assert.equal(host.hoard.empty.length,1);assert.equal(host.hoard.seats[2].canKick,true);assert.ok(pokerTemplate(host).includes('Встряхнуть корзину'));
+    game.user=gm;const master=await PokerWindow.prototype._prepareContext.call(hoardApp);assert.equal(master.seatPicker.length,2);assert.equal(master.canAddNpc,true);pokerTemplate(master);
+    Object.assign(hoardState,{phase:'playing',round:2,pot:15,snake:{total:17,round:2},log:[{round:1,seat:0,snake:15,grab:19,success:true,taken:5},{round:1,seat:1,snake:15,grab:8,success:false,dodge:9,bite:14,bitten:true}]});
+    hoardState.seats[0].collected=5;hoardState.seats[1].bites=1;hoardState.seats[1].acted=true;
+    const reaching=await PokerWindow.prototype._prepareContext.call({...hoardApp,seatIndex:1});
+    assert.equal(reaching.seatIndex??2,2);assert.equal(reaching.canReach,true,'The picker jumps to the NPC that still has to reach');assert.equal(reaching.hoard.log.length,2);assert.equal(reaching.hoard.snake,17);
+    const reachHtml=pokerTemplate(reaching);assert.ok(reachHtml.includes('Сунуть руку в корзину'));assert.ok(reachHtml.includes('укус'));assert.ok(!reachHtml.includes('undefined'));
+    game.user=guest;const watchers=await PokerWindow.prototype._prepareContext.call(hoardApp);assert.equal(watchers.spectator,true);assert.equal(watchers.canReach,false);pokerTemplate(watchers);
+    for(const phase of ['gathering','funding','playing','settling','finished','cancelled']){hoardState.phase=phase;const html=pokerTemplate(await PokerWindow.prototype._prepareContext.call(hoardApp));assert.ok(!html.includes('undefined'));
+      assert.equal(new foundry.documents.BaseChatMessage({content:pokerCard(hoardState),flags:hoardTable.flags,author:gm.id}).validationFailures.fields,null);}
+    hoardState.phase='finished';hoardState.pot=0;game.user=first;const loot=await PokerWindow.prototype._prepareContext.call(hoardApp);
+    assert.equal(loot.result.title,'Клад разобран!');assert.equal(loot.hoard.seats[0].payout,'5 монет');assert.equal(loot.hoard.leader,'Игрок <1>');
+    game.user=gm;const npcLobby=await PokerWindow.prototype._prepareContext.call({...app,tableId:'',table:null,game:'poker',seatIndex:-1});assert.ok(npcLobby.npcs.length>0);assert.ok(pokerTemplate(npcLobby).includes('НПС — играете вы'));
   } finally {Object.assign(game,saved);}
-  console.log('Dice poker: native wallets and private chat cards, all window phases, open rerolls, loaded-dice swaps, spectators and gwent tables render correctly');
+  console.log('Dice poker: native wallets and private chat cards, all window phases, open rerolls, loaded-dice swaps, spectators, gwent and dragon hoard tables, NPC seats render correctly');
 }

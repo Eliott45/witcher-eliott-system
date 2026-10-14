@@ -4,9 +4,9 @@ export const POKER_HANDS = ["Без комбинации", "Пара", "Две �
 /** «Шулерские кости»: one die may be changed after seeing every die; spotting it is Awareness DC 16. */
 export const LOADED_DICE_DC = 16;
 /** Gaming gear that can start a game straight from the inventory. */
-export const TAVERN_GAMES = { poker: { name: "Покер на костях", icon: "fa-dice" }, gwent: { name: "Гвинт", icon: "fa-layer-group" } };
+export const TAVERN_GAMES = { poker: { name: "Покер на костях", icon: "fa-dice" }, gwent: { name: "Гвинт", icon: "fa-layer-group" }, hoard: { name: "Драконий клад", icon: "fa-staff-snake" } };
 export const POKER_ITEMS = { "gear.dice-poker-board": "poker", "gear.loaded-dice": "poker", "gear.gwent-deck": "gwent" };
-export const gameOf = state => state?.game === "gwent" ? "gwent" : "poker";
+export const gameOf = state => TAVERN_GAMES[state?.game] ? state.game : "poker";
 export function pokerItemContext(item) {
   const game = POKER_ITEMS[item?.system?.ruleId];
   return game && item.actor ? { game, label: `${TAVERN_GAMES[game].name}: бросить вызов`, icon: TAVERN_GAMES[game].icon } : null;
@@ -47,24 +47,31 @@ export function wagerAmount(value) {
 }
 export const pokerClosed = state => ["finished", "declined", "cancelled"].includes(state?.phase);
 export const pokerSeat = (state, userId) => state.seats.findIndex(seat => seat.userId === userId);
-export function requirePokerAction(state, userId, action, revision) {
+/** A seat is played by its user; NPC seats are played by any GM, so one GM can run several NPCs at once. */
+export const controlsSeat = (seat, user) => Boolean(seat && user) && (seat.userId === user.id || Boolean(seat.npc && user.isGM));
+export const controlledSeats = (state, user) => state?.seats.flatMap((seat, index) => controlsSeat(seat, user) ? [index] : []) ?? [];
+const GAME_ACTIONS = { poker: ["roll", "reroll", "finish", "concede"], gwent: ["play", "concede"], hoard: ["reach", "leave"] };
+export function requirePokerAction(state, user, action, revision, seatIndex) {
+  if (typeof user === "string") user = { id: user, isGM: false };
   if (!state || state.version !== 1) throw new Error("Этот стол недоступен.");
-  const seat = pokerSeat(state, userId);
-  if (seat < 0) throw new Error("Вы не участник этой партии.");
+  const seat = Number.isInteger(seatIndex) ? seatIndex : pokerSeat(state, user.id);
+  if (!controlsSeat(state.seats[seat], user)) throw new Error("Вы не участник этой партии.");
   // Concurrent moves by different seats are valid; each seat has its own revision.
   if (state.seats[seat].revision !== revision) throw new Error("Ход уже обработан. Стол обновлён.");
-  const row = state.seats[seat], gwent = gameOf(state) === "gwent";
-  if (["roll", "reroll", "finish"].includes(action) && gwent || action === "play" && !gwent) throw new Error("Сейчас это действие недоступно.");
+  const row = state.seats[seat], kind = gameOf(state);
+  if (!["accept", "decline", "cancel"].includes(action) && !GAME_ACTIONS[kind].includes(action)) throw new Error("Сейчас это действие недоступно.");
   const allowed = action === "accept" ? state.phase === "invited" && seat === 1
     : action === "decline" ? state.phase === "invited" && seat === 1
-      : action === "cancel" ? state.phase === "invited" && seat === 0
+      : action === "cancel" ? ["invited", "gathering"].includes(state.phase) && seat === 0
         : action === "roll" ? state.phase === "opening" && !row.opening
           // The single reroll is final: keeping every die is a reroll of nothing.
           : action === "reroll" ? state.phase === "drawing" && !row.draw
             // Only a player carrying loaded dice gets the extra moment before the reveal.
             : action === "finish" ? state.phase === "palming" && Boolean(row.palm) && !row.final
               : action === "play" ? state.phase === "playing" && !state.rounds?.[state.round - 1]?.plays[seat]
-                : action === "concede" ? ["opening", "drawing", "palming", "playing"].includes(state.phase) : false;
+                : action === "concede" ? ["opening", "drawing", "palming", "playing"].includes(state.phase)
+                  : action === "reach" ? state.phase === "playing" && row.active && !row.acted && Boolean(state.snake)
+                    : action === "leave" ? state.phase === "gathering" && seat > 0 || state.phase === "playing" && row.active : false;
   if (!allowed) throw new Error("Сейчас это действие недоступно.");
   return seat;
 }

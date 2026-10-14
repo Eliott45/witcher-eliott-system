@@ -43,7 +43,7 @@
 <div class="poker-app game-{{game}} {{#if lobby}}is-lobby{{else}}phase-{{phase}}{{/if}}">
   <header class="poker-head">
     <div class="poker-title"><i class="fa-solid {{gameIcon}}" aria-hidden="true"></i><div><small>Развлечения в таверне</small><h1>{{gameName}}</h1></div></div>
-    {{#if table}}<div class="poker-pills">{{#if spectator}}<span class="poker-pill is-watch"><i class="fa-solid fa-eye" aria-hidden="true"></i> Вы зритель</span>{{/if}}<span class="poker-pill">{{stage}}</span><span class="poker-pill is-gold"><i class="fa-solid fa-coins" aria-hidden="true"></i> {{#if stake}}Банк {{pot}} кр.{{else}}Без ставок{{/if}}</span></div>{{/if}}
+    {{#if table}}<div class="poker-pills">{{#if spectator}}<span class="poker-pill is-watch"><i class="fa-solid fa-eye" aria-hidden="true"></i> Вы зритель</span>{{/if}}<span class="poker-pill">{{stage}}</span><span class="poker-pill is-gold"><i class="fa-solid fa-coins" aria-hidden="true"></i> {{#if isHoard}}{{#if stake}}В корзине {{pot}} кр.{{else}}На монеты{{/if}}{{else}}{{#if stake}}Банк {{pot}} кр.{{else}}Без ставок{{/if}}{{/if}}</span></div>{{/if}}
   </header>
   {{#unless hasGM}}<p class="poker-notice" role="status"><i class="fa-solid fa-plug-circle-xmark"></i> Нужен подключённый мастер — он ведёт стол. Партия сохранена.</p>{{/unless}}
   {{#if notice}}<p class="poker-notice" role="alert"><i class="fa-solid fa-triangle-exclamation"></i> {{notice}}</p>{{/if}}
@@ -52,7 +52,8 @@
       <div class="tavern-games" role="group" aria-label="Игра">{{#each games}}<button type="button" class="tavern-game {{#if selected}}is-selected{{/if}}" data-action="game" data-game="{{id}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}"><i class="fa-solid {{icon}}" aria-hidden="true"></i> {{name}}</button>{{/each}}</div>
       <div class="poker-fields">
         <label><span>Играть за</span><select name="actorUuid"><option value="">От своего имени · без кошелька</option>{{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}} · {{crowns}} кр.</option>{{/each}}</select></label>
-        <label><span>Соперник</span><select name="opponentId"><option value="">Кого позвать за стол?</option>{{#each opponents}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}{{#if isGM}} · мастер{{/if}}</option>{{/each}}</select></label>
+        {{#if isHoard}}<p class="hoard-lobby-note"><i class="fa-solid fa-users"></i> От 2 до 4 игроков. Остальные подсаживаются из чата или списка столов{{#if isGM}}, а вы можете посадить НПС и играть за них{{/if}}.</p>
+        {{else}}<label><span>Соперник</span><select name="opponentId"><option value="">Кого позвать за стол?</option>{{#each opponents}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}{{#if isGM}} · мастер{{/if}}</option>{{/each}}{{#if npcs.length}}<optgroup label="НПС — играете вы">{{#each npcs}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</optgroup>{{/if}}</select></label>{{/if}}
       </div>
       {{#if isGwent}}<div class="gwent-deck-pick">{{> deckPicker deck=deck}}</div>{{/if}}
       <div class="poker-stakes"><span>Ставка с каждого</span>
@@ -60,10 +61,47 @@
         <small>Деньги списываются, только когда соперник примет вызов. Победитель забирает банк, при ничьей ставки возвращаются.</small>
       </div>
       <label class="poker-toggle"><input type="checkbox" name="open" {{checked openGame}}><span><i class="fa-solid fa-eye"></i> Пустить зрителей — партия видна всем за столом таверны</span></label>
-      <button type="button" class="poker-primary poker-wide" data-action="challenge" {{disabled busy}}><i class="fa-solid fa-hand-fist"></i> Бросить вызов</button>
+      <button type="button" class="poker-primary poker-wide" data-action="challenge" {{disabled busy}}>{{#if isHoard}}<i class="fa-solid fa-staff-snake"></i> Поставить корзину со змеёй{{else}}<i class="fa-solid fa-hand-fist"></i> Бросить вызов{{/if}}</button>
       {{#if recent}}<div class="poker-recent"><h3>Столы</h3>{{#each recent}}<button type="button" class="{{#if open}}is-open{{/if}}" data-action="openTable" data-table="{{id}}"><span><i class="fa-solid {{icon}}" aria-hidden="true"></i> {{names}}</span><small>{{status}}{{#if stake}} · {{stake}} кр.{{/if}} {{#if watch}}<b><i class="fa-solid fa-eye"></i> смотреть</b>{{else}}<i class="fa-solid fa-chevron-right"></i>{{/if}}</small></button>{{/each}}</div>{{/if}}
     </div>
   {{else}}
+    {{#if seatPicker.length}}<div class="seat-picker" role="group" aria-label="Вы ведёте"><span>Вы ведёте</span>{{#each seatPicker}}<button type="button" class="{{#if selected}}is-selected{{/if}} {{#if needs}}needs-move{{/if}}" data-action="seat" data-seat="{{index}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}"><img src="{{img}}" alt=""> {{name}}{{#if needs}} <i class="fa-solid fa-circle-exclamation" data-tooltip="Ждёт хода"></i>{{/if}}</button>{{/each}}</div>{{/if}}
+    {{#if isHoard}}
+    <div class="hoard-felt">
+      <div class="hoard-ring">
+        {{#each hoard.seats}}<article class="hoard-seat pos-{{index}} {{#if mine}}is-mine{{/if}} {{#if out}}is-out{{/if}} {{#if caught}}is-caught{{/if}}">
+          <img class="poker-portrait" src="{{img}}" alt="">
+          <div class="hoard-seat-name"><strong>{{name}}</strong><small>{{#if npc}}НПС · {{/if}}{{status}}{{#unless online}} · не в сети{{/unless}}</small></div>
+          <div class="hoard-loot"><i class="fa-solid fa-coins" aria-hidden="true"></i> {{coins}}{{#if bites}} <span class="hoard-bites" data-tooltip="Укусов змеи"><i class="fa-solid fa-skull-crossbones"></i> {{bites}}</span>{{/if}}{{#if doped}} <span class="hoard-doped" data-tooltip="Дыхание суккуба: +5 к Ловкости рук. Видите только вы и мастер."><i class="fa-solid fa-mask"></i></span>{{/if}}</div>
+          {{#if payout}}<div class="hoard-payout">Уносит {{payout}}</div>{{/if}}
+          {{#if canKick}}<button type="button" class="hoard-kick" data-action="kick" data-seat="{{index}}" data-tooltip="Убрать из-за стола" aria-label="Убрать {{name}}" {{disabled ../busy}}><i class="fa-solid fa-xmark"></i></button>{{/if}}
+        </article>{{/each}}
+        {{#each hoard.empty}}<article class="hoard-seat pos-{{index}} is-empty"><i class="fa-solid fa-chair" aria-hidden="true"></i><small>Свободное место</small></article>{{/each}}
+        <div class="hoard-basket {{#if hoard.snake}}is-alert{{/if}}">
+          <div class="hoard-coins" aria-hidden="true">{{#each hoard.coins}}<i class="hoard-coin" style="--i:{{i}}"></i>{{/each}}</div>
+          <div class="hoard-wicker"></div>
+          <svg class="hoard-snake-svg" viewBox="0 0 120 110" aria-hidden="true"><path class="hoard-snake-body" d="M24 100 C 18 70, 92 78, 84 54 C 78 36, 40 46, 46 26 C 50 14, 64 12, 70 16"/><path class="hoard-snake-scales" d="M24 100 C 18 70, 92 78, 84 54 C 78 36, 40 46, 46 26 C 50 14, 64 12, 70 16"/><ellipse class="hoard-snake-head" cx="74" cy="17" rx="11" ry="7.5" transform="rotate(18 74 17)"/><circle class="hoard-snake-eye" cx="78" cy="14" r="1.8"/><path class="hoard-snake-tongue" d="M84 22 l7 4 m-7 -4 l4 7"/></svg>
+          <div class="hoard-pot"><strong>{{hoard.potLabel}}</strong><small>в корзине · рывок {{hoard.grab}}</small></div>
+          {{#if hoard.snake}}<div class="hoard-snake-roll" data-tooltip="Внимание змеи: 1d10 + {{hoard.awareness}}"><small>Змея</small><b>{{hoard.snake}}</b></div>{{/if}}
+        </div>
+      </div>
+      <div class="poker-center" aria-live="polite">
+        {{#if result}}<div class="poker-result" role="status"><h2>{{result.title}}</h2>{{#if result.detail}}<p>{{result.detail}}</p>{{/if}}{{#if result.bank}}<p class="poker-bank-note"><i class="fa-solid fa-coins"></i> {{result.bank}}</p>{{/if}}</div>
+        {{else}}<div class="poker-instruction"><p>{{#if waiting}}<i class="fa-solid fa-hourglass-half fa-fade"></i> {{/if}}{{instruction}}</p></div>{{/if}}
+      </div>
+      {{#if hoard.log.length}}<ol class="hoard-log">{{#each hoard.log}}<li class="is-{{tone}}"><i class="fa-solid {{icon}}" aria-hidden="true"></i> {{text}}</li>{{/each}}</ol>{{/if}}
+      <div class="poker-actions">
+        {{#if canJoin}}<div class="hoard-join"><label class="poker-inline-field"><span>Сесть за стол как</span><select name="actorUuid"><option value="">От своего имени · без кошелька</option>{{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}} · {{crowns}} кр.</option>{{/each}}</select></label><button type="button" data-action="join" {{disabled busy}}><i class="fa-solid fa-chair"></i> Сесть</button></div>{{/if}}
+        {{#if canAddNpc}}<div class="hoard-join"><label class="poker-inline-field"><span>Посадить НПС</span><select name="npcUuid"><option value="">Выберите персонажа…</option>{{#each npcs}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label><button type="button" data-action="addNpc" {{disabled busy}}><i class="fa-solid fa-user-plus"></i> Посадить</button></div>{{/if}}
+        {{#if canStart}}<div class="poker-buttons"><button type="button" class="poker-primary poker-big" data-action="start" {{disabled busy}}><i class="fa-solid fa-staff-snake"></i> Встряхнуть корзину и начать</button></div>{{/if}}
+        {{#if canReach}}<div class="poker-buttons"><button type="button" class="poker-primary poker-big is-shady" data-action="reach" {{disabled busy}}><i class="fa-solid fa-hand-holding-dollar"></i> Сунуть руку в корзину</button></div>{{/if}}
+        {{#if canLeave}}<div class="poker-buttons"><button type="button" data-action="leave" {{disabled busy}}>{{#if canReach}}<i class="fa-solid fa-person-walking-arrow-right"></i> Забрать добычу и отойти{{else}}<i class="fa-solid fa-person-walking-arrow-right"></i> Встать из-за стола{{/if}}</button></div>{{/if}}
+        {{#if canCancel}}<div class="poker-buttons"><button type="button" data-action="cancel" {{disabled busy}}><i class="fa-solid fa-xmark"></i> Убрать корзину</button></div>{{/if}}
+        {{#if canRematch}}<div class="poker-buttons"><button type="button" class="poker-primary" data-action="rematch" {{disabled busy}}><i class="fa-solid fa-rotate-right"></i> Ещё раз</button><button type="button" data-action="lobby" {{disabled busy}}><i class="fa-solid fa-table-list"></i> Другие столы</button></div>{{/if}}
+        {{#if busy}}<p class="poker-wait"><i class="fa-solid fa-spinner fa-spin"></i> Змея следит…</p>{{/if}}
+      </div>
+    </div>
+    {{else}}
     <div class="poker-felt {{#if isGwent}}is-gwent{{/if}}">
       {{#if isGwent}}{{> gwentSeat seat=top}}{{else}}{{> pokerSeat seat=top palming=canPalm}}{{/if}}
       <div class="poker-center" aria-live="polite">
@@ -89,6 +127,7 @@
         {{#if busy}}<p class="poker-wait"><i class="fa-solid fa-spinner fa-spin"></i> {{#if isGwent}}Карты на столе…{{else}}Кости в пути…{{/if}}</p>{{/if}}
       </div>
     </div>
+    {{/if}}
     <footer class="poker-management">
       {{#unless canRematch}}<button type="button" data-action="lobby" {{disabled busy}}><i class="fa-solid fa-arrow-left"></i> Столы</button>{{/unless}}
       {{#if canConcede}}<button type="button" data-action="concede" {{disabled busy}}><i class="fa-solid fa-flag"></i> Сдаться</button>{{/if}}
@@ -96,7 +135,14 @@
       {{#if canAbort}}<button type="button" data-action="abort" {{disabled busy}}>Мастер: отменить с возвратом</button>{{/if}}
     </footer>
   {{/if}}
-  {{#if isGwent}}
+  {{#if isHoard}}
+  <details class="poker-rules" {{#if rulesOpen}}open{{/if}}><summary><i class="fa-solid fa-book-open"></i> Правила драконьего клада</summary>
+    <p>В центре стола корзина с ядовитой змеёй, вокруг — по 10 монет от каждого (или по ставке в кронах). В начале каждого раунда змея проверяет Внимание: 1d10 + 12.</p>
+    <p>Каждый участник тянется к корзине: Ловкость рук должна быть выше результата змеи — тогда он забирает 5 монет (половину ставки). Промах — Уклонение против укуса (атака 1d10 + 10); укушенный получает отравление.</p>
+    <p>Игра идёт, пока монеты не кончатся или игроки не отойдут с добычей. Оставшиеся монеты делятся поровну, каждый уносит своё.</p>
+    <p><i class="fa-solid fa-mask"></i> Под «Дыханием суккуба» (на коже или выпитым) змея хуже замечает руку: +5 к Ловкости рук. Остальные один раз проверяют Внимание СЛ 16 — заметят, и обманщик выбывает, а его монеты возвращаются в корзину.</p>
+  </details>
+  {{else if isGwent}}
   <details class="poker-rules" {{#if rulesOpen}}open{{/if}}><summary><i class="fa-solid fa-book-open"></i> Карты и правила гвинта</summary>
     <ol class="gwent-table">{{#each gwentRules}}<li><b>{{faces}}</b><i class="fa-solid {{icon}}" aria-hidden="true"></i><strong>{{name}}</strong><span>{{mod}}</span><small>{{text}}</small></li>{{/each}}</ol>
     <p>В начале каждого раунда оба тянут карту (d10 по таблице) и добавляют модификатор к проверке Азартных игр или Тактики. Выше результат — раунд ваш. Партия — до двух выигранных раундов, максимум три раунда; возможны ничьи. Редкая колода даёт +1…+3 — её назначает мастер в листе колоды.</p>

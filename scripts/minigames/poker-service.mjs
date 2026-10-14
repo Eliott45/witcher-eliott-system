@@ -3,7 +3,9 @@ import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { isCarried } from "../data/containers.mjs";
 import { skillValue } from "../data/skills.mjs";
-import { pokerClosed, requirePokerAction, rerollIndices, revealPoker, wagerAmount, pokerHand, gameOf, LOADED_DICE_DC } from "./poker-rules.mjs";
+import { setStatus, hasStatus } from "../combat/status-effects.mjs";
+import { pokerClosed, requirePokerAction, rerollIndices, revealPoker, wagerAmount, pokerHand, gameOf, controlsSeat, LOADED_DICE_DC } from "./poker-rules.mjs";
+import { HOARD_MAX, HOARD_MIN, SNAKE_AWARENESS, SNAKE_BITE, DOPING_BONUS, DOPING_DC, DOPING_STATUSES, hoardCoins, hoardSeat, applyReach, leaveHoard, hoardPayouts, hoardLeader } from "./hoard-rules.mjs";
 import { GWENT_SKILLS, drawGwentCard, gwentDeckBonus, gwentForgeries, gwentStart, settleGwentRound, clamp } from "./gwent-rules.mjs";
 
 export const pokerState = message => message?.flags?.[SYSTEM_ID]?.pokerTable;
@@ -38,8 +40,15 @@ function actorFor(uuid, user, required = false) {
   if (!actor || !["character", "npc"].includes(actor.type) || !actor.testUserPermission(user, "OWNER")) throw new Error("Выберите своего персонажа для этой партии.");
   return actor;
 }
-function participant(user, actor, deck = null) {
-  return { userId: user.id, name: actor?.name ?? user.name, actorUuid: actor?.uuid ?? "", revision: 0, opening: "", draw: "", rerolled: [], palm: "", final: "", ...(deck ? { deck } : {}) };
+/** `npc` seats belong to the GMs: any GM may play them, several at once. */
+function participant(user, actor, extra = {}) {
+  return { userId: user.id, name: actor?.name ?? user.name, actorUuid: actor?.uuid ?? "", npc: false, revision: 0, opening: "", draw: "", rerolled: [], palm: "", final: "", ...extra };
+}
+/** The GM may seat any character or NPC of the world, not only owned ones. */
+function npcActor(uuid) {
+  const actor = game.actors.find(entry => entry.uuid === uuid);
+  if (!actor || !["character", "npc"].includes(actor.type)) throw new Error("Выберите персонажа или НПС для места за столом.");
+  return actor;
 }
 /** Without a chosen deck the players borrow the tavern's: no rarity bonus, no forged cards. */
 function deckFor(actor, data) {
@@ -57,7 +66,15 @@ function gwentCard(state) {
   const audience = state.open === false ? "Закрытая партия" : "Зрители могут смотреть";
   return `<section class="witcher-poker-card is-gwent"><h3><i class="fa-solid fa-layer-group"></i> Гвинт</h3><p>${state.seats.map(seat => esc(seat.name)).join(" против ")}</p><strong>${esc(result)}</strong>${caught}${score}<p>${state.stake ? `Ставка: ${state.stake} кр. с каждого · Банк: ${state.stake * 2} кр.` : "Игра без ставок"} · ${audience}</p><button type="button" data-poker-open><i class="fa-solid fa-layer-group"></i> Открыть стол</button></section>`;
 }
+function hoardCard(state) {
+  const phase = { gathering: "Набор участников", funding: "Монеты на стол", playing: `Раунд ${state.round}`, settling: "Подсчёт добычи", finished: "Клад разобран", cancelled: "Игра отменена" }[state.phase];
+  const coins = state.stake ? "кр." : "монет";
+  const loot = ["playing", "settling", "finished"].includes(state.phase) ? `<p>${state.seats.map(seat => `${esc(seat.name)}: ${seat.collected}${seat.bites ? ` · укусов ${seat.bites}` : ""}${seat.caught ? " · пойман" : ""}`).join("<br>")}</p><p>В корзине: ${state.pot} ${coins}</p>` : `<p>${state.seats.map(seat => esc(seat.name)).join(", ")}</p>`;
+  const audience = state.open === false ? "Закрытая игра" : "Зрители могут смотреть";
+  return `<section class="witcher-poker-card is-hoard"><h3><i class="fa-solid fa-staff-snake"></i> Драконий клад</h3><strong>${esc(phase)}</strong>${loot}<p>${state.stake ? `По ${state.stake} кр. с каждого` : "По 10 монет с каждого, без крон"} · ${audience}</p><button type="button" data-poker-open><i class="fa-solid fa-staff-snake"></i> Открыть стол</button></section>`;
+}
 export function pokerCard(state) {
+  if (gameOf(state) === "hoard") return hoardCard(state);
   if (gameOf(state) === "gwent") return gwentCard(state);
   const phase = { invited: "Приглашение за стол", funding: "Сбор ставок", opening: "Первый бросок", drawing: "Переброс костей", palming: "Вскрытие", settling: "Расчёт банка", finished: "Партия завершена", declined: "Приглашение отклонено", cancelled: "Партия отменена" }[state.phase];
   const result = state.phase === "finished" ? state.winner === null ? "Ничья" : `Победитель: ${state.seats[state.winner].name}` : phase;
@@ -80,7 +97,7 @@ async function createReceipt(request, user, fields) {
     whisper: [...new Set([user.id, ...gmIds()])], content: "<p>Ход за столом покера.</p>" });
 }
 const actorOf = seat => seat.actorUuid ? game.actors.find(actor => actor.uuid === seat.actorUuid) ?? null : null;
-const skillTotal = (actor, key) => { try { return actor ? skillValue(actor.system, key)?.total ?? null : null; } catch { return null; } };
+const skillTotal = (actor, key) => { try { const total = actor ? skillValue(actor.system, key)?.total : null; return Number.isFinite(total) ? total : null; } catch { return null; } };
 const signed = value => value < 0 ? `- ${-value}` : `+ ${value}`;
 /** The opponent's character gets a hidden Awareness check; only the GM sees the trick and the roll. */
 async function spotCheat(state, index, dc, title, text) {
@@ -92,6 +109,46 @@ async function spotCheat(state, index, dc, title, text) {
   await documentClass().create({ ...messageSource({ pokerNote: true }), whisper: gmIds(), blind: true, rolls: roll ? [roll] : [],
     content: `<section class="witcher-poker-card is-note"><h3><i class="fa-solid fa-mask"></i> ${title}</h3><p>${esc(state.seats[index].name)} ${text}</p>${check}</section>` });
   return { spotted, check: roll?.total ?? null };
+}
+const rollTotal = async formula => (await new Roll(formula).evaluate()).total;
+/** At the start of each round the snake checks Awareness (base 12); everyone sees the number before reaching. */
+async function snakeTick(state) {
+  if (gameOf(state) !== "hoard" || state.phase !== "playing" || state.snake) return state;
+  const total = await rollTotal(`1d10wc + ${SNAKE_AWARENESS}`);
+  return { ...state, snake: { total, round: state.round } };
+}
+/** «Дыхание суккуба» is easy to smell: every other player with a character gets one hidden Awareness check. */
+async function spotDoping(state, index) {
+  const lines = [];
+  let caught = false;
+  for (const [other, seat] of state.seats.entries()) {
+    if (other === index || !seat.active) continue;
+    const watcher = actorOf(seat), awareness = skillTotal(watcher, "awareness");
+    if (awareness == null) continue;
+    const roll = await new Roll(`1d10wc ${signed(awareness)}`).evaluate(), spotted = roll.total >= DOPING_DC;
+    caught ||= spotted; lines.push(`${esc(watcher.name)}: ${roll.total}${spotted ? " — заметил!" : ""}`);
+  }
+  await documentClass().create({ ...messageSource({ pokerNote: true }), whisper: gmIds(), blind: true,
+    content: `<section class="witcher-poker-card is-note"><h3><i class="fa-solid fa-mask"></i> Дыхание суккуба</h3><p>${esc(state.seats[index].name)} тянется к корзине под действием состава (+${DOPING_BONUS} к Ловкости рук).</p><p>Внимание против СЛ ${DOPING_DC}: ${lines.join(", ") || "некому проверить"}.</p><p><strong>${caught ? "Обман замечен: игрок выбывает, его монеты возвращаются в корзину." : "Никто не заметил."}</strong></p></section>` });
+  return { caught };
+}
+/** One reach into the basket: Sleight of Hand must beat the snake; a miss means Dodge/Escape against a base 10 bite. */
+async function reachHoard(state, index) {
+  const seat = state.seats[index], actor = actorOf(seat), sleight = skillTotal(actor, "sleightOfHand") ?? 0;
+  const doping = Boolean(actor?.effects && DOPING_STATUSES.some(status => hasStatus(actor, status)));
+  const play = { snake: state.snake.total, sleight, doping };
+  if (doping && !seat.checked) Object.assign(play, await spotDoping(state, index));
+  if (play.caught) return play;
+  play.grab = await rollTotal(`1d10wc ${signed(sleight + (doping ? DOPING_BONUS : 0))}`);
+  play.success = play.grab > play.snake;
+  if (!play.success) {
+    play.dodge = await rollTotal(`1d10wc ${signed(skillTotal(actor, "dodgeEscape") ?? 0)}`);
+    play.bite = await rollTotal(`1d10wc + ${SNAKE_BITE}`);
+    play.bitten = play.bite > play.dodge;
+    // The supplement's snake is venomous: a bite poisons the character (the GM rules on anything harsher).
+    if (play.bitten && actor?.effects) await setStatus(actor, "poisoned", true);
+  }
+  return play;
 }
 const spotSwap = (state, index, cheat) => spotCheat(state, index, LOADED_DICE_DC, "Шулерские кости", `подменяет кость ${cheat.index + 1}: ${cheat.from} → ${cheat.value}.`);
 /** One gwent round for one player: a d10 card from the table, then 1d10 + Gambling or Tactics with every modifier. */
@@ -155,16 +212,16 @@ export async function recoverPokerBank(message) {
           for (const actor of actors) if (!ledger(actor, message.id).deposit && balance(actor) < state.stake) throw new Error(`У ${actor.name} больше не хватает крон. Пополните кошелёк или отмените партию с возвратом.`);
           for (const actor of actors) await transfer(actor, message.id, -state.stake, "deposit");
         } else {
-          for (const [index, actor] of actors.entries()) {
-            const deposited = ledger(actor, message.id).deposit;
-            const amount = state.winner === null ? (deposited ? state.stake : 0) : index === state.winner ? actors.reduce((sum, payer) => sum + (ledger(payer, message.id).deposit ? state.stake : 0), 0) : 0;
-            await transfer(actor, message.id, amount, "paid");
-          }
+          const deposits = actors.map(actor => ledger(actor, message.id).deposit ? state.stake : 0), pot = deposits.reduce((a, b) => a + b, 0);
+          // Hoard players keep what they grabbed; the duel games pay the whole bank to the winner.
+          const amounts = state.reason === "cancelled" ? deposits : gameOf(state) === "hoard" ? deposits.every(Boolean) ? hoardPayouts(state) : deposits
+            : state.winner === null ? deposits : actors.map((_, index) => index === state.winner ? pot : 0);
+          for (const [index, actor] of actors.entries()) await transfer(actor, message.id, amounts[index], "paid");
         }
       });
     }
-    const started = gameOf(state) === "gwent" ? "playing" : "opening";
-    await saveTable(message, { ...state, issue: "", phase: state.phase === "funding" ? started : state.reason === "cancelled" ? "cancelled" : "finished" });
+    const started = gameOf(state) === "poker" ? "opening" : "playing";
+    await saveTable(message, await snakeTick({ ...state, issue: "", phase: state.phase === "funding" ? started : state.reason === "cancelled" ? "cancelled" : "finished" }));
   } catch (error) {
     if (activeGM()) await saveTable(message, { ...state, issue: error.message });
     throw error;
@@ -174,20 +231,66 @@ let jobs = Promise.resolve();
 export function pokerWrite(work) {
   const job = jobs.catch(() => {}).then(work); jobs = job; return job;
 }
+const seatedElsewhere = userId => pokerTables().some(message => !pokerClosed(pokerState(message)) && pokerState(message).seats.some(seat => seat.userId === userId && !seat.npc));
 async function challenge(request, user, data) {
   const existing = pokerTables().find(message => pokerState(message).invitation === request.id);
   if (existing) return existing;
-  const opponent = game.users.get(data.opponentId), stake = wagerAmount(data.stake);
-  if (!opponent?.active || opponent.id === user.id) throw new Error("Выберите другого подключённого игрока или мастера.");
-  if (pokerTables().some(message => !pokerClosed(pokerState(message)) && pokerState(message).seats.some(seat => seat.userId === user.id || seat.userId === opponent.id))) throw new Error("Один из участников уже за столом. Завершите или отмените его партию.");
-  const actor = actorFor(data.actorUuid, user, stake > 0 || Boolean(data.deckId)), gwent = data.game === "gwent";
-  if (actor && balance(actor) < stake) throw new Error("Не хватает крон для ставки.");
-  const open = data.open !== false;
-  const state = { version: 1, invitation: request.id, phase: "invited", stake, tieMode: "faces", issue: "", hands: [[], []], winner: null, reason: "", processed: [request.id],
-    seats: [participant(user, actor, gwent ? deckFor(actor, data) : null), participant(opponent, null, gwent ? deckFor(null, {}) : null)], created: Date.now(), open,
-    ...(gwent ? { game: "gwent", ...gwentStart() } : {}) };
+  const stake = wagerAmount(data.stake), kind = ["gwent", "hoard"].includes(data.game) ? data.game : "poker", gwent = kind === "gwent";
+  // GMs run any number of tables and NPC seats; a player sits at one table at a time.
+  if (!user.isGM && seatedElsewhere(user.id)) throw new Error("Вы уже за столом. Завершите или отмените свою партию.");
+  const own = user.isGM && data.actorUuid ? npcActor(data.actorUuid) : actorFor(data.actorUuid, user, stake > 0 || Boolean(data.deckId));
+  if (own && stake && balance(own) < stake) throw new Error("Не хватает крон для ставки.");
+  const open = data.open !== false, host = participant(user, own, { npc: Boolean(user.isGM && own), ...(gwent ? { deck: deckFor(own, data) } : {}), ...(kind === "hoard" ? hoardSeat() : {}) });
+  const base = { version: 1, invitation: request.id, stake, tieMode: "faces", issue: "", hands: [[], []], winner: null, reason: "", processed: [request.id], created: Date.now(), open };
+  let state;
+  if (kind === "hoard") state = { ...base, game: "hoard", phase: "gathering", seats: [host], pot: 0, round: 0, snake: null, log: [], ...hoardCoins(stake) };
+  else if (String(data.opponentId).startsWith("actor:")) {
+    // Against an NPC the GM plays both sides of the table, so there is nobody to invite.
+    if (!user.isGM) throw new Error("Сажать НПС за стол может только мастер.");
+    const npc = npcActor(data.opponentId.slice(6));
+    if (npc.uuid === own?.uuid) throw new Error("За столом должны быть разные персонажи.");
+    if (stake && balance(npc) < stake) throw new Error(`У ${npc.name} не хватает крон для ставки.`);
+    state = { ...base, phase: "funding", seats: [host, participant(user, npc, { npc: true, ...(gwent ? { deck: deckFor(null, {}) } : {}) })], ...(gwent ? { game: "gwent", ...gwentStart() } : {}) };
+  } else {
+    const opponent = game.users.get(data.opponentId);
+    if (!opponent?.active || opponent.id === user.id) throw new Error("Выберите другого подключённого игрока или мастера.");
+    if (!opponent.isGM && seatedElsewhere(opponent.id)) throw new Error("Соперник уже за другим столом.");
+    state = { ...base, phase: "invited", seats: [host, participant(opponent, null, gwent ? { deck: deckFor(null, {}) } : {})], ...(gwent ? { game: "gwent", ...gwentStart() } : {}) };
+  }
+  const opponent = kind === "hoard" ? null : game.users.get(state.seats[1].userId);
   // The table holds no secrets (dice are public, swaps live in private receipts), so an open game is a public card anyone can watch.
-  return documentClass().create({ ...messageSource({ pokerTable: state }), whisper: open ? [] : [...new Set([user.id, opponent.id, ...gmIds()])], content: pokerCard(state) });
+  return documentClass().create({ ...messageSource({ pokerTable: state }), whisper: open ? [] : [...new Set([user.id, ...(opponent ? [opponent.id] : []), ...gmIds()])], content: pokerCard(state) });
+}
+/** Table-level hoard moves: anyone may join until the host starts; the GM adds NPCs and may remove seats. */
+function hoardTable(state, user, command) {
+  const data = command.data ?? {}, host = controlsSeat(state.seats[0], user) || user.isGM;
+  if (gameOf(state) !== "hoard" || state.phase !== "gathering") throw new Error("Набор за этот стол уже закрыт.");
+  const seats = [...state.seats];
+  const seatActor = actor => { if (actor && seats.some(seat => seat.actorUuid === actor.uuid)) throw new Error("Этот персонаж уже за столом."); return actor; };
+  if (command.action === "join" || command.action === "addNpc") {
+    if (seats.length >= HOARD_MAX) throw new Error(`За корзиной помещаются не больше ${HOARD_MAX} игроков.`);
+    if (command.action === "addNpc") {
+      if (!user.isGM) throw new Error("Добавлять НПС может только мастер.");
+      const actor = seatActor(npcActor(data.actorUuid));
+      if (state.stake && balance(actor) < state.stake) throw new Error(`У ${actor.name} не хватает крон для ставки.`);
+      seats.push(participant(user, actor, { npc: true, ...hoardSeat() }));
+    } else {
+      if (seats.some(seat => seat.userId === user.id && !seat.npc)) throw new Error("Вы уже за этим столом.");
+      if (!user.isGM && seatedElsewhere(user.id)) throw new Error("Вы уже за другим столом.");
+      const actor = seatActor(actorFor(data.actorUuid, user, state.stake > 0));
+      if (actor && balance(actor) < state.stake) throw new Error("Не хватает крон для ставки.");
+      seats.push(participant(user, actor, hoardSeat()));
+    }
+    return { ...state, seats };
+  }
+  if (!host) throw new Error("Это решает хозяин стола или мастер.");
+  if (command.action === "kick") {
+    const index = Number(data.seat);
+    if (!Number.isInteger(index) || index < 1 || index >= seats.length) throw new Error("Такого места нет.");
+    seats.splice(index, 1); return { ...state, seats };
+  }
+  if (seats.length < HOARD_MIN) throw new Error(`Нужно хотя бы ${HOARD_MIN} игрока.`);
+  return { ...state, phase: "funding", round: 1, pot: state.per * seats.length };
 }
 /** Requests are native ChatMessages: the server records their author. Only GM-authored receipts are trusted. */
 export async function processPokerRequest(request, creatorId) {
@@ -199,7 +302,10 @@ export async function processPokerRequest(request, creatorId) {
   let receipt = prior;
   try {
     let table;
-    if (command.action === "challenge") table = await challenge(request, user, command.data ?? {});
+    if (command.action === "challenge") {
+      table = await challenge(request, user, command.data ?? {});
+      if (pokerState(table)?.phase === "funding") await recoverPokerBank(table);
+    }
     else {
       table = game.messages.get(command.tableId);
       if (!gmDocument(table) || !pokerState(table)) throw new Error("Стол больше недоступен.");
@@ -216,10 +322,13 @@ export async function processPokerRequest(request, creatorId) {
         if (command.action === "abort" || command.action === "recover") {
           if (!user.isGM || pokerClosed(state)) throw new Error("Это действие доступно ведущему для незавершённой партии.");
           if (command.action === "abort" && state.phase === "settling") throw new Error("Результат уже зафиксирован. Завершите расчёт банка; изменить победителя нельзя.");
-          if (command.action === "abort") state = { ...state, phase: state.phase === "invited" ? "cancelled" : "settling", winner: null, reason: "cancelled" };
+          if (command.action === "abort") state = { ...state, phase: ["invited", "gathering"].includes(state.phase) ? "cancelled" : "settling", winner: null, reason: "cancelled" };
           else if (!["funding", "settling"].includes(state.phase)) throw new Error("Расчёт банка не требуется.");
-        } else {
-          const index = requirePokerAction(state, user.id, command.action, command.revision), seat = state.seats[index], data = command.data ?? {};
+        } else if (["join", "addNpc", "kick", "start"].includes(command.action)) state = hoardTable(state, user, command);
+        else {
+          const index = requirePokerAction(state, user, command.action, command.revision, command.seat), seat = state.seats[index], data = command.data ?? {};
+          // Receipts belong to the seat, so an NPC's private dice stay readable by whichever GM plays it.
+          const owner = game.users.get(seat.userId) ?? user;
           if (command.action === "accept") {
             const actor = actorFor(data.actorUuid, user, state.stake > 0 || Boolean(data.deckId));
             if (actor && actor.uuid === state.seats[0].actorUuid) throw new Error("За столом должны быть разные персонажи.");
@@ -227,12 +336,22 @@ export async function processPokerRequest(request, creatorId) {
             state.seats[index] = participant(user, actor, gameOf(state) === "gwent" ? deckFor(actor, data) : null); state.phase = "funding";
           } else if (["decline", "cancel"].includes(command.action)) state.phase = command.action === "decline" ? "declined" : "cancelled";
           else if (command.action === "concede") { state.phase = "settling"; state.winner = 1 - index; state.reason = "conceded"; }
-          else if (command.action === "play") {
+          else if (command.action === "leave") {
+            if (state.phase === "gathering") state = { ...state, seats: state.seats.filter((_, i) => i !== index) };
+            else state = await snakeTick(leaveHoard(state, index));
+          } else if (command.action === "reach") {
+            let play = pokerReceipt(receipt)?.play;
+            if (!play) {
+              play = await reachHoard(state, index);
+              receipt = await createReceipt(request, owner, { tableId: table.id, kind: "reach", play });
+            }
+            state = await snakeTick(applyReach(state, index, play));
+          } else if (command.action === "play") {
             // The receipt keeps the drawn card and roll, so a retry after a failed save never redraws.
             let play = pokerReceipt(receipt)?.play;
             if (!play) {
               play = await playGwent(state, index, data);
-              receipt = await createReceipt(request, user, { tableId: table.id, kind: "play", play });
+              receipt = await createReceipt(request, owner, { tableId: table.id, kind: "play", play });
             }
             state.rounds[state.round - 1].plays[index] = play;
             state = settleGwentRound(state);
@@ -245,7 +364,7 @@ export async function processPokerRequest(request, creatorId) {
                 const indices = rerollIndices(data.indices), rolled = await rollDice(indices.length);
                 dice = [...state.hands[index]]; indices.forEach((position, i) => dice[position] = rolled[i]);
               } else {
-                dice = [...seatReceipt(seat.draw, table.id, user.id, "reroll").dice];
+                dice = [...seatReceipt(seat.draw, table.id, seat.userId, "reroll").dice];
                 if (data.cheat) {
                   const { index: position, value } = data.cheat;
                   rerollIndices([position]); if (!Number.isInteger(value) || value < 1 || value > 6) throw new Error("На кости может быть от 1 до 6.");
@@ -258,7 +377,7 @@ export async function processPokerRequest(request, creatorId) {
                 }
               }
               pokerHand(dice);
-              receipt = await createReceipt(request, user, { tableId: table.id, kind, dice, ...(cheat ? { cheat } : {}), ...(kind === "reroll" ? { indices: rerollIndices(data.indices) } : {}) });
+              receipt = await createReceipt(request, owner, { tableId: table.id, kind, dice, ...(cheat ? { cheat } : {}), ...(kind === "reroll" ? { indices: rerollIndices(data.indices) } : {}) });
             }
             if (kind === "roll") {
               seat.opening = receipt.id; state.hands[index] = [...pokerReceipt(receipt).dice];
@@ -274,7 +393,7 @@ export async function processPokerRequest(request, creatorId) {
               if (state.seats.every(row => row.final)) state = revealTable(state, table);
             }
           }
-          state.seats[index].revision++;
+          if (state.seats[index] && command.action !== "leave") state.seats[index].revision++;
         }
         state.processed.push(request.id);
         await saveTable(table, state);
@@ -293,13 +412,13 @@ export async function processPokerRequest(request, creatorId) {
   }
 }
 const sending = new Map();
-export function sendPoker(action, table = null, data = {}) {
+export function sendPoker(action, table = null, data = {}, seat = null) {
   const key = table?.id ?? "challenge";
   if (sending.has(key)) return sending.get(key);
   const work = (async () => {
     if (!game.users.activeGM) throw new Error("Для синхронизации стола нужен подключённый мастер.");
-    const row = pokerState(table)?.seats.find(seat => seat.userId === game.user.id);
-    const request = await documentClass().create({ ...messageSource({ pokerRequest: { action, tableId: table?.id ?? "", revision: row?.revision ?? 0, data } }),
+    const seats = pokerState(table)?.seats ?? [], index = Number.isInteger(seat) ? seat : seats.findIndex(row => row.userId === game.user.id);
+    const request = await documentClass().create({ ...messageSource({ pokerRequest: { action, tableId: table?.id ?? "", revision: seats[index]?.revision ?? 0, ...(index >= 0 ? { seat: index } : {}), data } }),
       whisper: [...new Set([game.user.id, ...gmIds()])], content: "<p>Действие за столом покера.</p>" });
     if (!request) throw new Error("Не удалось отправить ход.");
     if (activeGM()) await pokerWrite(() => processPokerRequest(request, game.user.id));

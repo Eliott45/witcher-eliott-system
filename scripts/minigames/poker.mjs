@@ -25,7 +25,7 @@ export const pokerActions = {
   }
 };
 export function registerPoker() {
-  game.system.api = { ...game.system.api, poker: tavernApi("poker"), gwent: tavernApi("gwent") };
+  game.system.api = { ...game.system.api, poker: tavernApi("poker"), gwent: tavernApi("gwent"), hoard: tavernApi("hoard") };
   const report = error => { console.error("Dice poker", error); ui.notifications.warn(error.message); };
   Hooks.on("getSceneControlButtons", controls => {
     const tokens = controls.tokens ?? controls.token;

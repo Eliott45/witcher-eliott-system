@@ -210,3 +210,75 @@
 .poker-rules .gwent-table li small { grid-column:3/5; color:#b8ad96; font-size:11.5px; }
 .witcher-poker-card.is-gwent { background:radial-gradient(ellipse at top,#3a4a5e,#141b25); }
 @media (max-width:560px) { .gwent-row { grid-template-columns:auto 1fr; } .gwent-total { grid-column:1/-1; justify-self:center; } }
+
+/* Seats a GM plays at once */
+.seat-picker { display:flex; flex-wrap:wrap; align-items:center; gap:6px; font-size:12px; color:var(--poker-muted); }
+.witcher-poker-window .seat-picker button { min-height:30px; padding:3px 10px 3px 4px; border-radius:999px; font-size:12px; background:#2a211a; }
+.witcher-poker-window .seat-picker button img { width:22px; height:22px; border-radius:50%; object-fit:cover; object-position:top; border:1px solid #c9a15e; }
+.witcher-poker-window .seat-picker button.is-selected { color:#2a1a08; background:linear-gradient(#f0d28c,#c89a45); border-color:#f6dc9b; }
+.witcher-poker-window .seat-picker button.needs-move i { color:#ff8a6a; }
+.witcher-poker-window .seat-picker button.is-selected.needs-move i { color:#7a1d10; }
+.hoard-lobby-note { grid-column:2; align-self:end; margin:0; font-size:12.5px; line-height:1.45; color:var(--poker-muted); }
+.hoard-lobby-note i { color:var(--poker-gold); margin-right:4px; }
+
+/* Dragon's hoard: a rug, a wicker basket and an angry snake */
+.hoard-felt { position:relative; display:flex; flex-direction:column; gap:8px; padding:16px; border-radius:22px; border:2px solid #8f3b23;
+  background:radial-gradient(circle at 50% 38%,#7a2f1f 0,#4d1a12 42%,#260c08 100%); box-shadow:inset 0 0 0 6px #2a0f0a,inset 0 0 0 7px #c58a3e88,inset 0 0 50px #000b,0 10px 30px #000a; }
+.hoard-felt::before { content:""; position:absolute; inset:14px; border-radius:14px; pointer-events:none; opacity:.35;
+  background:repeating-linear-gradient(45deg,transparent 0 14px,#e0a95522 14px 15px),repeating-linear-gradient(-45deg,transparent 0 14px,#e0a95522 14px 15px); }
+.hoard-ring { position:relative; display:grid; grid-template-columns:1fr 190px 1fr; grid-template-areas:"s0 basket s1" "s2 basket s3"; gap:10px; align-items:center; }
+.hoard-seat.pos-0 { grid-area:s0; } .hoard-seat.pos-1 { grid-area:s1; } .hoard-seat.pos-2 { grid-area:s2; } .hoard-seat.pos-3 { grid-area:s3; }
+.hoard-seat { position:relative; display:grid; grid-template-columns:auto 1fr; gap:4px 9px; align-items:center; min-height:82px; padding:9px 10px; border-radius:12px;
+  background:#1c0b07cc; border:1px solid #c58a3e55; box-shadow:0 4px 12px #0008; transition:transform .2s,box-shadow .2s; }
+.hoard-seat .poker-portrait { width:40px; height:40px; grid-row:span 2; }
+.hoard-seat-name { min-width:0; }
+.hoard-seat-name strong { display:block; font:700 14px/1.2 Georgia,serif; color:#fbe7c6; overflow-wrap:anywhere; }
+.hoard-seat-name small { display:block; font-size:11px; color:#d9b9a0; }
+.hoard-loot { display:flex; flex-wrap:wrap; align-items:center; gap:6px; font:700 14px Georgia,serif; color:#ffd772; }
+.hoard-bites { color:#ff9c86; font-size:12px; }
+.hoard-doped { color:#e7a0ff; font-size:12px; }
+.hoard-payout { grid-column:1/-1; padding:3px 8px; border-radius:999px; background:#f3cf7a; color:#2a1a08; font-size:12px; font-weight:700; text-align:center; }
+.hoard-seat.is-mine { border-color:#ffd772; box-shadow:0 0 0 2px #ffd77255,0 0 18px #ffb34a55; }
+.hoard-seat.is-out { opacity:.5; filter:grayscale(.6); }
+.hoard-seat.is-caught { border-color:#ff6b5a; }
+.hoard-seat.is-empty { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; background:transparent; border:1px dashed #c58a3e55; box-shadow:none; color:#c58a3e99; font-size:11.5px; }
+.hoard-seat.is-empty i { font-size:18px; }
+.witcher-poker-window .hoard-kick { position:absolute; top:-8px; right:-8px; width:24px; min-width:24px; height:24px; min-height:24px; padding:0; border-radius:50%; font-size:11px; background:#5a1d14; border-color:#ff9c86; }
+.hoard-basket { grid-area:basket; position:relative; justify-self:center; width:180px; height:180px; }
+.hoard-wicker { position:absolute; inset:28px; border-radius:50%; border:5px solid #6b4220;
+  background:repeating-linear-gradient(0deg,#a8763c 0 6px,#7c5128 6px 8px),#8a5a2c; background-blend-mode:multiply;
+  box-shadow:inset 0 0 0 6px #5a3618,inset 0 0 24px #000c,0 8px 18px #000c; }
+.hoard-wicker::after { content:""; position:absolute; inset:16px; border-radius:50%; background:radial-gradient(circle,#140805,#2a140a 70%); box-shadow:inset 0 6px 12px #000; }
+.hoard-snake-svg { position:absolute; left:34px; top:6px; width:112px; height:104px; z-index:2; transform-origin:30% 95%; transition:transform .4s; filter:drop-shadow(0 4px 4px #000a); }
+.hoard-snake-body { fill:none; stroke:#4f7a2c; stroke-width:12; stroke-linecap:round; }
+.hoard-snake-scales { fill:none; stroke:#2c4a18; stroke-width:12; stroke-linecap:round; stroke-dasharray:3 7; opacity:.75; }
+.hoard-snake-head { fill:#5d8c33; stroke:#2c4a18; stroke-width:1.5; }
+.hoard-snake-eye { fill:#ffd23a; }
+.hoard-snake-tongue { fill:none; stroke:#d63b2f; stroke-width:1.6; stroke-linecap:round; opacity:0; }
+.hoard-basket.is-alert .hoard-snake-svg { animation:hoard-sway 2.6s ease-in-out infinite; }
+.hoard-basket.is-alert .hoard-snake-tongue { animation:hoard-tongue 1.3s steps(2) infinite; }
+@keyframes hoard-sway { 0%,100% { transform:rotate(-4deg); } 50% { transform:rotate(5deg) translateY(-3px); } }
+@keyframes hoard-tongue { 0% { opacity:0; } 50% { opacity:1; } }
+.hoard-coins { position:absolute; inset:0; }
+.hoard-coin { position:absolute; left:calc(50% - 9px); top:calc(50% - 9px); width:18px; height:18px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff2b8,#e0b14a 55%,#9a6c1e); border:1px solid #fff0b0; box-shadow:0 2px 3px #000a;
+  transform:rotate(calc(var(--i) * 30deg)) translateY(-82px); }
+.hoard-pot { position:absolute; left:50%; bottom:-6px; z-index:3; transform:translateX(-50%); padding:3px 12px; border-radius:999px; text-align:center; white-space:nowrap;
+  background:#1c0b07ee; border:1px solid #e0b14a; box-shadow:0 3px 8px #000a; }
+.hoard-pot strong { display:block; font:700 15px Georgia,serif; color:#ffd772; }
+.hoard-pot small { font-size:10px; color:#d9b9a0; }
+.hoard-snake-roll { position:absolute; right:-14px; top:4px; z-index:3; display:grid; place-items:center; width:52px; height:52px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#a6e07a,#4f7a2c 60%,#24390f); border:2px solid #d8f5b5; color:#0f1a06; box-shadow:0 0 16px #8fd35a88; animation:poker-result-in .4s ease-out both; }
+.hoard-snake-roll small { font-size:9px; text-transform:uppercase; letter-spacing:.08em; line-height:1; margin-top:6px; }
+.hoard-snake-roll b { font:700 20px Georgia,serif; line-height:1; margin-bottom:6px; }
+.hoard-log { margin:0; padding:8px 10px; list-style:none; display:flex; flex-direction:column; gap:4px; max-height:150px; overflow-y:auto; border-radius:10px; background:#00000045; font-size:12px; line-height:1.4; }
+.hoard-log li { color:#ead6c3; }
+.hoard-log li:first-child { animation:poker-result-in .35s ease-out both; }
+.hoard-log li i { width:16px; text-align:center; }
+.hoard-log .is-grab i { color:#ffd772; } .hoard-log .is-bite { color:#ffb3a6; } .hoard-log .is-bite i { color:#ff6b5a; } .hoard-log .is-dodge i { color:#a6e07a; }
+.hoard-log .is-caught { color:#e7a0ff; } .hoard-log .is-left i { color:#b9c3cf; }
+.hoard-join { display:flex; align-items:flex-end; justify-content:center; gap:8px; width:min(100%,440px); }
+.hoard-join .poker-inline-field { flex:1; }
+.witcher-poker-card.is-hoard { background:radial-gradient(ellipse at top,#7a2f1f,#260c08); border-color:#c58a3e; }
+@media (max-width:560px) { .hoard-ring { grid-template-columns:1fr 1fr; grid-template-areas:"basket basket" "s0 s1" "s2 s3"; } }
+@media (prefers-reduced-motion:reduce) { .hoard-basket.is-alert :is(.hoard-snake-svg,.hoard-snake-tongue) { animation:none; } }

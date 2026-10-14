@@ -1,5 +1,7 @@
 import { SYSTEM_ID } from "../config.mjs";
-import { POKER_HANDS, LOADED_DICE_DC, TAVERN_GAMES, gameOf, pokerHand, pokerScoring, pokerSeat, pokerClosed } from "./poker-rules.mjs";
+import { POKER_HANDS, LOADED_DICE_DC, TAVERN_GAMES, gameOf, pokerHand, pokerScoring, pokerClosed, controlledSeats } from "./poker-rules.mjs";
+import { hoardView } from "./hoard-view.mjs";
+import { SNAKE_BITE } from "./hoard-rules.mjs";
 import { pokerState, pokerTables, ownedPokerActors, seatReceipt, sendPoker, gwentDecks } from "./poker-service.mjs";
 import { gwentRules, gwentSkills, gwentSeat, gwentRoundLine } from "./gwent-view.mjs";
 
@@ -25,14 +27,15 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
     window: { title: "Развлечения в таверне", icon: "fa-solid fa-beer-mug-empty", resizable: false }, actions: {
       game: PokerWindow.#game, challenge: PokerWindow.#challenge, stake: PokerWindow.#stake, accept: PokerWindow.#accept, decline: PokerWindow.#decline, cancel: PokerWindow.#cancel,
       roll: PokerWindow.#roll, die: PokerWindow.#die, reroll: PokerWindow.#reroll, palmValue: PokerWindow.#palmValue, palm: PokerWindow.#palm, fair: PokerWindow.#fair,
-      skill: PokerWindow.#skill, play: PokerWindow.#play,
+      skill: PokerWindow.#skill, play: PokerWindow.#play, seat: PokerWindow.#seat, join: PokerWindow.#join, addNpc: PokerWindow.#addNpc, kick: PokerWindow.#kick,
+      start: PokerWindow.#start, reach: PokerWindow.#reach, leave: PokerWindow.#leave,
       concede: PokerWindow.#concede, abort: PokerWindow.#abort, recover: PokerWindow.#recover, lobby: PokerWindow.#lobby, openTable: PokerWindow.#open, rematch: PokerWindow.#rematch
     } };
   static PARTS = { content: { template: `systems/${SYSTEM_ID}/templates/poker-table.hbs` } };
   constructor(tableId = "", { actorUuid = "", game: kind = "poker" } = {}) {
     super(); this.tableId = tableId; this.selected = new Set(); this.busy = false; this.notice = ""; this.opponentId = ""; this.stake = 0; this.open = true; this.rulesOpen = false;
     this.actorUuid = actorUuid || game.user.character?.uuid || ""; this.palm = { index: -1, value: 0 };
-    this.game = TAVERN_GAMES[kind] ? kind : "poker"; this.deckId = ""; this.fakes = false; this.skill = "";
+    this.game = TAVERN_GAMES[kind] ? kind : "poker"; this.deckId = ""; this.fakes = false; this.skill = ""; this.seatIndex = -1; this.npcUuid = "";
     this.hooks = ["createChatMessage", "updateChatMessage", "deleteChatMessage", "updateUser", "updateActor"].map(event => [event, Hooks.on(event, () => { if (!this.busy) this.render(); })]);
   }
   get table() { return game.messages.get(this.tableId); }
@@ -46,21 +49,34 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
       forgeries: chosen?.forgeries.count ?? 0, forgeryDc: chosen?.forgeries.dc ?? 0, fakes: Boolean(this.fakes && chosen?.forgeries.count) };
   }
   async _prepareContext() {
-    const state = pokerState(this.table), me = state ? pokerSeat(state, game.user.id) : -1, own = state?.seats[me], user = game.user;
-    const closed = pokerClosed(state), stake = Number(state?.stake ?? this.stake) || 0, palm = this.palm ?? { index: -1, value: 0 };
-    const kind = state ? gameOf(state) : this.game ?? "poker", gwent = kind === "gwent";
+    const state = pokerState(this.table), user = game.user, kind = state ? gameOf(state) : this.game ?? "poker", gwent = kind === "gwent", hoard = kind === "hoard";
+    // A GM may play several seats (NPCs); the window follows whichever of them has a move to make.
+    const controlled = controlledSeats(state, user), needs = index => {
+      const seat = state.seats[index];
+      return { invited: index === 1, gathering: index === 0, opening: !seat.opening, drawing: !seat.draw, palming: Boolean(seat.palm) && !seat.final,
+        playing: gwent ? !state.rounds?.[state.round - 1]?.plays[index] : hoard ? seat.active && !seat.acted && Boolean(state.snake) : false }[state.phase] ?? false;
+    };
+    let me = controlled.includes(this.seatIndex) ? this.seatIndex : -1;
+    if (me < 0 || (!needs(me) && controlled.some(needs))) me = controlled.find(needs) ?? controlled[0] ?? -1;
+    if (this.seatIndex >= 0 && me !== this.seatIndex) { this.selected = new Set(); this.palm = { index: -1, value: 0 }; this.skill = ""; }
+    this.seatIndex = me;
+    const own = state?.seats[me], closed = pokerClosed(state), stake = Number(state?.stake ?? this.stake) || 0, palm = this.palm ?? { index: -1, value: 0 };
     const actors = ownedPokerActors(user).map(actor => ({ uuid: actor.uuid, name: actor.name, crowns: actor.system.crowns, selected: actor.uuid === this.actorUuid }));
     const view = { table: Boolean(state), lobby: !state, busy: this.busy, notice: this.notice || state?.issue || "", rulesOpen: this.rulesOpen, hasGM: Boolean(game.users.activeGM),
-      game: kind, gameName: TAVERN_GAMES[kind].name, gameIcon: TAVERN_GAMES[kind].icon, isGwent: gwent, isPoker: !gwent,
+      game: kind, gameName: TAVERN_GAMES[kind].name, gameIcon: TAVERN_GAMES[kind].icon, isGwent: gwent, isHoard: hoard, isPoker: kind === "poker", isGM: user.isGM,
       games: Object.entries(TAVERN_GAMES).map(([id, entry]) => ({ id, ...entry, selected: id === kind })),
       actors, stake, pot: stake * 2, stakes: STAKES.map(value => ({ value, label: value ? `${value} кр.` : "Без ставок", selected: value === stake })),
       opponents: game.users.filter(other => other.active && other.id !== user.id).map(other => ({ id: other.id, name: other.name, isGM: other.isGM, selected: other.id === this.opponentId })),
+      // GMs may seat any character or NPC of the world and play it themselves.
+      npcs: user.isGM ? game.actors.filter(actor => ["character", "npc"].includes(actor.type) && !state?.seats.some(seat => seat.actorUuid === actor.uuid))
+        .map(actor => ({ id: `actor:${actor.uuid}`, uuid: actor.uuid, name: actor.name, selected: `actor:${actor.uuid}` === this.opponentId || actor.uuid === this.npcUuid })) : [],
+      seatPicker: [], hoard: null, canStart: false, canJoin: false, canAddNpc: false, canReach: false, canLeave: false,
       openGame: this.open !== false, deck: { decks: [], forgeries: 0, forgeryDc: 0, fakes: false },
       // Own tables plus every unfinished game this user may watch (public cards reach every client).
       recent: pokerTables().filter(message => pokerState(message).seats.some(seat => seat.userId === user.id) || !pokerClosed(pokerState(message)) || user.isGM).slice(-8).reverse().map(message => {
         const table = pokerState(message), seated = table.seats.some(seat => seat.userId === user.id);
-        return { id: message.id, icon: TAVERN_GAMES[gameOf(table)].icon, names: table.seats.map(seat => seat.name).join(" против "), stake: table.stake, open: !pokerClosed(table), watch: !seated && !pokerClosed(table),
-          status: { finished: table.winner === null ? "Ничья" : `Победил ${table.seats[table.winner].name}`, cancelled: "Отменена", declined: "Вызов отклонён" }[table.phase] ?? "Идёт игра" };
+        return { id: message.id, icon: TAVERN_GAMES[gameOf(table)].icon, names: table.seats.map(seat => seat.name).join(gameOf(table) === "hoard" ? ", " : " против "), stake: table.stake, open: !pokerClosed(table), watch: !seated && !pokerClosed(table),
+          status: { finished: gameOf(table) === "hoard" ? "Клад разобран" : table.winner === null ? "Ничья" : `Победил ${table.seats[table.winner].name}`, cancelled: "Отменена", declined: "Вызов отклонён", gathering: "Набор игроков" }[table.phase] ?? "Идёт игра" };
       }),
       combinations: POKER_HANDS.map((name, rank) => ({ name, example: EXAMPLES[rank].map(value => faces[value]).join("") })).reverse(), gwentRules,
       dc: LOADED_DICE_DC, spectator: false, top: null, bottom: null, phase: state?.phase ?? "", stage: "", instruction: "", result: null, roundLine: "",
@@ -69,6 +85,8 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
     if (gwent && (!state || (state.phase === "invited" && me === 1))) view.deck = this.deckChoices();
     if (!state) return view;
     const phase = state.phase, opponent = state.seats[1 - me], spectator = me < 0;
+    if (controlled.length > 1) view.seatPicker = controlled.map(index => ({ index, name: state.seats[index].name, img: portrait(state.seats[index]), selected: index === me, needs: needs(index) && !closed }));
+    if (hoard) return this.hoardContext(view, state, me, { spectator, closed, stake, user });
     const palming = phase === "palming" && Boolean(own?.palm) && !own.final;
     Object.assign(view, { spectator,
       canAccept: phase === "invited" && me === 1, canCancel: phase === "invited" && me === 0,
@@ -103,7 +121,7 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
       if (revealed) swapped = state.swaps?.[index] ?? -1;
       else if (mine) {
         const id = seat.final || seat.draw || seat.opening;
-        const receipt = id ? seatReceipt(id, this.tableId, user.id, ["roll", "reroll", "finish"]) : null;
+        const receipt = id ? seatReceipt(id, this.tableId, seat.userId, ["roll", "reroll", "finish"]) : null;
         dice = receipt?.dice ?? []; swapped = receipt?.cheat?.index ?? -1;
       }
       const combination = dice?.length === 5 ? pokerHand(dice) : null;
@@ -146,6 +164,25 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
                         : phase === "palming" || phase === "settling" ? "Подводим итог…" : "";
     return view;
   }
+  hoardContext(view, state, me, { spectator, closed, stake, user }) {
+    const phase = state.phase, host = state.seats[0]?.name ?? "Хозяин";
+    Object.assign(view, hoardView(state, user, me, { portrait, online: seat => Boolean(game.users.get(seat.userId)?.active) }), { spectator,
+      canCancel: phase === "gathering" && me === 0, canAbort: user.isGM && !closed && phase !== "settling", canRecover: user.isGM && ["funding", "settling"].includes(phase),
+      canRematch: closed && me >= 0, pot: state.pot ?? 0, stage: { gathering: "Набор игроков", funding: "Монеты на стол", playing: `Раунд ${state.round}`, settling: "Подсчёт добычи" }[phase] ?? "Итог игры" });
+    view.waiting = me >= 0 && !closed && !view.canStart && !view.canReach && phase !== "gathering";
+    view.instruction = phase === "gathering" ? view.canStart ? `Игроков: ${state.seats.length} из 4. Когда все сели — начинайте.` : view.canJoin ? "Садитесь к корзине: нужно от 2 до 4 игроков." : `${host} собирает игроков вокруг корзины.`
+      : phase === "funding" ? "Монеты раскладываются вокруг корзины…"
+        : phase === "playing" ? view.canReach ? `Змея настороже: ${state.snake.total}. Ловкость рук должна быть выше — иначе Уклонение против укуса (база ${SNAKE_BITE}). Можно и забрать добычу, пока цел.`
+          : spectator ? "Игроки по очереди тянутся к корзине." : "Ждём остальных — потом змея снова насторожится."
+          : phase === "settling" ? "Подсчёт добычи…" : "";
+    if (closed) {
+      const empty = (state.pot ?? 0) <= 0;
+      view.result = { title: phase === "cancelled" ? "Игра отменена" : empty ? "Клад разобран!" : "Игра окончена",
+        detail: phase === "cancelled" ? "" : view.hoard.leader ? `Больше всех унёс ${view.hoard.leader}.` : "Никто не ушёл вперёд.",
+        bank: phase === "cancelled" ? stake ? "Ставки возвращены владельцам." : "" : `${empty ? "" : "Оставшиеся монеты делятся поровну. "}${stake ? "Каждый забирает свою добычу в кошелёк." : ""}`, win: false, lose: false };
+    }
+    return view;
+  }
   async _onRender(context, options) {
     await super._onRender(context, options);
     const title = this.element.querySelector(".window-title");
@@ -168,12 +205,13 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
     this.element.querySelector('[name="deckId"]')?.addEventListener("change", event => { this.deckId = event.target.value; this.render(); });
     this.element.querySelector('[name="fakes"]')?.addEventListener("change", event => { this.fakes = event.target.checked; });
     this.element.querySelector('[name="open"]')?.addEventListener("change", event => { this.open = event.target.checked; });
+    this.element.querySelector('[name="npcUuid"]')?.addEventListener("change", event => { this.npcUuid = event.target.value; });
     this.element.querySelector(".poker-rules")?.addEventListener("toggle", event => { this.rulesOpen = event.target.open; });
   }
   async run(action, data = {}) {
     if (this.busy) return;
     this.busy = true; this.notice = ""; await this.render();
-    try { const table = await sendPoker(action, action === "challenge" ? null : this.table, data); this.tableId = table.id; this.reset(); }
+    try { const table = await sendPoker(action, action === "challenge" ? null : this.table, data, this.seatIndex >= 0 ? this.seatIndex : null); this.tableId = table.id; this.reset(); }
     catch (error) { this.notice = error.message; }
     finally { this.busy = false; if (!this.dismissed) await this.render(); }
   }
@@ -183,7 +221,7 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
   static #challenge() {
     const field = name => this.element.querySelector(`[name="${name}"]`)?.value ?? "";
     Object.assign(this, { actorUuid: field("actorUuid"), opponentId: field("opponentId"), stake: field("stake"), open: this.element.querySelector('[name="open"]')?.checked ?? true });
-    if (!this.opponentId) { this.notice = "Выберите, кого позвать за стол."; return this.render(); }
+    if (!this.opponentId && this.game !== "hoard") { this.notice = "Выберите, кого позвать за стол."; return this.render(); }
     return this.run("challenge", { game: this.game, actorUuid: this.actorUuid, opponentId: this.opponentId, stake: this.stake, open: this.open, ...this.deckData() });
   }
   static #stake(_event, target) { this.stake = Number(target.dataset.value); this.actorUuid = this.element.querySelector('[name="actorUuid"]')?.value ?? this.actorUuid; this.opponentId = this.element.querySelector('[name="opponentId"]')?.value ?? this.opponentId; return this.render(); }
@@ -195,10 +233,28 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
   static #decline() { return this.run("decline"); }
   static #cancel() { return this.run("cancel"); }
   static #roll() { return this.run("roll"); }
+  static #seat(_event, target) { this.seatIndex = Number(target.dataset.seat); this.reset(); return this.render(); }
+  static #join() { this.actorUuid = this.element.querySelector('[name="actorUuid"]')?.value ?? ""; return this.run("join", { actorUuid: this.actorUuid }); }
+  static #addNpc() {
+    this.npcUuid = this.element.querySelector('[name="npcUuid"]')?.value ?? "";
+    if (!this.npcUuid) { this.notice = "Выберите персонажа или НПС."; return this.render(); }
+    return this.run("addNpc", { actorUuid: this.npcUuid });
+  }
+  static #kick(_event, target) { return this.run("kick", { seat: Number(target.dataset.seat) }); }
+  static #start() { return this.run("start"); }
+  static #reach() { return this.run("reach"); }
+  static async #leave() {
+    const state = pokerState(this.table);
+    if (state?.phase === "playing") {
+      const yes = await foundry.applications.api.DialogV2.confirm({ window: { title: "Отойти от корзины?" }, content: "<p>Вы сохраните уже добытые монеты, но больше не будете тянуться к корзине.</p>", yes: { label: "Забрать добычу" }, no: { label: "Остаться" }, rejectClose: false });
+      if (!yes) return;
+    }
+    return this.run("leave");
+  }
   static #die(_event, target) {
     const index = Number(target.dataset.index);
     if (this.busy) return;
-    const state = pokerState(this.table), own = state?.seats[pokerSeat(state, game.user.id)];
+    const state = pokerState(this.table), own = state?.seats[this.seatIndex];
     if (state?.phase === "palming" && own?.palm && !own.final) this.palm.index = this.palm.index === index ? -1 : index;
     else if (this.selected.has(index)) this.selected.delete(index); else this.selected.add(index);
     return this.render();
@@ -221,8 +277,9 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
   static #lobby() { this.game = gameOf(pokerState(this.table) ?? { game: this.game }); this.tableId = ""; this.reset(); return this.render(); }
   static #open(_event, target) { this.tableId = target.dataset.table; this.reset(); return this.render(); }
   static #rematch() {
-    const state = pokerState(this.table), index = pokerSeat(state, game.user.id);
-    Object.assign(this, { game: gameOf(state), actorUuid: state.seats[index].actorUuid, opponentId: state.seats[1 - index].userId, stake: state.stake, open: state.open !== false, tableId: "" });
+    const state = pokerState(this.table), index = this.seatIndex, other = state.seats[1 - index];
+    Object.assign(this, { game: gameOf(state), actorUuid: state.seats[index].actorUuid, opponentId: gameOf(state) === "hoard" || !other ? "" : other.npc ? `actor:${other.actorUuid}` : other.userId,
+      stake: state.stake, open: state.open !== false, tableId: "" });
     this.reset(); return this.render();
   }
 }
