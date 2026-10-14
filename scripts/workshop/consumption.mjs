@@ -157,7 +157,7 @@ async function restoreOrdinaryStamina(actor,item) {
   } finally { display.close(); }
 }
 
-const beneficial = new Set(["clotting", "numbing", "sterilizing", "succubus-breath", "pantagran", "smelling-salts", "wives-tears"]);
+const beneficial = new Set(["devils-musk", "clotting", "numbing", "sterilizing", "succubus-breath", "pantagran", "smelling-salts", "wives-tears"]);
 async function usageDialog(item) {
   const actor = item.actor, context = consumableContext(item);
   if (!actor?.isOwner || !context.canUse) throw new Error("Нет доступных порций при себе.");

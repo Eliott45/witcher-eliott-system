@@ -33,6 +33,17 @@
     "flags": {}
   },
   {
+    "_id": "gearTavern000001",
+    "name": "Развлечения в таверне",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
     "_id": "gearWitcherDLC01",
     "name": "Снаряжение ведьмака",
     "type": "Item",

@@ -287,3 +287,82 @@
 .hoard-snake-roll.is-crit { box-shadow:0 0 0 3px #ffd77288,0 0 22px #ffd772; }
 .witcher-poker-window .poker-end-all { align-self:center; font-size:12px; min-height:30px; color:#ffd2c8; background:#4f1f17; border-color:#b8483a; }
 .witcher-poker-window .poker-end-all:not(:disabled):hover { background:#6e2820; border-color:#ff9c86; }
+
+/* Seven games in the lobby */
+.tavern-games { grid-template-columns:repeat(4,1fr); }
+.witcher-poker-window .tavern-game { min-height:40px; font-size:12.5px; padding:6px 8px; }
+.witcher-poker-window .tavern-game i { font-size:15px; }
+.tavern-bet-field { max-width:120px; }
+.tavern-meter { position:relative; height:14px; margin-top:4px; border-radius:999px; background:#00000059; overflow:hidden; }
+.tavern-meter > span { position:absolute; inset:0 auto 0 0; background:linear-gradient(90deg,#4f8a5b,#8fd35a); transition:width .4s; }
+.tavern-meter.is-health > span { background:linear-gradient(90deg,#8f2a22,#e05a48); }
+.tavern-meter > i { position:absolute; top:0; bottom:0; width:2px; background:#ffd772; box-shadow:0 0 4px #ffd772; }
+.tavern-meter small { position:relative; display:block; padding:0 8px; font-size:9.5px; line-height:14px; color:#fff; text-shadow:0 1px 2px #000; }
+
+/* Arm wrestling: two rivals and a lean meter between them */
+.arm-felt { background:radial-gradient(ellipse at 50% 45%,#6b4a2a 0,#4a3019 50%,#24170c 100%); }
+.arm-seat { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:4px 12px; padding:10px; border-radius:14px; }
+.arm-seat.is-mine { background:#ffffff0a; }
+.arm-seat .poker-portrait { width:46px; height:46px; }
+.arm-total { display:grid; place-items:center; width:54px; height:54px; border-radius:50%; font:700 22px Georgia,serif; color:#2a1a08; background:radial-gradient(circle at 35% 30%,#fff3cf,#d9ab52 60%,#9a6c25); border:3px solid #f8e3ae; }
+.arm-total.is-faded { opacity:.45; }
+.arm-seat > small { grid-column:2 / -1; }
+.arm-trick { color:#e7a0ff; }
+.arm-arena { display:flex; flex-direction:column; align-items:center; gap:8px; padding:6px 0; }
+.arm-track { position:relative; width:min(100%,360px); height:26px; border-radius:999px; background:linear-gradient(90deg,#7c2a22,#3b2a1c 30%,#3b2a1c 70%,#2c6a3f); border:2px solid #c9a15e; box-shadow:inset 0 2px 6px #000a; }
+.arm-pin { position:absolute; top:-4px; bottom:-4px; width:4px; background:#ffd772; }
+.arm-pin.is-top { left:6%; } .arm-pin.is-bottom { right:6%; }
+.arm-mark { position:absolute; top:50%; left:50%; display:grid; place-items:center; width:34px; height:34px; margin:-17px 0 0 -17px; border-radius:50%; background:#f6ead0; color:#3b2418; border:2px solid #fff; box-shadow:0 2px 8px #000a; transition:left .5s cubic-bezier(.3,1.4,.5,1); }
+.arm-mark.lean--2 { left:8%; } .arm-mark.lean--1 { left:29%; } .arm-mark.lean-1 { left:71%; } .arm-mark.lean-2 { left:92%; }
+
+/* Drinking contest */
+.drink-felt { background:radial-gradient(ellipse at 50% 40%,#6b4a1f 0,#46301a 50%,#22160b 100%); }
+.drink-dc { align-self:center; padding:4px 14px; border-radius:999px; background:#00000059; border:1px solid #e0b14a88; color:#ffd772; font:700 14px Georgia,serif; }
+.drink-seats { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:8px; }
+.drink-seat { position:relative; display:grid; grid-template-columns:auto 1fr; gap:4px 8px; align-items:center; padding:8px 10px; border-radius:12px; background:#1c120acc; border:1px solid #c58a3e55; }
+.drink-seat.is-mine { border-color:#ffd772; }
+.drink-seat.is-tipsy { animation:drink-sway 3s ease-in-out infinite; }
+.drink-seat.is-out { opacity:.5; filter:grayscale(.6); }
+.drink-seat.is-winner { border-color:#ffd772; box-shadow:0 0 18px #f3cf7a66; }
+@keyframes drink-sway { 0%,100% { transform:rotate(-1deg); } 50% { transform:rotate(1.2deg) translateX(2px); } }
+.drink-mugs { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:3px; color:#ffd772; font-size:13px; min-height:16px; }
+.drink-oil { grid-column:1/-1; color:#e7a0ff; font-size:11px; }
+.witcher-poker-window .drink-surprise { position:absolute; top:-8px; right:-8px; width:26px; min-width:26px; height:26px; min-height:26px; padding:0; border-radius:50%; font-size:11px; background:#5a3a14; border-color:#ffd772; }
+.hoard-log .is-good i { color:#a6e07a; } .hoard-log .is-bad { color:#ffb3a6; } .hoard-log .is-bad i { color:#ff6b5a; }
+
+/* Five finger fillet */
+.fillet-felt { background:radial-gradient(ellipse at 50% 40%,#5e4a3a 0,#3a2c22 50%,#1c140f 100%); }
+.fillet-performer { display:grid; grid-template-columns:auto 1fr; gap:8px 12px; align-items:center; }
+.fillet-hand { grid-column:1/-1; justify-self:center; width:min(100%,300px); height:auto; overflow:visible; }
+.fillet-palm,.fillet-fingers rect { fill:#e3b98f; stroke:#8a5a3a; stroke-width:2; }
+.fillet-knife path { fill:#d6dde6; stroke:#7d8894; stroke-width:1.5; } .fillet-knife rect { fill:#5a3618; }
+.fillet-knife { animation:fillet-stab 1.2s ease-in-out infinite; transform-origin:98px 0; }
+@keyframes fillet-stab { 0%,100% { transform:translate(0,-6px); } 20% { transform:translate(-34px,6px); } 40% { transform:translate(-34px,-6px); } 60% { transform:translate(34px,6px); } 80% { transform:translate(68px,-4px); } }
+.fillet-performer.is-cut .fillet-fingers rect:nth-child(3) { fill:#c0392b; }
+.fillet-performer.is-cut .fillet-knife { animation:none; }
+.fillet-stages { grid-column:1/-1; display:flex; justify-content:center; gap:8px; }
+.fillet-stages span { display:flex; flex-direction:column; align-items:center; min-width:58px; padding:4px 8px; border-radius:10px; background:#00000040; border:1px solid #ffffff22; color:#c9b9a6; }
+.fillet-stages span.is-current { border-color:#ffd772; color:#ffd772; }
+.fillet-stages span.is-done { background:#2c6a3f88; color:#d8f5b5; }
+.fillet-stages b { font:700 16px Georgia,serif; }
+.fillet-bank { display:flex; justify-content:center; align-items:baseline; gap:10px; color:#ffd772; }
+.fillet-bettors { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:4px; }
+.fillet-bettors li { position:relative; display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:center; padding:4px 10px; border-radius:10px; background:#00000040; }
+.fillet-bettors li.is-mine { border:1px solid #ffd772; }
+.fillet-bettors img { width:26px; height:26px; border-radius:50%; object-fit:cover; object-position:top; }
+.fillet-bettors b { color:#ffd772; }
+
+/* Fistfight */
+.brawl-felt { background:radial-gradient(circle at 50% 45%,#5a5a4a 0,#3a3a30 45%,#1c1c16 100%); }
+.brawl-ring { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; }
+.brawl-fighter { position:relative; display:grid; grid-template-columns:auto 1fr; gap:4px 10px; align-items:center; padding:10px; border-radius:12px; background:#14140fcc; border:1px solid #c9a15e55; }
+.brawl-fighter .tavern-meter { grid-column:1/-1; }
+.brawl-fighter.is-mine { border-color:#ffd772; }
+.brawl-fighter.is-out { opacity:.5; filter:grayscale(.7); }
+.brawl-fighter.is-winner { border-color:#ffd772; box-shadow:0 0 18px #f3cf7a88; }
+.brawl-warning { grid-column:1/-1; color:#ffb36b; font-size:11px; }
+.brawl-hidden { grid-column:1/-1; color:#e7a0ff; font-size:11px; }
+.witcher-poker-window .brawl-award { position:absolute; top:-8px; right:-8px; width:26px; min-width:26px; height:26px; min-height:26px; padding:0; border-radius:50%; font-size:11px; background:#5a4514; border-color:#ffd772; color:#ffd772; }
+.witcher-poker-window .poker-buttons .is-shady { color:#fbe9e3; background:linear-gradient(#8f3a30,#5e211b); border-color:#c7695a; }
+@media (max-width:560px) { .tavern-games { grid-template-columns:repeat(2,1fr); } }
+@media (prefers-reduced-motion:reduce) { .drink-seat.is-tipsy,.fillet-knife { animation:none; } }

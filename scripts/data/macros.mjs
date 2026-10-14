@@ -14,6 +14,9 @@ export const MACRO_SOURCES = [{
   _id:"createCharactr01",name:"Создание персонажа",type:"script",scope:"global",img:"icons/svg/mystery-man.svg",
   command:"await game.system.api.createCharacter();",ownership:{default:2},flags:{}
 },{
+  _id:"tavernGames00001",name:"Развлечения в таверне",type:"script",scope:"global",img:"systems/witcher-eliott-system/assets/icons/tavern.svg",
+  command:"await game.system.api.tavern({ actor: canvas.tokens?.controlled[0]?.actor ?? game.user.character });",ownership:{default:2},flags:{}
+},{
   _id:"dicePokerTable01",name:"Покер на костях",type:"script",scope:"global",img:"systems/witcher-eliott-system/assets/icons/tavern-dice.svg",
   command:"await game.system.api.poker({ actor: canvas.tokens?.controlled[0]?.actor ?? game.user.character });",ownership:{default:2},flags:{}
 },{

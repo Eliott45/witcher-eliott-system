@@ -62,7 +62,9 @@ export const CONDITION_DEFINITIONS = [
   // Core p.167, dimeritium table: lasts while the contact does; a later half-hour check replaces it.
   entry("dimeritium-spasms", "Двимерит: спазмы", "daze", "Кожа чешется, подташнивает, тело периодически скручивают спазмы. Каждые 1d6 ходов в начале хода — проверка Стойкости СЛ 15, при провале персонаж ошеломлён. Длится, пока персонаж касается двимерита.", { dimeritium: { kind: "spasms", every: "1d6" } }),
   entry("dimeritium-agony", "Двимерит: жжение", "fire-shield", "Кожа словно в огне, персонаж едва может сосредоточиться: в начале каждого хода — испытание Устойчивости, при провале он дезориентирован. Длится, пока персонаж касается двимерита.", { dimeritium: { kind: "stun" } }),
-  entry("dimeritium-burn", "Двимерит возжигает магию", "explosion", "Двимерит возжигает магию в теле: в начале каждого хода персонаж получает 1d6 урона, пока касается двимерита. Броня этот урон не поглощает.", { dimeritium: { kind: "damage", formula: "1d6" } })
+  entry("dimeritium-burn", "Двимерит возжигает магию", "explosion", "Двимерит возжигает магию в теле: в начале каждого хода персонаж получает 1d6 урона, пока касается двимерита. Броня этот урон не поглощает.", { dimeritium: { kind: "damage", formula: "1d6" } }),
+  // «Развлечения в таверне»: five minutes of strength, then the body pays (nausea is added when the effect ends).
+  entry("devils-musk", "Дьявольский мускус", "upgrade", "+3 к Силе на 5 минут. Когда действие закончится, наступает тошнота.", {seconds:300,modifiers:[{target:"skills.physique",value:3}],thenStatus:"nauseated"})
 ];
 export const CONDITION_BY_ID = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,entry]));
 // Variants share the status ID: poison/drunkenness cannot stack with themselves.
@@ -72,7 +74,7 @@ export const EFFECT_TEMPLATES = [...CONDITION_DEFINITIONS.map((entry,i)=>({...en
   {...CONDITION_BY_ID.intoxicated,key:"perfume",name:"Ароматное зелье: опьянение",documentId:"efct000000000103",description:"После провала первоначальной Стойкости СЛ 16: опьянение на 1d10 часов. −2 РЕА, ЛВК и ИНТ; −3 в словесной дуэли. Снять можно магией или Слезами жён, повторного спасброска нет. Токсичность 25%. Стр. 88.",rules:{...CONDITION_BY_ID.intoxicated.rules,secondsFormula:"1d10 * 3600"}},
   {...CONDITION_BY_ID.bleeding,key:"burrowing",name:"Ввинчивающийся наконечник",documentId:"efct000000000104",description:"Кровотечение от эльфского наконечника: 2 урона за ход. Для прекращения нужно извлечь наконечник: Первая помощь СЛ 16. В бою урон наносится автоматически в начале хода. Стр. 84.",rules:{save:skillSave("firstAid",16),autoSave:true}}
 ];
-export const ALCHEMY_EFFECT_KEYS = {clotting:["clotting"],hallucinogen:["hallucinogen"],numbing:["numbing"],sterilizing:["sterilizing"],"succubus-breath":["succubus-skin","succubus-drink"],adhesive:["adhesive"],"black-venom":["black-venom"],chloroform:["chloroform"],"quick-fire":["quick-fire"],fisstech:["fisstech"],pantagran:["pantagran"],perfume:["perfume"],"talgar-tears":["frozen"],"zerrikanian-fire":["burning"]};
+export const ALCHEMY_EFFECT_KEYS = {"devils-musk":["devils-musk"],clotting:["clotting"],hallucinogen:["hallucinogen"],numbing:["numbing"],sterilizing:["sterilizing"],"succubus-breath":["succubus-skin","succubus-drink"],adhesive:["adhesive"],"black-venom":["black-venom"],chloroform:["chloroform"],"quick-fire":["quick-fire"],fisstech:["fisstech"],pantagran:["pantagran"],perfume:["perfume"],"talgar-tears":["frozen"],"zerrikanian-fire":["burning"]};
 export const effectUuid = key => `Compendium.${SYSTEM_ID}.effects.ActiveEffect.${EFFECT_TEMPLATES.find(entry=>entry.key===key).documentId}`;
 export function conditionSource(entry, localize = text=>text) {
   const name=localize(entry.name), description=stripPageReferences(localize(entry.description));

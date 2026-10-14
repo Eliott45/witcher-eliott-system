@@ -1606,6 +1606,44 @@
     }
   },
   {
+    "_id": "efct000000000046",
+    "name": "Дьявольский мускус",
+    "img": "icons/svg/upgrade.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>+3 к Силе на 5 минут. Когда действие закончится, наступает тошнота.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "devils-musk"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "devils-musk",
+          "seconds": 300,
+          "modifiers": [
+            {
+              "target": "skills.physique",
+              "value": 3
+            }
+          ],
+          "thenStatus": "nauseated"
+        }
+      }
+    }
+  },
+  {
     "_id": "efct000000000101",
     "name": "Чёрный яд",
     "img": "icons/svg/poison.svg",

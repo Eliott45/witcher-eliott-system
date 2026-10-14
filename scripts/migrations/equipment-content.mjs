@@ -1,4 +1,5 @@
 import { PROSTHETIC_EQUIPMENT } from "../data/prosthetic-equipment.mjs";
+import { TAVERN_EQUIPMENT, TAVERN_RECIPES } from "../data/tavern-equipment.mjs";
 import { prostheticContentUpdate } from "./prosthetic-content.mjs";
 import { CORE_TRANSPORT, CORE_TACK } from "../data/core-transport.mjs";
 import { WITCHER_SPECIAL_EQUIPMENT } from "../data/witcher-special-equipment.mjs";
@@ -30,7 +31,8 @@ import { radolfPotionContentUpdate } from "./radolf-potion-content.mjs";
 import { PEASANT_WEAPONS } from "../data/peasant-equipment.mjs";
 import { MANTICORE_EQUIPMENT } from "../data/manticore-school.mjs";
 import { SCHOOL_GEAR, SCHOOL_MATERIALS } from "../data/witcher-school-gear.mjs";
-export const EQUIPMENT_CONTENT_VERSION = 36;
+// 37: tavern games — Devil's Musk with its formula, the Hidden Weight with its diagram.
+export const EQUIPMENT_CONTENT_VERSION = 37;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {
@@ -56,7 +58,7 @@ export async function migrateEquipmentContent() {
   const index = await pack.getIndex({ fields: ["system.ruleId"] });
   const existing = new Set(Array.from(index.values(), entry => entry.system?.ruleId));
   const diagrams = RECIPES.filter(entry => entry.system.recipe.category === "diagram");
-  const additions = [...PROSTHETIC_EQUIPMENT, ...SCHOOL_GEAR, ...SCHOOL_MATERIALS, ...MANTICORE_EQUIPMENT, ...PEASANT_WEAPONS, ...RADOLF_UPGRADES, ...RADOLF_POTIONS, ...RADOLF_RECIPES, ...RADOLF_EQUIPMENT, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS, ...WITCHER_SPECIAL_EQUIPMENT, ...diagrams, ...PURE_SUBSTANCES, ...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES];
+  const additions = [...PROSTHETIC_EQUIPMENT, ...TAVERN_EQUIPMENT, ...TAVERN_RECIPES, ...SCHOOL_GEAR, ...SCHOOL_MATERIALS, ...MANTICORE_EQUIPMENT, ...PEASANT_WEAPONS, ...RADOLF_UPGRADES, ...RADOLF_POTIONS, ...RADOLF_RECIPES, ...RADOLF_EQUIPMENT, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS, ...WITCHER_SPECIAL_EQUIPMENT, ...diagrams, ...PURE_SUBSTANCES, ...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES];
   const missing = [...new Map(additions.map(entry => [entry.id, entry])).values()].filter(entry => !existing.has(entry.id));
   const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry =>
     specialRuleIds.has(entry.system?.ruleId) || RADOLF_POTIONS.some(potion => potion.id === entry.system?.ruleId) || TOOL_RULES[entry.system?.ruleId] || GENERAL_GEAR_RULES[entry.system?.ruleId] || entry.system?.ruleId === "dimeritium-ring" || /^(material|substance|ammunition|alchemy|potion|oil|decoction|mutagen|formula|diagram|bomb|trap|rune|glyph)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));

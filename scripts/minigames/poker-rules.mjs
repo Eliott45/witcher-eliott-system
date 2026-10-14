@@ -4,7 +4,11 @@ export const POKER_HANDS = ["Без комбинации", "Пара", "Две �
 /** «Шулерские кости»: one die may be changed after seeing every die; spotting it is Awareness DC 16. */
 export const LOADED_DICE_DC = 16;
 /** Gaming gear that can start a game straight from the inventory. */
-export const TAVERN_GAMES = { poker: { name: "Покер на костях", icon: "fa-dice" }, gwent: { name: "Гвинт", icon: "fa-layer-group" }, hoard: { name: "Драконий клад", icon: "fa-staff-snake" } };
+export const TAVERN_GAMES = { poker: { name: "Покер на костях", icon: "fa-dice" }, gwent: { name: "Гвинт", icon: "fa-layer-group" }, hoard: { name: "Драконий клад", icon: "fa-staff-snake" },
+  arm: { name: "Борьба на руках", icon: "fa-hand-fist" }, drink: { name: "Соревнование по выпивке", icon: "fa-beer-mug-empty" }, fillet: { name: "Филе из пяти пальцев", icon: "fa-hand" },
+  brawl: { name: "Кулачный бой", icon: "fa-hand-back-fist" } };
+/** Duels invite one opponent; the other games gather a table that anyone may join before the host starts. */
+export const GATHERING_GAMES = ["hoard", "drink", "fillet", "brawl"];
 export const POKER_ITEMS = { "gear.dice-poker-board": "poker", "gear.loaded-dice": "poker", "gear.gwent-deck": "gwent" };
 export const gameOf = state => TAVERN_GAMES[state?.game] ? state.game : "poker";
 export function pokerItemContext(item) {
@@ -50,7 +54,8 @@ export const pokerSeat = (state, userId) => state.seats.findIndex(seat => seat.u
 /** A seat is played by its user; NPC seats are played by any GM, so one GM can run several NPCs at once. */
 export const controlsSeat = (seat, user) => Boolean(seat && user) && (seat.userId === user.id || Boolean(seat.npc && user.isGM));
 export const controlledSeats = (state, user) => state?.seats.flatMap((seat, index) => controlsSeat(seat, user) ? [index] : []) ?? [];
-const GAME_ACTIONS = { poker: ["roll", "reroll", "finish", "concede"], gwent: ["play", "concede"], hoard: ["reach", "leave"] };
+const GAME_ACTIONS = { poker: ["roll", "reroll", "finish", "concede"], gwent: ["play", "concede"], hoard: ["reach", "leave"], arm: ["press", "concede"],
+  drink: ["drink", "leave"], fillet: ["stab", "stop", "speed", "resume", "bet", "leave"], brawl: ["yield", "leave"] };
 export function requirePokerAction(state, user, action, revision, seatIndex) {
   if (typeof user === "string") user = { id: user, isGM: false };
   if (!state || state.version !== 1) throw new Error("Этот стол недоступен.");
@@ -69,9 +74,16 @@ export function requirePokerAction(state, user, action, revision, seatIndex) {
             // Only a player carrying loaded dice gets the extra moment before the reveal.
             : action === "finish" ? state.phase === "palming" && Boolean(row.palm) && !row.final
               : action === "play" ? state.phase === "playing" && !state.rounds?.[state.round - 1]?.plays[seat]
-                : action === "concede" ? ["opening", "drawing", "palming", "playing"].includes(state.phase)
+                : action === "concede" ? ["opening", "drawing", "palming", "playing"].includes(state.phase) && ["poker", "gwent", "arm"].includes(kind)
                   : action === "reach" ? state.phase === "playing" && row.active && !row.acted && Boolean(state.snake)
-                    : action === "leave" ? state.phase === "gathering" && seat > 0 || state.phase === "playing" && row.active : false;
+                    : action === "leave" ? state.phase === "gathering" && seat > 0 || state.phase === "playing" && row.active && ["hoard", "drink"].includes(kind)
+                      : action === "press" ? state.phase === "playing" && !state.rounds?.[state.round - 1]?.plays[seat]
+                        : action === "drink" ? state.phase === "playing" && row.active && !row.acted
+                          : action === "stab" ? state.phase === "playing" && seat === 0
+                            : ["stop", "speed"].includes(action) ? state.phase === "decide" && seat === 0 && (action === "stop" || state.stage < 3)
+                              : action === "resume" ? state.phase === "betting" && seat === 0
+                                : action === "bet" ? ["gathering", "betting"].includes(state.phase) && seat > 0
+                                  : action === "yield" ? state.phase === "fighting" && row.active : false;
   if (!allowed) throw new Error("Сейчас это действие недоступно.");
   return seat;
 }

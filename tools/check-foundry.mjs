@@ -2168,6 +2168,43 @@ const manualEditingPreviews={};
     hoardState.phase='finished';hoardState.pot=0;game.user=first;const loot=await PokerWindow.prototype._prepareContext.call(hoardApp);
     assert.equal(loot.result.title,'Клад разобран!');assert.equal(loot.hoard.seats[0].payout,'5 монет');assert.equal(loot.hoard.leader,'Игрок <1>');
     game.user=gm;const npcLobby=await PokerWindow.prototype._prepareContext.call({...app,tableId:'',table:null,game:'poker',seatIndex:-1});assert.ok(npcLobby.npcs.length>0);assert.ok(npcLobby.openTables>0);const npcLobbyHtml=pokerTemplate(npcLobby);assert.ok(npcLobbyHtml.includes('НПС — играете вы'));assert.ok(npcLobbyHtml.includes('завершить все игры'));
+    // Arm wrestling, drinking, fillet and fistfight: every phase renders for a player, a GM running NPCs and a spectator.
+    const baseSeat=(user,name,extra={})=>({userId:user.id,name,actorUuid:'',npc:false,revision:0,opening:'',draw:'',rerolled:[],palm:'',final:'',...extra});
+    const gameTable=(id,state)=>{const message={id,author:gm,flags:{[game.system.id]:{pokerTable:{version:1,stake:5,tieMode:'faces',issue:'',hands:[[],[]],winner:null,reason:'',processed:[],open:true,log:[],...state}}}};game.messages.push(message);return message;};
+    const views={
+      arm:gameTable('armTable00000001',{game:'arm',phase:'playing',round:2,streak:{seat:0,count:1},rounds:[{plays:[{total:17,faces:[10,2],trick:{caught:false,bonus:5}},{total:12,faces:[3]}],winner:0},{plays:[null,null],winner:null}],
+        seats:[baseSeat(first,'Игрок <1>',{actorUuid:game.actors[0].uuid}),baseSeat(gm,'Кузнец',{npc:true})]}),
+      drink:gameTable('drinkTable000001',{game:'drink',phase:'playing',round:3,log:[{round:2,seat:0,portion:true,dc:12,checks:[{dc:12,total:9,faces:[1,3],success:false}]},{round:2,seat:1,portion:true,dc:12,deferred:{dc:12},checks:[]}],
+        seats:[baseSeat(first,'Игрок <1>',{fails:1,active:true,acted:false,out:false,outRound:0,drinks:2,oil:0,pending:[]}),baseSeat(gm,'Пьяница',{npc:true,fails:0,active:true,acted:true,out:false,outRound:0,drinks:3,oil:2,pending:[{dc:12}]}),baseSeat(gm,'Трезвенник',{npc:true,fails:2,active:false,acted:true,out:true,outRound:2,drinks:2,oil:0,pending:[]})]}),
+      fillet:gameTable('filletTable00001',{game:'fillet',phase:'decide',stage:2,stake:0,limitBase:12,limitFaces:[10,2],log:[{stage:1,dc:12,total:14,faces:[5],success:true},{stage:2,dc:15,total:16,faces:[6],success:true}],
+        seats:[baseSeat(first,'Игрок <1>',{bets:[0,0,0]}),baseSeat(second,'Игрок <2>',{bets:[10,5,0]}),baseSeat(gm,'Купец',{npc:true,bets:[2,0,0]})]}),
+      brawl:gameTable('brawlTable000001',{game:'brawl',phase:'fighting',combat:'',log:[{seat:2,out:'yield'}],
+        seats:[baseSeat(first,'Игрок <1>',{actorUuid:game.actors[0].uuid,active:true,out:'',caught:false}),baseSeat(gm,'Громила',{npc:true,active:true,out:'',caught:false}),baseSeat(gm,'Задира',{npc:true,active:false,out:'yield',caught:false})]})
+    };
+    const phases={arm:['invited','funding','playing','settling','finished','declined','cancelled'],drink:['gathering','funding','playing','settling','finished','cancelled'],
+      fillet:['gathering','funding','playing','decide','betting','settling','finished','cancelled'],brawl:['gathering','funding','fighting','settling','finished','cancelled']};
+    for(const [kind,message] of Object.entries(views)){
+      const state=message.flags[game.system.id].pokerTable,tableApp={...app,tableId:message.id,table:message,game:kind,seatIndex:-1,npcUuid:'',gameContext:PokerWindow.prototype.gameContext,hoardContext:PokerWindow.prototype.hoardContext};
+      for(const user of [first,gm,guest]) for(const phase of phases[kind]){
+        game.user=user;state.phase=phase;Object.assign(state,phase==='finished'?{winner:0,winners:[0],reason:kind==='fillet'?'collected':'showdown'}:{winner:null,winners:undefined,reason:''});
+        const context=await PokerWindow.prototype._prepareContext.call(tableApp);assert.equal(context.game,kind);
+        const html=pokerTemplate(context);assert.ok(!html.includes('undefined'),`${kind} ${phase}`);assert.ok(!html.includes('[object Object]'),`${kind} ${phase}`);
+        assert.equal(new foundry.documents.BaseChatMessage({content:pokerCard(state),flags:message.flags,author:gm.id}).validationFailures.fields,null);
+      }
+    }
+    game.user=first;views.arm.flags[game.system.id].pokerTable.phase='playing';
+    const armSeat=await PokerWindow.prototype._prepareContext.call({...app,tableId:'armTable00000001',table:views.arm,game:'arm',seatIndex:-1,gameContext:PokerWindow.prototype.gameContext});
+    assert.equal(armSeat.canPress,true);assert.equal(armSeat.arm.lean,1);assert.ok(pokerTemplate(armSeat).includes('Давить!'));
+    game.user=gm;views.drink.flags[game.system.id].pokerTable.phase='playing';
+    const tavernMaster=await PokerWindow.prototype._prepareContext.call({...app,tableId:'drinkTable000001',table:views.drink,game:'drink',seatIndex:-1,gameContext:PokerWindow.prototype.gameContext});
+    assert.equal(tavernMaster.drink.seats[1].oil,2,'The GM sees the oil');assert.deepEqual(tavernMaster.drink.seats.map(seat=>seat.canSurprise),[true,true,false]);
+    game.user=guest;const drinkGuest=await PokerWindow.prototype._prepareContext.call({...app,tableId:'drinkTable000001',table:views.drink,game:'drink',seatIndex:-1,gameContext:PokerWindow.prototype.gameContext});
+    assert.equal(drinkGuest.drink.seats[1].oil,0,'Spectators do not see the oil');
+    game.user=first;views.fillet.flags[game.system.id].pokerTable.phase='decide';
+    const performer=await PokerWindow.prototype._prepareContext.call({...app,tableId:'filletTable00001',table:views.fillet,game:'fillet',seatIndex:-1,gameContext:PokerWindow.prototype.gameContext});
+    assert.equal(performer.canDecide,true);assert.equal(performer.fillet.total,17);assert.equal(performer.fillet.limit,24);assert.ok(pokerTemplate(performer).includes('Ускориться'));
+    const tavernLobby=await PokerWindow.prototype._prepareContext.call({...app,tableId:'',table:null,game:'fillet',seatIndex:-1});
+    assert.equal(tavernLobby.games.length,7);const tavernLobbyHtml=pokerTemplate(tavernLobby);assert.ok(tavernLobbyHtml.includes('Открыть стол'));assert.ok(!tavernLobbyHtml.includes('Ставка с каждого'));
   } finally {Object.assign(game,saved);}
-  console.log('Dice poker: native wallets and private chat cards, all window phases, open rerolls, loaded-dice swaps, spectators, gwent and dragon hoard tables, NPC seats render correctly');
+  console.log('Dice poker: native wallets and private chat cards, all window phases, open rerolls, loaded-dice swaps, spectators, gwent, dragon hoard, arm wrestling, drinking, fillet and fistfight tables, NPC seats render correctly');
 }

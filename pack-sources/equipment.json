@@ -805,6 +805,72 @@
     "flags": {}
   },
   {
+    "_id": "tvrnItem00000001",
+    "name": "Дьявольский мускус",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "alchemy.devils-musk",
+      "source": "Развлечения в таверне",
+      "kind": "alchemy",
+      "weight": 0.3,
+      "rarity": "rare",
+      "alchemy": {
+        "category": "substance"
+      },
+      "properties": "+3 к Силе на 5 минут; затем тошнота",
+      "description": "<p>Печально известный анаболический состав. Одна доза на 5 минут увеличивает Силу на +3, но по окончании действия вызывает тошноту. Закончить состязание лучше раньше, чем побочные эффекты станут заметны проницательным глазам.</p><p>Используйте дозу из инвентаря: эффект и последующая тошнота применяются автоматически.</p>"
+    },
+    "effects": [],
+    "folder": "gearTavern000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "tvrnItem00000002",
+    "name": "Скрытый вес",
+    "type": "weapon",
+    "img": "icons/svg/sword.svg",
+    "system": {
+      "ruleId": "weapon.hidden-weight",
+      "skill": "brawling",
+      "damageType": "Д",
+      "accuracy": 0,
+      "rarity": "common",
+      "damage": "1d6",
+      "reliability": {
+        "value": 5,
+        "max": 5
+      },
+      "hands": 1,
+      "range": 0,
+      "rangeBodyMultiplier": 0,
+      "concealment": "small",
+      "enhancementSlots": 0,
+      "weight": 0.5,
+      "price": 120,
+      "properties": "Незаметное (Внимание СЛ 18); Рукопашное: прибавляется к урону без оружия",
+      "category": "melee",
+      "encumbrance": 0,
+      "source": "Развлечения в таверне",
+      "description": "<p>Груз, зажатый в ладони, добавляет удару вес и поддерживает костяшки пальцев. Запрещён в кулачном бою — заметить его можно проверкой Внимания СЛ 18.</p><p>В «Кулачном бое» таверны каждый соперник один раз скрыто проверяет Внимание против экипированного груза.</p>"
+    },
+    "effects": [],
+    "folder": "gearTavern000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "mantShield000001",
     "name": "Щит школы Мантикоры",
     "type": "weapon",
@@ -29218,6 +29284,101 @@
     },
     "effects": [],
     "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "tvrnRecp00000001",
+    "name": "Формула: Дьявольский мускус",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "formula.devils-musk",
+      "source": "Развлечения в таверне",
+      "price": 0,
+      "recipe": {
+        "category": "formula",
+        "grade": "journeyman",
+        "dc": 15,
+        "time": 3600,
+        "quantity": 1,
+        "tools": [
+          "gear.alchemy-tools"
+        ],
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.tvrnItem00000001",
+        "components": [
+          {
+            "substance": "rebis",
+            "quantity": 3,
+            "uuid": ""
+          },
+          {
+            "substance": "sol",
+            "quantity": 1,
+            "uuid": ""
+          }
+        ]
+      },
+      "description": "<p>Алхимическая формула с пропорциями, порядком смешивания и временем выдержки. По ней готовят «Дьявольский мускус».</p>"
+    },
+    "effects": [],
+    "folder": "gearTavern000001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {
+      "witcher-eliott-system": {
+        "priceUnavailable": true
+      }
+    }
+  },
+  {
+    "_id": "tvrnRecp00000002",
+    "name": "Чертёж: Скрытый вес",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.weapon.hidden-weight",
+      "source": "Развлечения в таверне",
+      "price": 120,
+      "recipe": {
+        "category": "diagram",
+        "grade": "novice",
+        "dc": 13,
+        "time": 2700,
+        "investment": 60,
+        "quantity": 1,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "forge": true,
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.tvrnItem00000002",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000011",
+            "quantity": 1,
+            "substance": ""
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Скрытый вес».</p>"
+    },
+    "effects": [],
+    "folder": "gearTavern000001",
     "sort": 0,
     "ownership": {
       "default": 2

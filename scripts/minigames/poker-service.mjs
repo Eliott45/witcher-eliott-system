@@ -1,12 +1,13 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { inventoryWrite } from "../data/inventory-writes.mjs";
-import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { isCarried } from "../data/containers.mjs";
-import { skillValue } from "../data/skills.mjs";
 import { setStatus, hasStatus } from "../combat/status-effects.mjs";
 import { pokerClosed, requirePokerAction, rerollIndices, revealPoker, wagerAmount, pokerHand, gameOf, controlsSeat, LOADED_DICE_DC } from "./poker-rules.mjs";
 import { HOARD_MAX, HOARD_MIN, SNAKE_AWARENESS, SNAKE_BITE, DOPING_BONUS, DOPING_DC, DOPING_STATUSES, hoardCoins, hoardSeat, applyReach, leaveHoard, hoardPayouts, hoardLeader } from "./hoard-rules.mjs";
 import { tavernCheck, critText } from "./tavern-dice.mjs";
+import { gmIds, documentClass, messageSource, actorOf, skillTotal, crit, esc } from "./tavern-common.mjs";
+import { armStart, settleArmRound, drinkSeat, applyDrink, DRINK_MAX, filletSeat, placeBet, filletDeposits, filletPayouts, filletLimit, filletDC, FILLET_MAX_STAGE, betsTotal, brawlSeat, knockOut, BRAWL_MAX } from "./tavern-games.mjs";
+import { armPress, drinkTurn, filletOdds, filletStab, brawlStart, brawlKnockouts } from "./tavern-actions.mjs";
 import { GWENT_SKILLS, drawGwentCard, gwentDeckBonus, gwentForgeries, gwentStart, settleGwentRound, clamp } from "./gwent-rules.mjs";
 
 export const pokerState = message => message?.flags?.[SYSTEM_ID]?.pokerTable;
@@ -15,10 +16,7 @@ const requestOf = message => message?.flags?.[SYSTEM_ID]?.pokerRequest;
 const gmDocument = message => Boolean(message?.author?.isGM);
 export const pokerTables = () => game.messages.filter(message => gmDocument(message) && pokerState(message)?.version === 1);
 const activeGM = () => game.users.activeGM?.id === game.user.id;
-const gmIds = () => game.users.filter(user => user.isGM).map(user => user.id);
 const copy = value => foundry.utils.deepClone(value);
-const documentClass = () => foundry.documents.ChatMessage.implementation;
-const messageSource = flags => ({ author: game.user.id, style: CONST.CHAT_MESSAGE_STYLES.OTHER, flags: { [SYSTEM_ID]: { skipLuck: true, ...flags } } });
 export const ownedPokerActors = user => game.actors.filter(actor => ["character", "npc"].includes(actor.type) && actor.testUserPermission(user, "OWNER"));
 export const isGwentDeck = item => item?.system?.ruleId === "gear.gwent-deck";
 /** Deck rarity (+1…+3, set by the GM) and forged cards live on the deck item. */
@@ -74,7 +72,17 @@ function hoardCard(state) {
   const audience = state.open === false ? "Закрытая игра" : "Зрители могут смотреть";
   return `<section class="witcher-poker-card is-hoard"><h3><i class="fa-solid fa-staff-snake"></i> Драконий клад</h3><strong>${esc(phase)}</strong>${loot}<p>${state.stake ? `По ${state.stake} кр. с каждого` : "По 10 монет с каждого, без крон"} · ${audience}</p><button type="button" data-poker-open><i class="fa-solid fa-staff-snake"></i> Открыть стол</button></section>`;
 }
+const GAME_CARD = { arm: ["Борьба на руках", "fa-hand-fist"], drink: ["Соревнование по выпивке", "fa-beer-mug-empty"], fillet: ["Филе из пяти пальцев", "fa-hand"], brawl: ["Кулачный бой", "fa-hand-back-fist"] };
+const TABLE_PHASES = { invited: "Приглашение", gathering: "Набор участников", funding: "Ставки на стол", playing: "Идёт игра", decide: "Удар удался", betting: "Новые ставки", fighting: "Бой идёт", settling: "Подсчёт", finished: "Игра окончена", declined: "Вызов отклонён", cancelled: "Игра отменена" };
+function tableCard(state) {
+  const [title, icon] = GAME_CARD[gameOf(state)], winners = state.winners ?? (state.winner === null || state.winner === undefined ? [] : [state.winner]);
+  const result = state.phase === "finished" ? gameOf(state) === "fillet" ? state.reason === "collected" ? `${state.seats[0].name} забирает ставки` : `${state.seats[0].name} промахнулся` : winners.length ? `Победа: ${winners.map(index => state.seats[index].name).join(", ")}` : "Ничья" : TABLE_PHASES[state.phase] ?? "";
+  const money = gameOf(state) === "fillet" ? `Ставки против исполнителя: ${betsTotal(state)} кр.` : state.stake ? `Ставка: ${state.stake} кр. с каждого` : "Игра без ставок";
+  const audience = state.open === false ? "Закрытая игра" : "Зрители могут смотреть";
+  return `<section class="witcher-poker-card is-${gameOf(state)}"><h3><i class="fa-solid ${icon}"></i> ${title}</h3><p>${state.seats.map(seat => esc(seat.name)).join(", ")}</p><strong>${esc(result)}</strong><p>${money} · ${audience}</p><button type="button" data-poker-open><i class="fa-solid ${icon}"></i> Открыть стол</button></section>`;
+}
 export function pokerCard(state) {
+  if (GAME_CARD[gameOf(state)]) return tableCard(state);
   if (gameOf(state) === "hoard") return hoardCard(state);
   if (gameOf(state) === "gwent") return gwentCard(state);
   const phase = { invited: "Приглашение за стол", funding: "Сбор ставок", opening: "Первый бросок", drawing: "Переброс костей", palming: "Вскрытие", settling: "Расчёт банка", finished: "Партия завершена", declined: "Приглашение отклонено", cancelled: "Партия отменена" }[state.phase];
@@ -97,9 +105,6 @@ async function createReceipt(request, user, fields) {
   return documentClass().create({ ...messageSource({ pokerReceipt: { requestId: request.id, userId: user.id, done: false, ...fields } }),
     whisper: [...new Set([user.id, ...gmIds()])], content: "<p>Ход за столом покера.</p>" });
 }
-const actorOf = seat => seat.actorUuid ? game.actors.find(actor => actor.uuid === seat.actorUuid) ?? null : null;
-const skillTotal = (actor, key) => { try { const total = actor ? skillValue(actor.system, key)?.total : null; return Number.isFinite(total) ? total : null; } catch { return null; } };
-const crit = check => check.faces.length > 1 ? ` (${critText(check.faces)})` : "";
 /** The opponent's character gets a hidden Awareness check; only the GM sees the trick and the roll. */
 async function spotCheat(state, index, dc, title, text) {
   const watcher = actorOf(state.seats[1 - index]), awareness = skillTotal(watcher, "awareness");
@@ -199,28 +204,47 @@ async function transfer(actor, tableId, amount, field) {
   const saved = await actor.update({ "system.crowns": crowns, [`flags.${SYSTEM_ID}.pokerBank.${tableId}`]: { ...record, [field]: true } });
   if (!saved) throw new Error("Не удалось сохранить изменение кошелька.");
 }
+const depositField = stage => stage > 1 ? `deposit${stage}` : "deposit";
+/** What each seat puts in now: the fillet escrows every speed-up separately, the other games one equal stake. */
+const fundingAmounts = state => gameOf(state) === "fillet" ? filletDeposits(state) : state.seats.map(() => state.stake || 0);
+function depositedTotals(state, actors, tableId) {
+  if (gameOf(state) !== "fillet") return actors.map(actor => actor && ledger(actor, tableId).deposit ? state.stake || 0 : 0);
+  return actors.map((actor, index) => actor ? [1, 2, 3].reduce((sum, stage) => sum + (ledger(actor, tableId)[depositField(stage)] ? filletDeposits(state, stage)[index] : 0), 0) : 0);
+}
+function payoutAmounts(state, deposits) {
+  const pot = deposits.reduce((a, b) => a + b, 0);
+  if (state.reason === "cancelled") return deposits;
+  if (gameOf(state) === "hoard") return deposits.every(Boolean) ? hoardPayouts(state) : deposits;
+  if (gameOf(state) === "fillet") return filletPayouts(state);
+  // Duels pay the winner; a contest won by several at once splits the bank (the odd crown goes to the first).
+  const winners = state.winners ?? (state.winner === null || state.winner === undefined ? [] : [state.winner]);
+  if (!winners.length) return deposits;
+  const share = Math.floor(pot / winners.length), extra = pot - share * winners.length;
+  return deposits.map((_, index) => winners.includes(index) ? share + (index === winners[0] ? extra : 0) : 0);
+}
+const STARTED = { poker: "opening", brawl: "fighting" };
 /** Durable funding/settlement phases also recover after a GM disconnects between the two wallets. */
 export async function recoverPokerBank(message) {
   const state = copy(pokerState(message));
   if (!activeGM() || !["funding", "settling"].includes(state?.phase)) return;
   try {
-    if (state.stake) {
-      const actors = state.seats.map(seat => actorFor(seat.actorUuid, game.users.get(seat.userId), true));
-      await withWallets(actors, async () => {
-        if (state.phase === "funding") {
-          for (const actor of actors) if (!ledger(actor, message.id).deposit && balance(actor) < state.stake) throw new Error(`У ${actor.name} больше не хватает крон. Пополните кошелёк или отмените партию с возвратом.`);
-          for (const actor of actors) await transfer(actor, message.id, -state.stake, "deposit");
-        } else {
-          const deposits = actors.map(actor => ledger(actor, message.id).deposit ? state.stake : 0), pot = deposits.reduce((a, b) => a + b, 0);
-          // Hoard players keep what they grabbed; the duel games pay the whole bank to the winner.
-          const amounts = state.reason === "cancelled" ? deposits : gameOf(state) === "hoard" ? deposits.every(Boolean) ? hoardPayouts(state) : deposits
-            : state.winner === null ? deposits : actors.map((_, index) => index === state.winner ? pot : 0);
-          for (const [index, actor] of actors.entries()) await transfer(actor, message.id, amounts[index], "paid");
-        }
-      });
-    }
-    const started = gameOf(state) === "poker" ? "opening" : "playing";
-    await saveTable(message, await snakeTick({ ...state, issue: "", phase: state.phase === "funding" ? started : state.reason === "cancelled" ? "cancelled" : "finished" }));
+    const amounts = fundingAmounts(state);
+    const actors = state.seats.map(seat => seat.actorUuid ? actorFor(seat.actorUuid, game.users.get(seat.userId), true) : null);
+    if (state.phase === "funding") amounts.forEach((amount, index) => { if (amount && !actors[index]) throw new Error(`${state.seats[index].name}: для ставки нужен персонаж с кошельком.`); });
+    const wallets = actors.filter(Boolean), field = depositField(state.stage ?? 1);
+    if (wallets.length && (state.phase === "settling" || amounts.some(Boolean))) await withWallets(wallets, async () => {
+      if (state.phase === "funding") {
+        for (const [index, actor] of actors.entries()) if (actor && amounts[index] && !ledger(actor, message.id)[field] && balance(actor) < amounts[index]) throw new Error(`У ${actor.name} больше не хватает крон. Пополните кошелёк или отмените партию с возвратом.`);
+        for (const [index, actor] of actors.entries()) if (actor && amounts[index]) await transfer(actor, message.id, -amounts[index], field);
+      } else {
+        const pay = payoutAmounts(state, depositedTotals(state, actors, message.id));
+        for (const [index, actor] of actors.entries()) if (actor) await transfer(actor, message.id, pay[index], "paid");
+      }
+    });
+    let next = { ...state, issue: "", phase: state.phase === "funding" ? STARTED[gameOf(state)] ?? "playing" : state.reason === "cancelled" ? "cancelled" : "finished" };
+    if (state.phase === "funding" && gameOf(state) === "brawl") next = await brawlStart(next);
+    await saveTable(message, await snakeTick(next));
+    if (next.phase === "settling") await recoverPokerBank(message);
   } catch (error) {
     if (activeGM()) await saveTable(message, { ...state, issue: error.message });
     throw error;
@@ -234,53 +258,65 @@ const seatedElsewhere = userId => pokerTables().some(message => !pokerClosed(pok
 async function challenge(request, user, data) {
   const existing = pokerTables().find(message => pokerState(message).invitation === request.id);
   if (existing) return existing;
-  const stake = wagerAmount(data.stake), kind = ["gwent", "hoard"].includes(data.game) ? data.game : "poker", gwent = kind === "gwent";
+  const kind = ["gwent", "hoard", "arm", "drink", "fillet", "brawl"].includes(data.game) ? data.game : "poker", gwent = kind === "gwent";
+  // In the fillet the money is the spectators' bets, not an equal stake.
+  const stake = kind === "fillet" ? 0 : wagerAmount(data.stake);
   // GMs run any number of tables and NPC seats; a player sits at one table at a time.
   if (!user.isGM && seatedElsewhere(user.id)) throw new Error("Вы уже за столом. Завершите или отмените свою партию.");
-  const own = user.isGM && data.actorUuid ? npcActor(data.actorUuid) : actorFor(data.actorUuid, user, stake > 0 || Boolean(data.deckId));
+  const own = user.isGM && data.actorUuid ? npcActor(data.actorUuid) : actorFor(data.actorUuid, user, stake > 0 || Boolean(data.deckId) || kind === "brawl");
   if (own && stake && balance(own) < stake) throw new Error("Не хватает крон для ставки.");
-  const open = data.open !== false, host = participant(user, own, { npc: Boolean(user.isGM && own), ...(gwent ? { deck: deckFor(own, data) } : {}), ...(kind === "hoard" ? hoardSeat() : {}) });
+  const open = data.open !== false, host = participant(user, own, { npc: Boolean(user.isGM && own), ...(gwent ? { deck: deckFor(own, data) } : {}), ...(SEAT_EXTRAS[kind]?.() ?? {}) });
   const base = { version: 1, invitation: request.id, stake, tieMode: "faces", issue: "", hands: [[], []], winner: null, reason: "", processed: [request.id], created: Date.now(), open };
   let state;
+  const duel = { gwent: gwentStart, arm: armStart }[kind];
   if (kind === "hoard") state = { ...base, game: "hoard", phase: "gathering", seats: [host], pot: 0, round: 0, snake: null, log: [], ...hoardCoins(stake) };
+  else if (kind === "drink") state = { ...base, game: "drink", phase: "gathering", seats: [host], round: 0, log: [] };
+  else if (kind === "brawl") state = { ...base, game: "brawl", phase: "gathering", seats: [host], log: [] };
+  // The performer's Gambling sets how much the room will bet against them.
+  else if (kind === "fillet") state = { ...base, game: "fillet", phase: "gathering", seats: [host], stage: 1, log: [], ...await filletOdds(host) };
   else if (String(data.opponentId).startsWith("actor:")) {
     // Against an NPC the GM plays both sides of the table, so there is nobody to invite.
     if (!user.isGM) throw new Error("Сажать НПС за стол может только мастер.");
     const npc = npcActor(data.opponentId.slice(6));
     if (npc.uuid === own?.uuid) throw new Error("За столом должны быть разные персонажи.");
     if (stake && balance(npc) < stake) throw new Error(`У ${npc.name} не хватает крон для ставки.`);
-    state = { ...base, phase: "funding", seats: [host, participant(user, npc, { npc: true, ...(gwent ? { deck: deckFor(null, {}) } : {}) })], ...(gwent ? { game: "gwent", ...gwentStart() } : {}) };
+    state = { ...base, phase: "funding", seats: [host, participant(user, npc, { npc: true, ...(gwent ? { deck: deckFor(null, {}) } : {}) })], ...(duel ? { game: kind, ...duel() } : {}) };
   } else {
     const opponent = game.users.get(data.opponentId);
     if (!opponent?.active || opponent.id === user.id) throw new Error("Выберите другого подключённого игрока или мастера.");
     if (!opponent.isGM && seatedElsewhere(opponent.id)) throw new Error("Соперник уже за другим столом.");
-    state = { ...base, phase: "invited", seats: [host, participant(opponent, null, gwent ? { deck: deckFor(null, {}) } : {})], ...(gwent ? { game: "gwent", ...gwentStart() } : {}) };
+    state = { ...base, phase: "invited", seats: [host, participant(opponent, null, gwent ? { deck: deckFor(null, {}) } : {})], ...(duel ? { game: kind, ...duel() } : {}) };
   }
-  const opponent = kind === "hoard" ? null : game.users.get(state.seats[1].userId);
+  const opponent = state.seats[1] ? game.users.get(state.seats[1].userId) : null;
   // The table holds no secrets (dice are public, swaps live in private receipts), so an open game is a public card anyone can watch.
   return documentClass().create({ ...messageSource({ pokerTable: state }), whisper: open ? [] : [...new Set([user.id, ...(opponent ? [opponent.id] : []), ...gmIds()])], content: pokerCard(state) });
 }
-/** Table-level hoard moves: anyone may join until the host starts; the GM adds NPCs and may remove seats. */
-function hoardTable(state, user, command) {
-  const data = command.data ?? {}, host = controlsSeat(state.seats[0], user) || user.isGM;
-  if (gameOf(state) !== "hoard" || state.phase !== "gathering") throw new Error("Набор за этот стол уже закрыт.");
-  const seats = [...state.seats];
+const SEAT_EXTRAS = { hoard: hoardSeat, drink: drinkSeat, fillet: filletSeat, brawl: brawlSeat };
+const SEAT_LIMITS = { hoard: [HOARD_MIN, HOARD_MAX, "За корзиной помещаются"], drink: [2, DRINK_MAX, "Соревнуются"], fillet: [1, 8, "Вокруг стола помещаются"], brawl: [2, BRAWL_MAX, "В кругу дерутся"] };
+/** Table-level moves of the gathering games: anyone may join until the host starts; the GM adds NPCs and may remove seats. */
+function gatherTable(state, user, command) {
+  const data = command.data ?? {}, host = controlsSeat(state.seats[0], user) || user.isGM, kind = gameOf(state), [min, max, room] = SEAT_LIMITS[kind] ?? [];
+  if (!SEAT_EXTRAS[kind] || state.phase !== "gathering") throw new Error("Набор за этот стол уже закрыт.");
+  let seats = [...state.seats];
   const seatActor = actor => { if (actor && seats.some(seat => seat.actorUuid === actor.uuid)) throw new Error("Этот персонаж уже за столом."); return actor; };
+  const money = kind === "fillet" ? Number(data.bet) || 0 : state.stake;
   if (command.action === "join" || command.action === "addNpc") {
-    if (seats.length >= HOARD_MAX) throw new Error(`За корзиной помещаются не больше ${HOARD_MAX} игроков.`);
+    if (seats.length >= max) throw new Error(`${room} не больше ${max} участников.`);
+    let seat;
     if (command.action === "addNpc") {
       if (!user.isGM) throw new Error("Добавлять НПС может только мастер.");
-      const actor = seatActor(npcActor(data.actorUuid));
-      if (state.stake && balance(actor) < state.stake) throw new Error(`У ${actor.name} не хватает крон для ставки.`);
-      seats.push(participant(user, actor, { npc: true, ...hoardSeat() }));
+      seat = participant(user, seatActor(npcActor(data.actorUuid)), { npc: true, ...SEAT_EXTRAS[kind]() });
     } else {
       if (seats.some(seat => seat.userId === user.id && !seat.npc)) throw new Error("Вы уже за этим столом.");
       if (!user.isGM && seatedElsewhere(user.id)) throw new Error("Вы уже за другим столом.");
-      const actor = seatActor(actorFor(data.actorUuid, user, state.stake > 0));
-      if (actor && balance(actor) < state.stake) throw new Error("Не хватает крон для ставки.");
-      seats.push(participant(user, actor, hoardSeat()));
+      seat = participant(user, seatActor(actorFor(data.actorUuid, user, money > 0 || kind === "brawl")), SEAT_EXTRAS[kind]());
     }
-    return { ...state, seats };
+    const actor = actorOf(seat);
+    if (money && !actor) throw new Error("Для ставки нужен персонаж с кошельком.");
+    if (actor && money && balance(actor) < money) throw new Error(`У ${actor.name} не хватает крон для ставки.`);
+    seats.push(seat);
+    const next = { ...state, seats };
+    return kind === "fillet" && money ? placeBet(next, seats.length - 1, money) : next;
   }
   if (!host) throw new Error("Это решает хозяин стола или мастер.");
   if (command.action === "kick") {
@@ -288,8 +324,11 @@ function hoardTable(state, user, command) {
     if (!Number.isInteger(index) || index < 1 || index >= seats.length) throw new Error("Такого места нет.");
     seats.splice(index, 1); return { ...state, seats };
   }
-  if (seats.length < HOARD_MIN) throw new Error(`Нужно хотя бы ${HOARD_MIN} игрока.`);
-  return { ...state, phase: "funding", round: 1, pot: state.per * seats.length };
+  if (seats.length < min) throw new Error(`Нужно хотя бы ${min} участника.`);
+  if (kind === "hoard") return { ...state, phase: "funding", round: 1, pot: state.per * seats.length };
+  if (kind === "drink") return { ...state, phase: "funding", round: 1 };
+  if (kind === "fillet") { if (filletLimit(state) < betsTotal(state)) throw new Error("Ставки превышают лимит."); return { ...state, phase: "funding", stage: 1 }; }
+  return { ...state, phase: "funding" };
 }
 /** Requests are native ChatMessages: the server records their author. Only GM-authored receipts are trusted. */
 export async function processPokerRequest(request, creatorId) {
@@ -325,7 +364,20 @@ export async function processPokerRequest(request, creatorId) {
           if (command.action === "end" && gameOf(state) === "hoard" && state.phase === "playing") state = { ...state, phase: "settling", winner: null, reason: "ended" };
           else if (command.action !== "recover") state = { ...state, phase: ["invited", "gathering"].includes(state.phase) ? "cancelled" : "settling", winner: null, reason: "cancelled" };
           else if (!["funding", "settling"].includes(state.phase)) throw new Error("Расчёт банка не требуется.");
-        } else if (["join", "addNpc", "kick", "start"].includes(command.action)) state = hoardTable(state, user, command);
+        } else if (["join", "addNpc", "kick", "start"].includes(command.action)) state = gatherTable(state, user, command);
+        else if (command.action === "surprise") {
+          // The GM may call an Endurance DC 10 check on any drinker at any time; a failure ends their contest.
+          const index = Number(command.data?.seat);
+          if (!user.isGM || gameOf(state) !== "drink" || state.phase !== "playing" || !state.seats[index]?.active) throw new Error("Внезапную проверку назначает мастер участнику соревнования.");
+          let outcome = pokerReceipt(receipt)?.play;
+          if (!outcome) { outcome = await drinkTurn(state, index, {}, { surprise: true }); receipt = await createReceipt(request, user, { tableId: table.id, kind: "surprise", play: outcome }); }
+          state = applyDrink(state, index, outcome);
+        } else if (command.action === "award") {
+          // The GM rules a fistfight: everyone but the named fighter is out.
+          const winner = Number(command.data?.seat);
+          if (!user.isGM || gameOf(state) !== "brawl" || state.phase !== "fighting" || !state.seats[winner]) throw new Error("Присудить победу может мастер во время боя.");
+          for (const index of state.seats.keys()) if (index !== winner) state = knockOut(state, index, "award");
+        }
         else {
           const index = requirePokerAction(state, user, command.action, command.revision, command.seat), seat = state.seats[index], data = command.data ?? {};
           // Receipts belong to the seat, so an NPC's private dice stay readable by whichever GM plays it.
@@ -334,13 +386,33 @@ export async function processPokerRequest(request, creatorId) {
             const actor = actorFor(data.actorUuid, user, state.stake > 0 || Boolean(data.deckId));
             if (actor && actor.uuid === state.seats[0].actorUuid) throw new Error("За столом должны быть разные персонажи.");
             if (actor && balance(actor) < state.stake) throw new Error("Не хватает крон, чтобы принять ставку.");
-            state.seats[index] = participant(user, actor, gameOf(state) === "gwent" ? deckFor(actor, data) : null); state.phase = "funding";
+            state.seats[index] = participant(user, actor, { ...(gameOf(state) === "gwent" ? { deck: deckFor(actor, data) } : {}), revision: state.seats[index].revision }); state.phase = "funding";
           } else if (["decline", "cancel"].includes(command.action)) state.phase = command.action === "decline" ? "declined" : "cancelled";
           else if (command.action === "concede") { state.phase = "settling"; state.winner = 1 - index; state.reason = "conceded"; }
           else if (command.action === "leave") {
             if (state.phase === "gathering") state = { ...state, seats: state.seats.filter((_, i) => i !== index) };
+            else if (gameOf(state) === "drink") state = applyDrink(state, index, { left: true, checks: [{ surprise: true, success: false }] });
             else state = await snakeTick(leaveHoard(state, index));
-          } else if (command.action === "reach") {
+          } else if (command.action === "press") {
+            let play = pokerReceipt(receipt)?.play;
+            if (!play) { play = await armPress(state, index, data); receipt = await createReceipt(request, owner, { tableId: table.id, kind: "press", play }); }
+            state.rounds[state.round - 1].plays[index] = play;
+            state = settleArmRound(state);
+          } else if (command.action === "drink") {
+            let play = pokerReceipt(receipt)?.play;
+            if (!play) { play = await drinkTurn(state, index, data); receipt = await createReceipt(request, owner, { tableId: table.id, kind: "drink", play }); }
+            state = applyDrink(state, index, play);
+          } else if (command.action === "bet") state = placeBet(state, index, data.amount);
+          else if (command.action === "stab") {
+            let play = pokerReceipt(receipt)?.play;
+            if (!play) { play = await filletStab(state); receipt = await createReceipt(request, owner, { tableId: table.id, kind: "stab", play }); }
+            state = { ...state, log: [...state.log, play].slice(-30), ...(play.success ? { phase: "decide" } : { phase: "settling", reason: "failed", winner: null }) };
+          } else if (command.action === "stop") state = { ...state, phase: "settling", reason: "collected", winner: 0 };
+          else if (command.action === "speed") state = { ...state, phase: "betting", stage: state.stage + 1 };
+          else if (command.action === "resume") {
+            if (filletLimit(state) < betsTotal(state)) throw new Error("Ставки превышают лимит.");
+            state = { ...state, phase: "funding" };
+          } else if (command.action === "yield") state = knockOut(state, index, "yield"); else if (command.action === "reach") {
             let play = pokerReceipt(receipt)?.play;
             if (!play) {
               play = await reachHoard(state, index);
@@ -444,4 +516,16 @@ export async function resumePoker() {
     try { await recoverPokerBank(table); } catch (error) { console.warn("Poker bank recovery", error); }
   }
   for (const message of game.messages) if (requestOf(message) && !pokerReceipt(receiptFor(message.id))?.done) await processPokerRequest(message);
+}
+/** Knockouts happen in the real fight: the GM's client checks the fighters whenever an actor or effect changes. */
+export async function watchBrawls() {
+  if (!activeGM()) return;
+  for (const table of pokerTables()) {
+    const state = pokerState(table);
+    if (gameOf(state) !== "brawl" || state.phase !== "fighting") continue;
+    const next = brawlKnockouts(copy(state));
+    if (next.seats.every((seat, index) => seat.active === state.seats[index].active)) continue;
+    await saveTable(table, next);
+    await recoverPokerBank(table);
+  }
 }

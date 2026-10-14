@@ -1,4 +1,5 @@
 import { PROSTHETIC_EQUIPMENT, PROSTHETIC_FOLDER } from "../scripts/data/prosthetic-equipment.mjs";
+import { TAVERN_EQUIPMENT, TAVERN_FOLDER } from "../scripts/data/tavern-equipment.mjs";
 import { MACRO_SOURCES } from "../scripts/data/macros.mjs";
 import { spellSources, spellFolders } from "../scripts/data/spells.mjs";
 import { bestiarySources, bestiaryFolders } from "../scripts/data/bestiary.mjs";
@@ -30,7 +31,7 @@ import { SCHOOL_GEAR, SCHOOL_MATERIALS, SCHOOL_GEAR_FOLDER } from "../scripts/da
 import { MANTICORE_EQUIPMENT, MANTICORE_FOLDER } from "../scripts/data/manticore-school.mjs";
 import { peasantReference } from "../scripts/data/peasant-descriptions.mjs";
 
-const coreFolders = { prosthetics: PROSTHETIC_FOLDER, schoolGear: SCHOOL_GEAR_FOLDER, manticore: MANTICORE_FOLDER, radolf: RADOLF_FOLDER, transport: {id:"gearTransport001",name:"Транспорт"}, tack: {id:"gearTack00000001",name:"Упряжь и седельные сумки"}, materials: {id:"gearMaterials001",name:"Материалы и ингредиенты"}, alchemy:{id:"gearAlchemy00001",name:"Алхимия"}, mutagens:{id:"gearMutagens0001",name:"Мутагены"}, upgrades:{id:"gearUpgrades0001",name:"Улучшения"}, recipes:{id:"gearRecipes00001",name:"Чертежи и формулы"}, weapons: { id: "gearFolderWeapon", name: "Оружие и щиты" }, ammunition: { id: "gearAmmo00000001", name: "Боеприпасы" }, armor: { id: "gearFolderArmors", name: "Броня" }, tools: { id: "gearFolderTools1", name: "Инструменты" }, core: { id: "gearFolderCore01", name: "Снаряжение" } };
+const coreFolders = { prosthetics: PROSTHETIC_FOLDER, tavern: TAVERN_FOLDER, schoolGear: SCHOOL_GEAR_FOLDER, manticore: MANTICORE_FOLDER, radolf: RADOLF_FOLDER, transport: {id:"gearTransport001",name:"Транспорт"}, tack: {id:"gearTack00000001",name:"Упряжь и седельные сумки"}, materials: {id:"gearMaterials001",name:"Материалы и ингредиенты"}, alchemy:{id:"gearAlchemy00001",name:"Алхимия"}, mutagens:{id:"gearMutagens0001",name:"Мутагены"}, upgrades:{id:"gearUpgrades0001",name:"Улучшения"}, recipes:{id:"gearRecipes00001",name:"Чертежи и формулы"}, weapons: { id: "gearFolderWeapon", name: "Оружие и щиты" }, ammunition: { id: "gearAmmo00000001", name: "Боеприпасы" }, armor: { id: "gearFolderArmors", name: "Броня" }, tools: { id: "gearFolderTools1", name: "Инструменты" }, core: { id: "gearFolderCore01", name: "Снаряжение" } };
 
 const escapeHTML = text => text.replace(/[&<>"']/g, character => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -87,7 +88,7 @@ export function compendiumData(translations) {
       gear.system.description ||= itemLore(gear);
       return gear;
     }),
-      ...[...PROSTHETIC_EQUIPMENT, ...MANTICORE_EQUIPMENT, ...PEASANT_WEAPONS, ...RADOLF_UPGRADES, ...RADOLF_POTIONS, ...RADOLF_EQUIPMENT, ...CORE_EQUIPMENT, ...WITCHER_SPECIAL_EQUIPMENT, ...EXPERIMENTAL_DEVICES, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES, ...SCHOOL_GEAR, ...SCHOOL_MATERIALS].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: stripPageReferences(entry.system.description ?? "") || itemLore(entry) }),
+      ...[...PROSTHETIC_EQUIPMENT, ...TAVERN_EQUIPMENT, ...MANTICORE_EQUIPMENT, ...PEASANT_WEAPONS, ...RADOLF_UPGRADES, ...RADOLF_POTIONS, ...RADOLF_EQUIPMENT, ...CORE_EQUIPMENT, ...WITCHER_SPECIAL_EQUIPMENT, ...EXPERIMENTAL_DEVICES, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES, ...SCHOOL_GEAR, ...SCHOOL_MATERIALS].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: stripPageReferences(entry.system.description ?? "") || itemLore(entry) }),
         img: entry.img ?? defaultItemIcon(entry) }))],
     "influential-friends": INFLUENTIAL_FRIENDS.map(entry => item(entry.documentId, "influence", entry, {
       region: entry.group, roll: entry.roll,
