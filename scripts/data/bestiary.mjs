@@ -8,8 +8,11 @@ import { ALCHEMY } from "./workshop-alchemy.mjs";
 import { CORE_AMMUNITION } from "./core-ammunition.mjs";
 import { ELDER_EQUIPMENT } from "./elder-equipment.mjs";
 import { CORE_MAGIC } from "./spells.mjs";
+import { UPGRADES } from "./workshop-upgrades.mjs";
 import { bookSource } from "./book-references.mjs";
 import { radolfNPCSource, RADOLF_ACTOR_FOLDER } from "./radolf-npc.mjs";
+import { SCHOOL_MATERIALS } from "./witcher-school-gear.mjs";
+import { JOURNAL_MATERIALS } from "./journal-materials.mjs";
 
 export const bestiaryFolders = () => [structuredClone(RADOLF_ACTOR_FOLDER)];
 
@@ -66,13 +69,22 @@ const EXTRA_TRAITS = {
   "fire-immunity": ["Невосприимчивость к огню", "Огонь не причиняет ему урона; не может загореться."],
   "disease-immunity": ["Невосприимчивость к болезням", "Не заражается болезнями."],
   "bleeding-immunity": ["Невосприимчивость к кровотечению", "Состояние «Кровотечение» на него не накладывается."],
-  "enhanced-night-vision": ["Улучшенное ночное зрение", "Действует в слабом освещении и в темноте без штрафов."]
+  "enhanced-night-vision": ["Улучшенное ночное зрение", "Действует в слабом освещении и в темноте без штрафов."],
+  "freeze-immunity": ["Невосприимчивость к заморозке", "Состояние «Замораживание» на него не накладывается."],
+  "knockdown-immunity": ["Невосприимчивость к сбиванию с ног", "Его нельзя сбить с ног."],
+  "coercion-immunity": ["Невосприимчивость к убеждению", "Убеждение, обман и другие словесные уловки на него не действуют."]
 };
 // Loot names of the book that differ from the catalog names.
 const LOOT_ALIASES = { "Когти гуля": "material.ghoul-claw", "Перо грифона": "material.griffin-feathers", "Глаза беса": "material.fiend-eye", "Когти накера": "material.nekker-claw",
-  "Глаза главоглаза": "material.monster-eyes", "Стрелы": "ammunition.standard", "Эльфские ввинчивающиеся боеприпасы": "ammunition.elven-burrowing" };
-const lootCatalog = () => [...MATERIALS, ...ALCHEMY, ...CORE_EQUIPMENT, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT];
+  "Глаза главоглаза": "material.monster-eyes", "Стрелы": "ammunition.standard", "Эльфские ввинчивающиеся боеприпасы": "ammunition.elven-burrowing",
+  "Рунный камень Велеса": "rune.veles" };
+const lootCatalog = () => [...MATERIALS, ...JOURNAL_MATERIALS, ...SCHOOL_MATERIALS, ...ALCHEMY, ...CORE_EQUIPMENT, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...UPGRADES];
 const normal = text => text.toLocaleLowerCase("ru").replaceAll("ё", "е");
+/** Catalog name of a harvest row, so a text loot row can be matched to the item that replaces it. */
+export function harvestItemName(uuid) {
+  const id = String(uuid ?? "").split(".").at(-1);
+  return lootCatalog().find(entry => entry.documentId === id)?.name ?? null;
+}
 function lootSource(name) {
   const catalog = lootCatalog(), alias = LOOT_ALIASES[name];
   return alias ? catalog.find(entry => entry.id === alias) : catalog.find(entry => normal(entry.name) === normal(name)) ?? null;
@@ -132,12 +144,13 @@ function coreCreature(entry, index) {
     if (weapon.natural) item.system.ruleId = `creature.weapon.${entry.id}.${items.length}`;
     items.push(item);
   }
-  for (const trait of entry.traits ?? []) {
+  const addTraits = list => { for (const trait of list ?? []) {
     const [id, value] = trait.split(":"), known = CREATURE_TRAITS.find(row => row.id === `creature.${id}`);
     if (known) items.push(ability(known.id, known.name, id === "wild" && value ? `Внимание и Выживание в дикой природе рассчитываются с Интеллектом ${value} за инстинкты.` : known.description,
       id === "wild" && value ? { [SYSTEM_ID]: { wildIntelligence: Number(value) } } : {}));
     else if (EXTRA_TRAITS[id]) items.push(ability(`creature.${id}`, ...EXTRA_TRAITS[id]));
-  }
+  } };
+  addTraits(entry.traits);
   for (const [name, text] of entry.abilities ?? []) items.push(ability(ABILITY_IDS[name] ? `creature.${ABILITY_IDS[name]}` : `creature.${entry.id}.${items.length}`, name, text,
     name === "Регенерация" && entry.regeneration ? { [SYSTEM_ID]: { regeneration: entry.regeneration,
       ...(entry.regenerationSunlight !== undefined ? { regenerationSunlight: entry.regenerationSunlight } : {}) } } : {}));
@@ -155,6 +168,9 @@ function coreCreature(entry, index) {
   }
   items.push(...ammunition.map(({ source, quantity }) => catalogItem(source, itemId(), { quantity, equipped: false, carried: true })));
   items.push(...armor.map(source => catalogItem(source, itemId(), { quantity: 1, equipped: true, carried: true })));
+  // Traits and abilities added to a shipped creature later go last, keeping earlier item IDs and rule IDs.
+  addTraits(entry.appended?.traits);
+  for (const [name, text] of entry.appended?.abilities ?? []) items.push(ability(`creature.${entry.id}.${items.length}`, name, text));
   actor.items = items;
   return actor;
 }

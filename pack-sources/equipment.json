@@ -12114,6 +12114,146 @@
     }
   },
   {
+    "_id": "journalMatr00001",
+    "name": "Зубы туманника",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
+    "system": {
+      "ruleId": "material.foglet-teeth",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 40,
+      "rarity": "",
+      "material": {
+        "substance": "rebis",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Туманники"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Зубы туманника: алхимический компонент. Добывается: Туманники.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00002",
+    "name": "Эссенция туманника",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
+    "system": {
+      "ruleId": "material.foglet-essence",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 43,
+      "rarity": "",
+      "material": {
+        "substance": "aether",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Туманники"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Эссенция туманника: алхимический компонент. Добывается: Туманники.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00003",
+    "name": "Печень гнильца",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/caelum.svg",
+    "system": {
+      "ruleId": "material.rotfiend-liver",
+      "kind": "material",
+      "weight": 0.5,
+      "price": 42,
+      "rarity": "",
+      "material": {
+        "substance": "caelum",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Гнильцы"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Печень гнильца: алхимический компонент. Добывается: Гнильцы.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00004",
+    "name": "Эссенция баргеста",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/vermilion.svg",
+    "system": {
+      "ruleId": "material.barghest-essence",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 36,
+      "rarity": "",
+      "material": {
+        "substance": "vermilion",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Баргесты"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Эссенция баргеста: алхимический компонент. Добывается: Баргесты.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "journalMatr00005",
+    "name": "Кристаллическая эссенция",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/hydragenum.svg",
+    "system": {
+      "ruleId": "material.crystalline-essence",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 292,
+      "rarity": "",
+      "material": {
+        "substance": "hydragenum",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Химы, песты, вендиго, лешие, циклопы"
+      },
+      "source": "Дневник охотника на чудовищ",
+      "description": "<p>Кристаллическая эссенция: алхимический компонент. Добывается: Химы, песты, вендиго, лешие, циклопы.</p>"
+    },
+    "effects": [],
+    "folder": "gearMaterials001",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "alch000000000001",
     "name": "Могила Адды",
     "type": "equipment",
@@ -30287,14 +30427,20 @@
     "_id": "schoolMatr000003",
     "name": "Кровь гнильца",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
     "system": {
       "ruleId": "material.rotfiend-blood",
       "source": "Снаряжение ведьмака",
       "kind": "material",
-      "weight": 0,
-      "price": 0,
-      "description": "<p>Кровь гнильца: компонент чертежей ведьмачьего снаряжения.</p>"
+      "weight": 0.1,
+      "price": 30,
+      "material": {
+        "substance": "rebis",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Гнильцы"
+      },
+      "description": "<p>Кровь гнильца: компонент чертежей ведьмачьего снаряжения; алхимический компонент, добывается: Гнильцы.</p>"
     },
     "effects": [],
     "folder": "gearWitcherDLC01",
@@ -30302,11 +30448,7 @@
     "ownership": {
       "default": 2
     },
-    "flags": {
-      "witcher-eliott-system": {
-        "priceUnavailable": true
-      }
-    }
+    "flags": {}
   },
   {
     "_id": "schoolMatr000004",
@@ -30387,14 +30529,20 @@
     "_id": "schoolMatr000007",
     "name": "Кровь утковола",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/rebis.svg",
     "system": {
       "ruleId": "material.bullvore-blood",
       "source": "Снаряжение ведьмака",
       "kind": "material",
-      "weight": 0,
-      "price": 0,
-      "description": "<p>Кровь утковола: компонент чертежей ведьмачьего снаряжения.</p>"
+      "weight": 0.1,
+      "price": 85,
+      "material": {
+        "substance": "rebis",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Утковолы"
+      },
+      "description": "<p>Кровь утковола: компонент чертежей ведьмачьего снаряжения; алхимический компонент, добывается: Утковолы.</p>"
     },
     "effects": [],
     "folder": "gearWitcherDLC01",
@@ -30402,24 +30550,26 @@
     "ownership": {
       "default": 2
     },
-    "flags": {
-      "witcher-eliott-system": {
-        "priceUnavailable": true
-      }
-    }
+    "flags": {}
   },
   {
     "_id": "schoolMatr000008",
     "name": "Мозг утковола",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/fulgur.svg",
     "system": {
       "ruleId": "material.bullvore-brain",
       "source": "Снаряжение ведьмака",
       "kind": "material",
-      "weight": 0,
-      "price": 0,
-      "description": "<p>Мозг утковола: компонент чертежей ведьмачьего снаряжения.</p>"
+      "weight": 1,
+      "price": 150,
+      "material": {
+        "substance": "fulgur",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Утковолы"
+      },
+      "description": "<p>Мозг утковола: компонент чертежей ведьмачьего снаряжения; алхимический компонент, добывается: Утковолы.</p>"
     },
     "effects": [],
     "folder": "gearWitcherDLC01",
@@ -30427,24 +30577,26 @@
     "ownership": {
       "default": 2
     },
-    "flags": {
-      "witcher-eliott-system": {
-        "priceUnavailable": true
-      }
-    }
+    "flags": {}
   },
   {
     "_id": "schoolMatr000009",
     "name": "Глаза утковола",
     "type": "equipment",
-    "img": "icons/svg/item-bag.svg",
+    "img": "systems/witcher-eliott-system/assets/substances/vitriol.svg",
     "system": {
       "ruleId": "material.bullvore-eyes",
       "source": "Снаряжение ведьмака",
       "kind": "material",
-      "weight": 0,
-      "price": 0,
-      "description": "<p>Глаза утковола: компонент чертежей ведьмачьего снаряжения.</p>"
+      "weight": 0.5,
+      "price": 87,
+      "material": {
+        "substance": "vitriol",
+        "forageDC": 0,
+        "quantityFormula": "",
+        "location": "Утковолы"
+      },
+      "description": "<p>Глаза утковола: компонент чертежей ведьмачьего снаряжения; алхимический компонент, добывается: Утковолы.</p>"
     },
     "effects": [],
     "folder": "gearWitcherDLC01",
@@ -30452,11 +30604,7 @@
     "ownership": {
       "default": 2
     },
-    "flags": {
-      "witcher-eliott-system": {
-        "priceUnavailable": true
-      }
-    }
+    "flags": {}
   },
   {
     "_id": "schoolMatr000010",

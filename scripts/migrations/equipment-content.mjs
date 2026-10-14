@@ -31,12 +31,21 @@ import { radolfPotionContentUpdate } from "./radolf-potion-content.mjs";
 import { PEASANT_WEAPONS } from "../data/peasant-equipment.mjs";
 import { MANTICORE_EQUIPMENT } from "../data/manticore-school.mjs";
 import { SCHOOL_GEAR, SCHOOL_MATERIALS } from "../data/witcher-school-gear.mjs";
+import { JOURNAL_MATERIALS, journalComponentData } from "../data/journal-materials.mjs";
+
+/** An untouched unpriced placeholder gets the journal's substance, weight and price. */
+export function journalMaterialUpdate(item) {
+  const data = journalComponentData(item.system?.ruleId ?? "");
+  if (!data || item.system?.price || item.system?.weight) return {};
+  return { "system.weight": data.weight, "system.price": data.price, "system.material": data.material, [`flags.${SYSTEM_ID}.-=priceUnavailable`]: null };
+}
 // 37: tavern games — Devil's Musk with its formula, the Hidden Weight with its diagram.
-export const EQUIPMENT_CONTENT_VERSION = 37;
+// 38: Monster Hunter's Journal components (pp.142–143) for bestiary loot; priced school placeholders.
+export const EQUIPMENT_CONTENT_VERSION = 38;
 const specialRuleIds = new Set(WITCHER_SPECIAL_EQUIPMENT.map(item => item.id));
 
 const updatesFor = items => Array.from(items).flatMap(item => {
-  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item), ...toolDescriptionUpdate(item), ...generalGearDescriptionUpdate(item), ...specialEquipmentDescriptionUpdate(item), ...materialDescriptionUpdate(item), ...recipeDetailsUpdate(item), ...experimentalDescriptionUpdate(item), ...dimeritiumDescriptionUpdate(item), ...personalBelongingsDescriptionUpdate(item) };
+  const update = { ...ammunitionUpdate(item), ...equipmentIconUpdate(item), ...alchemyDescriptionUpdate(item), ...toolDescriptionUpdate(item), ...generalGearDescriptionUpdate(item), ...specialEquipmentDescriptionUpdate(item), ...materialDescriptionUpdate(item), ...journalMaterialUpdate(item), ...recipeDetailsUpdate(item), ...experimentalDescriptionUpdate(item), ...dimeritiumDescriptionUpdate(item), ...personalBelongingsDescriptionUpdate(item) };
   Object.assign(update, radolfPotionContentUpdate(item), prostheticContentUpdate(item));
   // Description migrations compose in order so a legacy cleanup is not lost to the new legend.
   Object.assign(update, relicArmorContentUpdate({ ...item, system: { ...item.system,
@@ -58,7 +67,7 @@ export async function migrateEquipmentContent() {
   const index = await pack.getIndex({ fields: ["system.ruleId"] });
   const existing = new Set(Array.from(index.values(), entry => entry.system?.ruleId));
   const diagrams = RECIPES.filter(entry => entry.system.recipe.category === "diagram");
-  const additions = [...PROSTHETIC_EQUIPMENT, ...TAVERN_EQUIPMENT, ...TAVERN_RECIPES, ...SCHOOL_GEAR, ...SCHOOL_MATERIALS, ...MANTICORE_EQUIPMENT, ...PEASANT_WEAPONS, ...RADOLF_UPGRADES, ...RADOLF_POTIONS, ...RADOLF_RECIPES, ...RADOLF_EQUIPMENT, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS, ...WITCHER_SPECIAL_EQUIPMENT, ...diagrams, ...PURE_SUBSTANCES, ...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES];
+  const additions = [...PROSTHETIC_EQUIPMENT, ...TAVERN_EQUIPMENT, ...TAVERN_RECIPES, ...SCHOOL_GEAR, ...SCHOOL_MATERIALS, ...JOURNAL_MATERIALS, ...MANTICORE_EQUIPMENT, ...PEASANT_WEAPONS, ...RADOLF_UPGRADES, ...RADOLF_POTIONS, ...RADOLF_RECIPES, ...RADOLF_EQUIPMENT, ...CORE_AMMUNITION, ...ELDER_EQUIPMENT, ...CORE_TRANSPORT, ...CORE_TACK, ...CORE_GENERAL_ADDITIONS, ...WITCHER_SPECIAL_EQUIPMENT, ...diagrams, ...PURE_SUBSTANCES, ...EXPERIMENTAL_DEVICES, ...EXPERIMENTAL_RECIPES];
   const missing = [...new Map(additions.map(entry => [entry.id, entry])).values()].filter(entry => !existing.has(entry.id));
   const oldDocuments = await Promise.all(Array.from(index.values()).filter(entry =>
     specialRuleIds.has(entry.system?.ruleId) || RADOLF_POTIONS.some(potion => potion.id === entry.system?.ruleId) || TOOL_RULES[entry.system?.ruleId] || GENERAL_GEAR_RULES[entry.system?.ruleId] || entry.system?.ruleId === "dimeritium-ring" || /^(material|substance|ammunition|alchemy|potion|oil|decoction|mutagen|formula|diagram|bomb|trap|rune|glyph)\./.test(entry.system?.ruleId??"") || ["armor", "weapon"].includes(entry.type)).map(entry => pack.getDocument(entry._id)));

@@ -6,6 +6,8 @@ const skillSave = (skill, dc, action = "Одно действие") => ({ kind: 
 // Verbal combat skills (core p.176): the penalty of Intoxication applies to all of them.
 const VERBAL = ["charisma", "persuasion", "seduction", "leadership", "deceit", "socialEtiquette", "intimidation"];
 const verbal = value => VERBAL.map(key => ({ target: `skills.${key}`, value }));
+// Every skill (as skills.mjs SKILL_KEYS; importing it here would be circular): "−2 to all actions" of a disease.
+export const ALL_SKILL_KEYS = ["awareness","wildernessSurvival","deduction","monsterLore","education","streetwise","teaching","tactics","business","socialEtiquette","melee","brawling","riding","staffSpear","smallBlades","swordsmanship","sailing","dodgeEscape","athletics","sleightOfHand","stealth","crossbow","archery","physique","endurance","gambling","groomingStyle","performance","fineArts","leadership","deceit","humanPerception","seduction","persuasion","charisma","alchemy","pickLock","trapCrafting","crafting","disguise","firstAid","forgery","intimidation","hexWeaving","ritualCrafting","resistMagic","resistCoercion","spellCasting","courage"];
 const entry = (id, name, icon, description, rules = {}) => ({ id, name, img: `icons/svg/${icon}.svg`, description, rules });
 // Canonical rules shared by token states, the compendium and existing Actor effects.
 export const CONDITION_DEFINITIONS = [
@@ -64,7 +66,9 @@ export const CONDITION_DEFINITIONS = [
   entry("dimeritium-agony", "Двимерит: жжение", "fire-shield", "Кожа словно в огне, персонаж едва может сосредоточиться: в начале каждого хода — испытание Устойчивости, при провале он дезориентирован. Длится, пока персонаж касается двимерита.", { dimeritium: { kind: "stun" } }),
   entry("dimeritium-burn", "Двимерит возжигает магию", "explosion", "Двимерит возжигает магию в теле: в начале каждого хода персонаж получает 1d6 урона, пока касается двимерита. Броня этот урон не поглощает.", { dimeritium: { kind: "damage", formula: "1d6" } }),
   // «Развлечения в таверне»: five minutes of strength, then the body pays (nausea is added when the effect ends).
-  entry("devils-musk", "Дьявольский мускус", "upgrade", "+3 к Силе на 5 минут. Когда действие закончится, наступает тошнота.", {seconds:300,modifiers:[{target:"skills.physique",value:3}],thenStatus:"nauseated"})
+  // Monster Hunter's Journal p.13 «Эффект: болезнь»: appended after the tavern effect (compendium IDs follow order).
+  entry("devils-musk", "Дьявольский мускус", "upgrade", "+3 к Силе на 5 минут. Когда действие закончится, наступает тошнота.", {seconds:300,modifiers:[{target:"skills.physique",value:3}],thenStatus:"nauseated"}),
+  entry("diseased", "Болезнь", "biohazard", "−2 ко всем действиям, максимум Выносливости снижен на четверть. По требованию ведущего — Стойкость СЛ 14, при провале тошнота. Вылечить: Лечащее прикосновение СЛ 15, затем полноценный ночной отдых.", {modifiers:[...ALL_SKILL_KEYS.map(key=>({target:`skills.${key}`,value:-2})),{target:"attributeCheck",value:-2},{target:"staminaMax",factor:0.75,value:0}]})
 ];
 export const CONDITION_BY_ID = Object.fromEntries(CONDITION_DEFINITIONS.map(entry=>[entry.id,entry]));
 // Variants share the status ID: poison/drunkenness cannot stack with themselves.

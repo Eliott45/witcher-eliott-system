@@ -16,6 +16,9 @@ import { fogRegions, fogSightLimit, revealFogletIfExposed, dispelFog, dismissFog
 import { afterCreatureAttack } from "../scripts/combat/creature-modes.mjs";
 import { actionQuote } from "../scripts/combat/action-economy.mjs";
 import { constrainHypnotizedVision } from "../scripts/combat/creature-actions-vision.mjs";
+import { igniteHym } from "../scripts/combat/hym.mjs";
+import { hymShadow } from "../scripts/combat/creature-spirits.mjs";
+import { pestaFliesTurn, onPestaStruck } from "../scripts/combat/pesta.mjs";
 
 const put=(object,path,value)=>{const keys=path.split(".");for(const key of keys.slice(0,-1))object=object[key]??= {};object[keys.at(-1)]=value;};
 const collection=values=>Object.assign(values,{get(id){return this.find(row=>row.id===id);},has(id){return this.some(row=>row.id===id);}});
@@ -390,4 +393,60 @@ test("a mage disperses the fog with 5 STA, an action and Spell Casting DC 18",as
   const stamina=mage.system.stamina.value;env.totals.push(17);
   await dispelFog(foglet,{sourceToken:from,targets:[caster]});assert.equal(fogRegions(env.scene).length,1);assert.equal(mage.system.stamina.value,stamina-5);
   env.totals.push(18);await dispelFog(foglet,{sourceToken:from,targets:[caster]});assert.equal(fogRegions(env.scene).length,0);
+});
+
+test("the hym whispers, sends hallucinations and nightmares to one victim within 10 m",async()=>{
+  const env=setup(),hym=env.actor("Хим"),wolf=env.actor("Волк"),from=env.token(hym),near=env.token(wolf,500),far=env.token(env.actor("Волк"),1000);const combat=env.combat();
+  await assert.rejects(useCreatureAction(hym,"hym-whisper",{sourceToken:from,targets:[far]}),/не дальше 10 м/);
+  env.totals.push(20,10,4);const whisper=await useCreatureAction(hym,"hym-whisper",{sourceToken:from,targets:[near]});
+  assert.match(whisper.content,/уединение на 4 ч/u);
+  combat.round=2;env.totals.push(9,10);await useCreatureAction(hym,"hym-hallucination",{sourceToken:from,targets:[near]});
+  assert.equal(wolf.effects.length,0,"a tie or loss leaves the victim calm");
+  combat.round=3;env.totals.push(18,10);await useCreatureAction(hym,"hym-hallucination",{sourceToken:from,targets:[near]});
+  assert.deepEqual(wolf.effects[0].flags[SYSTEM_ID].condition.modifiers,[{target:"skills.resistCoercion",value:-3}]);
+  combat.round=4;const max=wolf.system.statistics.staminaMax;await useCreatureAction(hym,"hym-nightmare",{sourceToken:from,targets:[near]});
+  const nightmare=wolf.effects.find(effect=>effect.flags[SYSTEM_ID].hymNightmare);
+  assert.deepEqual(nightmare.flags[SYSTEM_ID].condition.modifiers,[{target:"staminaMax",value:Math.max(5,Math.floor(max/2))-max}]);
+  assert.ok(hym.effects.some(effect=>effect.flags[SYSTEM_ID].creatureFullTurn),"nightmares take the full turn");
+});
+
+test("the hym steps from shadow to shadow and a fire attack lights it up for the round",async()=>{
+  const env=setup(),hym=env.actor("Хим"),wolf=env.actor("Волк"),from=env.token(hym),to=env.token(wolf,300);env.combat();
+  assert.ok(creatureActions(hym).find(action=>action.id==="shadow-step").disabled,"daylight scene");
+  hym.system.creature.shadowMode="active";
+  await useCreatureAction(hym,"shadow-step",{sourceToken:from,destination:{x:550,y:50}});assert.equal(from.x,500);
+  assert.equal(hymShadow(hym),true);
+  const card=await env.card(wolf,{weaponAttack:{target:from.uuid,traits:{types:["elemental"]},hitTraits:{}}});
+  assert.equal(await igniteHym(card),true);assert.equal(hymShadow(hym),false);
+  const steel=await env.card(wolf,{weaponAttack:{target:from.uuid,traits:{types:["slashing"]},hitTraits:{}}});
+  assert.equal(await igniteHym(steel),false);
+});
+
+test("the pesta's flies hinder and infect neighbours at their turn start until fire or wind scatters them",async()=>{
+  const env=setup(),pesta=env.actor("Песта"),wolf=env.actor("Волк"),far=env.actor("Волк"),from=env.token(pesta),near=env.token(wolf,100);env.token(far,2000);
+  const combat=env.combat(),[,neighbour,distant]=combat.combatants;neighbour.token=near;
+  env.totals.push(20);await pestaFliesTurn(combat,neighbour,{round:1});await pestaFliesTurn(combat,neighbour,{round:1});
+  assert.equal(wolf.effects.filter(effect=>effect.flags[SYSTEM_ID]?.pestaFlies).length,1);
+  assert.ok(wolf.effects.some(effect=>effect.statuses.has("diseased")),"20 ≤ 25%");
+  await pestaFliesTurn(combat,distant,{round:1});assert.equal(far.effects.length,0);
+  assert.equal(await onPestaStruck({target:from.uuid,traits:{types:["slashing"]}}),false);
+  assert.equal(await onPestaStruck({target:from.uuid,traits:{types:["elemental"]}}),true);
+  wolf.effects.length=0;combat.round=2;await pestaFliesTurn(combat,neighbour,{round:2});assert.equal(wolf.effects.length,0,"no flies, no penalty");
+  await useCreatureAction(pesta,"pesta-flies",{sourceToken:from});
+  assert.equal(pesta.flags[SYSTEM_ID].pestaFliesGone,false);
+});
+
+test("the pesta calls two rat swarms beside her; a swarm bite hits every body part and may infect",async()=>{
+  const env=setup(),pesta=env.actor("Песта"),from=env.token(pesta);env.combat();
+  await assert.rejects(useCreatureAction(pesta,"pesta-rats",{sourceToken:from,positions:[{x:150,y:50},{x:1050,y:50}]}),/Расстояние/);
+  env.combat().round=2;
+  await useCreatureAction(pesta,"pesta-rats",{sourceToken:from,positions:[{x:150,y:50},{x:50,y:150}]});
+  const swarms=env.scene.tokens.filter(token=>token.flags[SYSTEM_ID]?.pestaRats);assert.equal(swarms.length,2);
+  const rats=env.actor("Стая чумных крыс"),wolf=env.actor("Волк"),bite=env.token(rats,3000),victim=env.token(wolf,3100);
+  env.totals.push(10);const attack=(await useCreatureAction(rats,"swarm",{sourceToken:bite,targets:[victim]})).flags[SYSTEM_ID].weaponAttack;
+  assert.deepEqual([attack.base,attack.special,attack.defenses],[14,"creature:swarm",["dodge","reposition"]]);
+  const card=await env.card(rats,{weaponAttack:{name:"Атака стаи",special:"creature:swarm",attacker:bite.uuid,target:victim.uuid}}),before=wolf.system.health.value;
+  const parts=(await import("../scripts/combat/burning.mjs")).burningParts(wolf).length;
+  env.totals.push(...Array(parts).fill(5),40);await applyCreatureSpecial(card,0,{hit:true});await applyCreatureSpecial(card,0,{hit:true});
+  assert.ok(wolf.system.health.value<before);assert.equal(wolf.effects.filter(effect=>effect.statuses.has("diseased")).length,1);
 });

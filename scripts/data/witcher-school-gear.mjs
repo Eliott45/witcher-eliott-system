@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { journalComponentData } from "./journal-materials.mjs";
 import { weaponRecord } from "./equipment-records.mjs";
 import { equipmentUuid } from "./workshop.mjs";
 import { materialUuid } from "./workshop-materials.mjs";
@@ -56,8 +57,12 @@ export const SCHOOL_MATERIALS = [
   ["cockatrice-stomach", "Желудок куролиска"], ["bear-hide", "Медвежья шкура"], ["rotfiend-blood", "Кровь гнильца"],
   ["ruby-dust", "Рубиновая пыль"], ["knocker-hair", "Волосы стучака"], ["archespores-tendrils", "Усики археспоры"],
   ["bullvore-blood", "Кровь утковола"], ["bullvore-brain", "Мозг утковола"], ["bullvore-eyes", "Глаза утковола"], ["emerald-dust", "Изумрудная пыль"]
-].map(([id, name], index) => ({ id: `material.${id}`, documentId: `schoolMatr${String(index + 1).padStart(6, "0")}`, type: "equipment", source: "schoolGear", name, flags: unpriced,
-  system: { source: SCHOOL_GEAR_SOURCE, kind: "material", weight: 0, price: 0, description: `<p>${name}: компонент чертежей ведьмачьего снаряжения.</p>` } }));
+].map(([id, name], index) => {
+  // Monster Hunter's Journal pp.142–143 prices some of them; the rest stay unpriced.
+  const journal = journalComponentData(id);
+  return { id: `material.${id}`, documentId: `schoolMatr${String(index + 1).padStart(6, "0")}`, type: "equipment", source: "schoolGear", name, ...(journal ? {} : { flags: unpriced }),
+    system: { source: SCHOOL_GEAR_SOURCE, kind: "material", weight: 0, price: 0, ...journal, description: `<p>${name}: компонент чертежей ведьмачьего снаряжения${journal ? `; алхимический компонент, добывается: ${journal.material.location}` : ""}.</p>` } };
+});
 const componentUuid = id => { const extra = SCHOOL_MATERIALS.find(entry => entry.id === `material.${id}`); return extra ? equipmentUuid(extra.documentId) : materialUuid(id); };
 const steelBase = { "hardened-timber": 2, leather: 2, meteorite: 2, steel: 3, "sharpening-grit": 2, "etching-acid": 2, "ester-grease": 1, thread: 1 };
 const silverBase = { "hardened-timber": 2, leather: 2, silver: 4, steel: 1, "sharpening-grit": 2, "etching-acid": 1, "ester-grease": 1 };

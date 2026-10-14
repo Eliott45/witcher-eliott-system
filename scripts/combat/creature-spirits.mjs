@@ -1,5 +1,6 @@
 import { SYSTEM_ID, ROUND_SECONDS } from "../config.mjs";
 import { fullTurnStart } from "./full-turn-rules.mjs";
+import { actorEnvironment } from "./environment.mjs";
 
 const active = effect => !effect.disabled && !effect.isSuppressed && !effect.duration?.expired;
 const traits = actor => Array.from(actor?.items ?? []).filter(item => item.type === "ability").map(item => item.system?.ruleId ?? "");
@@ -22,13 +23,34 @@ export function creatureSuppression(actor) {
   return { moonDust, yrden, dimeritium, manual, suppressed: moonDust || yrden || manual, reasons };
 }
 
+export const isHym = actor => legacy(actor, "hym");
+/** A fire attack against the hym switches its shadow body off until the end of the round (outside combat: six seconds). */
+export function hymIgnited(actor, now = clock()) {
+  const ignited = actor?.flags?.[SYSTEM_ID]?.hymIgnited;
+  if (!ignited) return false;
+  if (ignited.combatId && now.combat?.started && now.combat.id === ignited.combatId) return now.combat.round === ignited.round;
+  return !ignited.combatId && now.worldTime - (ignited.time ?? 0) < ROUND_SECONDS;
+}
+/**
+ * Monster Hunter's Journal p.29 «Тело из теней»: in darkness the hym is incorporeal and invisible. Yrden does not cancel it;
+ * a fire attack this round does; the GM may force it on (deep shadow) or off (lit room).
+ */
+export function hymShadow(actor) {
+  if (!isHym(actor) || Array.from(actor?.effects ?? []).some(effect => active(effect) && effect.statuses?.has?.("dead"))) return false;
+  const mode = actor.system?.creature?.shadowMode ?? "auto";
+  if (mode === "off" || hymIgnited(actor)) return false;
+  return mode === "active" || actorEnvironment(actor)?.light?.id === "dark";
+}
+/** Shadow step needs dim light or darkness. */
+export const hymInShadow = actor => (actor?.system?.creature?.shadowMode ?? "auto") === "active" || ["dim", "dark"].includes(actorEnvironment(actor)?.light?.id);
+
 export function spiritState(actor) {
   const permanent = has(actor, "creature.incorporeal") || legacy(actor, "noonwraith");
   const slip = has(actor, "creature.slip") || legacy(actor, "wraith");
   const teleport = has(actor, "creature.teleport") || legacy(actor, "wraith");
   const suppression = creatureSuppression(actor);
   const temporary = Array.from(actor?.effects ?? []).some(effect => active(effect) && effect.statuses?.has?.(SPIRIT_SLIP));
-  const incorporeal = (permanent || temporary) && !suppression.suppressed;
+  const incorporeal = (permanent || temporary) && !suppression.suppressed || hymShadow(actor);
   const lunar = has(actor, "creature.lunar-weakness") || legacy(actor, "noonwraith");
   return { ...suppression, incorporeal, permanent, temporary, canSlip: slip && !suppression.suppressed,
     canTeleport: teleport && !suppression.suppressed, lunarPenalty: lunar && actor?.system?.creature?.moonlight ? -2 : 0,
@@ -188,7 +210,8 @@ export function refreshSpiritZones(scene) {
   const task = previous.catch(() => {}).then(async () => {
     for (const token of scene.tokens ?? []) {
       const actor = token.actor;
-      if (!actor) continue;
+      // Spell areas do not act on the hym (Monster Hunter's Journal p.29).
+      if (!actor || isHym(actor)) continue;
       const zones = spiritZonesAt({ isToken: true, token });
       for (const kind of ["yrden", "dimeritium"]) {
         const zone = zones.filter(entry => entry.kind === kind).sort((a, b) => b.penalty - a.penalty)[0];

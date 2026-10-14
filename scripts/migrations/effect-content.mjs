@@ -14,7 +14,8 @@ import { stripPageReferences } from "../data/item-lore.mjs";
 // 10: append the mage's «Устойчивость к двимериту» state (core p.66).
 // 11: append the dimeritium table rows: spasms, agony and burning magic (core p.167).
 // 12→13: append Devil's Musk from the tavern games.
-export const EFFECT_CONTENT_VERSION = 13;
+// 14: append Disease (Monster Hunter's Journal).
+export const EFFECT_CONTENT_VERSION = 14;
 // Earlier shipped names still count as unedited entries.
 const PREVIOUS_NAMES = { prone: ["Сбит с ног"] };
 const REFRESHED_CONDITIONS = new Set(["burning", "bleeding", "burrowing", "intoxicated", "blinded", "nauseated", "dying", "prone"]);

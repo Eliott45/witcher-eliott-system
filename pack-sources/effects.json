@@ -1644,6 +1644,243 @@
     }
   },
   {
+    "_id": "efct000000000047",
+    "name": "Болезнь",
+    "img": "icons/svg/biohazard.svg",
+    "type": "base",
+    "system": {},
+    "description": "<p>−2 ко всем действиям, максимум Выносливости снижен на четверть. По требованию ведущего — Стойкость СЛ 14, при провале тошнота. Вылечить: Лечащее прикосновение СЛ 15, затем полноценный ночной отдых.</p>",
+    "disabled": false,
+    "transfer": false,
+    "statuses": [
+      "diseased"
+    ],
+    "showIcon": 2,
+    "start": null,
+    "duration": {
+      "value": null,
+      "units": "seconds",
+      "expiry": null,
+      "expired": false
+    },
+    "folder": null,
+    "sort": 0,
+    "flags": {
+      "witcher-eliott-system": {
+        "condition": {
+          "key": "diseased",
+          "modifiers": [
+            {
+              "target": "skills.awareness",
+              "value": -2
+            },
+            {
+              "target": "skills.wildernessSurvival",
+              "value": -2
+            },
+            {
+              "target": "skills.deduction",
+              "value": -2
+            },
+            {
+              "target": "skills.monsterLore",
+              "value": -2
+            },
+            {
+              "target": "skills.education",
+              "value": -2
+            },
+            {
+              "target": "skills.streetwise",
+              "value": -2
+            },
+            {
+              "target": "skills.teaching",
+              "value": -2
+            },
+            {
+              "target": "skills.tactics",
+              "value": -2
+            },
+            {
+              "target": "skills.business",
+              "value": -2
+            },
+            {
+              "target": "skills.socialEtiquette",
+              "value": -2
+            },
+            {
+              "target": "skills.melee",
+              "value": -2
+            },
+            {
+              "target": "skills.brawling",
+              "value": -2
+            },
+            {
+              "target": "skills.riding",
+              "value": -2
+            },
+            {
+              "target": "skills.staffSpear",
+              "value": -2
+            },
+            {
+              "target": "skills.smallBlades",
+              "value": -2
+            },
+            {
+              "target": "skills.swordsmanship",
+              "value": -2
+            },
+            {
+              "target": "skills.sailing",
+              "value": -2
+            },
+            {
+              "target": "skills.dodgeEscape",
+              "value": -2
+            },
+            {
+              "target": "skills.athletics",
+              "value": -2
+            },
+            {
+              "target": "skills.sleightOfHand",
+              "value": -2
+            },
+            {
+              "target": "skills.stealth",
+              "value": -2
+            },
+            {
+              "target": "skills.crossbow",
+              "value": -2
+            },
+            {
+              "target": "skills.archery",
+              "value": -2
+            },
+            {
+              "target": "skills.physique",
+              "value": -2
+            },
+            {
+              "target": "skills.endurance",
+              "value": -2
+            },
+            {
+              "target": "skills.gambling",
+              "value": -2
+            },
+            {
+              "target": "skills.groomingStyle",
+              "value": -2
+            },
+            {
+              "target": "skills.performance",
+              "value": -2
+            },
+            {
+              "target": "skills.fineArts",
+              "value": -2
+            },
+            {
+              "target": "skills.leadership",
+              "value": -2
+            },
+            {
+              "target": "skills.deceit",
+              "value": -2
+            },
+            {
+              "target": "skills.humanPerception",
+              "value": -2
+            },
+            {
+              "target": "skills.seduction",
+              "value": -2
+            },
+            {
+              "target": "skills.persuasion",
+              "value": -2
+            },
+            {
+              "target": "skills.charisma",
+              "value": -2
+            },
+            {
+              "target": "skills.alchemy",
+              "value": -2
+            },
+            {
+              "target": "skills.pickLock",
+              "value": -2
+            },
+            {
+              "target": "skills.trapCrafting",
+              "value": -2
+            },
+            {
+              "target": "skills.crafting",
+              "value": -2
+            },
+            {
+              "target": "skills.disguise",
+              "value": -2
+            },
+            {
+              "target": "skills.firstAid",
+              "value": -2
+            },
+            {
+              "target": "skills.forgery",
+              "value": -2
+            },
+            {
+              "target": "skills.intimidation",
+              "value": -2
+            },
+            {
+              "target": "skills.hexWeaving",
+              "value": -2
+            },
+            {
+              "target": "skills.ritualCrafting",
+              "value": -2
+            },
+            {
+              "target": "skills.resistMagic",
+              "value": -2
+            },
+            {
+              "target": "skills.resistCoercion",
+              "value": -2
+            },
+            {
+              "target": "skills.spellCasting",
+              "value": -2
+            },
+            {
+              "target": "skills.courage",
+              "value": -2
+            },
+            {
+              "target": "attributeCheck",
+              "value": -2
+            },
+            {
+              "target": "staminaMax",
+              "factor": 0.75,
+              "value": 0
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
     "_id": "efct000000000101",
     "name": "Чёрный яд",
     "img": "icons/svg/poison.svg",

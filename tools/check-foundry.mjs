@@ -1680,7 +1680,9 @@ for(const source of bestiarySources()) {
     assert.equal(rendered.includes('name="system.creature.runBase"'),editing);
     assert.equal(rendered.includes('name="system.creature.recoveryBase"'),editing);
     assert.ok(rendered.includes(view.creatureClass.description));
-    assert.ok(rendered.includes(handlebars.escapeExpression(source.name)));assert.ok(rendered.includes('data-action="attackWeapon"'));assert.ok(!rendered.includes('data-mode="strong"'));
+    assert.ok(rendered.includes(handlebars.escapeExpression(source.name)));
+    // A plague rat swarm attacks only through its special action (Monster Hunter's Journal p.31).
+    if(source.items.some(item=>item.type==='weapon'))assert.ok(rendered.includes('data-action="attackWeapon"'));else assert.ok(rendered.includes('data-action="creatureSpecial"'),source.name);assert.ok(!rendered.includes('data-mode="strong"'));
     assert.equal((rendered.match(/aria-label="Добыча существа"/g)??[]).length,1,'NPC loot has one home in inventory');
     const inventoryTab=rendered.search(/<section class="tab[^\"]*" data-group="creature" data-tab="inventory">/);
     const loreTab=rendered.search(/<section class="tab[^\"]*" data-group="creature" data-tab="lore">/);

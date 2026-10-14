@@ -19,7 +19,15 @@ export const CREATURE_ACTIONS = {
   "fog-clear": { name:"Рассеять свой туман", profiles:["foglet"], fog:true, hint:"Действие" },
   "fog-invisible": { name:"Невидимость", profiles:["foglet"], fog:true, hint:"Действие в тумане: +10 к Скрытности, +5 к атаке" },
   "fog-copies": { name:"Иллюзорные копии", profiles:["foglet"], fog:true, hint:"Действие в тумане: четыре копии" },
-  "fog-illusion": { name:"Сотворение иллюзий", profiles:["foglet"], fog:true, fullTurn:true, hint:"Действие полного хода в тумане" }
+  "fog-illusion": { name:"Сотворение иллюзий", profiles:["foglet"], fog:true, fullTurn:true, hint:"Действие полного хода в тумане" },
+  // Monster Hunter's Journal pp.29–31, hym, pesta and her rats.
+  "shadow-step": { name:"Шаг сквозь тень", profiles:["hym"], movement:true, max:10, hint:"Перемещение: из тени в тень до 10 м" },
+  "hym-whisper": { name:"Нашёптывание", profiles:["hym"], hym:true, hint:"Действие: жертва (T) до 10 м, Убеждение против Сопротивления убеждению" },
+  "hym-hallucination": { name:"Галлюцинации", profiles:["hym"], hym:true, hint:"Действие: жертва (T) до 10 м, Сотворение заклинаний против Сопротивления убеждению" },
+  "hym-nightmare": { name:"Кошмары", profiles:["hym"], hym:true, fullTurn:true, hint:"Полный ход: спящая жертва (T) до 10 м" },
+  "pesta-flies": { name:"Призвать мух", profiles:["pesta"], pesta:true, hint:"Действие: вернуть рассеянное облако мух" },
+  "pesta-rats": { name:"Призвать чумных крыс", profiles:["pesta"], pesta:true, hint:"Действие: две стаи рядом с пестой" },
+  swarm: { name:"Атака стаи", profiles:["plague-rats"], max:1, skill:"melee", special:true, defenses:["dodge","reposition"] }
 };
 
 export const needleDice = defense => Math.max(0,15-Math.floor(defense));
@@ -35,7 +43,7 @@ const GRAVEIR_CHARGE={damage:"7d6",pushMeters:5,skill:"brawling",weapon:"Уда�
 export const chargeProfile = id => id==="ox"?{damage:"8d6",pushMeters:3,skill:"melee",weapon:"Рога"}:id==="graveir"?{...GRAVEIR_CHARGE,blockSave:{...GRAVEIR_CHARGE.blockSave}}
   :{damage:"10d6",pushMeters:8,skill:id==="golem"?"brawling":"melee",weapon:id==="fiend"?"Рога":id==="golem"?"Кулаки":"Когти"};
 export const pounceDistance = (id,statistics) => id==="ghoul"?5:id.startsWith("endrega-")?4:statistics.leap??0;
-export const isCreatureSpecial = attack => ["creature:web","creature:whirlwind"].includes(attack?.special);
+export const isCreatureSpecial = attack => ["creature:web","creature:whirlwind","creature:swarm"].includes(attack?.special);
 export const creatureSpecialDefenses = attack => CREATURE_ACTIONS[attack?.special?.replace("creature:","")]?.defenses??null;
 export const creatureHypnosisSource = actor => (actor?.effects??[]).find(effect=>activeEffect(effect)&&effect.flags?.[SYSTEM_ID]?.creatureHypnosis)?.flags[SYSTEM_ID].creatureHypnosis??null;
 export const creatureHypnosisPenalty = (subject,opponent) => {

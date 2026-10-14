@@ -1,6 +1,6 @@
 import { CORE_BESTIARY } from "./bestiary-core.mjs";
 import { SYSTEM_ID } from "../config.mjs";
-import { creatureSuppression } from "../combat/creature-spirits.mjs";
+import { creatureSuppression, hymShadow } from "../combat/creature-spirits.mjs";
 import { tokenActorSource } from "./token-actor-source.mjs";
 import { bookSource } from "./book-references.mjs";
 
@@ -33,7 +33,9 @@ export function creatureMovementMode(actor, environment = null) {
 export const creatureRaging = actor => creatureProfile(actor)?.id === "ghoul" && actor.system.health.value < 10 && !statuses(actor).has("dead");
 export const creatureHumanForm = actor => creatureProfile(actor)?.id === "werewolf" && actor.system.creature?.transformed === false;
 export const creatureSuppressionFlags = creatureSuppression;
-export const creatureInvisible = actor => Boolean(actor?.system?.creature?.invisible) && !creatureSuppression(actor).suppressed;
+export const creatureInvisible = actor => Boolean(actor?.system?.creature?.invisible) && !creatureSuppression(actor).suppressed || hymShadow(actor);
+/** A mage who found the hym by Magic Training halves its attack bonus until it moves (a move renews the epoch). */
+export const hymLocated = actor => { const located = actor?.flags?.[SYSTEM_ID]?.hymLocated; return located !== undefined && located === (actor.system?.creature?.invisibilityEpoch ?? ""); };
 export const creatureSeesInvisible = actor => creatureProfile(actor)?.id === "cat";
 export const creatureGolemSlowed = actor => creatureProfile(actor)?.id === "golem" && creatureSuppression(actor).dimeritium;
 const same = (a, b) => a === b || a?.uuid && a.uuid === b?.uuid;
@@ -71,7 +73,8 @@ export function creatureModeModifiers(actor, environment = null) {
   if (profile?.id === "bird" && movement === "flying") add("attributes.speed", 7 - (attrs.speed ?? 2), "Полёт птицы");
   if (creatureHumanForm(actor)) for (const [key, value] of Object.entries({ reflex: -2, body: -3, speed: -4, empathy: 5 })) add(`attributes.${key}`, value, "Человеческий облик волколака");
   if (creatureGolemSlowed(actor)) for (const key of Object.keys(attrs)) add(`attributes.${key}`, -2, "Двимеритовая бомба");
-  if (creatureInvisible(actor)) { add("skills.stealth", 10, "Невидимость"); add("combat.attack", 5, "Атака из невидимости"); }
+  if (hymShadow(actor)) add("combat.attack", hymLocated(actor) ? 5 : 10, hymLocated(actor) ? "Тело из теней: найден магом" : "Тело из теней");
+  else if (creatureInvisible(actor)) { add("skills.stealth", 10, "Невидимость"); add("combat.attack", 5, "Атака из невидимости"); }
   if (profile?.id === "arachas" && state.camouflage) add("skills.stealth", 10, "Неподвижный камуфляж");
   add("skills.courage", creaturePackBonus(actor), "Живой вожак стаи");
   const presence = creatureLeaderPresence(actor);
@@ -84,8 +87,8 @@ export function creatureModeModifiers(actor, environment = null) {
   return out;
 }
 /** A detected invisible katakan still imposes -3; an undetected one is handled by normal visibility/ambush. */
-export const creatureAttackParts = (actor, target) => creatureInvisible(target) && !creatureSeesInvisible(actor) ? [{ label: `Невидимый: ${target.name}`, value: -3 }] : [];
-export const creatureDefenseParts = (actor, attacker) => creatureInvisible(attacker) && !creatureSeesInvisible(actor) ? [{ label: `Невидимый: ${attacker.name}`, value: -3 }] : [];
+export const creatureAttackParts = (actor, target) => creatureInvisible(target) && !hymShadow(target) && !creatureSeesInvisible(actor) ? [{ label: `Невидимый: ${target.name}`, value: -3 }] : [];
+export const creatureDefenseParts = (actor, attacker) => creatureInvisible(attacker) && !hymShadow(attacker) && !creatureSeesInvisible(actor) ? [{ label: `Невидимый: ${attacker.name}`, value: -3 }] : [];
 
 export function creatureModeContext(actor) {
   const profile = creatureProfile(actor), state = actor.system.creature ?? {}, fields = [];
@@ -98,12 +101,15 @@ export function creatureModeContext(actor) {
   if (profile?.id === "arachas") { check("camouflage", "Неподвижен в привычной среде"); check("weakSpot", "Атакуют сзади: ПБ 10"); }
   if (profile?.id === "rock-troll") check("weakSpot", "Открытый живот: ПБ 5 для торса");
   if (profile?.id === "werewolf") check("transformed", "Облик волколака", true);
-  if (["wraith", "noonwraith", "katakan", "werewolf"].includes(profile?.id)) select("spiritMode", "Подавление способностей", [["normal", "По эффектам Ирдена и Лунной пыли"], ["suppressed", "Подавлено ведущим"]], "normal");
+  if (profile?.id === "hym") select("shadowMode", "Тело из теней", [["auto", "По освещению: в темноте"], ["active", "Хим в тени"], ["off", "Хим на свету"]], "auto");
+  if (["wraith", "noonwraith", "katakan", "werewolf", "pesta"].includes(profile?.id)) select("spiritMode", "Подавление способностей", [["normal", "По эффектам Ирдена и Лунной пыли"], ["suppressed", "Подавлено ведущим"]], "normal");
   if (profile?.id === "noonwraith") check("moonlight", "Под лунным светом");
   if (["wolf", "warg", "nekker", "nekker-chief", "barghest", ...BARGHEST_LEADERS].includes(profile?.id)) fields.push({ key: "packId", label: "Название стаи", text: true, value: state.packId ?? "" });
   // Monster Hunter's Journal p.21: read the decay effect directly; combat/rotfiend.mjs depends on this module.
   const rotfiend = profile?.id === "rotfiend" && !actor.flags?.[SYSTEM_ID]?.rotfiendExploded
     ? { decaying: Array.from(actor.effects ?? []).some(effect => active(effect) && effect.flags?.[SYSTEM_ID]?.rotfiendDecay) } : null;
-  const notes = [rotfiend?.decaying ? "Разлагается: взорвётся в начале своего следующего хода." : "", creatureRaging(actor) ? "Ярость: +3 ПЗ в начале хода; необходимо двигаться и атаковать." : "", creatureHasInfiniteStamina(actor) ? "Конструкция: Выносливость не расходуется." : "", creaturePackBonus(actor) ? "Живой вожак в этой стае: +4 к Храбрости." : "", creatureLeaderPresence(actor) ? "Присутствие вожака: +3 к атаке и защите." : "", creatureInvisible(actor) ? "Невидим: +10 Скрытности, +5 к атаке; после атаки станет видим." : ""].filter(Boolean);
-  return { fields, notes, rotfiend, available: fields.length > 0 || notes.length > 0 || ["cat", "foglet"].includes(profile?.id) || Boolean(rotfiend), infiniteStamina: creatureHasInfiniteStamina(actor), lycanthropy: profile?.id === "werewolf", detectMagic: profile?.id === "katakan", detectSight: ["katakan", "foglet"].includes(profile?.id), foglet: profile?.id === "foglet", senseMagic: profile?.id === "cat", sirenIllusion: profile?.id === "siren" && state.illusion, falling: (state.fallRemaining ?? 0) > 0, fallRemaining: state.fallRemaining ?? 0 };
+  const notes = [hymShadow(actor) ? `Тело из теней: бесплотен и невидим, +${hymLocated(actor) ? 5 : 10} к атаке.` : "",
+    profile?.id === "pesta" ? (actor.flags?.[SYSTEM_ID]?.pestaFliesGone ? "Облако мух рассеяно." : "Облако мух: −2 ко всем действиям рядом с ней, болезнь 25% в начале хода.") : "",
+    rotfiend?.decaying ? "Разлагается: взорвётся в начале своего следующего хода." : "", creatureRaging(actor) ? "Ярость: +3 ПЗ в начале хода; необходимо двигаться и атаковать." : "", creatureHasInfiniteStamina(actor) ? "Конструкция: Выносливость не расходуется." : "", creaturePackBonus(actor) ? "Живой вожак в этой стае: +4 к Храбрости." : "", creatureLeaderPresence(actor) ? "Присутствие вожака: +3 к атаке и защите." : "", creatureInvisible(actor) ? "Невидим: +10 Скрытности, +5 к атаке; после атаки станет видим." : ""].filter(Boolean);
+  return { fields, notes, rotfiend, available: fields.length > 0 || notes.length > 0 || ["cat", "foglet"].includes(profile?.id) || Boolean(rotfiend), infiniteStamina: creatureHasInfiniteStamina(actor), lycanthropy: profile?.id === "werewolf", detectMagic: ["katakan", "hym"].includes(profile?.id), detectSight: ["katakan", "foglet"].includes(profile?.id), foglet: profile?.id === "foglet", senseMagic: profile?.id === "cat", sirenIllusion: profile?.id === "siren" && state.illusion, falling: (state.fallRemaining ?? 0) > 0, fallRemaining: state.fallRemaining ?? 0 };
 }

@@ -119,13 +119,17 @@ export async function detectCreature(actor, { magic = false, observer = null } =
     if (!training) throw new Error("Нужна способность мага «Магические познания».");
     base = (observer.system.statistics.effective.intelligence ?? 0) + (training.system.level ?? 0);
   } else base = skillValue(observer.system, "awareness").total;
-  const defense = skillValue(actor.system, magic ? "resistMagic" : "stealth").total;
+  const hym = creatureProfile(actor)?.id === "hym";
+  if (hym && !magic) throw new Error("Хима нельзя обнаружить Вниманием: только маг Магическими познаниями.");
+  // Monster Hunter's Journal p.29: Magic Training is opposed by the hym's Stealth, not its Resist Magic.
+  const defense = skillValue(actor.system, magic && !hym ? "resistMagic" : "stealth").total;
   const [check, resist] = await Promise.all([creatureRoll(`1d10wc + ${base}`), creatureRoll(`1d10wc + ${defense}`)]);
   const success = check.total > resist.total;
   if (success) {
     const records = { ...(observer.flags?.[SYSTEM_ID]?.detectedCreatures ?? {}) }, key = encodeURIComponent(actor.uuid).replaceAll(".", "%2E");
     records[key] = { sourceActor: actor.uuid, sourceToken: actorToken(actor)?.uuid ?? "", epoch: actor.system.creature.invisibilityEpoch ?? "" };
     await observer.setFlag(SYSTEM_ID, "detectedCreatures", records);
+    if (hym) await actor.update({ [`flags.${SYSTEM_ID}.hymLocated`]: actor.system.creature.invisibilityEpoch ?? "" });
     globalThis.canvas?.perception?.update?.({ refreshVision: true });
   }
   await creaturePost(actor, { title: magic ? "Обнаружить магией" : "Заметить невидимого", rolls: [check, resist], text: `${esc(observer.name)}: ${success ? `обнаруживает: ${esc(actor.name)}; штраф −3 к атаке и защите против него остаётся` : `не обнаруживает: ${esc(actor.name)}`}.` });

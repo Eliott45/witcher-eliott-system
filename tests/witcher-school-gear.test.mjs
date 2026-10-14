@@ -1,3 +1,4 @@
+import { journalComponentData } from "../scripts/data/journal-materials.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -56,7 +57,11 @@ test("every new diagram resolves its result/components, spends exact quantities,
   const docs=documents.map(item=>({...item,id:item._id,uuid:equipmentUuid(item._id)})), refs=new Map(docs.map(item=>[item.uuid,item]));
   for (const entry of [...SCHOOL_GEAR,...SCHOOL_DIAGRAMS,...SCHOOL_MATERIALS]) {
     const item=docs.find(item=>item.system.ruleId === entry.id);
-    assert.equal(item.folder,SCHOOL_GEAR_FOLDER.id);assert.equal(item.system.source,"Снаряжение ведьмака"); assert.equal(item.flags[SYS].priceUnavailable,true);
+    assert.equal(item.folder,SCHOOL_GEAR_FOLDER.id);assert.equal(item.system.source,"Снаряжение ведьмака");
+    // Monster Hunter's Journal pp.142–143 prices some components; the supplement itself prices nothing.
+    const journal=journalComponentData(entry.id);
+    if (journal) { assert.equal(item.flags?.[SYS]?.priceUnavailable,undefined); assert.deepEqual([item.system.price,item.system.weight,item.system.material.substance],[journal.price,journal.weight,journal.material.substance]); }
+    else assert.equal(item.flags[SYS].priceUnavailable,true);
     if (item.type !== "recipe") continue;
     const recipe=item.system.recipe,result=refs.get(recipe.resultUuid);
     assert.ok(result); assert.equal(item.system.rarity,"rare");assert.equal(recipe.grade,"master");assert.equal(recipe.forge,true);

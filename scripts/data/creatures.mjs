@@ -4,6 +4,7 @@ import { potionImmunity } from "./consumables.mjs";
 import { creatureIsMassive, creatureHasInfiniteStamina } from "./creature-modes.mjs";
 import { spiritConditionImmune } from "../combat/creature-spirits.mjs";
 import { peasantImmunity } from "./peasant-rules.mjs";
+import { hasAbility } from "./abilities.mjs";
 
 /** NPC metadata only. Statistics, attacks, skills, abilities and equipment keep their existing models. */
 // Core p.164 «Модификаторы размера»: added to the DC of an unaware or inanimate target of a ranged attack (p.165).
@@ -21,7 +22,7 @@ export function creatureFields() {
     footing:itemText("auto",{choices:["auto","ordinary","quadruped","legless"]}),
     fallRemaining:itemNumber(),fallDistance:itemNumber(),fallRound:itemText(),illusion:new BooleanField({initial:false}),camouflage:new BooleanField({initial:false}),weakSpot:new BooleanField({initial:false}),
     invisible:new BooleanField({initial:false}),invisibilityEpoch:itemText(),transformed:new BooleanField({initial:true}),packId:itemText(),
-    spiritMode:itemText("normal",{choices:["normal","suppressed"]}),moonlight:new BooleanField({initial:false}),
+    spiritMode:itemText("normal",{choices:["normal","suppressed"]}),shadowMode:itemText("auto",{choices:["auto","active","off"]}),moonlight:new BooleanField({initial:false}),
     hasTailOrWings:new BooleanField({initial:false}),
     lore:new ArrayField(new SchemaField({name:itemText(),skill:itemText("education"),dc:itemNumber(),text:itemText()})),
     loot:new ArrayField(new SchemaField({name:itemText(),formula:itemText("1"),currency:new BooleanField({initial:false})})),
@@ -53,5 +54,9 @@ export function immuneToCondition(actor,statuses) {
     || ids.has("poisoned")&&traits.has("creature.poison-immunity")
     || ids.has("burning")&&traits.has("creature.fire-immunity")
     || ids.has("bleeding")&&traits.has("creature.bleeding-immunity")
+    || ids.has("frozen")&&traits.has("creature.freeze-immunity")
+    || ids.has("prone")&&traits.has("creature.knockdown-immunity")
+    // Witchers' Mutant Resilience and creatures with disease immunity cannot fall ill.
+    || ids.has("diseased")&&(traits.has("creature.disease-immunity")||actor.type==="character"&&hasAbility(actor,"witcher.mutant-resilience"))
     || traits.has("creature.construct")&&["bleeding","burning","poisoned"].some(id=>ids.has(id));
 }

@@ -41,6 +41,7 @@ import { magicShieldPlan, absorbWithMagicShield, applySpellHit } from "../magic/
 import { heatedWeapon } from "../magic/cadfan.mjs";
 import { igniteDragonClouds } from "./dragon-clouds.mjs";
 import { tokenCenter } from "./attack-target.mjs";
+import { onPestaStruck } from "./pesta.mjs";
 import { experimentalAmmoReplacesDamage, experimentalAttackRolls, experimentalExchangeOutcome, resolveExperimentalAmmunition, experimentalAmmoHTML } from "./experimental-ammunition.mjs";
 
 // One weapon attack card hosts the whole exchange: each attack roll gets its own defense, location, damage and
@@ -287,10 +288,13 @@ export function rollExchangeDamage(message, index) {
       extras.push({ label: "Раскалено (Хватка Кадфана)", value: heat.total });
       hitTraits = { ...hitTraits, burning: Math.max(hitTraits.burning ?? 0, 50) };
     }
+    // Monster Hunter's Journal p.29: the hym's shadow claws drain extra damage past armor and location.
+    const drain = hitTraits.shadowDrain ? await evaluateRoll(hitTraits.shadowDrain, options) : null;
+    if (drain) rolls.push(drain);
     const specter = specterDamageBonus(hitTraits, target);
     if (specter) extras.push({ label: "Лунный лук: против призрака", value: specter });
     return { rolls, flavor: `<h3>${esc(attack.name)} · урон</h3>`,
-      exchange: { base: rolls[0].total, silver: silver?.total ?? 0, oil: oilBonus, extras, hitTraits, ablation: ablation?.total ?? 0,
+      exchange: { base: rolls[0].total, silver: silver?.total ?? 0, oil: oilBonus, extras, hitTraits, ablation: ablation?.total ?? 0, drain: drain?.total ?? 0,
         location: { id: location.id, name: location.name, multiplier: location.multiplier }, traits, critical } };
   });
 }
@@ -318,6 +322,8 @@ export function damagePreview(message, index) {
       steps: amount > 1 ? [...result.steps, {label:"Разрушение брони", value:`ПБ −${amount}`} ] : result.steps };
   };
   preview.result = wear(preview.result);
+  if (data.drain && !preview.result.immune) preview.result = { ...preview.result, total: preview.result.total + data.drain,
+    steps: [...preview.result.steps, { label: "Теневые когти: мимо брони", value: `+${data.drain}` }] };
   if (preview.magicShield) preview.result = { ...preview.result, steps: [{ label: "Магический щит", value: `−${preview.magicShield}`, detail: "поглощено до брони" }, ...preview.result.steps] };
   // Core p.160: a blow to a prosthesis does not hurt its owner, but knocks the prosthesis off.
   const fitted = prosthesisAt(target, data.location.id);
@@ -916,6 +922,7 @@ async function afterSettled(message) {
     if (attack?.spell && attack.traits?.types?.includes("elemental") && token?.parent)
       await igniteDragonClouds(token.parent, tokenCenter(token));
   }
+  if (outcome?.hit && game.users.activeGM?.isSelf) await onPestaStruck(flagsOf(attackMessage).weaponAttack);
   if (outcome?.hit && game.users.activeGM?.isSelf && !linkedAny(attackMessage.id,link.index,"applied")) {
     const token = targetToken(flagsOf(attackMessage).weaponAttack);
     if (token?.actor?.flags?.[SYSTEM_ID]?.noonCopy && await destroyNoonCopy(token)) {

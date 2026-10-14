@@ -8251,13 +8251,13 @@
       },
       "creature": {
         "category": "specter",
-        "difficulty": "",
-        "reward": 0,
-        "size": "",
-        "weight": "",
-        "habitat": "",
-        "intellect": "",
-        "group": "Стая",
+        "difficulty": "Простые / незаурядные",
+        "reward": 30,
+        "size": "1 м",
+        "weight": "40 кг",
+        "habitat": "Возле поселений",
+        "intellect": "Дикий",
+        "group": "Группы из 3–5 особей",
         "source": "Дневник охотника на чудовищ",
         "description": "Проклятый призрачный пёс, охотящийся стаей и дышащий зелёным пламенем.",
         "tactics": "Окружает цель вместе со стаей, кусает и выдыхает зелёный огонь; засветившись, бросается призрачным рывком сквозь врага и ослепляет его.",
@@ -8283,13 +8283,7 @@
             "text": "Баргест рождается, как любое проклятие, из сгустка злой воли: одни преследуют лишь проклятого, другие бросаются на всех. Стая ловко окружает врага и плюётся зелёным огнём. Светящийся полупрозрачный баргест готовит призрачный рывок, ослепляющий жертву, — Ирден и Лунная пыль его срывают, помогает масло против духов."
           }
         ],
-        "loot": [
-          {
-            "name": "Эссенция баргеста",
-            "formula": "1d6",
-            "currency": false
-          }
-        ],
+        "loot": [],
         "lootGenerated": false
       },
       "harvest": [
@@ -8298,6 +8292,15 @@
           "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000182",
           "quantity": 0,
           "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "barghest-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00004",
+          "quantity": 0,
+          "formula": "1d6",
           "skill": "",
           "dc": 0,
           "attempted": false
@@ -8453,6 +8456,28 @@
           "description": "<p>бомба «Лунная пыль» и знак Ирден блокируют Призрачную атаку с разбега.</p>"
         },
         "flags": {}
+      },
+      {
+        "_id": "bst031i000000012",
+        "name": "Ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.night-vision",
+          "description": "<p>Действует в зонах со слабым освещением без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst031i000000013",
+        "name": "Выслеживание по запаху",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.barghest.12",
+          "description": "<p>Выслеживает существо по запаху, не видя и не слыша его, без штрафов.</p>"
+        },
+        "flags": {}
       }
     ]
   },
@@ -8529,13 +8554,7 @@
         "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [],
-        "loot": [
-          {
-            "name": "Эссенция баргеста",
-            "formula": "1d6",
-            "currency": false
-          }
-        ],
+        "loot": [],
         "lootGenerated": false
       },
       "harvest": [
@@ -8544,6 +8563,15 @@
           "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000182",
           "quantity": 0,
           "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "barghest-leader-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00004",
+          "quantity": 0,
+          "formula": "1d6",
           "skill": "",
           "dc": 0,
           "attempted": false
@@ -8775,19 +8803,22 @@
         "recoveryBase": 0,
         "sizeClass": "medium",
         "lore": [],
-        "loot": [
-          {
-            "name": "Эссенция баргеста",
-            "formula": "1d6",
-            "currency": false
-          }
-        ],
+        "loot": [],
         "lootGenerated": false
       },
       "harvest": [
         {
           "id": "kai-0",
           "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000182",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "kai-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00004",
           "quantity": 0,
           "formula": "1d6",
           "skill": "",
@@ -9049,21 +9080,6 @@
         ],
         "loot": [
           {
-            "name": "Глаза утковола",
-            "formula": "floor(1d6/3)",
-            "currency": false
-          },
-          {
-            "name": "Кровь утковола",
-            "formula": "2d6",
-            "currency": false
-          },
-          {
-            "name": "Мозг утковола",
-            "formula": "1",
-            "currency": false
-          },
-          {
             "name": "Жилы",
             "formula": "2d6",
             "currency": false
@@ -9074,6 +9090,33 @@
       "harvest": [
         {
           "id": "graveir-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000009",
+          "quantity": 0,
+          "formula": "floor(1d6 / 3)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "graveir-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000007",
+          "quantity": 0,
+          "formula": "2d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "graveir-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000008",
+          "quantity": 1,
+          "formula": "",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "graveir-3",
           "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
           "quantity": 0,
           "formula": "1d6",
@@ -9353,18 +9396,7 @@
             "text": "Слабо светящийся трупоед, заманивающий путников огоньком в тумане. В своём тумане исчезает, создаёт иллюзии и призрачные копии, развеивающиеся от удара; нанося удар, ненадолго становится видимым. Двимеритовая бомба не даст ему нагнать туман, Ирден и Лунная пыль делают его видимым, маг или жрец может разогнать туман."
           }
         ],
-        "loot": [
-          {
-            "name": "Зубы туманника",
-            "formula": "floor(1d6/2)",
-            "currency": false
-          },
-          {
-            "name": "Эссенция туманника",
-            "formula": "1d6",
-            "currency": false
-          }
-        ],
+        "loot": [],
         "lootGenerated": false
       },
       "harvest": [
@@ -9379,9 +9411,27 @@
         },
         {
           "id": "foglet-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00001",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "foglet-2",
           "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000205",
           "quantity": 0,
           "formula": "2d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "foglet-3",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00002",
+          "quantity": 0,
+          "formula": "1d6",
           "skill": "",
           "dc": 0,
           "attempted": false
@@ -9603,21 +9653,29 @@
             "text": "Не мертвецы, а трупоеды, похожие на трупы. Охотятся группами и бегают быстро, как скачущая лошадь. Серебро и масло против трупоедов убивают их легко, но умирающий гнилец взрывается и может вызвать цепную реакцию; последний удар лучше наносить огнём."
           }
         ],
-        "loot": [
-          {
-            "name": "Кровь гнильца",
-            "formula": "floor(1d6/2)",
-            "currency": false
-          },
-          {
-            "name": "Печень гнильца",
-            "formula": "1",
-            "currency": false
-          }
-        ],
+        "loot": [],
         "lootGenerated": false
       },
-      "harvest": []
+      "harvest": [
+        {
+          "id": "rotfiend-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000003",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "rotfiend-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00003",
+          "quantity": 1,
+          "formula": "",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
     },
     "items": [
       {
@@ -9719,6 +9777,678 @@
         "system": {
           "ruleId": "creature.rotfiend.7",
           "description": "<p>существо с обонянием чует гнильца за 20 м, с выслеживанием по запаху — за 40 м.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000037",
+    "name": "Хим",
+    "type": "npc",
+    "img": "icons/svg/terror.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Хим",
+      "texture": {
+        "src": "icons/svg/terror.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 7,
+        "reflex": 5,
+        "dexterity": 4,
+        "body": 7,
+        "speed": 5,
+        "empathy": 3,
+        "craft": 1,
+        "will": 12,
+        "luck": 0
+      },
+      "health": {
+        "value": 90,
+        "max": 90
+      },
+      "stamina": {
+        "value": 45,
+        "max": 45
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 13,
+        "brawling": 11,
+        "awareness": 10,
+        "wildernessSurvival": 7,
+        "intimidation": 5,
+        "physique": 8,
+        "stealth": 14,
+        "resistMagic": 5,
+        "resistCoercion": 6,
+        "persuasion": 14,
+        "courage": 6,
+        "dodgeEscape": 11
+      },
+      "creature": {
+        "category": "specter",
+        "difficulty": "Сложные / трудные",
+        "reward": 1500,
+        "size": "3 м",
+        "weight": "Невесомый",
+        "habitat": "Возле жертвы",
+        "intellect": "Разумный",
+        "group": "Одиночка",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Демон вины, сотканный из теней: невидим и неуязвим во тьме и мучает свою жертву галлюцинациями и кошмарами.",
+        "tactics": "Держится в тени возле жертвы, нашёптывает и насылает галлюцинации; в бою телепортируется из тени в тень и бьёт длинными когтями, вытягивающими жизнь мимо брони. Свет и огонь лишают его неуязвимости.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 90,
+        "staminaMax": 45,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "large",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 20,
+            "text": "О химах знают мало: говорят, это духи вины, что преследуют виноватого, насылают кошмары днём и ночью и доводят до безумия."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "monsterLore",
+            "dc": 18,
+            "text": "Хим — демон из внешних сфер, питающийся чувством вины. Он мучает жертву галлюцинациями и кошмарами и уговаривает её покалечить себя, пока та не умрёт, не найдёт кого-то виновнее или не сломается. В тени хим невидим и неуязвим; выманить его можно, заперев жертву в освещённой комнате. На свету его можно ранить — подожгите его, и останутся лишь когти; помогает масло против духов."
+          }
+        ],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "hym-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.schoolMatr000010",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "hym-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00005",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "hym-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000266",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "hym-3",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.upgr000000000009",
+          "quantity": 1,
+          "formula": "",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "hym-4",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000142",
+          "quantity": 0,
+          "formula": "2d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst037i000000001",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "brawling",
+          "damage": "5d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Теневые когти (2d6); Длинное",
+          "description": "<p>Теневые когти (2d6); Длинное СА 2.</p>",
+          "ruleId": "creature.weapon.hym.0"
+        }
+      },
+      {
+        "_id": "bst037i000000002",
+        "name": "Улучшенное ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.enhanced-night-vision",
+          "description": "<p>Действует в слабом освещении и в темноте без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst037i000000003",
+        "name": "Невосприимчивость к кровотечению",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.bleeding-immunity",
+          "description": "<p>Состояние «Кровотечение» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst037i000000004",
+        "name": "Невосприимчивость к заморозке",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.freeze-immunity",
+          "description": "<p>Состояние «Замораживание» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst037i000000005",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst037i000000006",
+        "name": "Невосприимчивость к сбиванию с ног",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.knockdown-immunity",
+          "description": "<p>Его нельзя сбить с ног.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst037i000000007",
+        "name": "Невосприимчивость к болезням",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.disease-immunity",
+          "description": "<p>Не заражается болезнями.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst037i000000008",
+        "name": "Регенерация",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.hym.7",
+          "description": "<p>Восстанавливает 5 ПЗ в начале каждого своего хода.</p>"
+        },
+        "flags": {
+          "witcher-eliott-system": {
+            "regeneration": 5
+          }
+        }
+      },
+      {
+        "_id": "bst037i000000009",
+        "name": "Тело из теней",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.hym.8",
+          "description": "<p>В темноте хим бесплотен и невидим: физические атаки не наносят ему урона, его нельзя услышать или учуять, против него не проходят проверки Внимания, а к его атакам +10. Ослеплённый не обнаружит его, пока тот не атакует или не получит урон. Маг действием проходит Магические познания против Скрытности хима: так он находит хима, может выбрать его целью магии, а бонус хима к атаке падает до +5 — до следующего перемещения хима. Перемещением хим телепортируется из тени в тень на расстояние до 10 м, если обе в полумраке или темноте. Ловушки и области заклинаний на него не действуют; Ирден не отменяет эту способность.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst037i000000010",
+        "name": "Теневые когти",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.hym.9",
+          "description": "<p>Каждое попадание когтями вытягивает жизненную силу: цель получает ещё 2d6 урона независимо от брони и части тела, даже если когти не пробили броню.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst037i000000011",
+        "name": "Убеждение жертвы",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.hym.10",
+          "description": "<p>Против цели в пределах 10 м. Действие: нашёптывание — Убеждение хима против Сопротивления убеждению; при провале цель один раз бьёт себя или кого-то рядом ближайшим оружием либо уединяется на 1d10 часов. Действие: галлюцинации — Сотворение заклинаний хима против Сопротивления убеждению; при провале паника и −3 к Сопротивлению убеждению против хима на 1 час. Полный ход: кошмары спящей цели — во сне она не восстанавливает ПЗ и ВЫН, а максимум ВЫН уменьшается вдвое (не ниже 5) до нормального сна; эффект суммируется.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst037i000000012",
+        "name": "Масло против духов",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.specter-oil",
+          "description": "<p>Уязвимость: масло против духов добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst037i000000013",
+        "name": "Уязвимость: Поджигание",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.hym.12",
+          "description": "<p>атака горящим оружием или огнём отключает Тело из теней до конца раунда; если хим до конца раунда уйдёт из освещённой зоны, способность вернётся в конце его хода.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000038",
+    "name": "Песта",
+    "type": "npc",
+    "img": "icons/svg/terror.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Песта",
+      "texture": {
+        "src": "icons/svg/terror.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 5,
+        "reflex": 8,
+        "dexterity": 6,
+        "body": 7,
+        "speed": 7,
+        "empathy": 1,
+        "craft": 1,
+        "will": 9,
+        "luck": 0
+      },
+      "health": {
+        "value": 80,
+        "max": 80
+      },
+      "stamina": {
+        "value": 40,
+        "max": 40
+      },
+      "vigor": 0,
+      "skills": {
+        "athletics": 8,
+        "brawling": 2,
+        "melee": 8,
+        "awareness": 4,
+        "wildernessSurvival": 3,
+        "intimidation": 5,
+        "physique": 3,
+        "stealth": 5,
+        "resistMagic": 6,
+        "dodgeEscape": 10
+      },
+      "creature": {
+        "category": "specter",
+        "difficulty": "Сложные / трудные",
+        "reward": 900,
+        "size": "1,75 м",
+        "weight": "Невесомая",
+        "habitat": "Возле поселений",
+        "intellect": "Разумная",
+        "group": "Одиночка",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Бесплотная моровая дева, окружённая заразными мухами и приводящая с собой стаи чумных крыс.",
+        "tactics": "Бьёт заразными когтями дважды за ход, держит вокруг облако мух и бросает на врагов стаи крыс. Пока её не сделают осязаемой Ирденом или «Лунной пылью», физическое оружие бессильно.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 80,
+        "staminaMax": 40,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "medium",
+        "lore": [
+          {
+            "name": "Предрассудки простолюдинов",
+            "skill": "education",
+            "dc": 14,
+            "text": "Песты разносят болезни: с ними приходят чумные крысы и насекомые, а укушенный ими вскоре слёг и не встанет. Справиться с ними, говорят, может только ведьмак."
+          },
+          {
+            "name": "Экология и поведение",
+            "skill": "monsterLore",
+            "dc": 16,
+            "text": "Песта, или моровая дева, — редкий бесплотный дух, рождающийся там, где бушует эпидемия. Без Ирдена или «Лунной пыли» сражаться с ней бессмысленно. Её окружают заразные мухи, а следом идут чумные крысы; когти сочатся заразой, поэтому бой грозит болезнью (ведьмаки к ней невосприимчивы). Сожгите мух, держитесь рядом, чтобы снова поставить Ирден, а союзники пусть истребляют крыс."
+          }
+        ],
+        "loot": [
+          {
+            "name": "Глиф Ирден",
+            "formula": "1",
+            "currency": false
+          }
+        ],
+        "lootGenerated": false
+      },
+      "harvest": [
+        {
+          "id": "pesta-0",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.journalMatr00005",
+          "quantity": 0,
+          "formula": "floor(1d6 / 2)",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "pesta-1",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000266",
+          "quantity": 0,
+          "formula": "1d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        },
+        {
+          "id": "pesta-2",
+          "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000142",
+          "quantity": 0,
+          "formula": "2d6",
+          "skill": "",
+          "dc": 0,
+          "attempted": false
+        }
+      ]
+    },
+    "items": [
+      {
+        "_id": "bst038i000000001",
+        "name": "Удар когтями",
+        "type": "weapon",
+        "img": "systems/witcher-eliott-system/assets/creatures/claws.svg",
+        "system": {
+          "category": "melee",
+          "skill": "melee",
+          "damage": "4d6",
+          "natural": true,
+          "damageIncludesBody": true,
+          "damageType": "Р",
+          "equipped": true,
+          "attackRate": 2,
+          "accuracy": 0,
+          "range": 0,
+          "hands": 1,
+          "quantity": 1,
+          "carried": true,
+          "source": "Дневник охотника на чудовищ",
+          "properties": "Болезнь (50%)",
+          "description": "<p>Болезнь (50%) СА 2.</p>",
+          "ruleId": "creature.weapon.pesta.0"
+        }
+      },
+      {
+        "_id": "bst038i000000002",
+        "name": "Ночное зрение",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.night-vision",
+          "description": "<p>Действует в зонах со слабым освещением без штрафов.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst038i000000003",
+        "name": "Невосприимчивость к кровотечению",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.bleeding-immunity",
+          "description": "<p>Состояние «Кровотечение» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst038i000000004",
+        "name": "Иммунитет к ядам",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.poison-immunity",
+          "description": "<p>Существо невосприимчиво к ядам. Состояние «Отравление» на него не накладывается.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst038i000000005",
+        "name": "Бесстрашие",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.fearless",
+          "description": "<p>Его нельзя запугать, с ним нельзя договориться.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst038i000000006",
+        "name": "Невосприимчивость к убеждению",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.coercion-immunity",
+          "description": "<p>Убеждение, обман и другие словесные уловки на него не действуют.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst038i000000007",
+        "name": "Невосприимчивость к болезням",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.disease-immunity",
+          "description": "<p>Не заражается болезнями.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst038i000000008",
+        "name": "Бесплотность",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.incorporeal",
+          "description": "<p>Физические атаки и воздействия не причиняют ей вреда. Знак Ирден и бомба «Лунная пыль» делают песту осязаемой.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst038i000000009",
+        "name": "Облако мух",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.pesta.8",
+          "description": "<p>Песта окружена заражёнными мухами. Каждый, кто в начале своего хода находится на дистанции ближнего боя от неё, получает −2 ко всем действиям и с вероятностью 25% заболевает. Попадание по песте огнём или заклинанием ветра рассеивает облако; действием песта снова призывает мух.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst038i000000010",
+        "name": "Призыв чумных крыс",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.pesta.9",
+          "description": "<p>Песта вступает в бой с двумя стаями заражённых крыс; действием призывает рядом с собой ещё две. В начале её хода каждая стая движется к ближайшему существу и по возможности атакует его.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst038i000000011",
+        "name": "Масло против духов",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.specter-oil",
+          "description": "<p>Уязвимость: масло против духов добавляет свой бонус к урону по этому существу.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst038i000000012",
+        "name": "Уязвимость: Лунная пыль и Ирден",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.pesta.11",
+          "description": "<p>делают песту осязаемой — только тогда её можно ранить.</p>"
+        },
+        "flags": {}
+      }
+    ]
+  },
+  {
+    "_id": "bstr000000000039",
+    "name": "Стая чумных крыс",
+    "type": "npc",
+    "img": "icons/svg/pawprint.svg",
+    "ownership": {
+      "default": 0
+    },
+    "prototypeToken": {
+      "name": "Стая чумных крыс",
+      "texture": {
+        "src": "icons/svg/pawprint.svg"
+      },
+      "actorLink": false,
+      "disposition": -1,
+      "sight": {
+        "enabled": false
+      }
+    },
+    "system": {
+      "attributes": {
+        "intelligence": 1,
+        "reflex": 8,
+        "dexterity": 1,
+        "body": 1,
+        "speed": 5,
+        "empathy": 1,
+        "craft": 1,
+        "will": 1,
+        "luck": 0
+      },
+      "health": {
+        "value": 10,
+        "max": 10
+      },
+      "stamina": {
+        "value": 5,
+        "max": 5
+      },
+      "vigor": 0,
+      "skills": {
+        "melee": 6,
+        "dodgeEscape": 8
+      },
+      "creature": {
+        "category": "beast",
+        "difficulty": "",
+        "reward": 0,
+        "size": "",
+        "weight": "",
+        "habitat": "Рядом с пестой",
+        "intellect": "Животный",
+        "group": "Стаи, призванные пестой",
+        "source": "Дневник охотника на чудовищ",
+        "description": "Стая заражённых крыс, призванная пестой.",
+        "tactics": "Движется к ближайшему существу и облепляет его, разнося болезнь.",
+        "naturalArmor": 0,
+        "resistances": "",
+        "healthMax": 10,
+        "staminaMax": 5,
+        "hasTailOrWings": false,
+        "runBase": 0,
+        "recoveryBase": 0,
+        "sizeClass": "small",
+        "lore": [],
+        "loot": [],
+        "lootGenerated": false
+      },
+      "harvest": []
+    },
+    "items": [
+      {
+        "_id": "bst039i000000001",
+        "name": "Атака стаи",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.plague-rats.0",
+          "description": "<p>Стая облепляет цель и кусает: защита — только Уклонение/Изворотливость или Смена позиции. При попадании 2d6 урона по каждой части тела и с вероятностью 50% болезнь.</p>"
+        },
+        "flags": {}
+      },
+      {
+        "_id": "bst039i000000002",
+        "name": "Масло против зверей",
+        "type": "ability",
+        "img": "icons/svg/aura.svg",
+        "system": {
+          "ruleId": "creature.beast-oil",
+          "description": "<p>Уязвимость: масло против зверей добавляет свой бонус к урону по этому существу.</p>"
         },
         "flags": {}
       }

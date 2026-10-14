@@ -1,6 +1,7 @@
 import { PROSTHETIC_EQUIPMENT, PROSTHETIC_RECIPES, PROSTHETIC_FOLDER } from "../scripts/data/prosthetic-equipment.mjs";
 import { TAVERN_EQUIPMENT, TAVERN_RECIPES, TAVERN_FOLDER } from "../scripts/data/tavern-equipment.mjs";
 import { SCHOOL_GEAR, SCHOOL_DIAGRAMS, SCHOOL_MATERIALS } from "../scripts/data/witcher-school-gear.mjs";
+import { JOURNAL_MATERIALS } from "../scripts/data/journal-materials.mjs";
 import { RADOLF_UPGRADES, RADOLF_POTIONS, RADOLF_RECIPES } from "../scripts/data/radolf-additions.mjs";
 import { MANTICORE_EQUIPMENT, MANTICORE_RECIPES, MANTICORE_FOLDER } from "../scripts/data/manticore-school.mjs";
 import { PEASANT_WEAPONS } from "../scripts/data/peasant-equipment.mjs";
@@ -82,7 +83,7 @@ function migrationFixture({ fail = false, locked = true, startVersion = 0, elder
   let version = startVersion;
   for (const item of diagrams) if (tavern || !tavernItems.includes(item)) index.set(item._id, structuredClone(item));
   if (tavern) for (const item of tavernItems) index.set(item._id, structuredClone(item));
-  for (const item of sources.filter(item => [...PROSTHETIC_EQUIPMENT, ...SCHOOL_GEAR, ...SCHOOL_MATERIALS, ...MANTICORE_EQUIPMENT].some(entry => entry.id === item.system.ruleId))) index.set(item._id, structuredClone(item));
+  for (const item of sources.filter(item => [...PROSTHETIC_EQUIPMENT, ...SCHOOL_GEAR, ...SCHOOL_MATERIALS, ...JOURNAL_MATERIALS, ...MANTICORE_EQUIPMENT].some(entry => entry.id === item.system.ruleId))) index.set(item._id, structuredClone(item));
   for (const item of radolfAdditions) index.set(item._id, structuredClone(item));
   for (const item of experiments) index.set(item._id, structuredClone(item));
   for (const item of sources.filter(item => item.system.ruleId.startsWith("peasant.weapon."))) index.set(item._id, structuredClone(item));
@@ -148,7 +149,7 @@ test("content update appends only missing ammunition, keeps edited entries and r
   game.user = state.gm;
   await migrateEquipmentContent();
   assert.deepEqual(state.writes, [["lock", false], ["folders", 1], ["items", 3], ["lock", true]]);
-  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 52 + PROSTHETIC_EQUIPMENT.length + SCHOOL_GEAR.length + SCHOOL_MATERIALS.length + MANTICORE_EQUIPMENT.length + PEASANT_WEAPONS.length + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length + tavernExtra);
+  assert.equal(state.version, EQUIPMENT_CONTENT_VERSION); assert.equal(state.index.size, 52 + PROSTHETIC_EQUIPMENT.length + SCHOOL_GEAR.length + SCHOOL_MATERIALS.length + JOURNAL_MATERIALS.length + MANTICORE_EQUIPMENT.length + PEASANT_WEAPONS.length + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length + tavernExtra);
   assert.equal(state.index.get("custom-canonical").system.price, 999);
   await migrateEquipmentContent(); assert.equal(state.writes.length, 4);
 });
@@ -409,7 +410,7 @@ test("version-one worlds repair pack, world, actor and unlinked token copies wit
     assert.equal(item.system.quantity, 10); assert.equal(item.system.weight, .05); assert.equal(item.system.price, 1);
     assert.equal(item.img, CORE_AMMUNITION[0].img); assert.equal(item.name, "Стандартные боеприпасы");
   }
-  assert.equal(state.index.size, 52 + PROSTHETIC_EQUIPMENT.length + SCHOOL_GEAR.length + SCHOOL_MATERIALS.length + MANTICORE_EQUIPMENT.length + PEASANT_WEAPONS.length + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length + tavernExtra); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
+  assert.equal(state.index.size, 52 + PROSTHETIC_EQUIPMENT.length + SCHOOL_GEAR.length + SCHOOL_MATERIALS.length + JOURNAL_MATERIALS.length + MANTICORE_EQUIPMENT.length + PEASANT_WEAPONS.length + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length + tavernExtra); assert.equal(state.pack.locked, true); assert.equal(state.version, EQUIPMENT_CONTENT_VERSION);
   assert.ok(Array.from(state.index.values()).filter(item=>item.system.kind==="ammunition").every(item => item.img === CORE_AMMUNITION[0].img));
   await migrateEquipmentContent(); assert.equal(worldActor.items[0].system.quantity, 10);
 });
@@ -441,7 +442,7 @@ test("version-three worlds append all thirty Elder Folk items without recreating
   const state=migrationFixture({startVersion:3,elder:false});
   for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
   await migrateEquipmentContent();
-  assert.equal(state.index.size,52 + PROSTHETIC_EQUIPMENT.length + SCHOOL_GEAR.length + SCHOOL_MATERIALS.length + MANTICORE_EQUIPMENT.length + PEASANT_WEAPONS.length + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length + tavernExtra);
+  assert.equal(state.index.size,52 + PROSTHETIC_EQUIPMENT.length + SCHOOL_GEAR.length + SCHOOL_MATERIALS.length + JOURNAL_MATERIALS.length + MANTICORE_EQUIPMENT.length + PEASANT_WEAPONS.length + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length + tavernExtra);
   assert.equal(state.writes.find(([key])=>key==="items")[1],30);
   assert.equal(state.version,EQUIPMENT_CONTENT_VERSION);
 });
@@ -465,7 +466,7 @@ test("creating or dropping an old pack normalizes once while new individual stac
 test("version-five worlds append transport and tack once with their own folders",async()=>{
  const state=migrationFixture({startVersion:5,transport:false});
  for(const item of sources.filter(item=>CORE_AMMUNITION.some(entry=>entry.id===item.system.ruleId)))state.index.set(item._id,structuredClone(item));
- await migrateEquipmentContent();assert.equal(state.index.size,52 + PROSTHETIC_EQUIPMENT.length + SCHOOL_GEAR.length + SCHOOL_MATERIALS.length + MANTICORE_EQUIPMENT.length + PEASANT_WEAPONS.length + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length + tavernExtra);
+ await migrateEquipmentContent();assert.equal(state.index.size,52 + PROSTHETIC_EQUIPMENT.length + SCHOOL_GEAR.length + SCHOOL_MATERIALS.length + JOURNAL_MATERIALS.length + MANTICORE_EQUIPMENT.length + PEASANT_WEAPONS.length + radolfAdditions.length + RADOLF_EQUIPMENT.length + CORE_GENERAL_ADDITIONS.length + WITCHER_SPECIAL_EQUIPMENT.length + diagrams.length + pureSubstances.length + experiments.length + tavernExtra);
  assert.equal(state.writes.find(([key])=>key==="items")[1],18);
  assert.equal(state.writes.find(([key])=>key==="folders")[1],2);
  const count=state.writes.length;await migrateEquipmentContent();assert.equal(state.writes.length,count);

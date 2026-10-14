@@ -5,6 +5,7 @@ import { spellSources, spellFolders } from "../scripts/data/spells.mjs";
 import { bestiarySources, bestiaryFolders } from "../scripts/data/bestiary.mjs";
 import { pregenSources } from "../scripts/data/pregens.mjs";
 import { MATERIALS } from "../scripts/data/workshop-materials.mjs";
+import { JOURNAL_MATERIALS } from "../scripts/data/journal-materials.mjs";
 import { ALCHEMY, MUTAGENS } from "../scripts/data/workshop-alchemy.mjs";
 import { UPGRADES } from "../scripts/data/workshop-upgrades.mjs";
 import { RECIPES } from "../scripts/data/workshop-recipes.mjs";
@@ -88,7 +89,7 @@ export function compendiumData(translations) {
       gear.system.description ||= itemLore(gear);
       return gear;
     }),
-      ...[...PROSTHETIC_EQUIPMENT, ...TAVERN_EQUIPMENT, ...MANTICORE_EQUIPMENT, ...PEASANT_WEAPONS, ...RADOLF_UPGRADES, ...RADOLF_POTIONS, ...RADOLF_EQUIPMENT, ...CORE_EQUIPMENT, ...WITCHER_SPECIAL_EQUIPMENT, ...EXPERIMENTAL_DEVICES, ...MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES, ...SCHOOL_GEAR, ...SCHOOL_MATERIALS].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: stripPageReferences(entry.system.description ?? "") || itemLore(entry) }),
+      ...[...PROSTHETIC_EQUIPMENT, ...TAVERN_EQUIPMENT, ...MANTICORE_EQUIPMENT, ...PEASANT_WEAPONS, ...RADOLF_UPGRADES, ...RADOLF_POTIONS, ...RADOLF_EQUIPMENT, ...CORE_EQUIPMENT, ...WITCHER_SPECIAL_EQUIPMENT, ...EXPERIMENTAL_DEVICES, ...MATERIALS, ...JOURNAL_MATERIALS, ...ALCHEMY, ...MUTAGENS, ...UPGRADES, ...RECIPES, ...SCHOOL_GEAR, ...SCHOOL_MATERIALS].map(entry => ({ ...item(entry.documentId, entry.type, entry, { ...entry.system, description: stripPageReferences(entry.system.description ?? "") || itemLore(entry) }),
         img: entry.img ?? defaultItemIcon(entry) }))],
     "influential-friends": INFLUENTIAL_FRIENDS.map(entry => item(entry.documentId, "influence", entry, {
       region: entry.group, roll: entry.roll,

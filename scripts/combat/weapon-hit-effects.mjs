@@ -16,6 +16,9 @@ export function weaponHitTraits(weapon = {}, actor = null) {
     burning: chance(/(?:горение|поджигающ\S*)\s*\((\d+)\s*%\)/iu),
     frozen: chance(/заморажива\S*\s*\((\d+)\s*%\)/iu),
     staggered: chance(/ошеломлени\S*\s*\((\d+)\s*%\)/iu),
+    // Monster Hunter's Journal: «Болезнь (50%)» needs an injury, like bleeding and poison.
+    diseased: chance(/болезн\S*\s*\((\d+)\s*%\)/iu),
+    shadowDrain: text.match(/теневые когти\s*\((\d+d\d+)\)/iu)?.[1] ?? null,
     stunModifier: /дезориентирующ/iu.test(text) ? Number(text.match(/дезориентирующ\S*\s*\(([−-]?\d+)\)/iu)?.[1]?.replace("−", "-") ?? 0) : null,
     specterDamage: Number(text.match(/\+(\d+)\s+урона\s+призракам/iu)?.[1] ?? 0),
     ablating: /разрушающ/iu.test(text),
@@ -30,7 +33,7 @@ export function weaponHitTraits(weapon = {}, actor = null) {
 
 export function weaponConditionChances(traits, result, { nonLethal = false } = {}) {
   if (result.immune) return [];
-  return ["bleeding", "poisoned", "burning", "frozen", "staggered"].filter(id => traits?.[id] > 0
+  return ["bleeding", "poisoned", "burning", "frozen", "staggered", "diseased"].filter(id => traits?.[id] > 0
     && (["burning", "frozen", "staggered"].includes(id) || !nonLethal && (traits.contact || result.total > 0 && result.penetrated)))
     .map(id => ({ id, chance: traits[id] }));
 }
@@ -77,7 +80,7 @@ export async function applyWeaponConditions(actor, effects) {
   }
 }
 
-export const weaponConditionLabel = id => ({ bleeding: "Кровотечение", poisoned: "Отравление", burning: "Горение", frozen: "Замораживание", staggered: "Ошеломление", stunned: "Дезориентация" })[id] ?? id;
+export const weaponConditionLabel = id => ({ bleeding: "Кровотечение", poisoned: "Отравление", burning: "Горение", frozen: "Замораживание", staggered: "Ошеломление", stunned: "Дезориентация", diseased: "Болезнь" })[id] ?? id;
 export const weaponConditionReport = effects => effects.map(effect => effect.save
   ? `Испытание УСТ ${effect.modifier}: ${effect.roll} против ${effect.target} — ${effect.applied ? "дезориентация" : "успех"}`
   : `${weaponConditionLabel(effect.id)} ${effect.chance}%: ${effect.immune ? "иммунитет" : `${effect.roll === null ? "" : `${effect.roll} — `}${effect.applied ? "наложено" : "не сработало"}`}`).join("; ");

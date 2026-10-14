@@ -14,7 +14,7 @@ import { weaponHitTraits } from "./weapon-hit-effects.mjs";
 import { weaponDamageTraits, armorAt, resolveDamage, monsterMaterial, fireVulnerable } from "./damage-rules.mjs";
 import { defenseChoices } from "./attack-exchange.mjs";
 import { rollDefense } from "./defense-rolls.mjs";
-import { spiritState, creatureSuppression, creatureMentalImmunity, creatureEffectImmunity } from "./creature-spirits.mjs";
+import { spiritState, creatureSuppression, creatureMentalImmunity, creatureEffectImmunity, hymInShadow } from "./creature-spirits.mjs";
 import { CREATURE_ACTIONS, needleDice, chargeProfile, pounceDistance, validateCreatureRange } from "./creature-actions-rules.mjs";
 import { creatureFlags, activeCreatureGM, requireCreatureGM, creatureRoll, creaturePost, creatureEffect, addCreatureEffect,
   markCreatureFullTurn, creatureTargets, creaturesInRadius, pickCreaturePoint, moveCreatureTo, liveCreatureWeb, esc } from "./creature-actions-common.mjs";
@@ -38,6 +38,7 @@ function blocked(actor,id) {
   if(!conditionRules(actor).canAct)return "Существо сейчас не может действовать";
   if(actor.effects.some(effect=>activeEffect(effect)&&creatureFlags(effect).creatureFullTurn))return "Полный ход уже потрачен";
   if(id==="teleport"&&!spiritState(actor).canTeleport)return `Телепортация подавлена: ${spiritState(actor).reason}`;
+  if(id==="shadow-step"&&!hymInShadow(actor))return "Шаг сквозь тень возможен только в полумраке или темноте";
   if(["charge","hypnosis"].includes(id)&&creatureSuppression(actor).dimeritium&&["golem","fiend"].includes(creatureProfile(actor)?.id))return "Способность подавлена двимеритовой бомбой";
   return "";
 }
@@ -132,7 +133,7 @@ export function useCreatureAction(actor,id,options={}) {
       return creaturePost(actor,{title:"Чувствительный слух",text:"Бес ошеломлён громким резким звуком до начала следующего хода."});
     }
     if(rule.movement) {
-      const {source}=creatureTargets(actor,{...options,targets:[]}),max=id==="teleport"?10:pounceDistance(profile.id,actor.system.statistics);
+      const {source}=creatureTargets(actor,{...options,targets:[]}),max=["teleport","shadow-step"].includes(id)?10:pounceDistance(profile.id,actor.system.statistics);
       const round=actionRoundKey(actor);
       if(round&&creatureFlags(actor).creatureMovementRound===round)throw new Error("Особое передвижение в этом раунде уже использовано.");
       const point=await pickCreaturePoint(source,{destination:options.destination,max,title:rule.name,throughWalls:id==="teleport"});
@@ -144,6 +145,10 @@ export function useCreatureAction(actor,id,options={}) {
     const quote=actionQuote(actor);
     if(rule.fullTurn&&quote.extra)throw new Error("Действие полного хода нельзя выполнить дополнительным действием.");
     if(["needles","scream","hypnosis"].includes(id))return areaAction(actor,id,rule,options,quote);
+    if(rule.hym||rule.pesta) {
+      const message=rule.hym?await (await import("./hym.mjs")).useHymAction(actor,id,options,quote):await (await import("./pesta.mjs")).usePestaAction(actor,id,options);
+      if(message)await payAction(actor,quote,rule,message.id);return message;
+    }
     if(rule.fog) {
       const {useFogAction}=await import("./creature-fog.mjs");
       const message=await useFogAction(actor,id,options);if(message)await payAction(actor,quote,rule,message.id);return message;
@@ -162,10 +167,21 @@ export function applyCreatureSpecial(message,index,outcome) {
   return once(`special:${message.id}:${index}`,async()=>{
     if(!activeCreatureGM()||!outcome?.hit)return false;
     const attack=creatureFlags(message).weaponAttack,id=attack?.special?.replace("creature:","");
-    if(!["web","whirlwind"].includes(id))return false;
+    if(!["web","whirlwind","swarm"].includes(id))return false;
     const target=resolveToken(attack.target)?.actor;if(!target?.isOwner)return false;
     const key=`${message.id}:${index}`,done=creatureFlags(message).creatureSpecialDone??{};
     if(done[index])return false;
+    if(id==="swarm") {
+      // Monster Hunter's Journal p.31: 2d6 to every body part and a 50% chance of disease.
+      const {bodyWideHit,PESTA}=await import("./pesta.mjs");
+      const hit=await bodyWideHit(target,"2d6"),immune=immuneToCondition(target,["diseased"])||hit.damage.total===0&&spiritState(target).incorporeal;
+      const roll=immune?null:await creatureRoll("1d100"),ill=Boolean(roll&&roll.total<=PESTA.swarmDisease);
+      await applyCreatureDamage(target,hit.damage,key,{effects:ill?[creatureEffect(target,"diseased")]:[]});
+      await message.update({[`flags.${SYSTEM_ID}.creatureSpecialDone`]:{...creatureFlags(message).creatureSpecialDone,[index]:true}});
+      const notes=[`${target.name}: ${hit.damage.total} урона по всем частям тела; болезнь ${PESTA.swarmDisease}%: ${immune?"невосприимчив":`${roll.total} — ${ill?"заболел":"обошлось"}`}.`];
+      await creaturePost(target,{title:attack.name,text:esc(notes.join(" ")),rolls:[...hit.dice,...(roll?[roll]:[])],flags:{exchange:{attack:message.id,index,kind:"special",notes}}});
+      return true;
+    }
     let source,rolls=[],notes;
     if(id==="web") {
       source=creatureEffect(target,"grappled",{name:"Паутина главоглаза",flags:{creatureWeb:{hp:10,source:attack.attacker}},
