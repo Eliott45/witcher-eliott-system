@@ -1,4 +1,5 @@
 import { SYSTEM_ID } from "../config.mjs";
+import { openPoker } from "../minigames/poker.mjs";
 import { DicePool, DICE_FACES, MAX_DICE } from "./dice-pool.mjs";
 
 const pool = new DicePool();
@@ -131,6 +132,11 @@ function createDiceTray() {
   });
   actions.append(formula, edit, reset, roll);
   panel.append(dice, quantities, actions);
+  const poker = document.createElement("button");
+  poker.type = "button"; poker.className = "witcher-poker-launch";
+  poker.innerHTML = '<i class="fa-solid fa-dice"></i> Покер на костях';
+  poker.addEventListener("click", () => openPoker().catch(error => ui.notifications.warn(error.message)));
+  panel.append(poker);
 
   function refresh(syncInputs = true) {
     panel.disabled = pool.busy;

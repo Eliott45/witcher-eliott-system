@@ -1,3 +1,4 @@
+import { registerPoker } from "./minigames/poker.mjs";
 import { registerSchoolGearChat } from "./combat/school-gear-chat.mjs";
 import { registerCrossbowMovement } from "./combat/crossbow-modifications.mjs";
 import { registerPeasantMigration, migratePeasantContent } from "./migrations/peasant-content.mjs";
@@ -112,6 +113,7 @@ import { migrateBookReferences, registerBookReferencesMigration } from "./migrat
 
 Hooks.once("init", async () => {
   registerSystemSettings();
+  registerPoker();
   registerSettingsLayout();
   registerManualCriticalChat();
   const templatesReady = foundry.applications.handlebars.loadTemplates(["ambush-card", "combat-actions", "verbal-duel", "effects-list", "learning", "magic", "magic-filters", "magic-spells", "magic-requirements", "profession", "profession-tree", "profession-node", "advancement-controls", "lifepath", "lifepath-entry", "inventory", "inventory-row", "installed-upgrades", "transport", "structured-fields", "workshop-item", "item-reference", "recipe-details", "workshop-actor", "npc-loot", "crafting", "alchemy", "recipe-card"].map(name => `systems/${SYSTEM_ID}/templates/${name}.hbs`));

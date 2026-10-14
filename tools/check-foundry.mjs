@@ -2073,3 +2073,39 @@ const manualEditingPreviews={};
   } finally {foundry.applications.api.DialogV2=saved.dialog;foundry.documents=saved.documents;}
   console.log('Manual editing: native wound controls, direct stabilization and catalogue-only rune installation OK');
 }
+
+// Poker windows render the same native actors for both seats, with only their own draft dice exposed.
+{
+  const saved={user:game.user,users:game.users,actors:game.actors,messages:game.messages};
+  const {PokerWindow}=await import('../scripts/minigames/poker-window.mjs');
+  const {pokerCard}=await import('../scripts/minigames/poker-service.mjs');
+  const pokerTemplate=handlebars.compile(await readFile(new URL('../templates/poker-table.hbs',import.meta.url),'utf8'),{strict:true});
+  const first={id:'pokerPlayer00001',name:'Первый',active:true},second={id:'pokerPlayer00002',name:'Второй',active:true},gm={id:'pokerMaster00001',name:'Мастер',active:true,isGM:true};
+  game.users=[first,second,gm];game.users.get=id=>game.users.find(user=>user.id===id);game.users.activeGM=gm;game.user=first;
+  game.actors=[new foundry.documents.BaseActor({_id:'pokerActor000001',name:'Игрок <1>',type:'character',system:{crowns:100},ownership:{[first.id]:3}})];
+  const state={version:1,phase:'invited',stake:10,tieMode:'faces',issue:'',hands:[[],[]],winner:null,reason:'',processed:[],
+    seats:[{userId:first.id,name:'Игрок <1>',actorUuid:game.actors[0].uuid,revision:0,opening:'',draw:'',final:''},
+      {userId:second.id,name:'Игрок <2>',actorUuid:'',revision:0,opening:'',draw:'',final:''}]};
+  const table={id:'pokerTable000001',author:gm,flags:{[game.system.id]:{pokerTable:state}}};
+  game.messages=[table];game.messages.get=id=>game.messages.find(message=>message.id===id);
+  const app={tableId:table.id,table,actorUuid:game.actors[0].uuid,selected:new Set([2]),busy:false,notice:'',rulesOpen:true,stake:10};
+  try {
+    const lobby=pokerTemplate(await PokerWindow.prototype._prepareContext.call({...app,table:null}));
+    assert.ok(lobby.includes('Бросить вызов'));assert.ok(lobby.includes('Игрок &lt;1&gt;'));
+    for(const phase of ['invited','funding','opening','drawing','settling','finished','declined','cancelled']) {
+      state.phase=phase;
+      state.hands=['drawing','settling','finished'].includes(phase)?[[1,1,2,3,4],[2,2,3,4,5]]:[[],[]];
+      const html=pokerTemplate(await PokerWindow.prototype._prepareContext.call(app));
+      assert.ok(html.includes('Игрок &lt;1&gt;'));assert.ok(html.includes('Игрок &lt;2&gt;'));assert.ok(!html.includes('undefined'));
+      const message=new foundry.documents.BaseChatMessage({content:pokerCard(state),flags:table.flags,author:gm.id,whisper:[first.id,second.id,gm.id]});
+      assert.equal(message.validationFailures.fields,null);
+    }
+    state.phase='drawing';state.hands=[[1,1,2,3,4],[2,2,3,4,5]];state.seats[0].draw='privateDraw00001';
+    game.messages.push({id:'privateDraw00001',author:gm,flags:{[game.system.id]:{pokerReceipt:{tableId:table.id,userId:first.id,kind:'reroll',dice:[6,6,6,6,6]}}}});
+    const own=await PokerWindow.prototype._prepareContext.call(app);assert.equal(own.seats.find(seat=>seat.mine).combination,'Покер');
+    game.user=second;const opposite=await PokerWindow.prototype._prepareContext.call(app);
+    assert.equal(opposite.seats.find(seat=>!seat.mine).combination,'Пара');
+    assert.equal(Boolean(opposite.canFinish),false);pokerTemplate(opposite);
+  } finally {Object.assign(game,saved);}
+  console.log('Dice poker: native wallets and private chat cards, all window phases and hidden opponent rerolls render correctly');
+}
