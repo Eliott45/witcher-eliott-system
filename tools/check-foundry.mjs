@@ -2100,23 +2100,22 @@ const manualEditingPreviews={};
       const message=new foundry.documents.BaseChatMessage({content:pokerCard(state),flags:table.flags,author:gm.id,whisper:[first.id,second.id,gm.id]});
       assert.equal(message.validationFailures.fields,null);
     }
-    state.phase='drawing';state.hands=[[1,1,2,3,4],[2,2,3,4,5]];state.seats[0].draw='privateDraw00001';
+    state.phase='drawing';state.hands=[[6,6,6,6,6],[2,2,3,4,5]];state.seats[0].draw='privateDraw00001';state.seats[0].rerolled=[0,1,2,3,4];
     game.messages.push({id:'privateDraw00001',author:gm,flags:{[game.system.id]:{pokerReceipt:{tableId:table.id,userId:first.id,kind:'reroll',dice:[6,6,6,6,6]}}}});
     const own=await PokerWindow.prototype._prepareContext.call(app);assert.equal(own.bottom.combination,'Покер');
     game.user=second;const opposite=await PokerWindow.prototype._prepareContext.call(app);
-    assert.equal(opposite.top.combination,'Пара');assert.equal(opposite.canPalm,false);pokerTemplate(opposite);
-    // Loaded dice: only the cheater sees the opponent's final dice and the swap controls.
-    game.user=first;state.phase='palming';state.seats[1].rerolled=[4];state.seats[0].palm='privatePeek00001';
-    game.messages.push({id:'privatePeek00001',author:gm,flags:{[game.system.id]:{pokerReceipt:{tableId:table.id,userId:first.id,kind:'peek',hands:[[6,6,6,6,6],[2,2,3,4,1]]}}}});
+    assert.equal(opposite.top.combination,'Покер','Rerolled dice are open to the opponent');assert.equal(opposite.canPalm,false);pokerTemplate(opposite);
+    // Loaded dice: only the cheater gets the swap controls once every die is on the table.
+    game.user=first;state.phase='palming';state.hands=[[6,6,6,6,6],[2,2,3,4,1]];state.seats[1].rerolled=[4];state.seats[0].palm=true;
     const palming=await PokerWindow.prototype._prepareContext.call({...app,palm:{index:4,value:1}});
     assert.equal(palming.canPalm,true);assert.equal(palming.palmReady,true);assert.equal(palming.top.combination,'Пара');
     assert.ok(pokerTemplate(palming).includes('Подменить и вскрыть'));
     game.user=second;const watcher=await PokerWindow.prototype._prepareContext.call(app);
-    assert.equal(watcher.canPalm,false);assert.equal(watcher.top.status,'Вскрытие…');assert.equal(watcher.top.combination,'Пара');
+    assert.equal(watcher.canPalm,false);assert.equal(watcher.top.status,'Вскрытие…');assert.equal(watcher.top.combination,'Покер');
     Object.assign(state,{phase:'finished',reason:'caught',caught:[0],winner:1,swaps:[4,-1],hands:[[6,6,6,6,1],[2,2,3,4,1]]});
     const caught=await PokerWindow.prototype._prepareContext.call(app);
     assert.ok(caught.result.title.includes('шулерские кости'));assert.equal(caught.result.win,true);assert.equal(caught.top.dice[4].swapped,true);
     assert.ok(pokerCard(state).includes('пойман'));pokerTemplate(caught);
   } finally {Object.assign(game,saved);}
-  console.log('Dice poker: native wallets and private chat cards, all window phases, hidden opponent rerolls and loaded-dice swaps render correctly');
+  console.log('Dice poker: native wallets and private chat cards, all window phases, open rerolls and loaded-dice swaps render correctly');
 }

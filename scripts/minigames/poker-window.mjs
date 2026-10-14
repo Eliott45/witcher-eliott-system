@@ -8,9 +8,9 @@ const faces = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
 const EXAMPLES = [[1, 2, 3, 4, 6], [2, 2, 3, 4, 6], [2, 2, 4, 4, 6], [3, 3, 3, 4, 6], [1, 2, 3, 4, 5], [2, 3, 4, 5, 6], [3, 3, 3, 5, 5], [4, 4, 4, 4, 6], [6, 6, 6, 6, 6]];
 const STAKES = [0, 5, 10, 25, 50];
 export const pokerDots = value => (dots[value] ?? []).map(position => ({ position }));
-export function pokerDiceView(dice, { selected = new Set(), selectable = false, hidden = [], scoring = [], swapped = -1 } = {}) {
+export function pokerDiceView(dice, { selected = new Set(), selectable = false, scoring = [], swapped = -1 } = {}) {
   return Array.from({ length: 5 }, (_, index) => {
-    const value = hidden.includes(index) ? 0 : dice?.[index] ?? 0;
+    const value = dice?.[index] ?? 0;
     return { index, number: index + 1, value, hidden: !value, selected: selected.has(index), selectable, scoring: Boolean(value) && scoring.includes(index), swapped: swapped === index, dots: pokerDots(value) };
   });
 }
@@ -50,31 +50,31 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
       selectedCount: this.selected.size, palmValues: [], palmReady: false, palmPreview: "", waiting: false };
     if (!state) return view;
     const phase = state.phase, opponent = state.seats[1 - me];
-    const peek = phase === "palming" && own?.palm && !own.final ? seatReceipt(own.palm, this.tableId, user.id, "peek") : null;
+    const palming = phase === "palming" && Boolean(own?.palm) && !own.final;
     Object.assign(view, {
       canAccept: phase === "invited" && me === 1, canCancel: phase === "invited" && me === 0,
-      canRoll: phase === "opening" && Boolean(own) && !own.opening, canDraw: phase === "drawing" && Boolean(own) && !own.draw, canPalm: Boolean(peek),
+      canRoll: phase === "opening" && Boolean(own) && !own.opening, canDraw: phase === "drawing" && Boolean(own) && !own.draw, canPalm: palming,
       canConcede: me >= 0 && ["opening", "drawing", "palming"].includes(phase), canAbort: user.isGM && !closed && phase !== "settling",
       canRecover: user.isGM && ["funding", "settling"].includes(phase), canRematch: closed && me >= 0,
       stage: { invited: "Приглашение", funding: "Ставки в банк", opening: "Первый бросок", drawing: "Переброс", palming: "Вскрытие", settling: "Расчёт банка" }[phase] ?? "Итог партии"
     });
     view.waiting = me >= 0 && !closed && !view.canAccept && !view.canCancel && !view.canRoll && !view.canDraw && !view.canPalm;
-    if (peek) {
+    if (palming) {
+      const hand = state.hands[me];
       view.palmValues = Array.from({ length: 6 }, (_, i) => ({ value: i + 1, selected: palm.value === i + 1, dots: pokerDots(i + 1) }));
-      view.palmReady = palm.index >= 0 && palm.value > 0 && peek.hands[0][palm.index] !== palm.value;
-      if (view.palmReady) view.palmPreview = pokerHand(peek.hands[0].map((value, index) => index === palm.index ? palm.value : value)).name;
+      view.palmReady = palm.index >= 0 && palm.value > 0 && hand[palm.index] !== palm.value;
+      if (view.palmReady) view.palmPreview = pokerHand(hand.map((value, index) => index === palm.index ? palm.value : value)).name;
     }
     const seatView = index => {
       const seat = state.seats[index], mine = index === me, revealed = closed || phase === "settling";
-      let dice = state.hands[index], hidden = [], swapped = -1;
+      let dice = state.hands[index], swapped = -1;
       if (revealed) swapped = state.swaps?.[index] ?? -1;
       else if (mine) {
         const id = seat.final || seat.draw || seat.opening;
         const receipt = id ? seatReceipt(id, this.tableId, user.id, ["roll", "reroll", "finish"]) : null;
         dice = receipt?.dice ?? []; swapped = receipt?.cheat?.index ?? -1;
-      } else if (peek) dice = peek.hands[1];
-      else if (["drawing", "palming"].includes(phase)) hidden = seat.rerolled ?? [];
-      const known = dice?.length === 5 && !hidden.length, combination = known ? pokerHand(dice) : null;
+      }
+      const combination = dice?.length === 5 ? pokerHand(dice) : null;
       const selectable = mine && !this.busy && (view.canDraw || view.canPalm);
       const selected = mine && view.canPalm ? new Set(palm.index >= 0 ? [palm.index] : []) : mine && view.canDraw ? this.selected : new Set();
       const status = closed ? state.winner === index ? "Победитель" : state.caught?.includes(index) ? "Пойман на шулерстве" : ""
@@ -84,8 +84,8 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
               : phase === "palming" ? "Вскрытие…" : "Считает банк";
       return { name: seat.name, mine, label: mine ? "Ваши кости" : me < 0 ? `Игрок ${index + 1}` : "Соперник", img: portrait(seat), online: Boolean(game.users.get(seat.userId)?.active), status,
         winner: phase === "finished" && state.winner === index, loser: phase === "finished" && state.winner !== null && state.winner !== index,
-        dice: pokerDiceView(dice, { selected, selectable, hidden, swapped, scoring: combination && (revealed || mine || peek) ? pokerScoring(dice) : [] }),
-        combination: combination?.name ?? (dice?.length === 5 ? "Комбинация скрыта" : "Кости ещё не брошены"), rank: combination?.rank ?? -1, sum: combination ? combination.sum : 0 };
+        dice: pokerDiceView(dice, { selected, selectable, swapped, scoring: combination ? pokerScoring(dice) : [] }),
+        combination: combination?.name ?? "Кости ещё не брошены", rank: combination?.rank ?? -1, sum: combination ? combination.sum : 0 };
     };
     const order = me === 0 ? [1, 0] : [0, 1];
     view.top = seatView(order[0]); view.bottom = seatView(order[1]);

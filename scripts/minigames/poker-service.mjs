@@ -71,18 +71,14 @@ function revealTable(state, table) {
   return { ...revealPoker(state, finals.map(receipt => receipt.dice), caught), swaps: finals.map(receipt => receipt.cheat?.spotted ? receipt.cheat.index : -1) };
 }
 /** Once both have rerolled: reveal at once, unless someone carries loaded dice and may still palm one die. */
-async function afterDraws(state, table) {
+function afterDraws(state, table) {
   if (state.phase !== "drawing" || !state.seats.every(row => row.draw)) return state;
-  const finals = state.seats.map(row => seatReceipt(row.draw, table.id, row.userId, "reroll").dice);
-  const palming = state.seats.map(row => !row.final && hasLoadedDice(actorOf(row)));
-  for (const [index, row] of state.seats.entries()) {
-    if (!palming[index]) { row.final ||= row.draw; continue; }
-    if (row.palm) continue;
-    // The rule lets the cheater see every die first; the opponent's dice reach only them and the GM.
-    const peek = await createReceipt({ id: "" }, game.users.get(row.userId), { tableId: table.id, kind: "peek", done: true, ok: true, hands: [finals[index], finals[1 - index]] });
-    row.palm = peek.id;
+  // Every die is already on the table, which is exactly when the rule lets the cheater swap one.
+  for (const row of state.seats) if (!row.final) {
+    if (hasLoadedDice(actorOf(row))) row.palm = true;
+    else row.final = row.draw;
   }
-  return palming.some(Boolean) ? { ...state, phase: "palming" } : revealTable(state, table);
+  return state.seats.some(row => !row.final) ? { ...state, phase: "palming" } : revealTable(state, table);
 }
 async function rollDice(count) {
   if (!count) return [];
@@ -212,13 +208,14 @@ export async function processPokerRequest(request, creatorId) {
               receipt = await createReceipt(request, user, { tableId: table.id, kind, dice, ...(cheat ? { cheat } : {}), ...(kind === "reroll" ? { indices: rerollIndices(data.indices) } : {}) });
             }
             if (kind === "roll") {
-              seat.opening = receipt.id;
+              seat.opening = receipt.id; state.hands[index] = [...pokerReceipt(receipt).dice];
               if (state.seats.every(row => row.opening)) {
                 state.hands = state.seats.map(row => seatReceipt(row.opening, table.id, row.userId, "roll").dice); state.phase = "drawing";
               }
             } else if (kind === "reroll") {
-              seat.draw = receipt.id; seat.rerolled = pokerReceipt(receipt).indices ?? [];
-              state = await afterDraws(state, table);
+              // Rerolled dice are open to both players at once, as at a real table.
+              seat.draw = receipt.id; seat.rerolled = pokerReceipt(receipt).indices ?? []; state.hands[index] = [...pokerReceipt(receipt).dice];
+              state = afterDraws(state, table);
             } else {
               seat.final = receipt.id;
               if (state.seats.every(row => row.final)) state = revealTable(state, table);

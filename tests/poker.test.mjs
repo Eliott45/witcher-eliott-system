@@ -93,8 +93,8 @@ test("accepted challenges escrow both wagers and a full game pays the winner onc
   f.rolls.push([6, 6, 6]); const draw = await f.request(f.a, "reroll", table, { indices: [2, 3, 4] });
   assert.equal(draw.reply.done, true); assert.deepEqual(draw.reply.dice, [1, 1, 6, 6, 6]);
   assert.ok(!draw.response.whisper.includes(f.b.id)); assert.ok(draw.response.whisper.includes(f.gm.id));
-  assert.deepEqual(pokerState(table).hands[0], [1, 1, 2, 3, 4], "The opponent sees the opening hand until both finish");
-  assert.deepEqual(pokerState(table).seats[0].rerolled, [2, 3, 4], "Which dice were rerolled is public, their values are not");
+  assert.deepEqual(pokerState(table).hands[0], [1, 1, 6, 6, 6], "Rerolled dice are open to the opponent at once");
+  assert.deepEqual(pokerState(table).seats[0].rerolled, [2, 3, 4]); assert.equal(pokerState(table).phase, "drawing");
   const finish = await f.request(f.b, "reroll", table, { indices: [] });
   assert.equal(pokerState(table).phase, "finished", "The reroll is final: no extra confirmation"); assert.equal(pokerState(table).winner, 0);
   assert.deepEqual(pokerState(table).hands, [[1, 1, 6, 6, 6], [2, 2, 3, 4, 5]]);
@@ -187,8 +187,7 @@ test("loaded dice: the cheater sees every die, swaps one privately and an unnoti
   f.rolls.push([6]); await f.request(f.b, "reroll", table, { indices: [4] });
   const state = pokerState(table); assert.equal(state.phase, "palming");
   assert.equal(state.seats[1].final, state.seats[1].draw, "The honest player is done after the reroll");
-  const peek = f.messages.get(state.seats[0].palm);
-  assert.deepEqual(pokerReceipt(peek).hands, [[1, 1, 2, 3, 4], [2, 2, 3, 4, 6]]); assert.ok(!peek.whisper.includes(f.b.id));
+  assert.equal(state.seats[0].palm, true); assert.deepEqual(state.hands, [[1, 1, 2, 3, 4], [2, 2, 3, 4, 6]], "The cheater sees every die before swapping");
   const honest = await f.request(f.b, "finish", table); assert.equal(honest.reply.ok, false);
   const swap = await f.request(f.a, "finish", table, { cheat: { index: 4, value: 1 } }); assert.equal(swap.reply.ok, true);
   assert.deepEqual(swap.reply.dice, [1, 1, 2, 3, 1]); assert.ok(!swap.response.whisper.includes(f.b.id));
