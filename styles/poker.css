@@ -146,3 +146,67 @@
 
 @media (max-width:560px) { .poker-fields,.poker-rules ol { grid-template-columns:1fr; } .poker-dice { gap:8px; } }
 @media (prefers-reduced-motion:reduce) { .witcher-poker-window :is(.poker-die,.poker-result) { transition:none; animation:none !important; } }
+
+/* Game choice in the lobby */
+.tavern-games { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.witcher-poker-window .tavern-game { min-height:46px; font:700 15px Georgia,serif; background:#2a211a; border-color:#ffffff22; }
+.witcher-poker-window .tavern-game i { color:var(--poker-gold); font-size:17px; }
+.witcher-poker-window .tavern-game.is-selected { color:#2a1a08; background:linear-gradient(#f2d48f,#c3913e); border-color:#f7dfa4; box-shadow:0 2px 0 #7a5420; }
+.witcher-poker-window .tavern-game.is-selected i { color:#2a1a08; }
+.gwent-deck-pick { display:flex; flex-direction:column; gap:8px; }
+.witcher-poker-window .poker-toggle.is-shady { color:#f1c2b6; font-size:12.5px; }
+.witcher-poker-window .poker-toggle.is-shady i { color:#e07b6a; }
+.poker-recent span i { color:var(--poker-gold); margin-right:4px; }
+.poker-instruction p { margin:0; }
+.gwent-round-line { display:block; margin-bottom:3px; font:600 12.5px Georgia,serif; color:var(--poker-gold); }
+
+/* Gwent board */
+.poker-felt.is-gwent { background:radial-gradient(ellipse at 50% 45%,#3a4a5e 0,#25303f 45%,#141b25 100%); }
+.gwent-gems { display:flex; gap:5px; }
+.gwent-gem { width:14px; height:14px; transform:rotate(45deg); border-radius:3px; background:#00000055; border:1px solid #e8d39d55; }
+.gwent-gem.is-won { background:radial-gradient(circle at 35% 30%,#ffb3a6,#c0392b 55%,#6e1810); border-color:#ffd2c8; box-shadow:0 0 10px #ff6b5a99; }
+.gwent-row { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:14px; padding:2px 8px; }
+.gwent-card { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; width:78px; height:108px; padding:8px 6px; border-radius:9px; text-align:center;
+  color:#f6ead0; background:linear-gradient(160deg,#4a3a28,#21170f); border:2px solid #c9a15e; box-shadow:inset 0 0 0 3px #00000055,0 6px 14px #000a; }
+.gwent-card i { font-size:26px; color:var(--poker-gold); filter:drop-shadow(0 2px 2px #000); }
+.gwent-card strong { font:700 11px/1.15 Georgia,serif; }
+.gwent-card-mod { position:absolute; top:-9px; left:-9px; display:grid; place-items:center; min-width:28px; height:28px; padding:0 4px; border-radius:50%; font:700 13px Georgia,serif;
+  color:#2a1a08; background:radial-gradient(circle at 35% 30%,#fff1c9,#d6a54a); border:2px solid #fff3d0; box-shadow:0 2px 5px #000a; }
+.gwent-card.tone-good { border-color:#e3c06c; background:linear-gradient(160deg,#5a4520,#241809); }
+.gwent-card.tone-bad { border-color:#b8483a; background:linear-gradient(160deg,#4f2420,#1d0d0b); }
+.gwent-card.tone-bad .gwent-card-mod { color:#fff0ec; background:radial-gradient(circle at 35% 30%,#f19a8c,#9c2c20); border-color:#ffd2c8; }
+.gwent-card.tone-bad i { color:#f19a8c; }
+.gwent-card.is-back { background:repeating-linear-gradient(45deg,#2b2117 0 8px,#33271b 8px 16px); border-color:#8b6d43; }
+.gwent-card.is-back i { color:#8b6d43; }
+.gwent-card.is-faded,.gwent-math.is-faded,.gwent-total.is-faded { opacity:.45; filter:saturate(.6); }
+.gwent-card.just-played { animation:gwent-card-in .6s cubic-bezier(.3,1.3,.5,1) both; }
+@keyframes gwent-card-in { 0% { transform:translateY(-30px) rotateY(90deg) scale(.8); opacity:0; } 60% { transform:translateY(3px) rotateY(-8deg); opacity:1; } 100% { transform:none; } }
+.gwent-math { display:flex; flex-direction:column; gap:5px; min-width:0; }
+.gwent-parts { display:flex; flex-wrap:wrap; gap:5px; }
+.gwent-parts span { display:flex; flex-direction:column; align-items:center; min-width:44px; padding:3px 7px; border-radius:7px; background:#00000040; border:1px solid #ffffff14; }
+.gwent-parts small { font-size:9.5px; color:#b9c3cf; text-transform:uppercase; letter-spacing:.05em; white-space:nowrap; }
+.gwent-parts b { font:700 15px Georgia,serif; color:#f6ead0; }
+.gwent-previous,.gwent-path { color:#b9c3cf; font-size:11.5px; }
+.gwent-path i { color:var(--poker-gold); }
+.gwent-total { display:grid; place-items:center; width:60px; height:60px; border-radius:50%; font:700 26px Georgia,serif; color:#2a1a08;
+  background:radial-gradient(circle at 35% 30%,#fff3cf,#d9ab52 60%,#9a6c25); border:3px solid #f8e3ae; box-shadow:0 4px 12px #000a,inset 0 -3px 0 #8a5e1d; }
+.gwent-total.is-empty { color:#b9c3cf; background:#00000040; border:2px dashed #ffffff30; box-shadow:none; }
+.poker-seat.is-winner .gwent-total { box-shadow:0 0 0 3px #f3cf7a66,0 0 20px #f3cf7a; }
+.gwent-history { display:flex; flex-wrap:wrap; align-items:center; gap:6px; padding:0 8px; font-size:11.5px; }
+.gwent-history span { padding:2px 8px; border-radius:999px; background:#00000040; color:#d6dde6; }
+.gwent-history span.is-won { background:#f3cf7a; color:#2a1a08; font-weight:700; }
+.gwent-history span.is-lost { opacity:.65; }
+.gwent-history small { margin-left:auto; color:#9fabb8; }
+.gwent-skills { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+.witcher-poker-window .gwent-skill { border-radius:999px; background:#2a211a; }
+.witcher-poker-window .gwent-skill b { color:var(--poker-gold); }
+.witcher-poker-window .gwent-skill.is-selected { color:#2a1a08; background:linear-gradient(#f0d28c,#c89a45); border-color:#f6dc9b; }
+.witcher-poker-window .gwent-skill.is-selected b { color:#2a1a08; }
+.poker-rules ol.gwent-table { grid-template-columns:1fr; }
+.poker-rules .gwent-table li { display:grid; grid-template-columns:34px 20px 1fr 30px; grid-template-rows:auto auto; column-gap:6px; justify-content:stretch; }
+.poker-rules .gwent-table li b { color:var(--poker-gold); }
+.poker-rules .gwent-table li i { color:var(--poker-gold); }
+.poker-rules .gwent-table li span { font:700 13px Georgia,serif; letter-spacing:0; text-align:right; }
+.poker-rules .gwent-table li small { grid-column:3/5; color:#b8ad96; font-size:11.5px; }
+.witcher-poker-card.is-gwent { background:radial-gradient(ellipse at top,#3a4a5e,#141b25); }
+@media (max-width:560px) { .gwent-row { grid-template-columns:auto 1fr; } .gwent-total { grid-column:1/-1; justify-self:center; } }

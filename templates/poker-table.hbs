@@ -1,56 +1,92 @@
-{{#*inline "pokerSeat"}}
-<section class="poker-seat {{#if seat.mine}}is-mine{{/if}} {{#if seat.winner}}is-winner{{/if}} {{#if seat.loser}}is-loser{{/if}}" aria-label="{{seat.label}}: {{seat.name}}">
+{{#*inline "seatHead"}}
   <header class="poker-seat-head">
     <img class="poker-portrait" src="{{seat.img}}" alt="">
     <div class="poker-seat-name"><small>{{seat.label}}{{#unless seat.online}} · не в сети{{/unless}}</small><h2>{{#if seat.winner}}<i class="fa-solid fa-crown"></i> {{/if}}{{seat.name}}</h2></div>
+    {{#if seat.gems}}<span class="gwent-gems" aria-label="Выиграно раундов">{{#each seat.gems}}<i class="gwent-gem {{#if won}}is-won{{/if}}"></i>{{/each}}</span>{{/if}}
     {{#if seat.status}}<span class="poker-status">{{seat.status}}</span>{{/if}}
   </header>
+{{/inline}}
+{{#*inline "pokerSeat"}}
+<section class="poker-seat {{#if seat.mine}}is-mine{{/if}} {{#if seat.winner}}is-winner{{/if}} {{#if seat.loser}}is-loser{{/if}}" aria-label="{{seat.label}}: {{seat.name}}">
+  {{> seatHead seat=seat}}
   <div class="poker-dice">{{#each seat.dice}}<button type="button" class="poker-die {{#if selected}}is-selected{{/if}} {{#if hidden}}is-hidden{{/if}} {{#if scoring}}is-scoring{{/if}} {{#if swapped}}is-swapped{{/if}}" data-action="die" data-index="{{index}}" aria-label="Кость {{number}}: {{#if hidden}}скрыта{{else}}{{value}}{{/if}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}" {{disabled (not selectable)}}>{{#if hidden}}<span class="poker-unknown">?</span>{{else}}<span class="poker-face" aria-hidden="true">{{#each dots}}<i class="poker-dot pos-{{position}}"></i>{{/each}}</span>{{/if}}{{#if selected}}<span class="poker-die-marker" aria-hidden="true"><i class="fa-solid {{#if ../palming}}fa-mask{{else}}fa-rotate{{/if}}"></i></span>{{/if}}</button>{{/each}}</div>
   <footer class="poker-hand rank-{{seat.rank}}"><strong>{{seat.combination}}</strong>{{#if seat.sum}}<small>сумма {{seat.sum}}</small>{{/if}}</footer>
 </section>
 {{/inline}}
-<div class="poker-app {{#if lobby}}is-lobby{{else}}phase-{{phase}}{{/if}}">
+{{#*inline "gwentSeat"}}
+<section class="poker-seat gwent-seat {{#if seat.mine}}is-mine{{/if}} {{#if seat.winner}}is-winner{{/if}} {{#if seat.loser}}is-loser{{/if}}" aria-label="{{seat.label}}: {{seat.name}}">
+  {{> seatHead seat=seat}}
+  <div class="gwent-row">
+    {{#if seat.play}}
+      <article class="gwent-card tone-{{seat.play.tone}} {{#if seat.play.faded}}is-faded{{/if}}" data-tooltip="{{seat.play.text}}">
+        <span class="gwent-card-mod">{{seat.play.mod}}</span><i class="fa-solid {{seat.play.icon}}" aria-hidden="true"></i><strong>{{seat.play.name}}</strong>
+      </article>
+      <div class="gwent-math {{#if seat.play.faded}}is-faded{{/if}}">
+        {{#if seat.play.faded}}<small class="gwent-previous">прошлый раунд</small>{{/if}}
+        <div class="gwent-parts">{{#each seat.play.parts}}<span><small>{{label}}</small><b>{{value}}</b></span>{{/each}}</div>
+        {{#if seat.play.path}}<small class="gwent-path"><i class="fa-solid fa-route"></i> {{seat.play.path}}</small>{{/if}}
+      </div>
+      <output class="gwent-total {{#if seat.play.faded}}is-faded{{/if}}">{{seat.play.total}}</output>
+    {{else}}
+      <article class="gwent-card is-back" aria-label="Карты ещё не разыграны"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></article>
+      <div class="gwent-math"><small class="gwent-previous">{{seat.deckNote}}</small></div>
+      <output class="gwent-total is-empty">–</output>
+    {{/if}}
+  </div>
+  {{#if seat.history.length}}<footer class="gwent-history">{{#each seat.history}}<span class="is-{{result}}">Р{{round}} · {{total}}</span>{{/each}}<small>{{seat.deckNote}}</small></footer>{{/if}}
+</section>
+{{/inline}}
+{{#*inline "deckPicker"}}
+  <label class="poker-inline-field"><span>Колода</span><select name="deckId">{{#each deck.decks}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+  {{#if deck.forgeries}}<label class="poker-toggle is-shady"><input type="checkbox" name="fakes" {{checked deck.fakes}}><span><i class="fa-solid fa-mask"></i> Подложить поддельные карты (+{{deck.forgeries}}). Видите только вы и мастер; соперник проверит Внимание СЛ {{deck.forgeryDc}}.</span></label>{{/if}}
+{{/inline}}
+<div class="poker-app game-{{game}} {{#if lobby}}is-lobby{{else}}phase-{{phase}}{{/if}}">
   <header class="poker-head">
-    <div class="poker-title"><i class="fa-solid fa-dice" aria-hidden="true"></i><div><small>Развлечения в таверне</small><h1>Покер на костях</h1></div></div>
+    <div class="poker-title"><i class="fa-solid {{gameIcon}}" aria-hidden="true"></i><div><small>Развлечения в таверне</small><h1>{{gameName}}</h1></div></div>
     {{#if table}}<div class="poker-pills">{{#if spectator}}<span class="poker-pill is-watch"><i class="fa-solid fa-eye" aria-hidden="true"></i> Вы зритель</span>{{/if}}<span class="poker-pill">{{stage}}</span><span class="poker-pill is-gold"><i class="fa-solid fa-coins" aria-hidden="true"></i> {{#if stake}}Банк {{pot}} кр.{{else}}Без ставок{{/if}}</span></div>{{/if}}
   </header>
   {{#unless hasGM}}<p class="poker-notice" role="status"><i class="fa-solid fa-plug-circle-xmark"></i> Нужен подключённый мастер — он ведёт стол. Партия сохранена.</p>{{/unless}}
   {{#if notice}}<p class="poker-notice" role="alert"><i class="fa-solid fa-triangle-exclamation"></i> {{notice}}</p>{{/if}}
   {{#if lobby}}
     <div class="poker-lobby">
+      <div class="tavern-games" role="group" aria-label="Игра">{{#each games}}<button type="button" class="tavern-game {{#if selected}}is-selected{{/if}}" data-action="game" data-game="{{id}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}"><i class="fa-solid {{icon}}" aria-hidden="true"></i> {{name}}</button>{{/each}}</div>
       <div class="poker-fields">
         <label><span>Играть за</span><select name="actorUuid"><option value="">От своего имени · без кошелька</option>{{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}} · {{crowns}} кр.</option>{{/each}}</select></label>
         <label><span>Соперник</span><select name="opponentId"><option value="">Кого позвать за стол?</option>{{#each opponents}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}{{#if isGM}} · мастер{{/if}}</option>{{/each}}</select></label>
       </div>
+      {{#if isGwent}}<div class="gwent-deck-pick">{{> deckPicker deck=deck}}</div>{{/if}}
       <div class="poker-stakes"><span>Ставка с каждого</span>
         <div class="poker-chips">{{#each stakes}}<button type="button" class="poker-chip {{#if selected}}is-selected{{/if}}" data-action="stake" data-value="{{value}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}">{{label}}</button>{{/each}}<label class="poker-chip-input"><input name="stake" type="number" min="0" max="1000000" step="1" value="{{stake}}" aria-label="Своя ставка, кр."><span>кр.</span></label></div>
         <small>Деньги списываются, только когда соперник примет вызов. Победитель забирает банк, при ничьей ставки возвращаются.</small>
       </div>
       <label class="poker-toggle"><input type="checkbox" name="open" {{checked openGame}}><span><i class="fa-solid fa-eye"></i> Пустить зрителей — партия видна всем за столом таверны</span></label>
       <button type="button" class="poker-primary poker-wide" data-action="challenge" {{disabled busy}}><i class="fa-solid fa-hand-fist"></i> Бросить вызов</button>
-      {{#if recent}}<div class="poker-recent"><h3>Столы</h3>{{#each recent}}<button type="button" class="{{#if open}}is-open{{/if}}" data-action="openTable" data-table="{{id}}"><span>{{names}}</span><small>{{status}}{{#if stake}} · {{stake}} кр.{{/if}} {{#if watch}}<b><i class="fa-solid fa-eye"></i> смотреть</b>{{else}}<i class="fa-solid fa-chevron-right"></i>{{/if}}</small></button>{{/each}}</div>{{/if}}
+      {{#if recent}}<div class="poker-recent"><h3>Столы</h3>{{#each recent}}<button type="button" class="{{#if open}}is-open{{/if}}" data-action="openTable" data-table="{{id}}"><span><i class="fa-solid {{icon}}" aria-hidden="true"></i> {{names}}</span><small>{{status}}{{#if stake}} · {{stake}} кр.{{/if}} {{#if watch}}<b><i class="fa-solid fa-eye"></i> смотреть</b>{{else}}<i class="fa-solid fa-chevron-right"></i>{{/if}}</small></button>{{/each}}</div>{{/if}}
     </div>
   {{else}}
-    <div class="poker-felt">
-      {{> pokerSeat seat=top palming=canPalm}}
+    <div class="poker-felt {{#if isGwent}}is-gwent{{/if}}">
+      {{#if isGwent}}{{> gwentSeat seat=top}}{{else}}{{> pokerSeat seat=top palming=canPalm}}{{/if}}
       <div class="poker-center" aria-live="polite">
         {{#if result}}
           <div class="poker-result {{#if result.win}}is-win{{/if}} {{#if result.lose}}is-lose{{/if}}" role="status"><h2>{{result.title}}</h2>{{#if result.detail}}<p>{{result.detail}}</p>{{/if}}{{#if result.bank}}<p class="poker-bank-note"><i class="fa-solid fa-coins"></i> {{result.bank}}</p>{{/if}}</div>
         {{else}}
-          <p class="poker-instruction">{{#if waiting}}<i class="fa-solid fa-hourglass-half fa-fade"></i> {{/if}}{{instruction}}</p>
+          <div class="poker-instruction">{{#if roundLine}}<strong class="gwent-round-line">{{roundLine}}</strong>{{/if}}<p>{{#if waiting}}<i class="fa-solid fa-hourglass-half fa-fade"></i> {{/if}}{{instruction}}</p></div>
         {{/if}}
       </div>
-      {{> pokerSeat seat=bottom palming=canPalm}}
+      {{#if isGwent}}{{> gwentSeat seat=bottom}}{{else}}{{> pokerSeat seat=bottom palming=canPalm}}{{/if}}
       <div class="poker-actions">
         {{#if canAccept}}<label class="poker-inline-field"><span>Играть за</span><select name="actorUuid"><option value="">От своего имени · без кошелька</option>{{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}} · {{crowns}} кр.</option>{{/each}}</select></label>
+          {{#if isGwent}}{{> deckPicker deck=deck}}{{/if}}
           <div class="poker-buttons"><button type="button" class="poker-primary" data-action="accept" {{disabled busy}}><i class="fa-solid fa-handshake"></i> Принять{{#if stake}} · {{stake}} кр.{{/if}}</button><button type="button" data-action="decline" {{disabled busy}}>Отказаться</button></div>{{/if}}
         {{#if canCancel}}<div class="poker-buttons"><button type="button" data-action="cancel" {{disabled busy}}><i class="fa-solid fa-xmark"></i> Отозвать вызов</button></div>{{/if}}
         {{#if canRoll}}<div class="poker-buttons"><button type="button" class="poker-primary poker-big" data-action="roll" {{disabled busy}}><i class="fa-solid fa-dice"></i> Бросить кости</button></div>{{/if}}
         {{#if canDraw}}<div class="poker-buttons"><button type="button" class="poker-primary poker-big" data-action="reroll" {{disabled busy}}>{{#if selectedCount}}<i class="fa-solid fa-rotate"></i> Перебросить отмеченные · {{selectedCount}}{{else}}<i class="fa-solid fa-hand"></i> Оставить все и вскрыть{{/if}}</button></div>{{/if}}
         {{#if canPalm}}<div class="poker-palm"><span><i class="fa-solid fa-mask"></i> Новое значение</span><div class="poker-palm-faces">{{#each palmValues}}<button type="button" class="poker-die is-mini {{#if selected}}is-selected{{/if}}" data-action="palmValue" data-value="{{value}}" aria-label="Значение {{value}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}" {{disabled ../busy}}><span class="poker-face" aria-hidden="true">{{#each dots}}<i class="poker-dot pos-{{position}}"></i>{{/each}}</span></button>{{/each}}</div>{{#if palmPreview}}<em>станет: {{palmPreview}}</em>{{/if}}</div>
           <div class="poker-buttons"><button type="button" class="poker-primary is-shady" data-action="palm" {{disabled (or busy (not palmReady))}}><i class="fa-solid fa-mask"></i> Подменить и вскрыть</button><button type="button" data-action="fair" {{disabled busy}}><i class="fa-solid fa-scale-balanced"></i> Играть честно</button></div>{{/if}}
+        {{#if canPlay}}<div class="gwent-skills" role="group" aria-label="Навык">{{#each skills}}<button type="button" class="gwent-skill {{#if selected}}is-selected{{/if}}" data-action="skill" data-skill="{{key}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}" {{disabled ../busy}}>{{label}} <b>{{value}}</b></button>{{/each}}</div>
+          <div class="poker-buttons"><button type="button" class="poker-primary poker-big" data-action="play" {{disabled busy}}><i class="fa-solid fa-layer-group"></i> Разыграть раунд {{round}}</button></div>{{/if}}
         {{#if canRematch}}<div class="poker-buttons"><button type="button" class="poker-primary" data-action="rematch" {{disabled busy}}><i class="fa-solid fa-rotate-right"></i> Реванш</button><button type="button" data-action="lobby" {{disabled busy}}><i class="fa-solid fa-table-list"></i> Другие столы</button></div>{{/if}}
-        {{#if busy}}<p class="poker-wait"><i class="fa-solid fa-spinner fa-spin"></i> Кости в пути…</p>{{/if}}
+        {{#if busy}}<p class="poker-wait"><i class="fa-solid fa-spinner fa-spin"></i> {{#if isGwent}}Карты на столе…{{else}}Кости в пути…{{/if}}</p>{{/if}}
       </div>
     </div>
     <footer class="poker-management">
@@ -60,9 +96,17 @@
       {{#if canAbort}}<button type="button" data-action="abort" {{disabled busy}}>Мастер: отменить с возвратом</button>{{/if}}
     </footer>
   {{/if}}
+  {{#if isGwent}}
+  <details class="poker-rules" {{#if rulesOpen}}open{{/if}}><summary><i class="fa-solid fa-book-open"></i> Карты и правила гвинта</summary>
+    <ol class="gwent-table">{{#each gwentRules}}<li><b>{{faces}}</b><i class="fa-solid {{icon}}" aria-hidden="true"></i><strong>{{name}}</strong><span>{{mod}}</span><small>{{text}}</small></li>{{/each}}</ol>
+    <p>В начале каждого раунда оба тянут карту (d10 по таблице) и добавляют модификатор к проверке Азартных игр или Тактики. Выше результат — раунд ваш. Партия — до двух выигранных раундов, максимум три раунда; возможны ничьи. Редкая колода даёт +1…+3 — её назначает мастер в листе колоды.</p>
+    <p><i class="fa-solid fa-mask"></i> Поддельная карта: набор для письма, 3 часа и проверка Подделки (кнопка на колоде). Каждая даёт +1, не больше +3. Соперник один раз проверяет Внимание против худшего результата Подделки: заметит — шулер проигрывает.</p>
+  </details>
+  {{else}}
   <details class="poker-rules" {{#if rulesOpen}}open{{/if}}><summary><i class="fa-solid fa-book-open"></i> Комбинации и правила</summary>
     <ol>{{#each combinations}}<li><strong>{{name}}</strong><span aria-hidden="true">{{example}}</span></li>{{/each}}</ol>
     <p>Оба бросают по пять костей, затем один раз перебрасывают любые из них или оставляют все. После переброса кости сразу вскрываются. При одинаковой комбинации решает её достоинство, затем остальные кости; без комбинации — сумма. Полное равенство — ничья.</p>
     <p><i class="fa-solid fa-mask"></i> С шулерскими костями при себе вы увидите все кости перед вскрытием и сможете подменить одну свою. Соперник проверяет Внимание СЛ {{dc}}: заметит — шулер проигрывает.</p>
   </details>
+  {{/if}}
 </div>

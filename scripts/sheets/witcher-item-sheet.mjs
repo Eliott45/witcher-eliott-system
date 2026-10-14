@@ -23,6 +23,7 @@ import { radolfActions } from "../combat/radolf-actions.mjs";
 import { radolfItemContext } from "../data/radolf-rules.mjs";
 import { pokerItemContext } from "../minigames/poker-rules.mjs";
 import { pokerActions } from "../minigames/poker.mjs";
+import { gwentDeckContext } from "../minigames/gwent-forgery.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const effectItemActions={
@@ -97,7 +98,7 @@ export class WitcherItemSheet extends HandlebarsApplicationMixin(foundry.applica
     return Object.assign(context, {
       workshop, recipeDetails, spell, hasDetails, hasActions, isEffectItem, installations: this.item.system.installations ?? [],
       relicLore: relicLore(this.item),
-      radolf: radolfItemContext(this.item), poker: pokerItemContext(this.item),
+      radolf: radolfItemContext(this.item), poker: pokerItemContext(this.item), gwentDeck: gwentDeckContext(this.item),
       consumption: this.item.actor ? consumableContext(this.item) : { enabled: false },
       effectTemplates:isEffectItem?await Promise.all(this.item.effects.map(async effect=>({id:effect.id,uuid:effect.uuid,name:effect.name,description:effect.description,enriched:await enrich(effect.description),duration:effectDurationLabel(effect)}))):[],
       itemTabs:visible.map(id=>context.tabs[id]),

@@ -4,8 +4,13 @@ export const POKER_HANDS = ["Без комбинации", "Пара", "Две �
 /** «Шулерские кости»: one die may be changed after seeing every die; spotting it is Awareness DC 16. */
 export const LOADED_DICE_DC = 16;
 /** Gaming gear that can start a game straight from the inventory. */
-export const POKER_ITEMS = ["gear.dice-poker-board", "gear.loaded-dice"];
-export const pokerItemContext = item => POKER_ITEMS.includes(item?.system?.ruleId) && item.actor ? { label: "Покер на костях: бросить вызов", icon: "fa-dice" } : null;
+export const TAVERN_GAMES = { poker: { name: "Покер на костях", icon: "fa-dice" }, gwent: { name: "Гвинт", icon: "fa-layer-group" } };
+export const POKER_ITEMS = { "gear.dice-poker-board": "poker", "gear.loaded-dice": "poker", "gear.gwent-deck": "gwent" };
+export const gameOf = state => state?.game === "gwent" ? "gwent" : "poker";
+export function pokerItemContext(item) {
+  const game = POKER_ITEMS[item?.system?.ruleId];
+  return game && item.actor ? { game, label: `${TAVERN_GAMES[game].name}: бросить вызов`, icon: TAVERN_GAMES[game].icon } : null;
+}
 export function pokerHand(dice) {
   if (!Array.isArray(dice) || dice.length !== 5 || dice.some(n => !Number.isInteger(n) || n < 1 || n > 6)) throw new Error("Нужны пять шестигранных костей.");
   const counts = new Map(); for (const n of dice) counts.set(n, (counts.get(n) ?? 0) + 1);
@@ -48,7 +53,8 @@ export function requirePokerAction(state, userId, action, revision) {
   if (seat < 0) throw new Error("Вы не участник этой партии.");
   // Concurrent moves by different seats are valid; each seat has its own revision.
   if (state.seats[seat].revision !== revision) throw new Error("Ход уже обработан. Стол обновлён.");
-  const row = state.seats[seat];
+  const row = state.seats[seat], gwent = gameOf(state) === "gwent";
+  if (["roll", "reroll", "finish"].includes(action) && gwent || action === "play" && !gwent) throw new Error("Сейчас это действие недоступно.");
   const allowed = action === "accept" ? state.phase === "invited" && seat === 1
     : action === "decline" ? state.phase === "invited" && seat === 1
       : action === "cancel" ? state.phase === "invited" && seat === 0
@@ -57,7 +63,8 @@ export function requirePokerAction(state, userId, action, revision) {
           : action === "reroll" ? state.phase === "drawing" && !row.draw
             // Only a player carrying loaded dice gets the extra moment before the reveal.
             : action === "finish" ? state.phase === "palming" && Boolean(row.palm) && !row.final
-              : action === "concede" ? ["opening", "drawing", "palming"].includes(state.phase) : false;
+              : action === "play" ? state.phase === "playing" && !state.rounds?.[state.round - 1]?.plays[seat]
+                : action === "concede" ? ["opening", "drawing", "palming", "playing"].includes(state.phase) : false;
   if (!allowed) throw new Error("Сейчас это действие недоступно.");
   return seat;
 }

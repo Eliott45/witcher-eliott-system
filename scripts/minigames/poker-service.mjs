@@ -3,7 +3,8 @@ import { inventoryWrite } from "../data/inventory-writes.mjs";
 import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { isCarried } from "../data/containers.mjs";
 import { skillValue } from "../data/skills.mjs";
-import { pokerClosed, requirePokerAction, rerollIndices, revealPoker, wagerAmount, pokerHand, LOADED_DICE_DC } from "./poker-rules.mjs";
+import { pokerClosed, requirePokerAction, rerollIndices, revealPoker, wagerAmount, pokerHand, gameOf, LOADED_DICE_DC } from "./poker-rules.mjs";
+import { GWENT_SKILLS, drawGwentCard, gwentDeckBonus, gwentForgeries, gwentStart, settleGwentRound, clamp } from "./gwent-rules.mjs";
 
 export const pokerState = message => message?.flags?.[SYSTEM_ID]?.pokerTable;
 export const pokerReceipt = message => message?.flags?.[SYSTEM_ID]?.pokerReceipt;
@@ -16,6 +17,14 @@ const copy = value => foundry.utils.deepClone(value);
 const documentClass = () => foundry.documents.ChatMessage.implementation;
 const messageSource = flags => ({ author: game.user.id, style: CONST.CHAT_MESSAGE_STYLES.OTHER, flags: { [SYSTEM_ID]: { skipLuck: true, ...flags } } });
 export const ownedPokerActors = user => game.actors.filter(actor => ["character", "npc"].includes(actor.type) && actor.testUserPermission(user, "OWNER"));
+export const isGwentDeck = item => item?.system?.ruleId === "gear.gwent-deck";
+/** Deck rarity (+1…+3, set by the GM) and forged cards live on the deck item. */
+export function gwentDeckData(item) {
+  const flags = item?.flags?.[SYSTEM_ID]?.gwent ?? {};
+  return { quality: clamp(flags.quality, 0, 3), forgeries: gwentForgeries(flags.forgeries) };
+}
+export const gwentDecks = actor => (actor?.items.filter(item => isGwentDeck(item) && item.system.quantity > 0 && isCarried(item)) ?? [])
+  .map(item => ({ id: item.id, name: item.name, ...gwentDeckData(item) }));
 export const hasLoadedDice = actor => Boolean(actor?.items.some(item => item.system.ruleId === "gear.loaded-dice" && item.system.quantity > 0 && isCarried(item)));
 const receiptFor = requestId => game.messages.find(message => gmDocument(message) && pokerReceipt(message)?.requestId === requestId);
 export function seatReceipt(id, tableId, userId, kind) {
@@ -29,10 +38,27 @@ function actorFor(uuid, user, required = false) {
   if (!actor || !["character", "npc"].includes(actor.type) || !actor.testUserPermission(user, "OWNER")) throw new Error("Выберите своего персонажа для этой партии.");
   return actor;
 }
-function participant(user, actor) {
-  return { userId: user.id, name: actor?.name ?? user.name, actorUuid: actor?.uuid ?? "", revision: 0, opening: "", draw: "", rerolled: [], palm: "", final: "" };
+function participant(user, actor, deck = null) {
+  return { userId: user.id, name: actor?.name ?? user.name, actorUuid: actor?.uuid ?? "", revision: 0, opening: "", draw: "", rerolled: [], palm: "", final: "", ...(deck ? { deck } : {}) };
+}
+/** Without a chosen deck the players borrow the tavern's: no rarity bonus, no forged cards. */
+function deckFor(actor, data) {
+  if (!data.deckId) return { name: "", quality: 0, fakes: 0, fakeDc: 0 };
+  const item = actor?.items.get(data.deckId);
+  if (!isGwentDeck(item) || !isCarried(item) || !(item.system.quantity > 0)) throw new Error("Колода для гвинта должна быть при себе у выбранного персонажа.");
+  const { quality, forgeries } = gwentDeckData(item), fakes = data.fakes ? forgeries.count : 0;
+  return { name: item.name, quality, fakes, fakeDc: fakes ? forgeries.dc : 0 };
+}
+function gwentCard(state) {
+  const phase = { invited: "Приглашение за стол", funding: "Сбор ставок", playing: `Раунд ${state.round} из 3`, settling: "Расчёт банка", finished: "Партия завершена", declined: "Приглашение отклонено", cancelled: "Партия отменена" }[state.phase];
+  const result = state.phase === "finished" ? state.winner === null ? "Ничья" : `Победитель: ${state.seats[state.winner].name}` : phase;
+  const caught = state.phase === "finished" && state.reason === "caught" ? `<p class="witcher-poker-caught"><i class="fa-solid fa-mask"></i> ${state.caught.map(index => esc(state.seats[index].name)).join(" и ")}: пойман на поддельных картах</p>` : "";
+  const score = ["playing", "settling", "finished"].includes(state.phase) ? `<p>Счёт раундов: ${state.score.join(" : ")}</p>` : "";
+  const audience = state.open === false ? "Закрытая партия" : "Зрители могут смотреть";
+  return `<section class="witcher-poker-card is-gwent"><h3><i class="fa-solid fa-layer-group"></i> Гвинт</h3><p>${state.seats.map(seat => esc(seat.name)).join(" против ")}</p><strong>${esc(result)}</strong>${caught}${score}<p>${state.stake ? `Ставка: ${state.stake} кр. с каждого · Банк: ${state.stake * 2} кр.` : "Игра без ставок"} · ${audience}</p><button type="button" data-poker-open><i class="fa-solid fa-layer-group"></i> Открыть стол</button></section>`;
 }
 export function pokerCard(state) {
+  if (gameOf(state) === "gwent") return gwentCard(state);
   const phase = { invited: "Приглашение за стол", funding: "Сбор ставок", opening: "Первый бросок", drawing: "Переброс костей", palming: "Вскрытие", settling: "Расчёт банка", finished: "Партия завершена", declined: "Приглашение отклонено", cancelled: "Партия отменена" }[state.phase];
   const result = state.phase === "finished" ? state.winner === null ? "Ничья" : `Победитель: ${state.seats[state.winner].name}` : phase;
   const caught = state.phase === "finished" && state.reason === "caught" ? `<p class="witcher-poker-caught"><i class="fa-solid fa-mask"></i> ${state.caught.map(index => esc(state.seats[index].name)).join(" и ")}: пойман на шулерских костях</p>` : "";
@@ -54,18 +80,30 @@ async function createReceipt(request, user, fields) {
     whisper: [...new Set([user.id, ...gmIds()])], content: "<p>Ход за столом покера.</p>" });
 }
 const actorOf = seat => seat.actorUuid ? game.actors.find(actor => actor.uuid === seat.actorUuid) ?? null : null;
-/** The opponent's character gets a hidden Awareness check; only the GM sees the swap and the roll. */
-async function spotSwap(state, index, cheat) {
-  const cheater = state.seats[index], watcher = actorOf(state.seats[1 - index]);
-  let skill = null;
-  try { skill = watcher ? skillValue(watcher.system, "awareness") : null; } catch { skill = null; }
-  const roll = skill?.total == null ? null : await new Roll(`1d10wc + ${skill.total}`).evaluate();
-  const spotted = Boolean(roll && roll.total >= LOADED_DICE_DC);
-  const check = roll ? `<p>Внимание: ${esc(watcher.name)} — ${roll.total} против СЛ ${LOADED_DICE_DC}. <strong>${spotted ? "Подмена замечена: шулер проигрывает." : "Подмену не заметили."}</strong></p>`
-    : `<p>У соперника нет персонажа — при желании проведите проверку Внимания СЛ ${LOADED_DICE_DC} вручную.</p>`;
+const skillTotal = (actor, key) => { try { return actor ? skillValue(actor.system, key)?.total ?? null : null; } catch { return null; } };
+const signed = value => value < 0 ? `- ${-value}` : `+ ${value}`;
+/** The opponent's character gets a hidden Awareness check; only the GM sees the trick and the roll. */
+async function spotCheat(state, index, dc, title, text) {
+  const watcher = actorOf(state.seats[1 - index]), awareness = skillTotal(watcher, "awareness");
+  const roll = awareness == null ? null : await new Roll(`1d10wc ${signed(awareness)}`).evaluate();
+  const spotted = Boolean(roll && roll.total >= dc);
+  const check = roll ? `<p>Внимание: ${esc(watcher.name)} — ${roll.total} против СЛ ${dc}. <strong>${spotted ? "Обман замечен: шулер проигрывает." : "Обман не заметили."}</strong></p>`
+    : `<p>У соперника нет персонажа — при желании проведите проверку Внимания СЛ ${dc} вручную.</p>`;
   await documentClass().create({ ...messageSource({ pokerNote: true }), whisper: gmIds(), blind: true, rolls: roll ? [roll] : [],
-    content: `<section class="witcher-poker-card is-note"><h3><i class="fa-solid fa-mask"></i> Шулерские кости</h3><p>${esc(cheater.name)} подменяет кость ${cheat.index + 1}: ${cheat.from} → ${cheat.value}.</p>${check}</section>` });
+    content: `<section class="witcher-poker-card is-note"><h3><i class="fa-solid fa-mask"></i> ${title}</h3><p>${esc(state.seats[index].name)} ${text}</p>${check}</section>` });
   return { spotted, check: roll?.total ?? null };
+}
+const spotSwap = (state, index, cheat) => spotCheat(state, index, LOADED_DICE_DC, "Шулерские кости", `подменяет кость ${cheat.index + 1}: ${cheat.from} → ${cheat.value}.`);
+/** One gwent round for one player: a d10 card from the table, then 1d10 + Gambling or Tactics with every modifier. */
+async function playGwent(state, index, data) {
+  const seat = state.seats[index], skill = GWENT_SKILLS[data.skill] ? data.skill : "gambling", value = skillTotal(actorOf(seat), skill) ?? 0;
+  const card = await drawGwentCard(async () => (await new Roll("1d10").evaluate()).total, state.round);
+  const deck = gwentDeckBonus(seat.deck), carry = state.carry?.[index] ?? 0, base = value + card.mod + deck + carry;
+  const roll = await new Roll(`1d10wc ${signed(base)}`).evaluate();
+  const play = { skill, skillValue: value, card, deck, carry, die: roll.total - base, total: roll.total };
+  // Forged cards are in the deck from the first hand; the opponent gets one chance to notice them.
+  if (state.round === 1 && seat.deck?.fakes) Object.assign(play, await spotCheat(state, index, seat.deck.fakeDc, "Поддельные карты гвинта", `играет колодой с поддельными картами (+${seat.deck.fakes}).`));
+  return play;
 }
 function revealTable(state, table) {
   const finals = state.seats.map(row => seatReceipt(row.final, table.id, row.userId, ["reroll", "finish"]));
@@ -125,7 +163,8 @@ export async function recoverPokerBank(message) {
         }
       });
     }
-    await saveTable(message, { ...state, issue: "", phase: state.phase === "funding" ? "opening" : state.reason === "cancelled" ? "cancelled" : "finished" });
+    const started = gameOf(state) === "gwent" ? "playing" : "opening";
+    await saveTable(message, { ...state, issue: "", phase: state.phase === "funding" ? started : state.reason === "cancelled" ? "cancelled" : "finished" });
   } catch (error) {
     if (activeGM()) await saveTable(message, { ...state, issue: error.message });
     throw error;
@@ -141,11 +180,12 @@ async function challenge(request, user, data) {
   const opponent = game.users.get(data.opponentId), stake = wagerAmount(data.stake);
   if (!opponent?.active || opponent.id === user.id) throw new Error("Выберите другого подключённого игрока или мастера.");
   if (pokerTables().some(message => !pokerClosed(pokerState(message)) && pokerState(message).seats.some(seat => seat.userId === user.id || seat.userId === opponent.id))) throw new Error("Один из участников уже за столом. Завершите или отмените его партию.");
-  const actor = actorFor(data.actorUuid, user, stake > 0);
+  const actor = actorFor(data.actorUuid, user, stake > 0 || Boolean(data.deckId)), gwent = data.game === "gwent";
   if (actor && balance(actor) < stake) throw new Error("Не хватает крон для ставки.");
   const open = data.open !== false;
   const state = { version: 1, invitation: request.id, phase: "invited", stake, tieMode: "faces", issue: "", hands: [[], []], winner: null, reason: "", processed: [request.id],
-    seats: [participant(user, actor), participant(opponent, null)], created: Date.now(), open };
+    seats: [participant(user, actor, gwent ? deckFor(actor, data) : null), participant(opponent, null, gwent ? deckFor(null, {}) : null)], created: Date.now(), open,
+    ...(gwent ? { game: "gwent", ...gwentStart() } : {}) };
   // The table holds no secrets (dice are public, swaps live in private receipts), so an open game is a public card anyone can watch.
   return documentClass().create({ ...messageSource({ pokerTable: state }), whisper: open ? [] : [...new Set([user.id, opponent.id, ...gmIds()])], content: pokerCard(state) });
 }
@@ -166,7 +206,7 @@ export async function processPokerRequest(request, creatorId) {
       let state = copy(pokerState(table));
       if (!state.processed.includes(request.id)) {
         const staged = game.messages.find(message => gmDocument(message) && pokerReceipt(message)?.tableId === table.id
-          && pokerReceipt(message).userId === user.id && !pokerReceipt(message).done && message.id !== receipt?.id && pokerReceipt(message).dice);
+          && pokerReceipt(message).userId === user.id && !pokerReceipt(message).done && message.id !== receipt?.id && (pokerReceipt(message).dice || pokerReceipt(message).play));
         if (staged) {
           const original = game.messages.get(pokerReceipt(staged).requestId);
           if (original) await processPokerRequest(original);
@@ -181,13 +221,22 @@ export async function processPokerRequest(request, creatorId) {
         } else {
           const index = requirePokerAction(state, user.id, command.action, command.revision), seat = state.seats[index], data = command.data ?? {};
           if (command.action === "accept") {
-            const actor = actorFor(data.actorUuid, user, state.stake > 0);
+            const actor = actorFor(data.actorUuid, user, state.stake > 0 || Boolean(data.deckId));
             if (actor && actor.uuid === state.seats[0].actorUuid) throw new Error("За столом должны быть разные персонажи.");
             if (actor && balance(actor) < state.stake) throw new Error("Не хватает крон, чтобы принять ставку.");
-            state.seats[index] = participant(user, actor); state.phase = "funding";
+            state.seats[index] = participant(user, actor, gameOf(state) === "gwent" ? deckFor(actor, data) : null); state.phase = "funding";
           } else if (["decline", "cancel"].includes(command.action)) state.phase = command.action === "decline" ? "declined" : "cancelled";
           else if (command.action === "concede") { state.phase = "settling"; state.winner = 1 - index; state.reason = "conceded"; }
-          else {
+          else if (command.action === "play") {
+            // The receipt keeps the drawn card and roll, so a retry after a failed save never redraws.
+            let play = pokerReceipt(receipt)?.play;
+            if (!play) {
+              play = await playGwent(state, index, data);
+              receipt = await createReceipt(request, user, { tableId: table.id, kind: "play", play });
+            }
+            state.rounds[state.round - 1].plays[index] = play;
+            state = settleGwentRound(state);
+          } else {
             const kind = command.action;
             let dice = pokerReceipt(receipt)?.dice, cheat = null;
             if (!dice) {
@@ -237,7 +286,7 @@ export async function processPokerRequest(request, creatorId) {
   } catch (error) {
     // A persisted die must not turn into a fresh reroll if a later write fails. Keep it for retry.
     if (receipt && !pokerReceipt(receipt).done) {
-      ui.notifications.warn(`Покер: ${error.message}`); return;
+      ui.notifications.warn(`Таверна: ${error.message}`); return;
     }
     receipt ??= await createReceipt(request, user, { tableId: command.tableId ?? "", kind: command.action });
     await saveReceipt(receipt, { ...pokerReceipt(receipt), done: true, ok: false, error: error.message });

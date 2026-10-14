@@ -2,7 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { SYSTEM_ID as SYS } from "../scripts/config.mjs";
 import { pokerHand, pokerScoring, comparePoker, rerollIndices, wagerAmount, requirePokerAction, pokerItemContext } from "../scripts/minigames/poker-rules.mjs";
-import { pokerState, pokerReceipt, processPokerRequest, pokerWrite, recoverPokerBank, resumePoker, pokerTables } from "../scripts/minigames/poker-service.mjs";
+import { pokerState, pokerReceipt, processPokerRequest, pokerWrite, recoverPokerBank, resumePoker, pokerTables, pokerCard } from "../scripts/minigames/poker-service.mjs";
+import { drawGwentCard, settleGwentRound, gwentStart, gwentForgeries, gwentDeckBonus, gwentCard } from "../scripts/minigames/gwent-rules.mjs";
 
 test("dice poker ranks all 7776 outcomes with the printed full-house/straight hierarchy", () => {
   const counts = Array(9).fill(0);
@@ -29,7 +30,8 @@ test("only owned gaming gear offers a dice poker challenge", () => {
   assert.ok(pokerItemContext({ actor: {}, system: { ruleId: "gear.dice-poker-board" } }));
   assert.ok(pokerItemContext({ actor: {}, system: { ruleId: "gear.loaded-dice" } }));
   assert.equal(pokerItemContext({ actor: null, system: { ruleId: "gear.dice-poker-board" } }), null);
-  assert.equal(pokerItemContext({ actor: {}, system: { ruleId: "gear.gwent-deck" } }), null);
+  assert.equal(pokerItemContext({ actor: {}, system: { ruleId: "gear.gwent-deck" } }).game, "gwent");
+  assert.equal(pokerItemContext({ actor: {}, system: { ruleId: "gear.map" } }), null);
 });
 test("matching hands compare their groups before kickers and exact ties stay ties", () => {
   assert.equal(comparePoker([3, 3, 1, 2, 4], [2, 2, 4, 5, 6]), 1);
@@ -59,7 +61,7 @@ function fixture() {
     } }; messages.push(message); return message;
   };
   const actor = (owner, name, money) => {
-    const value = { uuid: `Actor.${owner.id}`, name, type: "character", isOwner: true, system: { crowns: money }, items: [], flags: {},
+    const value = { uuid: `Actor.${owner.id}`, name, type: "character", isOwner: true, system: { crowns: money }, items: Object.assign([], { get(id) { return this.find(item => item.id === id); } }), flags: {},
       testUserPermission: user => user?.isGM || user?.id === owner.id, async update(update) { if (this.failUpdate?.(update)) throw new Error("Wallet unavailable"); apply(this, update); return this; } };
     actors.push(value); return value;
   };
@@ -68,7 +70,7 @@ function fixture() {
   globalThis.ui = { notifications: { warn() {} } };
   globalThis.CONST = { CHAT_MESSAGE_STYLES: { OTHER: 0 } };
   globalThis.foundry = { utils: { deepClone: structuredClone }, documents: { ChatMessage: { implementation: { async create(data) { return make(data); } } } } };
-  globalThis.Roll = class { constructor(formula) { this.formula = formula; this.count = Number(formula.split("d")[0]); this.bonus = Number(formula.split("+")[1] ?? 0); }
+  globalThis.Roll = class { constructor(formula) { this.formula = formula; this.count = Number(formula.split("d")[0]); const sign = formula.match(/([+-])\s*(\d+)\s*$/); this.bonus = sign ? Number(sign[2]) * (sign[1] === "-" ? -1 : 1) : 0; }
     async evaluate() { rolled++; const dice = rolls.shift() ?? Array(this.count).fill(1); assert.equal(dice.length, this.count); this.dice = [{ results: dice.map(result => ({ result, active: true })) }]; this.total = dice.reduce((a, b) => a + b, this.bonus); return this; } };
   const request = async (user, action, table = null, data = {}, changes = {}) => {
     const revision = pokerState(table)?.seats.find(seat => seat.userId === user.id)?.revision ?? 0;
@@ -222,4 +224,74 @@ test("a spotted swap loses the game and the bank; picking the same value is no s
   const rolled = f.rolled(); await f.request(f.a, "finish", fair, { cheat: { index: 0, value: 1 } });
   assert.equal(f.rolled(), rolled, "Choosing the value already on the die is not a swap");
   assert.equal(pokerState(fair).reason, "showdown"); assert.equal(pokerState(fair).winner, 1);
+});
+
+const skilled = (actor, skills) => { actor.system = { ...actor.system, skills, statistics: { effective: { intelligence: 5, empathy: 5, craft: 5 }, modifiers: [], mobilityAttributes: {} } }; };
+const gwentDeck = (actor, id, gwent = {}) => { const item = { id, name: "Колода Севера", system: { ruleId: "gear.gwent-deck", quantity: 1, carried: true }, flags: { [SYS]: { gwent } } }; actor.items.push(item); return item; };
+test("gwent cards follow the printed d10 table, including the sacrifice and the path to victory", async () => {
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(face => gwentCard(face).mod), [3, -3, 2, -2, 1, 1, -1, -1, -2, 0]);
+  const queue = values => async () => values.shift();
+  assert.deepEqual(await drawGwentCard(queue([10, 1]), 1), { faces: [10], key: "path", name: "Путь к победе", mod: 0, path: false, carry: 0 }, "No reroll in the first round");
+  const path = await drawGwentCard(queue([10, 10, 3]), 2); assert.deepEqual(path.faces, [10, 10, 3]); assert.equal(path.mod, 2); assert.equal(path.path, true);
+  assert.equal((await drawGwentCard(queue([9]), 1)).carry, 3);
+  assert.deepEqual(gwentForgeries([14, "x", 9, 20, 11]), { count: 3, dc: 11 }); assert.equal(gwentDeckBonus({ quality: 2, fakes: 5 }), 5);
+});
+test("gwent rounds: two won rounds end the match, a third round decides, ties and sacrifices carry over", () => {
+  const play = (total, carry = 0) => ({ total, carry });
+  let state = { phase: "playing", ...gwentStart() };
+  state.rounds[0].plays = [play(15, 3), play(12)]; state = settleGwentRound(state);
+  assert.equal(state.round, 2); assert.deepEqual(state.score, [1, 0]); assert.deepEqual(state.carry, [3, 0]);
+  state.rounds[1].plays = [play(10), play(10)]; state = settleGwentRound(state);
+  assert.equal(state.round, 3); assert.deepEqual(state.score, [1, 0]); assert.equal(state.rounds[1].winner, null);
+  state.rounds[2].plays = [play(8), play(18)]; state = settleGwentRound(state);
+  assert.equal(state.phase, "settling"); assert.equal(state.winner, null, "1 : 1 with a drawn round is a draw");
+  let quick = { phase: "playing", ...gwentStart() };
+  quick.rounds[0].plays = [play(20), play(5)]; quick = settleGwentRound(quick); quick.rounds[1].plays = [play(20), play(5)]; quick = settleGwentRound(quick);
+  assert.equal(quick.phase, "settling"); assert.equal(quick.winner, 0); assert.equal(quick.rounds.length, 2);
+});
+test("a full gwent match is public to spectators, pays the bank and only the chosen skill counts", async () => {
+  const f = fixture(); skilled(f.first, { gambling: 4, tactics: 1 }); skilled(f.second, { gambling: 1, tactics: 2 });
+  gwentDeck(f.first, "deckA0000000001", { quality: 1 });
+  const invite = await f.request(f.a, "challenge", null, { game: "gwent", opponentId: f.b.id, actorUuid: f.first.uuid, stake: 20, deckId: "deckA0000000001" });
+  assert.ok(invite.reply.ok, invite.reply.error); const table = invite.table;
+  assert.deepEqual(table.whisper, []); assert.equal(pokerState(table).game, "gwent"); assert.deepEqual(pokerState(table).seats[0].deck, { name: "Колода Севера", quality: 1, fakes: 0, fakeDc: 0 });
+  await f.request(f.b, "accept", table, { actorUuid: f.second.uuid }); assert.equal(pokerState(table).phase, "playing");
+  const early = await f.request(f.a, "roll", table); assert.equal(early.reply.ok, false, "Poker moves are refused at a gwent table");
+  f.rolls.push([1], [5]); await f.request(f.a, "play", table, { skill: "gambling" });
+  const first = pokerState(table).rounds[0].plays[0];
+  assert.deepEqual([first.card.name, first.skillValue, first.deck, first.die, first.total], ["Карта героя", 9, 1, 5, 18]);
+  const twice = await f.request(f.a, "play", table, { skill: "gambling" }); assert.equal(twice.reply.ok, false);
+  f.rolls.push([2], [3]); await f.request(f.b, "play", table, { skill: "tactics" });
+  assert.equal(pokerState(table).rounds[0].plays[1].total, 7 - 3 + 3); assert.deepEqual(pokerState(table).score, [1, 0]); assert.equal(pokerState(table).round, 2);
+  f.rolls.push([5], [6], [9], [2]); await f.request(f.a, "play", table, { skill: "gambling" }); await f.request(f.b, "play", table, { skill: "gambling" });
+  assert.equal(pokerState(table).phase, "finished"); assert.equal(pokerState(table).winner, 0); assert.deepEqual(pokerState(table).score, [2, 0]);
+  assert.equal(f.first.system.crowns, 120); assert.equal(f.second.system.crowns, 80);
+  assert.ok(pokerCard(pokerState(table)).includes("Счёт раундов: 2 : 0"));
+});
+test("forged gwent cards add their bonus and a spotted forgery loses the match", async () => {
+  const f = fixture(); skilled(f.first, { gambling: 2, tactics: 0 }); skilled(f.second, { gambling: 2, tactics: 0, awareness: 6 });
+  gwentDeck(f.first, "deckA0000000001", { forgeries: [15, 13] });
+  const invite = await f.request(f.a, "challenge", null, { game: "gwent", opponentId: f.b.id, actorUuid: f.first.uuid, stake: 10, deckId: "deckA0000000001", fakes: true });
+  const table = invite.table; assert.deepEqual(pokerState(table).seats[0].deck, { name: "Колода Севера", quality: 0, fakes: 2, fakeDc: 13 });
+  await f.request(f.b, "accept", table, { actorUuid: f.second.uuid });
+  f.rolls.push([5], [4], [1]); await f.request(f.a, "play", table, { skill: "gambling" });
+  const play = pokerState(table).rounds[0].plays[0]; assert.equal(play.total, 4 + 7 + 1 + 2); assert.equal(play.spotted, false, "Awareness 1 + 11 misses the weakest forgery (DC 13)");
+  const note = f.messages.find(message => message.flags?.[SYS]?.pokerNote); assert.deepEqual(note.whisper, [f.gm.id]);
+  f.rolls.push([5], [1]); await f.request(f.b, "play", table, { skill: "gambling" });
+  assert.equal(pokerState(table).phase, "playing"); assert.deepEqual(pokerState(table).score, [1, 0]);
+  const caught = fixture(); skilled(caught.first, { gambling: 2, tactics: 0 }); skilled(caught.second, { gambling: 2, tactics: 0, awareness: 6 });
+  gwentDeck(caught.first, "deckA0000000001", { forgeries: [12] });
+  const other = (await caught.request(caught.a, "challenge", null, { game: "gwent", opponentId: caught.b.id, actorUuid: caught.first.uuid, stake: 10, deckId: "deckA0000000001", fakes: true })).table;
+  await caught.request(caught.b, "accept", other, { actorUuid: caught.second.uuid });
+  caught.rolls.push([1], [10], [1]); await caught.request(caught.a, "play", other, { skill: "gambling" });
+  caught.rolls.push([2], [1]); await caught.request(caught.b, "play", other, { skill: "gambling" });
+  const state = pokerState(other); assert.equal(state.reason, "caught"); assert.deepEqual(state.caught, [0]); assert.equal(state.winner, 1);
+  assert.equal(caught.first.system.crowns, 90); assert.equal(caught.second.system.crowns, 110);
+});
+test("a gwent deck must belong to the player and be carried", async () => {
+  const f = fixture(); gwentDeck(f.second, "deckB0000000001");
+  const stolen = await f.request(f.a, "challenge", null, { game: "gwent", opponentId: f.b.id, actorUuid: f.first.uuid, stake: 0, deckId: "deckB0000000001" }); assert.equal(stolen.reply.ok, false);
+  gwentDeck(f.first, "deckA0000000001").system.carried = false;
+  const stored = await f.request(f.a, "challenge", null, { game: "gwent", opponentId: f.b.id, actorUuid: f.first.uuid, stake: 0, deckId: "deckA0000000001" }); assert.equal(stored.reply.ok, false);
+  const tavern = await f.request(f.a, "challenge", null, { game: "gwent", opponentId: f.b.id, actorUuid: "", stake: 0 }); assert.equal(tavern.reply.ok, true);
 });

@@ -16,4 +16,7 @@ export const MACRO_SOURCES = [{
 },{
   _id:"dicePokerTable01",name:"Покер на костях",type:"script",scope:"global",img:"icons/svg/d6-grey.svg",
   command:"await game.system.api.poker({ actor: canvas.tokens?.controlled[0]?.actor ?? game.user.character });",ownership:{default:2},flags:{}
+},{
+  _id:"gwentTable000001",name:"Гвинт",type:"script",scope:"global",img:"icons/svg/card-hand.svg",
+  command:"await game.system.api.gwent({ actor: canvas.tokens?.controlled[0]?.actor ?? game.user.character });",ownership:{default:2},flags:{}
 }];

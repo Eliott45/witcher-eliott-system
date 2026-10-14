@@ -2124,6 +2124,30 @@ const manualEditingPreviews={};
     const watchHtml=pokerTemplate(watching);assert.ok(watchHtml.includes('Вы зритель'));assert.ok(!watchHtml.includes('data-action="concede"'));
     state.phase='drawing';const live=await PokerWindow.prototype._prepareContext.call(app);assert.equal(live.instruction,'Игроки выбирают кости для переброса.');
     const lobbyGuest=await PokerWindow.prototype._prepareContext.call({...app,tableId:'',table:null});assert.equal(lobbyGuest.recent[0].watch,true);pokerTemplate(lobbyGuest);
+    // Gwent: tavern deck in the lobby, public plays for everyone, forged cards named only to their owner.
+    game.user=first;
+    const gwentLobby=await PokerWindow.prototype._prepareContext.call({...app,tableId:'',table:null,game:'gwent',deckId:'',fakes:false,deckChoices:PokerWindow.prototype.deckChoices});
+    assert.equal(gwentLobby.isGwent,true);assert.equal(gwentLobby.deck.decks.length,1);const gwentLobbyHtml=pokerTemplate(gwentLobby);
+    assert.ok(gwentLobbyHtml.includes('Колода таверны'));assert.ok(gwentLobbyHtml.includes('Карты и правила гвинта'));
+    const card=(faces,key,name,mod,carry=0)=>({faces,key,name,mod,path:false,carry});
+    const gwentState={version:1,game:'gwent',phase:'playing',stake:10,tieMode:'faces',issue:'',hands:[[],[]],winner:null,reason:'',processed:[],open:true,
+      seats:[{userId:first.id,name:'Игрок <1>',actorUuid:game.actors[0].uuid,revision:2,opening:'',draw:'',rerolled:[],palm:'',final:'',deck:{name:'Колода Севера',quality:1,fakes:2,fakeDc:12}},
+        {userId:second.id,name:'Игрок <2>',actorUuid:'',revision:2,opening:'',draw:'',rerolled:[],palm:'',final:'',deck:{name:'',quality:0,fakes:0,fakeDc:0}}],
+      round:2,rounds:[{plays:[{skill:'gambling',skillValue:7,card:card([1],'hero','Карта героя',3),deck:3,carry:0,die:6,total:19},
+        {skill:'tactics',skillValue:5,card:card([9],'sacrifice','Вынужденная жертва',-2,3),deck:0,carry:0,die:4,total:7}],winner:0},{plays:[null,null],winner:null}],score:[1,0],carry:[0,3]};
+    const gwentTable={id:'gwentTable000001',author:gm,flags:{[game.system.id]:{pokerTable:gwentState}}};game.messages.push(gwentTable);
+    const gwentApp={...app,tableId:gwentTable.id,table:gwentTable,skill:'',game:'gwent'};
+    const player=await PokerWindow.prototype._prepareContext.call(gwentApp);
+    assert.equal(player.canPlay,true);assert.equal(player.skills.length,2);assert.equal(player.bottom.play.faded,true);assert.ok(player.bottom.deckNote.includes('поддельных 2'));
+    assert.equal(player.roundLine,'Раунд 1: 19 — 7, берёт Игрок <1>');const playerHtml=pokerTemplate(player);assert.ok(playerHtml.includes('Разыграть раунд 2'));assert.ok(!playerHtml.includes('undefined'));
+    game.user=second;const rival=await PokerWindow.prototype._prepareContext.call(gwentApp);assert.ok(!rival.top.deckNote.includes('поддельных'));assert.equal(rival.top.gems[0].won,true);pokerTemplate(rival);
+    game.user=guest;const crowd=await PokerWindow.prototype._prepareContext.call(gwentApp);assert.equal(crowd.spectator,true);assert.equal(crowd.instruction,'Игроки разыгрывают раунд.');pokerTemplate(crowd);
+    for(const phase of ['invited','funding','playing','settling','finished','declined','cancelled']){
+      gwentState.phase=phase;const html=pokerTemplate(await PokerWindow.prototype._prepareContext.call(gwentApp));assert.ok(!html.includes('undefined'));
+      assert.equal(new foundry.documents.BaseChatMessage({content:pokerCard(gwentState),flags:gwentTable.flags,author:gm.id}).validationFailures.fields,null);
+    }
+    Object.assign(gwentState,{phase:'finished',winner:0,score:[2,0],reason:'showdown'});game.user=first;
+    const won=await PokerWindow.prototype._prepareContext.call(gwentApp);assert.equal(won.result.detail,'Счёт раундов 2 : 0');assert.equal(won.result.win,true);assert.ok(pokerCard(gwentState).includes('Гвинт'));
   } finally {Object.assign(game,saved);}
-  console.log('Dice poker: native wallets and private chat cards, all window phases, open rerolls, loaded-dice swaps and spectators render correctly');
+  console.log('Dice poker: native wallets and private chat cards, all window phases, open rerolls, loaded-dice swaps, spectators and gwent tables render correctly');
 }
