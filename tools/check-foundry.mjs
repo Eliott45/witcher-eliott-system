@@ -2116,6 +2116,14 @@ const manualEditingPreviews={};
     const caught=await PokerWindow.prototype._prepareContext.call(app);
     assert.ok(caught.result.title.includes('шулерские кости'));assert.equal(caught.result.win,true);assert.equal(caught.top.dice[4].swapped,true);
     assert.ok(pokerCard(state).includes('пойман'));pokerTemplate(caught);
+    // Spectators watch the same table from outside: names, dice and the result, but no player controls.
+    const guest={id:'pokerGuest000001',name:'Зритель',active:true};game.users.push(guest);game.user=guest;
+    const watching=await PokerWindow.prototype._prepareContext.call(app);
+    assert.equal(watching.spectator,true);assert.equal(watching.top.name,'Игрок <1>');assert.equal(watching.bottom.combination,'Пара');
+    assert.equal(watching.canRematch||watching.canConcede||watching.canPalm||watching.result.win||watching.result.lose,false);
+    const watchHtml=pokerTemplate(watching);assert.ok(watchHtml.includes('Вы зритель'));assert.ok(!watchHtml.includes('data-action="concede"'));
+    state.phase='drawing';const live=await PokerWindow.prototype._prepareContext.call(app);assert.equal(live.instruction,'Игроки выбирают кости для переброса.');
+    const lobbyGuest=await PokerWindow.prototype._prepareContext.call({...app,tableId:'',table:null});assert.equal(lobbyGuest.recent[0].watch,true);pokerTemplate(lobbyGuest);
   } finally {Object.assign(game,saved);}
-  console.log('Dice poker: native wallets and private chat cards, all window phases, open rerolls and loaded-dice swaps render correctly');
+  console.log('Dice poker: native wallets and private chat cards, all window phases, open rerolls, loaded-dice swaps and spectators render correctly');
 }

@@ -30,7 +30,10 @@ export function registerPoker() {
   });
   Hooks.on("renderChatMessageHTML", (message, html) => {
     if (message.flags?.[SYSTEM_ID]?.pokerRequest || pokerReceipt(message)) { html.hidden = true; html.classList.add("witcher-poker-internal"); return; }
-    if (pokerState(message) && message.author?.isGM && message.isContentVisible) html.querySelector("[data-poker-open]")?.addEventListener("click", () => openPoker(message.id).catch(report));
+    const button = pokerState(message) && message.author?.isGM && message.isContentVisible ? html.querySelector("[data-poker-open]") : null;
+    if (!button) return;
+    if (!pokerState(message).seats.some(seat => seat.userId === game.user.id)) button.innerHTML = '<i class="fa-solid fa-eye"></i> Смотреть игру';
+    button.addEventListener("click", () => openPoker(message.id).catch(report));
   });
   Hooks.once("ready", () => {
     pokerWrite(resumePoker).catch(report);

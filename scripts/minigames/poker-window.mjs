@@ -26,7 +26,7 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
     } };
   static PARTS = { content: { template: `systems/${SYSTEM_ID}/templates/poker-table.hbs` } };
   constructor(tableId = "", { actorUuid = "" } = {}) {
-    super(); this.tableId = tableId; this.selected = new Set(); this.busy = false; this.notice = ""; this.opponentId = ""; this.stake = 0; this.rulesOpen = false;
+    super(); this.tableId = tableId; this.selected = new Set(); this.busy = false; this.notice = ""; this.opponentId = ""; this.stake = 0; this.open = true; this.rulesOpen = false;
     this.actorUuid = actorUuid || game.user.character?.uuid || ""; this.palm = { index: -1, value: 0 };
     this.hooks = ["createChatMessage", "updateChatMessage", "deleteChatMessage", "updateUser", "updateActor"].map(event => [event, Hooks.on(event, () => { if (!this.busy) this.render(); })]);
   }
@@ -39,17 +39,20 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
     const view = { table: Boolean(state), lobby: !state, busy: this.busy, notice: this.notice || state?.issue || "", rulesOpen: this.rulesOpen, hasGM: Boolean(game.users.activeGM),
       actors, stake, pot: stake * 2, stakes: STAKES.map(value => ({ value, label: value ? `${value} кр.` : "Без ставок", selected: value === stake })),
       opponents: game.users.filter(other => other.active && other.id !== user.id).map(other => ({ id: other.id, name: other.name, isGM: other.isGM, selected: other.id === this.opponentId })),
-      recent: pokerTables().filter(message => user.isGM || pokerState(message).seats.some(seat => seat.userId === user.id)).slice(-6).reverse().map(message => {
-        const table = pokerState(message);
-        return { id: message.id, names: table.seats.map(seat => seat.name).join(" против "), stake: table.stake, open: !pokerClosed(table),
+      openGame: this.open !== false,
+      // Own tables plus every unfinished game this user may watch (public cards reach every client).
+      recent: pokerTables().filter(message => pokerState(message).seats.some(seat => seat.userId === user.id) || !pokerClosed(pokerState(message)) || user.isGM).slice(-8).reverse().map(message => {
+        const table = pokerState(message), seated = table.seats.some(seat => seat.userId === user.id);
+        return { id: message.id, names: table.seats.map(seat => seat.name).join(" против "), stake: table.stake, open: !pokerClosed(table), watch: !seated && !pokerClosed(table),
           status: { finished: table.winner === null ? "Ничья" : `Победил ${table.seats[table.winner].name}`, cancelled: "Отменена", declined: "Вызов отклонён" }[table.phase] ?? "Идёт игра" };
       }),
       combinations: POKER_HANDS.map((name, rank) => ({ name, example: EXAMPLES[rank].map(value => faces[value]).join("") })).reverse(),
-      dc: LOADED_DICE_DC, top: null, bottom: null, phase: state?.phase ?? "", stage: "", instruction: "", result: null,
+      dc: LOADED_DICE_DC, spectator: false, top: null, bottom: null, phase: state?.phase ?? "", stage: "", instruction: "", result: null,
       canAccept: false, canCancel: false, canRoll: false, canDraw: false, canPalm: false, canConcede: false, canAbort: false, canRecover: false, canRematch: false,
       selectedCount: this.selected.size, palmValues: [], palmReady: false, palmPreview: "", waiting: false };
     if (!state) return view;
-    const phase = state.phase, opponent = state.seats[1 - me];
+    const phase = state.phase, opponent = state.seats[1 - me], spectator = me < 0;
+    view.spectator = spectator;
     const palming = phase === "palming" && Boolean(own?.palm) && !own.final;
     Object.assign(view, {
       canAccept: phase === "invited" && me === 1, canCancel: phase === "invited" && me === 0,
@@ -82,7 +85,7 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
           : phase === "opening" ? seat.opening ? "Кости брошены" : "Трясёт стакан…"
             : phase === "drawing" ? seat.draw ? rerolledText(seat.rerolled?.length ?? 0) : "Выбирает кости"
               : phase === "palming" ? "Вскрытие…" : "Считает банк";
-      return { name: seat.name, mine, label: mine ? "Ваши кости" : me < 0 ? `Игрок ${index + 1}` : "Соперник", img: portrait(seat), online: Boolean(game.users.get(seat.userId)?.active), status,
+      return { name: seat.name, mine, label: mine ? "Ваши кости" : spectator ? "Игрок" : "Соперник", img: portrait(seat), online: Boolean(game.users.get(seat.userId)?.active), status,
         winner: phase === "finished" && state.winner === index, loser: phase === "finished" && state.winner !== null && state.winner !== index,
         dice: pokerDiceView(dice, { selected, selectable, swapped, scoring: combination ? pokerScoring(dice) : [] }),
         combination: combination?.name ?? "Кости ещё не брошены", rank: combination?.rank ?? -1, sum: combination ? combination.sum : 0 };
@@ -100,7 +103,10 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
       const bank = !stake ? "" : phase === "finished" && winner ? `Банк ${stake * 2} кр. забирает ${winner.name}.` : state.reason === "cancelled" || phase === "finished" ? "Ставки возвращены владельцам." : "Ставки не списывались.";
       view.result = { title, detail, bank, win: phase === "finished" && state.winner === me && me >= 0, lose: phase === "finished" && state.winner !== null && state.winner !== me && me >= 0 };
     }
-    view.instruction = view.canAccept ? `${state.seats[0].name} зовёт вас сыграть. ${stake ? `Ставка ${stake} кр. с каждого — спишется, когда вы примете вызов.` : "Игра без ставок."}`
+    const [first, second] = state.seats.map(seat => seat.name);
+    if (spectator) view.instruction = { invited: `${first} вызывает ${second} на партию.`, funding: "Ставки вносятся в банк…", opening: "Игроки бросают кости.",
+      drawing: "Игроки выбирают кости для переброса.", palming: "Кости вскрываются…", settling: "Кости вскрываются…" }[phase] ?? "";
+    else view.instruction = view.canAccept ? `${state.seats[0].name} зовёт вас сыграть. ${stake ? `Ставка ${stake} кр. с каждого — спишется, когда вы примете вызов.` : "Игра без ставок."}`
       : view.canCancel ? `Ждём ответа: ${opponent.name}. Деньги пока не списаны.`
         : view.canRoll ? "Встряхните стакан и бросьте пять костей."
           : view.canDraw ? "Отметьте кости, которые хотите перебросить. Переброс один — после него кости откроются."
@@ -123,6 +129,7 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
     }
     this.handKey = hands;
     for (const name of ["actorUuid", "opponentId", "stake"]) this.element.querySelector(`[name="${name}"]`)?.addEventListener("change", event => { this[name] = event.target.value; });
+    this.element.querySelector('[name="open"]')?.addEventListener("change", event => { this.open = event.target.checked; });
     this.element.querySelector(".poker-rules")?.addEventListener("toggle", event => { this.rulesOpen = event.target.open; });
   }
   async run(action, data = {}) {
@@ -135,9 +142,9 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
   async close(options) { this.dismissed = true; for (const [event, id] of this.hooks) Hooks.off(event, id); window = null; return super.close(options); }
   static #challenge() {
     const field = name => this.element.querySelector(`[name="${name}"]`)?.value ?? "";
-    Object.assign(this, { actorUuid: field("actorUuid"), opponentId: field("opponentId"), stake: field("stake") });
+    Object.assign(this, { actorUuid: field("actorUuid"), opponentId: field("opponentId"), stake: field("stake"), open: this.element.querySelector('[name="open"]')?.checked ?? true });
     if (!this.opponentId) { this.notice = "Выберите, кого позвать за стол."; return this.render(); }
-    return this.run("challenge", { actorUuid: this.actorUuid, opponentId: this.opponentId, stake: this.stake });
+    return this.run("challenge", { actorUuid: this.actorUuid, opponentId: this.opponentId, stake: this.stake, open: this.open });
   }
   static #stake(_event, target) { this.stake = Number(target.dataset.value); this.actorUuid = this.element.querySelector('[name="actorUuid"]')?.value ?? this.actorUuid; this.opponentId = this.element.querySelector('[name="opponentId"]')?.value ?? this.opponentId; return this.render(); }
   static #accept() { this.actorUuid = this.element.querySelector('[name="actorUuid"]')?.value ?? ""; return this.run("accept", { actorUuid: this.actorUuid }); }
@@ -169,7 +176,7 @@ export class PokerWindow extends foundry.applications.api.HandlebarsApplicationM
   static #open(_event, target) { this.tableId = target.dataset.table; this.reset(); return this.render(); }
   static #rematch() {
     const state = pokerState(this.table), index = pokerSeat(state, game.user.id);
-    Object.assign(this, { actorUuid: state.seats[index].actorUuid, opponentId: state.seats[1 - index].userId, stake: state.stake, tableId: "" });
+    Object.assign(this, { actorUuid: state.seats[index].actorUuid, opponentId: state.seats[1 - index].userId, stake: state.stake, open: state.open !== false, tableId: "" });
     this.reset(); return this.render();
   }
 }

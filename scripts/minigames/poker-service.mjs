@@ -36,7 +36,9 @@ export function pokerCard(state) {
   const phase = { invited: "Приглашение за стол", funding: "Сбор ставок", opening: "Первый бросок", drawing: "Переброс костей", palming: "Вскрытие", settling: "Расчёт банка", finished: "Партия завершена", declined: "Приглашение отклонено", cancelled: "Партия отменена" }[state.phase];
   const result = state.phase === "finished" ? state.winner === null ? "Ничья" : `Победитель: ${state.seats[state.winner].name}` : phase;
   const caught = state.phase === "finished" && state.reason === "caught" ? `<p class="witcher-poker-caught"><i class="fa-solid fa-mask"></i> ${state.caught.map(index => esc(state.seats[index].name)).join(" и ")}: пойман на шулерских костях</p>` : "";
-  return `<section class="witcher-poker-card"><h3><i class="fa-solid fa-dice"></i> Покер на костях</h3><p>${state.seats.map(seat => esc(seat.name)).join(" · ")}</p><strong>${esc(result)}</strong>${caught}<p>${state.stake ? `Ставка: ${state.stake} кр. с каждого · Банк: ${state.stake * 2} кр.` : "Игра без ставок"}</p><button type="button" data-poker-open><i class="fa-solid fa-dice-five"></i> Открыть стол</button></section>`;
+  const hands = state.phase === "finished" && state.hands.every(hand => hand.length === 5) ? `<p>${state.seats.map((seat, index) => `${esc(seat.name)}: ${pokerHand(state.hands[index]).name}`).join(" · ")}</p>` : "";
+  const audience = state.open === false ? "Закрытая партия" : "Зрители могут смотреть";
+  return `<section class="witcher-poker-card"><h3><i class="fa-solid fa-dice"></i> Покер на костях</h3><p>${state.seats.map(seat => esc(seat.name)).join(" против ")}</p><strong>${esc(result)}</strong>${caught}${hands}<p>${state.stake ? `Ставка: ${state.stake} кр. с каждого · Банк: ${state.stake * 2} кр.` : "Игра без ставок"} · ${audience}</p><button type="button" data-poker-open><i class="fa-solid fa-dice-five"></i> Открыть стол</button></section>`;
 }
 async function saveTable(message, state) {
   if (!activeGM()) throw new Error("Мастер сменился. Повторите действие после подключения ведущего.");
@@ -141,9 +143,11 @@ async function challenge(request, user, data) {
   if (pokerTables().some(message => !pokerClosed(pokerState(message)) && pokerState(message).seats.some(seat => seat.userId === user.id || seat.userId === opponent.id))) throw new Error("Один из участников уже за столом. Завершите или отмените его партию.");
   const actor = actorFor(data.actorUuid, user, stake > 0);
   if (actor && balance(actor) < stake) throw new Error("Не хватает крон для ставки.");
+  const open = data.open !== false;
   const state = { version: 1, invitation: request.id, phase: "invited", stake, tieMode: "faces", issue: "", hands: [[], []], winner: null, reason: "", processed: [request.id],
-    seats: [participant(user, actor), participant(opponent, null)], created: Date.now() };
-  return documentClass().create({ ...messageSource({ pokerTable: state }), whisper: [...new Set([user.id, opponent.id, ...gmIds()])], content: pokerCard(state) });
+    seats: [participant(user, actor), participant(opponent, null)], created: Date.now(), open };
+  // The table holds no secrets (dice are public, swaps live in private receipts), so an open game is a public card anyone can watch.
+  return documentClass().create({ ...messageSource({ pokerTable: state }), whisper: open ? [] : [...new Set([user.id, opponent.id, ...gmIds()])], content: pokerCard(state) });
 }
 /** Requests are native ChatMessages: the server records their author. Only GM-authored receipts are trusted. */
 export async function processPokerRequest(request, creatorId) {

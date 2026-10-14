@@ -88,6 +88,7 @@ function fixture() {
 }
 test("accepted challenges escrow both wagers and a full game pays the winner once", async () => {
   const f = fixture(), table = await f.start(); assert.equal(pokerState(table).phase, "opening");
+  assert.deepEqual(table.whisper, [], "Open tables are public chat cards that spectators can watch");
   assert.equal(f.first.system.crowns, 90); assert.equal(f.second.system.crowns, 90);
   await f.open(table);
   f.rolls.push([6, 6, 6]); const draw = await f.request(f.a, "reroll", table, { indices: [2, 3, 4] });
@@ -110,6 +111,16 @@ test("draws return both stakes and playing a GM without an actor works with no s
   assert.equal(pokerState(table).winner, null); assert.equal(f.first.system.crowns, 100); assert.equal(f.second.system.crowns, 100);
   const next = await f.start(0, f.gm, null); assert.equal(pokerState(next).phase, "opening");
   await f.request(f.gm, "concede", next); assert.equal(pokerState(next).winner, 0); assert.equal(f.first.system.crowns, 100);
+});
+test("private tables stay whispered to the players and GMs; spectators cannot act", async () => {
+  const f = fixture(), invite = await f.request(f.a, "challenge", null, { opponentId: f.b.id, actorUuid: f.first.uuid, stake: 0, open: false });
+  assert.deepEqual([...invite.table.whisper].sort(), [f.a.id, f.b.id, f.gm.id].sort()); assert.equal(pokerState(invite.table).open, false);
+  assert.ok(invite.table.content.includes("Закрытая партия"));
+  await f.request(f.b, "accept", invite.table, { actorUuid: "" });
+  const watcher = await f.request(f.intruder, "concede", invite.table); assert.equal(watcher.reply.ok, false);
+  f.rolls.push([6, 6, 6, 6, 6], [1, 2, 3, 4, 6]); await f.request(f.a, "roll", invite.table); await f.request(f.b, "roll", invite.table);
+  for (const user of [f.a, f.b]) await f.request(user, "reroll", invite.table, { indices: [] });
+  assert.ok(invite.table.content.includes(": Покер") && invite.table.content.includes("Без комбинации"), "The finished card names both hands");
 });
 test("declining and withdrawing invitations never debit wallets; concurrent invitations cannot double-book", async () => {
   const f = fixture(), invite = await f.request(f.a, "challenge", null, { opponentId: f.b.id, actorUuid: f.first.uuid, stake: 50 });

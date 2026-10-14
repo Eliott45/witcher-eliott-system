@@ -12,6 +12,7 @@
 .poker-title h1 { font:700 23px/1.1 Georgia,serif; color:var(--poker-ink); }
 .poker-pills { display:flex; gap:6px; flex-wrap:wrap; }
 .poker-pill { padding:4px 11px; border-radius:999px; border:1px solid #ffffff22; background:#ffffff0d; font-size:12px; color:var(--poker-ink); white-space:nowrap; }
+.poker-pill.is-watch { color:#cfe3ff; border-color:#8fb3e066; background:#29405a88; }
 .poker-pill.is-gold { color:#2b1c0c; font-weight:700; background:linear-gradient(#f0d28c,#c89a45); border-color:#f6dc9b; }
 
 /* Generic controls */
@@ -42,6 +43,10 @@
 .witcher-poker-window .poker-chip.is-selected { color:#2a1a08; font-weight:700; background:linear-gradient(#f0d28c,#c89a45); border-color:#f6dc9b; }
 .witcher-poker-window .poker-chip-input { flex-direction:row; align-items:center; gap:5px; }
 .witcher-poker-window .poker-chip-input input { width:86px; min-height:32px; border-radius:999px; text-align:center; }
+.witcher-poker-window .poker-toggle { flex-direction:row; align-items:center; gap:9px; cursor:pointer; color:var(--poker-ink); }
+.witcher-poker-window .poker-toggle input { width:18px; min-height:18px; height:18px; margin:0; accent-color:#d4a24c; }
+.poker-toggle i { color:var(--poker-gold); margin-right:3px; }
+.poker-recent b { color:#cfe3ff; font-weight:600; }
 .poker-recent { display:flex; flex-direction:column; gap:5px; padding-top:12px; border-top:1px solid #ffffff14; }
 .poker-recent h3 { font:600 13px Georgia,serif; color:var(--poker-muted); letter-spacing:.04em; margin-bottom:2px; }
 .witcher-poker-window .poker-recent button { justify-content:space-between; text-align:left; background:#ffffff06; border-color:#ffffff18; }

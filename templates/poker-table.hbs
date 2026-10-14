@@ -12,7 +12,7 @@
 <div class="poker-app {{#if lobby}}is-lobby{{else}}phase-{{phase}}{{/if}}">
   <header class="poker-head">
     <div class="poker-title"><i class="fa-solid fa-dice" aria-hidden="true"></i><div><small>Развлечения в таверне</small><h1>Покер на костях</h1></div></div>
-    {{#if table}}<div class="poker-pills"><span class="poker-pill">{{stage}}</span><span class="poker-pill is-gold"><i class="fa-solid fa-coins" aria-hidden="true"></i> {{#if stake}}Банк {{pot}} кр.{{else}}Без ставок{{/if}}</span></div>{{/if}}
+    {{#if table}}<div class="poker-pills">{{#if spectator}}<span class="poker-pill is-watch"><i class="fa-solid fa-eye" aria-hidden="true"></i> Вы зритель</span>{{/if}}<span class="poker-pill">{{stage}}</span><span class="poker-pill is-gold"><i class="fa-solid fa-coins" aria-hidden="true"></i> {{#if stake}}Банк {{pot}} кр.{{else}}Без ставок{{/if}}</span></div>{{/if}}
   </header>
   {{#unless hasGM}}<p class="poker-notice" role="status"><i class="fa-solid fa-plug-circle-xmark"></i> Нужен подключённый мастер — он ведёт стол. Партия сохранена.</p>{{/unless}}
   {{#if notice}}<p class="poker-notice" role="alert"><i class="fa-solid fa-triangle-exclamation"></i> {{notice}}</p>{{/if}}
@@ -26,8 +26,9 @@
         <div class="poker-chips">{{#each stakes}}<button type="button" class="poker-chip {{#if selected}}is-selected{{/if}}" data-action="stake" data-value="{{value}}" aria-pressed="{{#if selected}}true{{else}}false{{/if}}">{{label}}</button>{{/each}}<label class="poker-chip-input"><input name="stake" type="number" min="0" max="1000000" step="1" value="{{stake}}" aria-label="Своя ставка, кр."><span>кр.</span></label></div>
         <small>Деньги списываются, только когда соперник примет вызов. Победитель забирает банк, при ничьей ставки возвращаются.</small>
       </div>
+      <label class="poker-toggle"><input type="checkbox" name="open" {{checked openGame}}><span><i class="fa-solid fa-eye"></i> Пустить зрителей — партия видна всем за столом таверны</span></label>
       <button type="button" class="poker-primary poker-wide" data-action="challenge" {{disabled busy}}><i class="fa-solid fa-hand-fist"></i> Бросить вызов</button>
-      {{#if recent}}<div class="poker-recent"><h3>Недавние столы</h3>{{#each recent}}<button type="button" class="{{#if open}}is-open{{/if}}" data-action="openTable" data-table="{{id}}"><span>{{names}}</span><small>{{status}}{{#if stake}} · {{stake}} кр.{{/if}} <i class="fa-solid fa-chevron-right"></i></small></button>{{/each}}</div>{{/if}}
+      {{#if recent}}<div class="poker-recent"><h3>Столы</h3>{{#each recent}}<button type="button" class="{{#if open}}is-open{{/if}}" data-action="openTable" data-table="{{id}}"><span>{{names}}</span><small>{{status}}{{#if stake}} · {{stake}} кр.{{/if}} {{#if watch}}<b><i class="fa-solid fa-eye"></i> смотреть</b>{{else}}<i class="fa-solid fa-chevron-right"></i>{{/if}}</small></button>{{/each}}</div>{{/if}}
     </div>
   {{else}}
     <div class="poker-felt">
