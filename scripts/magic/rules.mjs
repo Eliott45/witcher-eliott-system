@@ -1,3 +1,4 @@
+import { PROSTHETIC_TYPES, fittedProsthesis } from "../data/prosthetic-rules.mjs";
 import { equippedItems } from "../data/physical-items.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
 import { getToolRules } from "../data/tool-rules.mjs";
@@ -65,6 +66,7 @@ export function isFocusItem(item) {
 export function focusOptions(actor,spell=null) {
   const discounts=["mage","priest"].includes(actor.system.details.profession);
   return equippedItems(actor.items).flatMap(item=>{
+    if (PROSTHETIC_TYPES[item.system.ruleId] && !["rightArm", "leftArm", "rightLeg", "leftLeg"].some(limb => fittedProsthesis(actor, limb)?.item.id === item.id)) return [];
     const effective=effectiveItem(item);
     const properties=effective.properties??item.system.properties??"";
     const rating=discounts?(getToolRules(item)?.focus??Number(properties.match(/Фокусирующее\s*\((\d+)\)/iu)?.[1]??0)):0;

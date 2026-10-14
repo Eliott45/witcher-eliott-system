@@ -229,22 +229,22 @@ test("the shared loot actor is deleted once no pile token uses it", async () => 
   await cleanupLootTemplate("chest");
 });
 
-test("prostheses replace the penalties of a healed lost limb, per core p.160", async () => {
+test("prostheses replace healed-limb penalties using DLC Basic and legacy core Quality rules", async () => {
   const { setProsthesis, prosthesisAt } = await import("../scripts/combat/critical-wound-effects.mjs");
   const leg = (prosthesis, state = "treated") => stats(woundEffect("dismembered-leg", "deadly", { location: "leftLeg", state, prosthesis }));
   assert.equal(leg(null).effective.speed, 1, "A healed stump is still a lost leg");
-  assert.equal(leg({ quality: "simple" }).effective.speed, 4, "¾ of 6");
-  assert.deepEqual(leg({ quality: "simple" }).modifiers.filter(m => m.target === "skills.athletics").map(m => m.value), [-5]);
+  assert.equal(leg({ quality: "simple" }).effective.speed, 6, "DLC Basic restores mobility");
+  assert.deepEqual(leg({ quality: "simple" }).modifiers.filter(m => m.target === "skills.athletics").map(m => m.value), []);
   assert.equal(leg({ quality: "quality" }).effective.speed, 6);
   assert.deepEqual(leg({ quality: "quality" }).modifiers.filter(m => m.target === "skills.dodgeEscape").map(m => m.value), [-3]);
   const armWith = quality => ({ system: { statistics: stats(woundEffect("dismembered-arm", "deadly", { location: "rightArm", state: "treated", prosthesis: { quality } })) } });
-  assert.equal(usableHands(armWith("simple")), 1, "A simple arm holds no weapon");
+  assert.equal(usableHands(armWith("simple")), 2, "DLC Basic can hold weapons");
   assert.equal(usableHands(armWith("quality")), 2);
   assert.deepEqual(armPenaltyParts(armWith("quality"), { system: { grip: 1 } }).map(part => part.value), [-5]);
 
   const f = actorFixture();
   const items = [{ id: "p", parent: f.actor, system: { ruleId: "gear.quality-prosthesis", quantity: 1, carried: true, equipped: false }, async update(c) { this.system.equipped = c["system.equipped"]; } }];
-  f.actor.items = { get: id => items.find(item => item.id === id), filter: fn => items.filter(fn) };
+  f.actor.items = Object.assign(items, { get: id => items.find(item => item.id === id) });
   const wound = f.wound("dismembered-arm", "deadly", { location: "leftArm" });
   await assert.rejects(setProsthesis(wound, items[0]), /вылеченную/);
   wound.flags[ID].criticalWound.state = "treated";

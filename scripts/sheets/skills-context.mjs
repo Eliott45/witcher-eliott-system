@@ -17,6 +17,7 @@ export function skillTooltip(key, localize) {
 export function skillCalculationTooltip(system, value, i18n) {
   const { localize, format } = i18n;
   return [value.attributeOverride ? escapeTooltip(value.attributeOverride.label) : attributeTooltip(system, value.attribute, i18n),
+    ...(Object.hasOwn(system.statistics.mobilityAttributes ?? {}, value.key) ? ["Коляска: штрафы критических ранений и постоянного ограничения подвижности к этой проверке сняты."] : []),
     ...value.modifiers.map(modifier => `${modifier.value >= 0 ? "+" : "−"}${Math.abs(modifier.value)} — ${escapeTooltip(localize(modifier.label))}`),
     escapeTooltip(format("WITCHER.Skills.Formula", {
       attribute: localize(`WITCHER.Attributes.${value.attribute}.Short`), value: value.attributeValue ?? "—",

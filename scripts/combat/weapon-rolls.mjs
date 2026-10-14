@@ -15,7 +15,7 @@ import { escapeTooltip as esc } from "../sheets/statistics-tooltips.mjs";
 import { consumeAiming } from "./full-turn-rules.mjs";
 import { selectedAttackTarget } from "./attack-target.mjs";
 import { ambushAttack, ambushState, tacticsFlags } from "./tactics-rules.mjs";
-import { unarmedAttack, consumeFeint } from "./brawling.mjs";
+import { unarmedAttack, consumeFeint, chooseStrikeLimb } from "./brawling.mjs";
 import { loadedBolt, firedUpdate } from "./crossbow-ammo.mjs";
 import { actorEnvironment, rollFooting } from "./environment.mjs";
 import { adrenalineDamage, consumeAdrenalineDamage } from "./adrenaline.mjs";
@@ -57,6 +57,11 @@ export function rollWeaponAttack(actor,itemId,options={}) {
     const ambush=targetContext?ambushAttack(combat,targetContext.attacker,targetContext.target):{bonus:0};
     const item=itemId?actor.items.get(itemId):null,action=actionQuote(actor,{ignoreExtra:Boolean(reaction)}),attackOptions={...options,schoolReaction:Boolean(reaction),extraPenalty:action.penalty,targetContext,ambushBonus:ambush.bonus};
     // Unarmed strikes (core p.163) share the attack card; the second blow of a joint attack is part of the same action.
+    if (options.unarmed) {
+      const limb = await chooseStrikeLimb(actor, options.unarmed, options.limb);
+      if (limb !== undefined && !["rightArm", "leftArm", "rightLeg", "leftLeg"].includes(limb)) return;
+      attackOptions.limb = limb;
+    }
     const quote=options.unarmed?unarmedAttack(actor,options.unarmed,attackOptions):weaponAttack(actor,item,attackOptions);
     if(quote.blocked)throw new Error(quote.blocked);
     if (reaction && !targetContext) throw new Error("Токены участников этого обмена больше недоступны.");

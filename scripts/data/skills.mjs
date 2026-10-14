@@ -37,7 +37,7 @@ export function skillValue(system, key, languageId = "") {
   const level = language ? language.level : system.skills[key];
   const statistics = system.statistics;
   const override = creatureSkillAttribute(system,key);
-  const attribute = override?.value ?? statistics.effective[skill.attribute];
+  const attribute = override?.value ?? (Object.hasOwn(statistics.mobilityAttributes ?? {}, key) ? statistics.mobilityAttributes[key] : statistics.effective[skill.attribute]);
   const modifiers = cappedSkillModifiers(level, statistics.modifiers.filter(modifier => modifier.target === `skills.${key}`
     && (!modifier.languageId || (language && languageForEntry(language)?.id === modifier.languageId))
     && (!modifier.condition || (modifier.condition === "humanTarget" && system.abilityState.trustEnabled))));

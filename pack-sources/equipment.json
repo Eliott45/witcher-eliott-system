@@ -662,6 +662,149 @@
     "flags": {}
   },
   {
+    "_id": "prstGear00000001",
+    "name": "Магический протез",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.magical-prosthesis",
+      "source": "Протезы и инвалидные коляски",
+      "kind": "gear",
+      "weight": 1,
+      "price": 500,
+      "rarity": "unique",
+      "properties": "Полная подвижность; Не проводит Хаос",
+      "description": "<p>Зачарованный протез полностью заменяет утраченную конечность без штрафов. Проводить Хаос через него нельзя.</p><p>Наденьте протез на вылеченную потерю руки или ноги во вкладке «Эффекты». Надевание занимает около 2 минут, снятие — 30 секунд. Надёжность не расходуется; попадание перенаправляется на владельца, протез не отваливается.</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prstGear00000002",
+    "name": "Ведьмачий протез",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.witcher-prosthesis",
+      "source": "Протезы и инвалидные коляски",
+      "kind": "gear",
+      "weight": 2,
+      "price": 800,
+      "rarity": "unique",
+      "properties": "Полная подвижность; Проводит Хаос; Серебряные удары (1d6)",
+      "description": "<p>Укреплённый протез полностью заменяет конечность без штрафов и проводит Хаос. Удар именно этой рукой или ногой добавляет 1d6 серебряного урона против восприимчивых к серебру существ.</p><p>Наденьте протез на вылеченную потерю руки или ноги во вкладке «Эффекты». Надевание занимает около 2 минут, снятие — 30 секунд. Надёжность не расходуется; попадание перенаправляется на владельца, протез не отваливается.</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prstGear00000003",
+    "name": "Фокусирующий протез",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.conduit-prosthesis",
+      "source": "Протезы и инвалидные коляски",
+      "kind": "gear",
+      "weight": 3,
+      "price": 1000,
+      "rarity": "unique",
+      "properties": "Полная подвижность; Проводит Хаос; Фокусирующее (2); Улучшенное фокусирующее",
+      "description": "<p>Протез полностью заменяет конечность без штрафов и проводит Хаос. Надетый протез служит фокусом: Фокусирующее (2) и Улучшенное фокусирующее.</p><p>Наденьте протез на вылеченную потерю руки или ноги во вкладке «Эффекты». Надевание занимает около 2 минут, снятие — 30 секунд. Надёжность не расходуется; попадание перенаправляется на владельца, протез не отваливается.</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prstGear00000004",
+    "name": "Простая инвалидная коляска",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.basic-wheelchair",
+      "source": "Протезы и инвалидные коляски",
+      "kind": "gear",
+      "weight": 6,
+      "price": 50,
+      "rarity": "everywhere",
+      "properties": "Подвижность без штрафов от ранений; Плавание и лазание −3",
+      "description": "<p>Во время использования снимает снижение Скорости, Уклонения/Изворотливости и Атлетики, вызванное критическими ранениями или постоянным ограничением подвижности. Плавание и лазание: −3 к проверке.</p><p>Наденьте коляску в инвентаре. При броске Атлетики выберите обычную проверку, плавание или лазание. Штрафы брони, перегрузки и других состояний сохраняются. Атаки направлены в персонажа, коляска не становится отдельной целью.</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prstGear00000005",
+    "name": "Продвинутая инвалидная коляска",
+    "type": "equipment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "gear.quality-wheelchair",
+      "source": "Протезы и инвалидные коляски",
+      "kind": "gear",
+      "weight": 3,
+      "price": 200,
+      "rarity": "rare",
+      "properties": "Подвижность без штрафов от ранений; Плавание и лазание −1",
+      "description": "<p>Во время использования снимает снижение Скорости, Уклонения/Изворотливости и Атлетики, вызванное критическими ранениями или постоянным ограничением подвижности. Плавание и лазание: −1 к проверке.</p><p>Наденьте коляску в инвентаре. При броске Атлетики выберите обычную проверку, плавание или лазание. Штрафы брони, перегрузки и других состояний сохраняются. Атаки направлены в персонажа, коляска не становится отдельной целью.</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prstGear00000006",
+    "name": "Аир обыкновенный",
+    "type": "equipment",
+    "img": "systems/witcher-eliott-system/assets/substances/aether.svg",
+    "system": {
+      "ruleId": "material.sweet-flag",
+      "source": "Протезы и инвалидные коляски",
+      "kind": "material",
+      "weight": 0.1,
+      "price": 18,
+      "rarity": "common",
+      "material": {
+        "substance": "aether",
+        "forageDC": 12,
+        "quantityFormula": "1d10",
+        "location": "Поля и болота"
+      },
+      "description": "<p>Лекарственная трава для местного облегчения боли. Применяется в отыгрыше; числового лечебного бонуса не даёт. Содержит субстанцию «Эфир» и подходит для алхимических формул.</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
     "_id": "mantShield000001",
     "name": "Щит школы Мантикоры",
     "type": "weapon",
@@ -4972,15 +5115,16 @@
     "img": "icons/svg/item-bag.svg",
     "system": {
       "ruleId": "gear.simple-prosthesis",
-      "weight": 1,
-      "price": 50,
       "kind": "gear",
-      "description": "<p>Простая замена утраченной руки или ноги с ограниченной подвижностью: деревянная кисть для простого удержания вещей или опора для ходьбы.</p><h3>Применение и правила</h3><ul><li>Рука позволяет простые действия без точности (открыть дверь, схватить кого-то), но не держать оружие. Нога позволяет передвигаться с 3/4 Скорости, со штрафом −5 к Уклонению/Изворотливости и Атлетике.</li><li>Надевается во вкладке эффектов на вылеченную рану «Потеря руки» или «Потеря ноги» и заменяет её штрафы. Удар в протез не наносит владельцу урона, но протез отваливается и падает рядом.</li></ul>",
-      "properties": "Рука: простые действия, оружие держать нельзя; Нога: СКОР ×¾, −5 к Уклонению/Изворотливости и Атлетике",
-      "source": "Базовая книга"
+      "weight": 2,
+      "price": 50,
+      "rarity": "everywhere",
+      "source": "Протезы и инвалидные коляски",
+      "properties": "Рука: −3 к атаке и защите; Нога: −1 к Уклонению/Изворотливости; Не проводит Хаос",
+      "description": "<p>Подвижный протез восстанавливает функции конечности и обычную Скорость. Атаки и защиты с помощью протеза руки получают −3; протез ноги даёт −1 к Уклонению/Изворотливости. Проводить Хаос через него нельзя.</p><p>Наденьте протез на вылеченную потерю руки или ноги во вкладке «Эффекты». Надевание занимает около 2 минут, снятие — 30 секунд. Надёжность не расходуется; попадание перенаправляется на владельца, протез не отваливается.</p>"
     },
     "effects": [],
-    "folder": "gearFolderCore01",
+    "folder": "gearProsthetic01",
     "sort": 0,
     "ownership": {
       "default": 2
@@ -28675,6 +28819,410 @@
         "priceUnavailable": true
       }
     }
+  },
+  {
+    "_id": "prstDiag00000001",
+    "name": "Чертёж: Простой протез",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.gear.simple-prosthesis",
+      "source": "Протезы и инвалидные коляски",
+      "price": 76,
+      "recipe": {
+        "category": "diagram",
+        "grade": "novice",
+        "dc": 13,
+        "time": 18000,
+        "investment": 38,
+        "quantity": 1,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "forge": false,
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.ggen000000000008",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000003",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "quantity": 3,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "quantity": 1,
+            "substance": ""
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Простой протез».</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prstDiag00000002",
+    "name": "Чертёж: Магический протез",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.gear.magical-prosthesis",
+      "source": "Протезы и инвалидные коляски",
+      "price": 750,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 10,
+        "time": 28800,
+        "investment": 375,
+        "quantity": 1,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "forge": true,
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.prstGear00000001",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000003",
+            "quantity": 3,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000004",
+            "quantity": 2,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "quantity": 4,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "quantity": 4,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000027",
+            "quantity": 2,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "quantity": 3,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "quantity": 1,
+            "substance": ""
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Магический протез».</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prstDiag00000003",
+    "name": "Чертёж: Ведьмачий протез",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.gear.witcher-prosthesis",
+      "source": "Протезы и инвалидные коляски",
+      "price": 1200,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 22,
+        "time": 32400,
+        "investment": 600,
+        "quantity": 1,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "forge": true,
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.prstGear00000002",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000003",
+            "quantity": 2,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000004",
+            "quantity": 2,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "quantity": 2,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "quantity": 6,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000027",
+            "quantity": 3,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "quantity": 2,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000019",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000029",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000042",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "quantity": 2,
+            "substance": ""
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Ведьмачий протез».</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prstDiag00000004",
+    "name": "Чертёж: Фокусирующий протез",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.gear.conduit-prosthesis",
+      "source": "Протезы и инвалидные коляски",
+      "price": 1500,
+      "recipe": {
+        "category": "diagram",
+        "grade": "master",
+        "dc": 24,
+        "time": 36000,
+        "investment": 750,
+        "quantity": 1,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "forge": true,
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.prstGear00000003",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000003",
+            "quantity": 4,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000004",
+            "quantity": 2,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "quantity": 4,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000026",
+            "quantity": 8,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000027",
+            "quantity": 4,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000034",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000006",
+            "quantity": 3,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000165",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000013",
+            "quantity": 1,
+            "substance": ""
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Фокусирующий протез».</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prstDiag00000005",
+    "name": "Чертёж: Простая инвалидная коляска",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.gear.basic-wheelchair",
+      "source": "Протезы и инвалидные коляски",
+      "price": 76,
+      "recipe": {
+        "category": "diagram",
+        "grade": "novice",
+        "dc": 13,
+        "time": 18000,
+        "investment": 38,
+        "quantity": 1,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "forge": false,
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.prstGear00000004",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000003",
+            "quantity": 5,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000007",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "quantity": 8,
+            "substance": ""
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Простая инвалидная коляска».</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
+  },
+  {
+    "_id": "prstDiag00000006",
+    "name": "Чертёж: Продвинутая инвалидная коляска",
+    "type": "recipe",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "ruleId": "diagram.gear.quality-wheelchair",
+      "source": "Протезы и инвалидные коляски",
+      "price": 300,
+      "recipe": {
+        "category": "diagram",
+        "grade": "journeyman",
+        "dc": 16,
+        "time": 28800,
+        "investment": 150,
+        "quantity": 1,
+        "tools": [
+          "gear.crafting-tools"
+        ],
+        "forge": true,
+        "resultUuid": "Compendium.witcher-eliott-system.equipment.Item.prstGear00000005",
+        "components": [
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000003",
+            "quantity": 6,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000025",
+            "quantity": 2,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000043",
+            "quantity": 1,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000020",
+            "quantity": 2,
+            "substance": ""
+          },
+          {
+            "uuid": "Compendium.witcher-eliott-system.equipment.Item.matr000000000012",
+            "quantity": 8,
+            "substance": ""
+          }
+        ]
+      },
+      "description": "<p>Ремесленный чертёж с размерами, перечнем материалов и порядком работы. По нему изготавливают «Продвинутая инвалидная коляска».</p>"
+    },
+    "effects": [],
+    "folder": "gearProsthetic01",
+    "sort": 0,
+    "ownership": {
+      "default": 2
+    },
+    "flags": {}
   },
   {
     "_id": "schoolWeap000001",

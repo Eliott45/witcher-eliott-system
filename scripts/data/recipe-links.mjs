@@ -12,7 +12,8 @@ export function recipeRelations(item, documents) {
     if (document.type !== "recipe" || !document.system.recipe) continue;
     const recipe = document.system.recipe;
     // Prefer owned/world copies (input order), but retain edited variants of the same diagram.
-    const signature = JSON.stringify([recipeKey(document), recipe.resultUuid, recipe.components,
+    // Foundry DataModels and JSON sources serialize component keys in different orders.
+    const signature = JSON.stringify([recipeKey(document), recipe.resultUuid, (recipe.components ?? []).map(row => [row.uuid || "", row.substance || "", row.quantity]),
       recipe.dc, recipe.time, recipe.quantity, recipe.investment, recipe.grade, recipe.forge, recipe.tools]);
     if (seen.has(signature)) continue;
     seen.add(signature);

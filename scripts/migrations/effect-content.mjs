@@ -1,6 +1,6 @@
 import { SYSTEM_ID } from "../config.mjs";
 import { CONDITION_BY_ID, EFFECT_TEMPLATES, conditionSource } from "../data/condition-definitions.mjs";
-import { CRITICAL_WOUND_SOURCES } from "../combat/critical-wound-effects.mjs";
+import { CRITICAL_WOUND_SOURCES, woundEffectData } from "../combat/critical-wound-effects.mjs";
 import { stripPageReferences } from "../data/item-lore.mjs";
 
 // 2: also append conditions added to the system after a world's compendium was created (Staggered, Grappled…).
@@ -13,7 +13,7 @@ import { stripPageReferences } from "../data/item-lore.mjs";
 // 9: append environment exceptions (sun, lit, land/water/underwater) and dimeritium contact.
 // 10: append the mage's «Устойчивость к двимериту» state (core p.66).
 // 11: append the dimeritium table rows: spasms, agony and burning magic (core p.167).
-export const EFFECT_CONTENT_VERSION = 11;
+export const EFFECT_CONTENT_VERSION = 12;
 // Earlier shipped names still count as unedited entries.
 const PREVIOUS_NAMES = { prone: ["Сбит с ног"] };
 const REFRESHED_CONDITIONS = new Set(["burning", "bleeding", "burrowing", "intoxicated", "blinded", "nauseated", "dying", "prone"]);
@@ -68,10 +68,20 @@ export async function migrateEffectContent() {
     if (!token.actorLink && token.actor) actors.set(token.actor.uuid, token.actor);
   for (const parent of [...actors.values(), ...game.items, ...Array.from(actors.values()).flatMap(actor => Array.from(actor.items))]) {
     const updates = Array.from(parent.effects).flatMap(effect => {
-      const update = proneContentUpdate(effect);
+      const update = { ...proneContentUpdate(effect), ...prostheticWoundUpdate(effect) };
       return Object.keys(update).length ? [{_id:effect.id,...update}] : [];
     });
     if (updates.length) await parent.updateEmbeddedDocuments("ActiveEffect", updates);
   }
   await game.settings.set(SYSTEM_ID, "effectContentVersion", EFFECT_CONTENT_VERSION);
+}
+
+/** Existing fitted basic prostheses follow the original DLC rules too. */
+export function prostheticWoundUpdate(effect) {
+  const data = effect.flags?.[SYSTEM_ID]?.criticalWound;
+  if (data?.prosthesis?.quality !== "simple") return {};
+  const source = woundEffectData(data.id, data.level, data);
+  const update = { [`flags.${SYSTEM_ID}.condition.modifiers`]: source.flags[SYSTEM_ID].condition.modifiers };
+  if (effect.description?.includes("Удар в неё не наносит урона, но протез отваливается.")) update.description = effect.description.replace("Удар в неё не наносит урона, но протез отваливается.", "Попадание перенаправляется на владельца. Протез остаётся на месте.");
+  return update;
 }

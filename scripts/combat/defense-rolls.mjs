@@ -2,6 +2,8 @@ import { schoolGearSnapshot, parryingWeaponBonus } from "./school-gear-rules.mjs
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { isShieldMaster } from "./shield-master.mjs";
 import { armPenaltyParts } from "./critical-wound-effects.mjs";
+import { chooseStrikeLimb } from "./brawling.mjs";
+import { strikeLimbs, wheelchairPenalty, wheelchair, mobilityWoundSources, mobilityPenalty } from "../data/prosthetic-rules.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { effectiveItem } from "../data/workshop.mjs";
@@ -19,7 +21,7 @@ import { creatureCanSwim, creatureHasInfiniteStamina } from "../data/creature-mo
 export const INCOMING_ATTACKS=[{id:"melee",name:"Ближняя атака"},{id:"thrown",name:"Метательное оружие"},{id:"ranged",name:"Лук / арбалет"}];
 // Core p.168: spells name their defenses — Resist Magic, or a counter-casting check against Dispel.
 const NAMES={dodge:"Уклонение",reposition:"Смена позиции",block:"Блок",parry:"Парирование",brawl:"Борьба",resist:"Сопротивление магии",counter:"Сотворение заклинаний",slip:"Ускользание"};
-export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repeat=false,defenseModifier=0}={}) {
+export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repeat=false,defenseModifier=0,defendingLimb=""}={}) {
   if(!NAMES[mode]||!INCOMING_ATTACKS.some(entry=>entry.id===incoming))throw new Error("Неизвестный способ защиты.");
   const modifier=Number(defenseModifier);
   if(!Number.isFinite(modifier)||Math.abs(modifier)>100)throw new Error("Неверный модификатор защиты.");
@@ -31,7 +33,14 @@ export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repe
   const shieldMaster=mode==="parry"&&weapon?.category==="shield"&&isShieldMaster(actor);
   const skill=skillValue(actor.system,skillKey),penalty=mode==="parry"&&!shieldMaster?Math.min(0,(incoming==="thrown"?-5:-3)+parryingWeaponBonus(weapon)):0;
   const activeDodge=Boolean(statusEffect(actor,ACTIVE_DODGE));
-  const effects=[...combatModifierParts(actor,"combat.defense"),...(armed?combatModifierParts(actor,"combat.blockParry"):[]),...(item?armPenaltyParts(actor,item):[])],effectTotal=effects.reduce((sum,part)=>sum+part.value,0);
+  const arms = unarmed ? strikeLimbs(actor, "punch") : [];
+  const defendingArm = unarmed ? (defendingLimb ? arms.find(entry => entry.limb === defendingLimb) : arms.find(entry => entry.limb === "leftArm" && entry.available) ?? arms.find(entry => entry.available) ?? arms[0]) : null;
+  if (unarmed && !defendingArm) throw new Error("Выберите руку для защиты.");
+  const chairPenalty = underwater ? wheelchairPenalty(actor, "swimming") : 0;
+  const mobilityDefense = ["dodge", "reposition"].includes(mode) && wheelchair(actor), sources = mobilityWoundSources(actor.effects);
+  const defenseActor = mobilityDefense ? { ...actor, system: { ...actor.system, statistics: { ...actor.system.statistics,
+    modifiers: actor.system.statistics.modifiers.filter(mod => !mobilityPenalty(mod, sources)) } } } : actor;
+  const effects=[...combatModifierParts(defenseActor,"combat.defense"),...(armed?combatModifierParts(actor,"combat.blockParry"):[]),...(item?armPenaltyParts(actor,item):defendingArm?.parts ?? []), ...(chairPenalty ? [{ label: "Плавание в коляске", value: chairPenalty }] : [])],effectTotal=effects.reduce((sum,part)=>sum+part.value,0);
   const total=skill.total===null?null:skill.total+penalty+modifier+effectTotal,cost=repeat&&!activeDodge&&!creatureHasInfiniteStamina(actor)?1:0;
   let blocked=!actor.isOwner||!conditionRules(actor).canDefend?"Персонаж сейчас не может защищаться.":"";
   if(mode==="slip"&&!spiritState(actor).canSlip)blocked ||= "Ускользание недоступно: нет способности либо она подавлена Ирденом или Лунной пылью.";
@@ -39,18 +48,25 @@ export function defenseQuote(actor,{mode="dodge",itemId="",incoming="melee",repe
   if(mode==="block"&&incoming!=="melee"&&(unarmed||weapon?.category!=="shield"))blocked ||= "Дистанционные атаки можно блокировать только щитом.";
   if(mode==="parry"&&incoming==="ranged")blocked ||= "Обычное парирование не отражает стрелы и болты.";
   if(total===null)blocked ||= "Заполните параметр навыка.";
+  if (defendingArm && !defendingArm.available) blocked ||= "Эта рука недоступна для защиты.";
   if(!creatureHasInfiniteStamina(actor)&&actor.system.stamina.value<cost)blocked ||= "Недостаточно Выносливости: нужно 1.";
   const note=mode==="reposition"?`При успехе можно переместиться на половину СКОР (${Math.floor((actor.system.statistics.effective.speed??0)/2)} м).`:
     mode==="block"?(unarmed||weapon?.natural?"Блок телом в безвыходном положении: при успехе урон атаки сразу приходится в подставленную руку (ПБ учитывается, ×½).":"При успешном блоке предмет теряет 1 надёжности."):
     mode==="parry"?"При успехе атака отражена, противник ошеломлён. Оружие не теряет надёжность.":mode==="slip"?"При успехе атака отменяется: призрак бесплотен до начала следующего хода. Физические атаки и воздействия не действуют.":"Сравните результат с атакой противника.";
   const limb=mode==="block"&&(unarmed||Boolean(weapon?.natural));
   return {schoolGear:schoolGearSnapshot(actor,item),mode,itemId,skillKey,total,cost,penalty,modifier,incoming,blocked,activeDodge,limb,unarmed,name:unarmed?(mode==="block"?"Блок рукой":"Парирование рукой"):NAMES[mode],weaponName:item?.name??"",note:note+(activeDodge?" Активное уклонение: защиты без расхода ВЫН; атакующему в ближнем бою −2.":""),
+    defendingLimb: defendingArm?.limb ?? "leftArm",
     math:`Основа навыка: ${signed(skill.total??0)}; ${shieldMaster?"Мастер щита":NAMES[mode]}: ${signed(penalty)}; ситуация: ${signed(modifier)}${effects.map(part=>`; ${part.label}: ${signed(part.value)}`).join("")}. Точность оружия не добавляется.`};
 }
 const pending=new WeakMap();
 export function rollDefense(actor,options={}) {
   if(pending.has(actor))return pending.get(actor);
   const work=inventoryWrite(actor,async()=>{
+    if (["block", "parry"].includes(options.mode) && !options.itemId) {
+      const limb = await chooseStrikeLimb(actor, "punch", options.defendingLimb, "Какой рукой защищаться?");
+      if (limb !== undefined && !["rightArm", "leftArm"].includes(limb)) return;
+      options = { ...options, defendingLimb: limb ?? "" };
+    }
     const quote=defenseQuote(actor,options);if(quote.blocked)throw new Error(quote.blocked);
     const display=trackRollDisplay(),messageMode=game.settings.get("core","messageMode");
     try {

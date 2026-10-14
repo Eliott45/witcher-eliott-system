@@ -1,4 +1,5 @@
 import { SCHOOL_GEAR, SCHOOL_DIAGRAMS, SCHOOL_MATERIALS } from "../scripts/data/witcher-school-gear.mjs";
+import { PROSTHETIC_RECIPES } from "../scripts/data/prosthetic-equipment.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { RECIPES } from "../scripts/data/workshop-recipes.mjs";
@@ -18,7 +19,7 @@ const get = id => [...materials, ...recipes].find(item => item.system.ruleId ===
 
 test("printed supplements are complete, independent of diagram prices, with leather/wax on p. 130", () => {
   const diagrams = recipes.filter(item => item.system.recipe.category === "diagram");
-  assert.equal(diagrams.length, Object.keys(DIAGRAM_INVESTMENTS).length + 5 + MANTICORE_RECIPES.length + SCHOOL_DIAGRAMS.length + EXPERIMENTAL_RECIPES.filter(entry => entry.system.recipe.category === "diagram").length);
+  assert.equal(diagrams.length, Object.keys(DIAGRAM_INVESTMENTS).length + 5 + MANTICORE_RECIPES.length + SCHOOL_DIAGRAMS.length + PROSTHETIC_RECIPES.length + EXPERIMENTAL_RECIPES.filter(entry => entry.system.recipe.category === "diagram").length);
   assert.ok(diagrams.every(item => Number.isFinite(item.system.recipe.investment) && item.system.recipe.investment > 0));
   assert.equal(get("diagram.material.hardened-timber").system.recipe.investment, 11);
   assert.equal(get("diagram.weapon.dagger").system.recipe.investment, 33);
@@ -46,7 +47,8 @@ test("owned and world recipes support exact/custom components, duplicate copies 
   const recipe = { uuid: "Item.recipe", name: "Чертёж", type: "recipe", system: { ruleId: "custom-diagram", recipe: {
     resultUuid: "Item.result", components: [{ uuid: material.uuid, quantity: 2 }, { uuid: material.uuid, quantity: 3 }], dc: 10
   } } };
-  const duplicate = { ...recipe, uuid: "Actor.hero.Item.recipe" };
+  const duplicate = { ...recipe, uuid: "Actor.hero.Item.recipe", system: { ...recipe.system, recipe: { ...recipe.system.recipe,
+    components: recipe.system.recipe.components.map(row => ({ quantity: row.quantity, substance: "", uuid: row.uuid })) } } };
   const variant = { ...recipe, uuid: "Item.variant", system: { ...recipe.system, recipe: { ...recipe.system.recipe, dc: 12 } } };
   const result = recipeRelations(material, [duplicate, recipe, variant]);
   assert.equal(result.uses.length, 2);

@@ -1,4 +1,5 @@
 import { CORE_CONTAINERS } from "./core-containers.mjs";
+import { BASIC_PROSTHESIS } from "./prosthetic-equipment.mjs";
 
 // Core RU pp.93–96. Canonical ruleId reuses the existing gear and Lifepath identities.
 // Situational mechanics describe future actions; carrying an item never grants these bonuses.
@@ -31,9 +32,7 @@ export const GENERAL_GEAR_RULES = {
   "gear.perfume": gear("Флакон духов или одеколона с выбранным ароматом для повседневного ухода за собой."),
   "gear.pipe": gear("Курительная трубка для табака. Табак приобретается отдельно."),
   "gear.stakes": gear("Набор из пяти металлических колышков для закрепления верёвок и палаток. Колышком можно воспользоваться как импровизированным оружием.", "Колышки: 5 шт.; Импровизированный урон 1d6", { packSize: 5, improvisedWeapon: { damage: "1d6" } }, ["При использовании колышка как оружия он наносит 1d6 урона. Вес и цена указаны за набор из пяти колышков."]),
-  "gear.simple-prosthesis": gear("Простая замена утраченной руки или ноги с ограниченной подвижностью: деревянная кисть для простого удержания вещей или опора для ходьбы.",
-    "Рука: простые действия, оружие держать нельзя; Нога: СКОР ×¾, −5 к Уклонению/Изворотливости и Атлетике", {},
-    ["Рука позволяет простые действия без точности (открыть дверь, схватить кого-то), но не держать оружие. Нога позволяет передвигаться с 3/4 Скорости, со штрафом −5 к Уклонению/Изворотливости и Атлетике.", PROSTHESIS_USE]),
+  "gear.simple-prosthesis": gear(BASIC_PROSTHESIS.system.description, BASIC_PROSTHESIS.system.properties),
   "gear.quality-prosthesis": gear("Более сложный протез с деревянными и металлическими деталями, шарнирами и тягами. Обеспечивает большую подвижность по сравнению с простым протезом.",
     "Рука: оружие со штрафом −5; Нога: обычная СКОР, −3 к Уклонению/Изворотливости и Атлетике", {},
     ["Рука позволяет простые действия без точности и держать оружие со штрафом −5. Нога позволяет передвигаться с обычной Скоростью, со штрафом −3 к Уклонению/Изворотливости и Атлетике.", PROSTHESIS_USE], 95),
@@ -76,6 +75,10 @@ export const GENERAL_GEAR_RULES = {
 export const getGeneralGearRules = item => GENERAL_GEAR_RULES[item.system?.ruleId]?.mechanics ?? null;
 
 export function generalGearContent(ruleId) {
+  if (ruleId === BASIC_PROSTHESIS.id) {
+    const { description, properties, source } = BASIC_PROSTHESIS.system;
+    return { description, properties, source };
+  }
   const entry = GENERAL_GEAR_RULES[ruleId];
   if (!entry) return null;
   const container = CORE_CONTAINERS[ruleId];
@@ -122,7 +125,7 @@ export const CORE_GENERAL_ADDITIONS = [
   ["fashionable-clothing", "Модная одежда", 2, 70],
   ["jewelry", "Украшения", .5, 50],
   ["dark-clothing", "Тёмная одежда", 1.5, 50]
-].map(([id, name, weight, price], index) => ({
+].map(([id, name, weight, price], index) => id === "simple-prosthesis" ? structuredClone(BASIC_PROSTHESIS) : ({
   id: `gear.${id}`, documentId: `ggen${String(index + 1).padStart(12, "0")}`, name, type: "equipment", source: "core",
   system: { weight, price, kind: CORE_CONTAINERS[`gear.${id}`] ? "container" : "gear", ...CORE_CONTAINERS[`gear.${id}`], ...generalGearContent(`gear.${id}`) }
 }));

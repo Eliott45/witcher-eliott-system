@@ -1,3 +1,4 @@
+import { chaosHandError } from "../data/prosthetic-rules.mjs";
 import { validateSchoolReaction } from "../combat/school-gear-rules.mjs";
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { handActionError } from "../combat/shield-master.mjs";
@@ -51,7 +52,7 @@ export function castingQuote(actor,item,{cost,focusId="",maintenance=false,dc,he
   if(item.system.ruleId==="sign.yrden"&&!game.user.isGM&&!game.users?.activeGM)throw new Error("Для размещения Ирдена нужен подключённый ведущий.");
   const conditions=conditionRules(actor);
   if(!actor.isOwner || !(item.system.ruleId==="spell.dispel"?conditions.canDefend:conditions.canAct))throw new Error("Персонаж сейчас не может творить магию.");
-  const handError = !maintenance && item.system.kind === "sign" ? handActionError(actor, "sign") : "";
+  const handError = maintenance ? "" : item.system.kind === "sign" ? handActionError(actor, "sign") : chaosHandError(actor);
   if (handError) throw new Error(handError);
   const active=actor.items.get(actor.system.magic.sustainedId);
   if(maintenance) {

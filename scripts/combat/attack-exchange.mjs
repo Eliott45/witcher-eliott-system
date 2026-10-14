@@ -1,3 +1,4 @@
+import { originalProsthesis } from "../data/prosthetic-rules.mjs";
 import { schoolCriticalLevel } from "./school-gear-rules.mjs";
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
 import { sizeClassOf } from "../data/creatures.mjs";
@@ -205,7 +206,7 @@ function exchangeLocation(message, index) {
   const attack = flagsOf(message).weaponAttack, outcome = exchangeOutcome(message, index);
   const plan = bodyPlanOf(targetActor(attack));
   // A body block takes the blow on the blocking arm (core p.164); no location roll.
-  if (outcome?.limbBlock) return attackLocation("leftArm", plan);
+  if (outcome?.limbBlock) return attackLocation(flagsOf(outcome.defense).defense?.defendingLimb ?? "leftArm", plan);
   if (criticalPicksLocation(attack, outcome)) return null;
   return attack.location === "random" ? exchangeOf(linked(message.id, index, "location"))?.location
     : attackLocation(attack.location, plan);
@@ -318,7 +319,7 @@ export function damagePreview(message, index) {
   if (preview.magicShield) preview.result = { ...preview.result, steps: [{ label: "Магический щит", value: `−${preview.magicShield}`, detail: "поглощено до брони" }, ...preview.result.steps] };
   // Core p.160: a blow to a prosthesis does not hurt its owner, but knocks the prosthesis off.
   const fitted = prosthesisAt(target, data.location.id);
-  if (fitted) {
+  if (fitted && !originalProsthesis(fitted.item)) {
     preview.prosthesis = { effectId: fitted.effect.id, itemId: fitted.item.id, name: fitted.item.name };
     preview.result = { ...preview.result, total: 0, ablate: [], penetrated: false,
       steps: [...preview.result.steps, { label: "Удар пришёлся в протез", value: 0, detail: `${fitted.item.name} отваливается, владелец урона не получает` }] };

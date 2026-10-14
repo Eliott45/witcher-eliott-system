@@ -14,6 +14,7 @@ import { dimeritiumModifiers } from "../magic/dimeritium.mjs";
 import { creatureModeModifiers, creatureIsAmphibian, creatureProfile, creatureMovementMode } from "./creature-modes.mjs";
 import { hagModifiers } from "./hag-circle.mjs";
 import { peasantModifiers, stewRank } from "./peasant-rules.mjs";
+import { wheelchair, mobilityWoundSources, mobilityPenalty } from "./prosthetic-rules.mjs";
 
 export const ATTRIBUTE_KEYS = ["intelligence", "reflex", "dexterity", "body", "speed", "empathy", "craft", "will", "luck"];
 
@@ -38,6 +39,13 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
   if (mealArmor > racialArmor) modifiers.push({source:"peasant.stew.harvest",label:"Симфония урожая",category:"effect",target:"naturalArmor",value:mealArmor-racialArmor});
   const reputationTotal = reputationLevel(reputation.value, reputationBonus);
   modifiers.push(...reputationModifiers(reputation, reputationTotal));
+  const chair = wheelchair({ items }), mobilitySources = mobilityWoundSources(effects);
+  if (chair) {
+    for (let i = modifiers.length - 1; i >= 0; i--) {
+      if (["attributes.speed", "skills.dodgeEscape", "skills.athletics"].includes(modifiers[i].target)
+        && mobilityPenalty(modifiers[i], mobilitySources)) modifiers.splice(i, 1);
+    }
+  }
   const ev = armorEncumbrance(items, modifierTotal(modifiers, "armorEncumbrance"));
   for (const target of ["attributes.reflex", "attributes.dexterity", "skills.spellCasting", "skills.hexWeaving", "skills.ritualCrafting"])
     if (ev) modifiers.push({ source: "equipment.ev", label: "Скованность брони", category: "equipment", target, value: -ev });
@@ -77,6 +85,18 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
     return [key, value !== null && wounded && !ignoresWoundPenalty && WOUNDED_ATTRIBUTES.has(key) ? Math.floor(value / 2) : value];
   }));
   const { speed } = effective;
+  // Only these skill bases ignore attribute reductions from wounds. Other checks retain them.
+  const mobilityAttributes = {};
+  if (chair) for (const [skill, attribute] of [["dodgeEscape", "reflex"], ["athletics", "dexterity"]]) {
+    const kept = modifiers.filter(mod => !mobilityPenalty(mod, mobilitySources));
+    let value = attributes[attribute] === null ? null : Math.floor((attributes[attribute] + modifierTotal(kept, `attributes.${attribute}`)) * modifierFactor(kept, `attributes.${attribute}`));
+    if (value !== null) {
+      value = Math.max(ev ? 1 : 0, value);
+      if (dying || dead) value = Math.floor(value / 3);
+      else if (wounded && !ignoresWoundPenalty) value = Math.floor(value / 2);
+    }
+    mobilityAttributes[skill] = value;
+  }
   // Printed creature exceptions (bird RUN 10, fiend REC 11) override the ordinary formulas.
   // Movement still follows changes to SPEED, and recovery still receives its own effect modifiers.
   const flyingBird = creatureProfile(creatureActor)?.id === "bird" && creatureMovementMode(creatureActor, environment) === "flying";
@@ -89,7 +109,7 @@ export function deriveStatistics({ attributes, health, details = {}, abilityStat
     reputationBonus, reputation: reputationTotal, naturalArmor: modifierTotal(modifiers, "naturalArmor"),
     skillBonuses: Object.fromEntries([...new Set(modifiers.filter(modifier => modifier.target.startsWith("skills.")).map(modifier => modifier.target))]
       .map(target => [target.slice(7), modifierTotal(modifiers, target, abilityState.trustEnabled ? ["humanTarget"] : [])])),
-    initiative: effective.reflex,
+    initiative: effective.reflex, mobilityAttributes,
     run, leap: run === null ? null : Math.floor(run / 5),
     carryMax: effective.body === null ? null : (effective.body * 10 + modifierTotal(modifiers, "carryMax")) * (1 + modifierTotal(modifiers, "carryMultiplier"))
   };

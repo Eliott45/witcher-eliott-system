@@ -377,18 +377,24 @@ test("older chat damage and pre-rolled location snapshots remain usable", async 
   assert.equal(await rollExchangeLocation(f.message, 0), undefined);
 });
 
-test("a hit on a fitted prosthesis deals no damage to its owner", async t => {
+test("legacy core quality prosthesis falls off, while original DLC prostheses pass damage to the wearer", async t => {
   const f = fixture(t, { category: "necrophage", results: [10, 8] });
   await rollExchangeLocation(f.message, 0);
   await rollExchangeDamage(f.message, 0);
   assert.ok(damagePreview(f.message, 0).result.total > 0);
   const prosthesis = { id: "leg", name: "Качественный протез", system: { ruleId: "gear.quality-prosthesis", quantity: 1, equipped: true } };
   f.target.items = Object.assign([prosthesis], { get: id => id === "leg" ? prosthesis : undefined });
-  f.target.effects = [{ id: "wound", disabled: false, flags: { [SYSTEM_ID]: { criticalWound: { id: "dismembered-arm", arm: "leftArm", prosthesis: { itemId: "leg", quality: "quality" } } } } }];
+  f.target.effects = [{ id: "wound", disabled: false, flags: { [SYSTEM_ID]: { criticalWound: { id: "dismembered-arm", state: "treated", arm: "leftArm", prosthesis: { itemId: "leg", quality: "quality" } } } } }];
   const preview = damagePreview(f.message, 0);
   assert.equal(preview.result.total, 0);
   assert.deepEqual(preview.prosthesis, { effectId: "wound", itemId: "leg", name: "Качественный протез" });
   assert.match(preview.result.steps.at(-1).label, /протез/);
+  for (const ruleId of ["gear.simple-prosthesis", "gear.magical-prosthesis", "gear.witcher-prosthesis", "gear.conduit-prosthesis"]) {
+    prosthesis.system.ruleId = ruleId;
+    const original = damagePreview(f.message, 0);
+    assert.ok(original.result.total > 0, ruleId);
+    assert.equal(original.prosthesis, null, "The DLC does not detach the prosthesis or grant immunity");
+  }
 });
 
 test("alchemical freeze adds 2d6 before armor, breaks on application, and leaves ordinary freezing alone", async t => {

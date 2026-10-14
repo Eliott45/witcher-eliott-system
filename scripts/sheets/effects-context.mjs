@@ -15,6 +15,7 @@ import { escapeTooltip as esc } from "./statistics-tooltips.mjs";
 import { woundContext, stabilizeWound, setWoundState, setProsthesis, PROSTHESES } from "../combat/critical-wound-effects.mjs";
 import { stripPageReferences } from "../data/item-lore.mjs";
 import { canEditWound, editWound } from "./wound-editor.mjs";
+import { editMobility } from "./mobility-editor.mjs";
 
 export function toxicitySaveContext(sheet) {
   const effect = sheet.actor.effects.find(effect => activeEffect(effect) && isToxicityPoison(effect));
@@ -31,6 +32,7 @@ export async function effectsContext(sheet) {
     return {id:effect.id,name:legacy?game.i18n.localize(definition.name):effect.name,img:effect.img??definition?.img,inactive:effect.disabled||effect.isSuppressed,
       canRemove:sheet.isEditable&&(game.user.isGM||![DYING,DEAD,EXHAUSTED_STUN,UNCONSCIOUS].some(status=>effect.statuses.has(status))),
       canEditWound:sheet.isEditable&&canEditWound(effect),
+      disability: Boolean(rules.disability),
       toxicity:doseToxicity(effect),counter:effectCounter(effect),save,canSave:sheet.isEditable&&!pending&&canSaveEffect(sheet.actor,effect),
       saveHint:rules.save?.kind==="skill"?`${game.i18n.localize(`WITCHER.Skills.Entries.${rules.save.skill}.Label`)} · СЛ ${rules.save.dc}`:rules.save?.action,
       autoAllowed:Boolean(!rules.manualOnly&&rules.save&&rules.save.kind!=="death"&&rules.save.ends),autoSave:Boolean(rules.autoSave),
@@ -42,6 +44,7 @@ export async function effectsContext(sheet) {
 }
 const safe=fn=>async function(...args){try{return await fn.apply(this,args);}catch(error){console.error(error);ui.notifications.error(error.message);}};
 export const effectActions={
+  editMobility:safe(async function(_event,target){if(this.isEditable)await editMobility(this.actor, target.dataset.effectId ? this.actor.effects.get(target.dataset.effectId) : null);}),
   editWound:safe(async function(_event,target){
     if(!this.isEditable||target.disabled)return;target.disabled=true;
     try{await editWound(this.actor.effects.get(target.dataset.effectId));}finally{target.disabled=false;}
@@ -84,7 +87,7 @@ export const effectActions={
     if(!this.isEditable)return;
     const effect=this.actor.effects.get(target.dataset.effectId);if(!effect)return;
     const items=this.actor.items.filter(item=>PROSTHESES[item.system.ruleId]&&item.system.quantity>0&&item.system.carried!==false&&!item.system.containerId);
-    if(!items.length)throw new Error("В инвентаре нет протеза. Простой и качественный протезы есть в каталоге снаряжения.");
+    if(!items.length)throw new Error("В инвентаре нет протеза. Протезы есть в разделе «Протезы и инвалидные коляски» каталога снаряжения.");
     const id=items.length===1?items[0].id:await foundry.applications.api.DialogV2.prompt({window:{title:"Надеть протез"},
       content:`<label>Протез<select name="item">${items.map(item=>`<option value="${item.id}">${esc(item.name)}</option>`).join("")}</select></label>`,
       ok:{label:"Надеть",callback:(_e,button)=>new FormData(button.form).get("item")},rejectClose:false});

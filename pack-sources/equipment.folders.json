@@ -22,6 +22,17 @@
     "flags": {}
   },
   {
+    "_id": "gearProsthetic01",
+    "name": "Протезы и инвалидные коляски",
+    "type": "Item",
+    "description": "",
+    "folder": null,
+    "sorting": "a",
+    "sort": 0,
+    "color": "#947641",
+    "flags": {}
+  },
+  {
     "_id": "gearWitcherDLC01",
     "name": "Снаряжение ведьмака",
     "type": "Item",

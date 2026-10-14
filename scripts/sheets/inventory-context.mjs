@@ -1,3 +1,4 @@
+import { WHEELCHAIRS, PROSTHETIC_TYPES } from "../data/prosthetic-rules.mjs";
 import { isCrossbow, loadedBolt } from "../combat/crossbow-ammo.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { usableHands } from "../combat/critical-wound-effects.mjs";
@@ -61,7 +62,7 @@ export function inventoryContext(actor, preferences = {}) {
     isContainer: isContainer(item), parentId: containerParent(item, items)?.id ?? "", children: [], containerOpen: true,
     isRecipe: item.type === "recipe", oil: activeOil(item, globalThis.game?.time?.worldTime ?? 0), installations: item.system.installations ?? [],
     isWeapon: item.type === "weapon" && !item.system.natural, grip: gripOf(item),
-    category: equipmentCategory(item), search: equipmentEntry(item).search, canEquip: ["weapon", "armor"].includes(item.type) || isFocusItem(item),
+    category: equipmentCategory(item), search: equipmentEntry(item).search, canEquip: ["weapon", "armor"].includes(item.type) || isFocusItem(item) || Boolean(PROSTHETIC_TYPES[item.system.ruleId]) || Object.hasOwn(WHEELCHAIRS, item.system.ruleId),
     condition: conditionKey(item) ? effectiveItem(item)[conditionKey(item)] : null, conditionLabel: item.type === "armor" ? "ПБ" : "Н",
     crossbow: isCrossbow(item) ? { loaded: item.system.loaded !== false, bolt: loadedBolt(item)?.name ?? "" } : null,
     broken: isBroken(item), fittedOn: fittedLimbs(actor, item.id).join(", "),
@@ -126,6 +127,10 @@ export async function equipItem(_event, target) {
     const item = this.actor.items.get(target.dataset.itemId);
     if (!item || !isPhysical(item) || item.system.quantity <= 0) return;
     const updates = [];
+    if (!item.system.equipped && PROSTHETIC_TYPES[item.system.ruleId]) return void ui.notifications.info("Наденьте протез на вылеченную потерю конечности во вкладке «Эффекты».");
+    if (!item.system.equipped && Object.hasOwn(WHEELCHAIRS, item.system.ruleId)) {
+      for (const other of equippedItems(this.actor.items)) if (other.id !== item.id && Object.hasOwn(WHEELCHAIRS, other.system.ruleId)) updates.push({ _id: other.id, "system.equipped": false });
+    }
     if (!item.system.equipped && item.type === "armor") {
       // Up to three layers per zone, at most one medium and one heavy (core pp.154–155, errata).
       const plan = layeringPlan(item, equippedItems(this.actor.items));

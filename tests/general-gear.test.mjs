@@ -33,7 +33,7 @@ test("all sixty p93 physical items have descriptions, twenty-six additions have 
   assert.equal(all.find(item => item.system.ruleId === "shoulder-bag")._id, "gear000000000035");
   assert.match(all.find(item => item.system.ruleId === "sacred-symbol").system.description, /Великого Солнца/);
   assert.equal(all.find(item => item.system.ruleId === "sacred-symbol").folder, "gearFolderFamily");
-  assert.deepEqual(CORE_GENERAL_ADDITIONS.map(item => [item.system.weight, item.system.price]), [[.5,25],[.1,5],[1,38],[.1,18],[1,39],[.1,12],[.1,22],[1,50],[1.5,100],[2,50],[.1,4],[.5,10],[.1,11],[1.5,24],[.1,11],[.1,13],[1,18],[10,30],[1,10],[2.5,30],[5,100],[1,8],[1,5],[2,70],[.5,50],[1.5,50]]);
+  assert.deepEqual(CORE_GENERAL_ADDITIONS.map(item => [item.system.weight, item.system.price]), [[.5,25],[.1,5],[1,38],[.1,18],[1,39],[.1,12],[.1,22],[2,50],[1.5,100],[2,50],[.1,4],[.5,10],[.1,11],[1.5,24],[.1,11],[.1,13],[1,18],[10,30],[1,10],[2.5,30],[5,100],[1,8],[1,5],[2,70],[.5,50],[1.5,50]]);
   assert.equal(all.filter(item => item.system.ruleId === "alchemy.perfume").length, 1, "Perfume gear must not replace the alchemical compound");
 });
 

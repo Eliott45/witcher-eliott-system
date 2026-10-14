@@ -8,6 +8,7 @@ import { actionQuote, actionUpdate, actionNote, actionRoundKey } from "./action-
 import { attackerToken, selectedAttackTarget } from "./attack-target.mjs";
 import { ATTACK_LOCATIONS, RANGED_BANDS, bodyDamage, combatModifierParts, signed, canDualWield } from "./weapon-rules.mjs";
 import { usableHands } from "./critical-wound-effects.mjs";
+import { strikeLimbs, limbName } from "../data/prosthetic-rules.mjs";
 
 // Core p.163 «Борьба и рукопашный бой»: every unarmed attack is an action replacing a fast or strong attack and
 // deals non-lethal damage. Damage from the p.48 table: a kick is the punch +4.
@@ -34,16 +35,18 @@ export const UNARMED_MODES = [
 const TORSO = ATTACK_LOCATIONS.find(entry => entry.id === "torso");
 
 /** The same quote shape as a weapon attack, so the chat exchange handles defenses, location and damage alike. */
-export function unarmedAttack(actor, strike, { mode = "fast", extraPenalty = 0, location = "random", modifier = 0, targetContext = null, ambushBonus = 0 } = {}) {
+export function unarmedAttack(actor, strike, { mode = "fast", extraPenalty = 0, location = "random", modifier = 0, targetContext = null, ambushBonus = 0, limb } = {}) {
   const data = UNARMED_STRIKES[strike], attack = UNARMED_MODES.find(entry => entry.strike === strike && entry.id === mode);
   if (!data || !attack) throw new Error("Неизвестный удар.");
+  const limbs = strikeLimbs(actor, strike), usedLimb = limb ? limbs.find(entry => entry.limb === limb) : limbs.find(entry => entry.available);
+  if (limb && !usedLimb) throw new Error("Выберите конечность для этого удара.");
   const skill = skillValue(actor.system, "brawling");
   const aim = attack.push ? { ...TORSO, name: "Туловище (толчок)", penalty: 0 } : ATTACK_LOCATIONS.find(entry => entry.id === location);
   if (!aim || !Number.isFinite(Number(modifier))) throw new Error("Неверный модификатор атаки.");
   const parts = [{ label: "Основа навыка", value: skill?.total ?? null }, { label: attack.name, value: attack.penalty }, { label: "Дополнительное действие", value: extraPenalty },
     { label: aim.name, value: aim.penalty }, { label: "Ситуация", value: Number(modifier) }, ...(targetContext?.parts ?? []),
     ...(ambushBonus ? [{ label: "Засада", value: ambushBonus }] : []), ...combatModifierParts(actor, "combat.attack"),
-    ...(targetContext?.target?.actor ? combatModifierParts(targetContext.target.actor, "combat.targeted") : [])];
+    ...(targetContext?.target?.actor ? combatModifierParts(targetContext.target.actor, "combat.targeted") : []), ...(usedLimb?.parts ?? [])];
   const total = skill?.total == null ? null : parts.reduce((sum, part) => sum + (part.value ?? 0), 0);
   const body = actor.system.statistics?.effective?.body ?? null;
   const bonus = (actor.system.statistics?.meleeDamageBonus ?? 0) + (actor.system.statistics?.physicalDamageBonus ?? 0);
@@ -52,10 +55,21 @@ export function unarmedAttack(actor, strike, { mode = "fast", extraPenalty = 0, 
   // Push kick: a strong kick (×2) dealing half damage, i.e. the plain kick.
   const damage = attack.push ? `(${base}${bonus ? ` + ${bonus}` : ""})` : raw;
   const blocked = !conditionRules(actor).canAct ? "Нельзя действовать" : total === null ? "Заполните навык «Борьба»"
-    : data.hands > usableHands(actor) ? "Руки выведены из строя" : "";
-  return { name: `${data.name}${attack.push || attack.charge ? ` · ${attack.name}` : ""}`, weapon: { damageType: "", category: "melee", skill: "brawling" },
+    : !usedLimb?.available ? "Эта конечность недоступна" : data.hands > usableHands(actor) ? "Руки выведены из строя" : "";
+  return { name: `${data.name}${limb ? ` · ${limbName(limb)}` : ""}${attack.push || attack.charge ? ` · ${attack.name}` : ""}`, weapon: { damageType: "", category: "melee", skill: "brawling", properties: usedLimb?.silver ? "Серебряное (1d6)" : "" },
     attack: { ...attack, name: attack.push || attack.charge ? attack.name : `${data.name} · ${attack.name.toLocaleLowerCase("ru")}` },
-    skill, parts, total, damage, body: 0, bonus, aim, band: RANGED_BANDS[1], ranged: false, blocked, nonLethal: true, strike };
+    skill, parts, total, damage, body: 0, bonus, aim, band: RANGED_BANDS[1], ranged: false, blocked, nonLethal: true, strike, limb: usedLimb?.limb };
+}
+
+/** A side matters when an arm/leg is missing, injured or replaced; otherwise avoid an extra dialog. */
+export async function chooseStrikeLimb(actor, strike, limb, title = "Чем нанести удар?") {
+  if (limb) return limb;
+  const limbs = strikeLimbs(actor, strike);
+  if (!limbs.some(entry => entry.prosthesis || !entry.available || entry.parts.length)) return undefined;
+  if (!limbs.some(entry => entry.available)) return null;
+  return foundry.applications.api.DialogV2.wait({ window: { title },
+    content: `<p>${limbs.map(entry => `${esc(entry.name)}: ${esc(entry.prosthesis || (entry.available ? "без протеза" : "недоступна"))}${entry.silver ? " · +1d6 серебром" : ""}${entry.parts.length ? ` · штраф ${entry.parts.reduce((sum, part) => sum + part.value, 0)}` : ""}`).join("<br>")}</p>`,
+    buttons: limbs.filter(entry => entry.available).map(entry => ({ action: entry.limb, label: entry.name, callback: () => entry.limb })), rejectClose: false });
 }
 
 /** Unarmed buttons for the Actions tab. */

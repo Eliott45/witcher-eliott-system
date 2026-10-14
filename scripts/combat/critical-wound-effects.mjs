@@ -1,4 +1,5 @@
 import { evaluateRoll } from "../dice/minimum-roll.mjs";
+import { PROSTHETIC_TYPES, fittedProsthesis } from "../data/prosthetic-rules.mjs";
 import { SYSTEM_ID } from "../config.mjs";
 import { skillValue } from "../data/skills.mjs";
 import { CRITICAL_WOUNDS } from "../data/critical-wounds.mjs";
@@ -60,14 +61,13 @@ export const WOUND_RULES = {
   "dismembered-arm": { arm: true, limb: "arm", conditions: { fresh: ["bleeding"] }, mods: [disabledArm, disabledArm, disabledArm] },
   "dismembered-leg": { leg: true, limb: "leg", conditions: { fresh: ["bleeding"] }, mods: [mobilityFactor(0.25), mobilityFactor(0.25), mobilityFactor(0.25)] }
 };
-// Core p.160 «Протезы». A simple arm does simple tasks but holds no weapon; a quality arm holds one at −5.
-// A simple leg moves at ¾ SPD with −5 to Dodge/Escape and Athletics; a quality leg keeps SPD with −3.
-export const PROSTHESES = { "gear.simple-prosthesis": "simple", "gear.quality-prosthesis": "quality" };
+// Original Prostheses & Wheelchairs DLC replaces Basic rules; the legacy core Quality entry remains compatible.
+export const PROSTHESES = PROSTHETIC_TYPES;
 const PROSTHESIS_MODS = {
-  arm: { simple: () => disabledArm, quality: () => arm(-5) },
-  leg: { simple: () => [factor("attributes.speed", 0.75), ...skills(["dodgeEscape", "athletics"], -5)], quality: () => skills(["dodgeEscape", "athletics"], -3) }
+  arm: { simple: () => arm(-3), quality: () => arm(-5), magical: () => [], witcher: () => [], conduit: () => [] },
+  leg: { simple: () => skills(["dodgeEscape"], -1), quality: () => skills(["dodgeEscape", "athletics"], -3), magical: () => [], witcher: () => [], conduit: () => [] }
 };
-export const PROSTHESIS_NAMES = { simple: "простой", quality: "качественный" };
+export const PROSTHESIS_NAMES = { simple: "простой", quality: "качественный", magical: "магический", witcher: "ведьмачий", conduit: "фокусирующий" };
 export const WOUND_STATES = { fresh: "Не обработано", stabilized: "Стабилизировано", treated: "Вылечено" };
 const STATE_INDEX = { fresh: 0, stabilized: 1, treated: 2 };
 const ARMS = { rightArm: "Правая рука", leftArm: "Левая рука" };
@@ -86,7 +86,7 @@ export const linkedConditions = (id, state) => WOUND_RULES[id]?.conditions?.[sta
 /** Mechanics in plain words, so the sheet and the compendium say exactly what is automated. */
 function automationNotes(id, state, prosthesis = null) {
   const rules = WOUND_RULES[id] ?? {}, notes = [];
-  if (prosthesis?.quality) notes.push(`Протез (${PROSTHESIS_NAMES[prosthesis.quality]}) заменяет утраченную конечность. Удар в неё не наносит урона, но протез отваливается.`);
+  if (prosthesis?.quality) notes.push(`Протез (${PROSTHESIS_NAMES[prosthesis.quality]}) заменяет утраченную конечность. ${prosthesis.quality === "quality" ? "Удар в неё не наносит урона, но протез отваливается." : "Попадание перенаправляется на владельца. Протез остаётся на месте."}`);
   else if (rules.limb && state === "treated") notes.push("Можно надеть протез из инвентаря.");
   const conditions = linkedConditions(id, state);
   if (conditions.length) notes.push(`Накладывает: ${conditions.map(key => CONDITION_NAMES[key]).join(", ")}; снимается вместе со стабилизацией.`);
@@ -258,19 +258,14 @@ export async function setProsthesis(effect, item = null) {
 }
 /** The wound whose prosthesis replaces the limb at this hit location, if any. */
 export function prosthesisAt(actor, location) {
-  for (const effect of actor?.effects ?? []) {
-    const data = effect.flags?.[SYSTEM_ID]?.criticalWound;
-    if (effect.disabled || !data?.prosthesis?.itemId || data.arm !== location) continue;
-    const item = actor.items.get(data.prosthesis.itemId);
-    if (item) return { effect, item };
-  }
-  return null;
+  return fittedProsthesis(actor, location);
 }
 /** A prosthesis taken off the body (unequipped, dropped, deleted) no longer replaces the limb. */
 async function releaseProsthesis(item, userId) {
   const actor = item.parent;
   if (userId !== game.user.id || actor?.documentName !== "Actor") return;
-  const worn = actor.items.get(item.id)?.system.equipped && actor.items.get(item.id).system.quantity > 0;
+  const current = actor.items.get(item.id);
+  const worn = current?.system.equipped && current.system.quantity > 0 && current.system.carried !== false && !current.system.containerId;
   for (const effect of actor.effects.filter(other => other.flags?.[SYSTEM_ID]?.criticalWound?.prosthesis?.itemId === item.id))
     if (!worn) await setProsthesis(effect, null);
 }
